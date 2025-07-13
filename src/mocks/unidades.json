@@ -1,0 +1,17 @@
+[
+  {
+    "sigla": "STIC",
+    "situacao": "Em andamento",
+    "filhas": [
+      {
+        "sigla": "COSIS",
+        "situacao": "Não iniciado",
+        "filhas": [
+          { "sigla": "SEDESENV", "situacao": "Não iniciado", "filhas": [] },
+          { "sigla": "SESEL", "situacao": "Finalizado", "filhas": [] }
+        ]
+      },
+      { "sigla": "COINF", "situacao": "Finalizado", "filhas": [] }
+    ]
+  }
+] 

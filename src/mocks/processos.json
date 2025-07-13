@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "descricao": "Mapeamento de processos internos",
+    "tipo": "Mapeamento",
+    "unidades": "STIC, COSIS",
+    "dataLimite": "30/06/2024",
+    "situacao": "Em andamento"
+  },
+  {
+    "id": 2,
+    "descricao": "Revisão de procedimentos",
+    "tipo": "Revisão",
+    "unidades": "COINF",
+    "dataLimite": "15/07/2024",
+    "situacao": "Não iniciado"
+  },
+  {
+    "id": 3,
+    "descricao": "Diagnóstico de sistemas",
+    "tipo": "Diagnóstico",
+    "unidades": "COSIS",
+    "dataLimite": "10/08/2024",
+    "situacao": "Finalizado"
+  }
+] 

@@ -1,0 +1,36 @@
+[
+  {
+    "descricao": "Manutenção de sistemas administrativos criados pela unidade",
+    "conhecimentos": [
+      "Criação de testes de integração em Cypress",
+      "Criação de testes em Playwright",
+      "Programação em Java",
+      "Programação em JavaScript/Vue",
+      "Correções de vulnerabilidades"
+    ]
+  },
+  {
+    "descricao": "Especificação de sistemas administrativos",
+    "conhecimentos": [
+      "Modelagem de dados",
+      "Especificação de requisitos e casos de uso",
+      "Especificação de testes de aceitação"
+    ]
+  },
+  {
+    "descricao": "Implantação de sistemas externos",
+    "conhecimentos": []
+  },
+  {
+    "descricao": "Testes de Sistemas Eleitorais",
+    "conhecimentos": []
+  },
+  {
+    "descricao": "Participação em Simulados Eleitorais",
+    "conhecimentos": []
+  },
+  {
+    "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
+    "conhecimentos": []
+  }
+] 
