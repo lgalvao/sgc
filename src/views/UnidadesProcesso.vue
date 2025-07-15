@@ -49,6 +49,14 @@ const unidadesParticipantes = computed(() => {
   return processo.value.unidades.split(',').map(u => u.trim())
 })
 
+function consolidarSituacaoUnidade(unidade) {
+  if (!unidade.filhas || unidade.filhas.length === 0) return unidade.situacao || 'Não iniciado'
+  const situacoes = unidade.filhas.map(consolidarSituacaoUnidade)
+  if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
+  if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
+  return 'Não iniciado'
+}
+
 function filtrarHierarquiaPorParticipantes(unidades, participantes) {
   // Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
   return unidades
@@ -61,6 +69,7 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
       if (isParticipante || filhasFiltradas.length > 0) {
         return {
           ...unidade,
+          situacao: consolidarSituacaoUnidade({ ...unidade, filhas: filhasFiltradas }),
           filhas: filhasFiltradas
         }
       }
@@ -72,7 +81,8 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
 const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
 
 function abrirAtividadesConhecimentos(sigla) {
-  router.push(`/processos/${processoId.value}/unidade/${sigla}/atividades`)
+  // router.push(`/processos/${processoId.value}/unidade/${sigla}/atividades`)
+  router.push({ path: `/unidade/${sigla}`, query: { processoId: processoId.value } })
 }
 function expandirTodos(unidadesArr) {
   for (const unidade of unidadesArr) {

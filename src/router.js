@@ -53,6 +53,11 @@ const routes = [
     name: 'UnidadesProcesso',
     component: () => import('./views/UnidadesProcesso.vue'),
   },
+  {
+    path: '/unidade/:sigla',
+    name: 'DetalheUnidade',
+    component: () => import('./views/DetalheUnidade.vue'),
+  },
 ]
 
 const router = createRouter({

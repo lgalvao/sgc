@@ -29,7 +29,7 @@
             <td>{{ processo.tipo }}</td>
             <td>{{ processo.unidades }}</td>
             <td>{{ processo.dataLimite }}</td>
-            <td>{{ processo.situacao }}</td>
+            <td>{{ consolidarSituacaoProcesso(processo) }}</td>
           </tr>
         </tbody>
       </table>
@@ -90,6 +90,7 @@ import { usePerfil } from '../composables/usePerfil'
 import { storeToRefs } from 'pinia'
 import { usePainelStore } from '../stores/painel'
 import { useProcessosStore } from '../stores/processos'
+import { useUnidadesStore } from '../stores/unidades'
 import { useRouter } from 'vue-router'
 import painelSEDOC from '../mocks/painel/painel_SEDOC.json'
 import painelGESTOR from '../mocks/painel/painel_GESTOR.json'
@@ -108,6 +109,8 @@ const dadosPainel = storeToRefs(painelStore)
 
 const processosStore = useProcessosStore()
 const { processos } = storeToRefs(processosStore)
+const unidadesStore = useUnidadesStore()
+const { unidades } = storeToRefs(unidadesStore)
 const router = useRouter()
 
 function abrirUnidades(id) {
@@ -121,5 +124,24 @@ function badgeClass(status) {
   if (status === 'info' || status === 'Novo') return 'bg-info text-dark'
   if (status === 'danger' || status === '!') return 'bg-danger'
   return 'bg-secondary'
+}
+
+function getSituacaoUnidade(sigla, unidades) {
+  for (const unidade of unidades) {
+    if (unidade.sigla === sigla) return unidade.situacao
+    if (unidade.filhas && unidade.filhas.length) {
+      const found = getSituacaoUnidade(sigla, unidade.filhas)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+function consolidarSituacaoProcesso(processo) {
+  const participantes = processo.unidades.split(',').map(u => u.trim())
+  const situacoes = participantes.map(sigla => getSituacaoUnidade(sigla, unidades.value) || 'Não iniciado')
+  if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
+  if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
+  return 'Não iniciado'
 }
 </script> 
