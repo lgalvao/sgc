@@ -1,28 +1,78 @@
 <template>
   <div class="container mt-4">
-    <h2>Unidades participantes do processo</h2>
-    <div class="list-group mt-4">
-      <TreeNode
-        v-for="unidade in unidades"
-        :key="unidade.sigla"
-        :unidade="unidade"
-        :abertas="abertas"
-        @abrir="abrirAtividadesConhecimentos"
-      />
+    <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
+    <h2>Detalhes do Processo</h2>
+    <div v-if="processo">
+      <div class="mb-3">
+        <strong>Descrição:</strong> {{ processo.descricao }}<br>
+        <strong>Tipo:</strong> {{ processo.tipo }}<br>
+        <strong>Data limite:</strong> {{ processo.dataLimite }}<br>
+        <strong>Situação:</strong> {{ processo.situacao }}<br>
+      </div>
+      <h4 class="mt-4">Unidades participantes</h4>
+      <div class="list-group mt-2">
+        <TreeNode
+          v-for="unidade in participantesHierarquia"
+          :key="unidade.sigla"
+          :unidade="unidade"
+          :abertas="abertas"
+          @abrir="abrirAtividadesConhecimentos"
+        />
+      </div>
+    </div>
+    <div v-else>
+      <p>Processo não encontrado.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useProcessosStore } from '../stores/processos'
+import { useUnidadesStore } from '../stores/unidades'
 import TreeNode from '../components/TreeNode.vue'
-import unidadesJson from '../mocks/unidades.json'
+
+const route = useRoute()
 const router = useRouter()
-const unidades = ref(unidadesJson)
+const processosStore = useProcessosStore()
+const { processos } = storeToRefs(processosStore)
+const unidadesStore = useUnidadesStore()
+const { unidades } = storeToRefs(unidadesStore)
 const abertas = ref({})
+
+const processoId = computed(() => Number(route.params.id))
+const processo = computed(() => processos.value.find(p => p.id === processoId.value))
+const unidadesParticipantes = computed(() => {
+  if (!processo.value) return []
+  return processo.value.unidades.split(',').map(u => u.trim())
+})
+
+function filtrarHierarquiaPorParticipantes(unidades, participantes) {
+  // Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
+  return unidades
+    .map(unidade => {
+      let filhasFiltradas = []
+      if (unidade.filhas && unidade.filhas.length) {
+        filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhas, participantes)
+      }
+      const isParticipante = participantes.includes(unidade.sigla)
+      if (isParticipante || filhasFiltradas.length > 0) {
+        return {
+          ...unidade,
+          filhas: filhasFiltradas
+        }
+      }
+      return null
+    })
+    .filter(Boolean)
+}
+
+const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
+
 function abrirAtividadesConhecimentos(sigla) {
-  router.push(`/processos/1/unidade/${sigla}/atividades`)
+  router.push(`/processos/${processoId.value}/unidade/${sigla}/atividades`)
 }
 function expandirTodos(unidadesArr) {
   for (const unidade of unidadesArr) {
@@ -33,8 +83,12 @@ function expandirTodos(unidadesArr) {
   }
 }
 onMounted(() => {
-  expandirTodos(unidades.value)
+  expandirTodos(participantesHierarquia.value)
 })
+
+function voltar() {
+  router.back()
+}
 </script>
 
 <style scoped>

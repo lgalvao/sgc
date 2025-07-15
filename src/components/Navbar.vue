@@ -2,9 +2,15 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
       <router-link class="navbar-brand" to="/painel">SGC</router-link>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+      <button class="navbar-toggler" type="button" 
+              data-bs-toggle="collapse" 
+              data-bs-target="#navbarNav" 
+              aria-controls="navbarNav" 
+              aria-expanded="false" 
+              aria-label="Alternar navegação">
         <span class="navbar-toggler-icon"></span>
       </button>
+      
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item" v-if="isPainelVisible">
@@ -26,9 +32,9 @@
             <router-link class="nav-link" to="/processos/1/unidade/1/atividades">Atividades</router-link>
           </li>
         </ul>
+      
         <ul class="navbar-nav align-items-center">
           <li class="nav-item me-2">
-            <!-- Seletor de perfil minimalista -->
             <select v-model="perfilValue" class="form-select form-select-sm">
               <option value="SEDOC">SEDOC</option>
               <option value="CHEFE">CHEFE</option>
@@ -52,6 +58,7 @@ const perfilValue = computed({
   get: () => perfil.value,
   set: v => { perfil.setPerfil(v) }
 })
+
 // Lógica minimalista para exibição dos menus conforme perfil
 const isPainelVisible = computed(() => true)
 const isProcessosVisible = computed(() => perfil.value === 'SEDOC' || perfil.value === 'GESTOR')

@@ -1,6 +1,8 @@
 <template>
   <div class="container mt-4">
+    <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
     <h2>Atividades e Conhecimentos</h2>
+    <div class="mb-3"><strong>Unidade:</strong> {{ siglaUnidade }}</div>
     <!-- Adicionar nova atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
@@ -38,19 +40,43 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import atividadesConhecimentosSESEL from '../mocks/atividades_conhecimentos_SESEL.json'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
+import { useUnidadesStore } from '../stores/unidades'
 
 const route = useRoute()
+const unidadeId = computed(() => route.params.unidadeId)
+const store = useAtividadesConhecimentosStore()
+const { atividadesPorUnidade } = storeToRefs(store)
+const unidadesStore = useUnidadesStore()
+
+function buscarSigla(unidades, sigla) {
+  for (const unidade of unidades) {
+    if (unidade.sigla === sigla) return unidade.sigla
+    if (unidade.filhas && unidade.filhas.length) {
+      const encontrada = buscarSigla(unidade.filhas, sigla)
+      if (encontrada) return encontrada
+    }
+  }
+  return sigla // fallback
+}
+
+const siglaUnidade = computed(() => buscarSigla(unidadesStore.unidades, unidadeId.value))
+
 let idAtividade = 1
 let idConhecimento = 1
-const atividades = ref([])
 const novaAtividade = ref('')
+
+const atividades = computed({
+  get: () => atividadesPorUnidade.value[unidadeId.value] || [],
+  set: (val) => store.setAtividades(unidadeId.value, val)
+})
 
 function adicionarAtividade() {
   if (novaAtividade.value.trim()) {
-    atividades.value.push({
+    store.adicionarAtividade(unidadeId.value, {
       id: idAtividade++,
       descricao: novaAtividade.value,
       conhecimentos: [],
@@ -61,13 +87,13 @@ function adicionarAtividade() {
 }
 
 function removerAtividade(idx) {
-  atividades.value.splice(idx, 1)
+  store.removerAtividade(unidadeId.value, idx)
 }
 
 function adicionarConhecimento(idx) {
   const atividade = atividades.value[idx]
   if (atividade.novoConhecimento && atividade.novoConhecimento.trim()) {
-    atividade.conhecimentos.push({
+    store.adicionarConhecimento(unidadeId.value, idx, {
       id: idConhecimento++,
       descricao: atividade.novoConhecimento
     })
@@ -76,18 +102,19 @@ function adicionarConhecimento(idx) {
 }
 
 function removerConhecimento(idx, cidx) {
-  atividades.value[idx].conhecimentos.splice(cidx, 1)
+  store.removerConhecimento(unidadeId.value, idx, cidx)
+}
+
+const router = useRouter()
+
+function voltar() {
+  router.back()
 }
 
 onMounted(() => {
-  // Se a unidade for SESEL, carregar dados do JSON
-  if (route.params.unidadeId === 'SESEL') {
-    atividades.value = atividadesConhecimentosSESEL.map(a => ({
-      id: idAtividade++,
-      descricao: a.descricao,
-      conhecimentos: a.conhecimentos.map(desc => ({ id: idConhecimento++, descricao: desc })),
-      novoConhecimento: ''
-    }))
+  // Se a unidade for SESEL e ainda não estiver carregada, inicializa do mock (já feito no store)
+  if (unidadeId.value === 'SESEL' && !atividadesPorUnidade.value.SESEL) {
+    store.setAtividades('SESEL', store.atividadesPorUnidade.SESEL)
   }
 })
 </script> 

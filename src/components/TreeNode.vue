@@ -1,7 +1,7 @@
 <template>
   <div
     class="list-group-item"
-    :class="{'unidade-folha': !unidade.filhas.length, 'unidade-folha-hover': folhaHover}"
+    :class="{'unidade-folha': !unidade.filhas.length, 'unidade-folha-hover': folhaHover, 'participante': isParticipante()}"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
     @click.stop="onClickNode"
@@ -21,6 +21,7 @@
         {{ unidade.sigla }}
       </strong>
       <span class="badge bg-secondary ms-2">{{ unidade.situacao }}</span>
+      <span v-if="isParticipante()" class="badge bg-success ms-2">Participante</span>
     </div>
     <div v-if="unidade.filhas.length && abertas[unidade.sigla]" class="ms-4 mt-2">
       <TreeNode
@@ -28,6 +29,7 @@
         :key="filha.sigla"
         :unidade="filha"
         :abertas="abertas"
+        :participantes="participantes"
         @abrir="$emit('abrir', $event)"
       />
     </div>
@@ -38,7 +40,8 @@
 import { ref } from 'vue'
 const props = defineProps({
   unidade: Object,
-  abertas: Object
+  abertas: Object,
+  participantes: Array // nova prop
 })
 const emit = defineEmits(['abrir'])
 const folhaHover = ref(false)
@@ -61,6 +64,7 @@ function onClickNode() {
     abrirFolha()
   }
 }
+const isParticipante = () => props.participantes && props.participantes.includes(props.unidade.sigla)
 </script>
 
 <style scoped>
@@ -75,5 +79,8 @@ function onClickNode() {
 .unidade-folha-hover strong,
 .unidade-folha-hover .badge {
   color: #fff !important;
+}
+.participante {
+  background: #e6ffe6 !important;
 }
 </style> 

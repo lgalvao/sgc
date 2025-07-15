@@ -5,13 +5,14 @@
     "filhas": [
       {
         "sigla": "COSIS",
-        "situacao": "Não iniciado",
+        "situacao": "Em andamento",
         "filhas": [
           { "sigla": "SEDESENV", "situacao": "Não iniciado", "filhas": [] },
-          { "sigla": "SESEL", "situacao": "Finalizado", "filhas": [] }
+          { "sigla": "SEDIA", "situacao": "Não iniciado", "filhas": [] },
+          { "sigla": "SESEL", "situacao": "Em andamento", "filhas": [] }
         ]
       },
-      { "sigla": "COINF", "situacao": "Finalizado", "filhas": [] }
+      { "sigla": "COSINF", "situacao": "Finalizado", "filhas": [] }
     ]
   }
 ] 

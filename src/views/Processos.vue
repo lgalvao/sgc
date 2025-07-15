@@ -6,37 +6,38 @@
     </div>
     <table class="table table-striped mt-4">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>Descrição</th>
-          <th>Tipo</th>
-          <th>Unidades participantes</th>
-          <th>Data limite</th>
-          <th>Situação</th>
-        </tr>
+      <tr>
+        <th>#</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Unidades participantes</th>
+        <th>Data limite</th>
+        <th>Situação</th>
+      </tr>
       </thead>
       <tbody>
-        <tr v-for="(processo, idx) in processos" :key="processo.id" @click="abrirUnidades(processo.id)" style="cursor:pointer">
-          <td>{{ processo.id }}</td>
-          <td>{{ processo.descricao }}</td>
-          <td>{{ processo.tipo }}</td>
-          <td>{{ processo.unidades }}</td>
-          <td>{{ processo.dataLimite }}</td>
-          <td>{{ processo.situacao }}</td>
-        </tr>
+      <tr v-for="(processo, idx) in processos" :key="processo.id" @click="abrirUnidades(processo.id)"
+          style="cursor:pointer">
+        <td>{{ processo.id }}</td>
+        <td>{{ processo.descricao }}</td>
+        <td>{{ processo.tipo }}</td>
+        <td>{{ processo.unidades }}</td>
+        <td>{{ processo.dataLimite }}</td>
+        <td>{{ processo.situacao }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
 </template>
 
 <script setup>
-// Lista fictícia de processos importada de JSON
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import processosJson from '../mocks/processos.json'
-const router = useRouter()
+import {useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useProcessosStore} from '../stores/processos'
 
-const processos = ref(processosJson)
+const router = useRouter()
+const processosStore = useProcessosStore()
+const {processos} = storeToRefs(processosStore)
 
 function abrirUnidades(id) {
   router.push(`/processos/${id}/unidades`)
