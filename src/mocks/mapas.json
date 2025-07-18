@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "unidade": "SESEL",
+    "status": "em_andamento",
+    "competencias": [
+      {
+        "id": 1,
+        "descricao": "Acompanhamento de processos eleitorais.",
+        "atividadesAssociadas": [
+          6
+        ]
+      },
+      {
+        "id": 2,
+        "descricao": "Implantação de sistemas.",
+        "atividadesAssociadas": [
+          1
+        ]
+      },
+      {
+        "id": 2,
+        "descricao": "Testes de sistemas eleitorais.",
+        "atividadesAssociadas": [
+          4,
+          5
+        ]
+      }
+    ],
+    "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": null,
+    "dataFinalizacao": null
+  }
+]

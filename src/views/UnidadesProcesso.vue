@@ -12,11 +12,11 @@
       <h4 class="mt-4">Unidades participantes</h4>
       <div class="list-group mt-2">
         <TreeNode
-          v-for="unidade in participantesHierarquia"
-          :key="unidade.sigla"
-          :unidade="unidade"
-          :abertas="abertas"
-          @abrir="abrirAtividadesConhecimentos"
+            v-for="unidade in participantesHierarquia"
+            :key="unidade.sigla"
+            :unidade="unidade"
+            :abertas="abertas"
+            @abrir="abrirAtividadesConhecimentos"
         />
       </div>
     </div>
@@ -27,19 +27,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useProcessosStore } from '../stores/processos'
-import { useUnidadesStore } from '../stores/unidades'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useProcessosStore} from '../stores/processos'
+import {useUnidadesStore} from '../stores/unidades'
 import TreeNode from '../components/TreeNode.vue'
 
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
-const { processos } = storeToRefs(processosStore)
+const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
-const { unidades } = storeToRefs(unidadesStore)
+const {unidades} = storeToRefs(unidadesStore)
 const abertas = ref({})
 
 const processoId = computed(() => Number(route.params.id))
@@ -60,30 +60,30 @@ function consolidarSituacaoUnidade(unidade) {
 function filtrarHierarquiaPorParticipantes(unidades, participantes) {
   // Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
   return unidades
-    .map(unidade => {
-      let filhasFiltradas = []
-      if (unidade.filhas && unidade.filhas.length) {
-        filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhas, participantes)
-      }
-      const isParticipante = participantes.includes(unidade.sigla)
-      if (isParticipante || filhasFiltradas.length > 0) {
-        return {
-          ...unidade,
-          situacao: consolidarSituacaoUnidade({ ...unidade, filhas: filhasFiltradas }),
-          filhas: filhasFiltradas
+      .map(unidade => {
+        let filhasFiltradas = []
+        if (unidade.filhas && unidade.filhas.length) {
+          filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhas, participantes)
         }
-      }
-      return null
-    })
-    .filter(Boolean)
+        const isParticipante = participantes.includes(unidade.sigla)
+        if (isParticipante || filhasFiltradas.length > 0) {
+          return {
+            ...unidade,
+            situacao: consolidarSituacaoUnidade({...unidade, filhas: filhasFiltradas}),
+            filhas: filhasFiltradas
+          }
+        }
+        return null
+      })
+      .filter(Boolean)
 }
 
 const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
 
 function abrirAtividadesConhecimentos(sigla) {
-  // router.push(`/processos/${processoId.value}/unidade/${sigla}/atividades`)
-  router.push({ path: `/unidade/${sigla}`, query: { processoId: processoId.value } })
+  router.push({path: `/unidade/${sigla}`, query: {processoId: processoId.value}})
 }
+
 function expandirTodos(unidadesArr) {
   for (const unidade of unidadesArr) {
     if (unidade.filhas && unidade.filhas.length) {
@@ -92,6 +92,7 @@ function expandirTodos(unidadesArr) {
     }
   }
 }
+
 onMounted(() => {
   expandirTodos(participantesHierarquia.value)
 })
@@ -101,11 +102,13 @@ function voltar() {
 }
 </script>
 
+<!--suppress CssUnusedSymbol -->
 <style scoped>
 .unidade-folha {
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .unidade-folha:hover {
   background: #e9ecef;
 }

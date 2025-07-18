@@ -1,9 +1,9 @@
 [
   {
     "id": 1,
-    "descricao": "Mapeamento de processos internos",
+    "descricao": "Mapeamento de processos da STIC",
     "tipo": "Mapeamento",
-    "unidades": "STIC, COSIS",
+    "unidades": "STIC, COSIS, SESEL, SEDESENV",
     "dataLimite": "30/06/2025",
     "situacao": "Em andamento"
   },

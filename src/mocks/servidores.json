@@ -1,0 +1,93 @@
+[
+    {
+        "id": 1,
+        "nome": "Ana Paula Souza",
+        "unidade": "SESEL",
+        "email": "ana.souza@org.br",
+        "ramal": "1234"
+    },
+    {
+        "id": 2,
+        "nome": "Carlos Henrique Lima",
+        "unidade": "SEADM",
+        "email": "carlos.lima@org.br",
+        "ramal": "2345"
+    },
+    {
+        "id": 3,
+        "nome": "Fernanda Oliveira",
+        "unidade": "SETEC",
+        "email": "fernanda.oliveira@org.br",
+        "ramal": "3456"
+    },
+    {
+        "id": 4,
+        "nome": "João Batista Silva",
+        "unidade": "SESEL",
+        "email": "joao.silva@org.br",
+        "ramal": "4567"
+    },
+    {
+        "id": 5,
+        "nome": "Marina Dias",
+        "unidade": "SEADM",
+        "email": "marina.dias@org.br",
+        "ramal": "5678"
+    },
+    {
+        "id": 6,
+        "nome": "Ricardo Alves",
+        "unidade": "SETEC",
+        "email": "ricardo.alves@org.br",
+        "ramal": "6789"
+    },
+    {
+        "id": 7,
+        "nome": "Zeca Gado",
+        "unidade": "STIC",
+        "email": "zeca.gado@org.br",
+        "ramal": "7001"
+    },
+    {
+        "id": 8,
+        "nome": "Paulo Minoso",
+        "unidade": "COSIS",
+        "email": "paulo.minoso@org.br",
+        "ramal": "7002"
+    },
+    {
+        "id": 9,
+        "nome": "Giuseppe Cadura",
+        "unidade": "SEDESENV",
+        "email": "giuseppe.cadura@org.br",
+        "ramal": "7003"
+    },
+    {
+        "id": 10,
+        "nome": "Paula Tejano",
+        "unidade": "SEDIA",
+        "email": "paula.tejano@org.br",
+        "ramal": "7004"
+    },
+    {
+        "id": 11,
+        "nome": "Kiko Branco",
+        "unidade": "SESEL",
+        "email": "kiko.branco@org.br",
+        "ramal": "7005"
+    },
+    {
+        "id": 12,
+        "nome": "Taís Condida",
+        "unidade": "SENIC",
+        "email": "tais.condida@org.br",
+        "ramal": "7006"
+    },
+    {
+        "id": 13,
+        "nome": "Mike Oxlong",
+        "unidade": "SESOP",
+        "email": "mike.oxlong@org.br",
+        "ramal": "7007"
+    }
+]

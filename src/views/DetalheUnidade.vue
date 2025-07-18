@@ -1,49 +1,83 @@
 <template>
   <div class="container mt-4">
-    <button class="btn btn-primary mb-3 me-2" @click="irParaAtividadesConhecimentos">Atividades e Conhecimentos</button>
-    <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
-    <h2>Detalhes da Unidade</h2>
-    <div v-if="unidade">
-      <div class="mb-3">
-        <strong>Sigla:</strong> {{ unidade.sigla }}<br>
-        <strong>Nome:</strong> {{ unidade.nome || unidade.sigla }}<br>
-        <strong>Responsável:</strong> {{ atribuicao?.nomeResponsavel || 'Não definido' }}<br>
-        <strong>Contato:</strong> {{ atribuicao?.contato || 'Não informado' }}<br>
-        <strong>Situação:</strong> <span class="badge" :class="badgeClass(unidade.situacao)">{{ unidade.situacao }}</span><br>
+    <!-- Breadcrumb e navegação -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a @click="router.push('/')" style="cursor:pointer">Início</a></li>
+          <li class="breadcrumb-item"><a @click="router.push('/unidades')" style="cursor:pointer">Unidades</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ unidade?.sigla }}</li>
+        </ol>
+      </nav>
+      <div>
+        <button class="btn btn-secondary me-2" @click="voltar">
+          <!-- Ícone de seta pode ser adicionado com Bootstrap Icons se disponível -->
+          Voltar
+        </button>
+        <button class="btn btn-primary" @click="irParaAtividadesConhecimentos">
+          Atividades e Conhecimentos
+        </button>
       </div>
-      <div class="mb-4">
-        <h5>Atribuição Temporária</h5>
-        <div v-if="atribuicao">
-          <p><strong>Responsável:</strong> {{ atribuicao.nomeResponsavel }}</p>
-          <p><strong>Data de início:</strong> {{ atribuicao.dataInicio }}</p>
-          <p><strong>Data de término:</strong> {{ atribuicao.dataTermino }}</p>
-          <button class="btn btn-warning btn-sm me-2" @click="editarAtribuicao">Editar</button>
-          <button class="btn btn-danger btn-sm" @click="removerAtribuicao">Remover</button>
-        </div>
-        <div v-else>
-          <button class="btn btn-primary btn-sm" @click="novaAtribuicao">Nova atribuição temporária</button>
-        </div>
-      </div>
-      <div class="mb-4">
-        <h5>Mapa de Competências</h5>
-        <div v-if="mapa">
-          <div v-if="mapa.status === 'em_andamento'">
-            <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar mapa</button>
-          </div>
-          <div v-else-if="mapa.status === 'disponivel_validacao'">
-            <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar mapa</button>
-          </div>
-          <div v-else>
-            <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar mapa</button>
-          </div>
-        </div>
-        <div v-else>
-          <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar mapa</button>
-        </div>
+    </div>
+
+    <!-- Card de informações da unidade -->
+    <div v-if="unidade" class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title mb-3">Detalhes da Unidade</h2>
+        <p><strong>Sigla:</strong> {{ unidade.sigla }}</p>
+        <p><strong>Nome:</strong> {{ unidade.nome || unidade.sigla }}</p>
+        <p><strong>Responsável:</strong> {{ atribuicao?.nomeResponsavel || 'Não definido' }}</p>
+        <p><strong>Contato:</strong> {{ atribuicao?.contato || 'Não informado' }}</p>
+        <p>
+          <strong>Situação:</strong>
+          <span class="badge" :class="badgeClass(unidade.situacao)">{{ unidade.situacao }}</span>
+        </p>
       </div>
     </div>
     <div v-else>
       <p>Unidade não encontrada.</p>
+    </div>
+
+    <!-- Cards de ações -->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Atribuição Temporária</h5>
+            <div v-if="atribuicao">
+              <p><strong>Responsável:</strong> {{ atribuicao.nomeResponsavel }}</p>
+              <p><strong>Data de início:</strong> {{ atribuicao.dataInicio }}</p>
+              <p><strong>Data de término:</strong> {{ atribuicao.dataTermino }}</p>
+              <button class="btn btn-warning btn-sm me-2" @click="editarAtribuicao">Editar</button>
+              <button class="btn btn-danger btn-sm" @click="removerAtribuicao">Remover</button>
+            </div>
+            <div v-else>
+              <button class="btn btn-primary btn-sm" @click="irParaCriarAtribuicao">Criar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Mapa de Competências</h5>
+            <div v-if="mapa">
+              <div v-if="mapa.status === 'em_andamento'">
+                <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar</button>
+              </div>
+              <div v-else-if="mapa.status === 'disponivel_validacao'">
+                <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar</button>
+              </div>
+              <div v-else>
+                <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar</button>
+              </div>
+            </div>
+            <div v-else>
+              <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Modais ou formulários para editar/criar atribuição/mapa podem ser adicionados aqui -->
   </div>
@@ -96,19 +130,18 @@ function editarAtribuicao() {
 function removerAtribuicao() {
   atribuicaoStore.removerAtribuicao(sigla.value)
 }
-function novaAtribuicao() {
-  // abrir modal ou navegação para criar nova atribuição
+function irParaCriarAtribuicao() {
+  router.push({ path: `/unidade/${sigla.value}/atribuir` })
 }
 function criarMapa() {
-  // abrir modal ou navegação para criar novo mapa
+  router.push({ path: `/unidade/${sigla.value}/mapa` })
 }
 function editarMapa() {
-  // abrir modal ou navegação para editar mapa
+  router.push({ path: `/unidade/${sigla.value}/mapa` })
 }
 function visualizarMapa() {
-  // abrir modal ou navegação para visualizar mapa
+  router.push({ path: `/unidade/${sigla.value}/mapa/visualizar` })
 }
-
 function irParaAtividadesConhecimentos() {
   // Tenta obter o id do processo da query string ou do localStorage, se não disponível, alerta
   const processoId = route.query.processoId || localStorage.getItem('processoIdAtual')
@@ -118,4 +151,4 @@ function irParaAtividadesConhecimentos() {
     alert('ID do processo não encontrado. Acesse a partir do painel do processo.')
   }
 }
-</script> 
+</script>

@@ -1,28 +1,9 @@
 {
   "cartoes": [
     {
-      "titulo": "Estatísticas de Processos",
-      "tipo": "processos",
-      "campos": [
-        { "rotulo": "Total", "chaveDado": "totalProcessos" },
-        { "rotulo": "Em andamento", "chaveDado": "emAndamento" },
-        { "rotulo": "Finalizados", "chaveDado": "finalizados" }
-      ],
-      "link": { "to": "/processos", "rotulo": "Ver Processos" }
-    },
-    {
       "titulo": "Notificações",
       "tipo": "notificacoes",
       "chaveLista": "notificacoes"
-    },
-    {
-      "titulo": "Ações rápidas",
-      "tipo": "acoes",
-      "acoes": [
-        { "to": "/processos", "rotulo": "Criar Processo" },
-        { "to": "/mapas", "rotulo": "Ver Mapas" },
-        { "to": "/diagnostico", "rotulo": "Ver Diagnóstico" }
-      ]
     }
   ]
 } 

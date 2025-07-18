@@ -4,15 +4,6 @@
       "titulo": "Pendências",
       "tipo": "pendencias",
       "chaveLista": "pendenciasPorUnidade"
-    },
-    {
-      "titulo": "Ações rápidas",
-      "tipo": "acoes",
-      "acoes": [
-        { "to": "/processos", "rotulo": "Validar Cadastros" },
-        { "to": "/mapas", "rotulo": "Ver Mapas" },
-        { "to": "/diagnostico", "rotulo": "Ver Diagnóstico" }
-      ]
     }
   ]
 } 

@@ -58,6 +58,26 @@ const routes = [
     name: 'DetalheUnidade',
     component: () => import('./views/DetalheUnidade.vue'),
   },
+  {
+    path: '/unidade/:sigla/mapa',
+    name: 'MapaCompetencias',
+    component: () => import('./views/MapaCompetencias.vue'),
+  },
+  {
+    path: '/unidade/:sigla/mapa/visualizar',
+    name: 'VisualizacaoMapa',
+    component: () => import('./views/VisualizacaoMapa.vue'),
+  },
+  {
+    path: '/finalizacao-mapa',
+    name: 'FinalizacaoMapa',
+    component: () => import('./views/FinalizacaoMapa.vue'),
+  },
+  {
+    path: '/unidade/:sigla/atribuir',
+    name: 'AtribuicaoTemporariaForm',
+    component: () => import('./views/AtribuicaoTemporariaForm.vue'),
+  },
 ]
 
 const router = createRouter({

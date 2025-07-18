@@ -7,10 +7,11 @@ Este projeto é um protótipo de um Sistema de Gestão de Competências (SGC) pa
 - **Processo**: O fluxo principal é o de mapeamento de competências. Cada processo tem tipo (Mapeamento, Revisão, Diagnóstico), unidades participantes (em hierarquia) e situação (Não iniciado, Em andamento, Finalizado), sendo esta situação determinada pelo sistema
 - **Unidades Organizacionais**: Possuem hierarquia (ex: STIC > COSIS > SEDESENV/SESEL). Apenas unidades "folha" (sem filhas) podem cadastrar atividades/conhecimentos.
 - **Atividades e Conhecimentos**: Cada unidade folha cadastra atividades (descrição) e, para cada atividade, conhecimentos (descrição). Tudo é feito em uma única tela dinâmica.
-- **Situação**: Situação dos processos e unidades é padronizada: Não iniciado, Em andamento, Finalizado. Situação dos procesos e unidades é calculada pelo sistema.
+- **Mapa de Competências**: Para cada unidade finalizada, é possível criar, editar, visualizar e disponibilizar um Mapa de Competências, associando atividades a competências. O fluxo é simulado no front-end, com dados centralizados em store Pinia e mockados em JSON.
+- **Situação**: Situação dos processos, unidades e mapas é padronizada: Não iniciado, Em andamento, Finalizado, Disponível para validação. Situação dos procesos, unidades e mapas é calculada pelo sistema.
 - **Sem backend**: Todos os dados são fictícios e manipulados apenas no front-end.
-- **Centralização dos dados**: Todos os dados de processos, unidades, atividades e conhecimentos são centralizados em stores Pinia. Os componentes acessam e manipulam os dados exclusivamente via os stores, garantindo reatividade e fonte única de verdade.
-- **Dados de amostra**: Os dados mockados ficam em arquivos JSON na pasta `src/mocks` e são importados apenas nos stores Pinia, nunca diretamente nos componentes.
+- **Centralização dos dados**: Todos os dados de processos, unidades, atividades, conhecimentos e mapas de competências são centralizados em stores Pinia. Os componentes acessam e manipulam os dados exclusivamente via os stores, garantindo reatividade e fonte única de verdade.
+- **Dados de amostra**: Os dados mockados ficam em arquivos JSON na pasta `src/mocks` e são importados apenas nos stores Pinia, nunca diretamente nos componentes. O arquivo `src/mocks/mapas.json` armazena os mapas de competências.
 
 ## Telas e Componentes
 
@@ -20,7 +21,10 @@ Este projeto é um protótipo de um Sistema de Gestão de Competências (SGC) pa
 - **Formulário de Processo**: Cadastro de novo processo, seleção de unidades participantes via checkboxes hierárquicos.
 - **Unidades do Processo**: Árvore colapsável de unidades. Clique em qualquer nó expande/recolhe. Unidades folha são destacadas em azul ao hover e são totalmente clicáveis (linha inteira), levando à tela de atividades/conhecimentos.
 - **Atividades/Conhecimentos**: Tela única para cada unidade folha, onde o usuário cadastra atividades e conhecimentos. Para a unidade SESEL, já existem atividades/conhecimentos predefinidos em JSON.
-- **Navbar**: Links para todas as áreas principais, incluindo acesso direto à tela de atividades/conhecimentos. Inclui seletor de perfil global.
+- **Mapa de Competências**: Para cada unidade finalizada, é possível criar, editar, visualizar e disponibilizar um mapa de competências. O fluxo inclui:
+  - **Edição de Mapa de Competências** (`src/views/MapaCompetencias.vue`): Seleção de atividades, associação a competências, descrição detalhada, visualização das competências cadastradas e geração do mapa.
+  - **Finalização de Mapa de Competências** (`src/views/FinalizacaoMapa.vue`): Resumo das competências, opção de incluir atividades, definição de data limite para validação e simulação de notificação de disponibilização.
+- **Navbar**: Links para todas as áreas principais, incluindo acesso direto à tela de atividades/conhecimentos e mapas. Inclui seletor de perfil global.
 - **TreeNode.vue**: Componente recursivo para árvore de unidades.
 
 ## UI/UX
@@ -30,6 +34,7 @@ Este projeto é um protótipo de um Sistema de Gestão de Competências (SGC) pa
 - **Árvore de unidades**: Todos os nós começam expandidos. Clique em qualquer parte do nó (exceto folha) expande/recolhe. Folhas têm hover azul (bg-primary, texto branco) e são totalmente clicáveis.
 - **Formulários**: Simples, sem validação real.
 - **Seletor de perfil global**: Sempre visível na Navbar, permite alternar entre SEDOC, CHEFE e GESTOR. Exibe aviso de que a alternância é apenas simulação, sem controle real de permissões.
+- **Fluxo do Mapa de Competências**: O usuário SEDOC pode criar, editar e disponibilizar mapas para unidades finalizadas. O fluxo é totalmente simulado, com status e notificações fictícias.
 
 ## Gerenciamento de Perfil (Pinia + localStorage)
 
@@ -87,3 +92,6 @@ console.log(perfil.value); // 'SEDOC', 'CHEFE' ou 'GESTOR'
 - `src/views/Processos.vue`: Lista de processos.
 - `src/components/Navbar.vue`: Barra de navegação principal.
 - `src/views/Painel.vue`: Painel dinâmico parametrizado por perfil e JSON.
+- `src/views/MapaCompetencias.vue`: Edição e criação de mapa de competências por unidade.
+- `src/views/FinalizacaoMapa.vue`: Finalização e disponibilização do mapa de competências.
+- `src/mocks/mapas.json`: Mock de dados dos mapas de competências.

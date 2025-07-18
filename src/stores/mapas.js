@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
+import mapasMock from '../mocks/mapas.json'
 
 export const useMapasStore = defineStore('mapas', {
   state: () => ({
-    mapas: [] // { id, unidade, competencias: [ { nome, atividades: [ { nome, conhecimentos: [string] } ] } ] }
+    mapas: mapasMock // { id, unidade, competencias: [ { nome, atividades: [ { nome, conhecimentos: [string] } ] } ] }
   }),
   actions: {
     adicionarMapa(mapa) {

@@ -1,12 +1,12 @@
 {
   "cartoes": [
     {
-      "titulo": "Status do Cadastro",
+      "titulo": "Situação do Cadastro",
       "tipo": "statusCadastro",
       "campos": [
         { "rotulo": "Situação", "chaveDado": "situacaoCadastro" }
       ],
-      "link": { "to": "/processos/1/unidade/1/atividades", "rotulo": "Acessar Cadastro" }
+      "link": { "to": "/processos/1/unidade/1/atividades", "rotulo": "Cadastro de atividades" }
     },
     {
       "titulo": "Mapa de Competências",

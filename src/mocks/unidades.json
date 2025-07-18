@@ -1,18 +1,59 @@
 [
   {
     "sigla": "STIC",
+    "nome": "Secretaria de Informática e Comunicações",
+    "titular": 7,
     "situacao": "Em andamento",
     "filhas": [
       {
         "sigla": "COSIS",
+        "nome": "Coordenadoria de Sistemas",
+        "titular": 8,
         "situacao": "Em andamento",
         "filhas": [
-          { "sigla": "SEDESENV", "situacao": "Não iniciado", "filhas": [] },
-          { "sigla": "SEDIA", "situacao": "Não iniciado", "filhas": [] },
-          { "sigla": "SESEL", "situacao": "Em andamento", "filhas": [] }
+          {
+            "sigla": "SEDESENV",
+            "nome": "Seção de Desenvolvimento de Sistemas",
+            "titular": 9,
+            "situacao": "Finalizado",
+            "filhas": []
+          },
+          {
+            "sigla": "SEDIA",
+            "nome": "Seção de Dados de Inteligência Artificial",
+            "titular": 10,
+            "situacao": "Não iniciado",
+            "filhas": []
+          },
+          {
+            "sigla": "SESEL",
+            "nome": "Seção de Sistemas Eleitorais",
+            "titular": 11,
+            "situacao": "Em andamento",
+            "filhas": []
+          }
         ]
       },
-      { "sigla": "COSINF", "situacao": "Finalizado", "filhas": [] }
+      {
+        "sigla": "COSINF",
+        "situacao": "Finalizado",
+        "filhas": [
+          {
+            "sigla": "SENIC",
+            "nome": "Seção de Infraestrutura de Redes",
+            "titular": 12,
+            "situacao": "Não iniciado",
+            "filhas": []
+          },
+          {
+            "sigla": "SESOP",
+            "nome": "Seção de Suporte",
+            "titular": 13,
+            "situacao": "Não iniciado",
+            "filhas": []
+          }
+        ]
+      }
     ]
   }
-] 
+]
