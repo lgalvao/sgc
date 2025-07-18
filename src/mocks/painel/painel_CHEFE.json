@@ -2,11 +2,17 @@
   "cartoes": [
     {
       "titulo": "Situação do Cadastro",
-      "tipo": "statusCadastro",
+      "tipo": "situacaoCadastro",
       "campos": [
-        { "rotulo": "Situação", "chaveDado": "situacaoCadastro" }
+        {
+          "rotulo": "Situação",
+          "chaveDado": "situacaoCadastro"
+        }
       ],
-      "link": { "to": "/processos/1/unidade/1/atividades", "rotulo": "Cadastro de atividades" }
+      "link": {
+        "to": "/processos/1/unidade/1/atividades",
+        "rotulo": "Cadastro de atividades"
+      }
     },
     {
       "titulo": "Mapa de Competências",
@@ -14,9 +20,9 @@
       "chaveDescricao": "descricaoMapa"
     },
     {
-      "titulo": "Notificações",
-      "tipo": "notificacoes",
-      "chaveLista": "notificacoes"
+      "titulo": "Alertas",
+      "tipo": "alertas",
+      "chaveLista": "alertas"
     }
   ]
-} 
+}

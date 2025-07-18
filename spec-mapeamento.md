@@ -66,11 +66,10 @@ O SGC é um sistema para apoiar a SEDOC (Seção de Desenvolvimento Organizacion
 ---
 
 ## Implicações para o Protótipo
-- **Painel.vue** deve evoluir para um dashboard real, mostrando status, pendências, notificações e atalhos para as ações de cada perfil.
+- **Painel.vue** deve evoluir para um painel de monitoramento real, mostrando situações e alertas.
 - **Controle de permissões**: cada tela/ação deve ser acessível apenas ao perfil correto (SEDOC, CHEFE, GESTOR), mesmo que simulado.
-- **Fluxo de criação do mapa de competências**: prever a etapa de análise e conversão feita pela SEDOC, com interface para associar competências a atividades.
 - **Validação e devolução**: telas e ações para GESTOR validar ou devolver cadastros, com fluxo subindo/descendo na hierarquia.
-- **Notificações e status**: devem ser simulados no protótipo para ilustrar o fluxo real.
+- **Notificações e situações**: devem ser simulados no protótipo para ilustrar o fluxo real.
 - **Dados de amostra**: organizados em arquivos JSON para facilitar ajuste fino e simulação de dados reais.
 
 ---

@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>Novo Processo</h2>
+    <h2>Novo processo</h2>
     <div v-if="feedback" class="alert alert-info mt-3">{{ feedback }}</div>
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
       <div class="mb-3">
@@ -23,16 +23,19 @@
           <div>
             <template v-for="unidade in unidadesStore.unidades" :key="unidade.sigla">
               <div class="form-check" :style="{ marginLeft: '0px' }">
-                <input type="checkbox" class="form-check-input" :id="'chk-' + unidade.sigla" :value="unidade.sigla" :checked="isChecked(unidade.sigla)" @change="() => toggleUnidade(unidade.sigla)" />
+                <input type="checkbox" class="form-check-input" :id="'chk-' + unidade.sigla" :value="unidade.sigla"
+                  :checked="isChecked(unidade.sigla)" @change="() => toggleUnidade(unidade.sigla)" />
                 <label class="form-check-label ms-2" :for="'chk-' + unidade.sigla"><strong>{{ unidade.sigla }}</strong></label>
               </div>
               <template v-if="unidade.filhas && unidade.filhas.length">
                 <div v-for="filha in unidade.filhas" :key="filha.sigla" class="form-check" :style="{ marginLeft: '20px' }">
-                  <input type="checkbox" class="form-check-input" :id="'chk-' + filha.sigla" :value="filha.sigla" :checked="isChecked(filha.sigla)" @change="() => toggleUnidade(filha.sigla)" />
+                  <input type="checkbox" class="form-check-input" :id="'chk-' + filha.sigla" :value="filha.sigla"
+                    :checked="isChecked(filha.sigla)" @change="() => toggleUnidade(filha.sigla)" />
                   <label class="form-check-label ms-2" :for="'chk-' + filha.sigla"><strong>{{ filha.sigla }}</strong></label>
                   <template v-if="filha.filhas && filha.filhas.length">
                     <div v-for="neta in filha.filhas" :key="neta.sigla" class="form-check" :style="{ marginLeft: '40px' }">
-                      <input type="checkbox" class="form-check-input" :id="'chk-' + neta.sigla" :value="neta.sigla" :checked="isChecked(neta.sigla)" @change="() => toggleUnidade(neta.sigla)" />
+                      <input type="checkbox" class="form-check-input" :id="'chk-' + neta.sigla" :value="neta.sigla"
+                        :checked="isChecked(neta.sigla)" @change="() => toggleUnidade(neta.sigla)" />
                       <label class="form-check-label ms-2" :for="'chk-' + neta.sigla"><strong>{{ neta.sigla }}</strong></label>
                     </div>
                   </template>
@@ -49,7 +52,7 @@
       </div>
       <button type="button" class="btn btn-primary" @click="salvarProcesso">Salvar</button>
       <button type="button" class="btn btn-success ms-2" @click="iniciarProcesso">Iniciar processo</button>
-      <router-link to="/processos" class="btn btn-secondary ms-2">Cancelar</router-link>
+      <router-link to="/painel" class="btn btn-secondary ms-2">Cancelar</router-link>
     </form>
   </div>
 </template>
@@ -99,7 +102,7 @@ function salvarProcesso() {
   processosStore.adicionarProcesso(novo)
   feedback.value = 'Processo salvo com sucesso!'
   setTimeout(() => {
-    router.push('/processos')
+    router.push('/painel')
   }, 1000)
   limparCampos()
 }

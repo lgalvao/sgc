@@ -2,7 +2,7 @@
   {
     "id": 1,
     "unidade": "SESEL",
-    "status": "em_andamento",
+    "situacao": "em_andamento",
     "competencias": [
       {
         "id": 1,

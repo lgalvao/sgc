@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "descricao": "Mapeamento de processos da STIC",
+    "descricao": "Mapeamento de competências - 2025",
     "tipo": "Mapeamento",
     "unidades": "STIC, COSIS, SESEL, SEDESENV",
     "dataLimite": "30/06/2025",
@@ -9,18 +9,34 @@
   },
   {
     "id": 2,
-    "descricao": "Revisão de procedimentos",
+    "descricao": "Revisão de mapeamento STIC/COINF - 2025",
     "tipo": "Revisão",
-    "unidades": "COINF",
+    "unidades": "STIC, COINF, SENIC",
     "dataLimite": "15/07/2024",
     "situacao": "Não iniciado"
   },
   {
     "id": 3,
-    "descricao": "Diagnóstico de sistemas",
+    "descricao": "Diagnóstico de mapa de competências SEMARE - 2025",
     "tipo": "Diagnóstico",
-    "unidades": "COSIS",
+    "unidades": "SGP, SEMARE",
+    "dataLimite": "10/08/2025",
+    "situacao": "Não iniciado"
+  },
+  {
+    "id": 4,
+    "descricao": "Revisão de mapa de competências STIC - 2024",
+    "tipo": "Revisão",
+    "unidades": "STIC, COSIS, SEDESENV, SEDIA, SESEL",
+    "dataLimite": "10/05/2024",
+    "situacao": "Finalizado"
+  },
+  {
+    "id": 5,
+    "descricao": "Revisão de mapa de competências - 2024",
+    "tipo": "Diagnóstico",
+    "unidades": "STIC, COSIS, SEDIA",
     "dataLimite": "10/08/2024",
     "situacao": "Finalizado"
   }
-] 
+]

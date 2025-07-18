@@ -34,7 +34,7 @@ Este projeto é um protótipo de um Sistema de Gestão de Competências (SGC) pa
 - **Árvore de unidades**: Todos os nós começam expandidos. Clique em qualquer parte do nó (exceto folha) expande/recolhe. Folhas têm hover azul (bg-primary, texto branco) e são totalmente clicáveis.
 - **Formulários**: Simples, sem validação real.
 - **Seletor de perfil global**: Sempre visível na Navbar, permite alternar entre SEDOC, CHEFE e GESTOR. Exibe aviso de que a alternância é apenas simulação, sem controle real de permissões.
-- **Fluxo do Mapa de Competências**: O usuário SEDOC pode criar, editar e disponibilizar mapas para unidades finalizadas. O fluxo é totalmente simulado, com status e notificações fictícias.
+- **Fluxo do Mapa de Competências**: O usuário SEDOC pode criar, editar e disponibilizar mapas para unidades finalizadas. O fluxo é totalmente simulado, com situação e notificações fictícias.
 
 ## Gerenciamento de Perfil (Pinia + localStorage)
 
@@ -66,7 +66,7 @@ console.log(perfil.value); // 'SEDOC', 'CHEFE' ou 'GESTOR'
 - Esses arquivos definem os cartões, listas e ações rápidas de cada perfil, usando apenas dados puros e chaves em português (ex: `cartoes`, `titulo`, `tipo`, `campos`, `rotulo`, `chaveDado`, `chaveLista`, `acoes`).
 - O Painel.vue consome esses JSONs e renderiza dinamicamente os elementos conforme o perfil selecionado.
 - A tabela de processos é exibida para os perfis SEDOC e GESTOR, acima dos cartões, com navegação igual à da tela de Processos.
-- O mapeamento de status/tipo para classes de estilo (ex: Bootstrap) é feito apenas no componente Vue, nunca nos JSONs.
+- O mapeamento de situação/tipo para classes de estilo (ex: Bootstrap) é feito apenas no componente Vue, nunca nos JSONs.
 - Todo o sistema, inclusive dados, configuração e comentários, deve ser mantido em português.
 
 ## Observações

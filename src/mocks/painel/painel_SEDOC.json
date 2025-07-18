@@ -1,9 +1,9 @@
 {
   "cartoes": [
     {
-      "titulo": "Notificações",
-      "tipo": "notificacoes",
-      "chaveLista": "notificacoes"
+      "titulo": "Alertas",
+      "tipo": "alertas",
+      "chaveLista": "alertas"
     }
   ]
-} 
+}

@@ -1,9 +1,9 @@
 {
   "cartoes": [
     {
-      "titulo": "Pendências",
-      "tipo": "pendencias",
-      "chaveLista": "pendenciasPorUnidade"
+      "titulo": "Alertas",
+      "tipo": "alertas",
+      "chaveLista": "alertas"
     }
   ]
-} 
+}

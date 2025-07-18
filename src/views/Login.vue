@@ -1,25 +1,64 @@
 <template>
-  <div class="container mt-4">
-    <h2 class="mb-4">Login</h2>
-    <form class="col-md-4 col-sm-6 col-12 p-0" @submit.prevent="entrar">
-      <div class="mb-3">
-        <label for="usuario" class="form-label">Usuário</label>
-        <input type="text" class="form-control" id="usuario" placeholder="Digite seu usuário" />
+  <div class="login-bg">
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+      <div class="card login-card p-4 shadow-lg">
+        <h2 class="mb-4 text-center">SGC - Login</h2>
+        <form class="p-0" @submit.prevent="entrar">
+          <div class="mb-3">
+            <label for="usuario" class="form-label">Título</label>
+            <input type="text" class="form-control" id="usuario" placeholder="Digite o título de eleitor" v-model="usuario" />
+          </div>
+          <div class="mb-3">
+            <label for="senha" class="form-label">Senha</label>
+            <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" v-model="senha" />
+          </div>
+          <button type="submit" class="btn btn-primary w-100 login-btn">Entrar</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label for="senha" class="form-label">Senha</label>
-        <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" />
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Entrar</button>
-    </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-// Página de login fictícia, sem validação ou backend
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
+const usuario = ref('')
+const senha = ref('')
+const submitted = ref(false)
+
 function entrar() {
+  // Não exige mais campos obrigatórios
   router.push('/painel')
 }
-</script> 
+</script>
+
+<style scoped>
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f6faff 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 18px;
+  border: none;
+}
+
+.login-btn {
+  font-size: 1.15rem;
+  padding: 0.75rem 0;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.login-btn:hover {
+  background: #1769e0;
+}
+
+.card {
+  box-shadow: 0 6px 32px 0 rgba(0, 0, 0, 0.10);
+}
+</style>

@@ -62,10 +62,10 @@
           <div class="card-body">
             <h5 class="card-title">Mapa de Competências</h5>
             <div v-if="mapa">
-              <div v-if="mapa.status === 'em_andamento'">
+              <div v-if="mapa.situacao === 'em_andamento'">
                 <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar</button>
               </div>
-              <div v-else-if="mapa.status === 'disponivel_validacao'">
+              <div v-else-if="mapa.situacao === 'disponivel_validacao'">
                 <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar</button>
               </div>
               <div v-else>
@@ -114,10 +114,10 @@ const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
 const atribuicao = computed(() => atribuicaoStore.getAtribuicaoPorUnidade(sigla.value))
 const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
 
-function badgeClass(status) {
-  if (status === 'Aguardando' || status === 'Em andamento' || status === 'Aguardando validação') return 'bg-warning text-dark'
-  if (status === 'Finalizado' || status === 'Validado') return 'bg-success'
-  if (status === 'Devolvido') return 'bg-danger'
+function badgeClass(situacao) {
+  if (situacao === 'Aguardando' || situacao === 'Em andamento' || situacao === 'Aguardando validação') return 'bg-warning text-dark'
+  if (situacao === 'Finalizado' || situacao === 'Validado') return 'bg-success'
+  if (situacao === 'Devolvido') return 'bg-danger'
   return 'bg-secondary'
 }
 
