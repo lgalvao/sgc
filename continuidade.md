@@ -15,13 +15,13 @@ do TRE, centralizando todos os dados no front-end.
   andamento, Finalizado, Disponível para validação.
 - **Login**: Tela de login sem autenticação real e sem validação obrigatória; o acesso é sempre permitido.
 
-## Telas e Fluxos Principais
+## Telas e Componentes Principais
 
 - **Painel**: Tela inicial parametrizada por perfil, exibindo cartões, listas, alertas e ações rápidas conforme arquivos
   JSON em `src/mocks/painel`. Inclui tabela de processos (para SEDOC e GESTOR) e cartões de alertas/notificações.
 - **Unidades do Processo**: Exibe árvore de unidades participantes. Unidades folha são destacadas e levam à tela de
   atividades/conhecimentos.
-- **Atividades/Conhecimentos**: Cadastro de atividades e conhecimentos por unidade folha, em tela única e dinâmica.
+- **Atividades/Conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e dinâmica.
 - **Mapa de Competências**: Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar, visualizar e disponibilizar mapas de
   competências, associando atividades a competências.
 - **Atribuição Temporária**: Tela para criação/edição de atribuições temporárias de servidores a unidades.
