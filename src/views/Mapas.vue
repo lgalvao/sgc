@@ -6,7 +6,9 @@
         <label class="form-label" for="filtroUnidade">Unidade</label>
         <select id="filtroUnidade" v-model="filtroUnidade" class="form-select">
           <option value="">Todas</option>
-          <option v-for="u in unidadesFolha" :key="u.sigla" :value="u.sigla">{{ u.sigla }} - {{ u.nome }}</option>
+          <option v-for="u in unidadesFolha" :key="u.sigla" :value="u.sigla">
+            {{ u.sigla }} - {{ u.nome }}
+          </option>
         </select>
       </div>
 
@@ -30,10 +32,12 @@
             <p class="card-text mb-1"><strong>Situação:</strong>
               <span :class="badgeClass(mapa.situacao)">{{ situacaoLabel(mapa.situacao) }}</span>
             </p>
+
             <p class="card-text mb-1"><strong>Competências:</strong> {{ mapa.competencias.length }}</p>
             <p class="card-text mb-1"><strong>Data de criação:</strong>
               {{ mapa.dataCriacao ? formatarData(mapa.dataCriacao) : '-' }}
             </p>
+
             <router-link :to="`/unidade/${mapa.unidade}/mapa/visualizar`"
                          class="btn btn-outline-primary btn-sm mt-2">Visualizar
             </router-link>

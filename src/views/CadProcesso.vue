@@ -5,7 +5,7 @@
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
       <div class="mb-3">
         <label class="form-label" for="descricao">Descrição</label>
-        <input id="descricao" v-model="descricao" class="form-control" placeholder="Descreva o processo" type="text"/>
+        <input id="descricao" v-model="descricao" class="form-control" placeholder="Descreva o processo" type="text" />
       </div>
 
       <div class="mb-3">
@@ -23,24 +23,24 @@
           <div>
             <template v-for="unidade in unidadesStore.unidades" :key="unidade.sigla">
               <div :style="{ marginLeft: '0px' }" class="form-check">
-                <input :id="'chk-' + unidade.sigla" :checked="isChecked(unidade.sigla)" :value="unidade.sigla" class="form-check-input"
-                       type="checkbox" @change="() => toggleUnidade(unidade.sigla)"/>
-                <label :for="'chk-' + unidade.sigla" class="form-check-label ms-2"><strong>{{ unidade.sigla }}</strong></label>
+                <input :id="`chk-${unidade.sigla}`" :checked="isChecked(unidade.sigla)" :value="unidade.sigla" class="form-check-input"
+                  type="checkbox" @change="() => toggleUnidade(unidade.sigla)" />
+                <label :for="`chk-${unidade.sigla}`" class="form-check-label ms-2"><strong>{{ unidade.sigla }}</strong></label>
               </div>
 
               <template v-if="unidade.filhas && unidade.filhas.length">
-                <div v-for="filha in unidade.filhas" :key="filha.sigla" :style="{ marginLeft: '20px' }"
-                     class="form-check">
+                <div v-for="filha in unidade.filhas" :key="filha.sigla" :style="{ marginLeft: '20px' }" class="form-check">
                   <input :id="'chk-' + filha.sigla" :checked="isChecked(filha.sigla)" :value="filha.sigla" class="form-check-input"
-                         type="checkbox" @change="() => toggleUnidade(filha.sigla)"/>
+                    type="checkbox" @change="() => toggleUnidade(filha.sigla)" />
                   <label :for="'chk-' + filha.sigla" class="form-check-label ms-2"><strong>{{
-                      filha.sigla
-                    }}</strong></label>
+                    filha.sigla
+                  }}</strong>
+                  </label>
+
                   <template v-if="filha.filhas && filha.filhas.length">
-                    <div v-for="neta in filha.filhas" :key="neta.sigla" :style="{ marginLeft: '40px' }"
-                         class="form-check">
+                    <div v-for="neta in filha.filhas" :key="neta.sigla" :style="{ marginLeft: '40px' }" class="form-check">
                       <input :id="'chk-' + neta.sigla" :checked="isChecked(neta.sigla)" :value="neta.sigla" class="form-check-input"
-                             type="checkbox" @change="() => toggleUnidade(neta.sigla)"/>
+                        type="checkbox" @change="() => toggleUnidade(neta.sigla)" />
                       <label :for="'chk-' + neta.sigla" class="form-check-label ms-2"><strong>{{ neta.sigla }}</strong></label>
                     </div>
                   </template>
@@ -53,7 +53,7 @@
 
       <div class="mb-3">
         <label class="form-label" for="dataLimite">Data limite</label>
-        <input id="dataLimite" v-model="dataLimite" class="form-control" type="date"/>
+        <input id="dataLimite" v-model="dataLimite" class="form-control" type="date" />
       </div>
       <button class="btn btn-primary" type="button" @click="salvarProcesso">Salvar</button>
       <button class="btn btn-success ms-2" type="button" @click="iniciarProcesso">Iniciar processo</button>
@@ -63,10 +63,10 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {useProcessosStore} from '../stores/processos'
-import {useUnidadesStore} from '../stores/unidades'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useProcessosStore } from '../stores/processos'
+import { useUnidadesStore } from '../stores/unidades'
 
 const unidadesSelecionadas = ref([])
 const descricao = ref('')

@@ -19,7 +19,7 @@ const routes = [
   {
     path: "/processos/novo",
     name: "NovoProcesso",
-    component: () => import("./views/FormProcesso.vue"),
+    component: () => import("./views/CadProcesso.vue"),
   },
   {
     path: "/mapas",
@@ -27,49 +27,44 @@ const routes = [
     component: () => import("./views/Mapas.vue"),
   },
   {
-    path: "/diagnostico",
-    name: "Diagnóstico",
-    component: () => import("./views/Diagnostico.vue"),
-  },
-  {
     path: "/processos/:id/unidade/:unidadeId/atividades",
     name: "AtividadesConhecimentos",
-    component: () => import("./views/AtividadesConhecimentos.vue"),
+    component: () => import("./views/CadAtividadesConhecimentos.vue"),
   },
   {
     path: "/processos/:id/unidades",
     name: "UnidadesProcesso",
-    component: () => import("./views/UnidadesProcesso.vue"),
+    component: () => import("./views/DetalhesProcesso.vue"),
   },
   {
     path: "/unidade/:sigla",
     name: "DetalheUnidade",
-    component: () => import("./views/DetalheUnidade.vue"),
+    component: () => import("./views/DetalhesUnidade.vue"),
   },
   {
     path: "/unidade/:sigla/mapa",
     name: "MapaCompetencias",
-    component: () => import("./views/MapaCompetencias.vue"),
+    component: () => import("./views/CadastroMapa.vue"),
   },
   {
     path: "/unidade/:sigla/mapa/visualizar",
     name: "VisualizacaoMapa",
-    component: () => import("./views/VisualizacaoMapa.vue"),
+    component: () => import("./views/MapaVisualizacao.vue"),
   },
   {
     path: "/finalizacao-mapa",
     name: "FinalizacaoMapa",
-    component: () => import("./views/FinalizacaoMapa.vue"),
+    component: () => import("./views/MapaFinalizacao.vue"),
   },
   {
     path: "/unidade/:sigla/atribuir",
     name: "AtribuicaoTemporariaForm",
-    component: () => import("./views/AtribuicaoTemporariaForm.vue"),
+    component: () => import("./views/CadastroAtribuicao.vue"),
   },
   {
     path: "/historico",
     name: "Historico",
-    component: () => import("./views/Historico.vue"),
+    component: () => import("./views/HistoricoProcessos.vue"),
   },
 ];
 
