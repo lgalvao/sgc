@@ -84,7 +84,7 @@ function descricaoAtividade(id) {
 
 function disponibilizarMapa() {
   mapaStore.editarMapa(mapa.value.id, {
-    status: 'disponivel_validacao',
+    situacao: 'disponivel_validacao',
     dataDisponibilizacao: new Date().toISOString(),
     dataLimite: dataLimite.value
   })

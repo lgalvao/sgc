@@ -6,11 +6,13 @@
         <form class="p-0" @submit.prevent="entrar">
           <div class="mb-3">
             <label for="usuario" class="form-label">Título</label>
-            <input type="text" class="form-control" id="usuario" placeholder="Digite o título de eleitor" v-model="usuario" />
+            <input type="text" class="form-control" id="usuario" placeholder="Digite o título de eleitor" v-model="usuario"
+              autocomplete="username" />
           </div>
           <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" v-model="senha" />
+            <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" v-model="senha"
+              autocomplete="current-password" />
           </div>
           <button type="submit" class="btn btn-primary w-100 login-btn">Entrar</button>
         </form>

@@ -10,11 +10,6 @@ export const usePainelStore = defineStore("painel", {
     finalizados: () =>
       useProcessosStore().processos.filter((p) => p.situacao === "Finalizado")
         .length,
-    pendenciasPorUnidade: () => [
-      { unidade: "COSIS", status: "Aguardando", badge: "bg-warning text-dark" },
-      { unidade: "SESEL", status: "Finalizado", badge: "bg-success" },
-      { unidade: "SEDESENV", status: "Devolvido", badge: "bg-danger" },
-    ],
     alertas: () => [
       {
         data: "2025-07-01",
@@ -30,10 +25,10 @@ export const usePainelStore = defineStore("painel", {
     processosSubordinadas: () => [
       {
         nome: "Processo 2024/1",
-        status: "Em andamento",
+        situacao: "Em andamento",
         badge: "bg-warning text-dark",
       },
-      { nome: "Processo 2023/2", status: "Finalizado", badge: "bg-success" },
+      { nome: "Processo 2023/2", situacao: "Finalizado", badge: "bg-success" },
     ],
     situacaoCadastro: () => "Em andamento",
     descricaoMapa: () =>

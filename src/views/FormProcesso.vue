@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>Novo processo</h2>
+    <h2>Detalhes de processo</h2>
     <div v-if="feedback" class="alert alert-info mt-3">{{ feedback }}</div>
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
       <div class="mb-3">
