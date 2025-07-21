@@ -33,7 +33,7 @@ do TRE, centralizando todos os dados no front-end.
 - **Bootstrap 5**: Layout responsivo e visual padronizado.
 - **Árvore de Unidades**: Todos os nós começam expandidos; folhas são totalmente clicáveis e destacadas ao hover.
 - **Formulários**: Simples, sem validação real.
-- **Alertas/Notificações**: Exibidos no painel conforme configuração do perfil.
+- **Alertas e Notificações**: Exibidos no painel conforme configuração do perfil.
 - **Navegação**: Sempre via Vue Router; componentes acessam dados exclusivamente via stores do Pinia.
 
 ## Arquitetura e Componentização
@@ -43,19 +43,18 @@ do TRE, centralizando todos os dados no front-end.
 - **Componentes**:
   - `TreeNode.vue`: Árvore recursiva de unidades.
   - `Navbar.vue`: Barra de navegação e seletor de perfil.
+- **Views**
   - `Painel.vue`: Painel dinâmico por perfil.
-  - `FormProcesso.vue`: Cadastro de processo.
-  - `UnidadesProcesso.vue`: Árvore de unidades do processo.
-  - `AtividadesConhecimentos.vue`: Cadastro de atividades/conhecimentos.
-  - `MapaCompetencias.vue`: Edição/criação de mapa de competências.
-  - `FinalizacaoMapa.vue`: Finalização/disponibilização de mapa.
-  - `AtribuicaoTemporariaForm.vue`: Atribuição temporária de servidores.
-  - `Historico.vue`: Consulta de processos finalizados.
+  - `CadProcesso.vue`: Cadastro de processo.
+  - `DetalhesProcesso.vue`: Árvore de unidades do processo.
+  - `CadAtividadesConhecimentos.vue`: Cadastro de atividades/conhecimentos.
+  - `CadMapa.vue`: Edição/criação de mapa de competências.
+  - `MapaFinalizacao.vue`: Finalização/disponibilização de mapa.
+  - `CadAtribuicao.vue`: Atribuição temporária de servidores.
+  - `HistoricoProcessos.vue`: Consulta de processos finalizados.
 
 ## Regras Importantes
-
 - Sempre centralize dados e lógica nos stores do Pinia.
 - Nunca acesse arquivos JSON diretamente nos componentes.
 - Mantenha todo o código, comentários e dados em português.
 - Siga o padrão de navegação, componentização e UI já estabelecido.
-- Atualize este documento ao evoluir o sistema.
