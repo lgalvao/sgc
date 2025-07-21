@@ -1,5 +1,3 @@
-// src/router.js
-// Configuração do Vue Router para navegação entre páginas
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
@@ -32,11 +30,6 @@ const routes = [
     path: "/diagnostico",
     name: "Diagnóstico",
     component: () => import("./views/Diagnostico.vue"),
-  },
-  {
-    path: "/atribuicoes",
-    name: "Atribuições",
-    component: () => import("./views/Atribuicoes.vue"),
   },
   {
     path: "/processos/:id/unidade/:unidadeId/atividades",

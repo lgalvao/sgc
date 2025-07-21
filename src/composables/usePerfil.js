@@ -1,4 +1,5 @@
-import { usePerfilStore } from '../stores/perfil'
+import {usePerfilStore} from '../stores/perfil'
+
 export function usePerfil() {
-  return usePerfilStore()
+    return usePerfilStore()
 } 

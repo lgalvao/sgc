@@ -21,7 +21,6 @@
           </div>
         </div>
       </div>
-      <div class="alert alert-info">Esta é uma visualização somente leitura. Apenas CHEFE e GESTOR podem acessar por este modo.</div>
     </div>
     <div v-else>
       <p>Unidade ou mapa não encontrado.</p>
@@ -30,21 +29,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useMapasStore } from '../stores/mapas'
-import { useUnidadesStore } from '../stores/unidades'
-import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
+import {computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useMapasStore} from '../stores/mapas'
+import {useUnidadesStore} from '../stores/unidades'
+import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
 
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.query.sigla || route.params.sigla)
 const unidadesStore = useUnidadesStore()
-const { unidades } = storeToRefs(unidadesStore)
+const {unidades} = storeToRefs(unidadesStore)
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesConhecimentosStore()
-const { atividadesPorUnidade } = storeToRefs(atividadesStore)
+const {atividadesPorUnidade} = storeToRefs(atividadesStore)
 
 function buscarUnidade(unidades, sigla) {
   for (const unidade of unidades) {

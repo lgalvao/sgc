@@ -3,15 +3,17 @@
     <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
     <h2>Atividades e Conhecimentos</h2>
     <div class="mb-3"><strong>Unidade:</strong> {{ siglaUnidade }}</div>
+
     <!-- Adicionar nova atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" type="text" class="form-control" placeholder="Descrição da nova atividade" />
+        <input v-model="novaAtividade" class="form-control" placeholder="Descrição da nova atividade" type="text"/>
       </div>
       <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Adicionar Atividade</button>
+        <button class="btn btn-primary" type="submit">Adicionar Atividade</button>
       </div>
     </form>
+
     <!-- Lista de atividades -->
     <div v-for="(atividade, idx) in atividades" :key="atividade.id" class="card mb-3">
       <div class="card-body">
@@ -19,18 +21,22 @@
           <strong>{{ atividade.descricao }}</strong>
           <button class="btn btn-sm btn-outline-danger" @click="removerAtividade(idx)">Remover</button>
         </div>
+
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
-          <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id" class="d-flex align-items-center mb-2">
+          <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id"
+               class="d-flex align-items-center mb-2">
             <span>{{ conhecimento.descricao }}</span>
-            <button class="btn btn-sm btn-link text-danger ms-2" @click="removerConhecimento(idx, cidx)">Remover</button>
+            <button class="btn btn-sm btn-link text-danger ms-2" @click="removerConhecimento(idx, cidx)">Remover
+            </button>
           </div>
           <form class="row g-2 align-items-center" @submit.prevent="adicionarConhecimento(idx)">
             <div class="col">
-              <input v-model="atividade.novoConhecimento" type="text" class="form-control form-control-sm" placeholder="Novo conhecimento" />
+              <input v-model="atividade.novoConhecimento" class="form-control form-control-sm" placeholder="Novo conhecimento"
+                     type="text"/>
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-sm btn-outline-primary">Adicionar Conhecimento</button>
+              <button class="btn btn-sm btn-outline-primary" type="submit">Adicionar Conhecimento</button>
             </div>
           </form>
         </div>
@@ -40,16 +46,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
-import { useUnidadesStore } from '../stores/unidades'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
+import {useUnidadesStore} from '../stores/unidades'
 
 const route = useRoute()
 const unidadeId = computed(() => route.params.unidadeId)
 const store = useAtividadesConhecimentosStore()
-const { atividadesPorUnidade } = storeToRefs(store)
+const {atividadesPorUnidade} = storeToRefs(store)
 const unidadesStore = useUnidadesStore()
 
 function buscarSigla(unidades, sigla) {

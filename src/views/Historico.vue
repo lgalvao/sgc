@@ -1,53 +1,52 @@
 <template>
-    <div class="container mt-4">
-        <h2>Histórico de Processos</h2>
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr>
-                    <th @click="ordenarPor('descricao')" style="cursor:pointer">
-                        Descrição
-                        <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
-                    </th>
-                    <th @click="ordenarPor('tipo')" style="cursor:pointer">
-                        Tipo
-                        <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
-                    </th>
-                    <th @click="ordenarPor('unidades')" style="cursor:pointer">
-                        Unidades participantes
-                        <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
-                    </th>
-                    <th @click="ordenarPor('dataLimite')" style="cursor:pointer">
-                        Data limite
-                        <span v-if="criterio === 'dataLimite'">{{ asc ? '↑' : '↓' }}</span>
-                    </th>
-                    <th>
-                        Situação
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
-                    <td>{{ processo.descricao }}</td>
-                    <td>{{ processo.tipo }}</td>
-                    <td>{{ processo.unidades }}</td>
-                    <td>{{ processo.dataLimite }}</td>
-                    <td><span class="badge bg-success">Finalizado</span></td>
-                </tr>
-            </tbody>
-        </table>
-        <div v-if="processosFinalizadosOrdenados.length === 0" class="alert alert-info mt-4">
-            Nenhum processo finalizado encontrado.
-        </div>
+  <div class="container mt-4">
+    <h2>Histórico de Processos</h2>
+    <table class="table table-striped mt-4">
+      <thead>
+      <tr>
+        <th style="cursor:pointer" @click="ordenarPor('descricao')">
+          Descrição
+          <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
+        </th>
+        <th style="cursor:pointer" @click="ordenarPor('tipo')">
+          Tipo
+          <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
+        </th>
+        <th style="cursor:pointer" @click="ordenarPor('unidades')">
+          Unidades participantes
+          <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
+        </th>
+        <th style="cursor:pointer" @click="ordenarPor('dataLimite')">
+          Data limite
+          <span v-if="criterio === 'dataLimite'">{{ asc ? '↑' : '↓' }}</span>
+        </th>
+        <th> Situação</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
+        <td>{{ processo.descricao }}</td>
+        <td>{{ processo.tipo }}</td>
+        <td>{{ processo.unidades }}</td>
+        <td>{{ processo.dataLimite }}</td>
+        <td><span class="badge bg-success">Finalizado</span></td>
+      </tr>
+      </tbody>
+    </table>
+    <div v-if="processosFinalizadosOrdenados.length === 0" class="alert alert-info mt-4">
+      Nenhum processo finalizado encontrado.
     </div>
+  </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useProcessosStore } from '../stores/processos'
+import {computed, ref} from 'vue'
+import {storeToRefs} from 'pinia'
+import {useProcessosStore} from '../stores/processos'
 
 const processosStore = useProcessosStore()
-const { processos } = storeToRefs(processosStore)
+const {processos} = storeToRefs(processosStore)
 
 const criterio = ref('descricao')
 const asc = ref(true)
@@ -57,19 +56,19 @@ const processosFinalizados = computed(() =>
 )
 
 const processosFinalizadosOrdenados = computed(() => {
-    return [...processosFinalizados.value].sort((a, b) => {
-        if (a[criterio.value] < b[criterio.value]) return asc.value ? -1 : 1
-        if (a[criterio.value] > b[criterio.value]) return asc.value ? 1 : -1
-        return 0
-    })
+  return [...processosFinalizados.value].sort((a, b) => {
+    if (a[criterio.value] < b[criterio.value]) return asc.value ? -1 : 1
+    if (a[criterio.value] > b[criterio.value]) return asc.value ? 1 : -1
+    return 0
+  })
 })
 
 function ordenarPor(campo) {
-    if (criterio.value === campo) {
-        asc.value = !asc.value
-    } else {
-        criterio.value = campo
-        asc.value = true
-    }
+  if (criterio.value === campo) {
+    asc.value = !asc.value
+  } else {
+    criterio.value = campo
+    asc.value = true
+  }
 }
 </script>

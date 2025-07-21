@@ -5,16 +5,16 @@
         <h2 class="mb-4 text-center">SGC - Login</h2>
         <form class="p-0" @submit.prevent="entrar">
           <div class="mb-3">
-            <label for="usuario" class="form-label">Título</label>
-            <input type="text" class="form-control" id="usuario" placeholder="Digite o título de eleitor" v-model="usuario"
-              autocomplete="username" />
+            <label class="form-label" for="usuario">Título</label>
+            <input id="usuario" v-model="usuario" autocomplete="username" class="form-control"
+                   type="text"/>
           </div>
           <div class="mb-3">
-            <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" v-model="senha"
-              autocomplete="current-password" />
+            <label class="form-label" for="senha">Senha</label>
+            <input id="senha" v-model="senha" autocomplete="current-password" class="form-control"
+                   type="password"/>
           </div>
-          <button type="submit" class="btn btn-primary w-100 login-btn">Entrar</button>
+          <button class="btn btn-primary w-100 login-btn" type="submit">Entrar</button>
         </form>
       </div>
     </div>
@@ -22,16 +22,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
 
 const router = useRouter()
 const usuario = ref('')
 const senha = ref('')
-const submitted = ref(false)
 
 function entrar() {
-  // Não exige mais campos obrigatórios
   router.push('/painel')
 }
 </script>

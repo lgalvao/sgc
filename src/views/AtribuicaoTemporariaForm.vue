@@ -7,30 +7,34 @@
           <h5 class="card-title">Unidade: {{ unidade.nome }} ({{ unidade.sigla }})</h5>
           <form @submit.prevent="criarAtribuicao">
             <div class="mb-3">
-              <label for="servidor" class="form-label">Servidor</label>
-              <select v-model="servidorSelecionado" id="servidor" class="form-select" required>
-                <option value="" disabled>Selecione um servidor</option>
+              <label class="form-label" for="servidor">Servidor</label>
+              <select id="servidor" v-model="servidorSelecionado" class="form-select" required>
+                <option disabled value="">Selecione um servidor</option>
                 <option v-for="servidor in servidoresElegiveis" :key="servidor.id" :value="servidor.id">
                   {{ servidor.nome }}
                 </option>
               </select>
               <div v-if="erroServidor" class="text-danger small">{{ erroServidor }}</div>
             </div>
+
             <div class="mb-3">
-              <label for="dataTermino" class="form-label">Data de término</label>
-              <input type="date" v-model="dataTermino" id="dataTermino" class="form-control" required />
+              <label class="form-label" for="dataTermino">Data de término</label>
+              <input id="dataTermino" v-model="dataTermino" class="form-control" required type="date"/>
             </div>
+
             <div class="mb-3">
-              <label for="justificativa" class="form-label">Justificativa</label>
-              <textarea v-model="justificativa" id="justificativa" class="form-control" required></textarea>
+              <label class="form-label" for="justificativa">Justificativa</label>
+              <textarea id="justificativa" v-model="justificativa" class="form-control" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Criar atribuição</button>
-            <button type="button" class="btn btn-secondary ms-2" @click="voltar">Cancelar</button>
+            <button class="btn btn-primary" type="submit">Criar atribuição</button>
+            <button class="btn btn-secondary ms-2" type="button" @click="voltar">Cancelar</button>
           </form>
+
           <div v-if="sucesso" class="alert alert-success mt-3">Atribuição criada com sucesso!</div>
         </div>
       </div>
     </div>
+
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
@@ -38,18 +42,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useUnidadesStore } from '../stores/unidades'
-import { useAtribuicaoTemporariaStore } from '../stores/atribuicaoTemporaria'
+import {computed, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useUnidadesStore} from '../stores/unidades'
+import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
 import servidoresMock from '../mocks/servidores.json'
 
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.sigla)
 const unidadesStore = useUnidadesStore()
-const { unidades } = storeToRefs(unidadesStore)
+const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 
 function buscarUnidade(unidades, sigla) {
@@ -65,9 +69,9 @@ function buscarUnidade(unidades, sigla) {
 
 const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
 const atribuicoes = computed(() =>
-  atribuicaoStore.atribuicoes
-    ? atribuicaoStore.atribuicoes.filter(a => a.unidadeSigla === sigla.value)
-    : []
+    atribuicaoStore.atribuicoes
+        ? atribuicaoStore.atribuicoes.filter(a => a.unidadeSigla === sigla.value)
+        : []
 )
 
 const servidorSelecionado = ref("")
@@ -84,8 +88,7 @@ const servidoresDaUnidade = computed(() => {
 })
 
 const servidoresElegiveis = computed(() => {
-  // Não pode já ter atribuição para esta unidade
-  // Não pode ser o titular da unidade
+  // Não pode já ter atribuição para esta unidade nem ser o titular da unidade
   const titularId = unidade.value?.titular
   return servidoresDaUnidade.value.filter(servidor => {
     const jaTemAtribuicao = atribuicoes.value.some(a => a.servidorId === servidor.id)

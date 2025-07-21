@@ -4,16 +4,13 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-          <li class="breadcrumb-item"><a @click="router.push('/')" style="cursor:pointer">Início</a></li>
-          <li class="breadcrumb-item"><a @click="router.push('/unidades')" style="cursor:pointer">Unidades</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ unidade?.sigla }}</li>
+          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/')">Início</a></li>
+          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/unidades')">Unidades</a></li>
+          <li aria-current="page" class="breadcrumb-item active">{{ unidade?.sigla }}</li>
         </ol>
       </nav>
       <div>
-        <button class="btn btn-secondary me-2" @click="voltar">
-          <!-- Ícone de seta pode ser adicionado com Bootstrap Icons se disponível -->
-          Voltar
-        </button>
+        <button class="btn btn-secondary me-2" @click="voltar"> Voltar</button>
         <button class="btn btn-primary" @click="irParaAtividadesConhecimentos">
           Atividades e Conhecimentos
         </button>
@@ -30,7 +27,7 @@
         <p><strong>Contato:</strong> {{ atribuicao?.contato || 'Não informado' }}</p>
         <p>
           <strong>Situação:</strong>
-          <span class="badge" :class="badgeClass(unidade.situacao)">{{ unidade.situacao }}</span>
+          <span :class="badgeClass(unidade.situacao)" class="badge">{{ unidade.situacao }}</span>
         </p>
       </div>
     </div>
@@ -79,23 +76,22 @@
         </div>
       </div>
     </div>
-    <!-- Modais ou formulários para editar/criar atribuição/mapa podem ser adicionados aqui -->
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useUnidadesStore } from '../stores/unidades'
-import { useAtribuicaoTemporariaStore } from '../stores/atribuicaoTemporaria'
-import { useMapasStore } from '../stores/mapas'
+import {computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useUnidadesStore} from '../stores/unidades'
+import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
+import {useMapasStore} from '../stores/mapas'
 
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.sigla)
 const unidadesStore = useUnidadesStore()
-const { unidades } = storeToRefs(unidadesStore)
+const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 const mapaStore = useMapasStore()
 
@@ -124,31 +120,38 @@ function badgeClass(situacao) {
 function voltar() {
   router.back()
 }
+
 function editarAtribuicao() {
   // abrir modal ou navegação para edição
 }
+
 function removerAtribuicao() {
   atribuicaoStore.removerAtribuicao(sigla.value)
 }
+
 function irParaCriarAtribuicao() {
-  router.push({ path: `/unidade/${sigla.value}/atribuir` })
+  router.push({path: `/unidade/${sigla.value}/atribuir`})
 }
+
 function criarMapa() {
-  router.push({ path: `/unidade/${sigla.value}/mapa` })
+  router.push({path: `/unidade/${sigla.value}/mapa`})
 }
+
 function editarMapa() {
-  router.push({ path: `/unidade/${sigla.value}/mapa` })
+  router.push({path: `/unidade/${sigla.value}/mapa`})
 }
+
 function visualizarMapa() {
-  router.push({ path: `/unidade/${sigla.value}/mapa/visualizar` })
+  router.push({path: `/unidade/${sigla.value}/mapa/visualizar`})
 }
+
 function irParaAtividadesConhecimentos() {
   // Tenta obter o id do processo da query string ou do localStorage, se não disponível, alerta
   const processoId = route.query.processoId || localStorage.getItem('processoIdAtual')
   if (processoId) {
     router.push(`/processos/${processoId}/unidade/${sigla.value}/atividades`)
   } else {
-    alert('ID do processo não encontrado. Acesse a partir do painel do processo.')
+    alert('ID do processo não encontrado. Acesse a partir do processo no painel.')
   }
 }
 </script>

@@ -2,13 +2,13 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
       <router-link class="navbar-brand" to="/painel">SGC</router-link>
-      <button class="navbar-toggler" type="button" 
-              data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-        aria-expanded="false" aria-label="Alternar navegação">
+      <button aria-controls="navbarNav" aria-expanded="false"
+              aria-label="Alternar navegação" class="navbar-toggler" data-bs-target="#navbarNav"
+              data-bs-toggle="collapse" type="button">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div id="navbarNav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link class="nav-link" to="/mapas">Mapas</router-link>
@@ -36,12 +36,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { usePerfil } from '../composables/usePerfil'
+import {computed} from 'vue'
+import {usePerfil} from '../composables/usePerfil'
+
 const perfil = usePerfil()
 const perfilValue = computed({
   get: () => perfil.value,
-  set: v => { perfil.setPerfil(v) }
+  set: v => {
+    perfil.setPerfil(v)
+  }
 })
 
 // Lógica minimalista para exibição dos menus conforme perfil

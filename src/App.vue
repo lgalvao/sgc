@@ -1,12 +1,13 @@
 <script setup>
 import Navbar from './components/Navbar.vue'
-import { usePerfil } from './composables/usePerfil'
+import {usePerfil} from './composables/usePerfil'
+
 const perfil = usePerfil()
 </script>
 
 <template>
-  <Navbar />
-  <router-view :key="perfil.value" />
+  <Navbar/>
+  <router-view :key="perfil.value"/>
 </template>
 
 <style scoped>

@@ -14,8 +14,8 @@
         <TreeNode
             v-for="unidade in participantesHierarquia"
             :key="unidade.sigla"
-            :unidade="unidade"
             :abertas="abertas"
+            :unidade="unidade"
             @abrir="abrirAtividadesConhecimentos"
         />
       </div>
@@ -57,8 +57,8 @@ function consolidarSituacaoUnidade(unidade) {
   return 'Não iniciado'
 }
 
+// Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
 function filtrarHierarquiaPorParticipantes(unidades, participantes) {
-  // Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
   return unidades
       .map(unidade => {
         let filhasFiltradas = []

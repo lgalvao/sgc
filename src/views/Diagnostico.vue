@@ -19,5 +19,4 @@
 </template>
 
 <script setup>
-// Diagnóstico fictício do sistema
-</script> 
+</script>
