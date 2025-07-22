@@ -44,14 +44,16 @@ do TRE, centralizando todos os dados no front-end.
   - `TreeNode.vue`: Árvore recursiva de unidades.
   - `Navbar.vue`: Barra de navegação e seletor de perfil.
 - **Views**
-  - `Painel.vue`: Painel dinâmico por perfil.
-  - `CadProcesso.vue`: Cadastro de processo.
-  - `DetalhesProcesso.vue`: Árvore de unidades do processo.
+  - `Login.vue`: Tela padrão de login.
+  - `Painel.vue`: Painel, ajustado dinamicamente de acordo com o perfil atual.
+  - `CadProcesso.vue`: Cadastro de processos (CRUD)
+  - `DetalhesProcesso.vue`: Detalhes de um processo (não editáveis), incluindo a árvore de unidades do processo.
+  - `DetalhesUnidade.vue`: Detalhes de um processo para uma unidade.
   - `CadAtividadesConhecimentos.vue`: Cadastro de atividades/conhecimentos.
+  - `CadAtribuicao.vue`: Cadastri de atribuições temporárias (CRUD).
   - `CadMapa.vue`: Edição/criação de mapa de competências.
   - `MapaFinalizacao.vue`: Finalização/disponibilização de mapa.
-  - `CadAtribuicao.vue`: Atribuição temporária de servidores.
-  - `HistoricoProcessos.vue`: Consulta de processos finalizados.
+  - `HistoricoProcessos.vue`: Lista de processos finalizados.
 
 ## Regras Importantes
 - Sempre centralize dados e lógica nos stores do Pinia.

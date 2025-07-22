@@ -24,10 +24,6 @@
               Unidades participantes
               <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
             </th>
-            <th style="cursor:pointer" @click="ordenarPor('dataLimite')">
-              Data limite
-              <span v-if="criterio === 'dataLimite'">{{ asc ? '↑' : '↓' }}</span>
-            </th>
             <th style="cursor:pointer" @click="ordenarPor('situacao')">
               Situação
               <span v-if="criterio === 'situacao'">{{ asc ? '↑' : '↓' }}</span>
@@ -40,7 +36,6 @@
             <td>{{ processo.descricao }}</td>
             <td>{{ processo.tipo }}</td>
             <td>{{ processo.unidades }}</td>
-            <td>{{ processo.dataLimite }}</td>
             <td>{{ consolidarSituacaoProcesso(processo) }}</td>
           </tr>
         </tbody>
@@ -102,16 +97,6 @@
               </tbody>
             </table>
 
-            <!-- Cartão de descrição -->
-            <p v-else-if="cartao.chaveDescricao">{{ dadosPainel[cartao.chaveDescricao].value }}</p>
-            <!-- Cartão de ações rápidas -->
-            <div v-else-if="cartao.tipo === 'acoes'">
-              <router-link v-for="acao in cartao.acoes" :key="acao.to" :to="acao.to" class="btn btn-sm mb-2 btn-outline-primary">{{
-                acao.rotulo
-              }}
-              </router-link>
-            </div>
-
             <!-- Cartão de situacao simples -->
             <p v-else-if="cartao.tipo === 'situacaoCadastro'">
               Situação: <span class="badge bg-warning text-dark">{{ dadosPainel.situacaoCadastro.value }}</span>
@@ -124,10 +109,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div v-if="!painelConfig.cartoes">
-      <p>Nenhum painel para o perfil: [{{ perfil.value }}]</p>
     </div>
   </div>
 </template>

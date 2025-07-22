@@ -34,6 +34,7 @@
       </tr>
       </tbody>
     </table>
+
     <div v-if="processosFinalizadosOrdenados.length === 0" class="alert alert-info mt-4">
       Nenhum processo finalizado encontrado.
     </div>

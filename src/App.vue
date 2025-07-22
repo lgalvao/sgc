@@ -11,7 +11,3 @@ const route = useRoute()
   <Navbar v-if="route.path !== '/login'" />
   <router-view :key="perfil.value" />
 </template>
-
-<style scoped>
-/* Estilos globais podem ser definidos em style.css */
-</style>

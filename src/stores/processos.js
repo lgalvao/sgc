@@ -8,7 +8,6 @@ export const useProcessosStore = defineStore('processos', {
     actions: {
         adicionarProcesso(novo) {
             this.processos.push(novo)
-        },
-        // Métodos para editar/remover podem ser adicionados conforme necessário
+        }
     }
 }) 

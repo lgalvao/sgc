@@ -12,7 +12,7 @@
       </button>
     </div>
 
-    <!-- Adicionar nova atividade -->
+    <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
         <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text" />
@@ -35,6 +35,7 @@
             <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade" title="Cancelar"
               data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
           </template>
+
           <template v-else>
             <strong class="atividade-descricao">{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
@@ -321,14 +322,11 @@ onMounted(() => {
   color: #333;
   font-weight: bold;
   border-radius: 0.5rem;
-  padding: 0.2em 0.8em;
-  font-size: 1.1em;
   letter-spacing: 1px;
 }
 
 .unidade-nome {
   color: #222;
-  font-size: 1em;
   opacity: 0.85;
   padding-right: 1rem;
 }

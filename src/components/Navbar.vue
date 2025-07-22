@@ -11,7 +11,10 @@
       <div id="navbarNav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link class="nav-link" to="/mapas">Mapas</router-link>
+            <router-link class="nav-link" to="/painel">Painel</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/unidades">Unidades</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/historico">Histórico</router-link>

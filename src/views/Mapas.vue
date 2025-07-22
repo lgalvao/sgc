@@ -38,8 +38,8 @@
               {{ mapa.dataCriacao ? formatarData(mapa.dataCriacao) : '-' }}
             </p>
 
-            <router-link :to="`/unidade/${mapa.unidade}/mapa/visualizar`"
-                         class="btn btn-outline-primary btn-sm mt-2">Visualizar
+            <router-link :to="`/unidade/${mapa.unidade}/mapa/visualizar`" class="btn btn-outline-primary btn-sm mt-2">
+              Visualizar
             </router-link>
           </div>
         </div>

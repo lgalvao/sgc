@@ -44,7 +44,7 @@ const routes = [
   {
     path: "/unidade/:sigla/mapa",
     name: "MapaCompetencias",
-    component: () => import("./views/CadastroMapa.vue"),
+    component: () => import("./views/CadMapa.vue"),
   },
   {
     path: "/unidade/:sigla/mapa/visualizar",
@@ -59,7 +59,7 @@ const routes = [
   {
     path: "/unidade/:sigla/atribuir",
     name: "AtribuicaoTemporariaForm",
-    component: () => import("./views/CadastroAtribuicao.vue"),
+    component: () => import("./views/CadAtribuicao.vue"),
   },
   {
     path: "/historico",
