@@ -16,14 +16,6 @@
     "situacao": "Não iniciado"
   },
   {
-    "id": 3,
-    "descricao": "Diagnóstico de mapa de competências SEMARE - 2025",
-    "tipo": "Diagnóstico",
-    "unidades": "SGP, SEMARE",
-    "dataLimite": "10/08/2025",
-    "situacao": "Não iniciado"
-  },
-  {
     "id": 4,
     "descricao": "Revisão de mapa de competências STIC - 2024",
     "tipo": "Revisão",
