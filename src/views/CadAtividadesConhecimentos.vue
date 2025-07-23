@@ -15,7 +15,7 @@
     <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text" />
+        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text"/>
       </div>
       <div class="col-auto">
         <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip"><i
@@ -27,21 +27,23 @@
     <div v-for="(atividade, idx) in atividades" :key="atividade.id" class="card mb-3 atividade-card">
       <div class="card-body py-2">
         <div
-          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
+            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
           <template v-if="editandoAtividade === idx">
-            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input" />
+            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"/>
             <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(idx)" title="Salvar"
-              data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
+                    data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
             <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade" title="Cancelar"
-              data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
+                    data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
           </template>
 
           <template v-else>
             <strong class="atividade-descricao">{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
-              <button class="btn btn-sm btn-primary botao-acao" @click="iniciarEdicaoAtividade(idx, atividade.descricao)" title="Editar"
-                data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-danger botao-acao" @click="removerAtividade(idx)" title="Remover" data-bs-toggle="tooltip"><i
+              <button class="btn btn-sm btn-primary botao-acao"
+                      @click="iniciarEdicaoAtividade(idx, atividade.descricao)" title="Editar"
+                      data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-danger botao-acao" @click="removerAtividade(idx)" title="Remover"
+                      data-bs-toggle="tooltip"><i
                   class="bi bi-trash"></i></button>
             </div>
           </template>
@@ -50,31 +52,35 @@
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
           <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id"
-            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
+               class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
-              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2" style="max-width: 300px;" />
-              <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoConhecimento(idx, cidx)" title="Salvar"
-                data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
+              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2" style="max-width: 300px;"/>
+              <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoConhecimento(idx, cidx)"
+                      title="Salvar"
+                      data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
               <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoConhecimento" title="Cancelar"
-                data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
+                      data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
             </template>
             <template v-else>
               <span>{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-                <button class="btn btn-sm btn-primary botao-acao" @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
-                  title="Editar" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-primary botao-acao"
+                        @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
+                        title="Editar" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-danger botao-acao" @click="removerConhecimento(idx, cidx)" title="Remover"
-                  data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
+                        data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
               </div>
             </template>
           </div>
           <form class="row g-2 align-items-center" @submit.prevent="adicionarConhecimento(idx)">
             <div class="col">
-              <input v-model="atividade.novoConhecimento" class="form-control form-control-sm" placeholder="Novo conhecimento"
-                type="text" />
+              <input v-model="atividade.novoConhecimento" class="form-control form-control-sm"
+                     placeholder="Novo conhecimento"
+                     type="text"/>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary btn-sm" type="submit" title="Adicionar Conhecimento" data-bs-toggle="tooltip"><i
+              <button class="btn btn-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
+                      data-bs-toggle="tooltip"><i
                   class="bi bi-plus"></i></button>
             </div>
           </form>
@@ -85,16 +91,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
-import { useUnidadesStore } from '../stores/unidades'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
+import {useUnidadesStore} from '../stores/unidades'
 
 const route = useRoute()
 const unidadeId = computed(() => route.params.unidadeId)
 const store = useAtividadesConhecimentosStore()
-const { atividadesPorUnidade } = storeToRefs(store)
+const {atividadesPorUnidade} = storeToRefs(store)
 const unidadesStore = useUnidadesStore()
 
 function buscarSigla(unidades, sigla) {
@@ -122,6 +128,7 @@ const nomeUnidade = computed(() => {
     }
     return sigla
   }
+
   return buscarNome(unidadesStore.unidades, siglaUnidade.value)
 })
 
@@ -166,11 +173,11 @@ function removerConhecimento(idx, cidx) {
 }
 
 // --- Edição de conhecimento ---
-const editandoConhecimento = ref({ idxAtividade: null, idxConhecimento: null })
+const editandoConhecimento = ref({idxAtividade: null, idxConhecimento: null})
 const conhecimentoEditado = ref('')
 
 function iniciarEdicaoConhecimento(idxAtividade, idxConhecimento, valorAtual) {
-  editandoConhecimento.value = { idxAtividade, idxConhecimento }
+  editandoConhecimento.value = {idxAtividade, idxConhecimento}
   conhecimentoEditado.value = valorAtual
 }
 
@@ -183,9 +190,10 @@ function salvarEdicaoConhecimento(idxAtividade, idxConhecimento) {
 }
 
 function cancelarEdicaoConhecimento() {
-  editandoConhecimento.value = { idxAtividade: null, idxConhecimento: null }
+  editandoConhecimento.value = {idxAtividade: null, idxConhecimento: null}
   conhecimentoEditado.value = ''
 }
+
 // ---
 
 // --- Edição de atividade ---
@@ -208,13 +216,8 @@ function cancelarEdicaoAtividade() {
   editandoAtividade.value = null
   atividadeEditada.value = ''
 }
-// ---
 
 const router = useRouter()
-
-function voltar() {
-  router.back()
-}
 
 onMounted(() => {
   // Se a unidade for SESEL e ainda não estiver carregada, inicializa do mock (já feito no store)

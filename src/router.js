@@ -66,6 +66,12 @@ const routes = [
     name: "Historico",
     component: () => import("./views/HistoricoProcessos.vue"),
   },
+  {
+    path: "/unidades",
+    name: "Unidades",
+    component: () => import("./views/Unidades.vue"),
+  },
+
 ];
 
 const router = createRouter({

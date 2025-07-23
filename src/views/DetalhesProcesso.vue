@@ -9,16 +9,11 @@
         <strong>Data limite:</strong> {{ processo.dataLimite }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
       </div>
-      <h4 class="mt-4">Unidades participantes</h4>
-      <div class="list-group mt-2">
-        <TreeNode
-            v-for="unidade in participantesHierarquia"
-            :key="unidade.sigla"
-            :abertas="abertas"
-            :unidade="unidade"
-            @abrir="abrirAtividadesConhecimentos"
-        />
-      </div>
+      <TreeTable
+        :data="dadosFormatados"
+        :columns="colunasTabela"
+        title="Unidades participantes"
+      />
     </div>
     <div v-else>
       <p>Processo não encontrado.</p>
@@ -27,12 +22,12 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '../stores/processos'
 import {useUnidadesStore} from '../stores/unidades'
-import TreeNode from '../components/TreeNode.vue'
+import TreeTable from '../components/TreeTable.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -80,36 +75,36 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
 
 const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
 
+const colunasTabela = [
+  { key: 'nome', label: 'Unidade' },
+  { key: 'situacao', label: 'Situação' }
+]
+
+const dadosFormatados = computed(() => {
+  return formatarDadosParaArvore(participantesHierarquia.value)
+})
+
+function formatarDadosParaArvore(dados) {
+  if (!dados) return []
+  return dados.map(item => {
+    const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
+    return {
+      id: item.sigla,
+      nome: item.sigla + ' - ' + item.nome ,
+      situacao: item.situacao,
+      expanded: true,
+      children: children,
+      // Garante que a estrutura de filhos seja consistente
+      ...(children.length > 0 && { children })
+    }
+  })
+}
+
 function abrirAtividadesConhecimentos(sigla) {
   router.push({path: `/unidade/${sigla}`, query: {processoId: processoId.value}})
 }
-
-function expandirTodos(unidadesArr) {
-  for (const unidade of unidadesArr) {
-    if (unidade.filhas && unidade.filhas.length) {
-      abertas.value[unidade.sigla] = true
-      expandirTodos(unidade.filhas)
-    }
-  }
-}
-
-onMounted(() => {
-  expandirTodos(participantesHierarquia.value)
-})
 
 function voltar() {
   router.back()
 }
 </script>
-
-<!--suppress CssUnusedSymbol -->
-<style scoped>
-.unidade-folha {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.unidade-folha:hover {
-  background: #e9ecef;
-}
-</style> 

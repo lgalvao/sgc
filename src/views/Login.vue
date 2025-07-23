@@ -68,7 +68,6 @@ function entrar() {
   border-radius: 8px;
   transition: background 0.2s;
   font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 .login-btn:hover {

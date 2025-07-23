@@ -50,11 +50,5 @@ const perfilValue = computed({
   }
 })
 
-// Lógica minimalista para exibição dos menus conforme perfil
-const isPainelVisible = computed(() => true)
-const isProcessosVisible = computed(() => perfil.value === 'SEDOC' || perfil.value === 'GESTOR')
-const isMapasVisible = computed(() => perfil.value === 'SEDOC' || perfil.value === 'GESTOR' || perfil.value === 'CHEFE')
-const isDiagnosticoVisible = computed(() => perfil.value === 'SEDOC' || perfil.value === 'GESTOR')
-const isAtribuicoesVisible = computed(() => perfil.value === 'SEDOC')
-const isAtividadesVisible = computed(() => perfil.value === 'CHEFE' || perfil.value === 'GESTOR')
+
 </script>
