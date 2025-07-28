@@ -10,7 +10,6 @@ do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvi
 - Não vamos nos preocupar com performance. Não temos sequer um backend, nem pretendemos criar um backend para esse protótipo. O foco é no funcionamento da UX/UI do sistema.
 
 ## Visão geral do projeto
-
 - **Dados Centralizados**: Todos os dados (processos, unidades, atividades, conhecimentos, mapas de competências,
   atribuições temporárias) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend;
   toda manipulação é local e reativa.
@@ -29,7 +28,6 @@ do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvi
 - /src/composables/: Lógica reutilizável
 
 ## Telas e Componentes Principais
-
 - **Painel**: Tela inicial parametrizada por perfil, exibindo cartões, listas, alertas e ações rápidas conforme arquivos
   JSON em `src/mocks/painel`. Inclui tabela de processos (para SEDOC e GESTOR) e cartões de alertas/notificações.
 - **Detalhes de processo**: Exibe árvore de unidades participantes de um processo. Unidades folha são destacadas e levam à tela de
@@ -42,9 +40,8 @@ do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvi
 - **Navbar**: Barra de navegação principal com links para todas as áreas, incluindo seletor global de perfil.
 
 ## UI/UX e Padrões
-
 - **Bootstrap 5**: Layout responsivo e visual padronizado.
-- **Árvore de Unidades**: Todos os nós começam expandidos; folhas são totalmente clicáveis e destacadas ao hover.
+- **Bootstrap Icons**: Padronização de ícones.
 - **Formulários**: Implementados com validação básica, podendo ser aprimorados.
 - **Alertas e Notificações**: Exibidos no painel conforme configuração do perfil.
 - **Navegação**: Sempre via Vue Router; componentes acessam dados exclusivamente via stores do Pinia.
@@ -52,7 +49,6 @@ do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvi
 - **Responsividade**: Layout adaptável a diferentes tamanhos de tela.
 
 ## Arquitetura e Componentização
-
 - **Dados**: Mockados em JSON, importados apenas nos stores do Pinia.
 - **Stores**: Cada domínio (processo, mapa, unidade, perfil etc.) possui um store dedicado.
   - `processos.js`: Gerencia o estado dos processos

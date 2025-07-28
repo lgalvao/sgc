@@ -1,46 +1,22 @@
 <template>
-  <tr
-      class="tree-row"
-      :class="{ 'child-row': level > 0 }"
-      @click="navigateToUnit(item)"
-      style="cursor: pointer;"
-  >
-    <td class="py-2">
-      <div :style="{ paddingLeft: level * 20 + 'px' }">
-          <span v-if="item.children && item.children.length > 0"
-                @click="$emit('toggle', item.id)"
-                class="expand-icon me-2"
-                :class="{ expanded: item.expanded }">
-            <i class="bi bi-caret-right-fill"></i>
-          </span>
-
-        <span v-else class="me-2" style="width: 20px; display: inline-block;"></span>
-        <i class="bi me-2" :class="getIconClass(item)"></i>
-        <span>
-            {{ item.nome || '-' }}
-          </span>
-      </div>
+  <tr @click="handleRowClick" class="tree-row">
+    <td :style="{ paddingLeft: (level * 20) + 'px' }">
+      <span v-if="item.children && item.children.length > 0" @click.stop="toggleExpand(item.id)" class="toggle-icon">
+        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
+      </span>
+      {{ item.nome }}
     </td>
-
-    <!-- Situação -->
-    <td class="py-2">
-      <div class="text-end pe-4">
-          <span class="badge" :class="getSituacaoBadgeClass(item.situacao)">
-            {{ item.situacao || '-' }}
-          </span>
-      </div>
-    </td>
+    <td>{{ item.situacao }}</td>
   </tr>
-
-  <!-- Child rows -->
-  <template v-if="item.expanded && item.children && item.children.length > 0">
+  <template v-if="item.expanded && item.children">
     <TreeRow
         v-for="child in item.children"
         :key="child.id"
         :item="child"
         :level="level + 1"
         :columns="columns"
-        @toggle="$emit('toggle', $event)"
+        @toggle="toggleExpand"
+        @row-click="$emit('row-click', child)"
     />
   </template>
 </template>
@@ -58,102 +34,36 @@ export default {
       default: 0
     },
     columns: {
-      type: Array,
-      required: true
+      type: Array
     }
   },
   emits: ['toggle', 'row-click'],
-
-  setup() {
-    const getColumnValue = (item, column) => {
-      return item[column.key] || '-'
+  setup(props, { emit }) {
+    const toggleExpand = (id) => {
+      emit('toggle', id)
     }
 
-    const getIconClass = () => {
-      return 'bi-file-earmark text-info'
+    const handleRowClick = () => {
+      emit('row-click', props.item)
     }
-
-    const getBadgeClass = (type) => {
-      return type === 'folder' ? 'bg-warning text-dark' : 'bg-info'
-    }
-
-    const getSituacaoBadgeClass = (situacao) => {
-      switch (situacao?.toLowerCase()) {
-        case 'finalizado':
-          return 'bg-success';
-        case 'em andamento':
-          return 'bg-warning text-dark';
-        case 'não iniciado':
-        default:
-          return 'bg-secondary';
-      }
-    }
-
-    const navigateToUnit = (item) => {
-      if (item.id) {
-        emit('row-click', item.id);
-      }
-    };
 
     return {
-      getColumnValue,
-      getIconClass,
-      getBadgeClass,
-      getSituacaoBadgeClass,
-      navigateToUnit
+      toggleExpand,
+      handleRowClick
     }
   }
 }
 </script>
 
 <style scoped>
-.tree-row {
-  vertical-align: middle;
+.toggle-icon {
   cursor: pointer;
+  margin-right: 5px;
 }
 
 .tree-row:hover {
-  background-color: #f8f9fa;
-}
-
-.tree-row td {
-  vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Estilo para linhas filhas */
-.child-row {
-  background-color: rgba(var(--bs-secondary-rgb), 0.05);
-}
-
-/* Estilo para o ícone de expandir/recolher */
-.expand-icon {
+  background-color: #0d6efd;
+  color: white;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  display: inline-block;
-  width: 20px;
-  text-align: center;
-}
-
-.expand-icon.expanded {
-  transform: rotate(90deg);
-}
-
-.child-row {
-  background-color: rgba(var(--bs-secondary-rgb), 0.05);
-}
-
-.expand-icon {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  display: inline-block;
-  width: 20px;
-  text-align: center;
-}
-
-.expand-icon.expanded {
-  transform: rotate(90deg);
 }
 </style>

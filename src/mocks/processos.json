@@ -12,8 +12,8 @@
     "descricao": "Revisão de mapeamento STIC/COINF - 2025",
     "tipo": "Revisão",
     "unidades": "STIC, COINF, SENIC",
-    "dataLimite": "15/07/2024",
-    "situacao": "Não iniciado"
+    "dataLimite": "15/07/2025",
+    "situacao": "Criado"
   },
   {
     "id": 4,
@@ -21,6 +21,7 @@
     "tipo": "Revisão",
     "unidades": "STIC, COSIS, SEDESENV, SEDIA, SESEL",
     "dataLimite": "10/05/2024",
+    "dataFinalizacao": "15/06/2024",
     "situacao": "Finalizado"
   },
   {
@@ -28,7 +29,8 @@
     "descricao": "Revisão de mapa de competências - 2024",
     "tipo": "Diagnóstico",
     "unidades": "STIC, COSIS, SEDIA",
-    "dataLimite": "10/08/2024",
+    "dataLimite": "10/08/2025",
+    "dataFinalizacao": "15/08/2025",
     "situacao": "Finalizado"
   }
 ]

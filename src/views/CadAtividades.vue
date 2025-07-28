@@ -7,9 +7,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-0">Atividades e Conhecimentos</h2>
-      <button class="btn btn-outline-primary" title="Importar" data-bs-toggle="tooltip">
-        Importar
-      </button>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary" title="Importar" data-bs-toggle="tooltip">
+          Importar
+        </button>
+        <button class="btn btn-primary" title="Disponibilizar" data-bs-toggle="tooltip" @click="disponibilizarCadastro">
+          Disponibilizar
+        </button>
+      </div>
     </div>
 
     <!-- Adicionar atividade -->
@@ -96,12 +101,19 @@ import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
 import {useUnidadesStore} from '../stores/unidades'
+import {useProcessosStore} from '../stores/processos'
 
 const route = useRoute()
+const router = useRouter()
 const unidadeId = computed(() => route.params.unidadeId)
-const store = useAtividadesConhecimentosStore()
-const {atividadesPorUnidade} = storeToRefs(store)
+const processoId = computed(() => Number(route.params.id))
+
+const atividadesConhecimentosStore = useAtividadesConhecimentosStore()
+const {atividadesPorUnidade} = storeToRefs(atividadesConhecimentosStore)
 const unidadesStore = useUnidadesStore()
+const {unidades} = storeToRefs(unidadesStore)
+const processosStore = useProcessosStore()
+const {processos} = storeToRefs(processosStore)
 
 function buscarSigla(unidades, sigla) {
   for (const unidade of unidades) {
@@ -138,12 +150,12 @@ const novaAtividade = ref('')
 
 const atividades = computed({
   get: () => atividadesPorUnidade.value[unidadeId.value] || [],
-  set: (val) => store.setAtividades(unidadeId.value, val)
+  set: (val) => atividadesConhecimentosStore.setAtividades(unidadeId.value, val)
 })
 
 function adicionarAtividade() {
   if (novaAtividade.value.trim()) {
-    store.adicionarAtividade(unidadeId.value, {
+    atividadesConhecimentosStore.adicionarAtividade(unidadeId.value, {
       id: idAtividade++,
       descricao: novaAtividade.value,
       conhecimentos: [],
@@ -154,13 +166,13 @@ function adicionarAtividade() {
 }
 
 function removerAtividade(idx) {
-  store.removerAtividade(unidadeId.value, idx)
+  atividadesConhecimentosStore.removerAtividade(unidadeId.value, idx)
 }
 
 function adicionarConhecimento(idx) {
   const atividade = atividades.value[idx]
   if (atividade.novoConhecimento && atividade.novoConhecimento.trim()) {
-    store.adicionarConhecimento(unidadeId.value, idx, {
+    atividadesConhecimentosStore.adicionarConhecimento(unidadeId.value, idx, {
       id: idConhecimento++,
       descricao: atividade.novoConhecimento
     })
@@ -169,7 +181,7 @@ function adicionarConhecimento(idx) {
 }
 
 function removerConhecimento(idx, cidx) {
-  store.removerConhecimento(unidadeId.value, idx, cidx)
+  atividadesConhecimentosStore.removerConhecimento(unidadeId.value, idx, cidx)
 }
 
 // --- Edição de conhecimento ---
@@ -194,8 +206,6 @@ function cancelarEdicaoConhecimento() {
   conhecimentoEditado.value = ''
 }
 
-// ---
-
 // --- Edição de atividade ---
 const editandoAtividade = ref(null)
 const atividadeEditada = ref('')
@@ -217,12 +227,59 @@ function cancelarEdicaoAtividade() {
   atividadeEditada.value = ''
 }
 
-const router = useRouter()
+function encontrarUnidadePai(unidades, siglaFilha) {
+  for (const unidade of unidades) {
+    if (unidade.filhas && unidade.filhas.some(f => f.sigla === siglaFilha)) {
+      return unidade.sigla;
+    }
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      const paiEncontrado = encontrarUnidadePai(unidade.filhas, siglaFilha);
+      if (paiEncontrado) {
+        return paiEncontrado;
+      }
+    }
+  }
+  return null;
+}
+
+async function disponibilizarCadastro() {
+  const atividadesDoProcesso = atividades.value
+
+  const atividadesSemConhecimento = atividadesDoProcesso.filter(atividade => {
+    return !atividade.conhecimentos || atividade.conhecimentos.length === 0
+  })
+
+  if (atividadesSemConhecimento.length > 0) {
+    const atividadesFaltantes = atividadesSemConhecimento.map(a => a.descricao).join(', ')
+    alert(`As seguintes atividades precisam de conhecimentos associados: ${atividadesFaltantes}`)
+    return
+  }
+
+  const confirmacao = confirm(
+    'Confirma finalização e disponibilização do cadastro? Essa ação bloqueia a edição e habilita a validação por unidades superiores'
+  )
+
+  if (confirmacao) {
+    processosStore.atualizarSituacaoProcesso(processoId.value, 'Cadastro disponibilizado')
+
+    const siglaUnidadeAtual = unidadeId.value
+    const siglaUnidadeSuperior = encontrarUnidadePai(unidades.value, siglaUnidadeAtual)
+
+    if (siglaUnidadeSuperior) {
+      processosStore.atualizarLocalizacaoProcesso(processoId.value, siglaUnidadeSuperior)
+    } else {
+      console.warn(`Não foi encontrada unidade superior para ${siglaUnidadeAtual}. O processo permanecerá na unidade atual.`)
+    }
+
+    alert('Cadastro de atividades disponibilizado')
+    router.push('/painel')
+  }
+}
 
 onMounted(() => {
   // Se a unidade for SESEL e ainda não estiver carregada, inicializa do mock (já feito no store)
   if (unidadeId.value === 'SESEL' && !atividadesPorUnidade.value.SESEL) {
-    store.setAtividades('SESEL', store.atividadesPorUnidade.SESEL)
+    atividadesConhecimentosStore.setAtividades('SESEL', atividadesConhecimentosStore.atividadesPorUnidade.SESEL)
   }
 })
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4">
     <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
-    <h2>Detalhes do Processo</h2>
+    <h2>Detalhes do processo</h2>
     <div v-if="processo">
       <div class="mb-3">
         <strong>Descrição:</strong> {{ processo.descricao }}<br>
@@ -13,6 +13,7 @@
         :data="dadosFormatados"
         :columns="colunasTabela"
         title="Unidades participantes"
+        @row-click="abrirDetalhesUnidade"
       />
     </div>
     <div v-else>
@@ -22,25 +23,29 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
-import {useProcessosStore} from '../stores/processos'
-import {useUnidadesStore} from '../stores/unidades'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useProcessosStore } from '../stores/processos'
+import { useUnidadesStore } from '../stores/unidades'
+import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
 import TreeTable from '../components/TreeTable.vue'
 
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
-const {processos} = storeToRefs(processosStore)
+const { processos } = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
+const { unidades } = storeToRefs(unidadesStore)
+const atividadesConhecimentosStore = useAtividadesConhecimentosStore()
+const { atividadesPorUnidade } = storeToRefs(atividadesConhecimentosStore)
+
 const abertas = ref({})
 
 const processoId = computed(() => Number(route.params.id))
 const processo = computed(() => processos.value.find(p => p.id === processoId.value))
 const unidadesParticipantes = computed(() => {
-  if (!processo.value) return []
+  if (!processo.value || !processo.value.unidades) return []
   return processo.value.unidades.split(',').map(u => u.trim())
 })
 
@@ -90,7 +95,7 @@ function formatarDadosParaArvore(dados) {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
     return {
       id: item.sigla,
-      nome: item.sigla + ' - ' + item.nome ,
+      nome: item.sigla + ' - ' + item.nome,
       situacao: item.situacao,
       expanded: true,
       children: children,
@@ -100,8 +105,17 @@ function formatarDadosParaArvore(dados) {
   })
 }
 
-function abrirAtividadesConhecimentos(sigla) {
-  router.push({path: `/unidade/${sigla}`, query: {processoId: processoId.value}})
+function abrirDetalhesUnidade(item) {
+  router.push({ path: `/unidade-processo/${item.id}`, query: { processoId: processoId.value } })
+}
+
+function gerenciarAtividades() {
+  const unidadeSigla = unidadesParticipantes.value;
+  if (unidadeSigla) {
+    router.push({ path: `/processos/${processoId.value}/unidade/${unidadeSigla}/atividades` });
+  } else {
+    alert('Não foi possível determinar a unidade para gerenciar atividades.');
+  }
 }
 
 function voltar() {

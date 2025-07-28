@@ -26,8 +26,8 @@ const router = useRouter()
 const unidadesStore = useUnidadesStore()
 const { unidades } = storeToRefs(unidadesStore)
 
-const navigateToUnit = (unitId) => {
-  router.push(`/unidade/${unitId}`)
+const navigateToUnit = (item) => {
+  router.push({ path: `/unidade/${item.id}` })
 }
 
 const colunasTabela = [

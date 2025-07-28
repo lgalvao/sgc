@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>Histórico de Processos</h2>
+    <h2>Histórico de processos</h2>
     <table class="table table-striped mt-4">
       <thead>
       <tr>
@@ -16,11 +16,10 @@
           Unidades participantes
           <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
         </th>
-        <th style="cursor:pointer" @click="ordenarPor('dataLimite')">
-          Data limite
-          <span v-if="criterio === 'dataLimite'">{{ asc ? '↑' : '↓' }}</span>
+        <th style="cursor:pointer" @click="ordenarPor('dataFinalizacao')">
+          Finalizado em
+          <span v-if="criterio === 'dataFinalizacao'">{{ asc ? '↑' : '↓' }}</span>
         </th>
-        <th> Situação</th>
       </tr>
       </thead>
 
@@ -29,14 +28,13 @@
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
         <td>{{ processo.unidades }}</td>
-        <td>{{ processo.dataLimite }}</td>
-        <td><span class="badge bg-success">Finalizado</span></td>
+        <td>{{ processo.dataFinalizacao }}</td>
       </tr>
       </tbody>
     </table>
 
     <div v-if="processosFinalizadosOrdenados.length === 0" class="alert alert-info mt-4">
-      Nenhum processo finalizado encontrado.
+      Nenhum processo finalizado.
     </div>
   </div>
 </template>

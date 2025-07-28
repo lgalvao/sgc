@@ -27,6 +27,7 @@
               :level="0"
               :columns="columns"
               @toggle="toggleExpand"
+              @row-click="$emit('row-click', item)"
           />
         </template>
         </tbody>
@@ -57,8 +58,8 @@ export default {
       default: ''
     }
   },
-
-  setup(props) {
+  emits: ['row-click'],
+  setup(props, { emit }) {
     const internalData = ref([])
 
     // Initialize internal data with expanded property
@@ -119,23 +120,6 @@ export default {
       collapse(internalData.value)
     }
 
-    // Get all folders for parent selection
-    const getAllFolders = () => {
-      const folders = []
-      const collectFolders = (items) => {
-        items.forEach(item => {
-          if (item.type === 'folder') {
-            folders.push(item)
-            if (item.children && item.children.length > 0) {
-              collectFolders(item.children)
-            }
-          }
-        })
-      }
-      collectFolders(internalData.value)
-      return folders
-    }
-
     const handleRowClick = (item) => {
       emit('row-click', item)
     }
@@ -145,7 +129,6 @@ export default {
       toggleExpand,
       expandAll,
       collapseAll,
-      getAllFolders,
       handleRowClick
     }
   }
