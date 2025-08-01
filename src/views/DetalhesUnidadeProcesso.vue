@@ -5,8 +5,10 @@
         <span class="badge text-bg-secondary mb-2" style="border-radius: 0" >Processo de unidade</span>
 
         <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome}}</h2>
-        <p><strong>Responsável:</strong> {{ atribuicao?.nomeResponsavel || 'Não definido' }}</p>
-        <p><strong>Contato:</strong> {{ atribuicao?.contato || 'Não informado' }}</p>
+        <p><strong>Responsável:</strong> {{ responsavelDetalhes.nome }}</p>
+        <p class="ms-3">{{ responsavelDetalhes.tipo }}</p>
+        <p class="ms-3"><strong>Ramal:</strong> {{ responsavelDetalhes.ramal }}</p>
+        <p class="ms-3"><strong>E-mail:</strong> {{ responsavelDetalhes.email }}</p>
         <p>
           <span class="fw-bold me-1">Situação:</span>
           <span :class="badgeClass(unidade.situacao)" class="badge">{{ unidade.situacao }}</span>
@@ -18,56 +20,68 @@
     </div>
 
     <div class="row">
-      <section class="col-md-4 mb-3">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Atividades e conhecimentos</h5>
-            <div>
-              <button class="btn btn-primary btn-sm" @click="irParaAtividadesConhecimentos">Criar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="col-md-4 mb-3">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Mapa de Competências</h5>
-            <div v-if="mapa">
-              <div v-if="mapa.situacao === 'em_andamento'">
-                <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar</button>
-              </div>
-
-              <div v-else-if="mapa.situacao === 'disponivel_validacao'">
-                <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar</button>
+      <template v-if="processoAtual?.tipo === 'Mapeamento' || processoAtual?.tipo === 'Revisão'">
+        <section class="col-md-4 mb-3">
+          <div class="card h-100" @click="irParaAtividadesConhecimentos" style="cursor: pointer;">
+            <div class="card-body">
+              <h5 class="card-title">Atividades e conhecimentos</h5>
+              <p class="card-text text-muted">Cadastro de atividades e conhecimentos da unidade</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-secondary">Não disponibilizado</span>
               </div>
             </div>
-            <div v-else>
-              <button class="btn btn-primary btn-sm me-2" @click="criarMapa">Criar</button>
+          </div>
+        </section>
+
+        <section class="col-md-4 mb-3">
+          <div class="card h-100" style="cursor: pointer;" @click="mapa ? (mapa.situacao === 'em_andamento' ? editarMapa() : visualizarMapa()) : criarMapa()">
+            <div class="card-body">
+              <h5 class="card-title">Mapa de Competências</h5>
+              <p class="card-text text-muted">Mapa de competências da unidade</p>
+              <div v-if="mapa">
+                <div v-if="mapa.situacao === 'em_andamento'">
+                  <span class="badge bg-warning text-dark">Em andamento</span>
+                </div>
+
+                <div v-else-if="mapa.situacao === 'disponivel_validacao'">
+                  <span class="badge bg-success">Disponibilizado</span>
+                </div>
+              </div>
+              <div v-else>
+                <span class="badge bg-secondary">Não disponibilizado</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </template>
 
-      <section class="col-md-4 mb-3">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Atribuição temporária</h5>
-            <div v-if="atribuicao">
-              <p><strong>Responsável:</strong> {{ atribuicao.nomeResponsavel }}</p>
-              <p><strong>Data de início:</strong> {{ atribuicao.dataInicio }}</p>
-              <p><strong>Data de término:</strong> {{ atribuicao.dataTermino }}</p>
-              <button class="btn btn-warning btn-sm me-2" @click="editarAtribuicao">Editar</button>
-              <button class="btn btn-danger btn-sm" @click="removerAtribuicao">Remover</button>
-            </div>
-            <div v-else>
-              <button class="btn btn-primary btn-sm" @click="irParaCriarAtribuicao">Criar</button>
+      <template v-else-if="processoAtual?.tipo === 'Diagnóstico'">
+        <section class="col-md-4 mb-3">
+          <div class="card h-100" style="cursor: pointer;">
+            <div class="card-body">
+              <h5 class="card-title">Diagnóstico da Equipe</h5>
+              <p class="card-text text-muted">Diagnóstico das competências pelos servidores da unidade</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-secondary">Não disponibilizado</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-    </div>
+        <section class="col-md-4 mb-3">
+          <div class="card h-100" style="cursor: pointer;">
+            <div class="card-body">
+              <h5 class="card-title">Ocupações Críticas</h5>
+              <p class="card-text text-muted">Identificação das ocupações críticas da unidade</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-secondary">Não disponibilizado</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </template>
+
+      </div>
   </div>
 </template>
 
@@ -78,6 +92,8 @@ import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '../stores/unidades'
 import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
 import {useMapasStore} from '../stores/mapas'
+import {useServidoresStore} from '../stores/servidores'
+import {useProcessosStore} from '../stores/processos'
 
 const route = useRoute()
 const router = useRouter()
@@ -86,13 +102,37 @@ const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 const mapaStore = useMapasStore()
+const servidoresStore = useServidoresStore()
+const processosStore = useProcessosStore()
 
 const unidade = computed(() => {
-  console.log("Sigla recebida na rota:", sigla.value);
   return unidadesStore.findUnit(sigla.value);
 });
 const atribuicao = computed(() => atribuicaoStore.getAtribuicaoPorUnidade(sigla.value))
 const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
+
+const processoId = computed(() => Number(route.query.processoId))
+const processoAtual = computed(() => processosStore.processos.find(p => p.id === processoId.value))
+
+const responsavelDetalhes = computed(() => {
+  if (!unidade.value) return null;
+
+  const titular = servidoresStore.getServidorById(unidade.value.titular);
+  let tipoResponsabilidade = 'Titular';
+  let dataTermino = '';
+
+  if (atribuicao.value) {
+    tipoResponsabilidade = 'Atrib. temporária';
+    dataTermino = ` (até ${atribuicao.value.dataTermino})`; // Assumindo que dataTermino existe
+  }
+
+  return {
+    nome: titular?.nome || 'Não definido',
+    tipo: `${tipoResponsabilidade}${dataTermino}`,
+    ramal: titular?.ramal || 'Não informado',
+    email: titular?.email || 'Não informado'
+  };
+});
 
 function badgeClass(situacao) {
   if (situacao === 'Aguardando' || situacao === 'Em andamento' || situacao === 'Aguardando validação') return 'bg-warning text-dark'

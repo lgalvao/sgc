@@ -3,11 +3,10 @@
     <div v-if="processo">
       <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo</span>
       <h2>{{ processo.descricao }}</h2>
-      <div class="mb-5 mt-3">
+      <div class="mb-4 mt-3">
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
       </div>
-
       <TreeTable
           :data="dadosFormatados"
           :columns="colunasTabela"
@@ -15,9 +14,7 @@
           @row-click="abrirDetalhesUnidade"
       />
     </div>
-    <div v-else>
-      <p>Processo não encontrado.</p>
-    </div>
+    <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-danger mt-3" @click="finalizarProcesso">Finalizar processo</button>
   </div>
 </template>
 
@@ -27,6 +24,7 @@ import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '../stores/processos'
 import {useUnidadesStore} from '../stores/unidades'
+import {usePerfilStore} from '../stores/perfil'
 import TreeTable from '../components/TreeTable.vue'
 
 const route = useRoute()
@@ -35,6 +33,7 @@ const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
+const perfilStore = usePerfilStore()
 
 const processoId = computed(() => Number(route.params.id))
 const processo = computed(() => processos.value.find(p => p.id === processoId.value))
@@ -76,9 +75,9 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
 const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
 
 const colunasTabela = [
-  {key: 'nome', label: 'Unidade'},
-  {key: 'situacao', label: 'Situação'},
-  {key: 'dataLimite', label: 'Data limite'}
+  {key: 'nome', label: 'Unidade', width: '60%'},
+  {key: 'situacao', label: 'Situação', width: '20%'},
+  {key: 'dataLimite', label: 'Data limite', width: '20%'}
 ]
 
 const dadosFormatados = computed(() => {
@@ -104,6 +103,13 @@ function formatarDadosParaArvore(dados, dataLimite) {
 
 function abrirDetalhesUnidade(item) {
   router.push({path: `/unidade-processo/${item.id}`, query: {processoId: processoId.value}})
+}
+
+function finalizarProcesso() {
+  if (confirm('Tem certeza que deseja finalizar este processo?')) {
+    processosStore.finalizarProcesso(processoId.value);
+    router.push('/painel');
+  }
 }
 
 </script>

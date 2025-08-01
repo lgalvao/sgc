@@ -1,32 +1,20 @@
 # Sobre o projeto
 
-Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, desenvolvido em Vue 3 + Vite, com
-Vue Router, Bootstrap 5 e Pinia. O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de competências das
-unidades
-do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvimento ativo, com várias funcionalidades
-já implementadas e outras em andamento.
+Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, desenvolvido em Vue 3 + Vite, com Vue Router, Bootstrap 5 e Pinia. O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvimento ativo, com várias funcionalidades já implementadas e outras em andamento.
 
 ## Antes de qualquer coisa
 
-- Este é um protótipo. Não faremos validações, a não ser que eu solicite especificamente uma validação para ilustrar
-  algum aspecto do sistema.
-- Não vamos implementar segurança nem controles de acesso. No entando, o perfil atual é importante para a navegação e
-  exibição de dados, mesmo no protótipo.
+- Este é um protótipo. Não faremos validações, a não ser que eu solicite especificamente uma validação para ilustrar algum aspecto do sistema.
+- Não vamos implementar segurança nem controles de acesso. No entando, o perfil atual é importante para a navegação e exibição de dados, mesmo no protótipo.
 - Não vamos nos preocupar com desempenho; o foco é no funcionamento da UX/UI do sistema
-- Considerando os pontos acima, não antecipé otimizações e abstrações que possam ser necessárias no futuro.
+- Considerando os pontos acima, não antecipe otimizações e abstrações; faça só o necessário para o momento.
 - O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
 
 ## Visão geral do projeto
 
-- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, conhecimentos, mapas de competências,
-  atribuições temporárias etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há
-  backend;
-  toda manipulação é local e reativa.
-- **Perfis de Usuário**: O perfil de usuário (ADMIN, GESTOR, CHEFE, SERVIDOR) é determinado dinamicamente com base na
-  lotação do servidor logado, através do composable `usePerfil`. O `servidorId` do usuário logado é gerenciado pela
-  store `perfil.js` e persistido no localStorage.
-- **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, definindo o `servidorId`
-  globalmente. Não há autenticação real.
+- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, conhecimentos, mapas de competências, atribuições temporárias etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local e reativa.
+- **Perfis de Usuário**: O perfil de usuário (ADMIN, GESTOR, CHEFE, SERVIDOR) é determinado dinamicamente com base na lotação do servidor logado, através do composable `usePerfil`. O `servidorId` do usuário logado é gerenciado pela store `perfil.js` e persistido no localStorage.
+- **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
 
 ## Estrutura de Diretórios:
 
@@ -38,18 +26,16 @@ já implementadas e outras em andamento.
 
 ## Telas e Componentes Principais
 
-- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.js` store, enquanto os alertas são dados mockados da `painel.js` store.
-- **Detalhes de processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de
-  atividades/conhecimentos.
-- **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e
-  dinâmica.
+- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.js` store, enquanto os alertas são dados mockados da `painel.js` store. As datas dos alertas são formatadas.
+- **Detalhes de processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de atividades/conhecimentos. Inclui botão "Finalizar processo" para ADMINs e colunas da tabela ajustadas.
+- **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e dinâmica.
 - **Mapa de competências**: Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar,
   visualizar e disponibilizar mapas de
   competências, associando atividades a competências.
 - **Atribuição temporária**: Tela para criação/edição de atribuições temporárias de servidores a unidades.
 - **Histórico de processos**: Consulta de processos finalizados.
 - **Navbar**: Barra de navegação principal com links para todas as áreas, incluindo um seletor de servidor para simular
-  o login de diferentes usuários.
+  o login de diferentes usuários. Exibe o perfil e a unidade selecionados no login.
 
 ## UI/UX e Padrões
 
@@ -70,18 +56,18 @@ já implementadas e outras em andamento.
     - `atribuicaoTemporaria.js`: Gerencia atribuições temporárias
     - `perfil.js`: Gerencia o `servidorId`, o perfil e a unidade selecionados do usuário logado, persistindo-os no localStorage.
     - `servidores.js`: Gerencia os dados dos servidores.
-    - `unidades.js`: Gerencia as unidades organizacionais
+    - `unidades.js`: Gerencia as unidades organizacionais e inclui a função `findUnit` para busca hierárquica.
     - `painel.js`: Fornece dados mockados para o painel (ex: alertas).
 - **Componentes**:
-    - `TreeTable.vue`: Tabela hierárquica dinâmica que renderiza cabeçalhos e linhas com base nas colunas fornecidas.
-    - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente.
+    - `TreeTable.vue`: Tabela hierárquica dinâmica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados corretamente.
+    - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique corretamente.
     - `Navbar.vue`: Barra de navegação que exibe o perfil e a unidade selecionados, com um seletor de perfil oculto.
       **Views**
     - `Login.vue`: Tela de login que permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
-    - `Painel.vue`: Painel que exibe processos e alertas, utilizando os stores `processos.js` e `alertas.js`. O botão "Criar processo" é exibido condicionalmente com base no `perfilSelecionado`.
+    - `Painel.vue`: Painel que exibe processos e alertas, utilizando os stores `processos.js` e `alertas.js`. O botão "Criar processo" é exibido condicionalmente com base no `perfilSelecionado`. Datas de alerta formatadas.
     - `CadProcesso.vue`: Cadastro de processos (CRUD)
-    - `DetalhesProcesso.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta.
-    - `DetalhesUnidadeProcesso.vue`: Detalhes de um processo para uma unidade.
+    - `DetalhesProcesso.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada.
+    - `DetalhesUnidadeProcesso.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. O card "Atribuição temporária" foi removido.
     - `CadAtividades.vue`: Cadastro de atividades/conhecimentos.
     - `CadAtribuicao.vue`: Cadastro de atribuições temporárias (CRUD).
     - `CadMapa.vue`: Edição/criação de mapa de competências.
@@ -89,7 +75,7 @@ já implementadas e outras em andamento.
     - `CadMapaFinalizacao.vue`: Finalização/disponibilização de mapa.
     - `HistoricoProcessos.vue`: Lista de processos finalizados.
     - `Unidades.vue`: Listagem hierárquica de unidades.
-    - `DetalhesUnidade.vue`: Detalhes de uma unidade (sem vínculo com processo).
+    - `DetalhesUnidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações detalhadas do responsável, status do mapa vigente e uma `TreeTable` de unidades subordinadas (sem coluna de situação e sem cabeçalho de colunas, com largura total).
 
 ## Regras Importantes
 
@@ -99,9 +85,3 @@ já implementadas e outras em andamento.
 - Siga o padrão de navegação, componentização e UI/UX já estabelecido.
 - Mantenha a consistência do código seguindo as convenções existentes.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
-
-## Próximos Passos e Considerações
-
-- **Refatoração da lógica de `getPerfisEUnidades`**: A função em `Login.vue` pode ser refatorada para melhorar a legibilidade e manutenção, especialmente a função `findUnit`.
-- **Consistência da unidade no Navbar**: Atualmente, o seletor de perfil no Navbar ainda exibe a unidade de lotação principal do servidor (`servidor.unidade`) e não a unidade selecionada no login. Avaliar se o link "Minha unidade" deve refletir a unidade selecionada no login ou a unidade de lotação principal.
-- **Tratamento de erros**: Adicionar tratamento de erros mais robusto para cenários onde o servidor não é encontrado ou não há pares perfil/unidade disponíveis.

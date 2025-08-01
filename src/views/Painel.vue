@@ -59,7 +59,7 @@
         </thead>
         <tbody>
           <tr v-for="(alerta, index) in alertas" :key="index">
-            <td>{{ alerta.data }}</td>
+            <td>{{ formatarDataHora(alerta.data) }}</td>
             <td>{{ alerta.processo }}</td>
             <td>{{ alerta.unidade }}</td>
             <td>{{ alerta.descricao }}</td>
@@ -153,5 +153,10 @@ function consolidarSituacaoProcesso(processo) {
   if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
   if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
   return 'Em andamento' // Default para outros casos intermediários
+}
+
+function formatarDataHora(dataString) {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+  return new Date(dataString).toLocaleString('pt-BR', options);
 }
 </script>

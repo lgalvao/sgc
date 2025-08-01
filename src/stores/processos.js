@@ -20,6 +20,13 @@ export const useProcessosStore = defineStore('processos', {
             if (processo) {
                 processo.localizacao = novaLocalizacao;
             }
+        },
+        finalizarProcesso(processoId) {
+            const processo = this.processos.find(p => p.id === processoId);
+            if (processo) {
+                processo.situacao = 'Finalizado';
+                processo.dataFinalizacao = new Date().toLocaleDateString('pt-BR');
+            }
         }
     }
 })

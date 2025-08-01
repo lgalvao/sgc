@@ -16,7 +16,7 @@
     <div class="table-responsive w-100">
       <table class="table table-striped table-hover m-0">
         <colgroup>
-          <col v-for="(column, index) in columns" :key="column.key" :style="{ width: (100 / columns.length) + '%' }">
+          <col v-for="(column, index) in columns" :key="column.key" :style="{ width: column.width || (100 / columns.length) + '%' }">
         </colgroup>
 
         <thead v-if="!hideHeaders">
