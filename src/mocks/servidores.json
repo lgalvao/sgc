@@ -9,7 +9,7 @@
   {
     "id": 2,
     "nome": "Carlos Henrique Lima",
-    "unidade": "SEADM",
+    "unidade": "SGP",
     "email": "carlos.lima@tre-pe.jus.br",
     "ramal": "2345"
   },
@@ -30,7 +30,7 @@
   {
     "id": 5,
     "nome": "Marina Dias",
-    "unidade": "SEADM",
+    "unidade": "SGP",
     "email": "marina.dias@tre-pe.jus.br",
     "ramal": "5678"
   },

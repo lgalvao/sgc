@@ -25,6 +25,7 @@ import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '../stores/processos'
 import {useUnidadesStore} from '../stores/unidades'
 import {usePerfilStore} from '../stores/perfil'
+import {useProcessoUnidadesStore} from '../stores/processoUnidades'
 import TreeTable from '../components/TreeTable.vue'
 
 const route = useRoute()
@@ -34,6 +35,7 @@ const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const perfilStore = usePerfilStore()
+const processoUnidadesStore = useProcessoUnidadesStore()
 
 const processoId = computed(() => Number(route.params.id))
 const processo = computed(() => processos.value.find(p => p.id === processoId.value))
@@ -42,15 +44,6 @@ const unidadesParticipantes = computed(() => {
   return processo.value.unidades.split(',').map(u => u.trim())
 })
 
-function consolidarSituacaoUnidade(unidade) {
-  if (!unidade.filhas || unidade.filhas.length === 0) return unidade.situacao || 'Não iniciado'
-  const situacoes = unidade.filhas.map(consolidarSituacaoUnidade)
-  if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
-  if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
-  return 'Não iniciado'
-}
-
-// Retorna apenas os nós da hierarquia que são participantes ou têm filhos participantes
 function filtrarHierarquiaPorParticipantes(unidades, participantes) {
   return unidades
       .map(unidade => {
@@ -63,7 +56,6 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
           console.log("Unidade filtrada:", unidade.sigla);
           return {
             ...unidade,
-            situacao: consolidarSituacaoUnidade({...unidade, filhas: filhasFiltradas}),
             filhas: filhasFiltradas
           }
         }
@@ -81,18 +73,21 @@ const colunasTabela = [
 ]
 
 const dadosFormatados = computed(() => {
-  return formatarDadosParaArvore(participantesHierarquia.value, processo.value?.dataLimite)
+  return formatarDadosParaArvore(participantesHierarquia.value, processoId.value)
 })
 
-function formatarDadosParaArvore(dados, dataLimite) {
+function formatarDadosParaArvore(dados, processoId) {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas, dataLimite) : []
+    const children = item.filhas ? formatarDadosParaArvore(item.filhas, processoId) : []
+    const situacaoUnidade = processoUnidadesStore.getSituacaoUnidadeNoProcesso(processoId, item.sigla) || 'Não iniciado';
+    const dataLimiteUnidade = processoUnidadesStore.getDataLimiteUnidadeNoProcesso(processoId, item.sigla) || 'Não informado';
+
     return {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
-      situacao: item.situacao,
-      dataLimite: dataLimite, // Use the passed dataLimite
+      situacao: situacaoUnidade,
+      dataLimite: dataLimiteUnidade,
       expanded: true,
       children: children,
       // Garante que a estrutura de filhos seja consistente

@@ -80,6 +80,7 @@ import { usePerfilStore } from '../stores/perfil'
 import { useProcessosStore } from '../stores/processos'
 import { useUnidadesStore } from '../stores/unidades'
 import { useAlertasStore } from '../stores/alertas'
+import { useProcessoUnidadesStore } from '../stores/processoUnidades'
 import { useRouter } from 'vue-router'
 
 const perfil = usePerfilStore()
@@ -89,6 +90,7 @@ const unidadesStore = useUnidadesStore()
 const { unidades } = storeToRefs(unidadesStore)
 const alertasStore = useAlertasStore()
 const { alertas } = storeToRefs(alertasStore)
+const processoUnidadesStore = useProcessoUnidadesStore()
 const router = useRouter()
 
 // Lógica de Ordenação da Tabela de Processos
@@ -134,20 +136,13 @@ function abrirDetalhesProcesso(processo) {
 }
 
 // Funções de apoio (serão revisadas/utilizadas nas próximas fases)
-function getSituacaoUnidade(sigla, unidades) {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade.situacao
-    if (unidade.filhas && unidade.filhas.length) {
-      const achou = getSituacaoUnidade(sigla, unidade.filhas)
-      if (achou) return achou
-    }
-  }
-  return null
+function getSituacaoUnidade(processoId, sigla) {
+  return processoUnidadesStore.getSituacaoUnidadeNoProcesso(processoId, sigla);
 }
 
 function consolidarSituacaoProcesso(processo) {
   const participantes = processo.unidades.split(',').map(u => u.trim())
-  const situacoes = participantes.map(sigla => getSituacaoUnidade(sigla, unidades.value) || 'Não iniciado')
+  const situacoes = participantes.map(sigla => getSituacaoUnidade(processo.id, sigla) || 'Não iniciado')
 
   if (situacoes.every(s => s === 'Não iniciado')) return 'Criado' // Ajustado conforme CDU
   if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'

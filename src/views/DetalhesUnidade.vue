@@ -3,7 +3,8 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <button class="btn btn-outline-secondary me-2" @click="voltar"> Voltar</button>
-        <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" @click="irParaCriarAtribuicao">
+        <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary"
+                @click="irParaCriarAtribuicao">
           Criar atribuição
         </button>
       </div>
@@ -37,7 +38,6 @@
 <script setup>
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '../stores/unidades'
 import {usePerfilStore} from '../stores/perfil'
 import {useServidoresStore} from '../stores/servidores'
@@ -75,7 +75,7 @@ const dadosFormatadosSubordinadas = computed(() => {
 })
 
 const colunasTabela = [
-  { key: 'nome', label: 'Unidade' }
+  {key: 'nome', label: 'Unidade'}
 ]
 
 function formatarDadosParaArvore(dados) {
@@ -85,15 +85,14 @@ function formatarDadosParaArvore(dados) {
     return {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
-      situacao: item.situacao || 'Não iniciado',
       expanded: true,
-      ...(children.length > 0 && { children })
+      ...(children.length > 0 && {children})
     }
   })
 }
 
 function navigateToSubordinateUnit(item) {
-  router.push({ path: `/unidade/${item.id}` })
+  router.push({path: `/unidade/${item.id}`})
 }
 
 </script>

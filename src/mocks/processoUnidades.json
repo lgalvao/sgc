@@ -1,0 +1,33 @@
+[
+  {
+    "processoId": 1,
+    "unidades": [
+      { "sigla": "STIC", "situacao": "Cadastro em andamento", "dataLimite": "30/06/2025" },
+      { "sigla": "SESEL", "situacao": "Mapa criado", "dataLimite": "30/06/2025" },
+      { "sigla": "SEDESENV", "situacao": "Mapa homologado", "dataLimite": "20/08/2026" }
+    ]
+  },
+  {
+    "processoId": 2,
+    "unidades": [
+      { "sigla": "STIC", "situacao": "Revisão em andamento", "dataLimite": "15/07/2025" },
+      { "sigla": "COSINF", "situacao": "Revisão finalizada sem ajustes", "dataLimite": "15/07/2025" }
+    ]
+  },
+  {
+    "processoId": 4,
+    "unidades": [
+      { "sigla": "STIC", "situacao": "Mapa homologado", "dataLimite": "10/05/2024" },
+      { "sigla": "SEDESENV", "situacao": "Mapa dispoibilizado", "dataLimite": "20/08/2026" },
+      { "sigla": "SEDIA", "situacao": "Mapa homologado", "dataLimite": "20/09/2026" },
+      { "sigla": "SESEL", "situacao": "Mapa homologado", "dataLimite": "20/10/2026" }
+    ]
+  },
+  {
+    "processoId": 5,
+    "unidades": [
+      { "sigla": "STIC", "situacao": "Diagnóstico iniciado", "dataLimite": "10/08/2025" },
+      { "sigla": "SEDIA", "situacao": "Diagnóstico finalizado", "dataLimite": "20/09/2026" }
+    ]
+  }
+]

@@ -3,49 +3,61 @@
     "sigla": "SEDOC",
     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
     "titular": 7,
-    "situacao": "Finalizado",
     "filhas": [
       {
-        "sigla": "SEADM",
-        "nome": "Seção de Administração",
+        "sigla": "SGP",
+        "nome": "Secretaria de Gestao de Pessoas",
+        "tipo": "INTERMEDIARIA",
         "titular": 2,
-        "situacao": "Em andamento",
-        "filhas": []
+        "filhas": [
+          {
+            "sigla": "COEDE",
+            "nome": "Coordenadoria de Educação Especial",
+            "tipo": "INTERMEDIARIA",
+            "titular": 4,
+            "filhas": [
+              {
+                "sigla": "SEMARE",
+                "nome": "Seção Magistrados e Requisitados",
+                "tipo": "OPERACIONAL",
+                "titular": 11,
+                "filhas": []
+              }
+            ]
+          }
+        ]
       },
       {
         "sigla": "STIC",
         "nome": "Secretaria de Informática e Comunicações",
+        "tipo": "INTEROPERACIONAL",
         "titular": 8,
-        "situacao": "Em andamento",
         "filhas": [
           {
             "sigla": "COSIS",
             "nome": "Coordenadoria de Sistemas",
+            "tipo": "INTERMEDIARIA",
             "titular": 9,
-            "situacao": "Em andamento",
             "filhas": [
               {
                 "sigla": "SEDESENV",
                 "nome": "Seção de Desenvolvimento de Sistemas",
+                "tipo": "OPERACIONAL",
                 "titular": 10,
-                "situacao": "Finalizado",
-                "dataLimite": "20/08/2026",
                 "filhas": []
               },
               {
                 "sigla": "SEDIA",
                 "nome": "Seção de Dados de Inteligência Artificial",
+                "tipo": "OPERACIONAL",
                 "titular": 11,
-                "situacao": "Não iniciado",
-                "dataLimite": "20/09/2026",
                 "filhas": []
               },
               {
                 "sigla": "SESEL",
                 "nome": "Seção de Sistemas Eleitorais",
+                "tipo": "OPERACIONAL",
                 "titular": 12,
-                "situacao": "Em andamento",
-                "dataLimite": "20/10/2026",
                 "filhas": []
               }
             ]
@@ -53,9 +65,17 @@
           {
             "sigla": "COSINF",
             "nome": "Coordenadoria de Suporte e Infraestrutura",
+            "tipo": "OPERACIONAL",
             "titular": 13,
-            "situacao": "Finalizado",
-            "filhas": []
+            "filhas": [
+              {
+                "sigla": "SENIC",
+                "nome": "Seção de Infraestrutura",
+                "tipo": "OPERACIONAL",
+                "titular": 10,
+                "filhas": []
+              }
+            ]
           }
         ]
       }

@@ -11,7 +11,7 @@
         <p class="ms-3"><strong>E-mail:</strong> {{ responsavelDetalhes.email }}</p>
         <p>
           <span class="fw-bold me-1">Situação:</span>
-          <span :class="badgeClass(unidade.situacao)" class="badge">{{ unidade.situacao }}</span>
+          <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
         </p>
       </div>
     </div>
@@ -94,6 +94,7 @@ import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
 import {useMapasStore} from '../stores/mapas'
 import {useServidoresStore} from '../stores/servidores'
 import {useProcessosStore} from '../stores/processos'
+import {useProcessoUnidadesStore} from '../stores/processoUnidades'
 
 const route = useRoute()
 const router = useRouter()
@@ -104,6 +105,7 @@ const atribuicaoStore = useAtribuicaoTemporariaStore()
 const mapaStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
+const processoUnidadesStore = useProcessoUnidadesStore()
 
 const unidade = computed(() => {
   return unidadesStore.findUnit(sigla.value);
@@ -113,6 +115,10 @@ const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
 
 const processoId = computed(() => Number(route.query.processoId))
 const processoAtual = computed(() => processosStore.processos.find(p => p.id === processoId.value))
+
+const situacaoUnidadeNoProcesso = computed(() => {
+  return processoUnidadesStore.getSituacaoUnidadeNoProcesso(processoId.value, sigla.value) || 'Não iniciado';
+});
 
 const responsavelDetalhes = computed(() => {
   if (!unidade.value) return null;
