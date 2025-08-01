@@ -13,15 +13,13 @@
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive w-100">
       <table class="table table-striped table-hover m-0">
         <colgroup>
-          <col style="width: 60%;">
-          <col style="width: 20%;">
-          <col style="width: 20%;">
+          <col v-for="(column, index) in columns" :key="column.key" :style="{ width: (100 / columns.length) + '%' }">
         </colgroup>
 
-        <thead>
+        <thead v-if="!hideHeaders">
           <tr>
             <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
           </tr>
@@ -62,6 +60,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    hideHeaders: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['row-click'],
