@@ -1,17 +1,9 @@
 <template>
   <div class="container mt-4">
-    <!-- Breadcrumb e navegação -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/')">Início</a></li>
-          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/unidades')">Unidades</a></li>
-          <li aria-current="page" class="breadcrumb-item active">{{ unidade?.sigla }}</li>
-        </ol>
-      </nav>
       <div>
         <button class="btn btn-outline-secondary me-2" @click="voltar"> Voltar</button>
-        <button class="btn btn-outline-primary" @click="irParaCriarAtribuicao">
+        <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" @click="irParaCriarAtribuicao">
           Criar atribuição
         </button>
       </div>
@@ -36,25 +28,16 @@ import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '../stores/unidades'
+import {usePerfilStore} from '../stores/perfil'
 
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.sigla)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
+const perfilStore = usePerfilStore()
 
-function buscarUnidade(unidades, sigla) {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return null
-}
-
-const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
+const unidade = computed(() => unidadesStore.findUnit(sigla.value))
 
 function voltar() {
   router.back()

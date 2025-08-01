@@ -1,19 +1,18 @@
 <template>
   <div class="container mt-4">
-    <button class="btn btn-secondary mb-3" @click="voltar">Voltar</button>
-    <h2>Detalhes do processo</h2>
     <div v-if="processo">
-      <div class="mb-3">
-        <strong>Descrição:</strong> {{ processo.descricao }}<br>
+      <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo</span>
+      <h2>{{ processo.descricao }}</h2>
+      <div class="mb-5 mt-3">
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
-        <strong>Data limite:</strong> {{ processo.dataLimite }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
       </div>
+
       <TreeTable
-        :data="dadosFormatados"
-        :columns="colunasTabela"
-        title="Unidades participantes"
-        @row-click="abrirDetalhesUnidade"
+          :data="dadosFormatados"
+          :columns="colunasTabela"
+          title="Unidades participantes"
+          @row-click="abrirDetalhesUnidade"
       />
     </div>
     <div v-else>
@@ -23,24 +22,19 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useProcessosStore } from '../stores/processos'
-import { useUnidadesStore } from '../stores/unidades'
-import { useAtividadesConhecimentosStore } from '../stores/atividadesConhecimentos'
+import {computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {storeToRefs} from 'pinia'
+import {useProcessosStore} from '../stores/processos'
+import {useUnidadesStore} from '../stores/unidades'
 import TreeTable from '../components/TreeTable.vue'
 
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
-const { processos } = storeToRefs(processosStore)
+const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
-const { unidades } = storeToRefs(unidadesStore)
-const atividadesConhecimentosStore = useAtividadesConhecimentosStore()
-const { atividadesPorUnidade } = storeToRefs(atividadesConhecimentosStore)
-
-const abertas = ref({})
+const {unidades} = storeToRefs(unidadesStore)
 
 const processoId = computed(() => Number(route.params.id))
 const processo = computed(() => processos.value.find(p => p.id === processoId.value))
@@ -67,6 +61,7 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
         }
         const isParticipante = participantes.includes(unidade.sigla)
         if (isParticipante || filhasFiltradas.length > 0) {
+          console.log("Unidade filtrada:", unidade.sigla);
           return {
             ...unidade,
             situacao: consolidarSituacaoUnidade({...unidade, filhas: filhasFiltradas}),
@@ -81,44 +76,34 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
 const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
 
 const colunasTabela = [
-  { key: 'nome', label: 'Unidade' },
-  { key: 'situacao', label: 'Situação' }
+  {key: 'nome', label: 'Unidade'},
+  {key: 'situacao', label: 'Situação'},
+  {key: 'dataLimite', label: 'Data limite'}
 ]
 
 const dadosFormatados = computed(() => {
-  return formatarDadosParaArvore(participantesHierarquia.value)
+  return formatarDadosParaArvore(participantesHierarquia.value, processo.value?.dataLimite)
 })
 
-function formatarDadosParaArvore(dados) {
+function formatarDadosParaArvore(dados, dataLimite) {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
+    const children = item.filhas ? formatarDadosParaArvore(item.filhas, dataLimite) : []
     return {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
       situacao: item.situacao,
+      dataLimite: dataLimite, // Use the passed dataLimite
       expanded: true,
       children: children,
       // Garante que a estrutura de filhos seja consistente
-      ...(children.length > 0 && { children })
+      ...(children.length > 0 && {children})
     }
   })
 }
 
 function abrirDetalhesUnidade(item) {
-  router.push({ path: `/unidade-processo/${item.id}`, query: { processoId: processoId.value } })
+  router.push({path: `/unidade-processo/${item.id}`, query: {processoId: processoId.value}})
 }
 
-function gerenciarAtividades() {
-  const unidadeSigla = unidadesParticipantes.value;
-  if (unidadeSigla) {
-    router.push({ path: `/processos/${processoId.value}/unidade/${unidadeSigla}/atividades` });
-  } else {
-    alert('Não foi possível determinar a unidade para gerenciar atividades.');
-  }
-}
-
-function voltar() {
-  router.back()
-}
 </script>

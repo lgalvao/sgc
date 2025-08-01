@@ -1,32 +1,14 @@
 <template>
   <div class="container mt-4">
-    <!-- Breadcrumb e navegação -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/')">Início</a></li>
-          <li class="breadcrumb-item"><a style="cursor:pointer" @click="router.push('/unidades')">Unidades</a></li>
-          <li aria-current="page" class="breadcrumb-item active">{{ unidade?.sigla }}</li>
-        </ol>
-      </nav>
-      <div>
-        <button class="btn btn-secondary me-2" @click="voltar"> Voltar</button>
-        <button class="btn btn-primary" @click="irParaAtividadesConhecimentos">
-          Atividades e conhecimentos
-        </button>
-      </div>
-    </div>
-
-    <!-- Card de informações da unidade -->
     <div v-if="unidade" class="card mb-4">
       <div class="card-body">
-        <h2 class="card-title mb-3">Detalhes da Unidade</h2>
-        <p><strong>Sigla:</strong> {{ unidade.sigla }}</p>
-        <p><strong>Nome:</strong> {{ unidade.nome || unidade.sigla }}</p>
+        <span class="badge text-bg-secondary mb-2" style="border-radius: 0" >Processo de unidade</span>
+
+        <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome}}</h2>
         <p><strong>Responsável:</strong> {{ atribuicao?.nomeResponsavel || 'Não definido' }}</p>
         <p><strong>Contato:</strong> {{ atribuicao?.contato || 'Não informado' }}</p>
         <p>
-          <strong>Situação:</strong>
+          <span class="fw-bold me-1">Situação:</span>
           <span :class="badgeClass(unidade.situacao)" class="badge">{{ unidade.situacao }}</span>
         </p>
       </div>
@@ -35,9 +17,39 @@
       <p>Unidade não encontrada.</p>
     </div>
 
-    <!-- Cards de ações -->
     <div class="row">
-      <div class="col-md-6 mb-3">
+      <section class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Atividades e conhecimentos</h5>
+            <div>
+              <button class="btn btn-primary btn-sm" @click="irParaAtividadesConhecimentos">Criar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Mapa de Competências</h5>
+            <div v-if="mapa">
+              <div v-if="mapa.situacao === 'em_andamento'">
+                <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar</button>
+              </div>
+
+              <div v-else-if="mapa.situacao === 'disponivel_validacao'">
+                <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar</button>
+              </div>
+            </div>
+            <div v-else>
+              <button class="btn btn-primary btn-sm me-2" @click="criarMapa">Criar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-md-4 mb-3">
         <div class="card h-100">
           <div class="card-body">
             <h5 class="card-title">Atribuição temporária</h5>
@@ -53,28 +65,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-6 mb-3">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Mapa de Competências</h5>
-            <div v-if="mapa">
-              <div v-if="mapa.situacao === 'em_andamento'">
-                <button class="btn btn-primary btn-sm me-2" @click="editarMapa">Editar</button>
-              </div>
-              <div v-else-if="mapa.situacao === 'disponivel_validacao'">
-                <button class="btn btn-info btn-sm me-2" @click="visualizarMapa">Visualizar</button>
-              </div>
-              <div v-else>
-                <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar</button>
-              </div>
-            </div>
-            <div v-else>
-              <button class="btn btn-success btn-sm me-2" @click="criarMapa">Criar</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
+
     </div>
   </div>
 </template>
@@ -95,18 +87,10 @@ const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 const mapaStore = useMapasStore()
 
-function buscarUnidade(unidades, sigla) {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarUnidade(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return null
-}
-
-const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
+const unidade = computed(() => {
+  console.log("Sigla recebida na rota:", sigla.value);
+  return unidadesStore.findUnit(sigla.value);
+});
 const atribuicao = computed(() => atribuicaoStore.getAtribuicaoPorUnidade(sigla.value))
 const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
 

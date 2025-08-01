@@ -3,7 +3,7 @@ import mapasMock from '../mocks/mapas.json'
 
 export const useMapasStore = defineStore('mapas', {
     state: () => ({
-        mapas: mapasMock // { id, unidade, competencias: [ { nome, atividades: [ { nome, conhecimentos: [string] } ] } ] }
+        mapas: mapasMock
     }),
     actions: {
         editarMapa(id, novosDados) {

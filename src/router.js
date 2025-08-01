@@ -22,11 +22,6 @@ const routes = [
     component: () => import('./views/CadProcesso.vue'),
   },
   {
-    path: '/mapas',
-    name: 'Mapas',
-    component: () => import('./views/Mapas.vue'),
-  },
-  {
     path: '/processos/:id/unidade/:unidadeId/atividades',
     name: 'AtividadesConhecimentos',
     component: () => import('./views/CadAtividades.vue'),
@@ -54,12 +49,12 @@ const routes = [
   {
     path: '/unidade/:sigla/mapa/visualizar',
     name: 'VisualizacaoMapa',
-    component: () => import('./views/MapaVisualizacao.vue'),
+    component: () => import('./views/CadMapaVisualizacao.vue'),
   },
   {
     path: '/finalizacao-mapa',
     name: 'FinalizacaoMapa',
-    component: () => import('./views/MapaFinalizacao.vue'),
+    component: () => import('./views/CadMapaFinalizacao.vue'),
   },
   {
     path: '/unidade/:sigla/atribuir',
@@ -75,6 +70,11 @@ const routes = [
     path: '/unidades',
     name: 'Unidades',
     component: () => import('./views/Unidades.vue'),
+  },
+  {
+    path: '/relatorios',
+    name: 'Relatorios',
+    component: () => import('./views/Relatorios.vue'),
   },
 
 ];

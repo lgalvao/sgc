@@ -6,7 +6,7 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Atividades e Conhecimentos</h2>
+      <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
         <button class="btn btn-outline-primary" title="Importar" data-bs-toggle="tooltip">
           Importar

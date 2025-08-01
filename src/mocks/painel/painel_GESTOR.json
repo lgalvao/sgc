@@ -1,9 +1,0 @@
-{
-  "cartoes": [
-    {
-      "titulo": "Alertas",
-      "tipo": "alertas",
-      "chaveLista": "alertas"
-    }
-  ]
-}

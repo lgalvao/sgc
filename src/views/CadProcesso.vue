@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>Detalhes de processo</h2>
+    <h2>Cadastro de processo</h2>
     <div v-if="feedback" class="alert alert-info mt-3">{{ feedback }}</div>
 
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
@@ -105,7 +105,7 @@ function limparCampos() {
   unidadesSelecionadas.value = []
 }
 
-function formatarDataBR(dataISO) {
+function formatarDataBr(dataISO) {
   if (!dataISO) return ''
   const [ano, mes, dia] = dataISO.split('-')
   return `${dia}/${mes}/${ano}`
@@ -121,8 +121,8 @@ function salvarProcesso() {
     id: processosStore.processos.length + 1,
     descricao: descricao.value,
     tipo: tipo.value,
-    unidades: unidadesSelecionadas.value.join(', '), // agora só siglas
-    dataLimite: formatarDataBR(dataLimite.value),
+    unidades: unidadesSelecionadas.value.join(', '),
+    dataLimite: formatarDataBr(dataLimite.value),
     situacao: 'Não iniciado'
   }
   processosStore.adicionarProcesso(novo)
@@ -143,7 +143,7 @@ function iniciarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     unidades: unidadesSelecionadas.value.join(', '),
-    dataLimite: formatarDataBR(dataLimite.value),
+    dataLimite: formatarDataBr(dataLimite.value),
     situacao: 'Iniciado'
   }
 
@@ -208,27 +208,23 @@ function toggleUnidade(unidade) {
 </script>
 
 <style scoped>
-/* Estilo para o checkbox indeterminado */
 input[type="checkbox"]:indeterminate {
   background-color: #0d6efd;
   border-color: #0d6efd;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10h8'/%3e%3c/svg%3e");
 }
 
-/* Melhora o espaçamento e a hierarquia visual */
 .form-check {
   margin-bottom: 0.25rem;
   padding-left: 1.5em;
 }
 
-/* Melhora a visualização da hierarquia */
 .ms-4 {
   border-left: 1px dashed #dee2e6;
   padding-left: 1rem;
   margin-left: 0.5rem;
 }
 
-/* Estilo para os labels */
 .form-check-label {
   cursor: pointer;
   user-select: none;
@@ -236,7 +232,6 @@ input[type="checkbox"]:indeterminate {
   display: inline-block;
 }
 
-/* Ajuste para os checkboxes */
 .form-check-input {
   margin-top: 0.25rem;
 }

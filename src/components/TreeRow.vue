@@ -1,12 +1,11 @@
 <template>
   <tr @click="handleRowClick" class="tree-row">
-    <td :style="{ paddingLeft: (level * 20) + 'px' }">
-      <span v-if="item.children && item.children.length > 0" @click.stop="toggleExpand(item.id)" class="toggle-icon">
+    <td v-for="(column, index) in columns" :key="column.key" :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
+      <span v-if="index === 0 && item.children && item.children.length > 0" @click.stop="toggleExpand(item.id)" class="toggle-icon">
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
       </span>
-      {{ item.nome }}
+      {{ item[column.key] }}
     </td>
-    <td>{{ item.situacao }}</td>
   </tr>
   <template v-if="item.expanded && item.children">
     <TreeRow
@@ -16,7 +15,7 @@
         :level="level + 1"
         :columns="columns"
         @toggle="toggleExpand"
-        @row-click="$emit('row-click', child)"
+        @row-click="handleChildRowClick"
     />
   </template>
 </template>
@@ -44,12 +43,18 @@ export default {
     }
 
     const handleRowClick = () => {
+      console.log("TreeRow - handleRowClick - item.id:", props.item.id);
       emit('row-click', props.item)
+    }
+
+    const handleChildRowClick = (childItem) => {
+      emit('row-click', childItem);
     }
 
     return {
       toggleExpand,
-      handleRowClick
+      handleRowClick,
+      handleChildRowClick
     }
   }
 }

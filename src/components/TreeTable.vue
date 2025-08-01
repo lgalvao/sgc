@@ -16,10 +16,16 @@
     <div class="table-responsive">
       <table class="table table-striped table-hover m-0">
         <colgroup>
-          <col style="width: 75%;">
-          <col style="width: 25%;">
+          <col style="width: 60%;">
+          <col style="width: 20%;">
+          <col style="width: 20%;">
         </colgroup>
 
+        <thead>
+          <tr>
+            <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
+          </tr>
+        </thead>
         <tbody>
         <template v-for="item in internalData" :key="item.id">
           <TreeRow
@@ -27,7 +33,7 @@
               :level="0"
               :columns="columns"
               @toggle="toggleExpand"
-              @row-click="$emit('row-click', item)"
+              @row-click="handleTreeRowClick"
           />
         </template>
         </tbody>
@@ -120,8 +126,8 @@ export default {
       collapse(internalData.value)
     }
 
-    const handleRowClick = (item) => {
-      emit('row-click', item)
+    const handleTreeRowClick = (clickedItem) => {
+      emit('row-click', clickedItem)
     }
 
     return {
@@ -129,7 +135,7 @@ export default {
       toggleExpand,
       expandAll,
       collapseAll,
-      handleRowClick
+      handleTreeRowClick
     }
   }
 }

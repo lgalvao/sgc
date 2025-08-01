@@ -1,15 +1,14 @@
 <template>
   <div class="container mt-4">
-    <!-- Tabela de processos para GESTOR e SEDOC -->
-    <div v-if="perfil === 'GESTOR' || perfil.value === 'SEDOC'" class="mb-4">
+    <!-- Tabela de Processos -->
+    <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Processos</h4>
-        <router-link v-if="perfil.value === 'SEDOC'" class="btn btn-outline-primary" to="/processos/novo">
-          Criar processo
+        <div class="display-5 mb-0">Processos</div>
+        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" to="/processos/novo">
+          <i class="bi bi-plus-lg"></i> Criar processo
         </router-link>
       </div>
-
-      <table class="table table-striped">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th style="cursor:pointer" @click="ordenarPor('descricao')">
@@ -28,12 +27,14 @@
               Situação
               <span v-if="criterio === 'situacao'">{{ asc ? '↑' : '↓' }}</span>
             </th>
+            <!-- Coluna Unidade Atual a ser adicionada na Fase 2 -->
           </tr>
         </thead>
-
         <tbody>
-          <tr v-for="processo in processosOrdenados" :key="processo.id" style="cursor:pointer" @click="abrirUnidades(processo.id)">
-            <td>{{ processo.descricao }}</td>
+          <tr v-for="processo in processosOrdenados" :key="processo.id">
+            <td style="cursor:pointer; color: var(--bs-link-color);" @click="abrirDetalhesProcesso(processo)">
+              {{ processo.descricao }}
+            </td>
             <td>{{ processo.tipo }}</td>
             <td>{{ processo.unidades }}</td>
             <td>{{ consolidarSituacaoProcesso(processo) }}</td>
@@ -42,113 +43,77 @@
       </table>
     </div>
 
-    <div class="row mt-4">
-      <div v-for="(cartao, idx) in painelConfig.cartoes" :key="idx" :class="cartao.tipo === 'alertas' ? 'col-12 mb-3' : 'col-md-3 mb-3'">
-        <div class="card h-100">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h5 class="card-title">{{ cartao.titulo }}</h5>
-
-            <!-- Cartões de processos com campos -->
-            <div v-if="cartao.campos">
-              <p v-for="campo in cartao.campos" :key="campo.chaveDado" class="card-text">
-                {{ campo.rotulo }}:
-                <span class="badge bg-secondary">{{ dadosPainel[campo.chaveDado].value }}</span>
-              </p>
-              <router-link v-if="cartao.link" :to="cartao.link.to" class="btn btn-outline-primary btn-sm">{{
-                cartao.link.rotulo
-              }}
-              </router-link>
-            </div>
-
-            <!-- Cartões de listas -->
-            <ul v-else-if="cartao.chaveLista && cartao.tipo !== 'alertas'" class="list-group list-group-flush">
-              <li v-for="item in dadosPainel[cartao.chaveLista].value" :key="item.unidade || item.texto || item.nome"
-                class="list-group-item d-flex align-items-center gap-2 py-2 px-3 notification-item">
-                <template v-if="cartao.tipo === 'pendencias'">
-                  {{ item.unidade }} <span :class="badgeClass(item.situacao)" class="badge">{{ item.situacao }}</span>
-                </template>
-
-                <template v-else-if="cartao.tipo === 'notificacoes'">
-                  <span :class="badgeClass(item.tipo)" class="badge">{{ item.tipo === 'info' ? 'Novo' : '!' }}</span>
-                  <span class="notification-text ms-2">{{ item.texto }}</span>
-                </template>
-
-                <template v-else-if="cartao.tipo === 'processosSubordinadas'">
-                  {{ item.nome }} <span :class="badgeClass(item.situacao)" class="badge">{{ item.situacao }}</span>
-                </template>
-              </li>
-            </ul>
-
-            <!-- Tabela de alertas -->
-            <table v-else-if="cartao.tipo === 'alertas'" class="table table-bordered table-sm mb-0">
-              <thead>
-                <tr>
-                  <th style="width: 100px;">Data</th>
-                  <th style="width: 120px;">Unidade</th>
-                  <th>Descrição</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(alerta, idx) in dadosPainel[cartao.chaveLista].value" :key="idx">
-                  <td>{{ formatarData(alerta.data) }}</td>
-                  <td>{{ alerta.unidade }}</td>
-                  <td>{{ alerta.descricao }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Cartão de situacao simples -->
-            <p v-else-if="cartao.tipo === 'situacaoCadastro'">
-              Situação: <span class="badge bg-warning text-dark">{{ dadosPainel.situacaoCadastro.value }}</span>
-              <br>
-              <router-link v-if="cartao.link" :to="cartao.link.to" class="btn btn-primary btn-sm mt-2">{{
-                cartao.link.rotulo
-              }}
-              </router-link>
-            </p>
-          </div>
-        </div>
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="mb-0 display-5">Alertas</div>
       </div>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <!-- Colunas a serem implementadas na Fase 3 -->
+            <th>Data/Hora</th>
+            <th>Processo</th>
+            <th>Unidade</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(alerta, index) in alertas" :key="index">
+            <td>{{ alerta.data }}</td>
+            <td>{{ alerta.processo }}</td>
+            <td>{{ alerta.unidade }}</td>
+            <td>{{ alerta.descricao }}</td>
+          </tr>
+          <tr v-if="!alertas || alertas.length === 0">
+            <td colspan="4" class="text-center text-muted">Nenhum alerta no momento.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
-import { usePerfil } from '../composables/usePerfil'
 import { storeToRefs } from 'pinia'
-import { usePainelStore } from '../stores/painel'
+import { usePerfilStore } from '../stores/perfil'
 import { useProcessosStore } from '../stores/processos'
 import { useUnidadesStore } from '../stores/unidades'
+import { useAlertasStore } from '../stores/alertas'
 import { useRouter } from 'vue-router'
-import painelSEDOC from '../mocks/painel/painel_SEDOC.json'
-import painelGESTOR from '../mocks/painel/painel_GESTOR.json'
-import painelCHEFE from '../mocks/painel/painel_CHEFE.json'
 
-const perfil = usePerfil()
-const perfisPainel = {
-  SEDOC: painelSEDOC,
-  GESTOR: painelGESTOR,
-  CHEFE: painelCHEFE
-}
-const painelConfig = computed(() => perfisPainel[perfil.value] || painelSEDOC)
-
-const painelStore = usePainelStore()
-const dadosPainel = storeToRefs(painelStore)
-
+const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
 const { processos } = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const { unidades } = storeToRefs(unidadesStore)
+const alertasStore = useAlertasStore()
+const { alertas } = storeToRefs(alertasStore)
 const router = useRouter()
 
-// Ordenação simples
+// Lógica de Ordenação da Tabela de Processos
 const criterio = ref('descricao')
 const asc = ref(true)
+
+// A lógica de filtragem e exibição será implementada na Fase 2
+const processosFiltrados = computed(() => {
+  // Por enquanto, retorna todos os processos
+  return processos.value
+})
+
 const processosOrdenados = computed(() => {
-  return [...processos.value].sort((a, b) => {
-    if (a[criterio.value] < b[criterio.value]) return asc.value ? -1 : 1
-    if (a[criterio.value] > b[criterio.value]) return asc.value ? 1 : -1
+  return [...processosFiltrados.value].sort((a, b) => {
+    let valA = a[criterio.value]
+    let valB = b[criterio.value]
+
+    // Tratamento especial para a situação consolidada, que não é um campo direto
+    if (criterio.value === 'situacao') {
+      valA = consolidarSituacaoProcesso(a)
+      valB = consolidarSituacaoProcesso(b)
+    }
+
+    if (valA < valB) return asc.value ? -1 : 1
+    if (valA > valB) return asc.value ? 1 : -1
     return 0
   })
 })
@@ -162,19 +127,13 @@ function ordenarPor(campo) {
   }
 }
 
-function abrirUnidades(id) {
-  router.push(`/processos/${id}/unidades`)
+// Navegação será ajustada na Fase 2
+function abrirDetalhesProcesso(processo) {
+  // Lógica de navegação condicional (CDU-002) a ser implementada
+  router.push(`/processos/${processo.id}/unidades`)
 }
 
-function badgeClass(situacao) {
-  if (situacao === 'Aguardando' || situacao === 'Em andamento' || situacao === 'Aguardando validação') return 'bg-warning text-dark'
-  if (situacao === 'Finalizado' || situacao === 'Validado') return 'bg-success'
-  if (situacao === 'Devolvido') return 'bg-danger'
-  if (situacao === 'info' || situacao === 'Novo') return 'bg-info text-dark'
-  if (situacao === 'danger' || situacao === '!') return 'bg-danger'
-  return 'bg-secondary'
-}
-
+// Funções de apoio (serão revisadas/utilizadas nas próximas fases)
 function getSituacaoUnidade(sigla, unidades) {
   for (const unidade of unidades) {
     if (unidade.sigla === sigla) return unidade.situacao
@@ -190,15 +149,9 @@ function consolidarSituacaoProcesso(processo) {
   const participantes = processo.unidades.split(',').map(u => u.trim())
   const situacoes = participantes.map(sigla => getSituacaoUnidade(sigla, unidades.value) || 'Não iniciado')
 
-  if (situacoes.every(s => s === 'Não iniciado')) return 'Não iniciado'
+  if (situacoes.every(s => s === 'Não iniciado')) return 'Criado' // Ajustado conforme CDU
   if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
   if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
-  return 'Não iniciado'
-}
-
-function formatarData(dataISO) {
-  if (!dataISO) return '';
-  const [ano, mes, dia] = dataISO.split('-');
-  return `${dia}/${mes}/${ano}`;
+  return 'Em andamento' // Default para outros casos intermediários
 }
 </script>

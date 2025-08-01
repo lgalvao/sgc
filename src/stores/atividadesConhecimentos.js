@@ -5,7 +5,6 @@ export const useAtividadesConhecimentosStore = defineStore(
   "atividadesConhecimentos",
   {
     state: () => ({
-      // Estrutura: { [siglaUnidade]: [atividades] }
       atividadesPorUnidade: {
         SESEL: atividadesConhecimentosSESEL.map((a, idx) => ({
           id: idx + 1,
