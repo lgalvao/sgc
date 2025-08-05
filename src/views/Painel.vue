@@ -36,8 +36,8 @@
               {{ processo.descricao }}
             </td>
             <td>{{ processo.tipo }}</td>
-            <td>{{ processo.unidades }}</td>
-            <td>{{ consolidarSituacaoProcesso(processo) }}</td>
+            <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidadeId).join(', ') }}</td>
+            <td>{{ processo.situacao }}</td>
           </tr>
         </tbody>
       </table>
@@ -58,7 +58,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(alerta, index) in alertas" :key="index">
+          <tr v-for="(alerta, index) in alertasFormatados" :key="index">
             <td>{{ formatarDataHora(alerta.data) }}</td>
             <td>{{ alerta.processo }}</td>
             <td>{{ alerta.unidade }}</td>
@@ -80,7 +80,7 @@ import { usePerfilStore } from '../stores/perfil'
 import { useProcessosStore } from '../stores/processos'
 import { useUnidadesStore } from '../stores/unidades'
 import { useAlertasStore } from '../stores/alertas'
-import { useProcessoUnidadesStore } from '../stores/processoUnidades'
+
 import { useRouter } from 'vue-router'
 
 const perfil = usePerfilStore()
@@ -90,7 +90,7 @@ const unidadesStore = useUnidadesStore()
 const { unidades } = storeToRefs(unidadesStore)
 const alertasStore = useAlertasStore()
 const { alertas } = storeToRefs(alertasStore)
-const processoUnidadesStore = useProcessoUnidadesStore()
+
 const router = useRouter()
 
 // Lógica de Ordenação da Tabela de Processos
@@ -108,10 +108,9 @@ const processosOrdenados = computed(() => {
     let valA = a[criterio.value]
     let valB = b[criterio.value]
 
-    // Tratamento especial para a situação consolidada, que não é um campo direto
-    if (criterio.value === 'situacao') {
-      valA = consolidarSituacaoProcesso(a)
-      valB = consolidarSituacaoProcesso(b)
+    if (criterio.value === 'unidades') {
+      valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidadeId).join(', ')
+      valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidadeId).join(', ')
     }
 
     if (valA < valB) return asc.value ? -1 : 1
@@ -135,20 +134,20 @@ function abrirDetalhesProcesso(processo) {
   router.push(`/processos/${processo.id}/unidades`)
 }
 
-// Funções de apoio (serão revisadas/utilizadas nas próximas fases)
-function getSituacaoUnidade(processoId, sigla) {
-  return processoUnidadesStore.getSituacaoUnidadeNoProcesso(processoId, sigla);
-}
+const alertasFormatados = computed(() => {
+  return alertas.value.map(alerta => {
+    const processoUnidade = processosStore.getProcessoUnidadeById(alerta.processoUnidadeId);
+    const processo = processoUnidade ? processosStore.processos.find(p => p.id === processoUnidade.processoId) : null;
+    const unidade = processoUnidade ? unidadesStore.pesquisarUnidade(processoUnidade.unidadeId) : null;
 
-function consolidarSituacaoProcesso(processo) {
-  const participantes = processo.unidades.split(',').map(u => u.trim())
-  const situacoes = participantes.map(sigla => getSituacaoUnidade(processo.id, sigla) || 'Não iniciado')
-
-  if (situacoes.every(s => s === 'Não iniciado')) return 'Criado' // Ajustado conforme CDU
-  if (situacoes.every(s => s === 'Finalizado')) return 'Finalizado'
-  if (situacoes.some(s => s === 'Em andamento')) return 'Em andamento'
-  return 'Em andamento' // Default para outros casos intermediários
-}
+    return {
+      data: alerta.dataHora,
+      processo: processo ? processo.descricao : 'Processo não encontrado',
+      unidade: unidade ? unidade.sigla : 'Unidade não encontrada',
+      descricao: alerta.descricao
+    };
+  });
+});
 
 function formatarDataHora(dataString) {
   const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };

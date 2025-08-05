@@ -44,6 +44,7 @@
                 "nome": "Seção de Desenvolvimento de Sistemas",
                 "tipo": "OPERACIONAL",
                 "titular": 10,
+                "responsavel": 5,
                 "filhas": []
               },
               {

@@ -52,21 +52,21 @@ const perfilStore = usePerfilStore()
 const servidoresStore = useServidoresStore()
 const mapasStore = useMapasStore()
 
-const unidade = computed(() => unidadesStore.findUnit(sigla.value))
+const unidade = computed(() => unidadesStore.pesquisarUnidade(sigla.value))
 const responsavel = computed(() => {
   if (unidade.value && unidade.value.titular) {
     return servidoresStore.getServidorById(unidade.value.titular)?.nome || 'Não definido'
   }
   return 'Não definido'
 })
-const mapaVigente = computed(() => mapasStore.getMapaPorUnidade(sigla.value))
+const mapaVigente = computed(() => mapasStore.getMapaVigentePorUnidade(sigla.value))
 
 function voltar() {
   router.back()
 }
 
 function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${sigla.value}/atribuir`})
+  router.push({path: `/unidade/${sigla.value}/atribuicao`})
 }
 
 const dadosFormatadosSubordinadas = computed(() => {

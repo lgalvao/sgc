@@ -13,6 +13,10 @@
           <span class="fw-bold me-1">Situação:</span>
           <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
         </p>
+        <p v-if="processoUnidadeDetalhes">
+          <strong>Unidade Atual:</strong> {{ processoUnidadeDetalhes.unidadeAtual || 'Não informado' }}<br>
+          <strong>Unidade Anterior:</strong> {{ processoUnidadeDetalhes.unidadeAnterior || 'N/A' }}
+        </p>
       </div>
     </div>
     <div v-else>
@@ -94,50 +98,56 @@ import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
 import {useMapasStore} from '../stores/mapas'
 import {useServidoresStore} from '../stores/servidores'
 import {useProcessosStore} from '../stores/processos'
-import {useProcessoUnidadesStore} from '../stores/processoUnidades'
+
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.params.sigla)
+const idProcessoUnidade = computed(() => Number(route.params.idProcessoUnidade))
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 const mapaStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
-const processoUnidadesStore = useProcessoUnidadesStore()
+const { processos } = storeToRefs(processosStore)
+
+const processoUnidadeDetalhes = computed(() => {
+  return processosStore.getProcessoUnidadeById(idProcessoUnidade.value);
+});
+
+const processoAtual = computed(() => {
+  if (!processoUnidadeDetalhes.value) return null;
+  return processos.value.find(p => p.id === processoUnidadeDetalhes.value.processoId);
+});
+
+const sigla = computed(() => processoUnidadeDetalhes.value?.unidadeId);
 
 const unidade = computed(() => {
-  return unidadesStore.findUnit(sigla.value);
-});
-const atribuicao = computed(() => atribuicaoStore.getAtribuicaoPorUnidade(sigla.value))
-const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
-
-const processoId = computed(() => Number(route.query.processoId))
-const processoAtual = computed(() => processosStore.processos.find(p => p.id === processoId.value))
-
-const situacaoUnidadeNoProcesso = computed(() => {
-  return processoUnidadesStore.getSituacaoUnidadeNoProcesso(processoId.value, sigla.value) || 'Não iniciado';
+  if (!sigla.value) {
+    return null;
+  }
+  const foundUnidade = unidadesStore.pesquisarUnidade(sigla.value);
+  // Garante que foundUnidade não é nulo/indefinido e possui as propriedades necessárias
+  if (foundUnidade && foundUnidade.sigla && foundUnidade.nome) {
+    return foundUnidade;
+  }
+  return null; // Retorna null se não encontrado ou propriedades ausentes
 });
 
 const responsavelDetalhes = computed(() => {
-  if (!unidade.value) return null;
-
-  const titular = servidoresStore.getServidorById(unidade.value.titular);
-  let tipoResponsabilidade = 'Titular';
-  let dataTermino = '';
-
-  if (atribuicao.value) {
-    tipoResponsabilidade = 'Atrib. temporária';
-    dataTermino = ` (até ${atribuicao.value.dataTermino})`; // Assumindo que dataTermino existe
+  if (!unidade.value || !unidade.value.responsavelId) {
+    return {}; // Retorna um objeto vazio para evitar erros de acesso a propriedades
   }
+  return servidoresStore.getServidorById(unidade.value.responsavelId);
+});
 
-  return {
-    nome: titular?.nome || 'Não definido',
-    tipo: `${tipoResponsabilidade}${dataTermino}`,
-    ramal: titular?.ramal || 'Não informado',
-    email: titular?.email || 'Não informado'
-  };
+const situacaoUnidadeNoProcesso = computed(() => {
+  return processoUnidadeDetalhes.value?.situacao || 'Não informado';
+});
+
+const mapa = computed(() => {
+  if (!unidade.value || !processoAtual.value) return null;
+  return mapaStore.getMapaByUnidadeId(unidade.value.sigla, processoAtual.value.id);
 });
 
 function badgeClass(situacao) {
@@ -156,28 +166,22 @@ function removerAtribuicao() {
 }
 
 function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${sigla.value}/atribuir`})
+  router.push({path: `/unidade/${sigla.value}/atribuicao`})
 }
 
 function criarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa`})
+  router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value?.id}})
 }
 
 function editarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa`})
+  router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value?.id}})
 }
 
 function visualizarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa/visualizar`})
+  router.push({path: `/unidade/${sigla.value}/mapa/visualizar`, query: {processoId: processoAtual.value?.id}})
 }
 
 function irParaAtividadesConhecimentos() {
-  // Tenta obter o id do processo da query string ou do localStorage, se não disponível, alerta
-  const processoId = route.query.processoId || localStorage.getItem('processoIdAtual')
-  if (processoId) {
-    router.push(`/processos/${processoId}/unidade/${sigla.value}/atividades`)
-  } else {
-    alert('ID do processo não encontrado. Acesse a partir do processo no painel.')
-  }
+  router.push(`/processos/${processoAtual.value?.id}/unidade/${sigla.value}/atividades`)
 }
 </script>

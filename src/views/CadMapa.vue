@@ -66,16 +66,16 @@ import {storeToRefs} from 'pinia'
 
 import {useMapasStore} from '../stores/mapas'
 import {useUnidadesStore} from '../stores/unidades'
-import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
+
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.query.sigla || route.params.sigla)
+const sigla = computed(() => route.params.sigla)
+const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
-const atividadesStore = useAtividadesConhecimentosStore()
+const atividadesStore = useAtividadesStore()
 const {unidades} = storeToRefs(unidadesStore)
-const {atividadesPorUnidade} = storeToRefs(atividadesStore)
 
 function buscarUnidade(unidades, sigla) {
   for (const unidade of unidades) {
@@ -89,7 +89,13 @@ function buscarUnidade(unidades, sigla) {
 }
 
 const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
-const atividades = computed(() => atividadesPorUnidade.value[sigla.value] || [])
+const processoUnidadeId = computed(() => {
+  const processo = processosStore.processos.find(p => p.id === processoId.value);
+  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === sigla.value);
+  return processoUnidade?.id;
+});
+
+const atividades = computed(() => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [])
 const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
 const competencias = ref(mapa.value ? [...mapa.value.competencias] : [])
 const atividadesSelecionadas = ref([])

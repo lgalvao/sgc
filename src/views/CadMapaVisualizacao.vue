@@ -34,16 +34,16 @@ import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useMapasStore} from '../stores/mapas'
 import {useUnidadesStore} from '../stores/unidades'
-import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
+
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.query.sigla || route.params.sigla)
+const sigla = computed(() => route.params.sigla)
+const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const mapaStore = useMapasStore()
-const atividadesStore = useAtividadesConhecimentosStore()
-const {atividadesPorUnidade} = storeToRefs(atividadesStore)
+const atividadesStore = useAtividadesStore()
 
 function buscarUnidade(unidades, sigla) {
   for (const unidade of unidades) {
@@ -58,7 +58,13 @@ function buscarUnidade(unidades, sigla) {
 
 const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
 const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
-const atividades = computed(() => atividadesPorUnidade.value[sigla.value] || [])
+const processoUnidadeId = computed(() => {
+  const processo = processosStore.processos.find(p => p.id === processoId.value);
+  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === sigla.value);
+  return processoUnidade?.id;
+});
+
+const atividades = computed(() => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [])
 
 function descricaoAtividade(id) {
   const atv = atividades.value.find(a => a.id === id)

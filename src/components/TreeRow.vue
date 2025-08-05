@@ -43,7 +43,6 @@ export default {
     }
 
     const handleRowClick = () => {
-      console.log("TreeRow - handleRowClick - item.id:", props.item.id);
       emit('row-click', props.item)
     }
 

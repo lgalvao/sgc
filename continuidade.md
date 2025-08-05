@@ -26,8 +26,8 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 
 ## Telas e Componentes Principais
 
-- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.js` store, enquanto os alertas são dados mockados da `painel.js` store. As datas dos alertas são formatadas.
-- **Detalhes de processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de atividades/conhecimentos. Inclui botão "Finalizar processo" para ADMINs e colunas da tabela ajustadas.
+- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.js` store, enquanto os alertas são dados mockados da `alertas.js` store. As datas dos alertas são formatadas.
+- **Processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de atividades/conhecimentos. Inclui botão "Finalizar processo" para ADMINs e colunas da tabela ajustadas.
 - **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e dinâmica.
 - **Mapa de competências**: Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar,
   visualizar e disponibilizar mapas de
@@ -50,14 +50,14 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 
 - **Dados**: Mockados em JSON, importados apenas nos stores do Pinia.
 - **Stores**: Cada domínio (processo, mapa, unidade, perfil etc.) possui um store dedicado.
-    - `processos.js`: Gerencia o estado dos processos
-    - `mapas.js`: Gerencia os mapas de competência
-    - `atividadesConhecimentos.js`: Gerencia atividades e conhecimentos
-    - `atribuicaoTemporaria.js`: Gerencia atribuições temporárias
+    - `processos.js`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `ProcessoUnidade`.
+    - `mapas.js`: Gerencia os mapas de competência.
+    - `atividades.js`: Gerencia atividades e conhecimentos.
+    - `atribuicaoTemporaria.js`: Gerencia atribuições temporárias.
     - `perfil.js`: Gerencia o `servidorId`, o perfil e a unidade selecionados do usuário logado, persistindo-os no localStorage.
     - `servidores.js`: Gerencia os dados dos servidores.
-    - `unidades.js`: Gerencia as unidades organizacionais e inclui a função `findUnit` para busca hierárquica.
-    - `painel.js`: Fornece dados mockados para o painel (ex: alertas).
+    - `unidades.js`: Gerencia as unidades organizacionais e inclui a função `pesquisarUnidade` para busca hierárquica.
+    - `alertas.js`: Fornece dados mockados para o painel (ex: alertas).
 - **Componentes**:
     - `TreeTable.vue`: Tabela hierárquica dinâmica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados corretamente.
     - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique corretamente.
@@ -66,16 +66,15 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
     - `Login.vue`: Tela de login que permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
     - `Painel.vue`: Painel que exibe processos e alertas, utilizando os stores `processos.js` e `alertas.js`. O botão "Criar processo" é exibido condicionalmente com base no `perfilSelecionado`. Datas de alerta formatadas.
     - `CadProcesso.vue`: Cadastro de processos (CRUD)
-    - `DetalhesProcesso.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada.
-    - `DetalhesUnidadeProcesso.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. O card "Atribuição temporária" foi removido.
+    - `Processo.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada.
+    - `ProcessoUnidade.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. O card "Atribuição temporária" foi removido.
     - `CadAtividades.vue`: Cadastro de atividades/conhecimentos.
     - `CadAtribuicao.vue`: Cadastro de atribuições temporárias (CRUD).
     - `CadMapa.vue`: Edição/criação de mapa de competências.
     - `CadMapaVisualizacao.vue`: Visualização de mapa de competências.
     - `CadMapaFinalizacao.vue`: Finalização/disponibilização de mapa.
     - `HistoricoProcessos.vue`: Lista de processos finalizados.
-    - `Unidades.vue`: Listagem hierárquica de unidades.
-    - `DetalhesUnidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações detalhadas do responsável, status do mapa vigente e uma `TreeTable` de unidades subordinadas (sem coluna de situação e sem cabeçalho de colunas, com largura total).
+    - `Unidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações detalhadas do responsável, status do mapa vigente e uma `TreeTable` de unidades subordinadas (sem coluna de situação e sem cabeçalho de colunas, com largura total).
 
 ## Regras Importantes
 
@@ -85,3 +84,4 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 - Siga o padrão de navegação, componentização e UI/UX já estabelecido.
 - Mantenha a consistência do código seguindo as convenções existentes.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
+- **Regra de Unidades Intermediárias**: Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas. Elas aparecem na hierarquia para fins de navegação e contexto, mas a participação direta em um processo é restrita às unidades operacionais ou inter-operacionais.

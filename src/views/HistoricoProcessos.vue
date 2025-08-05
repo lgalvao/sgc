@@ -27,7 +27,7 @@
       <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
-        <td>{{ processo.unidades }}</td>
+        <td>{{ processo.processosUnidade.map(pu => pu.unidadeId).join(', ') }}</td>
         <td>{{ processo.dataFinalizacao }}</td>
       </tr>
       </tbody>

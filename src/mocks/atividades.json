@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "descricao": "Manutenção de sistemas administrativos criados pela unidade",
+    "processoUnidadeId": 3,
+    "conhecimentos": [
+      { "id": 1, "descricao": "Criação de testes de integração em Cypress" },
+      { "id": 2, "descricao": "Criação de testes em Playwright" },
+      { "id": 3, "descricao": "Programação em Java" },
+      { "id": 4, "descricao": "ProgramNaoação em JavaScript/Vue" },
+      { "id": 5, "descricao": "Correções de vulnerabilidades" }
+    ]
+  },
+  {
+    "id": 2,
+    "descricao": "Especificação de sistemas administrativos",
+    "processoUnidadeId": 3,
+    "conhecimentos": [
+      { "id": 6, "descricao": "Modelagem de dados" },
+      { "id": 7, "descricao": "Especificação de requisitos e casos de uso" },
+      { "id": 8, "descricao": "Especificação de testes de aceitação" }
+    ]
+  },
+  {
+    "id": 3,
+    "descricao": "Implantação de sistemas externos",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 4,
+    "descricao": "Testes de Sistemas Eleitorais",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 5,
+    "descricao": "Participação em Simulados Eleitorais",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 6,
+    "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  }
+]

@@ -111,26 +111,43 @@ function formatarDataBr(dataISO) {
   return `${dia}/${mes}/${ano}`
 }
 
+function isUnidadeIntermediaria(sigla) {
+  const unidade = unidadesStore.pesquisarUnidade(sigla);
+  return unidade && unidade.tipo === 'INTERMEDIARIA';
+}
+
 function salvarProcesso() {
   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
     feedback.value = 'Preencha todos os campos e selecione ao menos uma unidade.'
     return
   }
 
+  const novoProcessoId = processosStore.processos.length + 1;
+  const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
+
+  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeId, index) => ({
+    id: Date.now() + index, // Simple unique ID generation
+    processoId: novoProcessoId,
+    unidadeId: unidadeId,
+    dataLimite: formatarDataBr(dataLimite.value),
+    unidadeAtual: unidadeId, // Inicializa com a própria unidade
+    unidadeAnterior: null // Não há unidade anterior no início
+  }));
+
   const novo = {
-    id: processosStore.processos.length + 1,
+    id: novoProcessoId,
     descricao: descricao.value,
     tipo: tipo.value,
-    unidades: unidadesSelecionadas.value.join(', '),
+    processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
     dataLimite: formatarDataBr(dataLimite.value),
     situacao: 'Não iniciado'
-  }
-  processosStore.adicionarProcesso(novo)
-  feedback.value = 'Processo salvo com sucesso!'
+  };
+  processosStore.adicionarProcesso(novo); // A store agora adiciona os objetos ProcessoUnidade separadamente
+  feedback.value = 'Processo salvo com sucesso!';
   setTimeout(() => {
-    router.push('/painel')
-  }, 1000)
-  limparCampos()
+    router.push('/painel');
+  }, 1000);
+  limparCampos();
 }
 
 function iniciarProcesso() {
@@ -138,16 +155,29 @@ function iniciarProcesso() {
     feedback.value = 'Preencha todos os campos e selecione ao menos uma unidade.'
     return
   }
+
+  const novoProcessoId = processosStore.processos.length + 1;
+  const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
+
+  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeId, index) => ({
+    id: Date.now() + index, // Simple unique ID generation
+    processoId: novoProcessoId,
+    unidadeId: unidadeId,
+    dataLimite: formatarDataBr(dataLimite.value),
+    unidadeAtual: unidadeId, // Inicializa com a própria unidade
+    unidadeAnterior: null // Não há unidade anterior no início
+  }));
+
   const novo = {
-    id: processosStore.processos.length + 1,
+    id: novoProcessoId,
     descricao: descricao.value,
     tipo: tipo.value,
-    unidades: unidadesSelecionadas.value.join(', '),
+    processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
     dataLimite: formatarDataBr(dataLimite.value),
     situacao: 'Iniciado'
-  }
+  };
 
-  processosStore.adicionarProcesso(novo)
+  processosStore.adicionarProcesso(novo); // A store agora adiciona os objetos ProcessoUnidade separadamente
   feedback.value = 'Processo iniciado! Notificações enviadas às unidades.'
   setTimeout(() => {
     router.push('/painel')

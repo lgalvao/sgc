@@ -99,7 +99,7 @@
 import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useAtividadesConhecimentosStore} from '../stores/atividadesConhecimentos'
+import {useAtividadesStore} from '../stores/atividades'
 import {useUnidadesStore} from '../stores/unidades'
 import {useProcessosStore} from '../stores/processos'
 
@@ -108,8 +108,8 @@ const router = useRouter()
 const unidadeId = computed(() => route.params.unidadeId)
 const processoId = computed(() => Number(route.params.id))
 
-const atividadesConhecimentosStore = useAtividadesConhecimentosStore()
-const {atividadesPorUnidade} = storeToRefs(atividadesConhecimentosStore)
+const atividadesStore = useAtividadesStore()
+const {atividadesPorUnidade} = storeToRefs(mapasStore)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const processosStore = useProcessosStore()
@@ -148,16 +148,23 @@ let idAtividade = 1
 let idConhecimento = 1
 const novaAtividade = ref('')
 
+const processoUnidadeId = computed(() => {
+  const processo = processosStore.processos.find(p => p.id === processoId.value);
+  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === unidadeId.value);
+  return processoUnidade?.id;
+});
+
 const atividades = computed({
-  get: () => atividadesPorUnidade.value[unidadeId.value] || [],
-  set: (val) => atividadesConhecimentosStore.setAtividades(unidadeId.value, val)
+  get: () => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [],
+  set: (val) => atividadesStore.setAtividades(processoUnidadeId.value, val)
 })
 
 function adicionarAtividade() {
   if (novaAtividade.value.trim()) {
-    atividadesConhecimentosStore.adicionarAtividade(unidadeId.value, {
+    atividadesStore.adicionarAtividade({
       id: idAtividade++,
       descricao: novaAtividade.value,
+      processoUnidadeId: processoUnidadeId.value,
       conhecimentos: [],
       novoConhecimento: ''
     })
@@ -166,13 +173,13 @@ function adicionarAtividade() {
 }
 
 function removerAtividade(idx) {
-  atividadesConhecimentosStore.removerAtividade(unidadeId.value, idx)
+  atividadesStore.removerAtividade(atividades.value[idx].id)
 }
 
 function adicionarConhecimento(idx) {
   const atividade = atividades.value[idx]
   if (atividade.novoConhecimento && atividade.novoConhecimento.trim()) {
-    atividadesConhecimentosStore.adicionarConhecimento(unidadeId.value, idx, {
+    atividadesStore.adicionarConhecimento(atividade.id, {
       id: idConhecimento++,
       descricao: atividade.novoConhecimento
     })
@@ -181,7 +188,7 @@ function adicionarConhecimento(idx) {
 }
 
 function removerConhecimento(idx, cidx) {
-  atividadesConhecimentosStore.removerConhecimento(unidadeId.value, idx, cidx)
+  atividadesStore.removerConhecimento(atividades.value[idx].id, atividades.value[idx].conhecimentos[cidx].id)
 }
 
 // --- Edição de conhecimento ---
@@ -278,9 +285,11 @@ async function disponibilizarCadastro() {
 
 onMounted(() => {
   // Se a unidade for SESEL e ainda não estiver carregada, inicializa do mock (já feito no store)
-  if (unidadeId.value === 'SESEL' && !atividadesPorUnidade.value.SESEL) {
-    atividadesConhecimentosStore.setAtividades('SESEL', atividadesConhecimentosStore.atividadesPorUnidade.SESEL)
-  }
+  // Não é mais necessário inicializar do mock, pois a store de atividades já faz isso.
+  // Apenas garantir que o estado inicial esteja correto.
+  // if (unidadeId.value === 'SESEL' && !atividadesStore.getAtividadesPorProcessoUnidade(`${processoId.value}-${unidadeId.value}`).length) {
+  //   atividadesStore.setAtividades(`${processoId.value}-${unidadeId.value}`, atividadesStore.getAtividadesPorProcessoUnidade(`${processoId.value}-${unidadeId.value}`))
+  // }
 })
 </script>
 

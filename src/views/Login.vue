@@ -99,14 +99,14 @@ const getPerfisEUnidades = (servidorId) => {
 
   const servidorComPerfil = servidoresComPerfil.value.find(s => s.id === servidorId)
   if (servidorComPerfil) {
-    const unidadeTitular = unidadesStore.findUnit(servidorComPerfil.unidade)
+    const unidadeTitular = unidadesStore.pesquisarUnidade(servidorComPerfil.unidade)
     if (unidadeTitular) {
       paresDisponiveis.push({ perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla })
     }
   }
 
   atribuicoes.forEach(atrb => {
-    const unidade = unidadesStore.findUnit(atrb.unidade)
+    const unidade = unidadesStore.pesquisarUnidade(atrb.unidade)
     if (unidade) {
       // Adiciona apenas se o par perfil-unidade ainda não existe
       const existe = paresDisponiveis.some(p => p.perfil === 'SERVIDOR' && p.unidade === unidade.sigla)
