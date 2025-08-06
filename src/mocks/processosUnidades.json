@@ -1,14 +1,14 @@
 [
-  { "id": 1, "processoId": 1, "unidadeId": "STIC", "dataLimite": "30/06/2025", "unidadeAtual": "STIC", "unidadeAnterior": null },
-  { "id": 3, "processoId": 1, "unidadeId": "SESEL", "dataLimite": "30/06/2025", "unidadeAtual": "SESEL", "unidadeAnterior": "STIC" },
-  { "id": 4, "processoId": 1, "unidadeId": "SEDESENV", "dataLimite": "30/06/2025", "unidadeAtual": "SEDESENV", "unidadeAnterior": "SESEL" },
-  { "id": 5, "processoId": 2, "unidadeId": "STIC", "dataLimite": "15/07/2025", "unidadeAtual": "STIC", "unidadeAnterior": null },
-  { "id": 6, "processoId": 2, "unidadeId": "COINF", "dataLimite": "15/07/2025", "unidadeAtual": "COINF", "unidadeAnterior": "STIC" },
-  { "id": 7, "processoId": 2, "unidadeId": "SENIC", "dataLimite": "15/07/2025", "unidadeAtual": "SENIC", "unidadeAnterior": "COINF" },
-  { "id": 8, "processoId": 4, "unidadeId": "STIC", "dataLimite": "10/06/2024", "unidadeAtual": "STIC", "unidadeAnterior": null },
-  { "id": 10, "processoId": 4, "unidadeId": "SEDESENV", "dataLimite": "10/05/2024", "unidadeAtual": "SEDESENV", "unidadeAnterior": "STIC" },
-  { "id": 11, "processoId": 4, "unidadeId": "SEDIA", "dataLimite": "10/07/2024", "unidadeAtual": "SEDIA", "unidadeAnterior": "SEDESENV" },
-  { "id": 12, "processoId": 4, "unidadeId": "SESEL", "dataLimite": "10/05/2024", "unidadeAtual": "SESEL", "unidadeAnterior": "SEDIA" },
-  { "id": 13, "processoId": 5, "unidadeId": "STIC", "dataLimite": "10/08/2025", "unidadeAtual": "STIC", "unidadeAnterior": null },
-  { "id": 15, "processoId": 5, "unidadeId": "SEDIA", "dataLimite": "10/08/2025", "unidadeAtual": "SEDIA", "unidadeAnterior": "STIC" }
+  { "id": 1, "processoId": 1, "unidadeId": "STIC", "dataLimite": "2025-06-30", "situacao": "Em andamento", "unidadeAtual": "STIC", "unidadeAnterior": null },
+  { "id": 3, "processoId": 1, "unidadeId": "SESEL", "dataLimite": "2025-06-30", "situacao": "Aguardando validação", "unidadeAtual": "SESEL", "unidadeAnterior": "STIC" },
+  { "id": 4, "processoId": 1, "unidadeId": "SEDESENV", "dataLimite": "2025-06-30", "situacao": "Validado", "unidadeAtual": "SEDESENV", "unidadeAnterior": "SESEL" },
+  { "id": 5, "processoId": 2, "unidadeId": "STIC", "dataLimite": "2025-07-15", "situacao": "Em andamento", "unidadeAtual": "STIC", "unidadeAnterior": null },
+  { "id": 6, "processoId": 2, "unidadeId": "COINF", "dataLimite": "2025-07-15", "situacao": "Em andamento", "unidadeAtual": "COINF", "unidadeAnterior": "STIC" },
+  { "id": 7, "processoId": 2, "unidadeId": "SENIC", "dataLimite": "2025-07-15", "situacao": "Em andamento", "unidadeAtual": "SENIC", "unidadeAnterior": "COINF" },
+  { "id": 8, "processoId": 4, "unidadeId": "STIC", "dataLimite": "2024-06-10", "situacao": "Finalizado", "unidadeAtual": "STIC", "unidadeAnterior": null },
+  { "id": 10, "processoId": 4, "unidadeId": "SEDESENV", "dataLimite": "2024-05-10", "situacao": "Finalizado", "unidadeAtual": "SEDESENV", "unidadeAnterior": "STIC" },
+  { "id": 11, "processoId": 4, "unidadeId": "SEDIA", "dataLimite": "2024-07-10", "situacao": "Finalizado", "unidadeAtual": "SEDIA", "unidadeAnterior": "SEDESENV" },
+  { "id": 12, "processoId": 4, "unidadeId": "SESEL", "dataLimite": "2024-05-10", "situacao": "Finalizado", "unidadeAtual": "SESEL", "unidadeAnterior": "SEDIA" },
+  { "id": 13, "processoId": 5, "unidadeId": "STIC", "dataLimite": "2025-08-10", "situacao": "Finalizado", "unidadeAtual": "STIC", "unidadeAnterior": null },
+  { "id": 15, "processoId": 5, "unidadeId": "SEDIA", "dataLimite": "2025-08-10", "situacao": "Finalizado", "unidadeAtual": "SEDIA", "unidadeAnterior": "STIC" }
 ]

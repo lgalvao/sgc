@@ -27,8 +27,8 @@
       <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
-        <td>{{ processo.processosUnidade.map(pu => pu.unidadeId).join(', ') }}</td>
-        <td>{{ processo.dataFinalizacao }}</td>
+        <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidadeId).join(', ') }}</td>
+        <td>{{ formatarData(processo.dataFinalizacao) }}</td>
       </tr>
       </tbody>
     </table>
@@ -56,11 +56,25 @@ const processosFinalizados = computed(() =>
 
 const processosFinalizadosOrdenados = computed(() => {
   return [...processosFinalizados.value].sort((a, b) => {
-    if (a[criterio.value] < b[criterio.value]) return asc.value ? -1 : 1
-    if (a[criterio.value] > b[criterio.value]) return asc.value ? 1 : -1
-    return 0
-  })
-})
+    let valA = a[criterio.value];
+    let valB = b[criterio.value];
+
+    if (criterio.value === 'unidades') {
+      valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidadeId).join(', ');
+      valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidadeId).join(', ');
+    }
+
+    if (valA < valB) return asc.value ? -1 : 1;
+    if (valA > valB) return asc.value ? 1 : -1;
+    return 0;
+  });
+});
+
+function formatarData(data) {
+  if (!data) return ''
+  const [ano, mes, dia] = data.split('-')
+  return `${dia}/${mes}/${ano}`
+}
 
 function ordenarPor(campo) {
   if (criterio.value === campo) {

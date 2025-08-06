@@ -12,9 +12,9 @@
       <div class="mb-3">
         <label class="form-label" for="tipo">Tipo</label>
         <select id="tipo" v-model="tipo" class="form-select">
-          <option>Mapeamento</option>
-          <option>Revisão</option>
-          <option>Diagnóstico</option>
+          <option v-for="tipoOption in ProcessoTipo" :key="tipoOption" :value="tipoOption">
+            {{ tipoOption }}
+          </option>
         </select>
       </div>
 
@@ -51,6 +51,7 @@
                       <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
                     </label>
                   </div>
+
                   <div v-if="filha.filhas && filha.filhas.length" class="ms-4">
                     <div v-for="neta in filha.filhas" :key="neta.sigla" class="form-check">
                       <input
@@ -88,10 +89,11 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '../stores/processos'
 import {useUnidadesStore} from '../stores/unidades'
+import {ProcessoTipo} from '../types/domain'
 
 const unidadesSelecionadas = ref([])
 const descricao = ref('')
-const tipo = ref('Mapeamento')
+const tipo = ref(ProcessoTipo.MAPEAMENTO)
 const dataLimite = ref('')
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -100,16 +102,12 @@ const unidadesStore = useUnidadesStore()
 
 function limparCampos() {
   descricao.value = ''
-  tipo.value = 'Mapeamento'
+  tipo.value = ProcessoTipo.MAPEAMENTO
   dataLimite.value = ''
   unidadesSelecionadas.value = []
 }
 
-function formatarDataBr(dataISO) {
-  if (!dataISO) return ''
-  const [ano, mes, dia] = dataISO.split('-')
-  return `${dia}/${mes}/${ano}`
-}
+
 
 function isUnidadeIntermediaria(sigla) {
   const unidade = unidadesStore.pesquisarUnidade(sigla);
@@ -129,7 +127,7 @@ function salvarProcesso() {
     id: Date.now() + index, // Simple unique ID generation
     processoId: novoProcessoId,
     unidadeId: unidadeId,
-    dataLimite: formatarDataBr(dataLimite.value),
+    dataLimite: dataLimite.value,
     unidadeAtual: unidadeId, // Inicializa com a própria unidade
     unidadeAnterior: null // Não há unidade anterior no início
   }));
@@ -139,7 +137,7 @@ function salvarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
-    dataLimite: formatarDataBr(dataLimite.value),
+    dataLimite: dataLimite.value,
     situacao: 'Não iniciado'
   };
   processosStore.adicionarProcesso(novo); // A store agora adiciona os objetos ProcessoUnidade separadamente
@@ -163,7 +161,7 @@ function iniciarProcesso() {
     id: Date.now() + index, // Simple unique ID generation
     processoId: novoProcessoId,
     unidadeId: unidadeId,
-    dataLimite: formatarDataBr(dataLimite.value),
+    dataLimite: dataLimite.value,
     unidadeAtual: unidadeId, // Inicializa com a própria unidade
     unidadeAnterior: null // Não há unidade anterior no início
   }));
@@ -173,7 +171,7 @@ function iniciarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
-    dataLimite: formatarDataBr(dataLimite.value),
+    dataLimite: dataLimite.value,
     situacao: 'Iniciado'
   };
 

@@ -53,7 +53,7 @@
             <!-- Colunas a serem implementadas na Fase 3 -->
             <th>Data/Hora</th>
             <th>Processo</th>
-            <th>Unidade</th>
+            <th>Unidade Origem</th>
             <th>Descrição</th>
           </tr>
         </thead>
@@ -136,14 +136,12 @@ function abrirDetalhesProcesso(processo) {
 
 const alertasFormatados = computed(() => {
   return alertas.value.map(alerta => {
-    const processoUnidade = processosStore.getProcessoUnidadeById(alerta.processoUnidadeId);
-    const processo = processoUnidade ? processosStore.processos.find(p => p.id === processoUnidade.processoId) : null;
-    const unidade = processoUnidade ? unidadesStore.pesquisarUnidade(processoUnidade.unidadeId) : null;
+    const processo = processosStore.processos.find(p => p.id === alerta.processoId);
 
     return {
       data: alerta.dataHora,
       processo: processo ? processo.descricao : 'Processo não encontrado',
-      unidade: unidade ? unidade.sigla : 'Unidade não encontrada',
+      unidade: alerta.unidadeOrigem, // Exibe a unidade de origem do alerta
       descricao: alerta.descricao
     };
   });

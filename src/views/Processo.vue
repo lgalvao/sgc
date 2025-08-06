@@ -63,33 +63,55 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
       .filter(Boolean)
 }
 
-const participantesHierarquia = computed(() => filtrarHierarquiaPorParticipantes(unidades.value, unidadesParticipantes.value))
+const participantesHierarquia = computed(() => {
+  const sedoc = unidadesStore.pesquisarUnidade('SEDOC');
+  const unidadesRaiz = sedoc ? sedoc.filhas : [];
+  return filtrarHierarquiaPorParticipantes(unidadesRaiz, unidadesParticipantes.value)
+})
 
 const colunasTabela = [
   {key: 'nome', label: 'Unidade', width: '40%'},
-  {key: 'situacao', label: 'Situação', width: '15%'},
-  {key: 'dataLimite', label: 'Data limite', width: '15%'},
-  {key: 'unidadeAtual', label: 'Unidade Atual', width: '15%'},
-  {key: 'unidadeAnterior', label: 'Unidade Anterior', width: '15%'}
+  {key: 'situacao', label: 'Situação', width: '20%'},
+  {key: 'dataLimite', label: 'Data limite', width: '20%'},
+  {key: 'unidadeAtual', label: 'Unidade Atual', width: '20%'}
 ]
 
 const dadosFormatados = computed(() => {
   return formatarDadosParaArvore(participantesHierarquia.value, processoId.value)
 })
 
+function formatarData(data) {
+  if (!data) return ''
+  const [ano, mes, dia] = data.split('-')
+  return `${dia}/${mes}/${ano}`
+}
+
 function formatarDadosParaArvore(dados, processoId) {
   if (!dados) return []
   return dados.map(item => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas, processoId) : []
-    const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find(pu => pu.unidadeId === item.sigla);
+    const unidadeOriginal = unidadesStore.pesquisarUnidade(item.sigla);
+    const isIntermediaria = unidadeOriginal && unidadeOriginal.tipo === 'INTERMEDIARIA';
+
+    let situacao = 'Não iniciado';
+    let dataLimite = 'Não informado';
+    let unidadeAtual = 'Não informado';
+
+    if (!isIntermediaria) {
+      const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find(pu => pu.unidadeId === item.sigla);
+      if (processoUnidade) {
+        situacao = processoUnidade.situacao;
+        dataLimite = formatarData(processoUnidade.dataLimite);
+        unidadeAtual = processoUnidade.unidadeAtual;
+      }
+    }
 
     return {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
-      situacao: processoUnidade ? processoUnidade.situacao : 'Não iniciado', // Usando a situação do ProcessoUnidade
-      dataLimite: processoUnidade ? processoUnidade.dataLimite : 'Não informado',
-      unidadeAtual: processoUnidade ? processoUnidade.unidadeAtual : 'Não informado',
-      unidadeAnterior: processoUnidade ? processoUnidade.unidadeAnterior || 'N/A' : 'Não informado',
+      situacao: isIntermediaria ? '' : situacao,
+      dataLimite: isIntermediaria ? '' : dataLimite,
+      unidadeAtual: isIntermediaria ? '' : unidadeAtual,
       expanded: true,
       children: children,
       // Garante que a estrutura de filhos seja consistente

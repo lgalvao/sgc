@@ -92,6 +92,11 @@ function descricaoAtividade(id) {
   return atv ? atv.descricao : 'Atividade não encontrada'
 }
 
+function formatarData(data) {
+  const [ano, mes, dia] = data.split('-')
+  return `${dia}/${mes}/${ano}`
+}
+
 function disponibilizarMapa() {
   mapaStore.editarMapa(mapa.value.id, {
     situacao: 'disponivel_validacao',
@@ -101,7 +106,7 @@ function disponibilizarMapa() {
 
   notificacao.value = `Notificação: O mapa de competências da unidade
                        ${unidade.value.sigla} foi disponibilizado para validação até
-                       ${dataLimite.value}. (Simulação)`
+                       ${formatarData(dataLimite.value)}. (Simulação)`
 }
 
 function voltar() {

@@ -6,18 +6,18 @@
         <h5 class="mb-4 text-center text-muted">Sistema de Gestão de Competências</h5>
         <form class="p-0" @submit.prevent="handleLogin">
           <div class="mb-3">
-            <label class="form-label" for="titulo">Título Eleitoral</label>
+            <label class="form-label" for="titulo">Título eleitoral</label>
             <input id="titulo" v-model="titulo" autocomplete="username" class="form-control" type="text"
-                   placeholder="Digite seu título" :disabled="loginStep > 1" />
+                   placeholder="Digite seu título" :disabled="loginStep > 1"/>
           </div>
           <div class="mb-3">
             <label class="form-label" for="senha">Senha</label>
             <input id="senha" v-model="senha" autocomplete="current-password" class="form-control" type="password"
-                   placeholder="Digite sua senha" :disabled="loginStep > 1" />
+                   placeholder="Digite sua senha" :disabled="loginStep > 1"/>
           </div>
 
           <div v-if="loginStep === 2 && paresDisponiveis.length > 1" class="mb-3">
-            <label class="form-label" for="par">Selecione seu Perfil e Unidade</label>
+            <label class="form-label" for="par">Selecione o Perfil e a Unidade</label>
             <select id="par" v-model="parSelecionado" class="form-select">
               <option v-for="par in paresDisponiveis" :key="par.perfil + par.unidade" :value="par">
                 {{ par.perfil }} - {{ par.unidade }}
@@ -25,9 +25,7 @@
             </select>
           </div>
 
-          <button class="btn btn-primary w-100 login-btn" type="submit">
-            {{ loginStep === 1 ? 'Próximo' : 'Entrar' }}
-          </button>
+          <button class="btn btn-primary w-100 login-btn" type="submit"> Entrar</button>
         </form>
       </div>
     </div>
@@ -48,7 +46,7 @@ const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
 const unidadesStore = useUnidadesStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
-const { setPerfil } = usePerfil()
+const {setPerfil} = usePerfil()
 
 const titulo = ref('1') // Preenchido para teste com Ana Paula Souza
 const senha = ref('123') // Preenchido para teste
@@ -92,7 +90,7 @@ const finalizarLogin = (servidorId, perfil, unidadeSigla) => {
 }
 
 const getPerfisEUnidades = (servidorId) => {
-  const { servidoresComPerfil } = usePerfil()
+  const {servidoresComPerfil} = usePerfil()
   const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(servidorId)
 
   const paresDisponiveis = []
@@ -101,7 +99,7 @@ const getPerfisEUnidades = (servidorId) => {
   if (servidorComPerfil) {
     const unidadeTitular = unidadesStore.pesquisarUnidade(servidorComPerfil.unidade)
     if (unidadeTitular) {
-      paresDisponiveis.push({ perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla })
+      paresDisponiveis.push({perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla})
     }
   }
 
@@ -111,7 +109,7 @@ const getPerfisEUnidades = (servidorId) => {
       // Adiciona apenas se o par perfil-unidade ainda não existe
       const existe = paresDisponiveis.some(p => p.perfil === 'SERVIDOR' && p.unidade === unidade.sigla)
       if (!existe) {
-        paresDisponiveis.push({ perfil: 'SERVIDOR', unidade: unidade.sigla })
+        paresDisponiveis.push({perfil: 'SERVIDOR', unidade: unidade.sigla})
       }
     }
   })

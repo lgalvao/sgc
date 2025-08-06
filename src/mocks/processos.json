@@ -4,7 +4,7 @@
     "descricao": "Mapeamento de competências - 2025",
     "tipo": "Mapeamento",
     "processosUnidade": [1, 3, 4],
-    "dataLimite": "30/06/2025",
+    "dataLimite": "2025-06-30",
     "situacao": "Em andamento"
   },
   {
@@ -12,7 +12,7 @@
     "descricao": "Revisão de mapeamento STIC/COINF - 2025",
     "tipo": "Revisão",
     "processosUnidade": [5, 6, 7],
-    "dataLimite": "15/07/2025",
+    "dataLimite": "2025-07-15",
     "situacao": "Criado"
   },
   {
@@ -20,8 +20,8 @@
     "descricao": "Revisão de mapa de competências STIC - 2024",
     "tipo": "Revisão",
     "processosUnidade": [8, 10, 11, 12],
-    "dataLimite": "10/05/2024",
-    "dataFinalizacao": "15/06/2024",
+    "dataLimite": "2024-05-10",
+    "dataFinalizacao": "2024-06-15",
     "situacao": "Finalizado"
   },
   {
@@ -29,8 +29,8 @@
     "descricao": "Revisão de mapa de competências - 2024",
     "tipo": "Diagnóstico",
     "processosUnidade": [13, 15],
-    "dataLimite": "10/08/2025",
-    "dataFinalizacao": "15/08/2025",
+    "dataLimite": "2025-08-10",
+    "dataFinalizacao": "2025-08-15",
     "situacao": "Finalizado"
   }
 ]

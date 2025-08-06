@@ -54,7 +54,7 @@ export const useProcessosStore = defineStore('processos', {
             const processo = this.processos.find(p => p.id === processoId);
             if (processo) {
                 processo.situacao = 'Finalizado';
-                processo.dataFinalizacao = new Date().toLocaleDateString('pt-BR');
+                processo.dataFinalizacao = new Date().toISOString().split('T')[0];
             }
         }
     }

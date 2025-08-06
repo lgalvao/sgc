@@ -64,6 +64,12 @@ const dadosFormatadosSubordinadas = computed(() => {
   return formatarDadosParaArvore(unidade.value.filhas, processoId.value)
 })
 
+function formatarData(data) {
+  if (!data) return ''
+  const [ano, mes, dia] = data.split('-')
+  return `${dia}/${mes}/${ano}`
+}
+
 function formatarDadosParaArvore(dados, processoId) {
   if (!dados) return []
   return dados.map(item => {
@@ -74,7 +80,7 @@ function formatarDadosParaArvore(dados, processoId) {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
       situacao: processoUnidade ? processoUnidade.situacao : 'Não participante',
-      dataLimite: processoUnidade ? processoUnidade.dataLimite : 'N/A',
+      dataLimite: processoUnidade ? formatarData(processoUnidade.dataLimite) : 'N/A',
       expanded: true,
       ...(children.length > 0 && {children})
     }

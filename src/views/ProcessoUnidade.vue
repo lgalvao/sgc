@@ -24,7 +24,7 @@
     </div>
 
     <div class="row">
-      <template v-if="processoAtual?.tipo === 'Mapeamento' || processoAtual?.tipo === 'Revisão'">
+      <template v-if="processoAtual?.tipo === ProcessoTipo.MAPEAMENTO || processoAtual?.tipo === ProcessoTipo.REVISAO">
         <section class="col-md-4 mb-3">
           <div class="card h-100" @click="irParaAtividadesConhecimentos" style="cursor: pointer;">
             <div class="card-body">
@@ -59,7 +59,7 @@
         </section>
       </template>
 
-      <template v-else-if="processoAtual?.tipo === 'Diagnóstico'">
+      <template v-else-if="processoAtual?.tipo === ProcessoTipo.DIAGNOSTICO">
         <section class="col-md-4 mb-3">
           <div class="card h-100" style="cursor: pointer;">
             <div class="card-body">
@@ -98,6 +98,7 @@ import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
 import {useMapasStore} from '../stores/mapas'
 import {useServidoresStore} from '../stores/servidores'
 import {useProcessosStore} from '../stores/processos'
+import {ProcessoTipo} from "../types/domain";
 
 
 const route = useRoute()

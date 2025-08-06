@@ -1,18 +1,19 @@
 # Sobre o projeto
 
-Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, desenvolvido em Vue 3 + Vite, com Vue Router, Bootstrap 5 e Pinia. O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE, centralizando todos os dados no front-end. O sistema está em desenvolvimento ativo, com várias funcionalidades já implementadas e outras em andamento.
+Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, desenvolvido em Vue 3 + Vite, com Vue Router, Bootstrap 5 e Pinia. 
+
+O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE, centralizando todos os dados no front-end. O sistema está em desenvolvimento ativo, com várias funcionalidades já implementadas e outras em andamento.
 
 ## Antes de qualquer coisa
 
 - Este é um protótipo. Não faremos validações, a não ser que eu solicite especificamente uma validação para ilustrar algum aspecto do sistema.
 - Não vamos implementar segurança nem controles de acesso. No entando, o perfil atual é importante para a navegação e exibição de dados, mesmo no protótipo.
-- Não vamos nos preocupar com desempenho; o foco é no funcionamento da UX/UI do sistema
-- Considerando os pontos acima, não antecipe otimizações e abstrações; faça só o necessário para o momento.
+- Não vamos nos preocupar com desempenho; o foco é no funcionamento da UX/UI do sistema; não antecipe otimizações e abstrações; faça só o necessário para o momento.
 - O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
 
 ## Visão geral do projeto
 
-- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, conhecimentos, mapas de competências, atribuições temporárias etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local e reativa.
+- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, conhecimentos, mapas de competências, atribuições temporárias, processosUnidades etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local e reativa.
 - **Perfis de Usuário**: O perfil de usuário (ADMIN, GESTOR, CHEFE, SERVIDOR) é determinado dinamicamente com base na lotação do servidor logado, através do composable `usePerfil`. O `servidorId` do usuário logado é gerenciado pela store `perfil.js` e persistido no localStorage.
 - **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
 
@@ -50,14 +51,15 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 
 - **Dados**: Mockados em JSON, importados apenas nos stores do Pinia.
 - **Stores**: Cada domínio (processo, mapa, unidade, perfil etc.) possui um store dedicado.
-    - `processos.js`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `ProcessoUnidade`.
-    - `mapas.js`: Gerencia os mapas de competência.
+    - `processos.js`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `ProcessoUnidade` e o acesso a `processosUnidades.json`.
+    - `mapas.js`: Gerencia os mapas de competência, incluindo a busca por unidade e processo (`getMapaByUnidadeId`) e a busca por mapa vigente (`getMapaVigentePorUnidade`).
     - `atividades.js`: Gerencia atividades e conhecimentos.
     - `atribuicaoTemporaria.js`: Gerencia atribuições temporárias.
     - `perfil.js`: Gerencia o `servidorId`, o perfil e a unidade selecionados do usuário logado, persistindo-os no localStorage.
     - `servidores.js`: Gerencia os dados dos servidores.
     - `unidades.js`: Gerencia as unidades organizacionais e inclui a função `pesquisarUnidade` para busca hierárquica.
     - `alertas.js`: Fornece dados mockados para o painel (ex: alertas).
+
 - **Componentes**:
     - `TreeTable.vue`: Tabela hierárquica dinâmica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados corretamente.
     - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique corretamente.
@@ -66,7 +68,8 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
     - `Login.vue`: Tela de login que permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
     - `Painel.vue`: Painel que exibe processos e alertas, utilizando os stores `processos.js` e `alertas.js`. O botão "Criar processo" é exibido condicionalmente com base no `perfilSelecionado`. Datas de alerta formatadas.
     - `CadProcesso.vue`: Cadastro de processos (CRUD)
-    - `Processo.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada.
+    - `Processo.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada. Ao clicar em uma unidade, navega para `ProcessoUnidade.vue` se for uma unidade participante direta, ou para `ProcessosSubordinadas.vue` se for uma unidade intermediária com subordinadas participantes.
+    - `ProcessosSubordinadas.vue`: Exibe as unidades subordinadas participantes de uma unidade pai dentro do contexto de um processo específico. Permite navegar para `ProcessoUnidade.vue` ou para outra `ProcessosSubordinadas.vue`.
     - `ProcessoUnidade.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. O card "Atribuição temporária" foi removido.
     - `CadAtividades.vue`: Cadastro de atividades/conhecimentos.
     - `CadAtribuicao.vue`: Cadastro de atribuições temporárias (CRUD).
@@ -84,4 +87,4 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 - Siga o padrão de navegação, componentização e UI/UX já estabelecido.
 - Mantenha a consistência do código seguindo as convenções existentes.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
-- **Regra de Unidades Intermediárias**: Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas. Elas aparecem na hierarquia para fins de navegação e contexto, mas a participação direta em um processo é restrita às unidades operacionais ou inter-operacionais.
+- Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas.
