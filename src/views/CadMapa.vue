@@ -30,7 +30,8 @@
                       rows="3">
             </textarea>
           </div>
-          <button :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao.trim()" class="btn btn-primary"
+          <button :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+                  class="btn btn-primary"
                   type="submit">
             Adicionar competência
           </button>
@@ -59,25 +60,29 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 
-import {useMapasStore} from '../stores/mapas'
-import {useUnidadesStore} from '../stores/unidades'
-
+import {useMapasStore} from '@/stores/mapas'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useAtividadesStore} from "@/stores/atividades";
+import {useProcessosStore} from "@/stores/processos";
+import {Atividade, Competencia, Unidade} from '@/types/tipos';
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.params.sigla)
+const sigla = computed(() => route.params.sigla as string)
 const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
+const processosStore = useProcessosStore()
+
 const {unidades} = storeToRefs(unidadesStore)
 
-function buscarUnidade(unidades, sigla) {
+function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
     if (unidade.sigla === sigla) return unidade
     if (unidade.filhas && unidade.filhas.length) {
@@ -88,26 +93,32 @@ function buscarUnidade(unidades, sigla) {
   return null
 }
 
-const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
+const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
 const processoUnidadeId = computed(() => {
-  const processo = processosStore.processos.find(p => p.id === processoId.value);
-  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === sigla.value);
+  const processoUnidade = processosStore.processosUnidade.find(
+      (pu: any) => pu.processoId === processoId.value && pu.unidade === sigla.value
+  );
   return processoUnidade?.id;
 });
 
-const atividades = computed(() => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [])
-const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
-const competencias = ref(mapa.value ? [...mapa.value.competencias] : [])
-const atividadesSelecionadas = ref([])
+const atividades = computed<Atividade[]>(() => {
+  if (typeof processoUnidadeId.value !== 'number') {
+    return []
+  }
+  return atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || []
+})
+const mapa = computed(() => mapaStore.getMapaVigentePorUnidade(sigla.value))
+const competencias = ref<Competencia[]>(mapa.value ? [...mapa.value.competencias] : [])
+const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
-function descricaoAtividade(id) {
+function descricaoAtividade(id: number): string {
   const atv = atividades.value.find(a => a.id === id)
   return atv ? atv.descricao : 'Atividade não encontrada'
 }
 
 function adicionarCompetencia() {
-  if (!novaCompetencia.value.descricao.trim() || atividadesSelecionadas.value.length === 0) return
+  if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return
   competencias.value.push({
     id: Date.now(),
     descricao: novaCompetencia.value.descricao,
@@ -118,8 +129,10 @@ function adicionarCompetencia() {
 }
 
 function finalizarEdicao() {
-  mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value})
-  router.push({path: '/finalizacao-mapa', query: {sigla: sigla.value}})
+  if (mapa.value) {
+    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value})
+    router.push({path: '/finalizacao-mapa', query: {sigla: sigla.value}})
+  }
 }
 
 function voltar() {

@@ -1,0 +1,32 @@
+import {defineStore} from 'pinia'
+import mapasData from '../mocks/mapas.json'
+import type {Mapa} from '@/types/tipos'
+
+function parseMapaDates(mapa: any): Mapa {
+    return {
+        ...mapa,
+        dataCriacao: new Date(mapa.dataCriacao),
+        dataDisponibilizacao: mapa.dataDisponibilizacao ? new Date(mapa.dataDisponibilizacao) : null,
+        dataFinalizacao: mapa.dataFinalizacao ? new Date(mapa.dataFinalizacao) : null,
+    };
+}
+
+export const useMapasStore = defineStore('mapas', {
+    state: () => ({
+        mapas: mapasData.map(parseMapaDates) as Mapa[]
+    }),
+    getters: {
+        getMapaByUnidadeId: (state) => (unidadeId: string, processoId: number): Mapa | undefined => {
+            return state.mapas.find(m => m.unidade === unidadeId && m.id === processoId)
+        },
+        getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
+            return state.mapas.find(m => m.unidade === unidadeId && m.situacao === 'em_andamento')
+        }
+    },
+    actions: {
+        editarMapa(id: number, novosDados: Partial<Mapa>) {
+            const idx = this.mapas.findIndex(m => m.id === id)
+            if (idx !== -1) this.mapas[idx] = {...this.mapas[idx], ...novosDados}
+        }
+    }
+})

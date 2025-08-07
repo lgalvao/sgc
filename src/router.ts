@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory, RouteLocationNormalized} from 'vue-router';
 
 const routes = [
   {
@@ -53,19 +53,19 @@ const routes = [
     path: '/unidade/:sigla/mapa',
     name: 'Mapa',
     component: () => import('./views/CadMapa.vue'),
-    props: (route) => ({ sigla: route.params.sigla, processoId: route.query.processoId }),
+    props: (route: RouteLocationNormalized) => ({ sigla: route.params.sigla, processoId: route.query.processoId }),
   },
   {
     path: '/unidade/:sigla/mapa/visualizar',
     name: 'VisualizacaoMapa',
     component: () => import('./views/CadMapaVisualizacao.vue'),
-    props: (route) => ({ sigla: route.params.sigla, processoId: route.query.processoId }),
+    props: (route: RouteLocationNormalized) => ({ sigla: route.params.sigla, processoId: route.query.processoId }),
   },
   {
     path: '/finalizacao-mapa',
     name: 'FinalizacaoMapa',
     component: () => import('./views/CadMapaFinalizacao.vue'),
-    props: (route) => ({ sigla: route.query.sigla, processoId: route.query.processoId }),
+    props: (route: RouteLocationNormalized) => ({ sigla: route.query.sigla, processoId: route.query.processoId }),
   },
   {
     path: '/unidade/:sigla/atribuicao',

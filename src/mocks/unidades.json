@@ -2,6 +2,7 @@
   {
     "sigla": "SEDOC",
     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
+    "tipo": "ADMINISTRATIVA",
     "titular": 7,
     "filhas": [
       {
@@ -51,14 +52,14 @@
                 "sigla": "SEDIA",
                 "nome": "Seção de Dados de Inteligência Artificial",
                 "tipo": "OPERACIONAL",
-                "titular": 11,
+                "titular": 10,
                 "filhas": []
               },
               {
                 "sigla": "SESEL",
                 "nome": "Seção de Sistemas Eleitorais",
                 "tipo": "OPERACIONAL",
-                "titular": 12,
+                "titular": 11,
                 "filhas": []
               }
             ]
@@ -67,13 +68,13 @@
             "sigla": "COSINF",
             "nome": "Coordenadoria de Suporte e Infraestrutura",
             "tipo": "OPERACIONAL",
-            "titular": 13,
+            "titular": 12,
             "filhas": [
               {
                 "sigla": "SENIC",
                 "nome": "Seção de Infraestrutura",
                 "tipo": "OPERACIONAL",
-                "titular": 10,
+                "titular": 12,
                 "filhas": []
               }
             ]

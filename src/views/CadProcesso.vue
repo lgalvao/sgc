@@ -24,10 +24,11 @@
           <div>
             <template v-for="unidade in unidadesStore.unidades" :key="unidade.sigla">
               <div :style="{ marginLeft: '0px' }" class="form-check">
+                <!--suppress HtmlUnknownAttribute -->
                 <input
                     :id="`chk-${unidade.sigla}`"
                     :checked="getEstadoSelecao(unidade) === true"
-                    :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
+                    v-bind:indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
                     class="form-check-input"
                     type="checkbox"
                     @change="() => toggleUnidade(unidade)"
@@ -39,10 +40,11 @@
               <div v-if="unidade.filhas && unidade.filhas.length" class="ms-4">
                 <template v-for="filha in unidade.filhas" :key="filha.sigla">
                   <div class="form-check">
+                    <!--suppress HtmlUnknownAttribute -->
                     <input
                         :id="`chk-${filha.sigla}`"
                         :checked="getEstadoSelecao(filha) === true"
-                        :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
+                        v-bind:indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
                         class="form-check-input"
                         type="checkbox"
                         @change="() => toggleUnidade(filha)"
@@ -84,20 +86,20 @@
   </div>
 </template>
 
-<script setup>
-import {ref} from 'vue'
+<script setup lang="ts">
+import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {useProcessosStore} from '../stores/processos'
-import {useUnidadesStore} from '../stores/unidades'
-import {ProcessoTipo} from '../types/domain'
+import {useProcessosStore} from '@/stores/processos'
+import {useUnidadesStore} from '@/stores/unidades'
+import {ProcessoTipo, Unidade} from '@/types/tipos'
 
-const unidadesSelecionadas = ref([])
-const descricao = ref('')
-const tipo = ref(ProcessoTipo.MAPEAMENTO)
-const dataLimite = ref('')
+const unidadesSelecionadas = ref<string[]>([])
+const descricao = ref<string>('')
+const tipo = ref<ProcessoTipo>(ProcessoTipo.MAPEAMENTO)
+const dataLimite = ref<string>('')
 const router = useRouter()
 const processosStore = useProcessosStore()
-const feedback = ref('')
+const feedback = ref<string>('')
 const unidadesStore = useUnidadesStore()
 
 function limparCampos() {
@@ -108,10 +110,9 @@ function limparCampos() {
 }
 
 
-
-function isUnidadeIntermediaria(sigla) {
+function isUnidadeIntermediaria(sigla: string): boolean {
   const unidade = unidadesStore.pesquisarUnidade(sigla);
-  return unidade && unidade.tipo === 'INTERMEDIARIA';
+  return !!(unidade && unidade.tipo === 'INTERMEDIARIA');
 }
 
 function salvarProcesso() {
@@ -123,24 +124,28 @@ function salvarProcesso() {
   const novoProcessoId = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeId, index) => ({
+  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
     processoId: novoProcessoId,
-    unidadeId: unidadeId,
-    dataLimite: dataLimite.value,
-    unidadeAtual: unidadeId, // Inicializa com a própria unidade
-    unidadeAnterior: null // Não há unidade anterior no início
+    unidade: unidadeSigla,
+    dataLimiteEtapa1: new Date(dataLimite.value),
+    dataLimiteEtapa2: new Date(dataLimite.value),
+    dataFimEtapa1: null,
+    dataFimEtapa2: null,
+    unidadeAtual: unidadeSigla, // Inicializa com a própria unidade
+    unidadeAnterior: null, // Não há unidade anterior no início
+    situacao: 'Não iniciado'
   }));
 
   const novo = {
     id: novoProcessoId,
     descricao: descricao.value,
     tipo: tipo.value,
-    processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
-    dataLimite: dataLimite.value,
+    dataLimite: new Date(dataLimite.value),
     situacao: 'Não iniciado'
   };
-  processosStore.adicionarProcesso(novo); // A store agora adiciona os objetos ProcessoUnidade separadamente
+  processosStore.adicionarProcesso(novo);
+  processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
   feedback.value = 'Processo salvo com sucesso!';
   setTimeout(() => {
     router.push('/painel');
@@ -157,25 +162,29 @@ function iniciarProcesso() {
   const novoProcessoId = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeId, index) => ({
+  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
     processoId: novoProcessoId,
-    unidadeId: unidadeId,
-    dataLimite: dataLimite.value,
-    unidadeAtual: unidadeId, // Inicializa com a própria unidade
-    unidadeAnterior: null // Não há unidade anterior no início
+    unidade: unidadeSigla,
+    dataLimiteEtapa1: new Date(dataLimite.value),
+    dataLimiteEtapa2: new Date(dataLimite.value),
+    dataFimEtapa1: null,
+    dataFimEtapa2: null,
+    unidadeAtual: unidadeSigla, // Inicializa com a própria unidade
+    unidadeAnterior: null, // Não há unidade anterior no início
+    situacao: 'Aguardando preenchimento do mapa'
   }));
 
   const novo = {
     id: novoProcessoId,
     descricao: descricao.value,
     tipo: tipo.value,
-    processosUnidade: novosProcessosUnidadeObjetos.map(pu => pu.id), // Armazena apenas os IDs
-    dataLimite: dataLimite.value,
+    dataLimite: new Date(dataLimite.value),
     situacao: 'Iniciado'
   };
 
-  processosStore.adicionarProcesso(novo); // A store agora adiciona os objetos ProcessoUnidade separadamente
+  processosStore.adicionarProcesso(novo);
+  processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
   feedback.value = 'Processo iniciado! Notificações enviadas às unidades.'
   setTimeout(() => {
     router.push('/painel')
@@ -183,8 +192,8 @@ function iniciarProcesso() {
   limparCampos()
 }
 
-function getTodasSubunidades(unidade) {
-  let subunidades = []
+function getTodasSubunidades(unidade: Unidade): string[] {
+  let subunidades: string[] = []
   if (unidade.filhas && unidade.filhas.length) {
     unidade.filhas.forEach(filha => {
       subunidades.push(filha.sigla)
@@ -194,17 +203,17 @@ function getTodasSubunidades(unidade) {
   return subunidades
 }
 
-function isFolha(unidade) {
+function isFolha(unidade: Unidade): boolean {
   return !unidade.filhas || unidade.filhas.length === 0
 }
 
-function isChecked(sigla) {
+function isChecked(sigla: string): boolean {
   return unidadesSelecionadas.value.includes(sigla)
 }
 
-function getEstadoSelecao(unidade) {
+function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
   if (isFolha(unidade)) {
-    return !!isChecked(unidade.sigla)
+    return isChecked(unidade.sigla)
   }
 
   const subunidades = getTodasSubunidades(unidade)
@@ -215,7 +224,7 @@ function getEstadoSelecao(unidade) {
   return 'indeterminate'
 }
 
-function toggleUnidade(unidade) {
+function toggleUnidade(unidade: Unidade) {
   const todasSubunidades = [unidade.sigla, ...getTodasSubunidades(unidade)]
   const todasEstaoSelecionadas = todasSubunidades.every(sigla => isChecked(sigla))
 
@@ -233,6 +242,10 @@ function toggleUnidade(unidade) {
     })
   }
 }
+
+onMounted(() => {
+  console.log('Unidades carregadas no store:', unidadesStore.unidades);
+});
 </script>
 
 <style scoped>

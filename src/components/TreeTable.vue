@@ -16,13 +16,14 @@
     <div class="table-responsive w-100">
       <table class="table table-striped table-hover m-0">
         <colgroup>
-          <col v-for="(column, index) in columns" :key="column.key" :style="{ width: column.width || (100 / columns.length) + '%' }">
+          <col v-for="(column) in columns" :key="column.key"
+               :style="{ width: column.width || (100 / columns.length) + '%' }">
         </colgroup>
 
         <thead v-if="!hideHeaders">
-          <tr>
-            <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
-          </tr>
+        <tr>
+          <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
+        </tr>
         </thead>
         <tbody>
         <template v-for="item in internalData" :key="item.id">
@@ -40,105 +41,98 @@
   </div>
 </template>
 
-<script>
-import {ref, watch} from 'vue'
+<script setup lang="ts">
+import {defineEmits, defineProps, ref, watch} from 'vue'
 import TreeRow from './TreeRow.vue'
 
-export default {
-  name: 'TreeTable',
-  components: {
-    TreeRow
-  },
-  props: {
-    data: {
-      type: Array,
-      required: true
-    },
-    columns: {
-      type: Array
-    },
-    title: {
-      type: String,
-      default: ''
-    },
-    hideHeaders: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['row-click'],
-  setup(props, { emit }) {
-    const internalData = ref([])
+interface TreeItem {
+  id: number | string;
+  expanded?: boolean;
+  children?: TreeItem[];
+  [key: string]: any; // Para permitir outras propriedades nos itens da árvore
+}
 
-    // Initialize internal data with expanded property
-    const initializeData = (data) => {
-      return data.map(item => ({
-        ...item,
-        expanded: item.expanded || false,
-        children: item.children ? initializeData(item.children) : []
-      }))
-    }
+interface Column {
+  key: string;
+  label: string;
+  width?: string;
+}
 
-    // Watch for prop changes
-    watch(() => props.data, (newData) => {
-      internalData.value = initializeData(newData)
-    }, {immediate: true, deep: true})
+interface TreeTableProps {
+  data: TreeItem[];
+  columns: Column[];
+  title?: string;
+  hideHeaders?: boolean;
+}
 
-    // Find item by ID recursively
-    const findItemById = (items, id) => {
-      for (let item of items) {
-        if (item.id === id) return item
-        if (item.children && item.children.length > 0) {
-          const found = findItemById(item.children, id)
-          if (found) return found
-        }
-      }
-      return null
-    }
+const props = defineProps<TreeTableProps>()
 
-    // Toggle expand/collapse
-    const toggleExpand = (id) => {
-      const item = findItemById(internalData.value, id)
-      if (item) item.expanded = !item.expanded
-    }
+const emit = defineEmits<{
+  (e: 'row-click', item: TreeItem): void;
+}>()
 
-    // Expand all items recursively
-    const expandAll = () => {
-      const expand = (items) => {
-        items.forEach(item => {
-          if (item.children && item.children.length > 0) {
-            item.expanded = true
-            expand(item.children)
-          }
-        })
-      }
-      expand(internalData.value)
-    }
+const internalData = ref<TreeItem[]>([])
 
-    // Collapse all items recursively
-    const collapseAll = () => {
-      const collapse = (items) => {
-        items.forEach(item => {
-          item.expanded = false
-          if (item.children && item.children.length > 0) {
-            collapse(item.children)
-          }
-        })
-      }
-      collapse(internalData.value)
-    }
+// Initialize internal data with expanded property
+const initializeData = (data: TreeItem[]): TreeItem[] => {
+  return data.map(item => ({
+    ...item,
+    expanded: item.expanded || false,
+    children: item.children ? initializeData(item.children) : []
+  }))
+}
 
-    const handleTreeRowClick = (clickedItem) => {
-      emit('row-click', clickedItem)
-    }
+// Watch for prop changes
+watch(() => props.data, (newData) => {
+  internalData.value = initializeData(newData)
+}, {immediate: true, deep: true})
 
-    return {
-      internalData,
-      toggleExpand,
-      expandAll,
-      collapseAll,
-      handleTreeRowClick
+// Find item by ID recursively
+const findItemById = (items: TreeItem[], id: number | string): TreeItem | null => {
+  for (let item of items) {
+    if (item.id === id) return item
+    if (item.children && item.children.length > 0) {
+      const found = findItemById(item.children, id)
+      if (found) return found
     }
   }
+  return null
 }
+
+// Toggle expand/collapse
+const toggleExpand = (id: number | string) => {
+  const item = findItemById(internalData.value, id)
+  if (item) item.expanded = !item.expanded
+}
+
+// Expand all items recursively
+const expandAll = () => {
+  const expand = (items: TreeItem[]) => {
+    items.forEach(item => {
+      if (item.children && item.children.length > 0) {
+        item.expanded = true
+        expand(item.children)
+      }
+    })
+  }
+  expand(internalData.value)
+}
+
+// Collapse all items recursively
+const collapseAll = () => {
+  const collapse = (items: TreeItem[]) => {
+    items.forEach(item => {
+      item.expanded = false
+      if (item.children && item.children.length > 0) {
+        collapse(item.children)
+      }
+    })
+  }
+  collapse(internalData.value)
+}
+
+const handleTreeRowClick = (clickedItem: TreeItem) => {
+  emit('row-click', clickedItem)
+}
+
 </script>

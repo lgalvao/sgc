@@ -1,7 +1,7 @@
-import { createApp } from "vue";
+import {createApp} from "vue";
 import App from "./App.vue";
 import router from "./router";
-import { createPinia } from "pinia";
+import {createPinia} from "pinia";
 import "./style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";

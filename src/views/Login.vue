@@ -32,28 +32,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {useServidoresStore} from '../stores/servidores'
-import {usePerfilStore} from '../stores/perfil'
-import {useUnidadesStore} from '../stores/unidades'
-import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
-import {usePerfil} from '../composables/usePerfil'
+import {useServidoresStore} from '@/stores/servidores'
+import {usePerfilStore} from '@/stores/perfil'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
+import {usePerfil} from '@/composables/usePerfil'
+import {Servidor} from '@/types/tipos';
+
+interface Par {
+  perfil: string;
+  unidade: string;
+}
 
 const router = useRouter()
 const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
 const unidadesStore = useUnidadesStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
-const {setPerfil} = usePerfil()
+
 
 const titulo = ref('1') // Preenchido para teste com Ana Paula Souza
 const senha = ref('123') // Preenchido para teste
 const loginStep = ref(1)
-const servidor = ref(null)
-const paresDisponiveis = ref([])
-const parSelecionado = ref(null)
+const servidor = ref<Servidor | null>(null)
+const paresDisponiveis = ref<Par[]>([])
+const parSelecionado = ref<Par | null>(null)
 
 const handleLogin = () => {
   if (loginStep.value === 1) {
@@ -79,42 +85,44 @@ const handleLogin = () => {
       alert('Usuário não encontrado.')
     }
   } else {
-    finalizarLogin(servidor.value.id, parSelecionado.value.perfil, parSelecionado.value.unidade)
+    if (servidor.value && parSelecionado.value) {
+      finalizarLogin(servidor.value.id, parSelecionado.value.perfil, parSelecionado.value.unidade)
+    }
   }
 }
 
-const finalizarLogin = (servidorId, perfil, unidadeSigla) => {
+const finalizarLogin = (servidorId: number, perfil: string, unidadeSigla: string) => {
   perfilStore.setServidorId(servidorId)
   perfilStore.setPerfilUnidade(perfil, unidadeSigla)
   router.push('/painel')
 }
 
-const getPerfisEUnidades = (servidorId) => {
+const getPerfisEUnidades = (servidorId: number): Par[] => {
   const {servidoresComPerfil} = usePerfil()
   const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(servidorId)
 
-  const paresDisponiveis = []
+  const pares: Par[] = []
 
   const servidorComPerfil = servidoresComPerfil.value.find(s => s.id === servidorId)
   if (servidorComPerfil) {
     const unidadeTitular = unidadesStore.pesquisarUnidade(servidorComPerfil.unidade)
     if (unidadeTitular) {
-      paresDisponiveis.push({perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla})
+      pares.push({perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla})
     }
   }
 
   atribuicoes.forEach(atrb => {
-    const unidade = unidadesStore.pesquisarUnidade(atrb.unidade)
-    if (unidade) {
+    const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade)
+    if (unidadeAtribuicao) {
       // Adiciona apenas se o par perfil-unidade ainda não existe
-      const existe = paresDisponiveis.some(p => p.perfil === 'SERVIDOR' && p.unidade === unidade.sigla)
+      const existe = pares.some(p => p.perfil === 'SERVIDOR' && p.unidade === unidadeAtribuicao.sigla)
       if (!existe) {
-        paresDisponiveis.push({perfil: 'SERVIDOR', unidade: unidade.sigla})
+        pares.push({perfil: 'SERVIDOR', unidade: unidadeAtribuicao.sigla})
       }
     }
   })
 
-  return paresDisponiveis
+  return pares
 }
 
 </script>

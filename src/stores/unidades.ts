@@ -1,17 +1,13 @@
 import {defineStore} from 'pinia'
 import unidadesMock from '../mocks/unidades.json'
-
-/**
- * @typedef { import('../types/domain').Unidade } Unidade
- */
+import type {Unidade} from '@/types/tipos'
 
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
-        /** @type {Unidade[]} */
-        unidades: [...unidadesMock]
+        unidades: unidadesMock as unknown as Unidade[]
     }),
     actions: {
-        pesquisarUnidade(sigla, units = this.unidades) {
+        pesquisarUnidade(this: any, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
             for (const unit of units) {
                 if (unit.sigla === sigla) return unit
                 if (unit.filhas) {

@@ -2,13 +2,12 @@
   <div class="container mt-4">
     <div v-if="unidade" class="card mb-4">
       <div class="card-body">
-        <span class="badge text-bg-secondary mb-2" style="border-radius: 0" >Processo de unidade</span>
+        <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo de unidade</span>
 
-        <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome}}</h2>
-        <p><strong>Responsável:</strong> {{ responsavelDetalhes.nome }}</p>
-        <p class="ms-3">{{ responsavelDetalhes.tipo }}</p>
-        <p class="ms-3"><strong>Ramal:</strong> {{ responsavelDetalhes.ramal }}</p>
-        <p class="ms-3"><strong>E-mail:</strong> {{ responsavelDetalhes.email }}</p>
+        <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
+        <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
+        <p class="ms-3"><strong>Ramal:</strong> {{ responsavelDetalhes?.ramal }}</p>
+        <p class="ms-3"><strong>E-mail:</strong> {{ responsavelDetalhes?.email }}</p>
         <p>
           <span class="fw-bold me-1">Situação:</span>
           <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
@@ -38,7 +37,8 @@
         </section>
 
         <section class="col-md-4 mb-3">
-          <div class="card h-100" style="cursor: pointer;" @click="mapa ? (mapa.situacao === 'em_andamento' ? editarMapa() : visualizarMapa()) : criarMapa()">
+          <div class="card h-100" style="cursor: pointer;"
+               @click="mapa ? (mapa.situacao === 'em_andamento' ? editarMapa() : visualizarMapa()) : criarMapa()">
             <div class="card-body">
               <h5 class="card-title">Mapa de Competências</h5>
               <p class="card-text text-muted">Mapa de competências da unidade</p>
@@ -85,104 +85,97 @@
         </section>
       </template>
 
-      </div>
+    </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useUnidadesStore} from '../stores/unidades'
-import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
-import {useMapasStore} from '../stores/mapas'
-import {useServidoresStore} from '../stores/servidores'
-import {useProcessosStore} from '../stores/processos'
-import {ProcessoTipo} from "../types/domain";
-
+import {useUnidadesStore} from '@/stores/unidades'
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
+import {useMapasStore} from '@/stores/mapas'
+import {useServidoresStore} from '@/stores/servidores'
+import {useProcessosStore} from '@/stores/processos'
+import {Mapa, Processo, ProcessoTipo, ProcessoUnidade, Servidor, Unidade} from "@/types/tipos";
 
 const route = useRoute()
 const router = useRouter()
 const idProcessoUnidade = computed(() => Number(route.params.idProcessoUnidade))
 const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
-const atribuicaoStore = useAtribuicaoTemporariaStore()
+useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
-const { processos } = storeToRefs(processosStore)
+const {processos} = storeToRefs(processosStore)
 
-const processoUnidadeDetalhes = computed(() => {
+const processoUnidadeDetalhes = computed<ProcessoUnidade | undefined>(() => {
   return processosStore.getProcessoUnidadeById(idProcessoUnidade.value);
 });
 
-const processoAtual = computed(() => {
+const processoAtual = computed<Processo | null>(() => {
   if (!processoUnidadeDetalhes.value) return null;
-  return processos.value.find(p => p.id === processoUnidadeDetalhes.value.processoId);
+  return (processos.value as Processo[]).find(p => p.id === processoUnidadeDetalhes.value?.processoId) || null;
 });
 
-const sigla = computed(() => processoUnidadeDetalhes.value?.unidadeId);
+const sigla = computed<string | undefined>(() => processoUnidadeDetalhes.value?.unidade);
 
-const unidade = computed(() => {
+const unidade = computed<Unidade | null>(() => {
   if (!sigla.value) {
     return null;
   }
-  const foundUnidade = unidadesStore.pesquisarUnidade(sigla.value);
-  // Garante que foundUnidade não é nulo/indefinido e possui as propriedades necessárias
-  if (foundUnidade && foundUnidade.sigla && foundUnidade.nome) {
-    return foundUnidade;
+  const unidadeEncontrada = unidadesStore.pesquisarUnidade(sigla.value);
+  if (unidadeEncontrada && unidadeEncontrada.sigla && unidadeEncontrada.nome) {
+    return unidadeEncontrada as Unidade;
   }
-  return null; // Retorna null se não encontrado ou propriedades ausentes
+  return null;
 });
 
-const responsavelDetalhes = computed(() => {
-  if (!unidade.value || !unidade.value.responsavelId) {
-    return {}; // Retorna um objeto vazio para evitar erros de acesso a propriedades
+const responsavelDetalhes = computed<Servidor | null>(() => {
+  if (!unidade.value || !unidade.value.responsavel) {
+    return null;
   }
-  return servidoresStore.getServidorById(unidade.value.responsavelId);
+  return servidoresStore.getServidorById(unidade.value.responsavel) || null;
 });
 
-const situacaoUnidadeNoProcesso = computed(() => {
+const situacaoUnidadeNoProcesso = computed<string>(() => {
   return processoUnidadeDetalhes.value?.situacao || 'Não informado';
 });
 
-const mapa = computed(() => {
+const mapa = computed<Mapa | null>(() => {
   if (!unidade.value || !processoAtual.value) return null;
-  return mapaStore.getMapaByUnidadeId(unidade.value.sigla, processoAtual.value.id);
+  return mapaStore.getMapaByUnidadeId(unidade.value.sigla, processoAtual.value.id) || null;
 });
 
-function badgeClass(situacao) {
+function badgeClass(situacao: string): string {
   if (situacao === 'Aguardando' || situacao === 'Em andamento' || situacao === 'Aguardando validação') return 'bg-warning text-dark'
   if (situacao === 'Finalizado' || situacao === 'Validado') return 'bg-success'
   if (situacao === 'Devolvido') return 'bg-danger'
   return 'bg-secondary'
 }
 
-function voltar() {
-  router.back()
-}
-
-function removerAtribuicao() {
-  atribuicaoStore.removerAtribuicao(sigla.value)
-}
-
-function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${sigla.value}/atribuicao`})
-}
-
 function criarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value?.id}})
+  if (sigla.value && processoAtual.value) {
+    router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value.id}})
+  }
 }
 
 function editarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value?.id}})
+  if (sigla.value && processoAtual.value) {
+    router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value.id}})
+  }
 }
 
 function visualizarMapa() {
-  router.push({path: `/unidade/${sigla.value}/mapa/visualizar`, query: {processoId: processoAtual.value?.id}})
+  if (sigla.value && processoAtual.value) {
+    router.push({path: `/unidade/${sigla.value}/mapa/visualizar`, query: {processoId: processoAtual.value.id}})
+  }
 }
 
 function irParaAtividadesConhecimentos() {
-  router.push(`/processos/${processoAtual.value?.id}/unidade/${sigla.value}/atividades`)
+  if (sigla.value && processoAtual.value) {
+    router.push(`/processos/${processoAtual.value.id}/unidade/${sigla.value}/atividades`)
+  }
 }
 </script>

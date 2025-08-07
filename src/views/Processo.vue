@@ -14,40 +14,52 @@
           @row-click="abrirDetalhesUnidade"
       />
     </div>
-    <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-danger mt-3" @click="finalizarProcesso">Finalizar processo</button>
+    <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-danger mt-3" @click="finalizarProcesso">
+      Finalizar processo
+    </button>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useProcessosStore} from '../stores/processos'
-import {useUnidadesStore} from '../stores/unidades'
-import {usePerfilStore} from '../stores/perfil'
+import {useProcessosStore} from '@/stores/processos'
+import {useUnidadesStore} from '@/stores/unidades'
+import {usePerfilStore} from '@/stores/perfil'
 
-import TreeTable from '../components/TreeTable.vue'
+import TreeTable from '@/components/TreeTable.vue'
+import {Processo, ProcessoUnidade, Unidade} from '@/types/tipos'
+
+interface TreeTableItem {
+  id: string;
+  nome: string;
+  situacao: string;
+  dataLimite: string;
+  unidadeAtual: string;
+  expanded: boolean;
+  children: TreeTableItem[];
+}
 
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
 const perfilStore = usePerfilStore()
 
 
 const processoId = computed(() => Number(route.params.id))
-const processo = computed(() => processos.value.find(p => p.id === processoId.value))
-const unidadesParticipantes = computed(() => {
+const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === processoId.value))
+const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
-  return processosStore.getUnidadesDoProcesso(processo.value.id).map(pu => pu.unidadeId)
+  return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: ProcessoUnidade) => pu.unidade)
 })
 
-function filtrarHierarquiaPorParticipantes(unidades, participantes) {
+function filtrarHierarquiaPorParticipantes(unidades: Unidade[], participantes: string[]): Unidade[] {
   return unidades
-      .map(unidade => {
-        let filhasFiltradas = []
+      .map((unidade): Unidade | null => {
+        let filhasFiltradas: Unidade[] = []
         if (unidade.filhas && unidade.filhas.length) {
           filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhas, participantes)
         }
@@ -60,13 +72,13 @@ function filtrarHierarquiaPorParticipantes(unidades, participantes) {
         }
         return null
       })
-      .filter(Boolean)
+      .filter((u): u is Unidade => u !== null)
 }
 
-const participantesHierarquia = computed(() => {
+const participantesHierarquia = computed<Unidade[]>(() => {
   const sedoc = unidadesStore.pesquisarUnidade('SEDOC');
-  const unidadesRaiz = sedoc ? sedoc.filhas : [];
-  return filtrarHierarquiaPorParticipantes(unidadesRaiz, unidadesParticipantes.value)
+  const unidadesRaiz = sedoc && sedoc.filhas ? sedoc.filhas : [];
+  return filtrarHierarquiaPorParticipantes(unidadesRaiz as Unidade[], unidadesParticipantes.value)
 })
 
 const colunasTabela = [
@@ -76,17 +88,19 @@ const colunasTabela = [
   {key: 'unidadeAtual', label: 'Unidade Atual', width: '20%'}
 ]
 
-const dadosFormatados = computed(() => {
+const dadosFormatados = computed<TreeTableItem[]>(() => {
   return formatarDadosParaArvore(participantesHierarquia.value, processoId.value)
 })
 
-function formatarData(data) {
+function formatarData(data: Date | null): string {
   if (!data) return ''
-  const [ano, mes, dia] = data.split('-')
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexed
+  const ano = data.getFullYear();
   return `${dia}/${mes}/${ano}`
 }
 
-function formatarDadosParaArvore(dados, processoId) {
+function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas, processoId) : []
@@ -98,10 +112,10 @@ function formatarDadosParaArvore(dados, processoId) {
     let unidadeAtual = 'Não informado';
 
     if (!isIntermediaria) {
-      const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find(pu => pu.unidadeId === item.sigla);
+      const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find((pu: ProcessoUnidade) => pu.unidade === item.sigla);
       if (processoUnidade) {
         situacao = processoUnidade.situacao;
-        dataLimite = formatarData(processoUnidade.dataLimite);
+        dataLimite = formatarData(processoUnidade.dataLimiteEtapa1);
         unidadeAtual = processoUnidade.unidadeAtual;
       }
     }
@@ -114,30 +128,34 @@ function formatarDadosParaArvore(dados, processoId) {
       unidadeAtual: isIntermediaria ? '' : unidadeAtual,
       expanded: true,
       children: children,
-      // Garante que a estrutura de filhos seja consistente
-      ...(children.length > 0 && {children})
     }
   })
 }
 
-function abrirDetalhesUnidade(item) {
-  const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find(pu => pu.unidadeId === item.id);
-  if (processoUnidade) {
-    // Se a unidade clicada é uma ProcessoUnidade direta, navega para ProcessoUnidade.vue
-    router.push({path: `/processo-unidade/${processoUnidade.id}`, query: {processoId: processoId.value}})
-  } else if (item.children && item.children.length > 0) {
-    // Se a unidade clicada não é uma ProcessoUnidade direta, mas tem filhos, navega para ProcessosSubordinadas.vue
-    router.push({path: `/processos/${processoId.value}/unidades/${item.id}`})
-  } else {
-    // Caso contrário, não faz nada (unidade folha não participante)
-    console.log(`Unidade ${item.id} não é participante e não possui subordinadas participantes.`);
+function abrirDetalhesUnidade(item: any) {
+  // The @row-click event from TreeTable emits a generic object.
+  // We use `any` and perform runtime checks to safely handle the event payload.
+  if (item && typeof item.id === 'string') {
+    const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
+    if (processoUnidade) {
+      // If the clicked unit is a direct ProcessoUnidade, navigate to ProcessoUnidade.vue
+      router.push({path: `/processo-unidade/${processoUnidade.id}`, query: {processoId: processoId.value}})
+    } else if (Array.isArray(item.children) && item.children.length > 0) {
+      // If the clicked unit is not a direct ProcessoUnidade but has children, navigate to ProcessosSubordinadas.vue
+      router.push({path: `/processos/${processoId.value}/unidades/${item.id}`})
+    } else {
+      // Otherwise, do nothing (non-participating leaf unit)
+      console.log(`Unidade ${item.id} não é participante e não possui subordinadas participantes.`);
+    }
   }
 }
 
 function finalizarProcesso() {
   if (confirm('Tem certeza que deseja finalizar este processo?')) {
-    processosStore.finalizarProcesso(processoId.value);
-    router.push('/painel');
+    if (processo.value) {
+      processosStore.finalizarProcesso(processo.value.id);
+      router.push('/painel');
+    }
   }
 }
 

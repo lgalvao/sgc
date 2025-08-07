@@ -35,7 +35,8 @@
         <ul class="navbar-nav align-items-center">
           <li class="nav-item me-3 d-flex align-items-center">
             <i class="bi bi-person-circle me-2 fs-5"></i>
-            <span v-if="!isEditingProfile && servidorLogado" @click="startEditingProfile" class="nav-link" style="cursor: pointer;">
+            <span v-if="!isEditingProfile && servidorLogado" @click="startEditingProfile" class="nav-link"
+                  style="cursor: pointer;">
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
             <select v-else
@@ -61,15 +62,18 @@
   </nav>
 </template>
 
-<script setup>
-import {ref, nextTick} from 'vue'
-import {usePerfilStore} from '../stores/perfil'
-import {usePerfil} from '../composables/usePerfil'
+<script setup lang="ts">
+import {nextTick, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {usePerfilStore} from '@/stores/perfil'
+import {usePerfil} from '@/composables/usePerfil'
 
-const { servidorLogado, servidoresComPerfil, perfilSelecionado, unidadeSelecionada } = usePerfil()
+const router = useRouter()
+
+const {servidorLogado, servidoresComPerfil, perfilSelecionado, unidadeSelecionada} = usePerfil()
 const perfilStore = usePerfilStore()
 const isEditingProfile = ref(false)
-const profileSelect = ref(null)
+const profileSelect = ref<HTMLSelectElement | null>(null)
 
 const startEditingProfile = () => {
   isEditingProfile.value = true
@@ -82,12 +86,13 @@ const stopEditingProfile = () => {
   isEditingProfile.value = false
 }
 
-const handleProfileChange = (event) => {
-  const selectedId = Number(event.target.value);
+const handleProfileChange = (event: Event) => {
+  const selectedId = Number((event.target as HTMLSelectElement).value);
   const selectedServidor = servidoresComPerfil.value.find(s => s.id === selectedId);
   if (selectedServidor) {
     perfilStore.setServidorId(selectedId);
     perfilStore.setPerfilUnidade(selectedServidor.perfil, selectedServidor.unidade);
+    router.push('/painel'); // Redireciona para o Painel
   }
   stopEditingProfile();
 }

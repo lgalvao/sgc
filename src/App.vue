@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import Navbar from './components/Navbar.vue'
-import { usePerfil } from './composables/usePerfil'
-import { useRoute } from 'vue-router'
+import {usePerfil} from './composables/usePerfil'
+import {useRoute} from 'vue-router'
 
 const perfil = usePerfil()
 const route = useRoute()
@@ -9,5 +9,5 @@ const route = useRoute()
 
 <template>
   <Navbar v-if="route.path !== '/login'" />
-  <router-view :key="perfil.value" />
+  <router-view :key="perfil" />
 </template>

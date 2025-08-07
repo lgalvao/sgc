@@ -29,7 +29,7 @@
     </form>
 
     <!-- Lista de atividades -->
-    <div v-for="(atividade, idx) in atividades" :key="atividade.id" class="card mb-3 atividade-card">
+    <div v-for="(atividade, idx) in atividades" :key="atividade.id || idx" class="card mb-3 atividade-card">
       <div class="card-body py-2">
         <div
             class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
@@ -37,7 +37,7 @@
             <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"/>
             <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(idx)" title="Salvar"
                     data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
-            <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade" title="Cancelar"
+            <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade()" title="Cancelar"
                     data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
           </template>
 
@@ -95,27 +95,27 @@
   </div>
 </template>
 
-<script setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
-import {useAtividadesStore} from '../stores/atividades'
-import {useUnidadesStore} from '../stores/unidades'
-import {useProcessosStore} from '../stores/processos'
+<script setup lang="ts">
+import {computed, ref} from 'vue'
+import {useRoute} from 'vue-router'
+import {useAtividadesStore} from '@/stores/atividades'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useProcessosStore} from '@/stores/processos'
+import type {Atividade, ProcessoUnidade, Unidade} from '@/types/tipos'
+
+interface AtividadeComEdicao extends Atividade {
+  novoConhecimento?: string;
+}
 
 const route = useRoute()
-const router = useRouter()
-const unidadeId = computed(() => route.params.unidadeId)
+const unidadeId = computed(() => route.params.unidadeId as string)
 const processoId = computed(() => Number(route.params.id))
 
 const atividadesStore = useAtividadesStore()
-const {atividadesPorUnidade} = storeToRefs(mapasStore)
 const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
 const processosStore = useProcessosStore()
-const {processos} = storeToRefs(processosStore)
 
-function buscarSigla(unidades, sigla) {
+function buscarSigla(unidades: Unidade[], sigla: string): string {
   for (const unidade of unidades) {
     if (unidade.sigla === sigla) return unidade.sigla
     if (unidade.filhas && unidade.filhas.length) {
@@ -126,11 +126,10 @@ function buscarSigla(unidades, sigla) {
   return sigla // fallback
 }
 
-const siglaUnidade = computed(() => buscarSigla(unidadesStore.unidades, unidadeId.value))
+const siglaUnidade = computed(() => buscarSigla(unidadesStore.unidades as Unidade[], unidadeId.value))
 
-// Buscar nome da unidade pela sigla
 const nomeUnidade = computed(() => {
-  function buscarNome(unidades, sigla) {
+  function buscarNome(unidades: Unidade[], sigla: string): string {
     for (const unidade of unidades) {
       if (unidade.sigla === sigla) return unidade.nome || unidade.sigla
       if (unidade.filhas && unidade.filhas.length) {
@@ -141,69 +140,82 @@ const nomeUnidade = computed(() => {
     return sigla
   }
 
-  return buscarNome(unidadesStore.unidades, siglaUnidade.value)
+  return buscarNome(unidadesStore.unidades as Unidade[], siglaUnidade.value)
 })
 
-let idAtividade = 1
-let idConhecimento = 1
 const novaAtividade = ref('')
 
 const processoUnidadeId = computed(() => {
-  const processo = processosStore.processos.find(p => p.id === processoId.value);
-  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === unidadeId.value);
+  const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
+      pu => pu.processoId === processoId.value && pu.unidade === unidadeId.value
+  );
   return processoUnidade?.id;
 });
 
-const atividades = computed({
-  get: () => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [],
-  set: (val) => atividadesStore.setAtividades(processoUnidadeId.value, val)
+const atividades = computed<AtividadeComEdicao[]>({
+  get: () => {
+    if (processoUnidadeId.value === undefined) return []
+    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || []
+    return storeAtividades.map((a: Atividade) => ({...a, novoConhecimento: ''}))
+  },
+  set: (val: AtividadeComEdicao[]) => {
+    if (processoUnidadeId.value === undefined) return
+    const storeVal = val.map(a => {
+      const {novoConhecimento, ...rest} = a
+      return rest
+    })
+    atividadesStore.setAtividades(processoUnidadeId.value, storeVal)
+  }
 })
 
 function adicionarAtividade() {
-  if (novaAtividade.value.trim()) {
+  if (novaAtividade.value && processoUnidadeId.value !== undefined) {
     atividadesStore.adicionarAtividade({
-      id: idAtividade++,
+      id: Date.now(),
       descricao: novaAtividade.value,
       processoUnidadeId: processoUnidadeId.value,
       conhecimentos: [],
-      novoConhecimento: ''
     })
     novaAtividade.value = ''
   }
 }
 
-function removerAtividade(idx) {
+function removerAtividade(idx: number) {
   atividadesStore.removerAtividade(atividades.value[idx].id)
 }
 
-function adicionarConhecimento(idx) {
+function adicionarConhecimento(idx: number) {
   const atividade = atividades.value[idx]
-  if (atividade.novoConhecimento && atividade.novoConhecimento.trim()) {
+  if (atividade.novoConhecimento?.trim()) {
     atividadesStore.adicionarConhecimento(atividade.id, {
-      id: idConhecimento++,
+      id: Date.now(),
       descricao: atividade.novoConhecimento
     })
-    atividade.novoConhecimento = ''
   }
 }
 
-function removerConhecimento(idx, cidx) {
+function removerConhecimento(idx: number, cidx: number) {
   atividadesStore.removerConhecimento(atividades.value[idx].id, atividades.value[idx].conhecimentos[cidx].id)
 }
 
-// --- Edição de conhecimento ---
-const editandoConhecimento = ref({idxAtividade: null, idxConhecimento: null})
+const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
+  idxAtividade: null,
+  idxConhecimento: null
+})
 const conhecimentoEditado = ref('')
 
-function iniciarEdicaoConhecimento(idxAtividade, idxConhecimento, valorAtual) {
+function iniciarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number, valorAtual: string) {
   editandoConhecimento.value = {idxAtividade, idxConhecimento}
   conhecimentoEditado.value = valorAtual
 }
 
-function salvarEdicaoConhecimento(idxAtividade, idxConhecimento) {
-  const atividade = atividades.value[idxAtividade]
-  if (atividade && conhecimentoEditado.value.trim()) {
-    atividade.conhecimentos[idxConhecimento].descricao = conhecimentoEditado.value.trim()
+function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number) {
+  if (conhecimentoEditado.value) {
+    const newAtividades = [...atividades.value];
+    const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos];
+    newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
+    newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
+    atividades.value = newAtividades;
   }
   cancelarEdicaoConhecimento()
 }
@@ -213,18 +225,19 @@ function cancelarEdicaoConhecimento() {
   conhecimentoEditado.value = ''
 }
 
-// --- Edição de atividade ---
-const editandoAtividade = ref(null)
+const editandoAtividade = ref<number | null>(null)
 const atividadeEditada = ref('')
 
-function iniciarEdicaoAtividade(idx, valorAtual) {
+function iniciarEdicaoAtividade(idx: number, valorAtual: string) {
   editandoAtividade.value = idx
   atividadeEditada.value = valorAtual
 }
 
-function salvarEdicaoAtividade(idx) {
-  if (atividadeEditada.value.trim()) {
-    atividades.value[idx].descricao = atividadeEditada.value.trim()
+function salvarEdicaoAtividade(idx: number) {
+  if (String(atividadeEditada.value).trim()) {
+    const newAtividades = [...atividades.value];
+    newAtividades[idx].descricao = String(atividadeEditada.value);
+    atividades.value = newAtividades;
   }
   cancelarEdicaoAtividade()
 }
@@ -234,63 +247,8 @@ function cancelarEdicaoAtividade() {
   atividadeEditada.value = ''
 }
 
-function encontrarUnidadePai(unidades, siglaFilha) {
-  for (const unidade of unidades) {
-    if (unidade.filhas && unidade.filhas.some(f => f.sigla === siglaFilha)) {
-      return unidade.sigla;
-    }
-    if (unidade.filhas && unidade.filhas.length > 0) {
-      const paiEncontrado = encontrarUnidadePai(unidade.filhas, siglaFilha);
-      if (paiEncontrado) {
-        return paiEncontrado;
-      }
-    }
-  }
-  return null;
+function disponibilizarCadastro() {
 }
-
-async function disponibilizarCadastro() {
-  const atividadesDoProcesso = atividades.value
-
-  const atividadesSemConhecimento = atividadesDoProcesso.filter(atividade => {
-    return !atividade.conhecimentos || atividade.conhecimentos.length === 0
-  })
-
-  if (atividadesSemConhecimento.length > 0) {
-    const atividadesFaltantes = atividadesSemConhecimento.map(a => a.descricao).join(', ')
-    alert(`As seguintes atividades precisam de conhecimentos associados: ${atividadesFaltantes}`)
-    return
-  }
-
-  const confirmacao = confirm(
-    'Confirma finalização e disponibilização do cadastro? Essa ação bloqueia a edição e habilita a validação por unidades superiores'
-  )
-
-  if (confirmacao) {
-    processosStore.atualizarSituacaoProcesso(processoId.value, 'Cadastro disponibilizado')
-
-    const siglaUnidadeAtual = unidadeId.value
-    const siglaUnidadeSuperior = encontrarUnidadePai(unidades.value, siglaUnidadeAtual)
-
-    if (siglaUnidadeSuperior) {
-      processosStore.atualizarLocalizacaoProcesso(processoId.value, siglaUnidadeSuperior)
-    } else {
-      console.warn(`Não foi encontrada unidade superior para ${siglaUnidadeAtual}. O processo permanecerá na unidade atual.`)
-    }
-
-    alert('Cadastro de atividades disponibilizado')
-    router.push('/painel')
-  }
-}
-
-onMounted(() => {
-  // Se a unidade for SESEL e ainda não estiver carregada, inicializa do mock (já feito no store)
-  // Não é mais necessário inicializar do mock, pois a store de atividades já faz isso.
-  // Apenas garantir que o estado inicial esteja correto.
-  // if (unidadeId.value === 'SESEL' && !atividadesStore.getAtividadesPorProcessoUnidade(`${processoId.value}-${unidadeId.value}`).length) {
-  //   atividadesStore.setAtividades(`${processoId.value}-${unidadeId.value}`, atividadesStore.getAtividadesPorProcessoUnidade(`${processoId.value}-${unidadeId.value}`))
-  // }
-})
 </script>
 
 <style scoped>

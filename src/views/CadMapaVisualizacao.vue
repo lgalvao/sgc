@@ -28,24 +28,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useMapasStore} from '../stores/mapas'
-import {useUnidadesStore} from '../stores/unidades'
-
+import {useMapasStore} from '@/stores/mapas'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useAtividadesStore} from "@/stores/atividades";
+import {useProcessosStore} from "@/stores/processos";
+import {Atividade, Mapa, ProcessoUnidade, Unidade} from '@/types/tipos';
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.params.sigla)
+const sigla = computed(() => route.params.sigla as string)
 const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
+const processosStore = useProcessosStore()
 
-function buscarUnidade(unidades, sigla) {
+function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
     if (unidade.sigla === sigla) return unidade
     if (unidade.filhas && unidade.filhas.length) {
@@ -56,17 +59,23 @@ function buscarUnidade(unidades, sigla) {
   return null
 }
 
-const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
-const mapa = computed(() => mapaStore.getMapaPorUnidade(sigla.value))
-const processoUnidadeId = computed(() => {
-  const processo = processosStore.processos.find(p => p.id === processoId.value);
-  const processoUnidade = processo?.processosUnidade.find(pu => pu.unidadeId === sigla.value);
+const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
+const mapa = computed<Mapa | null>(() => mapaStore.getMapaVigentePorUnidade(sigla.value) as Mapa | null)
+const processoUnidadeId = computed<number | undefined>(() => {
+  const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
+      pu => pu.processoId === processoId.value && pu.unidade === sigla.value
+  );
   return processoUnidade?.id;
 });
 
-const atividades = computed(() => atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || [])
+const atividades = computed<Atividade[]>(() => {
+  if (typeof processoUnidadeId.value === 'number') {
+    return atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) as Atividade[]
+  }
+  return []
+})
 
-function descricaoAtividade(id) {
+function descricaoAtividade(id: number): string {
   const atv = atividades.value.find(a => a.id === id)
   return atv ? atv.descricao : 'Atividade não encontrada'
 }

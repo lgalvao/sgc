@@ -3,12 +3,12 @@
     <h2>Criar atribuição temporária</h2>
     <div class="card mb-4 mt-4">
       <div class="card-body">
-        <h5 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h5>
+        <h5 class="card-title mb-3">{{ unidade?.sigla }} - {{ unidade?.nome }}</h5>
         <form @submit.prevent="criarAtribuicao">
           <div class="mb-3">
             <label class="form-label" for="servidor">Servidor</label>
             <select id="servidor" v-model="servidorSelecionado" class="form-select" required>
-              <option disabled value="">Selecione um servidor</option>
+              <option disabled :value="null">Selecione um servidor</option>
               <option v-for="servidor in servidoresElegiveis" :key="servidor.id" :value="servidor.id">
                 {{ servidor.nome }}
               </option>
@@ -35,22 +35,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useUnidadesStore} from '../stores/unidades'
-import {useAtribuicaoTemporariaStore} from '../stores/atribuicaoTemporaria'
-import servidoresMock from '../mocks/servidores.json'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
+import servidoresMock from '@/mocks/servidores.json'
+import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.params.sigla)
+const sigla = computed(() => route.params.sigla as string)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
 
-function buscarUnidade(unidades, sigla) {
+function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
     if (unidade.sigla === sigla) return unidade
     if (unidade.filhas && unidade.filhas.length) {
@@ -61,28 +62,26 @@ function buscarUnidade(unidades, sigla) {
   return null
 }
 
-const unidade = computed(() => buscarUnidade(unidades.value, sigla.value))
-const atribuicoes = computed(() =>
+const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
+const atribuicoes = computed<AtribuicaoTemporaria[]>(() =>
     atribuicaoStore.atribuicoes
-        ? atribuicaoStore.atribuicoes.filter(a => a.unidadeSigla === sigla.value)
+        ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade === sigla.value)
         : []
 )
 
-const servidorSelecionado = ref("")
+const servidorSelecionado = ref<number | null>(null)
 const dataTermino = ref("")
 const justificativa = ref("")
 const sucesso = ref(false)
 const erroServidor = ref("")
 
-const servidores = ref(servidoresMock)
+const servidores = ref<Servidor[]>(servidoresMock as Servidor[])
 
-const servidoresDaUnidade = computed(() => {
-  // Apenas servidores da unidade selecionada
+const servidoresDaUnidade = computed<Servidor[]>(() => {
   return servidores.value.filter(s => s.unidade === sigla.value)
 })
 
-const servidoresElegiveis = computed(() => {
-  // Não pode já ter atribuição para esta unidade nem ser o titular da unidade
+const servidoresElegiveis = computed<Servidor[]>(() => {
   const titularId = unidade.value?.titular
   return servidoresDaUnidade.value.filter(servidor => {
     const jaTemAtribuicao = atribuicoes.value.some(a => a.servidorId === servidor.id)
@@ -96,15 +95,16 @@ function criarAtribuicao() {
     erroServidor.value = "Selecione um servidor elegível."
     return
   }
-  // Regra: não permitir atribuição duplicada para a mesma unidade
+
   if (atribuicoes.value.some(a => a.servidorId === servidorSelecionado.value)) {
     erroServidor.value = "Este servidor já possui atribuição temporária nesta unidade."
     return
   }
   atribuicaoStore.criarAtribuicao({
-    unidadeSigla: sigla.value,
+    unidade: sigla.value,
     servidorId: servidorSelecionado.value,
-    dataTermino: dataTermino.value,
+    dataInicio: new Date(),
+    dataTermino: new Date(dataTermino.value),
     justificativa: justificativa.value
   })
   sucesso.value = true
@@ -116,4 +116,4 @@ function criarAtribuicao() {
 function voltar() {
   router.push(`/unidade/${sigla.value}`)
 }
-</script> 
+</script>

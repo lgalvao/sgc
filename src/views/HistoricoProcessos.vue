@@ -27,8 +27,8 @@
       <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
-        <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidadeId).join(', ') }}</td>
-        <td>{{ formatarData(processo.dataFinalizacao) }}</td>
+        <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
+        <td>{{ processo.dataFinalizacao }}</td>
       </tr>
       </tbody>
     </table>
@@ -39,44 +39,60 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed, ref} from 'vue'
 import {storeToRefs} from 'pinia'
-import {useProcessosStore} from '../stores/processos'
+import {useProcessosStore} from '@/stores/processos'
+import {Processo, ProcessoUnidade} from '@/types/tipos' // Import Processo and ProcessoUnidade types
+
+type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 
-const criterio = ref('descricao')
+const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
 const processosFinalizados = computed(() =>
-    processos.value.filter(p => p.situacao === 'Finalizado')
+    processos.value.filter((p: Processo) => p.situacao === 'Finalizado')
 )
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFinalizados.value].sort((a, b) => {
-    let valA = a[criterio.value];
-    let valB = b[criterio.value];
+  return [...processosFinalizados.value].sort((a: Processo, b: Processo) => {
+    let valA: any; // Use any for comparison values as they can be different types
+    let valB: any;
 
     if (criterio.value === 'unidades') {
-      valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidadeId).join(', ');
-      valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidadeId).join(', ');
+      valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: ProcessoUnidade) => pu.unidade).join(', ');
+      valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: ProcessoUnidade) => pu.unidade).join(', ');
+    } else if (criterio.value === 'dataFinalizacao') {
+      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao) : null;
+      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao) : null;
+      valA = dateA && !isNaN(dateA.getTime()) ? dateA.getTime() : null;
+      valB = dateB && !isNaN(dateB.getTime()) ? dateB.getTime() : null;
+
+      // Handle nulls for date comparison
+      if (valA === null && valB === null) return 0;
+      if (valA === null) return asc.value ? -1 : 1; // nulls come first if asc, last if desc
+      if (valB === null) return asc.value ? 1 : -1;
+      return (valA - valB) * (asc.value ? 1 : -1); // Compare timestamps
+    } else if (criterio.value === 'descricao') {
+      valA = a.descricao;
+      valB = b.descricao;
+    } else if (criterio.value === 'tipo') {
+      valA = a.tipo;
+      valB = b.tipo;
     }
 
+    // General comparison for strings and numbers (after date specific handling)
     if (valA < valB) return asc.value ? -1 : 1;
     if (valA > valB) return asc.value ? 1 : -1;
     return 0;
   });
 });
 
-function formatarData(data) {
-  if (!data) return ''
-  const [ano, mes, dia] = data.split('-')
-  return `${dia}/${mes}/${ano}`
-}
 
-function ordenarPor(campo) {
+function ordenarPor(campo: SortCriteria) {
   if (criterio.value === campo) {
     asc.value = !asc.value
   } else {

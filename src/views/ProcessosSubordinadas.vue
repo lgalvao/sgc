@@ -32,26 +32,36 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
-import {useUnidadesStore} from '../stores/unidades'
-import {useProcessosStore} from '../stores/processos'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useProcessosStore} from '@/stores/processos'
 import TreeTable from '../components/TreeTable.vue'
+import {Processo, ProcessoUnidade, Unidade} from '@/types/tipos';
+
+interface TreeTableItem {
+  id: string;
+  nome: string;
+  situacao: string;
+  dataLimite: string;
+  expanded: boolean;
+  children?: TreeTableItem[];
+}
 
 const route = useRoute()
 const router = useRouter()
 
-const siglaUnidadeAtual = computed(() => route.params.sigla)
+const siglaUnidadeAtual = computed(() => route.params.sigla as string)
 const processoId = computed(() => Number(route.params.processoId))
 
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 
-const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidadeAtual.value))
-const processoAtual = computed(() => processos.value.find(p => p.id === processoId.value))
+const unidade = computed<Unidade | null>(() => unidadesStore.pesquisarUnidade(siglaUnidadeAtual.value) as Unidade | null)
+const processoAtual = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === processoId.value))
 
 const colunasTabela = [
   {key: 'nome', label: 'Unidade'},
@@ -59,44 +69,54 @@ const colunasTabela = [
   {key: 'dataLimite', label: 'Data Limite'}
 ]
 
-const dadosFormatadosSubordinadas = computed(() => {
+const dadosFormatadosSubordinadas = computed<TreeTableItem[]>(() => {
   if (!unidade.value || !unidade.value.filhas || unidade.value.filhas.length === 0) return []
   return formatarDadosParaArvore(unidade.value.filhas, processoId.value)
 })
 
-function formatarData(data) {
-  if (!data) return ''
-  const [ano, mes, dia] = data.split('-')
-  return `${dia}/${mes}/${ano}`
+function formatarData(data: Date | string | null): string {
+  if (!data) return '';
+  const dataObj = typeof data === 'string' ? new Date(data) : data;
+  if (isNaN(dataObj.getTime())) {
+    return '';
+  }
+  const dia = String(dataObj.getDate()).padStart(2, '0');
+  const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+  const ano = dataObj.getFullYear();
+  return `${dia}/${mes}/${ano}`;
 }
 
-function formatarDadosParaArvore(dados, processoId) {
+function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas, processoId) : []
-    const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find(pu => pu.unidadeId === item.sigla);
+    const processoUnidade = (processosStore.getUnidadesDoProcesso(processoId) as ProcessoUnidade[]).find(pu => pu.unidade === item.sigla);
+
+    let dataLimiteFormatada = 'N/A';
+    if (processoUnidade && processoUnidade.dataLimiteEtapa1) {
+        dataLimiteFormatada = formatarData(processoUnidade.dataLimiteEtapa1);
+    }
 
     return {
       id: item.sigla,
       nome: item.sigla + ' - ' + item.nome,
       situacao: processoUnidade ? processoUnidade.situacao : 'Não participante',
-      dataLimite: processoUnidade ? formatarData(processoUnidade.dataLimite) : 'N/A',
+      dataLimite: dataLimiteFormatada,
       expanded: true,
       ...(children.length > 0 && {children})
     }
-  }).filter(item => item.situacao !== 'Não participante' || (item.children && item.children.length > 0)); // Filtra unidades não participantes sem filhos
+  }).filter(item => item.situacao !== 'Não participante' || (item.children && item.children.length > 0));
 }
 
-function navigateToSubordinateUnit(item) {
-  const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find(pu => pu.unidadeId === item.id);
+function navigateToSubordinateUnit(item: { id: unknown, children?: unknown[] }) {
+  if (typeof item.id !== 'string') return;
+
+  const processoUnidade = (processosStore.getUnidadesDoProcesso(processoId.value) as ProcessoUnidade[]).find(pu => pu.unidade === item.id);
   if (processoUnidade) {
-    // Se a unidade subordinada tem um ProcessoUnidade associado, navega para ProcessoUnidade.vue
     router.push({path: `/processo-unidade/${processoUnidade.id}`, query: {processoId: processoId.value}})
   } else if (item.children && item.children.length > 0) {
-    // Se é uma unidade intermediária com filhos, navega para ProcessosSubordinadas.vue para essa unidade
     router.push({path: `/processos/${processoId.value}/unidades/${item.id}`})
   } else {
-    // Caso contrário, não faz nada (unidade folha não participante)
     console.log(`Unidade ${item.id} não é participante e não possui subordinadas participantes.`);
   }
 }

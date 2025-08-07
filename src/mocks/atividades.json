@@ -44,5 +44,13 @@
     "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
     "processoUnidadeId": 3,
     "conhecimentos": []
+  },
+  {
+    "id": 7,
+    "descricao": "Minha Nova Atividade",
+    "processoUnidadeId": 3,
+    "conhecimentos": [
+      { "id": 9, "descricao": "Meu Novo Conhecimento" }
+    ]
   }
 ]

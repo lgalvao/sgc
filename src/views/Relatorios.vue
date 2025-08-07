@@ -30,12 +30,9 @@
   </div>
 </template>
 
-<script setup>
-import { useRouter } from 'vue-router';
+<script setup lang="ts">
 
-const router = useRouter();
-
-function navegarPara(rota) {
+function navegarPara(rota: string) {
   // Por enquanto, apenas navega para uma rota genérica.
   // A implementação específica de cada relatório será feita no futuro.
   // router.push(rota);

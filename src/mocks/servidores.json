@@ -16,7 +16,7 @@
   {
     "id": 3,
     "nome": "Fernanda Oliveira",
-    "unidade": "SETEC",
+    "unidade": "SGP",
     "email": "fernanda.oliveira@tre-pe.jus.br",
     "ramal": "3456"
   },
@@ -37,7 +37,7 @@
   {
     "id": 6,
     "nome": "Ricardo Alves",
-    "unidade": "SETEC",
+    "unidade": "SEDOC",
     "email": "ricardo.alves@tre-pe.jus.br",
     "ramal": "6789"
   },
@@ -86,7 +86,7 @@
   {
     "id": 13,
     "nome": "Mike Smith",
-    "unidade": "SESOP",
+    "unidade": "SENIC",
     "email": "mike.smith@tre-pe.jus.br",
     "ramal": "7007"
   }
