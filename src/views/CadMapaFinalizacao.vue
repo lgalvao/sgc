@@ -58,7 +58,7 @@ import {Atividade, Mapa, ProcessoUnidade, Unidade} from '@/types/tipos';
 
 const route = useRoute()
 const router = useRouter()
-const sigla = computed(() => route.params.sigla as string)
+const sigla = computed(() => route.query.sigla as string)
 const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
@@ -79,7 +79,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
-const mapa = computed<Mapa | null>(() => mapaStore.getMapaVigentePorUnidade(sigla.value) as Mapa | null)
+const mapa = computed<Mapa | null>(() => mapaStore.getMapaPorUnidadeEProcesso(sigla.value, processoId.value) as Mapa | null)
 const processoUnidadeId = computed<number | undefined>(() => {
   const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
       pu => pu.processoId === processoId.value && pu.unidade === sigla.value
@@ -122,7 +122,8 @@ function disponibilizarMapa() {
     dataDisponibilizacao: new Date(),
   })
 
-  notificacao.value = `Notificação: O mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimite.value)}. (Simulação)`
+  notificacao.value = `Notificação: O mapa de competências da unidade ${currentUnidade.sigla}
+                       foi disponibilizado para validação até ${formatarData(dataLimite.value)}. (Simulação)`
 }
 
 function voltar() {

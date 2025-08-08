@@ -13,8 +13,7 @@
           <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
         </p>
         <p v-if="processoUnidadeDetalhes">
-          <strong>Unidade Atual:</strong> {{ processoUnidadeDetalhes.unidadeAtual || 'Não informado' }}<br>
-          <strong>Unidade Anterior:</strong> {{ processoUnidadeDetalhes.unidadeAnterior || 'N/A' }}
+          <strong>Unidade Atual:</strong> {{ processoUnidadeDetalhes.unidadeAtual || 'Não informado' }}
         </p>
       </div>
     </div>
@@ -25,7 +24,7 @@
     <div class="row">
       <template v-if="processoAtual?.tipo === ProcessoTipo.MAPEAMENTO || processoAtual?.tipo === ProcessoTipo.REVISAO">
         <section class="col-md-4 mb-3">
-          <div class="card h-100" @click="irParaAtividadesConhecimentos" style="cursor: pointer;">
+          <div class="card h-100 card-actionable" @click="irParaAtividadesConhecimentos">
             <div class="card-body">
               <h5 class="card-title">Atividades e conhecimentos</h5>
               <p class="card-text text-muted">Cadastro de atividades e conhecimentos da unidade</p>
@@ -37,7 +36,7 @@
         </section>
 
         <section class="col-md-4 mb-3">
-          <div class="card h-100" style="cursor: pointer;"
+          <div class="card h-100 card-actionable"
                @click="mapa ? (mapa.situacao === 'em_andamento' ? editarMapa() : visualizarMapa()) : criarMapa()">
             <div class="card-body">
               <h5 class="card-title">Mapa de Competências</h5>
@@ -61,7 +60,7 @@
 
       <template v-else-if="processoAtual?.tipo === ProcessoTipo.DIAGNOSTICO">
         <section class="col-md-4 mb-3">
-          <div class="card h-100" style="cursor: pointer;">
+          <div class="card h-100 card-actionable">
             <div class="card-body">
               <h5 class="card-title">Diagnóstico da Equipe</h5>
               <p class="card-text text-muted">Diagnóstico das competências pelos servidores da unidade</p>
@@ -73,7 +72,7 @@
         </section>
 
         <section class="col-md-4 mb-3">
-          <div class="card h-100" style="cursor: pointer;">
+          <div class="card h-100 card-actionable">
             <div class="card-body">
               <h5 class="card-title">Ocupações Críticas</h5>
               <p class="card-text text-muted">Identificação das ocupações críticas da unidade</p>
@@ -179,3 +178,15 @@ function irParaAtividadesConhecimentos() {
   }
 }
 </script>
+
+<style scoped>
+.card-actionable {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-actionable:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+</style>

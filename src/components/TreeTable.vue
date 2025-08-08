@@ -42,13 +42,14 @@
 </template>
 
 <script setup lang="ts">
-import {defineEmits, defineProps, ref, watch} from 'vue'
+import {ref, watch} from 'vue'
 import TreeRow from './TreeRow.vue'
 
 interface TreeItem {
   id: number | string;
   expanded?: boolean;
   children?: TreeItem[];
+
   [key: string]: any; // Para permitir outras propriedades nos itens da árvore
 }
 
@@ -66,10 +67,7 @@ interface TreeTableProps {
 }
 
 const props = defineProps<TreeTableProps>()
-
-const emit = defineEmits<{
-  (e: 'row-click', item: TreeItem): void;
-}>()
+const emit = defineEmits<{ (e: 'row-click', item: TreeItem): void; }>()
 
 const internalData = ref<TreeItem[]>([])
 

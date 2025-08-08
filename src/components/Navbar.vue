@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
     <div class="container">
       <router-link class="navbar-brand" to="/painel">SGC</router-link>
       <button aria-controls="navbarNav" aria-expanded="false"
@@ -9,7 +9,7 @@
       </button>
 
       <div id="navbarNav" class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 left-nav">
           <li class="nav-item">
             <router-link class="nav-link" to="/painel">
               <i class="bi bi-house-door"></i> Painel
@@ -51,9 +51,15 @@
             </select>
           </li>
 
+          <li class="nav-item me-2">
+            <router-link class="nav-link" to="/configuracoes" title="Configurações do sistema">
+              <i class="bi bi-gear fs-5"></i>
+            </router-link>
+          </li>
+
           <li class="nav-item">
-            <router-link class="btn btn-outline-secondary btn-sm" to="/login" title="Sair">
-              <i class="bi bi-box-arrow-right"></i>
+            <router-link class="nav-link" to="/login" title="Sair">
+              <i class="bi bi-box-arrow-right fs-5"></i>
             </router-link>
           </li>
         </ul>
@@ -98,3 +104,13 @@ const handleProfileChange = (event: Event) => {
 }
 
 </script>
+
+<style scoped>
+.left-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.left-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 1) !important;
+}
+</style>

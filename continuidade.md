@@ -88,3 +88,11 @@ O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de compet
 - Mantenha a consistência do código seguindo as convenções existentes.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
 - Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas.
+
+## Testes E2E (Playwright)
+
+Os testes end-to-end (E2E) são implementados utilizando o Playwright e estão localizados no diretório `spec/`. Eles garantem que os fluxos críticos da aplicação funcionem corretamente do ponto de vista do usuário.
+
+- **Localização**: Todos os testes E2E estão no diretório `spec/`.
+- **Estrutura**: Cada arquivo `.spec.ts` contém um conjunto de testes relacionados a uma funcionalidade específica (ex: `login.spec.ts` para o fluxo de login, `cad-atividades.spec.ts` para o cadastro de atividades).
+- **Autenticação**: O login é realizado uma vez antes de cada teste ou suíte de testes, utilizando a função auxiliar `login` de `utils/auth.ts`, garantindo que os testes operem em um estado autenticado.

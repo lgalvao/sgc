@@ -52,5 +52,11 @@
     "conhecimentos": [
       { "id": 9, "descricao": "Meu Novo Conhecimento" }
     ]
+  },
+  {
+    "id": 8,
+    "descricao": "Atividade de Teste para STIC",
+    "processoUnidadeId": 1,
+    "conhecimentos": []
   }
 ]

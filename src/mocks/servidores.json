@@ -89,5 +89,12 @@
     "unidade": "SENIC",
     "email": "mike.smith@tre-pe.jus.br",
     "ramal": "7007"
+  },
+  {
+    "id": 14,
+    "nome": "Servidor Teste STIC",
+    "unidade": "STIC",
+    "email": "teste.stic@tre-pe.jus.br",
+    "ramal": "7008"
   }
 ]

@@ -23,30 +23,29 @@
 </template>
 
 <script setup lang="ts">
-import {defineEmits, defineProps} from 'vue';
-import TreeRow from './TreeRow.vue'; // Importação adicionada
+import TreeRow from './TreeRow.vue';
 
 interface Column {
   key: string;
-  // Adicione outras propriedades de coluna se existirem
 }
 
 interface TreeItem {
   id: number | string;
   expanded?: boolean;
   children?: TreeItem[];
-
   [key: string]: any; // Para permitir acesso a propriedades dinâmicas como item[column.key]
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   item: TreeItem;
   level?: number;
   columns?: Column[];
-}>();
+}>(), {
+  level: 0,
+  columns: () => []
+});
 
-const level = props.level ?? 0;
-const columns = props.columns ?? [];
+const { level, columns } = props;
 
 const emit = defineEmits(['toggle', 'row-click']);
 

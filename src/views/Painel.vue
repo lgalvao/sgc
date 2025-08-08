@@ -3,27 +3,27 @@
     <!-- Tabela de Processos -->
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="display-5 mb-0">Processos</div>
-        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" to="/processos/novo">
+        <div class="display-5 mb-0" data-testid="titulo-processos">Processos</div>
+        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" to="/processos/novo" data-testid="btn-criar-processo">
           <i class="bi bi-plus-lg"></i> Criar processo
         </router-link>
       </div>
-      <table class="table table-hover">
+      <table class="table table-hover" data-testid="tabela-processos">
         <thead>
         <tr>
-          <th style="cursor:pointer" @click="ordenarPor('descricao')">
+          <th style="cursor:pointer" @click="ordenarPor('descricao')" data-testid="coluna-descricao">
             Descrição
             <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('tipo')">
+          <th style="cursor:pointer" @click="ordenarPor('tipo')" data-testid="coluna-tipo">
             Tipo
             <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('unidades')">
+          <th style="cursor:pointer" @click="ordenarPor('unidades')" data-testid="coluna-unidades">
             Unidades participantes
             <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('situacao')">
+          <th style="cursor:pointer" @click="ordenarPor('situacao')" data-testid="coluna-situacao">
             Situação
             <span v-if="criterio === 'situacao'">{{ asc ? '↑' : '↓' }}</span>
           </th>
@@ -44,9 +44,9 @@
 
     <div>
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="mb-0 display-5">Alertas</div>
+        <div class="mb-0 display-5" data-testid="titulo-alertas">Alertas</div>
       </div>
-      <table class="table table-hover">
+      <table class="table table-hover" data-testid="tabela-alertas">
         <thead>
         <tr>
           <th>Data/Hora</th>

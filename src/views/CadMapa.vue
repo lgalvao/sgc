@@ -13,7 +13,8 @@
           <input :id="`atv-${atividade.id}`" v-model="atividadesSelecionadas"
                  :value="atividade.id"
                  class="form-check-input"
-                 type="checkbox">
+                 type="checkbox"
+                 data-testid="atividade-checkbox">
           <label :for="`atv-${atividade.id}`" class="form-check-label">
             {{ atividade.descricao }}
           </label>
@@ -41,14 +42,15 @@
       <div class="mb-4">
         <h5>Competências cadastradas</h5>
         <div v-if="competencias.length === 0" class="text-muted">Nenhuma competência cadastrada ainda.</div>
-        <div v-for="comp in competencias" :key="comp.id" class="card mb-2">
+        <div v-for="comp in competencias" :key="comp.id" class="card mb-2" data-testid="competencia-item">
           <div class="card-body">
-            <strong> {{ comp.descricao }}</strong><br>
+            <strong data-testid="competencia-descricao"> {{ comp.descricao }}</strong><br>
             <ul>
               <li v-for="atvId in comp.atividadesAssociadas" :key="atvId">
                 {{ descricaoAtividade(atvId) }}
               </li>
             </ul>
+            <button class="btn btn-danger btn-sm mt-2" @click="excluirCompetencia(comp.id)">Excluir</button>
           </div>
         </div>
       </div>
@@ -61,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 
@@ -77,6 +79,7 @@ const sigla = computed(() => route.params.sigla as string)
 const processoId = computed(() => Number(route.query.processoId))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
+const { mapas } = storeToRefs(mapaStore)
 const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
 
@@ -107,8 +110,13 @@ const atividades = computed<Atividade[]>(() => {
   }
   return atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || []
 })
-const mapa = computed(() => mapaStore.getMapaVigentePorUnidade(sigla.value))
-const competencias = ref<Competencia[]>(mapa.value ? [...mapa.value.competencias] : [])
+const mapa = computed(() => mapas.value.find(m => m.unidade === sigla.value && m.processoId === processoId.value))
+const competencias = ref<Competencia[]>([])
+watch(mapa, (novoMapa) => {
+  if (novoMapa) {
+    competencias.value = [...novoMapa.competencias];
+  }
+}, { immediate: true });
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
@@ -131,8 +139,24 @@ function adicionarCompetencia() {
 function finalizarEdicao() {
   if (mapa.value) {
     mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value})
-    router.push({path: '/finalizacao-mapa', query: {sigla: sigla.value}})
+  } else {
+    const novoMapa = {
+      id: Date.now(),
+      unidade: sigla.value,
+      processoId: processoId.value,
+      competencias: competencias.value,
+      situacao: 'em_andamento',
+      dataCriacao: new Date(),
+      dataDisponibilizacao: null,
+      dataFinalizacao: null,
+    };
+    mapas.value.push(novoMapa);
   }
+  router.push({path: '/finalizacao-mapa', query: {sigla: sigla.value, processoId: processoId.value}})
+}
+
+function excluirCompetencia(id: number) {
+  competencias.value = competencias.value.filter(comp => comp.id !== id);
 }
 
 function voltar() {

@@ -9,7 +9,7 @@
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
         <button class="btn btn-outline-primary" title="Importar" data-bs-toggle="tooltip">
-          Importar
+          Importar atividades
         </button>
         <button class="btn btn-primary" title="Disponibilizar" data-bs-toggle="tooltip" @click="disponibilizarCadastro">
           Disponibilizar
@@ -20,10 +20,10 @@
     <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text"/>
+        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text" data-testid="input-nova-atividade"/>
       </div>
       <div class="col-auto">
-        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip"><i
+        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip" data-testid="btn-adicionar-atividade"><i
             class="bi bi-plus"></i></button>
       </div>
     </form>
@@ -33,22 +33,22 @@
       <div class="card-body py-2">
         <div
             class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
-          <template v-if="editandoAtividade === idx">
-            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"/>
-            <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(idx)" title="Salvar"
-                    data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
+          <template v-if="editandoAtividade === atividade.id">
+            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input" data-testid="input-editar-atividade"/>
+            <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)" title="Salvar"
+                    data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-atividade"><i class="bi bi-save"></i></button>
             <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade()" title="Cancelar"
-                    data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
+                    data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-atividade"><i class="bi bi-x"></i></button>
           </template>
 
           <template v-else>
-            <strong class="atividade-descricao">{{ atividade.descricao }}</strong>
+            <strong class="atividade-descricao" data-testid="atividade-descricao">{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <button class="btn btn-sm btn-primary botao-acao"
-                      @click="iniciarEdicaoAtividade(idx, atividade.descricao)" title="Editar"
-                      data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
+                      @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)" title="Editar"
+                      data-bs-toggle="tooltip" data-testid="btn-editar-atividade"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-danger botao-acao" @click="removerAtividade(idx)" title="Remover"
-                      data-bs-toggle="tooltip"><i
+                      data-bs-toggle="tooltip" data-testid="btn-remover-atividade"><i
                   class="bi bi-trash"></i></button>
             </div>
           </template>
@@ -59,21 +59,21 @@
           <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id"
                class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
-              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2" style="max-width: 300px;"/>
+              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input" style="max-width: 300px;" data-testid="input-editar-conhecimento"/>
               <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoConhecimento(idx, cidx)"
                       title="Salvar"
-                      data-bs-toggle="tooltip"><i class="bi bi-save"></i></button>
+                      data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-conhecimento"><i class="bi bi-save"></i></button>
               <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoConhecimento" title="Cancelar"
-                      data-bs-toggle="tooltip"><i class="bi bi-x"></i></button>
+                      data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-conhecimento"><i class="bi bi-x"></i></button>
             </template>
             <template v-else>
-              <span>{{ conhecimento.descricao }}</span>
+              <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                 <button class="btn btn-sm btn-primary botao-acao"
                         @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
-                        title="Editar" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></button>
+                        title="Editar" data-bs-toggle="tooltip" data-testid="btn-editar-conhecimento"><i class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-danger botao-acao" @click="removerConhecimento(idx, cidx)" title="Remover"
-                        data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
+                        data-bs-toggle="tooltip" data-testid="btn-remover-conhecimento"><i class="bi bi-trash"></i></button>
               </div>
             </template>
           </div>
@@ -81,11 +81,11 @@
             <div class="col">
               <input v-model="atividade.novoConhecimento" class="form-control form-control-sm"
                      placeholder="Novo conhecimento"
-                     type="text"/>
+                     type="text" data-testid="input-novo-conhecimento"/>
             </div>
             <div class="col-auto">
               <button class="btn btn-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
-                      data-bs-toggle="tooltip"><i
+                      data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"><i
                   class="bi bi-plus"></i></button>
             </div>
           </form>
@@ -115,33 +115,23 @@ const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 
-function buscarSigla(unidades: Unidade[], sigla: string): string {
-  for (const unidade of unidades) {
-    if (unidade.sigla === sigla) return unidade.sigla
-    if (unidade.filhas && unidade.filhas.length) {
-      const encontrada = buscarSigla(unidade.filhas, sigla)
-      if (encontrada) return encontrada
-    }
-  }
-  return sigla // fallback
-}
-
-const siglaUnidade = computed(() => buscarSigla(unidadesStore.unidades as Unidade[], unidadeId.value))
-
-const nomeUnidade = computed(() => {
-  function buscarNome(unidades: Unidade[], sigla: string): string {
-    for (const unidade of unidades) {
-      if (unidade.sigla === sigla) return unidade.nome || unidade.sigla
-      if (unidade.filhas && unidade.filhas.length) {
-        const encontrada = buscarNome(unidade.filhas, sigla)
+const unidade = computed(() => {
+  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
+    for (const u of unidades) {
+      if (u.sigla === sigla) return u
+      if (u.filhas && u.filhas.length) {
+        const encontrada = buscarUnidade(u.filhas, sigla)
         if (encontrada) return encontrada
       }
     }
-    return sigla
   }
 
-  return buscarNome(unidadesStore.unidades as Unidade[], siglaUnidade.value)
+  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value)
 })
+
+const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
+
+const nomeUnidade = computed(() => (unidade.value?.nome ? `- ${unidade.value.nome}` : ''))
 
 const novaAtividade = ref('')
 
@@ -228,16 +218,19 @@ function cancelarEdicaoConhecimento() {
 const editandoAtividade = ref<number | null>(null)
 const atividadeEditada = ref('')
 
-function iniciarEdicaoAtividade(idx: number, valorAtual: string) {
-  editandoAtividade.value = idx
+function iniciarEdicaoAtividade(id: number, valorAtual: string) {
+  editandoAtividade.value = id
   atividadeEditada.value = valorAtual
 }
 
-function salvarEdicaoAtividade(idx: number) {
+function salvarEdicaoAtividade(id: number) {
   if (String(atividadeEditada.value).trim()) {
     const newAtividades = [...atividades.value];
-    newAtividades[idx].descricao = String(atividadeEditada.value);
-    atividades.value = newAtividades;
+    const atividadeIndex = newAtividades.findIndex(a => a.id === id);
+    if (atividadeIndex !== -1) {
+      newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
+      atividades.value = newAtividades;
+    }
   }
   cancelarEdicaoAtividade()
 }
