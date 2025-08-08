@@ -273,6 +273,26 @@ function adicionarOuAtualizarCompetencia() {
       atividadesAssociadas: [...atividadesSelecionadas.value]
     });
   }
+
+  // Persistir as mudanças no mapaStore
+  if (mapa.value) {
+    mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+  } else {
+    // Se não houver mapa, cria um novo.
+    const novoMapa = {
+      id: Date.now(),
+      unidade: sigla.value,
+      processoId: processoId.value,
+      competencias: competencias.value,
+      situacao: 'em_andamento',
+      dataCriacao: new Date(),
+      dataDisponibilizacao: null,
+      dataFinalizacao: null,
+    };
+    mapas.value.push(novoMapa);
+    mapaStore.adicionarMapa(novoMapa);
+  }
+
   novaCompetencia.value.descricao = '';
   atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
@@ -306,6 +326,9 @@ function finalizarEdicao() {
 
 function excluirCompetencia(id: number) {
   competencias.value = competencias.value.filter(comp => comp.id !== id);
+  if (mapa.value) {
+    mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+  }
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
@@ -313,6 +336,9 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
   if (competenciaIndex !== -1) {
     const competencia = competencias.value[competenciaIndex];
     competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
+    if (mapa.value) {
+      mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+    }
   }
 }
 
