@@ -58,5 +58,65 @@
     "descricao": "Atividade de Teste para STIC",
     "processoUnidadeId": 1,
     "conhecimentos": []
+  },
+  {
+    "id": 9,
+    "descricao": "Elaboração de documentação técnica",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 10,
+    "descricao": "Atendimento a usuários de sistemas",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 11,
+    "descricao": "Gerenciamento de projetos de TI",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 12,
+    "descricao": "Análise de dados e geração de relatórios",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 13,
+    "descricao": "Administração de bancos de dados",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 14,
+    "descricao": "Configuração de infraestrutura de rede",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 15,
+    "descricao": "Desenvolvimento de APIs RESTful",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 16,
+    "descricao": "Implementação de segurança da informação",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 17,
+    "descricao": "Otimização de performance de aplicações",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
+  },
+  {
+    "id": 18,
+    "descricao": "Pesquisa e desenvolvimento de novas tecnologias",
+    "processoUnidadeId": 3,
+    "conhecimentos": []
   }
 ]

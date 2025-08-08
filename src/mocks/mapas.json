@@ -7,21 +7,21 @@
     "competencias": [
       {
         "id": 1,
-        "descricao": "Acompanhamento de processos eleitorais.",
+        "descricao": "Acompanhamento de processos eleitorais",
         "atividadesAssociadas": [
           6
         ]
       },
       {
         "id": 2,
-        "descricao": "Implantação de sistemas.",
+        "descricao": "Implantação de sistemas",
         "atividadesAssociadas": [
           1
         ]
       },
       {
         "id": 3,
-        "descricao": "Testes de sistemas eleitorais.",
+        "descricao": "Testes de sistemas eleitorais",
         "atividadesAssociadas": [
           4,
           5

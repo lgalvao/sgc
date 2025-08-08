@@ -12,7 +12,7 @@
 
     <div v-if="unidade" class="card mb-4">
       <div class="card-body">
-        <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
+        <h2 class="display-6 mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
         <p><strong>Responsável:</strong> {{ responsavel }}</p>
         <p><strong>Contato:</strong> {{ responsavelEmail }}</p>
         <p><strong>Mapa vigente:</strong> {{ mapaVigente ? mapaVigente.situacao : 'Não disponível' }}</p>

@@ -4,7 +4,7 @@
       <div class="card-body">
         <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo de unidade</span>
 
-        <h2 class="card-title mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
+        <h2 class="display-6 mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
         <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
         <p class="ms-3"><strong>Ramal:</strong> {{ responsavelDetalhes?.ramal }}</p>
         <p class="ms-3"><strong>E-mail:</strong> {{ responsavelDetalhes?.email }}</p>

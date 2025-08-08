@@ -30,6 +30,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
     });
 
     test('deve permitir adicionar uma nova atividade', async ({page}) => {
+        const novaAtividade = `Atividade de Teste ${Date.now()}`;
         await adicionarAtividade(page, novaAtividade);
     });
 
@@ -89,7 +90,8 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o conhecimento recém-adicionado e simula o hover
         const conhecimentoRow = atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoOriginal});
         await conhecimentoRow.hover();
-        await conhecimentoRow.getByTestId('btn-editar-conhecimento').waitFor({state: 'visible'}); // Espera o botão de edição do conhecimento ficar visível
+        await conhecimentoRow.getByTestId('btn-editar-conhecimento')
+            .waitFor({state: 'visible'}); // Espera o botão de edição do conhecimento ficar visível
 
         // Inicia a edição do conhecimento
         await conhecimentoRow.getByTestId('btn-editar-conhecimento').click({force: true});
@@ -111,7 +113,8 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o conhecimento recém-adicionado e simula o hover
         const conhecimentoRow = atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover});
         await conhecimentoRow.hover();
-        await conhecimentoRow.getByTestId('btn-remover-conhecimento').waitFor({state: 'visible'}); // Espera o botão de remover conhecimento ficar visível
+        await conhecimentoRow.getByTestId('btn-remover-conhecimento')
+            .waitFor({state: 'visible'}); // Espera o botão de remover conhecimento ficar visível
 
         // Remove o conhecimento
         await conhecimentoRow.getByTestId('btn-remover-conhecimento').click({force: true});

@@ -56,6 +56,7 @@ export interface Mapa {
     id: number;
     unidade: string;
     situacao: string;
+    processoId: number;
     competencias: Competencia[];
     dataCriacao: DataISO;
     dataDisponibilizacao: DataISO | null;

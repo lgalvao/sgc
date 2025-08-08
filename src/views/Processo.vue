@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <div v-if="processo">
       <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo</span>
-      <h2>{{ processo.descricao }}</h2>
+      <h2 class="display-6">{{ processo.descricao }}</h2>
       <div class="mb-4 mt-3">
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>

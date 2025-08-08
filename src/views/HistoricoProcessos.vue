@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>Histórico de processos</h2>
+    <h2 class="display-6">Histórico de processos</h2>
     <table class="table table-striped mt-4">
       <thead>
       <tr>
