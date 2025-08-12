@@ -28,4 +28,6 @@ test.describe('Detalhes da Unidade no Processo', () => {
         await page.waitForURL(/.*\/processos\/\d+\/unidade\/STIC\/atividades/);
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
     });
+
+    
 });

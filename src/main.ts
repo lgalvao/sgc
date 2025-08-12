@@ -7,6 +7,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const app = createApp(App);
-app.use(createPinia());
+const pinia = createPinia();
+app.use(pinia);
+
+// @ts-ignore
+window.pinia = pinia;
+
 app.use(router);
 app.mount("#app");

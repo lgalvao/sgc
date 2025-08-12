@@ -22,10 +22,17 @@ function parseProcessoUnidadeDates(pu: any): ProcessoUnidade {
 }
 
 export const useProcessosStore = defineStore('processos', {
-    state: () => ({
-        processos: processosMock.map(parseProcessoDates) as Processo[],
-        processosUnidade: processosUnidadesMock.map(parseProcessoUnidadeDates) as ProcessoUnidade[]
-    }),
+    state: () => {
+        const storedProcessosUnidade = localStorage.getItem('processosUnidade');
+        const processosUnidade = storedProcessosUnidade
+            ? JSON.parse(storedProcessosUnidade).map(parseProcessoUnidadeDates)
+            : processosUnidadesMock.map(parseProcessoUnidadeDates);
+
+        return {
+            processos: processosMock.map(parseProcessoDates) as Processo[],
+            processosUnidade: processosUnidade as ProcessoUnidade[]
+        };
+    },
     getters: {
         getUnidadesDoProcesso: (state) => (processoId: number): ProcessoUnidade[] => {
             return state.processosUnidade.filter(pu => pu.processoId === processoId);
