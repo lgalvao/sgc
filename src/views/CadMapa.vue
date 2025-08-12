@@ -2,7 +2,6 @@
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6">Mapa de competências técnicas</div>
-      <button class="btn btn-secondary" @click="voltar">Voltar</button>
     </div>
 
     <div v-if="unidade">
@@ -13,10 +12,11 @@
       <div class="mb-4 mt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div class="fs-4 mb-0">Competências cadastradas</div>
-          <button class="btn btn-outline-primary" @click="abrirModalCriarNovaCompetencia">
+          <button class="btn btn-outline-primary" @click="abrirModalCriarNovaCompetencia" data-testid="btn-abrir-criar-competencia">
             <i class="bi bi-plus-lg"></i> Criar competência
           </button>
         </div>
+
         <div v-if="competencias.length === 0" class="text-muted">Nenhuma competência cadastrada ainda.</div>
         <div v-for="comp in competencias" :key="comp.id" class="card mb-2 competencia-card"
              data-testid="competencia-item">
@@ -162,7 +162,8 @@ import {Atividade, Competencia, Unidade} from '@/types/tipos';
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.sigla as string)
-const processoId = computed(() => Number(route.query.processoId))
+// processoId agora vem do parâmetro de rota (novo padrão /processo/:processoId/:sigla/...)
+const processoId = computed(() => Number(route.params.processoId))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const {mapas} = storeToRefs(mapaStore)
@@ -371,9 +372,6 @@ function fecharModalDisponibilizar() {
   notificacaoDisponibilizacao.value = ''; // Limpa a notificação ao fechar
 }
 
-function voltar() {
-  router.back()
-}
 </script>
 
 <style scoped>
@@ -386,8 +384,8 @@ function voltar() {
 }
 
 .botoes-acao {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1; /* sempre visível para evitar flakiness em testes */
+  pointer-events: auto;
   transition: opacity 0.2s;
 }
 

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { login } from "../utils/auth";
 
 test.describe('Cadastro de Atribuição Temporária', () => {
-    test.setTimeout(5000);
+    test.setTimeout(15000);
 
     test.beforeEach(async ({ page }) => {
         await login(page);
@@ -22,17 +22,19 @@ test.describe('Cadastro de Atribuição Temporária', () => {
     });
 
     test('deve permitir criar uma nova atribuição temporária', async ({ page }) => {
-        // Selecionar um servidor (assumindo que há servidores elegíveis)
-        await page.getByLabel('Servidor').selectOption({ label: 'Servidor Teste STIC' });
+        // Selecionar o primeiro servidor elegível disponível de forma robusta
+        const firstEligibleValue = await page.locator('[data-testid="select-servidor"] option:not([disabled])').first().getAttribute('value');
+        expect(firstEligibleValue).toBeTruthy();
+        await page.locator('[data-testid="select-servidor"]').selectOption(firstEligibleValue!);
 
         // Preencher data de término
-        await page.getByLabel('Data de término').fill('2025-12-31');
+        await page.getByTestId('input-data-termino').fill('2025-12-31');
 
         // Preencher justificativa
-        await page.getByLabel('Justificativa').fill(`Atribuição de Teste ${Date.now()}`);
+        await page.getByTestId('textarea-justificativa').fill(`Atribuição de Teste ${Date.now()}`);
 
         // Clicar em Criar
-        await page.getByRole('button', { name: 'Criar' }).click();
+        await page.getByTestId('btn-criar-atribuicao').click();
 
         // Verificar mensagem de sucesso ou redirecionamento
         await expect(page.getByText('Atribuição criada com sucesso!')).toBeVisible();

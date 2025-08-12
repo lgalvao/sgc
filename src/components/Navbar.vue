@@ -11,22 +11,25 @@
       <div id="navbarNav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 left-nav">
           <li class="nav-item">
-            <router-link class="nav-link" to="/painel">
+            <router-link class="nav-link" :to="{ path: '/painel', query: { fromNavbar: 1 } }">
               <i class="bi bi-house-door"></i> Painel
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" :to="`/unidade/${unidadeSelecionada}`">
+            <router-link
+              class="nav-link"
+              :to="{ path: `/unidade/${unidadeSelecionada}`, query: { fromNavbar: 1 } }"
+            >
               <i class="bi bi-person"></i> Minha unidade
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/relatorios">
+            <router-link class="nav-link" :to="{ path: '/relatorios', query: { fromNavbar: 1 } }">
               <i class="bi bi-bar-chart-line"></i> Relatórios
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/historico">
+            <router-link class="nav-link" :to="{ path: '/historico', query: { fromNavbar: 1 } }">
               <i class="bi bi-clock-history"></i> Histórico
             </router-link>
           </li>
@@ -52,7 +55,7 @@
           </li>
 
           <li class="nav-item me-2">
-            <router-link class="nav-link" to="/configuracoes" title="Configurações do sistema">
+            <router-link class="nav-link" :to="{ path: '/configuracoes', query: { fromNavbar: 1 } }" title="Configurações do sistema">
               <i class="bi bi-gear fs-5"></i>
             </router-link>
           </li>

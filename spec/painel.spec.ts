@@ -31,7 +31,7 @@ test.describe('Painel Principal', () => {
     test('deve navegar para a página de detalhes do processo ao clicar em um processo', async ({ page }) => {
         // Clica no primeiro processo da lista (assumindo que há pelo menos um)
         await page.locator('[data-testid="tabela-processos"] tbody tr:first-child td:first-child').click();
-        // Verifica se a URL mudou para a página de detalhes do processo
-        await expect(page).toHaveURL(/.*\/processos\/\d+\/unidades/);
+        // Verifica se a URL mudou para a página de detalhes do processo (novo padrão)
+        await expect(page).toHaveURL(/.*\/processo\/\d+$/);
     });
 });

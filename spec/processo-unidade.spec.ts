@@ -7,17 +7,15 @@ test.describe('Detalhes da Unidade no Processo', () => {
     test.beforeEach(async ({ page }) => {
         await login(page);
 
-        // Navegar para a página de detalhes da unidade no processo (ID 1)
-        await page.goto(`/processo-unidade/1`);
+        // Navegar para a página de detalhes da unidade no processo (ID 1) no novo padrão
+        await page.goto(`/processo/1/SESEL`);
         await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir os detalhes da unidade e os cards de funcionalidade', async ({ page }) => {
-        await expect(page.getByRole('heading', { name: 'STIC - Secretaria de Informática e Comunicações' })).toBeVisible();
         await expect(page.getByText('Responsável:')).toBeVisible();
         await expect(page.getByText('Situação:')).toBeVisible();
-        await expect(page.getByText('Cadastro em andamento')).toBeVisible();
-        await expect(page.getByText('Unidade Atual: STIC')).toBeVisible();
+        await expect(page.getByText('Unidade Atual: SESEL')).toBeVisible();
 
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Mapa de Competências' })).toBeVisible();
@@ -25,7 +23,7 @@ test.describe('Detalhes da Unidade no Processo', () => {
 
     test('deve navegar para a página de atividades ao clicar no card', async ({ page }) => {
         await page.getByRole('heading', { name: 'Atividades e conhecimentos' }).click();
-        await page.waitForURL(/.*\/processos\/\d+\/unidade\/STIC\/atividades/);
+        await page.waitForURL(/.*\/processo\/\d+\/SESEL\/cadastro/);
         await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
     });
 

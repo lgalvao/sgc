@@ -4,7 +4,7 @@
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="display-6 mb-0" data-testid="titulo-processos">Processos</div>
-        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" to="/processos/novo" data-testid="btn-criar-processo">
+        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary" :to="{ name: 'CadProcesso' }" data-testid="btn-criar-processo">
           <i class="bi bi-plus-lg"></i> Criar processo
         </router-link>
       </div>
@@ -121,7 +121,7 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
 }
 
 function abrirDetalhesProcesso(processo: Processo) {
-  router.push(`/processos/${processo.id}/unidades`)
+  router.push({ name: 'Processo', params: { processoId: processo.id } })
 }
 
 const alertasFormatados = computed(() => {

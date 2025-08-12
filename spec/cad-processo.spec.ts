@@ -8,7 +8,7 @@ test.describe('Cadastro de Processo', () => {
         await login(page);
 
         // Navegar para a página de cadastro de processo
-        await page.goto(`/processos/novo`);
+        await page.goto(`/processo/cadastro`);
         await page.waitForLoadState('networkidle');
     });
 

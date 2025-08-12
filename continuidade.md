@@ -30,18 +30,17 @@ O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de compet
 - **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.ts` store, enquanto os alertas são dados mockados da `alertas.ts` store. As datas dos alertas são formatadas.
 - **Processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de atividades/conhecimentos. Inclui botão "Finalizar processo" para ADMINs e colunas da tabela ajustadas.
 - **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e dinâmica.
-- **CadMapa.vue**: Edição/criação de mapa de competências. Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar, visualizar e disponibilizar mapas de competências, associando atividades a competências. Acessível via `/unidade/:sigla/mapa?processoId=:id`, geralmente após navegar por um processo e selecionar uma unidade folha.
+- **CadMapa.vue**: Edição/criação de mapa de competências. Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar, visualizar e disponibilizar mapas de competências, associando atividades a competências. Acessível no contexto de processo via `/processo/:idProcesso/:siglaUnidade/mapa`. Não possui botão "Voltar" local; utiliza o botão global.
 - **Atribuição temporária**: Tela para criação/edição de atribuições temporárias de servidores a unidades.
 - **Histórico de processos**: Consulta de processos finalizados.
-- **Navbar**: Barra de navegação principal com links para todas as áreas, incluindo um seletor de servidor para simular
-  o login de diferentes usuários. Exibe o perfil e a unidade selecionados no login.
+- **Navbar**: Barra de navegação principal com links para todas as áreas, incluindo um seletor de servidor para simular o login de diferentes usuários. Exibe o perfil e a unidade selecionados no login.
 
 ## UI/UX e Padrões
 
 - **Bootstrap 5**: Layout responsivo e visual padronizado.
 - **Bootstrap Icons**: Padronização de ícones.
 - **Alertas e Notificações**: Exibidos no painel a partir de dados mockados no `alertas.ts` store.
-- **Navegação**: Sempre via Vue Router; componentes acessam dados exclusivamente via stores do Pinia.
+- **Navegação**: Sempre via Vue Router; componentes acessam dados exclusivamente via stores do Pinia. Botão "Voltar" e breadcrumbs são globais, integrados no layout.
 - **Feedback ao Usuário**: Mensagens de sucesso/erro básicas implementadas.
 - **Responsividade**: Layout adaptável a diferentes tamanhos de tela.
 
@@ -66,14 +65,13 @@ O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de compet
     - `Login.vue`: Tela de login que permite ao usuário "logar" como qualquer servidor cadastrado, apresentando um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
     - `Painel.vue`: Painel que exibe processos e alertas, utilizando os stores `processos.ts` e `alertas.ts`. O botão "Criar processo" é exibido condicionalmente com base no `perfilSelecionado`. Datas de alerta formatadas.
     - `CadProcesso.vue`: Cadastro de processos (CRUD)
-    - `Processo.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada. Ao clicar em uma unidade, navega para `ProcessoUnidade.vue` se for uma unidade participante direta, ou para `ProcessosSubordinadas.vue` se for uma unidade intermediária com subordinadas participantes.
-    - `ProcessosSubordinadas.vue`: Exibe as unidades subordinadas participantes de uma unidade pai dentro do contexto de um processo específico. Permite navegar para `ProcessoUnidade.vue` ou para outra `ProcessosSubordinadas.vue`.
-    - `ProcessoUnidade.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. O card "Atribuição temporária" foi removido.
+    - `Processo.vue`: Detalhes de um processo, incluindo a árvore de unidades do processo com a `dataLimite` correta. O botão "Finalizar processo" é exibido para ADMINs. Largura das colunas da tabela ajustada. Ao clicar em uma unidade, navega sempre para `ProcessoUnidade.vue` (não há navegação para unidades intermediárias).
+    - `ProcessoUnidade.vue`: Detalhes de um processo para uma unidade. Exibe informações detalhadas do responsável e cards dinâmicos e clicáveis baseados no tipo de processo. Não possui card "Atribuição temporária".
     - `CadAtividades.vue`: Cadastro de atividades/conhecimentos.
     - `CadAtribuicao.vue`: Cadastro de atribuições temporárias (CRUD).
     - `CadMapa.vue`: Edição/criação de mapa de competências.
     - `HistoricoProcessos.vue`: Lista de processos finalizados.
-    - `Unidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações detalhadas do responsável, status do mapa vigente e uma `TreeTable` de unidades subordinadas (sem coluna de situação e sem cabeçalho de colunas, com largura total).
+    - `Unidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações detalhadas do responsável, status do mapa vigente e uma `TreeTable` de unidades subordinadas (sem coluna de situação e sem cabeçalho de colunas, com largura total). Não possui botão "Voltar" local; utiliza o botão global. Links para unidades intermediárias nas tabelas são desabilitados.
 
 ## Regras Importantes
 
@@ -82,6 +80,19 @@ O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de compet
 - Mantenha todo o código, comentários e dados em português.
 - Siga o padrão de navegação, componentização e UI/UX já estabelecido.
 - Mantenha a consistência do código seguindo as convenções existentes.
+- Padrão de rotas padronizado (Vue Router 4):
+ - Padrão de rotas padronizado (Vue Router 4) — veja descrições detalhadas em `endpoints.md`:
+    - `/processo/:idProcesso`
+    - `/processo/:idProcesso/:siglaUnidade`
+    - `/processo/:idProcesso/:siglaUnidade/mapa`
+    - `/processo/:idProcesso/:siglaUnidade/cadastro`
+    - `/unidade/:siglaUnidade`
+    - `/unidade/:siglaUnidade/atribuicao`
+    - `/relatorios`
+- Breadcrumbs globais: mostram trilha especial para processos/unidades: (home) > Processo > SIGLA > Página. O último breadcrumb nunca é link.
+- O botão "Voltar" global volta no histórico quando possível; caso contrário, cai no fallback (Painel). Ele é ocultado em login e quando a navegação vem da navbar (`fromNavbar`).
+- Breadcrumbs são ocultados no Painel e em navegação oriunda da navbar (`fromNavbar`). A sigla da unidade aparece sem nome expandido (o nome completo fica no tooltip).
+- Não há mais navegação para unidades intermediárias em árvores/tabelas hierárquicas.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
 - Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas.
 
@@ -99,4 +110,8 @@ Os testes end-to-end (E2E) são implementados utilizando o Playwright e estão l
     - **Conteúdo do DOM**: Em casos de elementos que não são encontrados, use `page.evaluate(() => document.body.innerHTML)` para inspecionar o conteúdo HTML completo da página e verificar se o elemento ou texto esperado está realmente presente.
     - **Requisições de Rede**: Monitore as requisições de rede para garantir que os dados mockados estão sendo carregados corretamente e que não há erros de rede.
     - **Asserções Robustas**: Prefira `toContainText()` para verificar a presença de texto em elementos, especialmente em casos onde a visibilidade pode ser transitória ou afetada por outros elementos. Use `toBeVisible()` quando a visibilidade explícita for crucial.
+- **Boas práticas específicas (após refatoração)**:
+      - Use o botão "Voltar" global nos testes (role/button com nome "Voltar"), não data-testids locais.
+      - Prefira rotas nomeadas e seletores `data-testid` estáveis para formulários e botões.
+      - Endpoints atualizados conforme a lista acima; não usar mais endpoints legados ou redirects.
 - **timeouts**: Os testes E2E devem ter timeouts curtos, de no máximo 5000ms, pois não há backend e está tudo mockado. Se um teste não passar, o problema geralmente estará em outro lugar, não no timeout. Além disso, para elementos dinâmicos (como modais ou notificações que aparecem e desaparecem rapidamente), pode ser necessário o uso de métodos de asserção mais robustos (ex: `toContainText` em vez de `toBeVisible`) para garantir a detecção correta.

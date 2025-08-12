@@ -8,7 +8,7 @@ test.describe('Detalhes do Processo - Unidades', () => {
         await login(page);
 
         // Navegar para a página de detalhes do processo (ID 1)
-        await page.goto(`/processos/1/unidades`);
+        await page.goto(`/processo/1`);
         await page.waitForLoadState('networkidle');
     });
 

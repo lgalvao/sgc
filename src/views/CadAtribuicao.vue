@@ -7,7 +7,7 @@
         <form @submit.prevent="criarAtribuicao">
           <div class="mb-3">
             <label class="form-label" for="servidor">Servidor</label>
-            <select id="servidor" v-model="servidorSelecionado" class="form-select" required>
+            <select id="servidor" v-model="servidorSelecionado" class="form-select" required data-testid="select-servidor">
               <option disabled :value="null">Selecione um servidor</option>
               <option v-for="servidor in servidoresElegiveis" :key="servidor.id" :value="servidor.id">
                 {{ servidor.nome }}
@@ -18,15 +18,15 @@
 
           <div class="mb-3">
             <label class="form-label" for="dataTermino">Data de término</label>
-            <input id="dataTermino" v-model="dataTermino" class="form-control" required type="date"/>
+            <input id="dataTermino" v-model="dataTermino" class="form-control" required type="date" data-testid="input-data-termino"/>
           </div>
 
           <div class="mb-3">
             <label class="form-label" for="justificativa">Justificativa</label>
-            <textarea id="justificativa" v-model="justificativa" class="form-control" required></textarea>
+            <textarea id="justificativa" v-model="justificativa" class="form-control" required data-testid="textarea-justificativa"></textarea>
           </div>
-          <button class="btn btn-primary" type="submit">Criar</button>
-          <button class="btn btn-secondary ms-2" type="button" @click="voltar">Cancelar</button>
+          <button class="btn btn-primary" type="submit" data-testid="btn-criar-atribuicao">Criar</button>
+          <button class="btn btn-secondary ms-2" type="button" @click="router.push(`/unidade/${sigla}`)" data-testid="btn-cancelar-atribuicao">Cancelar</button>
         </form>
 
         <div v-if="sucesso" class="alert alert-success mt-3">Atribuição criada com sucesso!</div>
@@ -111,9 +111,5 @@ function criarAtribuicao() {
   setTimeout(() => {
     router.push(`/unidade/${sigla.value}`)
   }, 1200)
-}
-
-function voltar() {
-  router.push(`/unidade/${sigla.value}`)
 }
 </script>

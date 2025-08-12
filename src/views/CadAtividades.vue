@@ -108,8 +108,9 @@ interface AtividadeComEdicao extends Atividade {
 }
 
 const route = useRoute()
-const unidadeId = computed(() => route.params.unidadeId as string)
-const processoId = computed(() => Number(route.params.id))
+// Novo padrão de rota: /processo/:processoId/:sigla/cadastro
+const unidadeId = computed(() => route.params.sigla as string)
+const processoId = computed(() => Number(route.params.processoId))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()

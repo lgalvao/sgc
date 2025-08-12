@@ -102,6 +102,8 @@ import {Mapa, Processo, ProcessoTipo, ProcessoUnidade, Servidor, Unidade} from "
 const route = useRoute()
 const router = useRouter()
 const idProcessoUnidade = computed(() => Number(route.params.idProcessoUnidade))
+const processoId = computed(() => Number((route.params as any).processoId || (route.query as any).processoId))
+const siglaParam = computed<string | undefined>(() => (route.params as any).sigla as string | undefined)
 const unidadesStore = useUnidadesStore()
 useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
@@ -110,7 +112,14 @@ const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 
 const processoUnidadeDetalhes = computed<ProcessoUnidade | undefined>(() => {
-  return processosStore.getProcessoUnidadeById(idProcessoUnidade.value);
+  // Preferir resolver por (processoId, sigla) quando disponíveis na nova rota canônica
+  if (processoId.value && siglaParam.value) {
+    const list = processosStore.getUnidadesDoProcesso(processoId.value)
+    return list.find((pu: ProcessoUnidade) => pu.unidade === siglaParam.value)
+  }
+  // Fallback: idProcessoUnidade (rota legada)
+  if (idProcessoUnidade.value) return processosStore.getProcessoUnidadeById(idProcessoUnidade.value)
+  return undefined
 });
 
 const processoAtual = computed<Processo | null>(() => {
@@ -156,27 +165,29 @@ function badgeClass(situacao: string): string {
 
 function criarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value.id}})
+    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
   }
 }
 
 function editarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({path: `/unidade/${sigla.value}/mapa`, query: {processoId: processoAtual.value.id}})
+    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
   }
 }
 
 function visualizarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({path: `/unidade/${sigla.value}/mapa/visualizar`, query: {processoId: processoAtual.value.id}})
+    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
   }
 }
 
 function irParaAtividadesConhecimentos() {
   if (sigla.value && processoAtual.value) {
-    router.push(`/processos/${processoAtual.value.id}/unidade/${sigla.value}/atividades`)
+    router.push({ name: 'ProcessoUnidadeCadastro', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
   }
 }
+
+// Renderizar subrotas (mapa/cadastro)
 </script>
 
 <style scoped>

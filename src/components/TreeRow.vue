@@ -1,5 +1,5 @@
 <template>
-  <tr @click="handleRowClick" class="tree-row">
+  <tr @click="handleRowClick" :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]">
     <td v-for="(column, index) in columns" :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
       <span v-if="index === 0 && item.children && item.children.length > 0" @click.stop="toggleExpand(item.id)"
@@ -54,6 +54,7 @@ const toggleExpand = (id: number | string) => {
 };
 
 const handleRowClick = () => {
+  if ((props.item as any).clickable === false) return;
   emit('row-click', props.item);
 };
 
@@ -72,5 +73,15 @@ const handleChildRowClick = (childItem: TreeItem) => {
   background-color: #0d6efd;
   color: white;
   cursor: pointer;
+}
+
+.tree-row-disabled {
+  cursor: default;
+}
+
+.tree-row-disabled:hover {
+  background-color: inherit;
+  color: inherit;
+  cursor: default;
 }
 </style>

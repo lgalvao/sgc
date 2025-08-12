@@ -2,7 +2,6 @@
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
-        <button class="btn btn-outline-secondary me-2" @click="voltar"> Voltar</button>
         <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary"
                 @click="irParaCriarAtribuicao">
           Criar atribuição
@@ -69,10 +68,6 @@ const responsavelEmail = computed<string>(() => {
 })
 
 const mapaVigente = computed<Mapa | undefined>(() => mapasStore.getMapaVigentePorUnidade(sigla.value))
-
-function voltar() {
-  router.back()
-}
 
 function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${sigla.value}/atribuicao`})

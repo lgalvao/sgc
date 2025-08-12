@@ -49,7 +49,7 @@ const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 
 
-const processoId = computed(() => Number(route.params.id))
+const processoId = computed(() => Number((route.params as any).processoId || (route.params as any).id || route.query.processoId))
 const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === processoId.value))
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
@@ -126,6 +126,7 @@ function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTabl
       situacao: isIntermediaria ? '' : situacao,
       dataLimite: isIntermediaria ? '' : dataLimite,
       unidadeAtual: isIntermediaria ? '' : unidadeAtual,
+      clickable: isIntermediaria ? false : true,
       expanded: true,
       children: children,
     }
@@ -138,11 +139,11 @@ function abrirDetalhesUnidade(item: any) {
   if (item && typeof item.id === 'string') {
     const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
     if (processoUnidade) {
-      // If the clicked unit is a direct ProcessoUnidade, navigate to ProcessoUnidade.vue
-      router.push({path: `/processo-unidade/${processoUnidade.id}`, query: {processoId: processoId.value}})
+      // É uma unidade participante direta: abre a visão padrão da unidade no processo
+      router.push({ name: 'ProcessoUnidade', params: { processoId: processoId.value, sigla: processoUnidade.unidade } })
     } else if (Array.isArray(item.children) && item.children.length > 0) {
-      // If the clicked unit is not a direct ProcessoUnidade but has children, navigate to ProcessosSubordinadas.vue
-      router.push({path: `/processos/${processoId.value}/unidades/${item.id}`})
+      // Unidade INTERMEDIARIA: não navegar mais (link desabilitado)
+      console.log(`Unidade intermediária ${item.id}: navegação desabilitada.`)
     } else {
       // Otherwise, do nothing (non-participating leaf unit)
       console.log(`Unidade ${item.id} não é participante e não possui subordinadas participantes.`);

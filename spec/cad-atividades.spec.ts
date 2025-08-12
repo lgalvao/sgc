@@ -18,8 +18,8 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
     test.beforeEach(async ({page}) => {
         await login(page);
 
-        // Navegar para a página de cadastro de atividades (processoId=1, unidadeId=STIC)
-        await page.goto(`/processos/1/unidade/STIC/atividades`);
+        // Navegar para a página de cadastro de atividades (novo padrão: /processo/:processoId/:sigla/cadastro)
+        await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
     });
 

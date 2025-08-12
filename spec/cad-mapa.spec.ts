@@ -2,16 +2,19 @@ import { expect, test } from "@playwright/test";
 import { login } from "../utils/auth";
 
 test.describe('Cadastro de Mapa de Competências', () => {
+    test.setTimeout(5000);
+
     test.beforeEach(async ({ page }) => {
         await login(page);
-        await page.goto('/processo-unidade/1'); // Navigate to the previous page first
+        // Navega diretamente para o novo endpoint padronizado
+        await page.goto('/processo/1/SESEL');
         await page.waitForLoadState('networkidle');
-        await page.goto('/unidade/SESEL/mapa?processoId=1');
+        await page.goto('/processo/1/SESEL/mapa');
         await page.waitForLoadState('networkidle');
     });
 
     test('deve criar uma nova competência com sucesso', async ({ page }) => {
-        await page.getByRole('button', { name: 'Criar competência' }).click();
+        await page.getByTestId('btn-abrir-criar-competencia').click();
 
         const competenciaDescricao = 'Nova Competência de Teste ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaDescricao);
@@ -28,7 +31,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve editar uma competência existente', async ({ page }) => {
         // Criar uma competência para editar
-        await page.getByRole('button', { name: 'Criar competência' }).click();
+        await page.getByTestId('btn-abrir-criar-competencia').click();
         const competenciaOriginal = 'Competência para Edição ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaOriginal);
         await page.locator('.atividade-card-item').nth(0).click();
@@ -55,7 +58,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve excluir uma competência', async ({ page }) => {
         // Criar uma competência para excluir
-        await page.getByRole('button', { name: 'Criar competência' }).click();
+        await page.getByTestId('btn-abrir-criar-competencia').click();
         const competenciaParaExcluir = 'Competência para Excluir ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaParaExcluir);
         await page.locator('.atividade-card-item').nth(0).click();
@@ -72,7 +75,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve disponibilizar o mapa com sucesso', async ({ page }) => {
         // Criar uma competência para habilitar o botão "Disponibilizar"
-        await page.getByRole('button', { name: 'Criar competência' }).click();
+        await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('input-nova-competencia').fill('Competência para Disponibilizar ' + Date.now());
         await page.locator('.atividade-card-item').nth(0).click();
         await page.getByTestId('btn-criar-competencia').click();
@@ -91,9 +94,10 @@ test.describe('Cadastro de Mapa de Competências', () => {
     });
 
     test('deve voltar para a página anterior', async ({ page }) => {
+        // Usa o botão Voltar global do layout
         await page.getByRole('button', { name: 'Voltar' }).click();
-        await page.waitForURL(/.*\/processo-unidade\/1/);
-        // Optionally, assert some element on the previous page to confirm it loaded correctly
-        await expect(page.getByRole('heading', { name: 'STIC - Secretaria de Informática e Comunicações' })).toBeVisible();
+        await page.waitForURL(/.*\/processo\/1\/SESEL$/);
+        // Confirma que voltou para a página da unidade SESEL
+        await expect(page.getByText('Unidade Atual: SESEL')).toBeVisible();
     });
 });
