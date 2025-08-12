@@ -65,7 +65,7 @@ Abaixo está a lista de endpoints da aplicação com a descrição do propósito
 
 - Breadcrumbs globais seguem o padrão: (home) > Processo > SIGLA > Página, quando aplicável.
 - O último breadcrumb nunca é link.
-- Ao navegar via navbar, a query `fromNavbar` é utilizada para ocultar breadcrumbs e botão Voltar.
+- Ao navegar via navbar, Breadcrumbs e o botão Voltar são ocultados apenas na primeira renderização após o clique (sem uso de query string).
 - O botão Voltar global retorna no histórico quando possível; se não houver histórico ou se o retorno for inválido, redireciona para o Painel.
 
 Resumo rápido:

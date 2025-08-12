@@ -11,27 +11,24 @@
       <div id="navbarNav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 left-nav">
           <li class="nav-item">
-            <router-link class="nav-link" :to="{ path: '/painel', query: { fromNavbar: 1 } }">
+            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar('/painel')">
               <i class="bi bi-house-door"></i> Painel
-            </router-link>
+            </a>
           </li>
           <li class="nav-item">
-            <router-link
-              class="nav-link"
-              :to="{ path: `/unidade/${unidadeSelecionada}`, query: { fromNavbar: 1 } }"
-            >
+            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar(`/unidade/${unidadeSelecionada}`)">
               <i class="bi bi-person"></i> Minha unidade
-            </router-link>
+            </a>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" :to="{ path: '/relatorios', query: { fromNavbar: 1 } }">
+            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar('/relatorios')">
               <i class="bi bi-bar-chart-line"></i> Relatórios
-            </router-link>
+            </a>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" :to="{ path: '/historico', query: { fromNavbar: 1 } }">
+            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar('/historico')">
               <i class="bi bi-clock-history"></i> Histórico
-            </router-link>
+            </a>
           </li>
         </ul>
 
@@ -55,9 +52,9 @@
           </li>
 
           <li class="nav-item me-2">
-            <router-link class="nav-link" :to="{ path: '/configuracoes', query: { fromNavbar: 1 } }" title="Configurações do sistema">
+            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar('/configuracoes')" title="Configurações do sistema">
               <i class="bi bi-gear fs-5"></i>
-            </router-link>
+            </a>
           </li>
 
           <li class="nav-item">
@@ -104,6 +101,11 @@ const handleProfileChange = (event: Event) => {
     router.push('/painel'); // Redireciona para o Painel
   }
   stopEditingProfile();
+}
+
+function navigateFromNavbar(path: string) {
+  try { sessionStorage.setItem('cameFromNavbar', '1') } catch {}
+  router.push(path)
 }
 
 </script>

@@ -1,9 +1,9 @@
 <template>
   <button
-    v-if="shouldShow"
-    class="btn btn-outline-secondary btn-sm"
-    type="button"
-    @click="goBack"
+      v-if="shouldShow"
+      class="btn btn-outline-secondary btn-sm"
+      type="button"
+      @click="goBack"
   >
     <i class="bi bi-arrow-left"></i> Voltar
   </button>
@@ -19,14 +19,10 @@ const router = useRouter()
 const fallbackPath = '/painel'
 
 const shouldShow = computed(() => {
-  // Esconde no login e quando veio diretamente via navbar
-  if (route.path === '/login') return false
-  if (route.query.fromNavbar) return false
-  return true
+  return route.path !== '/login';
 })
 
 function canGoBack(): boolean {
-  // Heurística simples: histórico > 1
   return window.history.length > 1
 }
 

@@ -90,8 +90,8 @@ O objetivo é simular os fluxos de mapeamento, revisão e diagnóstico de compet
     - `/unidade/:siglaUnidade/atribuicao`
     - `/relatorios`
 - Breadcrumbs globais: mostram trilha especial para processos/unidades: (home) > Processo > SIGLA > Página. O último breadcrumb nunca é link.
-- O botão "Voltar" global volta no histórico quando possível; caso contrário, cai no fallback (Painel). Ele é ocultado em login e quando a navegação vem da navbar (`fromNavbar`).
-- Breadcrumbs são ocultados no Painel e em navegação oriunda da navbar (`fromNavbar`). A sigla da unidade aparece sem nome expandido (o nome completo fica no tooltip).
+- O botão "Voltar" global volta no histórico quando possível; caso contrário, cai no fallback (Painel). Ele é ocultado em login e quando a navegação é iniciada pela navbar (por uma única renderização).
+- Breadcrumbs são ocultados no Painel e quando a navegação é iniciada pela navbar (por uma única renderização). A sigla da unidade aparece sem nome expandido (o nome completo fica no tooltip).
 - Não há mais navegação para unidades intermediárias em árvores/tabelas hierárquicas.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
 - Unidades do tipo `INTERMEDIARIA` (como a COSIS) não devem ter `processosUnidade` associados a elas.

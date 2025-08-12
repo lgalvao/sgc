@@ -1,12 +1,13 @@
 <template>
-  <nav v-if="shouldShow" aria-label="breadcrumb">
+  <nav v-if="shouldShow" aria-label="breadcrumb" data-testid="breadcrumbs">
     <ol class="breadcrumb mb-0">
-      <li v-for="(crumb, index) in crumbs" :key="index" class="breadcrumb-item" :class="{ active: index === crumbs.length - 1 }" aria-current="page">
+      <li v-for="(crumb, index) in crumbs" :key="index" class="breadcrumb-item"
+          :class="{ active: index === crumbs.length - 1 }" aria-current="page" data-testid="breadcrumb-item">
         <template v-if="index < crumbs.length - 1">
           <template v-if="crumb.to">
             <RouterLink :to="crumb.to" :title="crumb.title || undefined">
               <template v-if="crumb.label === '__home__'">
-                <i class="bi bi-house-door" aria-label="Início"></i>
+                <i class="bi bi-house-door" aria-label="Início" data-testid="breadcrumb-home-icon"></i>
               </template>
               <template v-else>
                 {{ crumb.label }}
@@ -16,7 +17,7 @@
           <template v-else>
             <span :title="crumb.title || undefined">
               <template v-if="crumb.label === '__home__'">
-                <i class="bi bi-house-door" aria-label="Início"></i>
+                <i class="bi bi-house-door" aria-label="Início" data-testid="breadcrumb-home-icon"></i>
               </template>
               <template v-else>
                 {{ crumb.label }}
@@ -27,7 +28,7 @@
         <template v-else>
           <span :title="crumb.title || undefined">
             <template v-if="crumb.label === '__home__'">
-              <i class="bi bi-house-door" aria-label="Início"></i>
+              <i class="bi bi-house-door" aria-label="Início" data-testid="breadcrumb-home-icon"></i>
             </template>
             <template v-else>
               {{ crumb.label }}
@@ -40,11 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useUnidadesStore } from '@/stores/unidades'
-import { useProcessosStore } from '@/stores/processos'
-import { useNavigationTrail, type TrailCrumb } from '@/stores/navigationTrail'
+import {computed, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useUnidadesStore} from '@/stores/unidades'
+import {useProcessosStore} from '@/stores/processos'
+import {type TrailCrumb, useNavigationTrail} from '@/stores/navigationTrail'
 
 const route = useRoute()
 const router = useRouter()
@@ -53,11 +54,10 @@ const processosStore = useProcessosStore()
 const trailStore = useNavigationTrail()
 
 const shouldShow = computed(() => {
-  // Esconde breadcrumbs: login, painel e quando vindo diretamente da navbar
+  // Esconde breadcrumbs: login e painel. Ocultação via navbar é controlada pelo layout (App.vue)
   if (route.path === '/login') return false
-  if (route.path === '/painel') return false
-  if (route.query.fromNavbar) return false
-  return true
+  return route.path !== '/painel';
+
 })
 
 function fillPathParams(path: string, params: Record<string, any>): string {
@@ -66,9 +66,18 @@ function fillPathParams(path: string, params: Record<string, any>): string {
 
 // Atualiza a trilha com base na navegação real
 const updateTrail = () => {
-  // Resetar quando vier explicitamente pela navbar nesta navegação
-  if (route.query && typeof route.query.fromNavbar !== 'undefined') {
+  // Resetar quando navegação for iniciada a partir da navbar (flag transitória em sessionStorage)
+  let cameFromNavbar = false
+  try {
+    cameFromNavbar = sessionStorage.getItem('cameFromNavbar') === '1'
+  } catch {
+  }
+  if (cameFromNavbar) {
     trailStore.reset()
+    try {
+      sessionStorage.removeItem('cameFromNavbar')
+    } catch {
+    }
   }
 
   // Se a rota atual coincide com algum crumb.to, consideramos como navegação "voltar" e apararmos até ele
@@ -93,12 +102,12 @@ const updateTrail = () => {
   if (route.path.startsWith('/processo') || route.path.startsWith('/processos')) {
     const processoIdParam = (route.params as any).id || (route.params as any).processoId || route.query.processoId
     const processoLink = processoIdParam
-      ? { name: 'Processo', params: { processoId: Number(processoIdParam) } }
-      : undefined
+        ? {name: 'Processo', params: {processoId: Number(processoIdParam)}}
+        : undefined
     // Garante crumb "Processo" após Home e atualiza seu link quando disponível
     const idxProcCrumb = trailStore.crumbs.findIndex(c => c.label === 'Processo')
     if (idxProcCrumb === -1) {
-      trailStore.push({ label: 'Processo', to: processoLink })
+      trailStore.push({label: 'Processo', to: processoLink})
     } else if (processoLink) {
       trailStore.crumbs[idxProcCrumb].to = processoLink
     }
@@ -121,11 +130,11 @@ const updateTrail = () => {
       const basePU = route.path.replace(/\/(mapa|atribuicao|atividades|cadastro)(\/.*)?$/, '')
       const pid = Number((route.params as any).id || (route.params as any).processoId || route.query.processoId)
       const siglaTo = isFinite(pid)
-        ? { name: 'ProcessoUnidade', params: { processoId: pid, sigla: siglaPU } }
-        : { path: basePU }
+          ? {name: 'ProcessoUnidade', params: {processoId: pid, sigla: siglaPU}}
+          : {path: basePU}
       if (!last || last.label !== siglaPU) {
         // navegar para rota padrão de unidade dentro do processo
-        trailStore.push({ label: siglaPU, to: siglaTo, title: u?.nome })
+        trailStore.push({label: siglaPU, to: siglaTo, title: u?.nome})
       } else {
         // Atualiza link da sigla se mudou (ex.: chegou o processoId)
         trailStore.crumbs[trailStore.crumbs.length - 1].to = siglaTo
@@ -135,13 +144,13 @@ const updateTrail = () => {
       const matchedChildren = route.matched.filter(m => /\/(mapa|atribuicao|atividades|cadastro)(\/.*)?$/.test(m.path))
       const lastMatch = matchedChildren[matchedChildren.length - 1]
       const metaBc = lastMatch ? (typeof lastMatch.meta?.breadcrumb === 'function' ? lastMatch.meta.breadcrumb(route) : lastMatch.meta?.breadcrumb) : undefined
-      let childLabel = ''
+      let childLabel: string
       if (/\/atividades(\/.*)?$/.test(route.path)) childLabel = 'Cadastro'
       else childLabel = metaBc ? String(metaBc) : ''
       if (childLabel) {
         const lastCrumb = trailStore.crumbs[trailStore.crumbs.length - 1]
         if (!lastCrumb || lastCrumb.label !== childLabel) {
-          trailStore.push({ label: childLabel, to: route.fullPath })
+          trailStore.push({label: childLabel, to: route.fullPath})
         }
       }
     } else {
@@ -166,7 +175,7 @@ const updateTrail = () => {
       }
       if (idxProc === -1) {
         // Garantir crumb Processo quando houver processoId
-        trailStore.push({ label: 'Processo', to: { name: 'Processo', params: { processoId: Number(processoId) } } })
+        trailStore.push({label: 'Processo', to: {name: 'Processo', params: {processoId: Number(processoId)}}})
       }
     } else {
       // Fora de processo: manter apenas Home
@@ -176,11 +185,11 @@ const updateTrail = () => {
     if (!last || last.label !== sigla) {
       // Se em contexto de processo (query.processoId), link da sigla deve ir ao processo da unidade
       const siglaTo = processoId
-        ? { name: 'ProcessoUnidade', params: { processoId: Number(processoId), sigla } }
-        : { path: `/unidade/${sigla}` }
+          ? {name: 'ProcessoUnidade', params: {processoId: Number(processoId), sigla}}
+          : {path: `/unidade/${sigla}`}
       // Antes da sigla, se processoId existe, garantir crumb Processo
       // (já garantido acima quando processoId existe)
-      trailStore.push({ label: sigla, to: siglaTo, title: u?.nome })
+      trailStore.push({label: sigla, to: siglaTo, title: u?.nome})
     }
 
     // Se houver rota filha, empilhar o último meta.breadcrumb
@@ -193,7 +202,7 @@ const updateTrail = () => {
       if (childLabel) {
         const lastCrumb = trailStore.crumbs[trailStore.crumbs.length - 1]
         if (!lastCrumb || lastCrumb.label !== childLabel) {
-          trailStore.push({ label: childLabel, to: route.fullPath })
+          trailStore.push({label: childLabel, to: route.fullPath})
         }
       }
     }
@@ -209,45 +218,43 @@ const updateTrail = () => {
     if (label) {
       const lastCrumb = trailStore.crumbs[trailStore.crumbs.length - 1]
       if (!lastCrumb || lastCrumb.label !== label) {
-        trailStore.push({ label, to: route.fullPath })
+        trailStore.push({label, to: route.fullPath})
       }
     }
   }
 }
 
-watch(() => route.fullPath, () => updateTrail(), { immediate: true })
+watch(() => route.fullPath, () => updateTrail(), {immediate: true})
 
 const crumbs = computed(() => {
-  const matched = route.matched.filter(m => m.meta && m.meta.breadcrumb !== false)
-
   // 1) Se há trilha de navegação explícita, use-a
   if (trailStore.crumbs.length > 0) return trailStore.crumbs as TrailCrumb[]
 
   // 2) Fallback mínimo (deep-link ou primeira carga):
   // Monta um caminho essencial em vez de usar hierarquia de unidades
   const baseCrumbs: Array<{ label: string; to?: any; title?: string }> = []
-  baseCrumbs.push({ label: '__home__', to: { path: '/painel' }, title: 'Painel' })
+  baseCrumbs.push({label: '__home__', to: {path: '/painel'}, title: 'Painel'})
 
   // Deep-link em contexto de Processo
   if (route.path.startsWith('/processo')) {
     const processoIdParam = (route.params as any).processoId || route.query.processoId
-    const processoLink = processoIdParam ? { name: 'Processo', params: { processoId: Number(processoIdParam) } } : undefined
-    baseCrumbs.push({ label: 'Processo', to: processoLink })
+    const processoLink = processoIdParam ? {name: 'Processo', params: {processoId: Number(processoIdParam)}} : undefined
+    baseCrumbs.push({label: 'Processo', to: processoLink})
     const siglaPU = String((route.params as any).sigla || '')
     if (siglaPU) {
       const u = unidadesStore.pesquisarUnidade(siglaPU)
       const processoIdParam2 = (route.params as any).processoId || route.query.processoId
       const siglaTo = processoIdParam2
-        ? { name: 'ProcessoUnidade', params: { processoId: Number(processoIdParam2), sigla: siglaPU } }
-        : undefined
-      baseCrumbs.push({ label: siglaPU, to: siglaTo, title: u?.nome })
+          ? {name: 'ProcessoUnidade', params: {processoId: Number(processoIdParam2), sigla: siglaPU}}
+          : undefined
+      baseCrumbs.push({label: siglaPU, to: siglaTo, title: u?.nome})
       const matchedChildren = route.matched.filter(m => /\/(mapa|atribuicao|atividades)(\/.*)?$/.test(m.path))
       const last = matchedChildren[matchedChildren.length - 1]
       const metaBc = last ? (typeof last.meta?.breadcrumb === 'function' ? last.meta.breadcrumb(route) : last.meta?.breadcrumb) : undefined
       const label = /\/atividades(\/.*)?$/.test(route.path)
-        ? 'Cadastro'
-        : (metaBc ? String(metaBc) : '')
-      if (label) baseCrumbs.push({ label })
+          ? 'Cadastro'
+          : (metaBc ? String(metaBc) : '')
+      if (label) baseCrumbs.push({label})
     }
     return baseCrumbs
   }
@@ -258,27 +265,25 @@ const crumbs = computed(() => {
   const sigla = String(route.params.sigla || '')
   if (route.path.startsWith('/unidade/') && sigla) {
     const processoId = String(route.query.processoId || '')
-    // Opcional: se veio por "Minha unidade" via navbar, inserir o passo
-    let cameFromNavbar = false
-    try { cameFromNavbar = sessionStorage.getItem('cameFromNavbar') === '1' } catch {}
-    if (cameFromNavbar) {
-      baseCrumbs.push({ label: 'Minha unidade', to: { path: `/unidade/${sigla}` } })
-    }
+    // Nota: Passo "Minha unidade" não é mais inserido via flag de navbar
 
     // Adiciona apenas a SIGLA (SEDOC já não entra pois não usamos a hierarquia aqui)
     const u = unidadesStore.pesquisarUnidade(sigla)
     const siglaTo = processoId
-      ? { name: 'ProcessoUnidade', params: { processoId: Number(processoId), sigla } }
-      : { path: `/unidade/${sigla}` }
-    if (processoId) baseCrumbs.push({ label: 'Processo', to: { name: 'Processo', params: { processoId: Number(processoId) } } })
-    baseCrumbs.push({ label: sigla, to: siglaTo, title: u?.nome })
+        ? {name: 'ProcessoUnidade', params: {processoId: Number(processoId), sigla}}
+        : {path: `/unidade/${sigla}`}
+    if (processoId) baseCrumbs.push({
+      label: 'Processo',
+      to: {name: 'Processo', params: {processoId: Number(processoId)}}
+    })
+    baseCrumbs.push({label: sigla, to: siglaTo, title: u?.nome})
 
     // Se estiver em rota filha (ex.: /mapa, /atribuicao), adiciona o último segmento como crumb final
     const matchedChildren = route.matched.filter(m => m.path !== '/unidade/:sigla')
     if (matchedChildren.length > 0) {
       const last = matchedChildren[matchedChildren.length - 1]
       const metaBc = typeof last.meta?.breadcrumb === 'function' ? last.meta.breadcrumb(route) : last.meta?.breadcrumb
-      if (metaBc) baseCrumbs.push({ label: String(metaBc) })
+      if (metaBc) baseCrumbs.push({label: String(metaBc)})
     }
     return baseCrumbs
   }
@@ -288,7 +293,7 @@ const crumbs = computed(() => {
   matchedAll.forEach((m, idx) => {
     if (idx === 0 && (m.path === '/' || m.path === '/painel')) return // já temos Painel
     const metaBc = typeof m.meta?.breadcrumb === 'function' ? m.meta.breadcrumb(route) : m.meta?.breadcrumb
-    if (metaBc) baseCrumbs.push({ label: String(metaBc) })
+    if (metaBc) baseCrumbs.push({label: String(metaBc)})
   })
 
   return baseCrumbs
@@ -298,14 +303,18 @@ function buildCrumbForMatch(m: any, idx: number, total: number) {
   let label: string = ''
   const bc = (m.meta as any)?.breadcrumb
   if (typeof bc === 'function') {
-    try { label = bc(route) ?? '' } catch { label = '' }
+    try {
+      label = bc(route) ?? ''
+    } catch {
+      label = ''
+    }
   } else if (typeof bc === 'string') {
     label = bc
   }
   if (!label) label = (m.meta as any)?.title || String(m.name || '') || 'Início'
-  const to = { path: fillPathParams(m.path, route.params as any) }
-  if (idx === total - 1) return { label }
-  return { label, to }
+  const to = {path: fillPathParams(m.path, route.params as any)}
+  if (idx === total - 1) return {label}
+  return {label, to}
 }
 </script>
 
