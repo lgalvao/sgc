@@ -38,11 +38,11 @@
                        :id="'atividade-' + atividade.id" data-testid="checkbox-atividade-importar">
                 <label class="form-check-label" :for="'atividade-' + atividade.id">
                   {{ atividade.descricao }}
-                  <ul class="list-unstyled ms-3" v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0">
-                    <li v-for="conhecimento in atividade.conhecimentos" :key="conhecimento.id">
+                  <span class="list-unstyled ms-3" v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0">
+                    <span v-for="conhecimento in atividade.conhecimentos" :key="conhecimento.id">
                       - {{ conhecimento.descricao }}
-                    </li>
-                  </ul>
+                    </span>
+                  </span>
                 </label>
               </div>
             </div>
