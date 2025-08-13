@@ -64,8 +64,6 @@ const routes = [
             breadcrumb: (route: RouteLocationNormalized) => `${route.params.sigla ?? ''}`,
         }
     },
-
-
     {
         path: '/unidade/:sigla/mapa',
         name: 'Mapa',
@@ -96,8 +94,7 @@ const routes = [
         name: 'Configuracoes',
         component: () => import('./views/Configuracoes.vue'),
         meta: {title: 'Configurações', breadcrumb: 'Configurações'},
-    },
-
+    }
 ];
 
 const router = createRouter({

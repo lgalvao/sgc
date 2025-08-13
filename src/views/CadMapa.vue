@@ -12,7 +12,8 @@
       <div class="mb-4 mt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div class="fs-4 mb-0">Competências cadastradas</div>
-          <button class="btn btn-outline-primary" @click="abrirModalCriarNovaCompetencia" data-testid="btn-abrir-criar-competencia">
+          <button class="btn btn-outline-primary" @click="() => abrirModalCriarNovaCompetencia()"
+                  data-testid="btn-abrir-criar-competencia">
             <i class="bi bi-plus-lg"></i> Criar competência
           </button>
         </div>
@@ -23,7 +24,7 @@
           <div class="card-body py-2">
             <div
                 class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card">
-              
+
 
               <strong data-testid="competencia-descricao" class="competencia-descricao"> {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
@@ -65,7 +66,8 @@
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="criarCompetenciaModalLabel">{{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}</h5>
+            <h5 class="modal-title" id="criarCompetenciaModalLabel">
+              {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}</h5>
             <button type="button" class="btn-close" @click="fecharModalCriarNovaCompetencia"
                     aria-label="Close"></button>
           </div>
@@ -118,9 +120,10 @@
     </div>
     <div v-if="mostrarModalCriarNovaCompetencia" class="modal-backdrop fade show"></div>
 
-    
-  <!-- Modal de Disponibilizar -->
-    <div v-if="mostrarModalDisponibilizar" class="modal fade show" style="display: block;" tabindex="-1" aria-labelledby="disponibilizarModalLabel" aria-modal="true" role="dialog">
+
+    <!-- Modal de Disponibilizar -->
+    <div v-if="mostrarModalDisponibilizar" class="modal fade show" style="display: block;" tabindex="-1"
+         aria-labelledby="disponibilizarModalLabel" aria-modal="true" role="dialog">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -138,7 +141,9 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="fecharModalDisponibilizar">Cancelar</button>
-            <button :disabled="!dataLimiteValidacao" type="button" class="btn btn-success" @click="disponibilizarMapa">Disponibilizar</button>
+            <button :disabled="!dataLimiteValidacao" type="button" class="btn btn-success" @click="disponibilizarMapa">
+              Disponibilizar
+            </button>
           </div>
         </div>
       </div>
@@ -150,7 +155,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {useRoute} from 'vue-router'
 import {storeToRefs} from 'pinia'
 
 import {useMapasStore} from '@/stores/mapas'
@@ -160,9 +165,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {Atividade, Competencia, Unidade} from '@/types/tipos';
 
 const route = useRoute()
-const router = useRouter()
 const sigla = computed(() => route.params.sigla as string)
-// processoId agora vem do parâmetro de rota (novo padrão /processo/:processoId/:sigla/...)
 const processoId = computed(() => Number(route.params.processoId))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
@@ -217,9 +220,7 @@ function toggleAtividade(id: number) {
 }
 
 
-
 const competenciaSendoEditada = ref<Competencia | null>(null)
-
 
 
 const mostrarModalCriarNovaCompetencia = ref(false)
@@ -245,12 +246,10 @@ function fecharModalCriarNovaCompetencia() {
 }
 
 
-
 function iniciarEdicaoCompetencia(competencia: Competencia) {
   competenciaSendoEditada.value = competencia;
   abrirModalCriarNovaCompetencia(competencia);
 }
-
 
 
 function descricaoAtividade(id: number): string {
@@ -277,7 +276,7 @@ function adicionarOuAtualizarCompetencia() {
 
   // Persistir as mudanças no mapaStore
   if (mapa.value) {
-    mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
   } else {
     // Se não houver mapa, cria um novo.
     const novoMapa = {
@@ -328,7 +327,7 @@ function finalizarEdicao() {
 function excluirCompetencia(id: number) {
   competencias.value = competencias.value.filter(comp => comp.id !== id);
   if (mapa.value) {
-    mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
   }
 }
 
@@ -338,7 +337,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
     const competencia = competencias.value[competenciaIndex];
     competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
     if (mapa.value) {
-      mapaStore.editarMapa(mapa.value.id, { competencias: competencias.value });
+      mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
     }
   }
 }

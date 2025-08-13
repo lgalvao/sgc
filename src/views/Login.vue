@@ -57,7 +57,7 @@ const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
 const titulo = ref('1') // Preenchido para teste com Ana Paula Souza
 const senha = ref('123') // Preenchido para teste
 const loginStep = ref(1)
-const servidor = ref<Servidor | null>(null)
+const servidor = ref<Servidor | null | undefined>(null)
 const paresDisponiveis = ref<Par[]>([])
 const parSelecionado = ref<Par | null>(null)
 
