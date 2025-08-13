@@ -44,13 +44,11 @@
 import {computed, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from '@/stores/processos'
 import {type TrailCrumb, useNavigationTrail} from '@/stores/navigationTrail'
 
 const route = useRoute()
 const router = useRouter()
 const unidadesStore = useUnidadesStore()
-const processosStore = useProcessosStore()
 const trailStore = useNavigationTrail()
 
 const shouldShow = computed(() => {
@@ -59,10 +57,6 @@ const shouldShow = computed(() => {
   return route.path !== '/painel';
 
 })
-
-function fillPathParams(path: string, params: Record<string, any>): string {
-  return path.replace(/:(\w+)/g, (_, key) => encodeURIComponent(params[key] ?? ''))
-}
 
 // Atualiza a trilha com base na navegação real
 const updateTrail = () => {
@@ -298,24 +292,6 @@ const crumbs = computed(() => {
 
   return baseCrumbs
 })
-
-function buildCrumbForMatch(m: any, idx: number, total: number) {
-  let label: string = ''
-  const bc = (m.meta as any)?.breadcrumb
-  if (typeof bc === 'function') {
-    try {
-      label = bc(route) ?? ''
-    } catch {
-      label = ''
-    }
-  } else if (typeof bc === 'string') {
-    label = bc
-  }
-  if (!label) label = (m.meta as any)?.title || String(m.name || '') || 'Início'
-  const to = {path: fillPathParams(m.path, route.params as any)}
-  if (idx === total - 1) return {label}
-  return {label, to}
-}
 </script>
 
 <style scoped>

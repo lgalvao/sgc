@@ -16,17 +16,6 @@ export const useUnidadesStore = defineStore('unidades', {
                 }
             }
             return null
-        },
-        caminhoAteSigla(this: any, sigla: string, units: Unidade[] = this.unidades, path: Unidade[] = []): Unidade[] | null {
-            for (const unit of units) {
-                const newPath = [...path, unit]
-                if (unit.sigla === sigla) return newPath
-                if (unit.filhas && unit.filhas.length) {
-                    const foundPath = this.caminhoAteSigla(sigla, unit.filhas, newPath)
-                    if (foundPath) return foundPath
-                }
-            }
-            return null
         }
     }
 }) 

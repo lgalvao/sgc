@@ -81,9 +81,10 @@ const initializeData = (data: TreeItem[]): TreeItem[] => {
 }
 
 // Watch for prop changes
-watch(() => props.data, (newData) => {
-  internalData.value = initializeData(newData)
-}, {immediate: true, deep: true})
+watch(() => props.data, (newData) =>
+        internalData.value = initializeData(newData),
+    {immediate: true, deep: true}
+)
 
 // Find item by ID recursively
 const findItemById = (items: TreeItem[], id: number | string): TreeItem | null => {

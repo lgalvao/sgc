@@ -1,87 +1,47 @@
-# Endpoints e Navegação
-
-Abaixo está a lista de endpoints da aplicação com a descrição do propósito de cada rota, componentes envolvidos e observações de navegação/breadcrumbs.
-
-## Autenticação e Painel
-
 - /login
-  - Tela de login. Permite selecionar o servidor/perfil de uso.
-  - Breadcrumbs: ocultos. Botão Voltar: oculto.
+  - Componente: Login.vue
+  - Tela de login (título e senha), permite selecionar o servidor/perfil de uso.
 
 - /painel
-  - Tela inicial (dashboard) com lista de processos e alertas.
-  - Breadcrumbs: ocultos. Botão Voltar: fallback de destino quando não há histórico.
-
-## Processo e Unidades no contexto do processo
+  - Componente: Painel.vue 
+  - Tela inicial (no estilo de 'dashboard') com lista de processos e alertas.
 
 - /processo/:idProcesso
   - Componente: Processo.vue
   - Mostra detalhes do processo e a tabela/árvore de unidades participantes.
-  - Breadcrumbs: (home) > Processo
 
 - /processo/:idProcesso/:siglaUnidade
   - Componente: ProcessoUnidade.vue
-  - Mostra o contexto do processo para a unidade (responsável, cards de ação etc.).
-  - Breadcrumbs: (home) > Processo > SIGLA
+  - Mostra o contexto do processo para a unidade (responsável, ações disponíveis etc.).
 
 - /processo/:idProcesso/:siglaUnidade/mapa
-  - Componente: CadMapa.vue (edição/criação do mapa de competências no contexto do processo)
-  - Breadcrumbs: (home) > Processo > SIGLA > Mapa
-
+  - Componente: CadMapa.vue 
+  - Edição/criação do mapa de competências no contexto do processo
+    
 - /processo/:idProcesso/:siglaUnidade/cadastro
-  - Componente: CadAtividades.vue (cadastro de atividades e conhecimentos para a unidade dentro do processo)
-  - Breadcrumbs: (home) > Processo > SIGLA > Cadastro
-
-## Unidades (fora do contexto de processo)
+  - Componente: CadAtividades.vue 
+  - Cadastro de atividades e conhecimentos para a unidade dentro do processo
 
 - /unidade/:siglaUnidade
   - Componente: Unidade.vue
-  - Mostra detalhes da unidade (responsável, mapa vigente e árvore de subordinadas).
-  - Breadcrumbs: (home) > SIGLA
+  - Detalhes da unidade fora do processo (responsável, mapa vigente e subordinadas, se houver); para ADMIN, dá acesso ao cad. de atribuição temporária
 
 - /unidade/:siglaUnidade/atribuicao
   - Componente: CadAtribuicao.vue (cadastro de atribuição temporária)
-  - Breadcrumbs: (home) > SIGLA > Atribuição
+  - Cadastra e edita atribuição temporária de servidores a unidades.
 
 - /unidade/:siglaUnidade/mapa
-  - Componente: Visualização do mapa vigente da unidade (quando aplicável).
-  - Breadcrumbs: (home) > SIGLA > Mapa
-
-## Outras
+  - Componente: (ASD) 
+  - Visualização do mapa vigente da unidade (quando aplicável).
 
 - /relatorios
   - Componente: Relatorios.vue
-  - Breadcrumbs: (home) > Relatórios
+  - Painel de relatórios. 
 
 - /historico
   - Componente: HistoricoProcessos.vue
-  - Breadcrumbs: (home) > Histórico
+  - Tabela de processos inativados.
 
 - /configuracoes
   - Componente: Configuracoes.vue
-  - Breadcrumbs: (home) > Configurações
-
-## Notas de Navegação
-
-- Breadcrumbs globais seguem o padrão: (home) > Processo > SIGLA > Página, quando aplicável.
-- O último breadcrumb nunca é link.
-- Ao navegar via navbar, Breadcrumbs e o botão Voltar são ocultados apenas na primeira renderização após o clique (sem uso de query string).
-- O botão Voltar global retorna no histórico quando possível; se não houver histórico ou se o retorno for inválido, redireciona para o Painel.
-
-Resumo rápido:
-
-/login
-/painel
-
-/processo/:idProcesso
-/processo/:idProcesso/:siglaUnidade
-/processo/:idProcesso/:siglaUnidade/mapa
-/processo/:idProcesso/:siglaUnidade/cadastro
-
-/unidade/:siglaUnidade
-/unidade/:siglaUnidade/atribuicao
-/unidade/:siglaUnidade/mapa
-
-/relatorios
-/historico
-/configuracoes
+  - Edição de configurações do sistema.

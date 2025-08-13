@@ -126,7 +126,7 @@ function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTabl
       situacao: isIntermediaria ? '' : situacao,
       dataLimite: isIntermediaria ? '' : dataLimite,
       unidadeAtual: isIntermediaria ? '' : unidadeAtual,
-      clickable: isIntermediaria ? false : true,
+      clickable: !isIntermediaria,
       expanded: true,
       children: children,
     }
@@ -140,7 +140,7 @@ function abrirDetalhesUnidade(item: any) {
     const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
     if (processoUnidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
-      router.push({ name: 'ProcessoUnidade', params: { processoId: processoId.value, sigla: processoUnidade.unidade } })
+      router.push({name: 'ProcessoUnidade', params: {processoId: processoId.value, sigla: processoUnidade.unidade}})
     } else if (Array.isArray(item.children) && item.children.length > 0) {
       // Unidade INTERMEDIARIA: não navegar mais (link desabilitado)
       console.log(`Unidade intermediária ${item.id}: navegação desabilitada.`)

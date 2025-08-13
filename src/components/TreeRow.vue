@@ -1,3 +1,4 @@
+<!--suppress CssUnusedSymbol -->
 <template>
   <tr @click="handleRowClick" :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]">
     <td v-for="(column, index) in columns" :key="column.key"
@@ -33,6 +34,7 @@ interface TreeItem {
   id: number | string;
   expanded?: boolean;
   children?: TreeItem[];
+
   [key: string]: any; // Para permitir acesso a propriedades dinâmicas como item[column.key]
 }
 
@@ -45,22 +47,18 @@ const props = withDefaults(defineProps<{
   columns: () => []
 });
 
-const { level, columns } = props;
+const {level, columns} = props;
 
 const emit = defineEmits(['toggle', 'row-click']);
 
-const toggleExpand = (id: number | string) => {
-  emit('toggle', id);
-};
+const toggleExpand = (id: number | string) => emit('toggle', id);
 
 const handleRowClick = () => {
-  if ((props.item as any).clickable === false) return;
+  if (!(props.item as any).clickable) return;
   emit('row-click', props.item);
 };
 
-const handleChildRowClick = (childItem: TreeItem) => {
-  emit('row-click', childItem);
-};
+const handleChildRowClick = (childItem: TreeItem) => emit('row-click', childItem);
 </script>
 
 <style scoped>
@@ -69,16 +67,19 @@ const handleChildRowClick = (childItem: TreeItem) => {
   margin-right: 5px;
 }
 
+/*noinspection CssUnusedSymbol*/
 .tree-row:hover {
   background-color: #0d6efd;
   color: white;
   cursor: pointer;
 }
 
+/*noinspection CssUnusedSymbol*/
 .tree-row-disabled {
   cursor: default;
 }
 
+/*noinspection CssUnusedSymbol*/
 .tree-row-disabled:hover {
   background-color: inherit;
   color: inherit;
