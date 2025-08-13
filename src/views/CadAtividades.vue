@@ -8,7 +8,8 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary" title="Importar" data-bs-toggle="tooltip">
+        <button v-if="isChefe" class="btn btn-outline-primary" title="Importar" @click="abrirModalImportarAtividades"
+                data-bs-toggle="modal" data-bs-target="#importarAtividadesModal">
           Importar atividades
         </button>
         <button class="btn btn-primary" title="Disponibilizar" data-bs-toggle="tooltip" @click="disponibilizarCadastro">
@@ -20,11 +21,13 @@
     <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text" data-testid="input-nova-atividade"/>
+        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text"
+               data-testid="input-nova-atividade"/>
       </div>
       <div class="col-auto">
-        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip" data-testid="btn-adicionar-atividade"><i
-            class="bi bi-plus"></i></button>
+        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip"
+                data-testid="btn-adicionar-atividade"><i
+            class="bi bi-save"></i></button>
       </div>
     </form>
 
@@ -34,11 +37,15 @@
         <div
             class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
           <template v-if="editandoAtividade === atividade.id">
-            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input" data-testid="input-editar-atividade"/>
-            <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)" title="Salvar"
-                    data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-atividade"><i class="bi bi-save"></i></button>
+            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"
+                   data-testid="input-editar-atividade"/>
+            <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)"
+                    title="Salvar"
+                    data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-atividade"><i class="bi bi-save"></i>
+            </button>
             <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade()" title="Cancelar"
-                    data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-atividade"><i class="bi bi-x"></i></button>
+                    data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-atividade"><i class="bi bi-x"></i>
+            </button>
           </template>
 
           <template v-else>
@@ -59,21 +66,26 @@
           <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id"
                class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
-              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input" style="max-width: 300px;" data-testid="input-editar-conhecimento"/>
+              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input"
+                     style="max-width: 300px;" data-testid="input-editar-conhecimento"/>
               <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoConhecimento(idx, cidx)"
                       title="Salvar"
-                      data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-conhecimento"><i class="bi bi-save"></i></button>
+                      data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-conhecimento"><i class="bi bi-save"></i>
+              </button>
               <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoConhecimento" title="Cancelar"
-                      data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-conhecimento"><i class="bi bi-x"></i></button>
+                      data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-conhecimento"><i class="bi bi-x"></i>
+              </button>
             </template>
             <template v-else>
               <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                 <button class="btn btn-sm btn-primary botao-acao"
                         @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
-                        title="Editar" data-bs-toggle="tooltip" data-testid="btn-editar-conhecimento"><i class="bi bi-pencil"></i></button>
+                        title="Editar" data-bs-toggle="tooltip" data-testid="btn-editar-conhecimento"><i
+                    class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-danger botao-acao" @click="removerConhecimento(idx, cidx)" title="Remover"
-                        data-bs-toggle="tooltip" data-testid="btn-remover-conhecimento"><i class="bi bi-trash"></i></button>
+                        data-bs-toggle="tooltip" data-testid="btn-remover-conhecimento"><i class="bi bi-trash"></i>
+                </button>
               </div>
             </template>
           </div>
@@ -86,17 +98,21 @@
             <div class="col-auto">
               <button class="btn btn-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
                       data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"><i
-                  class="bi bi-plus"></i></button>
+                  class="bi bi-save"></i></button>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
+  <ImportarAtividadesModal @import-atividades="handleImportAtividades"/>
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
+import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue'
+import {Modal} from 'bootstrap'
+import {usePerfil} from '@/composables/usePerfil'
 import {useRoute} from 'vue-router'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -132,7 +148,7 @@ const unidade = computed(() => {
 
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 
-const nomeUnidade = computed(() => (unidade.value?.nome ? `- ${unidade.value.nome}` : ''))
+const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
 
 const novaAtividade = ref('')
 
@@ -240,6 +256,46 @@ function cancelarEdicaoAtividade() {
   editandoAtividade.value = null
   atividadeEditada.value = ''
 }
+
+let importarAtividadesModal: Modal | null = null;
+
+onMounted(() => {
+  const modalElement = document.getElementById('importarAtividadesModal');
+  if (modalElement) {
+    importarAtividadesModal = new Modal(modalElement);
+  }
+});
+
+function abrirModalImportarAtividades() {
+  if (importarAtividadesModal) {
+    importarAtividadesModal.show();
+  }
+}
+
+function handleImportAtividades(atividadesImportadas: Atividade[]) {
+  if (processoUnidadeId.value === undefined) return;
+
+  atividadesImportadas.forEach(atividade => {
+    const novaAtividade: Atividade = {
+      id: Date.now() + Math.random(), // Gerar novo ID único
+      descricao: atividade.descricao,
+      processoUnidadeId: processoUnidadeId.value as number,
+      conhecimentos: atividade.conhecimentos.map(conhecimento => ({
+        id: Date.now() + Math.random(), // Gerar novo ID único para o conhecimento
+        descricao: conhecimento.descricao
+      }))
+    };
+    atividadesStore.adicionarAtividade(novaAtividade);
+  });
+
+  if (importarAtividadesModal) {
+    importarAtividadesModal.hide();
+  }
+}
+
+const {perfilSelecionado} = usePerfil()
+
+const isChefe = computed(() => perfilSelecionado.value === 'CHEFE')
 
 function disponibilizarCadastro() {
 }

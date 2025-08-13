@@ -14,8 +14,8 @@ function parseProcessoDates(processo: any): Processo {
 function parseProcessoUnidadeDates(pu: any): ProcessoUnidade {
     return {
         ...pu,
-        dataLimiteEtapa1: new Date(pu.dataLimiteEtapa1),
-        dataLimiteEtapa2: new Date(pu.dataLimiteEtapa2),
+        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
+        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
     };

@@ -30,10 +30,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="processo in processosOrdenados" :key="processo.id">
-          <td style="cursor:pointer; color: var(--bs-link-color);" @click="abrirDetalhesProcesso(processo)">
-            {{ processo.descricao }}
-          </td>
+        <tr v-for="processo in processosOrdenados" :key="processo.id" style="cursor:pointer;" @click="abrirDetalhesProcesso(processo)">
+              <td>
+                {{ processo.descricao }}
+              </td>
           <td>{{ processo.tipo }}</td>
           <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
           <td>{{ processo.situacao }}</td>
@@ -46,21 +46,21 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="mb-0 display-6" data-testid="titulo-alertas">Alertas</div>
       </div>
-      <table class="table table-hover" data-testid="tabela-alertas">
+      <table class="table" data-testid="tabela-alertas">
         <thead>
         <tr>
           <th>Data/Hora</th>
-          <th>Processo</th>
-          <th>Unidade Origem</th>
           <th>Descrição</th>
+          <th>Processo</th>
+          <th>Origem</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="(alerta, index) in alertasFormatados" :key="index">
           <td>{{ formatarDataHora(alerta.data) }}</td>
+          <td>{{ alerta.descricao }}</td>
           <td>{{ alerta.processo }}</td>
           <td>{{ alerta.unidade }}</td>
-          <td>{{ alerta.descricao }}</td>
         </tr>
         <tr v-if="!alertas || alertas.length === 0">
           <td colspan="4" class="text-center text-muted">Nenhum alerta no momento.</td>

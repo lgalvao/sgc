@@ -1,0 +1,1 @@
+Em @Painel.vue na seção de processos, as linhas devem inteiramente clicáveis, nao só as descrições. Também nao deve haver o destaque em azul (co de link) nas descrições 
