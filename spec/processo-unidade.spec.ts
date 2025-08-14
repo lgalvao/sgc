@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { login } from "../utils/auth";
+import {expect, test} from "@playwright/test";
+import {login} from "../utils/auth";
 
 test.describe('Detalhes da Unidade no Processo', () => {
     test.setTimeout(5000);

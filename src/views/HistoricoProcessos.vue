@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h2 class="display-6">Histórico de processos</h2>
     <table class="table table-striped mt-4">
-      <thead>
+      <thead role="rowgroup">
       <tr>
         <th style="cursor:pointer" @click="ordenarPor('descricao')">
           Descrição
@@ -28,7 +28,7 @@
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
         <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
-        <td>{{ processo.dataFinalizacao }}</td>
+        <td>{{ processo.dataFinalizacao ? processo.dataFinalizacao.toLocaleDateString('pt-BR') : '' }}</td>
       </tr>
       </tbody>
     </table>

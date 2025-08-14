@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
-        <button v-if="isChefe" class="btn btn-outline-primary" title="Importar" @click="abrirModalImportarAtividades"
+        <button v-if="isChefe" class="btn btn-outline-primary" title="Importar"
                 data-bs-toggle="modal" data-bs-target="#importarAtividadesModal">
           Importar atividades
         </button>
@@ -105,15 +105,11 @@
       </div>
     </div>
   </div>
-  <ImportarAtividadesModal @import-atividades="handleImportAtividades"/>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue'
-import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue'
-import {Modal} from 'bootstrap'
+import {computed, ref} from 'vue'
 import {usePerfil} from '@/composables/usePerfil'
-import {useRoute} from 'vue-router'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
@@ -123,10 +119,13 @@ interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
 }
 
-const route = useRoute()
-// Novo padrão de rota: /processo/:processoId/:sigla/cadastro
-const unidadeId = computed(() => route.params.sigla as string)
-const processoId = computed(() => Number(route.params.processoId))
+const props = defineProps<{
+  processoId: number | string,
+  sigla: string
+}>()
+
+const unidadeId = computed(() => props.sigla)
+const processoId = computed(() => Number(props.processoId))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -257,21 +256,6 @@ function cancelarEdicaoAtividade() {
   atividadeEditada.value = ''
 }
 
-let importarAtividadesModal: Modal | null = null;
-
-onMounted(() => {
-  const modalElement = document.getElementById('importarAtividadesModal');
-  if (modalElement) {
-    importarAtividadesModal = new Modal(modalElement);
-  }
-});
-
-function abrirModalImportarAtividades() {
-  if (importarAtividadesModal) {
-    importarAtividadesModal.show();
-  }
-}
-
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
   if (processoUnidadeId.value === undefined) return;
 
@@ -287,10 +271,6 @@ function handleImportAtividades(atividadesImportadas: Atividade[]) {
     };
     atividadesStore.adicionarAtividade(novaAtividade);
   });
-
-  if (importarAtividadesModal) {
-    importarAtividadesModal.hide();
-  }
 }
 
 const {perfilSelecionado} = usePerfil()

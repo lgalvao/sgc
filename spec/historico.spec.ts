@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { login } from "../utils/auth";
+import {expect, test} from "@playwright/test";
+import {login} from "../utils/auth";
 
 test.describe('Histórico de Processos', () => {
     test.setTimeout(5000);
@@ -23,7 +23,7 @@ test.describe('Histórico de Processos', () => {
 
     test('deve exibir processos no histórico', async ({ page }) => {
         // Verifica se há pelo menos uma linha de dados na tabela (excluindo o cabeçalho)
-        const rows = page.getByRole('row').filter({ hasNot: page.getByRole('rowgroup', { name: 'Descrição ↑ Tipo Unidades participantes Finalizado em' }) });
+        const rows = page.locator('tbody').getByRole('row');
         await expect(rows).toHaveCount(3); // Assumindo que há 3 processos no snapshot
     });
 });
