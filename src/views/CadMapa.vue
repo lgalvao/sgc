@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4">
     <div class="fs-5 w-100 mb-3">
-      {{ unidade.sigla }} - {{ unidade.nome }}
+      {{ unidade?.sigla }} - {{ unidade?.nome }}
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">

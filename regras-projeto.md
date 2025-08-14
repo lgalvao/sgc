@@ -67,7 +67,9 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
     - `CadAtividades.vue`: Cadastro de atividades/conhecimentos.
     - `CadAtribuicao.vue`: Cadastro de atribuições temporárias (CRUD).
     - `CadMapa.vue`: Edição/criação de mapa de competências.
+    - `VisMapa.vue`: Visualização de mapa de competências.
     - `Historico.vue`: Lista de processos finalizados.
+    - `VisAtividades.vue`: Visualização de atividades e conhecimentos.
     - `Unidade.vue`: Detalhes de uma unidade (sem vínculo com processo). Exibe informações do responsável e uma `TreeTable` de unidades subordinadas.
 
 ## Regras Importantes

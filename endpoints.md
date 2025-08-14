@@ -31,8 +31,8 @@
   - Cadastra e edita atribuição temporária de servidores a unidades.
 
 - /unidade/:siglaUnidade/mapa
-  - Componente: (ASD) 
-  - Visualização do mapa vigente da unidade (quando aplicável).
+  - Componente: CadMapa.vue 
+  - Edição/criação do mapa de competências da unidade (fora do contexto de um processo específico).
 
 - /relatorios
   - Componente: Relatorios.vue
