@@ -18,14 +18,14 @@ export const useAtividadesStore = defineStore('atividades', {
         };
     },
     getters: {
-        getAtividadesPorProcessoUnidade: (state) => (processoUnidadeId: number): Atividade[] => {
-            return state.atividades.filter(a => a.processoUnidadeId === processoUnidadeId);
+        getAtividadesPorProcessoUnidade: (state) => (subprocessoId: number): Atividade[] => {
+            return state.atividades.filter(a => a.subprocessoId === subprocessoId);
         }
     },
     actions: {
-        setAtividades(processoUnidadeId: number, novasAtividades: Atividade[]) {
-            // Remove as atividades antigas para este processoUnidadeId
-            this.atividades = this.atividades.filter(a => a.processoUnidadeId !== processoUnidadeId);
+        setAtividades(subprocessoId: number, novasAtividades: Atividade[]) {
+            // Remove as atividades antigas para este subprocessoId
+            this.atividades = this.atividades.filter(a => a.subprocessoId !== subprocessoId);
             // Adiciona as novas atividades
             this.atividades.push(...novasAtividades);
         },
@@ -53,6 +53,31 @@ export const useAtividadesStore = defineStore('atividades', {
             if (atividade) {
                 atividade.conhecimentos = atividade.conhecimentos.filter(c => c.id !== conhecimentoId);
             }
+        },
+
+        async fetchAtividadesPorProcessoUnidade(subprocessoId: number) {
+            // Simula uma chamada de API para buscar atividades
+            // Em um app real, você faria uma requisição HTTP aqui
+            const todasAtividades = atividadesMock as Atividade[];
+            const atividadesDoProcesso = todasAtividades.filter(a => a.subprocessoId === subprocessoId);
+
+            // Adiciona as atividades buscadas ao estado, evitando duplicatas
+            atividadesDoProcesso.forEach(novaAtividade => {
+                if (!this.atividades.some(a => a.id === novaAtividade.id)) {
+                    this.atividades.push(novaAtividade);
+                }
+            });
+        },
+
+        adicionarMultiplasAtividades(atividades: Atividade[]) {
+            const novasAtividadesComId = atividades.map(atividade => {
+                const novaAtividade = { ...atividade, id: this.nextId++ };
+                novaAtividade.conhecimentos = novaAtividade.conhecimentos.map(conhecimento => {
+                    return { ...conhecimento, id: this.nextId++ };
+                });
+                return novaAtividade;
+            });
+            this.atividades.push(...novasAtividadesComId);
         }
     }
 });

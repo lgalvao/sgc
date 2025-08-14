@@ -2,7 +2,7 @@
   {
     "id": 1,
     "descricao": "Manutenção de sistemas administrativos criados pela unidade",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": [
       { "id": 1, "descricao": "Criação de testes de integração em Cypress" },
       { "id": 2, "descricao": "Criação de testes em Playwright" },
@@ -14,7 +14,7 @@
   {
     "id": 2,
     "descricao": "Especificação de sistemas administrativos",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": [
       { "id": 6, "descricao": "Modelagem de dados" },
       { "id": 7, "descricao": "Especificação de requisitos e casos de uso" },
@@ -24,31 +24,31 @@
   {
     "id": 3,
     "descricao": "Implantação de sistemas externos",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 4,
     "descricao": "Testes de Sistemas Eleitorais",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 5,
     "descricao": "Participação em Simulados Eleitorais",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 6,
     "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 7,
     "descricao": "Minha Nova Atividade",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": [
       { "id": 9, "descricao": "Meu Novo Conhecimento" }
     ]
@@ -56,67 +56,67 @@
   {
     "id": 8,
     "descricao": "Atividade de Teste para STIC",
-    "processoUnidadeId": 1,
+    "subprocessoId": 1,
     "conhecimentos": []
   },
   {
     "id": 9,
     "descricao": "Elaboração de documentação técnica",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 10,
     "descricao": "Atendimento a usuários de sistemas",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 11,
     "descricao": "Gerenciamento de projetos de TI",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 12,
     "descricao": "Análise de dados e geração de relatórios",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 13,
     "descricao": "Administração de bancos de dados",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 14,
     "descricao": "Configuração de infraestrutura de rede",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 15,
     "descricao": "Desenvolvimento de APIs RESTful",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 16,
     "descricao": "Implementação de segurança da informação",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 17,
     "descricao": "Otimização de performance de aplicações",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   },
   {
     "id": 18,
     "descricao": "Pesquisa e desenvolvimento de novas tecnologias",
-    "processoUnidadeId": 3,
+    "subprocessoId": 3,
     "conhecimentos": []
   }
 ]

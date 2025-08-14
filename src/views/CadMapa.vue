@@ -187,7 +187,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
-const processoUnidadeId = computed(() => {
+const subprocessoId = computed(() => {
   const processoUnidade = processosStore.processosUnidade.find(
       (pu: any) => pu.processoId === processoId.value && pu.unidade === sigla.value
   );
@@ -195,10 +195,10 @@ const processoUnidadeId = computed(() => {
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof processoUnidadeId.value !== 'number') {
+  if (typeof subprocessoId.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || []
+  return atividadesStore.getAtividadesPorProcessoUnidade(subprocessoId.value) || []
 })
 const mapa = computed(() => mapas.value.find(m => m.unidade === sigla.value && m.processoId === processoId.value))
 const competencias = ref<Competencia[]>([])

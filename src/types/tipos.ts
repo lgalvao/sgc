@@ -71,7 +71,7 @@ export interface Conhecimento {
 export interface Atividade {
     id: number;
     descricao: string;
-    processoUnidadeId: number;
+    subprocessoId: number;
     conhecimentos: Conhecimento[];
     novoConhecimento?: string;
 }

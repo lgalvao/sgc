@@ -34,7 +34,7 @@ const routes = [
     {
         path: '/processo/:processoId/:sigla',
         name: 'ProcessoUnidade',
-        component: () => import('./views/ProcessoUnidade.vue'),
+        component: () => import('./views/Subprocesso.vue'),
         props: true,
         meta: {
             title: 'Processos da Unidade',
@@ -80,7 +80,7 @@ const routes = [
     {
         path: '/historico',
         name: 'Historico',
-        component: () => import('./views/HistoricoProcessos.vue'),
+        component: () => import('./views/Historico.vue'),
         meta: {title: 'Histórico', breadcrumb: 'Histórico'},
     },
     {

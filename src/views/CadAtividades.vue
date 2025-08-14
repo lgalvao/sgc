@@ -1,5 +1,71 @@
 <template>
   <div class="container mt-4">
+    <!-- Modal de Importação de Atividades -->
+    <div class="modal fade" id="importarAtividadesModal" tabindex="-1" aria-labelledby="importarAtividadesModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importarAtividadesModalLabel">Importação de atividades</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <!-- Etapa 1: Seleção de Processo -->
+            <div class="mb-3">
+              <label for="processo-select" class="form-label">Processo</label>
+              <select id="processo-select" class="form-select" v-model="processoSelecionadoId">
+                <option disabled value="">Selecione</option>
+                <option v-for="proc in processosDisponiveis" :key="proc.id" :value="proc.id">
+                  {{ proc.descricao }}
+                </option>
+              </select>
+              <div v-if="!processosDisponiveis.length" class="text-center text-muted mt-3">
+                Nenhum processo disponível para importação.
+              </div>
+            </div>
+
+            <!-- Etapa 2: Seleção de Unidade -->
+            <div class="mb-3">
+              <label for="unidade-select" class="form-label">Unidade</label>
+              <select id="unidade-select" class="form-select" v-model="unidadeSelecionadaId"
+                      :disabled="!processoSelecionado">
+                <option disabled value="">Selecione</option>
+                <option v-for="pu in unidadesParticipantes" :key="pu.id" :value="pu.id">
+                  {{ pu.unidade }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Etapa 3: Seleção de Atividades -->
+            <div v-if="unidadeSelecionada">
+              <h6>Atividades para importar</h6>
+              <div v-if="atividadesParaImportar.length" class="atividades-container border rounded p-2">
+                <div v-for="ativ in atividadesParaImportar" :key="ativ.id" class="form-check">
+                  <input class="form-check-input" type="checkbox" :value="ativ" v-model="atividadesSelecionadas"
+                         :id="`ativ-check-${ativ.id}`">
+                  <label class="form-check-label" :for="`ativ-check-${ativ.id}`">
+                    {{ ativ.descricao }}
+                  </label>
+                </div>
+              </div>
+              <div v-else class="text-center text-muted mt-3">
+                Nenhuma atividade encontrada para esta unidade/processo.
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" @click="importarAtividades"
+                    :disabled="!atividadesSelecionadas.length">Importar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="unidade-cabecalho w-100">
       <span class="unidade-sigla">{{ siglaUnidade }}</span>
       <span class="unidade-nome">{{ nomeUnidade }}</span>
@@ -25,7 +91,7 @@
                data-testid="input-nova-atividade"/>
       </div>
       <div class="col-auto">
-        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar Atividade" data-bs-toggle="tooltip"
+        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar atividade" data-bs-toggle="tooltip"
                 data-testid="btn-adicionar-atividade"><i
             class="bi bi-save"></i></button>
       </div>
@@ -108,12 +174,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import {computed, ref, watch, onMounted, onUnmounted} from 'vue'
+import {Modal} from 'bootstrap'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import type {Atividade, ProcessoUnidade, Unidade} from '@/types/tipos'
+import {Atividade, Processo, ProcessoTipo, ProcessoUnidade, Unidade} from '@/types/tipos'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -151,7 +218,7 @@ const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}
 
 const novaAtividade = ref('')
 
-const processoUnidadeId = computed(() => {
+const subprocessoId = computed(() => {
   const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
       pu => pu.processoId === processoId.value && pu.unidade === unidadeId.value
   );
@@ -160,26 +227,26 @@ const processoUnidadeId = computed(() => {
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
-    if (processoUnidadeId.value === undefined) return []
-    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(processoUnidadeId.value) || []
+    if (subprocessoId.value === undefined) return []
+    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(subprocessoId.value) || []
     return storeAtividades.map((a: Atividade) => ({...a, novoConhecimento: ''}))
   },
   set: (val: AtividadeComEdicao[]) => {
-    if (processoUnidadeId.value === undefined) return
+    if (subprocessoId.value === undefined) return
     const storeVal = val.map(a => {
       const {novoConhecimento, ...rest} = a
       return rest
     })
-    atividadesStore.setAtividades(processoUnidadeId.value, storeVal)
+    atividadesStore.setAtividades(subprocessoId.value, storeVal)
   }
 })
 
 function adicionarAtividade() {
-  if (novaAtividade.value && processoUnidadeId.value !== undefined) {
+  if (novaAtividade.value && subprocessoId.value !== undefined) {
     atividadesStore.adicionarAtividade({
       id: Date.now(),
       descricao: novaAtividade.value,
-      processoUnidadeId: processoUnidadeId.value,
+      subprocessoId: subprocessoId.value,
       conhecimentos: [],
     })
     novaAtividade.value = ''
@@ -257,34 +324,132 @@ function cancelarEdicaoAtividade() {
 }
 
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
-  if (processoUnidadeId.value === undefined) return;
+  if (subprocessoId.value === undefined) return;
 
-  atividadesImportadas.forEach(atividade => {
-    const novaAtividade: Atividade = {
-      id: Date.now() + Math.random(), // Gerar novo ID único
-      descricao: atividade.descricao,
-      processoUnidadeId: processoUnidadeId.value as number,
-      conhecimentos: atividade.conhecimentos.map(conhecimento => ({
-        id: Date.now() + Math.random(), // Gerar novo ID único para o conhecimento
-        descricao: conhecimento.descricao
-      }))
-    };
-    atividadesStore.adicionarAtividade(novaAtividade);
-  });
+  const novasAtividades = atividadesImportadas.map(atividade => ({
+    ...atividade,
+    subprocessoId: subprocessoId.value as number,
+  }));
+
+  atividadesStore.adicionarMultiplasAtividades(novasAtividades);
 }
 
 const {perfilSelecionado} = usePerfil()
 
 const isChefe = computed(() => perfilSelecionado.value === 'CHEFE')
 
+// Variáveis reativas para o modal de importação
+const processoSelecionado = ref<Processo | null>(null)
+const processoSelecionadoId = ref<number | null>(null)
+const unidadesParticipantes = ref<ProcessoUnidade[]>([])
+const unidadeSelecionada = ref<ProcessoUnidade | null>(null)
+const unidadeSelecionadaId = ref<number | null>(null)
+const atividadesParaImportar = ref<Atividade[]>([])
+const atividadesSelecionadas = ref<Atividade[]>([])
+
+const modalElement = ref<HTMLElement | null>(null)
+const cleanupBackdrop = () => {
+  const backdrop = document.querySelector('.modal-backdrop');
+  if (backdrop) {
+    backdrop.remove();
+  }
+  document.body.classList.remove('modal-open');
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+};
+
+onMounted(() => {
+  modalElement.value = document.getElementById('importarAtividadesModal');
+  modalElement.value?.addEventListener('hidden.bs.modal', cleanupBackdrop);
+});
+
+onUnmounted(() => {
+  modalElement.value?.removeEventListener('hidden.bs.modal', cleanupBackdrop);
+});
+
+watch(processoSelecionadoId, (newId) => {
+  if (newId) {
+    const processo = processosDisponiveis.value.find(p => p.id === newId)
+    if (processo) {
+      selecionarProcesso(processo)
+    }
+  } else {
+    selecionarProcesso(null)
+  }
+})
+
+watch(unidadeSelecionadaId, (newId) => {
+  if (newId) {
+    const unidade = unidadesParticipantes.value.find(u => u.id === newId)
+    if (unidade) {
+      selecionarUnidade(unidade)
+    }
+  } else {
+    selecionarUnidade(null)
+  }
+})
+
+// Computed property para processos disponíveis para importação
+const processosDisponiveis = computed<Processo[]>(() => {
+  return processosStore.processos.filter(p =>
+      (p.tipo === ProcessoTipo.MAPEAMENTO || p.tipo === ProcessoTipo.REVISAO) && p.situacao === 'Finalizado'
+  )
+})
+
+// Funções do modal
+function resetModal() {
+  processoSelecionado.value = null
+  processoSelecionadoId.value = null
+  unidadesParticipantes.value = []
+  unidadeSelecionada.value = null
+  unidadeSelecionadaId.value = null
+  atividadesParaImportar.value = []
+  atividadesSelecionadas.value = []
+}
+
+function selecionarProcesso(processo: Processo | null) {
+  processoSelecionado.value = processo
+  unidadesParticipantes.value = processo ? processosStore.getUnidadesDoProcesso(processo.id) : []
+  unidadeSelecionada.value = null // Reseta a unidade ao trocar de processo
+  unidadeSelecionadaId.value = null
+}
+
+async function selecionarUnidade(unidadePu: ProcessoUnidade | null) {
+  unidadeSelecionada.value = unidadePu
+  if (unidadePu) {
+    await atividadesStore.fetchAtividadesPorProcessoUnidade(unidadePu.id)
+    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorProcessoUnidade(unidadePu.id)
+    atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : []
+  } else {
+    atividadesParaImportar.value = []
+  }
+}
+
+function importarAtividades() {
+  handleImportAtividades(atividadesSelecionadas.value)
+  // Fechar o modal
+  const modalElement = document.getElementById('importarAtividadesModal')
+  if (modalElement) {
+    const modal = Modal.getInstance(modalElement) || new Modal(modalElement)
+    modal.hide()
+  }
+  resetModal()
+}
+
 function disponibilizarCadastro() {
 }
 </script>
 
-<style scoped>
-.atividade-edicao-row {
-  width: 100%;
-  justify-content: flex-start;
+<style>
+.atividades-container {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.unidade-nome {
+  color: #222;
+  opacity: 0.85;
+  padding-right: 1rem;
 }
 
 .atividade-edicao-input {
