@@ -49,11 +49,25 @@ const routes = [
         meta: {title: 'Mapa', breadcrumb: 'Mapa'},
     },
     {
+        path: '/processo/:processoId/:sigla/vis-mapa',
+        name: 'ProcessoUnidadeVisMapa',
+        component: () => import('./views/VisMapa.vue'),
+        props: (route: RouteLocationNormalized) => ({processoId: route.params.processoId, sigla: route.params.sigla}),
+        meta: {title: 'Visualização de Mapa', breadcrumb: 'Visualização de Mapa'},
+    },
+    {
         path: '/processo/:processoId/:sigla/cadastro',
         name: 'ProcessoUnidadeCadastro',
         component: () => import('./views/CadAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({processoId: route.params.processoId, sigla: route.params.sigla}),
         meta: {title: 'Cadastro', breadcrumb: 'Cadastro'},
+    },
+    {
+        path: '/processo/:processoId/:sigla/vis-cadastro',
+        name: 'ProcessoUnidadeVisCadastro',
+        component: () => import('./views/VisAtividades.vue'),
+        props: (route: RouteLocationNormalized) => ({processoId: route.params.processoId, sigla: route.params.sigla}),
+        meta: {title: 'Visualização de Atividades', breadcrumb: 'Visualização de Atividades'},
     },
     {
         path: '/unidade/:sigla',

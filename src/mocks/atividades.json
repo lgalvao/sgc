@@ -4,11 +4,26 @@
     "descricao": "Manutenção de sistemas administrativos criados pela unidade",
     "subprocessoId": 3,
     "conhecimentos": [
-      { "id": 1, "descricao": "Criação de testes de integração em Cypress" },
-      { "id": 2, "descricao": "Criação de testes em Playwright" },
-      { "id": 3, "descricao": "Programação em Java" },
-      { "id": 4, "descricao": "ProgramNaoação em JavaScript/Vue" },
-      { "id": 5, "descricao": "Correções de vulnerabilidades" }
+      {
+        "id": 1,
+        "descricao": "Criação de testes de integração em Cypress"
+      },
+      {
+        "id": 2,
+        "descricao": "Criação de testes em Playwright"
+      },
+      {
+        "id": 3,
+        "descricao": "Programação em Java"
+      },
+      {
+        "id": 4,
+        "descricao": "Programação em JavaScript/Vue"
+      },
+      {
+        "id": 5,
+        "descricao": "Correções de vulnerabilidades"
+      }
     ]
   },
   {
@@ -16,107 +31,258 @@
     "descricao": "Especificação de sistemas administrativos",
     "subprocessoId": 3,
     "conhecimentos": [
-      { "id": 6, "descricao": "Modelagem de dados" },
-      { "id": 7, "descricao": "Especificação de requisitos e casos de uso" },
-      { "id": 8, "descricao": "Especificação de testes de aceitação" }
+      {
+        "id": 6,
+        "descricao": "Modelagem de dados"
+      },
+      {
+        "id": 7,
+        "descricao": "Especificação de requisitos e casos de uso"
+      },
+      {
+        "id": 8,
+        "descricao": "Especificação de testes de aceitação"
+      }
     ]
   },
   {
     "id": 3,
     "descricao": "Implantação de sistemas externos",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 40,
+        "descricao": "Conhecimento em configuração de APIs de terceiros"
+      },
+      {
+        "id": 41,
+        "descricao": "Habilidade em mapeamento de dados entre sistemas"
+      }
+    ]
   },
   {
     "id": 4,
     "descricao": "Testes de Sistemas Eleitorais",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 42,
+        "descricao": "Conhecimento em legislação eleitoral"
+      },
+      {
+        "id": 43,
+        "descricao": "Habilidade em elaboração de cenários de teste para sistemas eleitorais"
+      }
+    ]
   },
   {
     "id": 5,
     "descricao": "Participação em Simulados Eleitorais",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 44,
+        "descricao": "Conhecimento em procedimentos de votação eletrônica"
+      },
+      {
+        "id": 45,
+        "descricao": "Habilidade em identificação de falhas em ambiente simulado"
+      }
+    ]
   },
   {
     "id": 6,
     "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 46,
+        "descricao": "Conhecimento em fluxo de trabalho de eleição"
+      },
+      {
+        "id": 47,
+        "descricao": "Habilidade em atendimento de chamados de suporte técnico"
+      }
+    ]
   },
   {
     "id": 7,
     "descricao": "Minha Nova Atividade",
     "subprocessoId": 3,
     "conhecimentos": [
-      { "id": 9, "descricao": "Meu Novo Conhecimento" }
+      {
+        "id": 9,
+        "descricao": "Meu Novo Conhecimento"
+      },
+      {
+        "id": 48,
+        "descricao": "Conhecimento em [tópico específico da nova atividade]"
+      }
     ]
   },
   {
     "id": 8,
     "descricao": "Atividade de Teste para STIC",
     "subprocessoId": 1,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 49,
+        "descricao": "Conhecimento em ferramentas de teste de software (ex: Selenium, JUnit)"
+      },
+      {
+        "id": 50,
+        "descricao": "Habilidade em escrita de planos de teste"
+      }
+    ]
   },
   {
     "id": 9,
     "descricao": "Elaboração de documentação técnica",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 51,
+        "descricao": "Conhecimento em normas de documentação (ex: ABNT, IEEE)"
+      },
+      {
+        "id": 52,
+        "descricao": "Habilidade em uso de ferramentas de diagramação (ex: Draw.io, Lucidchart)"
+      }
+    ]
   },
   {
     "id": 10,
     "descricao": "Atendimento a usuários de sistemas",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 53,
+        "descricao": "Conhecimento em sistemas de help desk"
+      },
+      {
+        "id": 54,
+        "descricao": "Habilidade em comunicação clara e empática"
+      }
+    ]
   },
   {
     "id": 11,
     "descricao": "Gerenciamento de projetos de TI",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 55,
+        "descricao": "Conhecimento em metodologias de gerenciamento de projetos (ex: Scrum, PMBOK)"
+      },
+      {
+        "id": 56,
+        "descricao": "Habilidade em uso de ferramentas de gestão de projetos (ex: Jira, Trello)"
+      }
+    ]
   },
   {
     "id": 12,
     "descricao": "Análise de dados e geração de relatórios",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 57,
+        "descricao": "Conhecimento em SQL e bancos de dados relacionais"
+      },
+      {
+        "id": 58,
+        "descricao": "Habilidade em uso de ferramentas de BI (ex: Power BI, Tableau)"
+      }
+    ]
   },
   {
     "id": 13,
     "descricao": "Administração de bancos de dados",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 59,
+        "descricao": "Conhecimento em otimização de queries SQL"
+      },
+      {
+        "id": 60,
+        "descricao": "Habilidade em backup e recuperação de dados"
+      }
+    ]
   },
   {
     "id": 14,
     "descricao": "Configuração de infraestrutura de rede",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 61,
+        "descricao": "Conhecimento em protocolos de rede (TCP/IP, DNS)"
+      },
+      {
+        "id": 62,
+        "descricao": "Habilidade em configuração de roteadores e switches"
+      }
+    ]
   },
   {
     "id": 15,
     "descricao": "Desenvolvimento de APIs RESTful",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 63,
+        "descricao": "Conhecimento em padrões de design de API (REST, OpenAPI)"
+      },
+      {
+        "id": 64,
+        "descricao": "Habilidade em uso de frameworks web (ex: Express.js, Spring Boot)"
+      }
+    ]
   },
   {
     "id": 16,
     "descricao": "Implementação de segurança da informação",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 65,
+        "descricao": "Conhecimento em OWASP Top 10"
+      },
+      {
+        "id": 66,
+        "descricao": "Habilidade em análise de vulnerabilidades"
+      }
+    ]
   },
   {
     "id": 17,
     "descricao": "Otimização de performance de aplicações",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 67,
+        "descricao": "Conhecimento em profiling de código"
+      },
+      {
+        "id": 68,
+        "descricao": "Habilidade em otimização de algoritmos"
+      }
+    ]
   },
   {
     "id": 18,
     "descricao": "Pesquisa e desenvolvimento de novas tecnologias",
     "subprocessoId": 3,
-    "conhecimentos": []
+    "conhecimentos": [
+      {
+        "id": 69,
+        "descricao": "Conhecimento em tendências tecnológicas"
+      },
+      {
+        "id": 70,
+        "descricao": "Habilidade em prototipagem rápida"
+      }
+    ]
   }
 ]

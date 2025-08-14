@@ -56,9 +56,9 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Cancelar
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @click="resetModal">Cancelar
             </button>
-            <button type="button" class="btn btn-primary" @click="importarAtividades"
+            <button type="button" class="btn btn-outline-primary" @click="importarAtividades"
                     :disabled="!atividadesSelecionadas.length">Importar
             </button>
           </div>
@@ -66,19 +66,20 @@
       </div>
     </div>
 
-    <div class="unidade-cabecalho w-100">
-      <span class="unidade-sigla">{{ siglaUnidade }}</span>
-      <span class="unidade-nome">{{ nomeUnidade }}</span>
+    <div class="fs-5 w-100 mb-3">
+      {{ siglaUnidade }} - {{ nomeUnidade }}
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Atividades e conhecimentos</h2>
+      <h1 class="mb-0 display-6">Atividades e conhecimentos</h1>
+
       <div class="d-flex gap-2">
         <button v-if="isChefe" class="btn btn-outline-primary" title="Importar"
                 data-bs-toggle="modal" data-bs-target="#importarAtividadesModal">
           Importar atividades
         </button>
-        <button class="btn btn-primary" title="Disponibilizar" data-bs-toggle="tooltip" @click="disponibilizarCadastro">
+        <button class="btn btn-outline-success" title="Disponibilizar" data-bs-toggle="tooltip"
+                @click="disponibilizarCadastro">
           Disponibilizar
         </button>
       </div>
@@ -91,7 +92,8 @@
                data-testid="input-nova-atividade"/>
       </div>
       <div class="col-auto">
-        <button class="btn btn-primary btn-sm" type="submit" title="Adicionar atividade" data-bs-toggle="tooltip"
+        <button class="btn btn-outline-primary btn-sm" type="submit" title="Adicionar atividade"
+                data-bs-toggle="tooltip"
                 data-testid="btn-adicionar-atividade"><i
             class="bi bi-save"></i></button>
       </div>
@@ -105,11 +107,12 @@
           <template v-if="editandoAtividade === atividade.id">
             <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"
                    data-testid="input-editar-atividade"/>
-            <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)"
+            <button class="btn btn-sm btn-outline-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)"
                     title="Salvar"
                     data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-atividade"><i class="bi bi-save"></i>
             </button>
-            <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoAtividade()" title="Cancelar"
+            <button class="btn btn-sm btn-outline-secondary botao-acao" @click="cancelarEdicaoAtividade()"
+                    title="Cancelar"
                     data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-atividade"><i class="bi bi-x"></i>
             </button>
           </template>
@@ -117,10 +120,10 @@
           <template v-else>
             <strong class="atividade-descricao" data-testid="atividade-descricao">{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
-              <button class="btn btn-sm btn-primary botao-acao"
+              <button class="btn btn-sm btn-outline-primary botao-acao"
                       @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)" title="Editar"
                       data-bs-toggle="tooltip" data-testid="btn-editar-atividade"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-danger botao-acao" @click="removerAtividade(idx)" title="Remover"
+              <button class="btn btn-sm btn-outline-danger botao-acao" @click="removerAtividade(idx)" title="Remover"
                       data-bs-toggle="tooltip" data-testid="btn-remover-atividade"><i
                   class="bi bi-trash"></i></button>
             </div>
@@ -134,22 +137,25 @@
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
               <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input"
                      style="max-width: 300px;" data-testid="input-editar-conhecimento"/>
-              <button class="btn btn-sm btn-success me-1 botao-acao" @click="salvarEdicaoConhecimento(idx, cidx)"
+              <button class="btn btn-sm btn-outline-success me-1 botao-acao"
+                      @click="salvarEdicaoConhecimento(idx, cidx)"
                       title="Salvar"
                       data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-conhecimento"><i class="bi bi-save"></i>
               </button>
-              <button class="btn btn-sm btn-secondary botao-acao" @click="cancelarEdicaoConhecimento" title="Cancelar"
+              <button class="btn btn-sm btn-outline-secondary botao-acao" @click="cancelarEdicaoConhecimento"
+                      title="Cancelar"
                       data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-conhecimento"><i class="bi bi-x"></i>
               </button>
             </template>
             <template v-else>
               <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-                <button class="btn btn-sm btn-primary botao-acao"
+                <button class="btn btn-sm btn-outline-primary botao-acao"
                         @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
                         title="Editar" data-bs-toggle="tooltip" data-testid="btn-editar-conhecimento"><i
                     class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger botao-acao" @click="removerConhecimento(idx, cidx)" title="Remover"
+                <button class="btn btn-sm btn-outline-danger botao-acao" @click="removerConhecimento(idx, cidx)"
+                        title="Remover"
                         data-bs-toggle="tooltip" data-testid="btn-remover-conhecimento"><i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -162,7 +168,7 @@
                      type="text" data-testid="input-novo-conhecimento"/>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
+              <button class="btn btn-outline-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
                       data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"><i
                   class="bi bi-save"></i></button>
             </div>
@@ -174,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch, onMounted, onUnmounted} from 'vue'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import {Modal} from 'bootstrap'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
@@ -446,12 +452,6 @@ function disponibilizarCadastro() {
   overflow-y: auto;
 }
 
-.unidade-nome {
-  color: #222;
-  opacity: 0.85;
-  padding-right: 1rem;
-}
-
 .atividade-edicao-input {
   flex-grow: 1;
   min-width: 0;
@@ -529,28 +529,6 @@ function disponibilizarCadastro() {
 
 .atividade-titulo-card .atividade-descricao {
   font-size: 1.1rem;
-}
-
-.unidade-cabecalho {
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin-bottom: 1.2rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.unidade-sigla {
-  background: #f8fafc;
-  color: #333;
-  font-weight: bold;
-  border-radius: 0.5rem;
-  letter-spacing: 1px;
-}
-
-.unidade-nome {
-  color: #222;
-  opacity: 0.85;
-  padding-right: 1rem;
 }
 
 </style>

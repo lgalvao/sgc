@@ -21,6 +21,25 @@
       <p>Unidade não encontrada.</p>
     </div>
 
+    <div class="row mt-4">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 cursor-pointer" @click="navegarParaAtividades" data-testid="card-atividades-conhecimentos">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <h5 class="card-title">Atividades e conhecimentos</h5>
+            <p class="card-text text-muted">Gerencie as atividades e conhecimentos da unidade.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 cursor-pointer" @click="visualizarMapa">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <h5 class="card-title">Mapa de Competências</h5>
+            <p class="card-text text-muted">Visualize o mapa de competências da unidade.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="unidade && unidade.filhas && unidade.filhas.length > 0" class="mt-5">
       <TreeTable
           :columns="colunasTabela"
@@ -104,8 +123,31 @@ function navegarParaUnidadeSubordinada(item: { id: unknown }) {
   if (item && typeof item.id === 'string') router.push({path: `/unidade/${item.id}`});
 }
 
+function navegarParaAtividades() {
+  if (mapaVigente.value) {
+    router.push({
+      name: 'ProcessoUnidadeCadastro',
+      params: {
+        processoId: mapaVigente.value.processoId,
+        sigla: sigla.value
+      }
+    });
+  } else {
+    // Tratar o caso onde não há mapa vigente, talvez com um alerta ou desabilitando o card
+    console.warn('Não há mapa vigente para navegar para atividades.');
+  }
+}
+
 function visualizarMapa() {
-  router.push({path: `/visualizacao-mapa`, query: {sigla: sigla.value}})
+  if (mapaVigente.value) {
+    router.push({
+      name: 'ProcessoUnidadeVisMapa',
+      params: {
+        processoId: mapaVigente.value.processoId,
+        sigla: sigla.value
+      }
+    });
+  }
 }
 
 </script>

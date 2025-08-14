@@ -109,7 +109,6 @@ function limparCampos() {
   unidadesSelecionadas.value = []
 }
 
-
 function isUnidadeIntermediaria(sigla: string): boolean {
   const unidade = unidadesStore.pesquisarUnidade(sigla);
   return !!(unidade && unidade.tipo === 'INTERMEDIARIA');

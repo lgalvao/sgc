@@ -1,31 +1,30 @@
 <template>
   <div class="container mt-4">
+    <div class="fs-5 w-100 mb-3">
+      {{ unidade.sigla }} - {{ unidade.nome }}
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="display-6">Mapa de competências técnicas</div>
+      <div class="display-6 mb-3">Mapa de competências técnicas</div>
+      <div class="d-flex gap-2">
+        <button :disabled="competencias.length === 0" class="btn btn-outline-success" @click="finalizarEdicao">
+          Disponibilizar
+        </button>
+      </div>
     </div>
 
     <div v-if="unidade">
-      <div class="mb-5 d-flex align-items-center">
-        <div class="fs-5">{{ unidade.sigla }} - {{ unidade.nome }}</div>
-      </div>
-
       <div class="mb-4 mt-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="fs-4 mb-0">Competências cadastradas</div>
-          <button class="btn btn-outline-primary" @click="() => abrirModalCriarNovaCompetencia()"
-                  data-testid="btn-abrir-criar-competencia">
-            <i class="bi bi-plus-lg"></i> Criar competência
-          </button>
-        </div>
+        <button class="btn btn-outline-primary mb-3" @click="() => abrirModalCriarNovaCompetencia()"
+                data-testid="btn-abrir-criar-competencia">
+          <i class="bi bi-plus-lg"></i> Criar competência
+        </button>
 
-        <div v-if="competencias.length === 0" class="text-muted">Nenhuma competência cadastrada ainda.</div>
         <div v-for="comp in competencias" :key="comp.id" class="card mb-2 competencia-card"
              data-testid="competencia-item">
           <div class="card-body py-2">
             <div
                 class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card">
-
-
               <strong data-testid="competencia-descricao" class="competencia-descricao"> {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <button class="btn btn-sm btn-outline-primary botao-acao"
@@ -52,9 +51,6 @@
           </div>
         </div>
       </div>
-      <button :disabled="competencias.length === 0" class="btn btn-lg btn-success" @click="finalizarEdicao">
-        Disponibilizar
-      </button>
     </div>
     <div v-else>
       <p>Unidade não encontrada.</p>
@@ -118,8 +114,8 @@
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalCriarNovaCompetencia" class="modal-backdrop fade show"></div>
 
+    <div v-if="mostrarModalCriarNovaCompetencia" class="modal-backdrop fade show"></div>
 
     <!-- Modal de Disponibilizar -->
     <div v-if="mostrarModalDisponibilizar" class="modal fade show" style="display: block;" tabindex="-1"
@@ -139,6 +135,7 @@
               {{ notificacaoDisponibilizacao }}
             </div>
           </div>
+
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="fecharModalDisponibilizar">Cancelar</button>
             <button :disabled="!dataLimiteValidacao" type="button" class="btn btn-success" @click="disponibilizarMapa">
@@ -148,6 +145,7 @@
         </div>
       </div>
     </div>
+
     <div v-if="mostrarModalDisponibilizar" class="modal-backdrop fade show"></div>
 
   </div>
