@@ -2,8 +2,7 @@
 import Navbar from './components/Navbar.vue'
 import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
-import BackButton from './components/BackButton.vue'
-import Breadcrumbs from './components/Breadcrumbs.vue'
+import BarraNavegacao from './components/BarraNavegacao.vue';
 
 const route = useRoute()
 
@@ -36,9 +35,8 @@ const shouldShowNavBarExtras = computed(() => {
 <template>
   <Navbar v-if="route.path !== '/login'"/>
   <div v-if="shouldShowNavBarExtras" class="bg-light border-bottom">
-    <div class="container py-2 d-flex align-items-center gap-3">
-      <BackButton/>
-      <Breadcrumbs/>
+    <div class="container py-2">
+      <BarraNavegacao/>
     </div>
   </div>
   <router-view/>

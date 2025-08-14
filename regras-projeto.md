@@ -30,22 +30,13 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 
 ## Telas e Componentes Principais
 
-- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela `processos.ts` store, enquanto os alertas são dados mockados da `alertas.ts` store. As datas dos alertas são formatadas.
-- **Processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. Unidades folha são destacadas e levam à tela de atividades/conhecimentos. Inclui botão "Finalizar processo" para ADMINs e colunas da tabela ajustadas.
-- **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade folha, em tela única e dinâmica.
-- **CadMapa.vue**: Edição/criação de mapa de competências. Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar, visualizar e disponibilizar mapas de competências, associando atividades a competências. Acessível no contexto de processo via `/processo/:idProcesso/:siglaUnidade/mapa`. Não possui botão "Voltar" local; utiliza o botão global.
+- **Painel**: Tela inicial que exibe uma lista de processos e uma seção de alertas. A lista de processos é alimentada pela store `processos.ts`; alertas são dados mockados da store `alertas.ts`.
+- **Processo**: Exibe árvore de unidades participantes de um processo, mostrando a `dataLimite` do processo para cada unidade. 
+- **Atividades e conhecimentos**: Cadastro de atividades e conhecimentos para uma unidade do tipo operacional ou interoperacional, em tela única e dinâmica.
+- **Mapa**: Edição/criação de mapa de competências. Para unidades com cadastro de atividades/conhecimentos finalizado, permite criar, editar, visualizar e disponibilizar mapas, que associam atividades a competências.  
 - **Atribuição temporária**: Tela para criação/edição de atribuições temporárias de servidores a unidades.
 - **Histórico de processos**: Consulta de processos finalizados.
 - **Navbar**: Barra de navegação principal com links para todas as áreas, incluindo um seletor de servidor para simular o login de diferentes usuários. Exibe o perfil e a unidade selecionados no login.
-
-## UI/UX e Padrões
-
-- **Bootstrap 5**: Layout responsivo e visual padronizado.
-- **Bootstrap Icons**: Padronização de ícones.
-- **Alertas e Notificações**: Exibidos no painel a partir de dados mockados no `alertas.ts` store.
-- **Navegação**: Sempre via Vue Router; componentes acessam dados exclusivamente via stores do Pinia. Botão "Voltar" e breadcrumbs são globais, integrados no layout.
-- **Feedback ao Usuário**: Mensagens de sucesso/erro básicas implementadas.
-- **Responsividade**: Layout adaptável a diferentes tamanhos de tela.
 
 ## Arquitetura e Componentização
 
@@ -62,6 +53,7 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
     - `alertas.ts`: Fornece dados mockados para o painel (ex: alertas).
 
 - **Componentes**:
+    - `BarraNavegacao.vue`: Componente que agrupa o botão "Voltar" e a trilha de navegação (breadcrumbs). O botão "Voltar" retorna ao histórico de navegação ou para o Painel. A trilha de navegação é dinâmica, sensível ao contexto (processos/unidades) e gerenciada por stores Pinia.
     - `TreeTable.vue`: Tabela hierárquica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados corretamente.
     - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique corretamente.
     - `Navbar.vue`: Barra de navegação que exibe o perfil e a unidade selecionados, com um seletor de perfil oculto.

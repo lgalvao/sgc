@@ -16,7 +16,7 @@ test.describe('Detalhes da Unidade', () => {
         await expect(page.getByRole('heading', { name: 'STIC - Secretaria de Informática e Comunicações' })).toBeVisible();
         await expect(page.getByText('Responsável: Paulo Horta')).toBeVisible();
         await expect(page.getByText('Contato: paulo.horta@tre-pe.jus.br')).toBeVisible();
-        await expect(page.getByText('Mapa vigente: Não disponível')).toBeVisible(); // Pode variar dependendo dos dados mockados
+        await expect(page.getByRole('button', { name: 'Visualizar Mapa' })).not.toBeVisible(); // Verifica que o botão não está visível quando não há mapa
         await expect(page.getByRole('heading', { name: 'Unidades Subordinadas' })).toBeVisible();
         await expect(page.getByRole('table')).toBeVisible();
     });

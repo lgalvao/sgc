@@ -14,7 +14,6 @@
         <h2 class="display-6 mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
         <p><strong>Responsável:</strong> {{ responsavel }}</p>
         <p><strong>Contato:</strong> {{ responsavelEmail }}</p>
-        <p><strong>Mapa vigente:</strong> {{ mapaVigente ? mapaVigente.situacao : 'Não disponível' }}</p>
         <button v-if="mapaVigente" class="btn btn-info btn-sm" @click="visualizarMapa">Visualizar Mapa</button>
       </div>
     </div>
@@ -78,19 +77,18 @@ const dadosFormatadosSubordinadas = computed(() => {
   return formatarDadosParaArvore(unidade.value.filhas)
 })
 
-const colunasTabela = [
-  {key: 'nome', label: 'Unidade'}
-]
+const colunasTabela = [{key: 'nome', label: 'Unidade'}]
 
-interface FormattedUnidade {
+interface UnidadeFormatada {
   id: string;
   nome: string;
   expanded: boolean;
-  children?: FormattedUnidade[];
+  children?: UnidadeFormatada[];
 }
 
-function formatarDadosParaArvore(dados: Unidade[]): FormattedUnidade[] {
+function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   if (!dados) return []
+
   return dados.map(item => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
     return {
@@ -103,9 +101,7 @@ function formatarDadosParaArvore(dados: Unidade[]): FormattedUnidade[] {
 }
 
 function navegarParaUnidadeSubordinada(item: { id: unknown }) {
-  if (item && typeof item.id === 'string') {
-    router.push({path: `/unidade/${item.id}`});
-  }
+  if (item && typeof item.id === 'string') router.push({path: `/unidade/${item.id}`});
 }
 
 function visualizarMapa() {
