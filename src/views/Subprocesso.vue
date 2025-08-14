@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <div v-if="unidade" class="card mb-4">
       <div class="card-body">
-        <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo de unidade</span>
+        <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Subprocesso</span>
 
         <h2 class="display-6 mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
         <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
