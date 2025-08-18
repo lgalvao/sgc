@@ -22,23 +22,16 @@ function parseProcessoUnidadeDates(pu: any): ProcessoUnidade {
 }
 
 export const useProcessosStore = defineStore('processos', {
-    state: () => {
-        const storedProcessosUnidade = localStorage.getItem('processosUnidade');
-        const processosUnidade = storedProcessosUnidade
-            ? JSON.parse(storedProcessosUnidade).map(parseProcessoUnidadeDates)
-            : processosUnidadesMock.map(parseProcessoUnidadeDates);
-
-        return {
-            processos: processosMock.map(parseProcessoDates) as Processo[],
-            processosUnidade: processosUnidade as ProcessoUnidade[]
-        };
-    },
+    state: () => ({
+        processos: processosMock.map(parseProcessoDates) as Processo[],
+        processosUnidade: processosUnidadesMock.map(parseProcessoUnidadeDates) as ProcessoUnidade[]
+    }),
     getters: {
-        getUnidadesDoProcesso: (state) => (processoId: number): ProcessoUnidade[] => {
-            return state.processosUnidade.filter(pu => pu.processoId === processoId);
+        getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoUnidade[] => {
+            return state.processosUnidade.filter(pu => pu.idProcesso === idProcesso);
         },
-        getProcessoUnidadeById: (state) => (subprocessoId: number): ProcessoUnidade | undefined => {
-            return state.processosUnidade.find(pu => pu.id === subprocessoId);
+        getProcessoUnidadeById: (state) => (subidProcesso: number): ProcessoUnidade | undefined => {
+            return state.processosUnidade.find(pu => pu.id === subidProcesso);
         }
     },
     actions: {
@@ -50,8 +43,8 @@ export const useProcessosStore = defineStore('processos', {
                 this.processosUnidade.push(pu);
             });
         },
-        finalizarProcesso(processoId: number) {
-            const processo = this.processos.find(p => p.id === processoId);
+        finalizarProcesso(idProcesso: number) {
+            const processo = this.processos.find(p => p.id === idProcesso);
             if (processo) {
                 processo.situacao = 'Finalizado';
                 processo.dataFinalizacao = new Date(); // Agora é um objeto Date

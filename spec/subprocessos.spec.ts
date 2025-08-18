@@ -14,7 +14,7 @@ test.describe('Detalhes da Unidade no Processo', () => {
         const mapasStore = useMapasStore();
         mapasStore.mapas = [{
             id: 1,
-            processoId: 1,
+            idProcesso: 1,
             unidadeSigla: 'SESEL',
             vigente: true,
             dataInicio: new Date(),

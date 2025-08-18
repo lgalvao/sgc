@@ -37,16 +37,17 @@
 
 <script setup lang="ts">
 import {computed, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
 import servidoresMock from '@/mocks/servidores.json'
 import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
 
-const route = useRoute()
+const props = defineProps<{ sigla: string }>()
+
 const router = useRouter()
-const sigla = computed(() => route.params.sigla as string)
+const sigla = computed(() => props.sigla)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()

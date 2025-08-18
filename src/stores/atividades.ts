@@ -18,14 +18,14 @@ export const useAtividadesStore = defineStore('atividades', {
         };
     },
     getters: {
-        getAtividadesPorProcessoUnidade: (state) => (subprocessoId: number): Atividade[] => {
-            return state.atividades.filter(a => a.subprocessoId === subprocessoId);
+        getAtividadesPorProcessoUnidade: (state) => (subidProcesso: number): Atividade[] => {
+            return state.atividades.filter(a => a.subidProcesso === subidProcesso);
         }
     },
     actions: {
-        setAtividades(subprocessoId: number, novasAtividades: Atividade[]) {
-            // Remove as atividades antigas para este subprocessoId
-            this.atividades = this.atividades.filter(a => a.subprocessoId !== subprocessoId);
+        setAtividades(subidProcesso: number, novasAtividades: Atividade[]) {
+            // Remove as atividades antigas para este subidProcesso
+            this.atividades = this.atividades.filter(a => a.subidProcesso !== subidProcesso);
             // Adiciona as novas atividades
             this.atividades.push(...novasAtividades);
         },
@@ -55,11 +55,11 @@ export const useAtividadesStore = defineStore('atividades', {
             }
         },
 
-        async fetchAtividadesPorProcessoUnidade(subprocessoId: number) {
+        async fetchAtividadesPorProcessoUnidade(subidProcesso: number) {
             // Simula uma chamada de API para buscar atividades
             // Em um app real, você faria uma requisição HTTP aqui
             const todasAtividades = atividadesMock as Atividade[];
-            const atividadesDoProcesso = todasAtividades.filter(a => a.subprocessoId === subprocessoId);
+            const atividadesDoProcesso = todasAtividades.filter(a => a.subidProcesso === subidProcesso);
 
             // Adiciona as atividades buscadas ao estado, evitando duplicatas
             atividadesDoProcesso.forEach(novaAtividade => {

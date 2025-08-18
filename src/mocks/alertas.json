@@ -4,7 +4,7 @@
     "unidadeOrigem": "COSIS",
     "unidadeDestino": "SESEL",
     "dataHora": "2025-07-02T10:00:00",
-    "processoId": 1,
+    "idProcesso": 1,
     "descricao": "Cadastro devolvido para ajustes"
   },
   {
@@ -12,7 +12,7 @@
     "unidadeOrigem": "SEDOC",
     "unidadeDestino": "SEDESENV",
     "dataHora": "2025-07-03T14:30:00",
-    "processoId": 1,
+    "idProcesso": 1,
     "descricao": "Prazo próximo para validação do mapa de competências"
   },
   {
@@ -20,7 +20,7 @@
     "unidadeOrigem": "SEDOC",
     "unidadeDestino": "SEDESENV",
     "dataHora": "2025-07-04T09:15:00",
-    "processoId": 2,
+    "idProcesso": 2,
     "descricao": "Nova atribuição temporária: Bruno Silva (10/10/2025 a 10/11/2025)"
   }
 ]

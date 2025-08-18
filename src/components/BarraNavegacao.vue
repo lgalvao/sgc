@@ -53,30 +53,26 @@ import {type TrailCrumb, useNavigationTrail} from '@/stores/navigationTrail'
 const route = useRoute()
 const router = useRouter()
 
-// --- Lógica do BackButton ---
 const fallbackPath = '/painel'
 
 const shouldShowBackButton = computed(() => {
   return route.path !== '/login';
 })
 
-function canGoBack(): boolean {
-  return window.history.length > 1
-}
-
 function goBack() {
-  if (canGoBack()) router.back()
-  else router.push(fallbackPath)
+  if (crumbs.value.length > 1) {
+    const parentCrumb = crumbs.value[crumbs.value.length - 2];
+    if (parentCrumb && parentCrumb.to) {
+      router.push(parentCrumb.to);
+      return;
+    }
+  }
+  router.push(fallbackPath)
 }
 
-// --- Fim da Lógica do BackButton ---
-
-
-// --- Lógica do Breadcrumbs ---
 const unidadesStore = useUnidadesStore()
 const trailStore = useNavigationTrail()
 
-// --- Funções Auxiliares para updateTrail ---
 const handleNavbarReset = () => {
   let cameFromNavbar = false
   try {
@@ -110,9 +106,9 @@ const handlePopToExistingCrumb = (): boolean => {
 }
 
 const processProcessoContext = () => {
-  const processoIdParam = (route.params as any).id || (route.params as any).processoId || route.query.processoId
-  const processoLink = processoIdParam
-      ? {name: 'Processo', params: {processoId: Number(processoIdParam)}}
+  const idProcessoParam = (route.params as any).id || (route.params as any).idProcesso || route.query.idProcesso
+  const processoLink = idProcessoParam
+      ? {name: 'Processo', params: {idProcesso: Number(idProcessoParam)}}
       : undefined
   const idxProcCrumb = trailStore.crumbs.findIndex(c => c.label === 'Processo')
   if (idxProcCrumb === -1) {
@@ -121,7 +117,7 @@ const processProcessoContext = () => {
     trailStore.crumbs[idxProcCrumb].to = processoLink
   }
 
-  let siglaPU = String((route.params as any).sigla || (route.params as any).unidadeId || '')
+  let siglaPU = String((route.params as any).siglaUnidade || (route.params as any).unidadeId || '')
   if (!siglaPU && /\/processos\/.+\/unidade\//.test(route.path)) {
     const m = route.path.match(/\/processos\/[^/]+\/unidade\/([^/]+)/)
     if (m && m[1]) siglaPU = decodeURIComponent(m[1])
@@ -134,9 +130,9 @@ const processProcessoContext = () => {
     }
     const last = trailStore.crumbs[trailStore.crumbs.length - 1]
     const basePU = route.path.replace(/\/(mapa|atribuicao|atividades|cadastro)(\/.*)?$/, '')
-    const pid = Number((route.params as any).id || (route.params as any).processoId || route.query.processoId)
+    const pid = Number((route.params as any).id || (route.params as any).idProcesso || route.query.idProcesso)
     const siglaTo = isFinite(pid)
-        ? {name: 'ProcessoUnidade', params: {processoId: pid, sigla: siglaPU}}
+        ? {name: 'ProcessoUnidade', params: {idProcesso: pid, siglaUnidade: siglaPU}}
         : {path: basePU}
     if (!last || last.label !== siglaPU) {
       trailStore.push({label: siglaPU, to: siglaTo, title: u?.nome})
@@ -160,29 +156,29 @@ const processProcessoContext = () => {
 }
 
 const processUnidadeContext = () => {
-  const sigla = String(route.params.sigla || '')
-  const processoId = String(route.query.processoId || '')
+  const sigla = String(route.params.siglaUnidade || '')
+  const idProcesso = String(route.query.idProcesso || '')
   const u = unidadesStore.pesquisarUnidade(sigla)
-  if (processoId) {
+  if (idProcesso) {
     const idxProc = trailStore.crumbs.findIndex(c => c.label === 'Processo')
     if (idxProc >= 0 && idxProc < trailStore.crumbs.length - 1) {
       trailStore.popTo(idxProc)
     }
     if (idxProc === -1) {
-      trailStore.push({label: 'Processo', to: {name: 'Processo', params: {processoId: Number(processoId)}}})
+      trailStore.push({label: 'Processo', to: {name: 'Processo', params: {idProcesso: Number(idProcesso)}}})
     }
   } else {
     if (trailStore.crumbs.length > 1) trailStore.popTo(0)
   }
   const last = trailStore.crumbs[trailStore.crumbs.length - 1]
   if (!last || last.label !== sigla) {
-    const siglaTo = processoId
-        ? {name: 'ProcessoUnidade', params: {processoId: Number(processoId), sigla}}
+    const siglaTo = idProcesso
+        ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
         : {path: `/unidade/${sigla}`}
     trailStore.push({label: sigla, to: siglaTo, title: u?.nome})
   }
 
-  const matchedChildren = route.matched.filter(m => m.path !== '/unidade/:sigla')
+  const matchedChildren = route.matched.filter(m => m.path !== '/unidade/:siglaUnidade')
   if (matchedChildren.length > 0) {
     const lastMatch = matchedChildren[matchedChildren.length - 1]
     const metaBc = typeof lastMatch.meta?.breadcrumb === 'function' ? lastMatch.meta.breadcrumb(route) : lastMatch.meta?.breadcrumb
@@ -217,15 +213,15 @@ const buildProcessoFallbackCrumbs = (baseCrumbs: Array<{ label: string; to?: any
   to?: any;
   title?: string
 }> => {
-  const processoIdParam = (route.params as any).processoId || route.query.processoId
-  const processoLink = processoIdParam ? {name: 'Processo', params: {processoId: Number(processoIdParam)}} : undefined
+  const idProcessoParam = (route.params as any).idProcesso || route.query.idProcesso
+  const processoLink = idProcessoParam ? {name: 'Processo', params: {idProcesso: Number(idProcessoParam)}} : undefined
   baseCrumbs.push({label: 'Processo', to: processoLink})
-  const siglaPU = String((route.params as any).sigla || '')
+  const siglaPU = String((route.params as any).siglaUnidade || '')
   if (siglaPU) {
     const u = unidadesStore.pesquisarUnidade(siglaPU)
-    const processoIdParam2 = (route.params as any).processoId || route.query.processoId
-    const siglaTo = processoIdParam2
-        ? {name: 'ProcessoUnidade', params: {processoId: Number(processoIdParam2), sigla: siglaPU}}
+    const idProcessoParam2 = (route.params as any).idProcesso || route.query.idProcesso
+    const siglaTo = idProcessoParam2
+        ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcessoParam2), siglaUnidade: siglaPU}}
         : undefined
     baseCrumbs.push({label: siglaPU, to: siglaTo, title: u?.nome})
     const matchedChildren = route.matched.filter(m => /\/(mapa|atribuicao|atividades)(\/.*)?$/.test(m.path))
@@ -244,19 +240,19 @@ const buildUnidadeFallbackCrumbs = (baseCrumbs: Array<{ label: string; to?: any;
   to?: any;
   title?: string
 }> => {
-  const sigla = String(route.params.sigla || '')
-  const processoId = String(route.query.processoId || '')
+  const sigla = String(route.params.siglaUnidade || '')
+  const idProcesso = String(route.query.idProcesso || '')
   const u = unidadesStore.pesquisarUnidade(sigla)
-  const siglaTo = processoId
-      ? {name: 'ProcessoUnidade', params: {processoId: Number(processoId), sigla}}
+  const siglaTo = idProcesso
+      ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
       : {path: `/unidade/${sigla}`}
-  if (processoId) baseCrumbs.push({
+  if (idProcesso) baseCrumbs.push({
     label: 'Processo',
-    to: {name: 'Processo', params: {processoId: Number(processoId)}}
+    to: {name: 'Processo', params: {idProcesso: Number(idProcesso)}}
   })
   baseCrumbs.push({label: sigla, to: siglaTo, title: u?.nome})
 
-  const matchedChildren = route.matched.filter(m => m.path !== '/unidade/:sigla')
+  const matchedChildren = route.matched.filter(m => m.path !== '/unidade/:siglaUnidade')
   if (matchedChildren.length > 0) {
     const last = matchedChildren[matchedChildren.length - 1]
     const metaBc = typeof last.meta?.breadcrumb === 'function' ? last.meta.breadcrumb(route) : last.meta?.breadcrumb
@@ -301,7 +297,7 @@ const updateTrail = () => {
     return
   }
 
-  const sigla = String(route.params.sigla || '')
+  const sigla = String(route.params.siglaUnidade || '')
   if (route.path.startsWith('/unidade/') && sigla) {
     processUnidadeContext()
     return
@@ -327,7 +323,7 @@ const crumbs = computed(() => {
   }
 
   // Deep-link em contexto de Unidade
-  const sigla = String(route.params.sigla || '')
+  const sigla = String(route.params.siglaUnidade || '')
   if (route.path.startsWith('/unidade/') && sigla) {
     return buildUnidadeFallbackCrumbs(baseCrumbs)
   }

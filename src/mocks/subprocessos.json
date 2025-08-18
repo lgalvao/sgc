@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "processoId": 1,
+    "idProcesso": 1,
     "unidade": "STIC",
     "dataLimiteEtapa1": "2025-06-30",
     "dataLimiteEtapa2": null,
@@ -13,7 +13,7 @@
   },
   {
     "id": 3,
-    "processoId": 1,
+    "idProcesso": 1,
     "unidade": "SESEL",
     "dataLimiteEtapa1": "2025-06-30",
     "dataLimiteEtapa2": "2025-07-30",
@@ -25,7 +25,7 @@
   },
   {
     "id": 4,
-    "processoId": 1,
+    "idProcesso": 1,
     "unidade": "SEDESENV",
     "dataLimiteEtapa1": "2025-06-30",
     "dataLimiteEtapa2": null,
@@ -37,7 +37,7 @@
   },
   {
     "id": 5,
-    "processoId": 2,
+    "idProcesso": 2,
     "unidade": "STIC",
     "dataLimiteEtapa1": "2025-07-15",
     "dataLimiteEtapa2": "2025-08-15",
@@ -49,7 +49,7 @@
   },
   {
     "id": 6,
-    "processoId": 2,
+    "idProcesso": 2,
     "unidade": "COINF",
     "dataLimiteEtapa1": "2025-07-20",
     "dataLimiteEtapa2": null,
@@ -61,7 +61,7 @@
   },
   {
     "id": 7,
-    "processoId": 2,
+    "idProcesso": 2,
     "unidade": "SENIC",
     "dataLimiteEtapa1": "2025-07-20",
     "dataLimiteEtapa2": null,
@@ -73,7 +73,7 @@
   },
   {
     "id": 8,
-    "processoId": 4,
+    "idProcesso": 4,
     "unidade": "STIC",
     "dataLimiteEtapa1": "2024-06-10",
     "dataLimiteEtapa2": null,
@@ -85,7 +85,7 @@
   },
   {
     "id": 10,
-    "processoId": 4,
+    "idProcesso": 4,
     "unidade": "SEDESENV",
     "dataLimiteEtapa1": "2024-05-10",
     "dataLimiteEtapa2": null,
@@ -97,7 +97,7 @@
   },
   {
     "id": 11,
-    "processoId": 4,
+    "idProcesso": 4,
     "unidade": "SEDIA",
     "dataLimiteEtapa1": "2024-07-10",
     "dataLimiteEtapa2": null,
@@ -109,7 +109,7 @@
   },
   {
     "id": 12,
-    "processoId": 4,
+    "idProcesso": 4,
     "unidade": "SESEL",
     "dataLimiteEtapa1": "2024-05-10",
     "dataLimiteEtapa2": null,
@@ -121,7 +121,7 @@
   },
   {
     "id": 13,
-    "processoId": 5,
+    "idProcesso": 5,
     "unidade": "STIC",
     "dataLimiteEtapa1": "2025-08-10",
     "dataLimiteEtapa2": null,
@@ -133,7 +133,7 @@
   },
   {
     "id": 15,
-    "processoId": 5,
+    "idProcesso": 5,
     "unidade": "SEDIA",
     "dataLimiteEtapa1": "2025-08-10",
     "dataLimiteEtapa2": null,

@@ -121,12 +121,12 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
 }
 
 function abrirDetalhesProcesso(processo: Processo) {
-  router.push({ name: 'Processo', params: { processoId: processo.id } })
+  router.push({ name: 'Processo', params: { idProcesso: processo.id } })
 }
 
 const alertasFormatados = computed(() => {
   return (alertas.value as Alerta[]).map(alerta => {
-    const processo = processosStore.processos.find(p => p.id === alerta.processoId);
+    const processo = processosStore.processos.find(p => p.id === alerta.idProcesso);
 
     return {
       data: alerta.dataHora,

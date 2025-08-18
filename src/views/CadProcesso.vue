@@ -120,12 +120,12 @@ function salvarProcesso() {
     return
   }
 
-  const novoProcessoId = processosStore.processos.length + 1;
+  const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
   const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
-    processoId: novoProcessoId,
+    idProcesso: novoidProcesso,
     unidade: unidadeSigla,
     dataLimiteEtapa1: new Date(dataLimite.value),
     dataLimiteEtapa2: new Date(dataLimite.value),
@@ -137,7 +137,7 @@ function salvarProcesso() {
   }));
 
   const novo = {
-    id: novoProcessoId,
+    id: novoidProcesso,
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),
@@ -158,12 +158,12 @@ function iniciarProcesso() {
     return
   }
 
-  const novoProcessoId = processosStore.processos.length + 1;
+  const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
   const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
-    processoId: novoProcessoId,
+    idProcesso: novoidProcesso,
     unidade: unidadeSigla,
     dataLimiteEtapa1: new Date(dataLimite.value),
     dataLimiteEtapa2: new Date(dataLimite.value),
@@ -175,7 +175,7 @@ function iniciarProcesso() {
   }));
 
   const novo = {
-    id: novoProcessoId,
+    id: novoidProcesso,
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),

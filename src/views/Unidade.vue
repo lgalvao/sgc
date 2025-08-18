@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import {computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades.js'
 import {usePerfilStore} from '@/stores/perfil.js'
 import {useServidoresStore} from '@/stores/servidores.js'
@@ -62,9 +62,10 @@ import {useMapasStore} from '@/stores/mapas.js'
 import TreeTable from '../components/TreeTable.vue'
 import {Mapa, Unidade} from '@/types/tipos';
 
-const route = useRoute()
+const props = defineProps<{ siglaUnidade: string }>();
+
 const router = useRouter()
-const sigla = computed(() => route.params.sigla as string)
+const sigla = computed(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 const servidoresStore = useServidoresStore()
@@ -128,8 +129,8 @@ function navegarParaAtividades() {
     router.push({
       name: 'ProcessoUnidadeCadastro',
       params: {
-        processoId: mapaVigente.value.processoId,
-        sigla: sigla.value
+        idProcesso: mapaVigente.value.idProcesso,
+        siglaUnidade: sigla.value
       }
     });
   } else {
@@ -143,8 +144,8 @@ function visualizarMapa() {
     router.push({
       name: 'ProcessoUnidadeVisMapa',
       params: {
-        processoId: mapaVigente.value.processoId,
-        sigla: sigla.value
+        idProcesso: mapaVigente.value.idProcesso,
+        siglaUnidade: sigla.value
       }
     });
   }

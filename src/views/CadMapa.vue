@@ -153,7 +153,6 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
 import {storeToRefs} from 'pinia'
 
 import {useMapasStore} from '@/stores/mapas'
@@ -162,9 +161,10 @@ import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
 import {Atividade, Competencia, Unidade} from '@/types/tipos';
 
-const route = useRoute()
-const sigla = computed(() => route.params.sigla as string)
-const processoId = computed(() => Number(route.params.processoId))
+const props = defineProps<{ sigla: string, idProcesso: number }>()
+
+const sigla = computed(() => props.sigla)
+const idProcesso = computed(() => props.idProcesso)
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const {mapas} = storeToRefs(mapaStore)
@@ -185,20 +185,20 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
-const subprocessoId = computed(() => {
+const subidProcesso = computed(() => {
   const processoUnidade = processosStore.processosUnidade.find(
-      (pu: any) => pu.processoId === processoId.value && pu.unidade === sigla.value
+      (pu: any) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
   return processoUnidade?.id;
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof subprocessoId.value !== 'number') {
+  if (typeof subidProcesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorProcessoUnidade(subprocessoId.value) || []
+  return atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
 })
-const mapa = computed(() => mapas.value.find(m => m.unidade === sigla.value && m.processoId === processoId.value))
+const mapa = computed(() => mapas.value.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
 const competencias = ref<Competencia[]>([])
 watch(mapa, (novoMapa) => {
   if (novoMapa) {
@@ -280,7 +280,7 @@ function adicionarOuAtualizarCompetencia() {
     const novoMapa = {
       id: Date.now(),
       unidade: sigla.value,
-      processoId: processoId.value,
+      idProcesso: idProcesso.value,
       competencias: competencias.value,
       situacao: 'em_andamento',
       dataCriacao: new Date(),
@@ -308,7 +308,7 @@ function finalizarEdicao() {
     const novoMapa = {
       id: Date.now(),
       unidade: sigla.value,
-      processoId: processoId.value,
+      idProcesso: idProcesso.value,
       competencias: competencias.value,
       situacao: 'em_andamento',
       dataCriacao: new Date(),

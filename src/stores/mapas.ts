@@ -19,14 +19,14 @@ export const useMapasStore = defineStore('mapas', {
         getMapaPorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
             return state.mapas.find(m => m.unidade === unidadeId)
         },
-        getMapaByUnidadeId: (state) => (unidadeId: string, processoId: number): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade === unidadeId && m.id === processoId)
+        getMapaByUnidadeId: (state) => (unidadeId: string, idProcesso: number): Mapa | undefined => {
+            return state.mapas.find(m => m.unidade === unidadeId && m.id === idProcesso)
         },
         getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
             return state.mapas.find(m => m.unidade === unidadeId && m.situacao === 'em_andamento')
         },
-        getMapaPorUnidadeEProcesso: (state) => (unidadeSigla: string, processoId: number): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade === unidadeSigla && m.processoId === processoId);
+        getMapaPorUnidadeEProcesso: (state) => (unidadeSigla: string, idProcesso: number): Mapa | undefined => {
+            return state.mapas.find(m => m.unidade === unidadeSigla && m.idProcesso === idProcesso);
         }
     },
     actions: {

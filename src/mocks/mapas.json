@@ -2,7 +2,7 @@
   {
     "id": 1,
     "unidade": "SESEL",
-    "processoId": 1,
+    "idProcesso": 1,
     "situacao": "em_andamento",
     "competencias": [
       {

@@ -18,7 +18,7 @@ export interface Processo {
 
 export interface ProcessoUnidade {
     id: number;
-    processoId: number;
+    idProcesso: number;
     unidade: string;
     dataLimiteEtapa1: DataISO;
     dataLimiteEtapa2: DataISO;
@@ -56,7 +56,7 @@ export interface Mapa {
     id: number;
     unidade: string;
     situacao: string;
-    processoId: number;
+    idProcesso: number;
     competencias: Competencia[];
     dataCriacao: DataISO;
     dataDisponibilizacao: DataISO | null;
@@ -71,7 +71,7 @@ export interface Conhecimento {
 export interface Atividade {
     id: number;
     descricao: string;
-    subprocessoId: number;
+    subidProcesso: number;
     conhecimentos: Conhecimento[];
     novoConhecimento?: string;
 }
@@ -81,7 +81,7 @@ export interface Alerta {
     unidadeOrigem: string;
     unidadeDestino: string;
     dataHora: DataHoraISO;
-    processoId: number;
+    idProcesso: number;
     descricao: string;
 }
 
@@ -92,4 +92,3 @@ export interface AtribuicaoTemporaria {
     dataTermino: DataISO;
     justificativa: string;
 }
-

@@ -193,12 +193,12 @@ interface AtividadeComEdicao extends Atividade {
 }
 
 const props = defineProps<{
-  processoId: number | string,
+  idProcesso: number | string,
   sigla: string
 }>()
 
 const unidadeId = computed(() => props.sigla)
-const processoId = computed(() => Number(props.processoId))
+const idProcesso = computed(() => Number(props.idProcesso))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -224,35 +224,35 @@ const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}
 
 const novaAtividade = ref('')
 
-const subprocessoId = computed(() => {
+const subidProcesso = computed(() => {
   const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
-      pu => pu.processoId === processoId.value && pu.unidade === unidadeId.value
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
   return processoUnidade?.id;
 });
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
-    if (subprocessoId.value === undefined) return []
-    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(subprocessoId.value) || []
+    if (subidProcesso.value === undefined) return []
+    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
     return storeAtividades.map((a: Atividade) => ({...a, novoConhecimento: ''}))
   },
   set: (val: AtividadeComEdicao[]) => {
-    if (subprocessoId.value === undefined) return
+    if (subidProcesso.value === undefined) return
     const storeVal = val.map(a => {
       const {novoConhecimento, ...rest} = a
       return rest
     })
-    atividadesStore.setAtividades(subprocessoId.value, storeVal)
+    atividadesStore.setAtividades(subidProcesso.value, storeVal)
   }
 })
 
 function adicionarAtividade() {
-  if (novaAtividade.value && subprocessoId.value !== undefined) {
+  if (novaAtividade.value && subidProcesso.value !== undefined) {
     atividadesStore.adicionarAtividade({
       id: Date.now(),
       descricao: novaAtividade.value,
-      subprocessoId: subprocessoId.value,
+      subidProcesso: subidProcesso.value,
       conhecimentos: [],
     })
     novaAtividade.value = ''
@@ -330,11 +330,11 @@ function cancelarEdicaoAtividade() {
 }
 
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
-  if (subprocessoId.value === undefined) return;
+  if (subidProcesso.value === undefined) return;
 
   const novasAtividades = atividadesImportadas.map(atividade => ({
     ...atividade,
-    subprocessoId: subprocessoId.value as number,
+    subidProcesso: subidProcesso.value as number,
   }));
 
   atividadesStore.adicionarMultiplasAtividades(novasAtividades);

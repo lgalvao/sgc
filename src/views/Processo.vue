@@ -49,8 +49,8 @@ const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 
 
-const processoId = computed(() => Number((route.params as any).processoId || (route.params as any).id || route.query.processoId))
-const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === processoId.value))
+const idProcesso = computed(() => Number((route.params as any).idProcesso || (route.params as any).id || route.query.idProcesso))
+const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === idProcesso.value))
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
   return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: ProcessoUnidade) => pu.unidade)
@@ -89,7 +89,7 @@ const colunasTabela = [
 ]
 
 const dadosFormatados = computed<TreeTableItem[]>(() => {
-  return formatarDadosParaArvore(participantesHierarquia.value, processoId.value)
+  return formatarDadosParaArvore(participantesHierarquia.value, idProcesso.value)
 })
 
 function formatarData(data: Date | null): string {
@@ -100,10 +100,10 @@ function formatarData(data: Date | null): string {
   return `${dia}/${mes}/${ano}`
 }
 
-function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTableItem[] {
+function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas, processoId) : []
+    const children = item.filhas ? formatarDadosParaArvore(item.filhas, idProcesso) : []
     const unidadeOriginal = unidadesStore.pesquisarUnidade(item.sigla);
     const isIntermediaria = unidadeOriginal && unidadeOriginal.tipo === 'INTERMEDIARIA';
 
@@ -112,7 +112,7 @@ function formatarDadosParaArvore(dados: Unidade[], processoId: number): TreeTabl
     let unidadeAtual = 'Não informado';
 
     if (!isIntermediaria) {
-      const processoUnidade = processosStore.getUnidadesDoProcesso(processoId).find((pu: ProcessoUnidade) => pu.unidade === item.sigla);
+      const processoUnidade = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: ProcessoUnidade) => pu.unidade === item.sigla);
       if (processoUnidade) {
         situacao = processoUnidade.situacao;
         dataLimite = formatarData(processoUnidade.dataLimiteEtapa1);
@@ -137,10 +137,10 @@ function abrirDetalhesUnidade(item: any) {
   // The @row-click event from TreeTable emits a generic object.
   // We use `any` and perform runtime checks to safely handle the event payload.
   if (item && typeof item.id === 'string') {
-    const processoUnidade = processosStore.getUnidadesDoProcesso(processoId.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
-    if (processoUnidade) {
+    const processoUnidade = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
+    if (processoUnidade && processoUnidade.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
-      router.push({name: 'ProcessoUnidade', params: {processoId: processoId.value, sigla: processoUnidade.unidade}})
+      router.push({name: 'ProcessoUnidade', params: {idProcesso: idProcesso.value, siglaUnidade: processoUnidade.unidade}})
     } else if (Array.isArray(item.children) && item.children.length > 0) {
       // Unidade INTERMEDIARIA: não navegar mais (link desabilitado)
       console.log(`Unidade intermediária ${item.id}: navegação desabilitada.`)

@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4">
     <h2 class="display-6">Histórico de processos</h2>
-    <table class="table table-striped mt-4">
+    <table class="table table-striped table-hover mt-4">
       <thead role="rowgroup">
       <tr>
         <th style="cursor:pointer" @click="ordenarPor('descricao')">
@@ -24,11 +24,11 @@
       </thead>
 
       <tbody>
-      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id">
+      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id" class="clickable-row" @click="abrirProcesso(processo.id)">
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
         <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
-        <td>{{ processo.dataFinalizacao ? processo.dataFinalizacao.toLocaleDateString('pt-BR') : '' }}</td>
+        <td>{{ processo.dataFinalizacao ? new Date(processo.dataFinalizacao).toLocaleDateString('pt-BR') : '' }}</td>
       </tr>
       </tbody>
     </table>
@@ -41,12 +41,14 @@
 
 <script setup lang="ts">
 import {computed, ref} from 'vue'
+import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
 import {Processo, ProcessoUnidade} from '@/types/tipos' // Import Processo and ProcessoUnidade types
 
 type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
+const router = useRouter()
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 
@@ -91,7 +93,6 @@ const processosFinalizadosOrdenados = computed(() => {
   });
 });
 
-
 function ordenarPor(campo: SortCriteria) {
   if (criterio.value === campo) {
     asc.value = !asc.value
@@ -100,4 +101,15 @@ function ordenarPor(campo: SortCriteria) {
     asc.value = true
   }
 }
+
+function abrirProcesso(processoId: number) {
+  router.push({name: 'Processo', params: {idProcesso: processoId}})
+}
+
 </script>
+
+<style scoped>
+.clickable-row {
+  cursor: pointer;
+}
+</style>

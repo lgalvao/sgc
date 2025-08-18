@@ -26,4 +26,16 @@ test.describe('Histórico de Processos', () => {
         const rows = page.locator('tbody').getByRole('row');
         await expect(rows).toHaveCount(3); // Assumindo que há 3 processos no snapshot
     });
+
+    test('deve navegar para os detalhes do processo ao clicar em uma linha', async ({ page }) => {
+        // Clicar na primeira linha da tabela (que é uma clickable-row)
+        await page.locator('tbody tr.clickable-row').first().click();
+
+        // Esperar que a navegação para a página de detalhes do processo ocorra
+        // A URL deve ser algo como /processo/1, /processo/2, etc.
+        await page.waitForURL(/\/processo\/\d+/);
+
+        // Verificar se um elemento específico da página de processo é visível
+        await expect(page.getByText('Processo', { exact: true }).first()).toBeVisible();
+    });
 });

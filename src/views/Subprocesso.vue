@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import {computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
@@ -99,11 +99,11 @@ import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {Mapa, Processo, ProcessoTipo, ProcessoUnidade, Servidor, Unidade} from "@/types/tipos";
 
-const route = useRoute()
+const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
+
 const router = useRouter()
-const idProcessoUnidade = computed(() => Number(route.params.idProcessoUnidade))
-const processoId = computed(() => Number((route.params as any).processoId || (route.query as any).processoId))
-const siglaParam = computed<string | undefined>(() => (route.params as any).sigla as string | undefined)
+const idProcesso = computed(() => props.idProcesso)
+const siglaParam = computed<string | undefined>(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
 useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
@@ -111,32 +111,37 @@ const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 
+console.log('Subprocesso.vue: idProcesso.value', idProcesso.value);
+console.log('Subprocesso.vue: siglaParam.value', siglaParam.value);
+
 const processoUnidadeDetalhes = computed<ProcessoUnidade | undefined>(() => {
-  // Preferir resolver por (processoId, sigla) quando disponíveis na nova rota canônica
-  if (processoId.value && siglaParam.value) {
-    const list = processosStore.getUnidadesDoProcesso(processoId.value)
-    return list.find((pu: ProcessoUnidade) => pu.unidade === siglaParam.value)
-  }
-  // Fallback: idProcessoUnidade (rota legada)
-  if (idProcessoUnidade.value) return processosStore.getProcessoUnidadeById(idProcessoUnidade.value)
-  return undefined
+  const result = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: ProcessoUnidade) => pu.unidade === siglaParam.value);
+  console.log('Subprocesso.vue: processoUnidadeDetalhes computed result', result);
+  return result;
 });
 
 const processoAtual = computed<Processo | null>(() => {
   if (!processoUnidadeDetalhes.value) return null;
-  return (processos.value as Processo[]).find(p => p.id === processoUnidadeDetalhes.value?.processoId) || null;
+  return (processos.value as Processo[]).find(p => p.id === processoUnidadeDetalhes.value?.idProcesso) || null;
 });
 
-const sigla = computed<string | undefined>(() => processoUnidadeDetalhes.value?.unidade);
+const sigla = computed<string | undefined>(() => {
+  const result = processoUnidadeDetalhes.value?.unidade;
+  console.log('Subprocesso.vue: sigla computed result', result);
+  return result;
+});
 
 const unidade = computed<Unidade | null>(() => {
   if (!sigla.value) {
+    console.log('Subprocesso.vue: sigla.value is null or undefined, returning null for unidade');
     return null;
   }
   const unidadeEncontrada = unidadesStore.pesquisarUnidade(sigla.value);
+  console.log('Subprocesso.vue: unidadesStore.pesquisarUnidade result', unidadeEncontrada);
   if (unidadeEncontrada && unidadeEncontrada.sigla && unidadeEncontrada.nome) {
     return unidadeEncontrada as Unidade;
   }
+  console.log('Subprocesso.vue: unidadeEncontrada is null or missing sigla/nome, returning null for unidade');
   return null;
 });
 
@@ -165,29 +170,27 @@ function badgeClass(situacao: string): string {
 
 function criarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
+    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function editarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
+    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function visualizarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
+    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function irParaAtividadesConhecimentos() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeCadastro', params: { processoId: processoAtual.value.id, sigla: sigla.value } })
+    router.push({ name: 'ProcessoUnidadeCadastro', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
-
-// Renderizar subrotas (mapa/cadastro)
 </script>
 
 <style scoped>

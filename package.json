@@ -20,6 +20,8 @@
     "@playwright/test": "^1.54.2",
     "@types/bootstrap": "^5.2.10",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^26.1.0",
     "playwright": "^1.54.2",
     "typescript": "^5.9.2",
     "vite": "^7.1.2",

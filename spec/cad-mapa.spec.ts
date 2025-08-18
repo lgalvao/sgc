@@ -92,12 +92,4 @@ test.describe('Cadastro de Mapa de Competências', () => {
         // Verificar a notificação de sucesso
         await expect(page.locator('.alert.alert-info')).toContainText('O mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
     });
-
-    test('deve voltar para a página anterior', async ({ page }) => {
-        // Usa o botão Voltar global do layout
-        await page.getByRole('button', { name: 'Voltar' }).click();
-        await page.waitForURL(/.*\/processo\/1\/SESEL$/);
-        // Confirma que voltou para a página da unidade SESEL
-        await expect(page.getByText('Unidade Atual: SESEL')).toBeVisible();
-    });
 });

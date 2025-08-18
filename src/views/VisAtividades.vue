@@ -45,12 +45,12 @@ import {useProcessosStore} from '@/stores/processos'
 import {Atividade, ProcessoUnidade, Unidade} from '@/types/tipos'
 
 const props = defineProps<{
-  processoId: number | string,
+  idProcesso: number | string,
   sigla: string
 }>()
 
 const unidadeId = computed(() => props.sigla)
-const processoId = computed(() => Number(props.processoId))
+const idProcesso = computed(() => Number(props.idProcesso))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -74,16 +74,16 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
 
-const subprocessoId = computed(() => {
+const subidProcesso = computed(() => {
   const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
-      pu => pu.processoId === processoId.value && pu.unidade === unidadeId.value
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
   return processoUnidade?.id;
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (subprocessoId.value === undefined) return []
-  return atividadesStore.getAtividadesPorProcessoUnidade(subprocessoId.value) || []
+  if (subidProcesso.value === undefined) return []
+  return atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
 })
 
 function validarCadastro() {
