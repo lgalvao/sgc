@@ -1,13 +1,22 @@
 import {mount} from '@vue/test-utils';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, MockInstance, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
 import {ref} from 'vue';
 
+interface MockPerfilServidor {
+    id: number;
+    nome: string;
+    perfil: string;
+    unidade: string;
+    email: string | null;
+    ramal: string | null;
+}
+
 // Mock do composable usePerfil
-const mockServidorLogadoRef = ref({});
-const mockServidoresComPerfilRef = ref([]);
+const mockServidorLogadoRef = ref<MockPerfilServidor | {}>({}); // Allow empty object initially
+const mockServidoresComPerfilRef = ref<MockPerfilServidor[]>([]);
 const mockPerfilSelecionadoRef = ref('');
 const mockUnidadeSelecionadaRef = ref('');
 
@@ -43,7 +52,7 @@ const routes: RouteRecordRaw[] = [
 describe('Navbar.vue', () => {
     let router: ReturnType<typeof createRouter>;
     let pinia: ReturnType<typeof createPinia>;
-    let pushSpy: ReturnType<typeof vi.spyOn>;
+    let pushSpy: MockInstance<typeof router.push>; // Explicitly type pushSpy
 
     beforeEach(() => {
         pinia = createPinia();
@@ -66,10 +75,7 @@ describe('Navbar.vue', () => {
     const mountComponent = async (initialRoute: string = '/painel') => {
         await router.push(initialRoute);
         const wrapper = mount(Navbar, {
-            global: {
-                plugins: [router, pinia],
-                // Removed stubs for RouterLink
-            },
+            global: {plugins: [router, pinia]},
         });
         await router.isReady();
         await wrapper.vm.$nextTick();
@@ -84,7 +90,6 @@ describe('Navbar.vue', () => {
     describe('Navegação', () => {
         beforeEach(() => {
             // Reset mocks for navigation tests
-            // vi.clearAllMocks(); // Removed
             vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
             });
             vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
@@ -119,7 +124,8 @@ describe('Navbar.vue', () => {
 
         it('deve navegar para histórico', async () => {
             const wrapper = await mountComponent('/login');
-            pushSpy.mockClear(); // Clear pushSpy after mountComponent
+            pushSpy.mockClear();
+
             await wrapper.findAll('a[href="#"][class="nav-link"]').find(w => w.text().includes('Histórico'))?.trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/historico');
             expect(sessionStorage.setItem).toHaveBeenCalledWith('cameFromNavbar', '1');
@@ -127,7 +133,8 @@ describe('Navbar.vue', () => {
 
         it('deve navegar para configurações', async () => {
             const wrapper = await mountComponent('/login');
-            pushSpy.mockClear(); // Clear pushSpy after mountComponent
+            pushSpy.mockClear();
+
             // O link de configurações não tem href="#", mas sim um router-link direto
             await wrapper.find('a[title="Configurações do sistema"]').trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/configuracoes');
@@ -149,22 +156,26 @@ describe('Navbar.vue', () => {
     });
 
     describe('Seleção de Perfil', () => {
-        // No need to declare perfilStore, setServidorIdSpy, setPerfilUnidadeSpy here
-        // as we are using global mocks directly.
-
         beforeEach(() => {
-            // vi.clearAllMocks(); // Clear all mocks before each profile selection test - REMOVED
-            // Re-mock sessionStorage after clearing all mocks
             vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
             });
             vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
             });
-            // Update the ref values directly
-            mockServidorLogadoRef.value = {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'};
+
+            mockServidorLogadoRef.value = {
+                id: 1,
+                nome: 'Teste',
+                perfil: 'ADMIN',
+                unidade: 'ABC',
+                email: 'teste@example.com',
+                ramal: null
+            } as MockPerfilServidor;
+
             mockServidoresComPerfilRef.value = [
-                {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'},
-                {id: 2, nome: 'Outro', perfil: 'USER', unidade: 'XYZ'},
-            ];
+                {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC', email: 'teste@example.com', ramal: null},
+                {id: 2, nome: 'Outro', perfil: 'USER', unidade: 'XYZ', email: null, ramal: '1234'},
+            ] as MockPerfilServidor[];
+
             mockPerfilSelecionadoRef.value = 'ADMIN';
             mockUnidadeSelecionadaRef.value = 'ABC';
 
