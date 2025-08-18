@@ -26,6 +26,7 @@ export const useAtividadesStore = defineStore('atividades', {
         setAtividades(subidProcesso: number, novasAtividades: Atividade[]) {
             // Remove as atividades antigas para este subidProcesso
             this.atividades = this.atividades.filter(a => a.subidProcesso !== subidProcesso);
+
             // Adiciona as novas atividades
             this.atividades.push(...novasAtividades);
         },
@@ -56,8 +57,6 @@ export const useAtividadesStore = defineStore('atividades', {
         },
 
         async fetchAtividadesPorProcessoUnidade(subidProcesso: number) {
-            // Simula uma chamada de API para buscar atividades
-            // Em um app real, você faria uma requisição HTTP aqui
             const todasAtividades = atividadesMock as Atividade[];
             const atividadesDoProcesso = todasAtividades.filter(a => a.subidProcesso === subidProcesso);
 
@@ -71,9 +70,9 @@ export const useAtividadesStore = defineStore('atividades', {
 
         adicionarMultiplasAtividades(atividades: Atividade[]) {
             const novasAtividadesComId = atividades.map(atividade => {
-                const novaAtividade = { ...atividade, id: this.nextId++ };
+                const novaAtividade = {...atividade, id: this.nextId++};
                 novaAtividade.conhecimentos = novaAtividade.conhecimentos.map(conhecimento => {
-                    return { ...conhecimento, id: this.nextId++ };
+                    return {...conhecimento, id: this.nextId++};
                 });
                 return novaAtividade;
             });

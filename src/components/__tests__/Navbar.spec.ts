@@ -1,22 +1,22 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {createRouter, createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
-import {ref} from 'vue'; // Importar ref
+import {ref} from 'vue';
 
 // Mock do composable usePerfil
-const mockServidorLogado = vi.fn();
-const mockServidoresComPerfil = vi.fn();
-const mockPerfilSelecionado = vi.fn();
-const mockUnidadeSelecionada = vi.fn();
+const mockServidorLogadoRef = ref({});
+const mockServidoresComPerfilRef = ref([]);
+const mockPerfilSelecionadoRef = ref('');
+const mockUnidadeSelecionadaRef = ref('');
 
 vi.mock('@/composables/usePerfil', () => ({
     usePerfil: () => ({
-        servidorLogado: mockServidorLogado(),
-        servidoresComPerfil: mockServidoresComPerfil(),
-        perfilSelecionado: mockPerfilSelecionado(),
-        unidadeSelecionada: mockUnidadeSelecionada(),
+        servidorLogado: mockServidorLogadoRef,
+        servidoresComPerfil: mockServidoresComPerfilRef,
+        perfilSelecionado: mockPerfilSelecionadoRef,
+        unidadeSelecionada: mockUnidadeSelecionadaRef,
     }),
 }));
 
@@ -31,42 +31,29 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
+const routes: RouteRecordRaw[] = [
+    {path: '/painel', name: 'Painel', component: {template: '<div>Painel</div>'}},
+    {path: '/unidade/:sigla', name: 'Unidade', component: {template: '<div>Unidade</div>'}},
+    {path: '/relatorios', name: 'Relatorios', component: {template: '<div>Relatórios</div>'}},
+    {path: '/historico', name: 'Historico', component: {template: '<div>Histórico</div>'}},
+    {path: '/configuracoes', name: 'Configuracoes', component: {template: '<div>Configurações</div>'}},
+    {path: '/login', name: 'Login', component: {template: '<div>Login</div>'}},
+];
+
 describe('Navbar.vue', () => {
-    let router: any;
-    let pushSpy: any;
-    let routerLinkStub: any; // Declarar o stub aqui
+    let router: ReturnType<typeof createRouter>;
+    let pinia: ReturnType<typeof createPinia>;
+    let pushSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
-        vi.useFakeTimers();
+        pinia = createPinia();
+        setActivePinia(pinia);
 
-        // Resetar mocks do composable usePerfil
-        mockServidorLogado.mockReturnValue(ref({id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'}));
-        mockServidoresComPerfil.mockReturnValue(ref([
-            {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'},
-            {id: 2, nome: 'Outro', perfil: 'USER', unidade: 'XYZ'},
-        ]));
-        mockPerfilSelecionado.mockReturnValue(ref('ADMIN'));
-        mockUnidadeSelecionada.mockReturnValue(ref('ABC'));
-
-        // Resetar mocks da perfilStore
-        mockSetServidorId.mockClear();
-        mockSetPerfilUnidade.mockClear();
-
-        // Criar uma instância do vue-router real
         router = createRouter({
             history: createWebHistory(),
-            routes: [
-                {path: '/painel', name: 'Painel', component: {template: '<div>Painel</div>'}},
-                {path: '/unidade/:sigla', name: 'Unidade', component: {template: '<div>Unidade</div>'}},
-                {path: '/relatorios', name: 'Relatorios', component: {template: '<div>Relatórios</div>'}},
-                {path: '/historico', name: 'Historico', component: {template: '<div>Histórico</div>'}},
-                {path: '/configuracoes', name: 'Configuracoes', component: {template: '<div>Configurações</div>'}},
-                {path: '/login', name: 'Login', component: {template: '<div>Login</div>'}},
-            ],
+            routes,
         });
 
-        // Espiar os métodos do router
         pushSpy = vi.spyOn(router, 'push');
 
         // Mock sessionStorage
@@ -76,85 +63,71 @@ describe('Navbar.vue', () => {
         });
     });
 
-    it('deve montar o componente corretamente', async () => {
-        await router.push('/painel');
+    const mountComponent = async (initialRoute: string = '/painel') => {
+        await router.push(initialRoute);
         const wrapper = mount(Navbar, {
             global: {
-                plugins: [router, createPinia()],
-                stubs: {
-                    RouterLink: routerLinkStub, // Usar o stub definido
-                },
+                plugins: [router, pinia],
+                // Removed stubs for RouterLink
             },
         });
+        await router.isReady();
+        await wrapper.vm.$nextTick();
+        return wrapper;
+    };
+
+    it('deve montar o componente corretamente', async () => {
+        const wrapper = await mountComponent();
         expect(wrapper.exists()).toBe(true);
     });
 
     describe('Navegação', () => {
-        it('deve navegar para o painel', async () => {
-            await router.push('/login'); // Rota inicial diferente
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
+        beforeEach(() => {
+            // Reset mocks for navigation tests
+            // vi.clearAllMocks(); // Removed
+            vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
             });
-            pushSpy.mockClear(); // Limpar chamadas anteriores
+            vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
+            });
+            // Ensure mockUnidadeSelecionadaRef is set for navigation tests
+            mockUnidadeSelecionadaRef.value = 'ABC';
+        });
+
+        it('deve navegar para o painel', async () => {
+            const wrapper = await mountComponent('/login');
+            pushSpy.mockClear(); // Clear pushSpy after mountComponent
             await wrapper.findAll('a[href="#"][class="nav-link"]').find(w => w.text().includes('Painel'))?.trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/painel');
             expect(sessionStorage.setItem).toHaveBeenCalledWith('cameFromNavbar', '1');
         });
 
         it('deve navegar para minha unidade', async () => {
-            await router.push('/login');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
-            pushSpy.mockClear();
+            const wrapper = await mountComponent('/login');
+            pushSpy.mockClear(); // Clear pushSpy after mountComponent
             await wrapper.findAll('a[href="#"][class="nav-link"]').find(w => w.text().includes('Minha unidade'))?.trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/unidade/ABC');
             expect(sessionStorage.setItem).toHaveBeenCalledWith('cameFromNavbar', '1');
         });
 
         it('deve navegar para relatórios', async () => {
-            await router.push('/login');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
-            pushSpy.mockClear();
+            const wrapper = await mountComponent('/login');
+            pushSpy.mockClear(); // Clear pushSpy after mountComponent
             await wrapper.findAll('a[href="#"][class="nav-link"]').find(w => w.text().includes('Relatórios'))?.trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/relatorios');
             expect(sessionStorage.setItem).toHaveBeenCalledWith('cameFromNavbar', '1');
         });
 
         it('deve navegar para histórico', async () => {
-            await router.push('/login');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
-            pushSpy.mockClear();
+            const wrapper = await mountComponent('/login');
+            pushSpy.mockClear(); // Clear pushSpy after mountComponent
             await wrapper.findAll('a[href="#"][class="nav-link"]').find(w => w.text().includes('Histórico'))?.trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/historico');
             expect(sessionStorage.setItem).toHaveBeenCalledWith('cameFromNavbar', '1');
         });
 
         it('deve navegar para configurações', async () => {
-            await router.push('/login');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
-            pushSpy.mockClear();
+            const wrapper = await mountComponent('/login');
+            pushSpy.mockClear(); // Clear pushSpy after mountComponent
             // O link de configurações não tem href="#", mas sim um router-link direto
             await wrapper.find('a[title="Configurações do sistema"]').trigger('click');
             expect(pushSpy).toHaveBeenCalledWith('/configuracoes');
@@ -162,86 +135,75 @@ describe('Navbar.vue', () => {
         });
 
         it('deve navegar para login ao sair', async () => {
-            await router.push('/painel');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {
-                        RouterLink: routerLinkStub,
-                    },
-                },
-            });
-            pushSpy.mockClear();
-
-            const logoutLink = wrapper.find('a[title="Sair"]');
+            const wrapper = await mountComponent('/painel'); // Start from painel
+            pushSpy.mockClear(); // Clear spy after initial navigation
+            const logoutLink = wrapper.find('a[title="Sair"]'); // Find the router-link
             expect(logoutLink.exists()).toBe(true);
 
-            await logoutLink.trigger('click');
-            await wrapper.vm.$nextTick(); // Adicionar esta linha
+            await logoutLink.trigger('click'); // Trigger click on the router-link
+            await wrapper.vm.$nextTick();
 
-            expect(pushSpy).toHaveBeenCalledWith('/login');
-            expect(sessionStorage.setItem).not.toHaveBeenCalledWith('cameFromNavbar', '1');
+            expect(pushSpy).toHaveBeenCalledWith('/login'); // router-link calls router.push
+            expect(sessionStorage.setItem).not.toHaveBeenCalledWith('cameFromNavbar', '1'); // router-link does not set this
         });
     });
 
     describe('Seleção de Perfil', () => {
-        it('deve exibir o perfil e unidade selecionados', async () => {
-            await router.push('/painel');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
+        // No need to declare perfilStore, setServidorIdSpy, setPerfilUnidadeSpy here
+        // as we are using global mocks directly.
+
+        beforeEach(() => {
+            // vi.clearAllMocks(); // Clear all mocks before each profile selection test - REMOVED
+            // Re-mock sessionStorage after clearing all mocks
+            vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
             });
+            vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
+            });
+            // Update the ref values directly
+            mockServidorLogadoRef.value = {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'};
+            mockServidoresComPerfilRef.value = [
+                {id: 1, nome: 'Teste', perfil: 'ADMIN', unidade: 'ABC'},
+                {id: 2, nome: 'Outro', perfil: 'USER', unidade: 'XYZ'},
+            ];
+            mockPerfilSelecionadoRef.value = 'ADMIN';
+            mockUnidadeSelecionadaRef.value = 'ABC';
+
+            // Clear the global mocks for perfilStore actions
+            mockSetServidorId.mockClear();
+            mockSetPerfilUnidade.mockClear();
+        });
+
+        it('deve exibir o perfil e unidade selecionados', async () => {
+            const wrapper = await mountComponent();
             expect(wrapper.text()).toContain('ADMIN - ABC');
             expect(wrapper.find('select').exists()).toBe(false);
         });
 
         it('deve ativar o modo de edição ao clicar no perfil', async () => {
-            await router.push('/painel');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
+            const wrapper = await mountComponent();
             await wrapper.find('span[style="cursor: pointer;"]').trigger('click');
-            await wrapper.vm.$nextTick(); // Usar wrapper.vm.$nextTick()
             expect(wrapper.find('select').exists()).toBe(true);
             expect(wrapper.find('span[style="cursor: pointer;"]').exists()).toBe(false);
         });
 
         it('deve desativar o modo de edição ao perder o foco', async () => {
-            await router.push('/painel');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
+            const wrapper = await mountComponent();
             await wrapper.find('span[style="cursor: pointer;"]').trigger('click');
-            await wrapper.vm.$nextTick(); // Usar wrapper.vm.$nextTick()
+            await wrapper.vm.$nextTick();
             await wrapper.find('select').trigger('blur');
-            await wrapper.vm.$nextTick(); // Usar wrapper.vm.$nextTick()
             expect(wrapper.find('select').exists()).toBe(false);
             expect(wrapper.find('span[style="cursor: pointer;"]').exists()).toBe(true);
         });
 
         it('deve atualizar o perfil e navegar para o painel ao selecionar um novo perfil', async () => {
-            await router.push('/painel');
-            const wrapper = mount(Navbar, {
-                global: {
-                    plugins: [router, createPinia()],
-                    stubs: {RouterLink: routerLinkStub}
-                }
-            });
+            const wrapper = await mountComponent();
             await wrapper.find('span[style="cursor: pointer;"]').trigger('click');
-            await wrapper.vm.$nextTick(); // Usar wrapper.vm.$nextTick()
+            await wrapper.vm.$nextTick();
 
             const select = wrapper.find('select');
             await select.setValue('2'); // Seleciona o servidor com id 2 (USER - XYZ)
             await select.trigger('change');
-            await wrapper.vm.$nextTick(); // Usar wrapper.vm.$nextTick()
+            await wrapper.vm.$nextTick();
 
             expect(mockSetServidorId).toHaveBeenCalledWith(2);
             expect(mockSetPerfilUnidade).toHaveBeenCalledWith('USER', 'XYZ');

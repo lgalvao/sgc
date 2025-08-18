@@ -29,9 +29,6 @@ export const useProcessosStore = defineStore('processos', {
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoUnidade[] => {
             return state.processosUnidade.filter(pu => pu.idProcesso === idProcesso);
-        },
-        getProcessoUnidadeById: (state) => (subidProcesso: number): ProcessoUnidade | undefined => {
-            return state.processosUnidade.find(pu => pu.id === subidProcesso);
         }
     },
     actions: {

@@ -7,9 +7,6 @@ export const useServidoresStore = defineStore('servidores', {
         servidores: servidoresMock as Servidor[]
     }),
     getters: {
-        getServidorByEmail: (state) => (email: string): Servidor | undefined => {
-            return state.servidores.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
-        },
         getServidorById: (state) => (id: number): Servidor | undefined => {
             return state.servidores.find(s => s.id === id);
         }

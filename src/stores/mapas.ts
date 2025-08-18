@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import mapasData from '../mocks/mapas.json' assert { type: "json" };
+import mapasData from '../mocks/mapas.json' assert {type: 'json'};
 import type {Mapa} from '@/types/tipos'
 
 function parseMapaDates(mapa: any): Mapa {
@@ -16,17 +16,11 @@ export const useMapasStore = defineStore('mapas', {
         mapas: mapasData.map(parseMapaDates) as Mapa[]
     }),
     getters: {
-        getMapaPorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade === unidadeId)
-        },
         getMapaByUnidadeId: (state) => (unidadeId: string, idProcesso: number): Mapa | undefined => {
             return state.mapas.find(m => m.unidade === unidadeId && m.id === idProcesso)
         },
         getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
             return state.mapas.find(m => m.unidade === unidadeId && m.situacao === 'em_andamento')
-        },
-        getMapaPorUnidadeEProcesso: (state) => (unidadeSigla: string, idProcesso: number): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade === unidadeSigla && m.idProcesso === idProcesso);
         }
     },
     actions: {

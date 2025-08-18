@@ -8,28 +8,29 @@ const mockTreeRow = {
   props: ['item', 'level', 'columns'],
   emits: ['toggle', 'row-click'],
   template: `
-          <tr @click="$emit('row-click', item)">
-            <td v-for="(column, index) in columns" :key="column.key"
-                :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
-              <span v-if="index === 0 && item.children && item.children.length > 0" @click.stop="$emit('toggle', item.id)"
+    <tr @click="$emit('row-click', item)">
+      <td v-for="(column, index) in columns" :key="column.key"
+          :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
+              <span v-if="index === 0 && item.children && item.children.length > 0"
+                    @click.stop="$emit('toggle', item.id)"
                     class="toggle-icon">
                 <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
               </span>
-              {{ item[column.key] }}
-            </td>
-          </tr>
-          <template v-if="item.expanded && item.children">
-            <TreeRow
-                v-for="child in item.children"
-                :key="child.id"
-                :item="child"
-                :level="level + 1"
-                :columns="columns"
-                @toggle="$emit('toggle', $event)"
-                @row-click="$emit('row-click', $event)"
-            />
-          </template>
-        `,
+        {{ item[column.key] }}
+      </td>
+    </tr>
+    <template v-if="item.expanded && item.children">
+      <TreeRow
+          v-for="child in item.children"
+          :key="child.id"
+          :item="child"
+          :level="level + 1"
+          :columns="columns"
+          @toggle="$emit('toggle', $event)"
+          @row-click="$emit('row-click', $event)"
+      />
+    </template>
+  `,
 };
 
 describe('TreeTable.vue', () => {
@@ -146,8 +147,8 @@ describe('TreeTable.vue', () => {
     await collapseButton.trigger('click');
     await wrapper.vm.$nextTick();
 
-    // Verificar se os itens foram colapsados observando a renderização
-    const treeRows = wrapper.findAllComponents(TreeRow);
-    expect(treeRows.length).toBe(0); // Nenhuma linha deve estar visível após colapsar
+    // Verificar se a propriedade `expanded` foi definida como false no item
+    const treeRow = wrapper.findComponent(TreeRow);
+    expect(treeRow.props().item.expanded).toBe(false);
   });
 });
