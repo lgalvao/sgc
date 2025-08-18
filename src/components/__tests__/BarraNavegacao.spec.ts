@@ -62,8 +62,10 @@ describe('BarraNavegacao.vue', () => {
 
         // Mock sessionStorage
         vi.spyOn(sessionStorage, 'getItem').mockReturnValue(null);
+
         vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
         });
+
         vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
         });
     });
@@ -205,6 +207,7 @@ describe('BarraNavegacao.vue', () => {
             const wrapper = await mountComponent();
             expect(ensureBaseSpy).toHaveBeenCalled();
             expect(pushSpy).toHaveBeenCalledWith({label: 'Relatórios', to: '/relatorios'});
+
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
             expect(breadcrumbItems.length).toBe(2);
             expect(breadcrumbItems[1].text()).toBe('Relatórios');
@@ -217,6 +220,7 @@ describe('BarraNavegacao.vue', () => {
                 {label: 'Custom Crumb', to: '/custom'}
             ]);
             await router.push('/custom');
+
             const wrapper = await mountComponent();
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
             expect(breadcrumbItems.length).toBe(2);

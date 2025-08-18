@@ -126,8 +126,7 @@ describe('TreeTable.vue', () => {
     await wrapper.find('button.btn-outline-primary').trigger('click'); // Usar seletor de botão
     await wrapper.vm.$nextTick(); // Adicionar esta linha
 
-    // Verificar estado após expandAll
-    // O ícone do filho deve mudar para expandido
+    // Verificar estado após expandAll. O ícone do filho deve mudar para expandido
     expect(childTreeRow.find('.bi-chevron-down').exists()).toBe(true); // Ícone de expandido
   });
 

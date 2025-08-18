@@ -15,6 +15,8 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve criar uma nova competência com sucesso', async ({ page }) => {
         await page.getByTestId('btn-abrir-criar-competencia').click();
+        // Wait for the input field to be visible after the button click
+        await page.getByTestId('input-nova-competencia').waitFor({ state: 'visible' });
 
         const competenciaDescricao = 'Nova Competência de Teste ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaDescricao);

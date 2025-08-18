@@ -14,18 +14,33 @@ Os testes são organizados usando blocos `describe` para agrupar testes relacion
 *   **`router.isReady()`:** Sempre aguarde a prontidão do router (`await router.isReady()`) após uma navegação (`router.push`) para garantir que todas as operações assíncronas do router foram concluídas antes de interagir com o componente.
 
 ### 2.2. Pinia Stores
-*   **Uso de Instância Real:** As stores Pinia devem ser testadas usando instâncias reais (`createPinia`, `setActivePinia`).
+*   **Inicialização:** As stores Pinia devem ser inicializadas em cada `beforeEach` usando `setActivePinia(createPinia())` e obtendo a instância da store (`useMinhaStore()`).
+*   **Reset de Estado:** Para garantir o isolamento dos testes, o estado da store deve ser resetado em cada `beforeEach`. Para stores com estado simples, `store.$reset()` pode ser suficiente. Para stores que carregam dados de mocks JSON ou têm inicialização de estado mais complexa, use `store.$patch()` ou atribuição direta (`store.prop = valor`) para redefinir o estado com dados frescos.
 *   **Espionagem de Ações:** Para verificar se as ações das stores foram chamadas, utilize `vi.spyOn(storeInstance, 'actionName')`.
 *   **Mocks Consistentes:** Ao mockar stores ou composables que retornam funções ou objetos reativos (como `ref`s), certifique-se de que os mocks sejam consistentes entre os testes. Se um mock retorna uma nova instância de `vi.fn()` a cada chamada, os spies podem não capturar as chamadas corretas. É melhor definir os `vi.fn()` globalmente e atribuí-los ao mock.
 
 ### 2.3. Composables
 *   Composables que retornam valores reativos (ex: `ref`) devem ser mockados de forma que seus valores possam ser manipulados diretamente nos testes (ex: `mockRef.value = 'novoValor'`).
 
-### 2.4. `sessionStorage`
-*   Mocks para `sessionStorage` (`vi.spyOn(sessionStorage, 'setItem')`, `vi.spyOn(sessionStorage, 'removeItem')`) são essenciais para isolar os testes de efeitos colaterais no armazenamento do navegador.
+### 2.4. `sessionStorage` e `localStorage`
+*   Mocks para `sessionStorage` e `localStorage` (`vi.spyOn(window.localStorage, 'setItem')`, `vi.spyOn(window.localStorage, 'getItem')`, etc.) são essenciais para isolar os testes de efeitos colaterais no armazenamento do navegador. Considere criar um mock global para `localStorage` que simule seu comportamento e permita limpar o estado entre os testes.
 
 ### 2.5. Stubs de Componentes
 *   Use stubs (`stubs: { Componente: { template: '...' } }`) para isolar o componente em teste de seus filhos. No entanto, tenha cuidado ao stubbar componentes que têm comportamento intrínseco (ex: `RouterLink`). Se o comportamento real do componente stubbado for crucial para o teste (como a navegação do `RouterLink`), é melhor não stubbá-lo.
+
+### 2.6. Mocking de Importações JSON
+*   **Problema de Hoisting:** `vi.mock` é içado para o topo do arquivo. Se você tentar mockar um módulo JSON usando uma variável definida no mesmo arquivo, mas *após* a chamada `vi.mock`, ocorrerá um `ReferenceError`.
+*   **Solução:** Defina os dados mockados diretamente dentro da função de fábrica do `vi.mock`. Isso garante que os dados estejam disponíveis quando o mock é processado.
+    ```typescript
+    // Exemplo:
+    vi.mock('../../mocks/meu-mock.json', () => ({
+      default: [
+        { id: 1, nome: 'Item Mockado' },
+        { id: 2, nome: 'Outro Item' }
+      ]
+    }));
+    ```
+*   **Mocks Dinâmicos/Re-mocking:** Para cenários onde você precisa de diferentes dados mockados para o mesmo módulo JSON em testes específicos, use `vi.doMock` e `vi.importActual` dentro do teste ou de um `beforeEach` aninhado. Lembre-se de que `vi.importActual` deve ser usado para obter a versão "real" do módulo após o mock ser aplicado.
 
 ## 3. Lidando com Assincronicidade
 
@@ -52,3 +67,6 @@ Testes em ambientes Vue são inerentemente assíncronos devido ao ciclo de atual
 *   **`vi.useFakeTimers()` Interferindo em Eventos:** `vi.useFakeTimers()` pode interferir na propagação de eventos ou na execução de microtasks/macrotasks. Use-o apenas quando estritamente necessário e sempre com `vi.runAllTimers()` e `vi.useRealTimers()`.
 *   **Stubbing de `RouterLink` que Impede a Navegação:** Stubbar `RouterLink` com um `<a>` simples impede que o `router.push` seja chamado. Se o teste depende da navegação do `RouterLink`, não o stubbe ou crie um stub mais sofisticado que simule o comportamento de navegação.
 *   **Erros de Sintaxe Silenciosos:** Pequenos erros de sintaxe (ex: chaves desbalanceadas) podem causar falhas de transformação que são difíceis de depurar. Use um editor com linting e formatação automática.
+*   **Problemas de Hoisting em Mocks JSON:** Variáveis definidas no mesmo arquivo que um `vi.mock` e usadas dentro da função de fábrica do mock podem não estar definidas devido ao içamento. A solução é definir os dados mockados diretamente dentro da função de fábrica do `vi.mock`.
+*   **Mutação de Estado de Store em Mocks:** Ao mockar dados para inicializar o estado de uma store, certifique-se de que os dados sejam clonados profundamente (ex: `JSON.parse(JSON.stringify(mockData))`) antes de serem atribuídos ao estado da store. Isso evita que modificações no estado da store em um teste afetem os dados mockados originais, causando efeitos colaterais em outros testes.
+*   **Inferência de Tipos com `ref([])` e `ref({})`:** Ao declarar `ref`s com arrays ou objetos vazios (`ref([])`, `ref({})`), o TypeScript pode inferir tipos muito genéricos (`never[]`, `{}`). Sempre forneça uma tipagem explícita para esses `ref`s para garantir a segurança de tipo e evitar erros de atribuição.
