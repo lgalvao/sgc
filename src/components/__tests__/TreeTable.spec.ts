@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import TreeTable from '../TreeTable.vue';
 import TreeRow from '../TreeRow.vue'; // Importar o componente real
 

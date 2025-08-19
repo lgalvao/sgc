@@ -83,18 +83,18 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const subidProcesso = computed(() => {
-  const processoUnidade = processosStore.processosUnidade.find(
+const idSubprocesso = computed(() => {
+  const Subprocesso = processosStore.processosUnidade.find(
       (pu: any) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
-  return processoUnidade?.id;
+  return Subprocesso?.id;
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof subidProcesso.value !== 'number') {
+  if (typeof idSubprocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
 const mapa = computed(() => mapaStore.mapas.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))

@@ -42,7 +42,7 @@ import {computed} from 'vue'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {Atividade, ProcessoUnidade, Unidade} from '@/types/tipos'
+import {Atividade, Subprocesso, Unidade} from '@/types/tipos'
 
 const props = defineProps<{
   idProcesso: number | string,
@@ -74,16 +74,16 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
 
-const subidProcesso = computed(() => {
-  const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
+const idSubprocesso = computed(() => {
+  const Subprocesso = (processosStore.processosUnidade as Subprocesso[]).find(
       pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
-  return processoUnidade?.id;
+  return Subprocesso?.id;
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (subidProcesso.value === undefined) return []
-  return atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
+  if (idSubprocesso.value === undefined) return []
+  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
 function validarCadastro() {

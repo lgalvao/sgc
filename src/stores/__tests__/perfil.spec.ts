@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { usePerfilStore } from '../perfil';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {usePerfilStore} from '../perfil';
 
 // Mock localStorage globally
 const mockLocalStorage = (() => {

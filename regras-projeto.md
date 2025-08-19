@@ -43,7 +43,7 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 - **Dados**: Mockados em JSON, importados apenas nos stores do Pinia.
 
 - **Stores**: Cada domínio (processo, mapa, unidade, perfil etc.) possui um store dedicado.
-    - `processos.ts`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `ProcessoUnidade` e o acesso a `processosUnidades.json`.
+    - `processos.ts`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `Subprocesso` e o acesso a `processosUnidades.json`.
     - `mapas.ts`: Gerencia os mapas de competência, incluindo a busca por unidade e processo (`getMapaByUnidadeId`) e a busca por mapa vigente (`getMapaVigentePorUnidade`).
     - `atividades.ts`: Gerencia atividades e conhecimentos.
     - `atribuicaoTemporaria.ts`: Gerencia atribuições temporárias.

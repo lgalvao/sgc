@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary"
-                @click="irParaCriarAtribuicao">
+                @click="irParaCriarAtribuicao" data-testid="btn-criar-atribuicao">
           Criar atribuição
         </button>
       </div>
@@ -127,7 +127,7 @@ function navegarParaUnidadeSubordinada(item: { id: unknown }) {
 function navegarParaAtividades() {
   if (mapaVigente.value) {
     router.push({
-      name: 'ProcessoUnidadeCadastro',
+      name: 'SubprocessoCadastro',
       params: {
         idProcesso: mapaVigente.value.idProcesso,
         siglaUnidade: sigla.value
@@ -142,7 +142,7 @@ function navegarParaAtividades() {
 function visualizarMapa() {
   if (mapaVigente.value) {
     router.push({
-      name: 'ProcessoUnidadeVisMapa',
+      name: 'SubprocessoVisMapa',
       params: {
         idProcesso: mapaVigente.value.idProcesso,
         siglaUnidade: sigla.value

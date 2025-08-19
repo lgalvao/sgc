@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import {vi} from 'vitest';
 
 export let mockTrailCrumbs: any[] = []; // Variável para o estado dos crumbs
 export const mockTrailReset = vi.fn();

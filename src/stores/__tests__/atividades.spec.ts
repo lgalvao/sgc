@@ -3,12 +3,11 @@ import {createPinia, setActivePinia} from 'pinia';
 import {useAtividadesStore} from '../atividades';
 import type {Atividade, Conhecimento} from '@/types/tipos';
 
-// Mock do atividades.json para garantir dados consistentes nos testes
 const getMockAtividadesData = () => [
     {
         "id": 1,
         "descricao": "Manutenção de sistemas administrativos criados pela unidade",
-        "subidProcesso": 3,
+        "idSubprocesso": 3,
         "conhecimentos": [
             {"id": 1, "descricao": "Criação de testes de integração em Cypress"}
         ]
@@ -16,7 +15,7 @@ const getMockAtividadesData = () => [
     {
         "id": 2,
         "descricao": "Especificação de sistemas administrativos",
-        "subidProcesso": 3,
+        "idSubprocesso": 3,
         "conhecimentos": [
             {"id": 6, "descricao": "Modelagem de dados"}
         ]
@@ -24,7 +23,7 @@ const getMockAtividadesData = () => [
     {
         "id": 3,
         "descricao": "Implantação de sistemas externos",
-        "subidProcesso": 1, // Changed subidProcesso for testing purposes
+        "idSubprocesso": 1, // Changed idSubprocesso for testing purposes
         "conhecimentos": [
             {"id": 40, "descricao": "Conhecimento em configuração de APIs de terceiros"}
         ]
@@ -65,29 +64,29 @@ describe('useAtividadesStore', () => {
     });
 
     describe('getters', () => {
-        it('getAtividadesPorProcessoUnidade should filter activities by subidProcesso', () => {
-            const atividades = atividadesStore.getAtividadesPorProcessoUnidade(3);
+        it('getAtividadesPorProcessoUnidade should filter activities by idSubprocesso', () => {
+            const atividades = atividadesStore.getAtividadesPorSubprocesso(3);
             expect(atividades.length).toBe(2);
             expect(atividades[0].id).toBe(1);
             expect(atividades[1].id).toBe(2);
         });
 
-        it('getAtividadesPorProcessoUnidade should return empty array if no matching subidProcesso', () => {
-            const atividades = atividadesStore.getAtividadesPorProcessoUnidade(999);
+        it('getAtividadesPorProcessoUnidade should return empty array if no matching idSubprocesso', () => {
+            const atividades = atividadesStore.getAtividadesPorSubprocesso(999);
             expect(atividades.length).toBe(0);
         });
     });
 
     describe('actions', () => {
-        it('setAtividades should replace activities for a given subidProcesso', () => {
+        it('setAtividades should replace activities for a given idSubprocesso', () => {
             const novasAtividades: Atividade[] = [
-                {id: 100, descricao: 'Nova Atividade 1', subidProcesso: 3, conhecimentos: []},
-                {id: 101, descricao: 'Nova Atividade 2', subidProcesso: 3, conhecimentos: []},
+                {id: 100, descricao: 'Nova Atividade 1', idSubprocesso: 3, conhecimentos: []},
+                {id: 101, descricao: 'Nova Atividade 2', idSubprocesso: 3, conhecimentos: []},
             ];
             const initialLength = atividadesStore.atividades.length;
             atividadesStore.setAtividades(3, novasAtividades);
 
-            // Should remove old activities for subidProcesso 3 (id 1, 2) and add new ones
+            // Should remove old activities for idSubprocesso 3 (id 1, 2) and add new ones
             expect(atividadesStore.atividades.length).toBe(initialLength - 2 + novasAtividades.length);
             expect(atividadesStore.atividades.some((a: Atividade) => a.id === 1)).toBe(false);
             expect(atividadesStore.atividades.some((a: Atividade) => a.id === 2)).toBe(false);
@@ -99,7 +98,7 @@ describe('useAtividadesStore', () => {
             const novaAtividade: Atividade = {
                 id: 0, // ID will be assigned by the store
                 descricao: 'Atividade Teste',
-                subidProcesso: 5,
+                idSubprocesso: 5,
                 conhecimentos: []
             };
             const initialLength = atividadesStore.atividades.length;
@@ -192,13 +191,13 @@ describe('useAtividadesStore', () => {
             testAtividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
 
             // Spy on the fetchAtividadesPorProcessoUnidade action and mock its implementation
-            const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorProcessoUnidade').mockImplementation(async function (this: typeof testAtividadesStore, subidProcesso: number) {
+            const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: number) {
                 const fetchedActivities: Atividade[] = [
-                    {id: 4, descricao: "Fetched Activity 1", subidProcesso: 3, conhecimentos: []},
-                    {id: 1, descricao: "Existing Activity", subidProcesso: 3, conhecimentos: []}, // Duplicate
+                    {id: 4, descricao: "Fetched Activity 1", idSubprocesso: 3, conhecimentos: []},
+                    {id: 1, descricao: "Existing Activity", idSubprocesso: 3, conhecimentos: []}, // Duplicate
                 ];
 
-                const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.subidProcesso === subidProcesso);
+                const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.idSubprocesso === idSubprocesso);
 
                 atividadesDoProcesso.forEach((novaAtividade: Atividade) => {
                     if (!testAtividadesStore.atividades.some((a: Atividade) => a.id === novaAtividade.id)) {
@@ -208,7 +207,7 @@ describe('useAtividadesStore', () => {
             });
 
             const initialLength = testAtividadesStore.atividades.length; // This will be 3 (from mockAtividadesData)
-            await testAtividadesStore.fetchAtividadesPorProcessoUnidade(3);
+            await testAtividadesStore.fetchAtividadesPorSubprocesso(3);
 
             // Should add only non-duplicate fetched activity
             expect(testAtividadesStore.atividades.length).toBe(initialLength + 1); // Expects 3 + 1 = 4
@@ -223,13 +222,13 @@ describe('useAtividadesStore', () => {
                 {
                     id: 0,
                     descricao: 'Multi Atividade 1',
-                    subidProcesso: 2,
+                    idSubprocesso: 2,
                     conhecimentos: [{id: 0, descricao: 'Multi Conhecimento 1'}]
                 },
                 {
                     id: 0,
                     descricao: 'Multi Atividade 2',
-                    subidProcesso: 2,
+                    idSubprocesso: 2,
                     conhecimentos: [{id: 0, descricao: 'Multi Conhecimento 2'}]
                 },
             ];

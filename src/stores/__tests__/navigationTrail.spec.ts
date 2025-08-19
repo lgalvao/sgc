@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useNavigationTrail } from '../navigationTrail';
-import type { TrailCrumb } from '../navigationTrail'; // Import TrailCrumb from the same file
+import {beforeEach, describe, expect, it} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import type {TrailCrumb} from '../navigationTrail'; // Import TrailCrumb from the same file
+import {useNavigationTrail} from '../navigationTrail';
 
 describe('useNavigationTrail', () => {
   let navigationTrailStore: ReturnType<typeof useNavigationTrail>;

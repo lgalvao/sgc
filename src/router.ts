@@ -33,7 +33,7 @@ const routes = [
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade',
-        name: 'ProcessoUnidade',
+        name: 'Subprocesso',
         component: () => import('./views/Subprocesso.vue'),
         props: (route: RouteLocationNormalized) => ({ idProcesso: Number(route.params.idProcesso), siglaUnidade: route.params.siglaUnidade }),
         meta: {
@@ -43,28 +43,28 @@ const routes = [
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/mapa',
-        name: 'ProcessoUnidadeMapa',
+        name: 'SubprocessoMapa',
         component: () => import('./views/CadMapa.vue'),
         props: (route: RouteLocationNormalized) => ({sigla: route.params.siglaUnidade, idProcesso: Number(route.params.idProcesso)}),
         meta: {title: 'Mapa', breadcrumb: 'Mapa'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
-        name: 'ProcessoUnidadeVisMapa',
+        name: 'SubprocessoVisMapa',
         component: () => import('./views/VisMapa.vue'),
         props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
         meta: {title: 'Visualização de Mapa', breadcrumb: 'Visualização de Mapa'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/cadastro',
-        name: 'ProcessoUnidadeCadastro',
+        name: 'SubprocessoCadastro',
         component: () => import('./views/CadAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
         meta: {title: 'Cadastro', breadcrumb: 'Cadastro'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
-        name: 'ProcessoUnidadeVisCadastro',
+        name: 'SubprocessoVisCadastro',
         component: () => import('./views/VisAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
         meta: {title: 'Visualização de Atividades', breadcrumb: 'Visualização de Atividades'},

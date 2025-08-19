@@ -2,7 +2,7 @@
   {
     "id": 1,
     "descricao": "Manutenção de sistemas administrativos criados pela unidade",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 1,
@@ -29,7 +29,7 @@
   {
     "id": 2,
     "descricao": "Especificação de sistemas administrativos",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 6,
@@ -48,7 +48,7 @@
   {
     "id": 3,
     "descricao": "Implantação de sistemas externos",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 40,
@@ -63,7 +63,7 @@
   {
     "id": 4,
     "descricao": "Testes de Sistemas Eleitorais",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 42,
@@ -78,7 +78,7 @@
   {
     "id": 5,
     "descricao": "Participação em Simulados Eleitorais",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 44,
@@ -93,7 +93,7 @@
   {
     "id": 6,
     "descricao": "Suporte e acompanhamento dos procedimentos eleitorais",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 46,
@@ -108,7 +108,7 @@
   {
     "id": 7,
     "descricao": "Minha Nova Atividade",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 9,
@@ -123,7 +123,7 @@
   {
     "id": 8,
     "descricao": "Atividade de Teste para STIC",
-    "subidProcesso": 1,
+    "idSubprocesso": 1,
     "conhecimentos": [
       {
         "id": 49,
@@ -138,7 +138,7 @@
   {
     "id": 9,
     "descricao": "Elaboração de documentação técnica",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 51,
@@ -153,7 +153,7 @@
   {
     "id": 10,
     "descricao": "Atendimento a usuários de sistemas",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 53,
@@ -168,7 +168,7 @@
   {
     "id": 11,
     "descricao": "Gerenciamento de projetos de TI",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 55,
@@ -183,7 +183,7 @@
   {
     "id": 12,
     "descricao": "Análise de dados e geração de relatórios",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 57,
@@ -198,7 +198,7 @@
   {
     "id": 13,
     "descricao": "Administração de bancos de dados",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 59,
@@ -213,7 +213,7 @@
   {
     "id": 14,
     "descricao": "Configuração de infraestrutura de rede",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 61,
@@ -228,7 +228,7 @@
   {
     "id": 15,
     "descricao": "Desenvolvimento de APIs RESTful",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 63,
@@ -243,7 +243,7 @@
   {
     "id": 16,
     "descricao": "Implementação de segurança da informação",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 65,
@@ -258,7 +258,7 @@
   {
     "id": 17,
     "descricao": "Otimização de performance de aplicações",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 67,
@@ -273,7 +273,7 @@
   {
     "id": 18,
     "descricao": "Pesquisa e desenvolvimento de novas tecnologias",
-    "subidProcesso": 3,
+    "idSubprocesso": 3,
     "conhecimentos": [
       {
         "id": 69,

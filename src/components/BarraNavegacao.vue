@@ -132,7 +132,7 @@ const processProcessoContext = () => {
     const basePU = route.path.replace(/\/(mapa|atribuicao|atividades|cadastro)(\/.*)?$/, '')
     const pid = Number((route.params as any).id || (route.params as any).idProcesso || route.query.idProcesso)
     const siglaTo = isFinite(pid)
-        ? {name: 'ProcessoUnidade', params: {idProcesso: pid, siglaUnidade: siglaPU}}
+        ? {name: 'Subprocesso', params: {idProcesso: pid, siglaUnidade: siglaPU}}
         : {path: basePU}
     if (!last || last.label !== siglaPU) {
       trailStore.push({label: siglaPU, to: siglaTo, title: u?.nome})
@@ -155,7 +155,7 @@ const processProcessoContext = () => {
   }
 }
 
-const processUnidadeContext = () => {
+const contextoSubprocesso = () => {
   const sigla = String(route.params.siglaUnidade || '')
   const idProcesso = String(route.query.idProcesso || '')
   const u = unidadesStore.pesquisarUnidade(sigla)
@@ -173,7 +173,7 @@ const processUnidadeContext = () => {
   const last = trailStore.crumbs[trailStore.crumbs.length - 1]
   if (!last || last.label !== sigla) {
     const siglaTo = idProcesso
-        ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
+        ? {name: 'Subprocesso', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
         : {path: `/unidade/${sigla}`}
     trailStore.push({label: sigla, to: siglaTo, title: u?.nome})
   }
@@ -221,7 +221,7 @@ const buildProcessoFallbackCrumbs = (baseCrumbs: Array<{ label: string; to?: any
     const u = unidadesStore.pesquisarUnidade(siglaPU)
     const idProcessoParam2 = (route.params as any).idProcesso || route.query.idProcesso
     const siglaTo = idProcessoParam2
-        ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcessoParam2), siglaUnidade: siglaPU}}
+        ? {name: 'Subprocesso', params: {idProcesso: Number(idProcessoParam2), siglaUnidade: siglaPU}}
         : undefined
     baseCrumbs.push({label: siglaPU, to: siglaTo, title: u?.nome})
     const matchedChildren = route.matched.filter(m => /\/(mapa|atribuicao|atividades)(\/.*)?$/.test(m.path))
@@ -244,7 +244,7 @@ const buildUnidadeFallbackCrumbs = (baseCrumbs: Array<{ label: string; to?: any;
   const idProcesso = String(route.query.idProcesso || '')
   const u = unidadesStore.pesquisarUnidade(sigla)
   const siglaTo = idProcesso
-      ? {name: 'ProcessoUnidade', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
+      ? {name: 'Subprocesso', params: {idProcesso: Number(idProcesso), siglaUnidade: sigla}}
       : {path: `/unidade/${sigla}`}
   if (idProcesso) baseCrumbs.push({
     label: 'Processo',
@@ -299,7 +299,7 @@ const updateTrail = () => {
 
   const sigla = String(route.params.siglaUnidade || '')
   if (route.path.startsWith('/unidade/') && sigla) {
-    processUnidadeContext()
+    contextoSubprocesso()
     return
   }
 

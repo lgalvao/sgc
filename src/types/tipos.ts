@@ -1,6 +1,7 @@
 export type DataISO = Date;
 export type DataHoraISO = Date;
 
+// noinspection JSUnusedGlobalSymbols
 export enum ProcessoTipo {
     MAPEAMENTO = 'Mapeamento',
     REVISAO = 'Revisão',
@@ -16,7 +17,7 @@ export interface Processo {
     dataFinalizacao?: DataISO | null;
 }
 
-export interface ProcessoUnidade {
+export interface Subprocesso {
     id: number;
     idProcesso: number;
     unidade: string;
@@ -30,6 +31,7 @@ export interface ProcessoUnidade {
 }
 
 export interface Unidade {
+    id: number;
     sigla: string;
     tipo: string;
     nome: string;
@@ -71,7 +73,7 @@ export interface Conhecimento {
 export interface Atividade {
     id: number;
     descricao: string;
-    subidProcesso: number;
+    idSubprocesso: number;
     conhecimentos: Conhecimento[];
     novoConhecimento?: string;
 }

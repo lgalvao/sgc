@@ -186,7 +186,7 @@ import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {Atividade, Processo, ProcessoTipo, ProcessoUnidade, Unidade} from '@/types/tipos'
+import {Atividade, Processo, ProcessoTipo, Subprocesso, Unidade} from '@/types/tipos'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -224,35 +224,35 @@ const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}
 
 const novaAtividade = ref('')
 
-const subidProcesso = computed(() => {
-  const processoUnidade = (processosStore.processosUnidade as ProcessoUnidade[]).find(
+const idSubprocesso = computed(() => {
+  const Subprocesso = (processosStore.processosUnidade as Subprocesso[]).find(
       pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
-  return processoUnidade?.id;
+  return Subprocesso?.id;
 });
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
-    if (subidProcesso.value === undefined) return []
-    const storeAtividades = atividadesStore.getAtividadesPorProcessoUnidade(subidProcesso.value) || []
+    if (idSubprocesso.value === undefined) return []
+    const storeAtividades = atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
     return storeAtividades.map((a: Atividade) => ({...a, novoConhecimento: ''}))
   },
   set: (val: AtividadeComEdicao[]) => {
-    if (subidProcesso.value === undefined) return
+    if (idSubprocesso.value === undefined) return
     const storeVal = val.map(a => {
       const {novoConhecimento, ...rest} = a
       return rest
     })
-    atividadesStore.setAtividades(subidProcesso.value, storeVal)
+    atividadesStore.setAtividades(idSubprocesso.value, storeVal)
   }
 })
 
 function adicionarAtividade() {
-  if (novaAtividade.value && subidProcesso.value !== undefined) {
+  if (novaAtividade.value && idSubprocesso.value !== undefined) {
     atividadesStore.adicionarAtividade({
       id: Date.now(),
       descricao: novaAtividade.value,
-      subidProcesso: subidProcesso.value,
+      idSubprocesso: idSubprocesso.value,
       conhecimentos: [],
     })
     novaAtividade.value = ''
@@ -330,11 +330,11 @@ function cancelarEdicaoAtividade() {
 }
 
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
-  if (subidProcesso.value === undefined) return;
+  if (idSubprocesso.value === undefined) return;
 
   const novasAtividades = atividadesImportadas.map(atividade => ({
     ...atividade,
-    subidProcesso: subidProcesso.value as number,
+    idSubprocesso: idSubprocesso.value as number,
   }));
 
   atividadesStore.adicionarMultiplasAtividades(novasAtividades);
@@ -347,8 +347,8 @@ const isChefe = computed(() => perfilSelecionado.value === 'CHEFE')
 // Variáveis reativas para o modal de importação
 const processoSelecionado = ref<Processo | null>(null)
 const processoSelecionadoId = ref<number | null>(null)
-const unidadesParticipantes = ref<ProcessoUnidade[]>([])
-const unidadeSelecionada = ref<ProcessoUnidade | null>(null)
+const unidadesParticipantes = ref<Subprocesso[]>([])
+const unidadeSelecionada = ref<Subprocesso | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
 const atividadesSelecionadas = ref<Atividade[]>([])
@@ -420,11 +420,11 @@ function selecionarProcesso(processo: Processo | null) {
   unidadeSelecionadaId.value = null
 }
 
-async function selecionarUnidade(unidadePu: ProcessoUnidade | null) {
+async function selecionarUnidade(unidadePu: Subprocesso | null) {
   unidadeSelecionada.value = unidadePu
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesPorProcessoUnidade(unidadePu.id)
-    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorProcessoUnidade(unidadePu.id)
+    await atividadesStore.fetchAtividadesPorSubprocesso(unidadePu.id)
+    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.id)
     atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : []
   } else {
     atividadesParaImportar.value = []

@@ -12,8 +12,8 @@
           <span class="fw-bold me-1">Situação:</span>
           <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
         </p>
-        <p v-if="processoUnidadeDetalhes">
-          <strong>Unidade Atual:</strong> {{ processoUnidadeDetalhes.unidadeAtual || 'Não informado' }}
+        <p v-if="SubprocessoDetalhes">
+          <strong>Unidade Atual:</strong> {{ SubprocessoDetalhes.unidadeAtual || 'Não informado' }}
         </p>
       </div>
     </div>
@@ -97,7 +97,7 @@ import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
-import {Mapa, Processo, ProcessoTipo, ProcessoUnidade, Servidor, Unidade} from "@/types/tipos";
+import {Mapa, Processo, ProcessoTipo, Servidor, Subprocesso, Unidade} from "@/types/tipos";
 
 const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
 
@@ -114,19 +114,19 @@ const {processos} = storeToRefs(processosStore)
 console.log('Subprocesso.vue: idProcesso.value', idProcesso.value);
 console.log('Subprocesso.vue: siglaParam.value', siglaParam.value);
 
-const processoUnidadeDetalhes = computed<ProcessoUnidade | undefined>(() => {
-  const result = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: ProcessoUnidade) => pu.unidade === siglaParam.value);
-  console.log('Subprocesso.vue: processoUnidadeDetalhes computed result', result);
+const SubprocessoDetalhes = computed<Subprocesso | undefined>(() => {
+  const result = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === siglaParam.value);
+  console.log('Subprocesso.vue: SubprocessoDetalhes computed result', result);
   return result;
 });
 
 const processoAtual = computed<Processo | null>(() => {
-  if (!processoUnidadeDetalhes.value) return null;
-  return (processos.value as Processo[]).find(p => p.id === processoUnidadeDetalhes.value?.idProcesso) || null;
+  if (!SubprocessoDetalhes.value) return null;
+  return (processos.value as Processo[]).find(p => p.id === SubprocessoDetalhes.value?.idProcesso) || null;
 });
 
 const sigla = computed<string | undefined>(() => {
-  const result = processoUnidadeDetalhes.value?.unidade;
+  const result = SubprocessoDetalhes.value?.unidade;
   console.log('Subprocesso.vue: sigla computed result', result);
   return result;
 });
@@ -153,7 +153,7 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
 });
 
 const situacaoUnidadeNoProcesso = computed<string>(() => {
-  return processoUnidadeDetalhes.value?.situacao || 'Não informado';
+  return SubprocessoDetalhes.value?.situacao || 'Não informado';
 });
 
 const mapa = computed<Mapa | null>(() => {
@@ -170,25 +170,25 @@ function badgeClass(situacao: string): string {
 
 function criarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function editarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function visualizarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 
 function irParaAtividadesConhecimentos() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'ProcessoUnidadeCadastro', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({ name: 'SubprocessoCadastro', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
   }
 }
 </script>

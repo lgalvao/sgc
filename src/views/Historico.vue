@@ -44,7 +44,7 @@ import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
-import {Processo, ProcessoUnidade} from '@/types/tipos' // Import Processo and ProcessoUnidade types
+import {Processo, Subprocesso} from '@/types/tipos' // Import Processo and Subprocesso types
 
 type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
@@ -61,12 +61,12 @@ const processosFinalizados = computed(() =>
 
 const processosFinalizadosOrdenados = computed(() => {
   return [...processosFinalizados.value].sort((a: Processo, b: Processo) => {
-    let valA: any; // Use any for comparison values as they can be different types
+    let valA: any;
     let valB: any;
 
     if (criterio.value === 'unidades') {
-      valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: ProcessoUnidade) => pu.unidade).join(', ');
-      valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: ProcessoUnidade) => pu.unidade).join(', ');
+      valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
+      valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: Subprocesso) => pu.unidade).join(', ');
     } else if (criterio.value === 'dataFinalizacao') {
       const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao) : null;
       const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao) : null;

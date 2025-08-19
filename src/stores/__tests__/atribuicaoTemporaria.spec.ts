@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useAtribuicaoTemporariaStore } from '../atribuicaoTemporaria';
-import type { AtribuicaoTemporaria } from '@/types/tipos';
+import {beforeEach, describe, expect, it} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {useAtribuicaoTemporariaStore} from '../atribuicaoTemporaria';
+import type {AtribuicaoTemporaria} from '@/types/tipos';
 
 describe('useAtribuicaoTemporariaStore', () => {
   let atribuicaoTemporariaStore: ReturnType<typeof useAtribuicaoTemporariaStore>;

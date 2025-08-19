@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useMapasStore } from '../mapas';
-import type { Mapa, Competencia } from '@/types/tipos';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {useMapasStore} from '../mapas';
+import type {Competencia, Mapa} from '@/types/tipos';
 
 // Mock the mapas.json import
 vi.mock('../../mocks/mapas.json', () => ({

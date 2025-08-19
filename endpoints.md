@@ -11,7 +11,7 @@
   - Mostra detalhes do processo e a tabela/árvore de unidades participantes.
 
 - /processo/:idProcesso/:siglaUnidadeUnidade
-  - Componente: ProcessoUnidade.vue
+  - Componente: Subprocesso.vue
   - Mostra o contexto do processo para a unidade (responsável, ações disponíveis etc.).
 
 - /processo/:idProcesso/:siglaUnidadeUnidade/mapa

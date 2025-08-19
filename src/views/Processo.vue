@@ -29,7 +29,7 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
 
 import TreeTable from '@/components/TreeTable.vue'
-import {Processo, ProcessoUnidade, Unidade} from '@/types/tipos'
+import {Processo, Subprocesso, Unidade} from '@/types/tipos'
 
 interface TreeTableItem {
   id: string;
@@ -53,7 +53,7 @@ const idProcesso = computed(() => Number((route.params as any).idProcesso || (ro
 const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === idProcesso.value))
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
-  return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: ProcessoUnidade) => pu.unidade)
+  return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)
 })
 
 function filtrarHierarquiaPorParticipantes(unidades: Unidade[], participantes: string[]): Unidade[] {
@@ -112,11 +112,11 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
     let unidadeAtual = 'Não informado';
 
     if (!isIntermediaria) {
-      const processoUnidade = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: ProcessoUnidade) => pu.unidade === item.sigla);
-      if (processoUnidade) {
-        situacao = processoUnidade.situacao;
-        dataLimite = formatarData(processoUnidade.dataLimiteEtapa1);
-        unidadeAtual = processoUnidade.unidadeAtual;
+      const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: Subprocesso) => pu.unidade === item.sigla);
+      if (Subprocesso) {
+        situacao = Subprocesso.situacao;
+        dataLimite = formatarData(Subprocesso.dataLimiteEtapa1);
+        unidadeAtual = Subprocesso.unidadeAtual;
       }
     }
 
@@ -137,10 +137,10 @@ function abrirDetalhesUnidade(item: any) {
   // The @row-click event from TreeTable emits a generic object.
   // We use `any` and perform runtime checks to safely handle the event payload.
   if (item && typeof item.id === 'string') {
-    const processoUnidade = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: ProcessoUnidade) => pu.unidade === item.id);
-    if (processoUnidade && processoUnidade.unidade) {
+    const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
+    if (Subprocesso && Subprocesso.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
-      router.push({name: 'ProcessoUnidade', params: {idProcesso: idProcesso.value, siglaUnidade: processoUnidade.unidade}})
+      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
     } else if (Array.isArray(item.children) && item.children.length > 0) {
       // Unidade INTERMEDIARIA: não navegar mais (link desabilitado)
       console.log(`Unidade intermediária ${item.id}: navegação desabilitada.`)

@@ -15,6 +15,7 @@
     "isolatedModules": true, /* Ensure that each file can be safely transpiled without relying on other imports. */
     "jsx": "preserve", /* Specify what JSX code is generated. */
     "lib": ["esnext", "dom", "dom.iterable"], /* Specify a list of bundled library declaration files that should be included in the compilation. */
+    "types": ["vitest/globals"],
     "baseUrl": ".", /* Specify the base directory to resolve non-relative module names. */
     "paths": {
       "@/*": ["src/*"]

@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import processosUnidadesMock from '../mocks/subprocessos.json'
-import type {Processo, ProcessoUnidade} from '@/types/tipos'
+import type {Processo, Subprocesso} from '@/types/tipos'
 
 function parseProcessoDates(processo: any): Processo {
     return {
@@ -11,7 +11,7 @@ function parseProcessoDates(processo: any): Processo {
     };
 }
 
-function parseProcessoUnidadeDates(pu: any): ProcessoUnidade {
+function parseSubprocessoDates(pu: any): Subprocesso {
     return {
         ...pu,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
@@ -24,10 +24,10 @@ function parseProcessoUnidadeDates(pu: any): ProcessoUnidade {
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        processosUnidade: processosUnidadesMock.map(parseProcessoUnidadeDates) as ProcessoUnidade[]
+        processosUnidade: processosUnidadesMock.map(parseSubprocessoDates) as Subprocesso[]
     }),
     getters: {
-        getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoUnidade[] => {
+        getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
             return state.processosUnidade.filter(pu => pu.idProcesso === idProcesso);
         }
     },
@@ -35,8 +35,8 @@ export const useProcessosStore = defineStore('processos', {
         adicionarProcesso(novoProcesso: Processo) {
             this.processos.push(novoProcesso);
         },
-        adicionarProcessosUnidade(processosUnidadeArray: ProcessoUnidade[]) {
-            processosUnidadeArray.forEach((pu: ProcessoUnidade) => {
+        adicionarProcessosUnidade(processosUnidadeArray: Subprocesso[]) {
+            processosUnidadeArray.forEach((pu: Subprocesso) => {
                 this.processosUnidade.push(pu);
             });
         },

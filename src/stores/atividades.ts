@@ -18,14 +18,14 @@ export const useAtividadesStore = defineStore('atividades', {
         };
     },
     getters: {
-        getAtividadesPorProcessoUnidade: (state) => (subidProcesso: number): Atividade[] => {
-            return state.atividades.filter(a => a.subidProcesso === subidProcesso);
+        getAtividadesPorSubprocesso: (state) => (idSubprocesso: number): Atividade[] => {
+            return state.atividades.filter(a => a.idSubprocesso === idSubprocesso);
         }
     },
     actions: {
-        setAtividades(subidProcesso: number, novasAtividades: Atividade[]) {
-            // Remove as atividades antigas para este subidProcesso
-            this.atividades = this.atividades.filter(a => a.subidProcesso !== subidProcesso);
+        setAtividades(idSubprocesso: number, novasAtividades: Atividade[]) {
+            // Remove as atividades antigas para este idSubprocesso
+            this.atividades = this.atividades.filter(a => a.idSubprocesso !== idSubprocesso);
 
             // Adiciona as novas atividades
             this.atividades.push(...novasAtividades);
@@ -56,9 +56,9 @@ export const useAtividadesStore = defineStore('atividades', {
             }
         },
 
-        async fetchAtividadesPorProcessoUnidade(subidProcesso: number) {
+        async fetchAtividadesPorSubprocesso(idSubprocesso: number) {
             const todasAtividades = atividadesMock as Atividade[];
-            const atividadesDoProcesso = todasAtividades.filter(a => a.subidProcesso === subidProcesso);
+            const atividadesDoProcesso = todasAtividades.filter(a => a.idSubprocesso === idSubprocesso);
 
             // Adiciona as atividades buscadas ao estado, evitando duplicatas
             atividadesDoProcesso.forEach(novaAtividade => {

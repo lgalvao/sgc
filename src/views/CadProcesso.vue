@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -242,9 +242,7 @@ function toggleUnidade(unidade: Unidade) {
   }
 }
 
-onMounted(() => {
-  console.log('Unidades carregadas no store:', unidadesStore.unidades);
-});
+
 </script>
 
 <style scoped>
