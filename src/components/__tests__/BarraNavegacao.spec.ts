@@ -52,6 +52,7 @@ describe('BarraNavegacao.vue', () => {
         // Mock das unidades store para não depender de dados reais
         const unidadesStore = useUnidadesStore();
         vi.spyOn(unidadesStore, 'pesquisarUnidade').mockImplementation((sigla: string) => ({
+            id: 1,
             sigla,
             nome: `Unidade ${sigla}`,
             tipo: 'Tipo',

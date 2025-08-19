@@ -61,7 +61,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {Atividade, Competencia, Conhecimento, Unidade} from '@/types/tipos';
 
 const route = useRoute()
-const sigla = computed(() => route.params.sigla as string)
+const sigla = computed(() => route.params.siglaUnidade as string)
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()

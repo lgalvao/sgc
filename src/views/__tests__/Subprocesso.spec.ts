@@ -8,7 +8,6 @@ import {useServidoresStore} from '@/stores/servidores';
 import {useProcessosStore} from '@/stores/processos';
 import {useRoute, useRouter} from 'vue-router';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {ProcessoTipo} from '@/types/tipos';
 
 // Mock do useRouter e useRoute
 vi.mock('vue-router', () => ({
@@ -18,6 +17,90 @@ vi.mock('vue-router', () => ({
     useRoute: vi.fn(() => ({
         params: {idProcesso: 1, siglaUnidade: 'SESEL'},
     })),
+}));
+
+// Mock de servidores.json
+vi.mock('@/mocks/servidores.json', () => ({
+    default: [
+        {id: 1, nome: 'Servidor Teste', unidade: 'SESEL', email: 'teste@email.com', ramal: '1234'},
+        {id: 2, nome: 'Servidor Teste 2', unidade: 'SEDESENV', email: 'teste2@email.com', ramal: '5678'},
+    ],
+}));
+
+// Mock de processos.json
+vi.mock('@/mocks/processos.json', () => ({
+    default: [
+        {
+            id: 1,
+            descricao: 'Processo Mapeamento',
+            tipo: 'Mapeamento',
+            dataLimite: '2025-12-31',
+            situacao: 'Em andamento'
+        },
+        {
+            id: 2,
+            descricao: 'Processo Diagnostico',
+            tipo: 'Diagnostico',
+            dataLimite: '2025-12-31',
+            situacao: 'Em andamento'
+        },
+    ],
+}));
+
+// Mock de subprocessos.json
+vi.mock('@/mocks/subprocessos.json', () => ({
+    default: [
+        {
+            id: 101,
+            idProcesso: 1,
+            unidade: 'SESEL',
+            dataLimiteEtapa1: '2025-12-20',
+            dataLimiteEtapa2: '2025-12-25',
+            dataFimEtapa1: null,
+            dataFimEtapa2: null,
+            situacao: 'Aguardando',
+            unidadeAtual: 'SESEL',
+            unidadeAnterior: null
+        },
+        {
+            id: 102,
+            idProcesso: 2,
+            unidade: 'SEDESENV',
+            dataLimiteEtapa1: '2025-12-20',
+            dataLimiteEtapa2: '2025-12-25',
+            dataFimEtapa1: null,
+            dataFimEtapa2: null,
+            situacao: 'Em andamento',
+            unidadeAtual: 'SEDESENV',
+            unidadeAnterior: null
+        },
+    ],
+}));
+
+// Mock de mapas.json
+vi.mock('@/mocks/mapas.json', () => ({
+    default: [
+        {
+            id: 1,
+            unidade: 'SESEL',
+            idProcesso: 1,
+            situacao: 'em_andamento',
+            competencias: [],
+            dataCriacao: '2025-01-01',
+            dataDisponibilizacao: null,
+            dataFinalizacao: null
+        },
+        {
+            id: 2,
+            unidade: 'SEDESENV',
+            idProcesso: 2,
+            situacao: 'disponivel_validacao',
+            competencias: [],
+            dataCriacao: '2025-01-01',
+            dataDisponibilizacao: '2025-01-10',
+            dataFinalizacao: null
+        },
+    ],
 }));
 
 describe('Subprocesso.vue', () => {
@@ -41,98 +124,6 @@ describe('Subprocesso.vue', () => {
 
         vi.clearAllMocks();
 
-        // Mock de dados iniciais para as stores
-        unidadesStore.unidades = [
-            {
-                id: 101,
-                sigla: 'SESEL',
-                nome: 'Seção de Sistemas Eleitorais',
-                titular: 1,
-                responsavel: null,
-                tipo: 'OPERACIONAL',
-                filhas: []
-            },
-            {
-                id: 102,
-                sigla: 'SEDESENV',
-                nome: 'Seção de Desenvolvimento',
-                titular: 2,
-                responsavel: null,
-                tipo: 'OPERACIONAL',
-                filhas: []
-            },
-        ];
-        servidoresStore.servidores = [
-            {id: 1, nome: 'Servidor Teste', unidade: 'SESEL', email: 'teste@email.com', ramal: '1234'},
-            {id: 2, nome: 'Servidor Teste 2', unidade: 'SEDESENV', email: 'teste2@email.com', ramal: '5678'},
-        ];
-        processosStore.processos = [
-            {
-                id: 1,
-                descricao: 'Processo Mapeamento',
-                tipo: ProcessoTipo.MAPEAMENTO,
-                dataLimite: new Date(),
-                situacao: 'Em andamento',
-                dataFinalizacao: null
-            },
-            {
-                id: 2,
-                descricao: 'Processo Diagnostico',
-                tipo: ProcessoTipo.DIAGNOSTICO,
-                dataLimite: new Date(),
-                situacao: 'Em andamento',
-                dataFinalizacao: null
-            },
-        ];
-        processosStore.processosUnidade = [
-            {
-                id: 101,
-                idProcesso: 1,
-                unidade: 'SESEL',
-                dataLimiteEtapa1: new Date(),
-                dataLimiteEtapa2: new Date(),
-                dataFimEtapa1: null,
-                dataFimEtapa2: null,
-                situacao: 'Aguardando',
-                unidadeAtual: 'SESEL',
-                unidadeAnterior: null
-            },
-            {
-                id: 102,
-                idProcesso: 2,
-                unidade: 'SEDESENV',
-                dataLimiteEtapa1: new Date(),
-                dataLimiteEtapa2: new Date(),
-                dataFimEtapa1: null,
-                dataFimEtapa2: null,
-                situacao: 'Em andamento',
-                unidadeAtual: 'SEDESENV',
-                unidadeAnterior: null
-            },
-        ];
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'SESEL',
-                idProcesso: 1,
-                situacao: 'em_andamento',
-                competencias: [],
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null
-            },
-            {
-                id: 2,
-                unidade: 'SEDESENV',
-                idProcesso: 2,
-                situacao: 'disponivel_validacao',
-                competencias: [],
-                dataCriacao: new Date(),
-                dataDisponibilizacao: new Date(),
-                dataFinalizacao: null
-            },
-        ];
-
         // Resetar o estado das stores
         unidadesStore.$reset();
         atribuicaoTemporariaStore.$reset();
@@ -146,6 +137,7 @@ describe('Subprocesso.vue', () => {
             props: {idProcesso: 1, siglaUnidade: 'SESEL'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find('h2').text()).toBe('SESEL - Seção de Sistemas Eleitorais');
         expect(wrapper.text()).toContain('Responsável: Servidor Teste');
@@ -160,6 +152,7 @@ describe('Subprocesso.vue', () => {
             props: {idProcesso: 1, siglaUnidade: 'SESEL'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.text()).toContain('Atividades e conhecimentos');
         expect(wrapper.text()).toContain('Mapa de Competências');
@@ -173,10 +166,16 @@ describe('Subprocesso.vue', () => {
     });
 
     it('deve exibir cards de Diagnóstico para o tipo de processo correspondente', async () => {
+        // Mock useRoute para retornar idProcesso 2 e siglaUnidade SEDESENV
+        (useRoute as vi.Mock).mockReturnValue({
+            params: {idProcesso: 2, siglaUnidade: 'SEDESENV'},
+        });
+
         const wrapper = mount(Subprocesso, {
             props: {idProcesso: 2, siglaUnidade: 'SEDESENV'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.text()).not.toContain('Atividades e conhecimentos');
         expect(wrapper.text()).not.toContain('Mapa de Competências');
@@ -194,8 +193,11 @@ describe('Subprocesso.vue', () => {
             props: {idProcesso: 1, siglaUnidade: 'SESEL'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
-        await wrapper.findAll('.card-actionable')[0].trigger('click');
+        const cardAtividades = wrapper.findAll('.card-actionable')[0];
+        expect(cardAtividades.exists()).toBe(true);
+        await cardAtividades.trigger('click');
         expect(routerPushMock).toHaveBeenCalledWith({
             name: 'SubprocessoCadastro',
             params: {idProcesso: 1, siglaUnidade: 'SESEL'},
@@ -207,8 +209,11 @@ describe('Subprocesso.vue', () => {
             props: {idProcesso: 1, siglaUnidade: 'SESEL'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
-        await wrapper.findAll('.card-actionable')[1].trigger('click');
+        const cardMapa = wrapper.findAll('.card-actionable')[1];
+        expect(cardMapa.exists()).toBe(true);
+        await cardMapa.trigger('click');
         expect(routerPushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: {idProcesso: 1, siglaUnidade: 'SESEL'},
@@ -221,8 +226,11 @@ describe('Subprocesso.vue', () => {
             props: {idProcesso: 1, siglaUnidade: 'SESEL'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
-        await wrapper.findAll('.card-actionable')[1].trigger('click');
+        const cardMapa = wrapper.findAll('.card-actionable')[1];
+        expect(cardMapa.exists()).toBe(true);
+        await cardMapa.trigger('click');
         expect(routerPushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: {idProcesso: 1, siglaUnidade: 'SESEL'},
@@ -230,12 +238,20 @@ describe('Subprocesso.vue', () => {
     });
 
     it('deve navegar para SubprocessoVisMapa (visualizar) ao clicar em "Mapa de Competências" disponibilizado', async () => {
+        // Mock useRoute para retornar idProcesso 2 e siglaUnidade SEDESENV
+        (useRoute as vi.Mock).mockReturnValue({
+            params: {idProcesso: 2, siglaUnidade: 'SEDESENV'},
+        });
+
         const wrapper = mount(Subprocesso, {
             props: {idProcesso: 2, siglaUnidade: 'SEDESENV'},
             global: {plugins: [createPinia()]},
         });
+        await wrapper.vm.$nextTick();
 
-        await wrapper.findAll('.card-actionable')[1].trigger('click');
+        const cardMapa = wrapper.findAll('.card-actionable')[1];
+        expect(cardMapa.exists()).toBe(true);
+        await cardMapa.trigger('click');
         expect(routerPushMock).toHaveBeenCalledWith({
             name: 'SubprocessoMapa',
             params: {idProcesso: 2, siglaUnidade: 'SEDESENV'},

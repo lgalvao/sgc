@@ -7,289 +7,310 @@ import {useAtividadesStore} from '@/stores/atividades';
 import {useProcessosStore} from '@/stores/processos';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+// Mock de unidades.json
+vi.mock('@/mocks/unidades.json', () => ({
+  default: [
+    { sigla: 'UN1', nome: 'Unidade Teste 1', filhas: [], titular: 1, responsavel: null, tipo: 'OPERACIONAL' },
+  ],
+}));
+
+// Mock de atividades.json
+vi.mock('@/mocks/atividades.json', () => ({
+  default: [
+    { id: 10, descricao: 'Atividade A', idSubprocesso: 101, conhecimentos: [] },
+    { id: 11, descricao: 'Atividade B', idSubprocesso: 101, conhecimentos: [] },
+  ],
+}));
+
+// Mock de mapas.json
+vi.mock('@/mocks/mapas.json', () => ({
+  default: [
+    { id: 1, unidade: 'UN1', idProcesso: 1, situacao: 'em_andamento', competencias: [], dataCriacao: '2025-01-01', dataDisponibilizacao: null, dataFinalizacao: null },
+  ],
+}));
+
 describe('CadMapa.vue', () => {
-    let mapasStore: ReturnType<typeof useMapasStore>;
-    let unidadesStore: ReturnType<typeof useUnidadesStore>;
-    let atividadesStore: ReturnType<typeof useAtividadesStore>;
-    let processosStore: ReturnType<typeof useProcessosStore>;
+  let mapasStore: ReturnType<typeof useMapasStore>;
+  let unidadesStore: ReturnType<typeof useUnidadesStore>;
+  let atividadesStore: ReturnType<typeof useAtividadesStore>;
+  let processosStore: ReturnType<typeof useProcessosStore>;
 
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        mapasStore = useMapasStore();
-        unidadesStore = useUnidadesStore();
-        atividadesStore = useAtividadesStore();
-        processosStore = useProcessosStore();
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    mapasStore = useMapasStore();
+    unidadesStore = useUnidadesStore();
+    atividadesStore = useAtividadesStore();
+    processosStore = useProcessosStore();
 
-        vi.clearAllMocks();
+    vi.clearAllMocks();
 
-        // Mock de dados iniciais para as stores
-        unidadesStore.unidades = [
-            {
-                id: 101,
-                sigla: 'UN1',
-                nome: 'Unidade Teste 1',
-                filhas: [],
-                titular: 1,
-                responsavel: null,
-                tipo: 'OPERACIONAL'
-            }
-        ];
-        processosStore.processosUnidade = [
-            {
-                id: 101,
-                idProcesso: 1,
-                unidade: 'UN1',
-                situacao: 'Em andamento',
-                dataLimiteEtapa1: new Date(),
-                dataLimiteEtapa2: new Date(),
-                dataFimEtapa1: null,
-                dataFimEtapa2: null,
-                unidadeAtual: 'UN1',
-                unidadeAnterior: null
-            },
-        ];
-        atividadesStore.atividades = [
-            {id: 10, descricao: 'Atividade A', idSubprocesso: 101, conhecimentos: []},
-            {id: 11, descricao: 'Atividade B', idSubprocesso: 101, conhecimentos: []},
-        ];
-        mapasStore.mapas = [];
+    // Resetar o estado das stores para garantir isolamento entre os testes
+    mapasStore.$reset();
+    unidadesStore.$reset();
+    atividadesStore.$reset();
+    processosStore.$reset();
 
-        // Espionar métodos das stores
-        vi.spyOn(mapasStore, 'editarMapa');
-        vi.spyOn(mapasStore, 'adicionarMapa');
+    // Configurar dados iniciais para os testes
+    processosStore.processosUnidade = [
+      { id: 101, idProcesso: 1, unidade: 'UN1', situacao: 'Em andamento', dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(), dataFimEtapa1: null, dataFimEtapa2: null, unidadeAtual: 'UN1', unidadeAnterior: null },
+    ];
+  });
 
-        // Resetar o estado das stores para garantir isolamento entre os testes
-        mapasStore.$reset();
-        unidadesStore.$reset();
-        atividadesStore.$reset();
-        processosStore.$reset();
+  it('deve renderizar corretamente com os dados iniciais da unidade', async () => {
+    const wrapper = mount(CadMapa, {
+      props: {
+        sigla: 'UN1',
+        idProcesso: 1,
+      },
+      global: {
+        plugins: [createPinia()],
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('UN1 - Unidade Teste 1');
+    expect(wrapper.find('h2').text()).toBe('Mapa de competências técnicas');
+    expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(true);
+    expect(wrapper.find('button').text()).toContain('Disponibilizar');
+  });
+
+  it('deve abrir e fechar o modal de criação de competência', async () => {
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: { plugins: [createPinia()] },
+    });
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.modal-dialog').exists()).toBe(true);
+    expect(wrapper.find('h5.modal-title').text()).toBe('Criação de competência');
+
+    await wrapper.find('.modal-header button.btn-close').trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.modal-dialog').exists()).toBe(false);
+  });
+
+  it('deve adicionar uma nova competência', async () => {
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: { plugins: [createPinia()] },
+    });
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    await wrapper.find('[data-testid="input-nova-competencia"]').setValue('Nova Competência');
+    await wrapper.find('[data-testid="atividade-checkbox"]').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('[data-testid="btn-criar-competencia"]').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(mapasStore.adicionarMapa).toHaveBeenCalled();
+    expect(wrapper.findAll('[data-testid="competencia-item"]').length).toBe(2);
+    expect(wrapper.findAll('[data-testid="competencia-descricao"]')[1].text()).toBe('Nova Competência');
+  });
+
+  it('deve editar uma competência existente', async () => {
+    mapasStore.mapas = [
+      {
+        id: 1,
+        unidade: 'UN1',
+        idProcesso: 1,
+        competencias: [{ id: 100, descricao: 'Competência Original', atividadesAssociadas: [10] }],
+        situacao: 'em_andamento',
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null,
+      },
+    ];
+
+    const wrapper = mount(CadMapa, {
+      props: {
+        sigla: 'UN1',
+        idProcesso: 1,
+      },
+      global: {
+        plugins: [createPinia()],
+      },
     });
 
-    it('deve renderizar corretamente com os dados iniciais da unidade', async () => {
-        const wrapper = mount(CadMapa, {
-            props: {
-                sigla: 'UN1',
-                idProcesso: 1,
-            },
-            global: {
-                plugins: [createPinia()],
-            },
-        });
+    await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain('UN1 - Unidade Teste 1');
-        expect(wrapper.find('h2').text()).toBe('Mapa de competências técnicas');
-        expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(true);
-        expect(wrapper.find('button').text()).toContain('Disponibilizar');
+    const editarBtn = wrapper.find('[data-testid="btn-editar-competencia"]');
+    expect(editarBtn.exists()).toBe(true);
+    await editarBtn.trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('h5.modal-title').text()).toBe('Edição de competência');
+
+    const inputEditar = wrapper.find('[data-testid="input-nova-competencia"]');
+    await inputEditar.setValue('Competência Editada');
+    const salvarBtn = wrapper.find('[data-testid="btn-criar-competencia"]');
+    expect(salvarBtn.exists()).toBe(true);
+    await salvarBtn.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(mapasStore.editarMapa).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        competencias: expect.arrayContaining([
+          expect.objectContaining({
+            id: 100,
+            descricao: 'Competência Editada',
+          }),
+        ]),
+      })
+    );
+    expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe('Competência Editada');
+  });
+
+  it('deve excluir uma competência', async () => {
+    mapasStore.mapas = [
+      {
+        id: 1,
+        unidade: 'UN1',
+        idProcesso: 1,
+        competencias: [{ id: 100, descricao: 'Competência a Excluir', atividadesAssociadas: [] }],
+        situacao: 'em_andamento',
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null,
+      },
+    ];
+
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: { plugins: [createPinia()] },
     });
+    await wrapper.vm.$nextTick();
 
-    it('deve abrir e fechar o modal de criação de competência', async () => {
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {plugins: [createPinia()]},
-        });
+    const excluirBtn = wrapper.find('[data-testid="btn-excluir-competencia"]');
+    expect(excluirBtn.exists()).toBe(true);
+    await excluirBtn.trigger('click');
+    await wrapper.vm.$nextTick();
 
-        // Abrir modal
-        await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click');
-        expect(wrapper.find('.modal-dialog').exists()).toBe(true);
-        expect(wrapper.find('h5.modal-title').text()).toBe('Criação de competência');
+    expect(mapasStore.editarMapa).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        competencias: [],
+      })
+    );
+    expect(wrapper.findAll('[data-testid="competencia-item"]').length).toBe(0);
+  });
 
-        // Fechar modal
-        await wrapper.find('.modal-header button.btn-close').trigger('click');
-        expect(wrapper.find('.modal-dialog').exists()).toBe(false);
+  it('deve remover uma atividade associada a uma competência', async () => {
+    mapasStore.mapas = [
+      {
+        id: 1,
+        unidade: 'UN1',
+        idProcesso: 1,
+        competencias: [{ id: 100, descricao: 'Competência', actividadesAssociadas: [10, 11] }],
+        situacao: 'em_andamento',
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null,
+      },
+    ];
+
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: { plugins: [createPinia()] },
     });
+    await wrapper.vm.$nextTick();
 
-    it('deve adicionar uma nova competência', async () => {
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {plugins: [createPinia()]},
-        });
+    const removerAtividadeBtn = wrapper.find('.botao-acao-inline');
+    expect(removerAtividadeBtn.exists()).toBe(true);
+    await removerAtividadeBtn.trigger('click');
+    await wrapper.vm.$nextTick();
 
-        await wrapper.find('[data-testid="btn-abrir-criar-competencia"]').trigger('click');
-        await wrapper.find('[data-testid="input-nova-competencia"]').setValue('Nova Competência');
-        await wrapper.find('[data-testid="atividade-checkbox"]').trigger('click'); // Seleciona uma atividade
+    expect(mapasStore.editarMapa).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        competencias: expect.arrayContaining([
+          expect.objectContaining({
+            id: 100,
+            atividadesAssociadas: [11],
+          }),
+        ]),
+      })
+    );
+  });
 
-        await wrapper.find('[data-testid="btn-criar-competencia"]').trigger('click');
+  it('deve abrir o modal de disponibilização e preencher a data limite', async () => {
+    mapasStore.mapas = [
+      {
+        id: 1,
+        unidade: 'UN1',
+        idProcesso: 1,
+        competencias: [{ id: 100, descricao: 'Competência', atividadesAssociadas: [10] }],
+        situacao: 'em_andamento',
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null,
+      },
+    ];
 
-        expect(mapasStore.adicionarMapa).toHaveBeenCalled();
-        expect(wrapper.findAll('[data-testid="competencia-item"]').length).toBe(1);
-        expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe('Nova Competência');
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: { plugins: [createPinia()] },
     });
+    await wrapper.vm.$nextTick();
 
-    it('deve editar uma competência existente', async () => {
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'UN1',
-                idProcesso: 1,
-                competencias: [{id: 100, descricao: 'Competência Original', atividadesAssociadas: [10]}],
-                situacao: 'em_andamento',
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null,
-            },
-        ];
+    const disponibilizarBtn = wrapper.find('button.btn-outline-success');
+    expect(disponibilizarBtn.exists()).toBe(true);
+    await disponibilizarBtn.trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.modal-dialog').exists()).toBe(true);
+    expect(wrapper.find('h5.modal-title').text()).toBe('Disponibilizar Mapa');
 
-        const wrapper = mount(CadMapa, {
-            props: {
-                sigla: 'UN1',
-                idProcesso: 1,
-            },
-            global: {
-                plugins: [createPinia()],
-            },
-        });
+    const inputDataLimite = wrapper.find('#dataLimite');
+    expect(inputDataLimite.exists()).toBe(true);
+    await inputDataLimite.setValue('2025-12-31');
+    expect((inputDataLimite.element as HTMLInputElement).value).toBe('2025-12-31');
+  });
 
-        await wrapper.vm.$nextTick();
+  it('deve disponibilizar o mapa e exibir notificação', async () => {
+    mapasStore.mapas = [
+      {
+        id: 1,
+        unidade: 'UN1',
+        idProcesso: 1,
+        competencias: [{ id: 100, descricao: 'Competência', atividadesAssociadas: [10] }],
+        situacao: 'em_andamento',
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null,
+      },
+    ];
 
-        // Iniciar edição
-        await wrapper.find('[data-testid="btn-editar-competencia"]').trigger('click');
-        expect(wrapper.find('h5.modal-title').text()).toBe('Edição de competência');
-
-        // Editar e salvar
-        await wrapper.find('[data-testid="input-nova-competencia"]').setValue('Competência Editada');
-        await wrapper.find('[data-testid="btn-criar-competencia"]').trigger('click');
-
-        expect(mapasStore.editarMapa).toHaveBeenCalledWith(
-            1,
-            expect.objectContaining({
-                competencias: expect.arrayContaining([
-                    expect.objectContaining({
-                        id: 100,
-                        descricao: 'Competência Editada',
-                    }),
-                ]),
-            })
-        );
-        expect(wrapper.find('[data-testid="competencia-descricao"]').text()).toBe('Competência Editada');
+    const wrapper = mount(CadMapa, {
+      props: { sigla: 'UN1', idProcesso: 1 },
+      global: {
+        plugins: [createPinia()],
+      },
     });
+    await wrapper.vm.$nextTick();
 
-    it('deve excluir uma competência', async () => {
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'UN1',
-                idProcesso: 1,
-                competencias: [{id: 100, descricao: 'Competência a Excluir', atividadesAssociadas: []}],
-                situacao: 'em_andamento',
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null,
-            },
-        ];
+    const disponibilizarBtn = wrapper.find('button.btn-outline-success');
+    expect(disponibilizarBtn.exists()).toBe(true);
+    await disponibilizarBtn.trigger('click');
+    await wrapper.vm.$nextTick();
 
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {plugins: [createPinia()]},
-        });
+    const inputDataLimite = wrapper.find('#dataLimite');
+    expect(inputDataLimite.exists()).toBe(true);
+    await inputDataLimite.setValue('2025-12-31');
+    const confirmarDisponibilizarBtn = wrapper.find('button.btn-success');
+    expect(confirmarDisponibilizarBtn.exists()).toBe(true);
+    await confirmarDisponibilizarBtn.trigger('click');
+    await wrapper.vm.$nextTick();
 
-        await wrapper.vm.$nextTick();
-
-        await wrapper.find('[data-testid="btn-excluir-competencia"]').trigger('click');
-
-        expect(mapasStore.editarMapa).toHaveBeenCalledWith(
-            1,
-            expect.objectContaining({
-                competencias: [],
-            })
-        );
-        expect(wrapper.findAll('[data-testid="competencia-item"]').length).toBe(0);
-    });
-
-    it('deve remover uma atividade associada a uma competência', async () => {
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'UN1',
-                idProcesso: 1,
-                competencias: [{id: 100, descricao: 'Competência', atividadesAssociadas: [10, 11]}],
-                situacao: 'em_andamento',
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null,
-            },
-        ];
-
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {plugins: [createPinia()]},
-        });
-
-        await wrapper.vm.$nextTick();
-
-        await wrapper.find('.botao-acao-inline').trigger('click');
-
-        expect(mapasStore.editarMapa).toHaveBeenCalledWith(
-            1,
-            expect.objectContaining({
-                competencias: expect.arrayContaining([
-                    expect.objectContaining({
-                        id: 100,
-                        atividadesAssociadas: [11],
-                    }),
-                ]),
-            })
-        );
-    });
-
-    it('deve abrir o modal de disponibilização e preencher a data limite', async () => {
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'UN1',
-                idProcesso: 1,
-                competencias: [{id: 100, descricao: 'Competência', atividadesAssociadas: [10]}],
-                situacao: 'em_andamento',
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null,
-            },
-        ];
-
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {plugins: [createPinia()]},
-        });
-
-        await wrapper.find('button.btn-outline-success').trigger('click');
-        expect(wrapper.find('.modal-dialog').exists()).toBe(true);
-        expect(wrapper.find('h5.modal-title').text()).toBe('Disponibilizar Mapa');
-
-        const inputDataLimite = wrapper.find('#dataLimite');
-        await inputDataLimite.setValue('2025-12-31');
-        expect((inputDataLimite.element as HTMLInputElement).value).toBe('2025-12-31');
-    });
-
-    it('deve disponibilizar o mapa e exibir notificação', async () => {
-        mapasStore.mapas = [
-            {
-                id: 1,
-                unidade: 'UN1',
-                idProcesso: 1,
-                competencias: [{id: 100, descricao: 'Competência', atividadesAssociadas: [10]}],
-                situacao: 'em_andamento',
-                dataCriacao: new Date(),
-                dataDisponibilizacao: null,
-                dataFinalizacao: null,
-            },
-        ];
-
-        const wrapper = mount(CadMapa, {
-            props: {sigla: 'UN1', idProcesso: 1},
-            global: {
-                plugins: [createPinia()],
-            },
-        });
-
-        await wrapper.find('button.btn-outline-success').trigger('click');
-        await wrapper.find('#dataLimite').setValue('2025-12-31');
-        await wrapper.find('button.btn-success').trigger('click');
-
-        expect(mapasStore.editarMapa).toHaveBeenCalledWith(
-            1,
-            expect.objectContaining({
-                situacao: 'disponivel_validacao',
-            })
-        );
-        expect(wrapper.find('.alert-info').text()).toContain('O mapa de competências da unidade UN1 foi disponibilizado para validação até 31/12/2025. (Simulação)');
-    });
+    expect(mapasStore.editarMapa).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        situacao: 'disponivel_validacao',
+      })
+    );
+    expect(wrapper.find('.alert-info').text()).toContain('O mapa de competências da unidade UN1 foi disponibilizado para validação até 31/12/2025. (Simulação)');
+  });
 });

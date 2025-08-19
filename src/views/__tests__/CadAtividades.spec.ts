@@ -26,6 +26,70 @@ vi.mock('@/composables/usePerfil', () => ({
     })),
 }));
 
+// Mock de unidades.json
+vi.mock('@/mocks/unidades.json', () => ({
+    default: [
+        {sigla: 'UN1', nome: 'Unidade Teste 1', filhas: [], titular: 1, responsavel: null, tipo: 'OPERACIONAL'},
+        {sigla: 'UN2', nome: 'Unidade Teste 2', filhas: [], titular: 2, responsavel: null, tipo: 'OPERACIONAL'},
+    ],
+}));
+
+// Mock de atividades.json
+vi.mock('@/mocks/atividades.json', () => ({
+    default: [
+        {
+            id: 1,
+            descricao: 'Manutenção de sistemas administrativos criados pela unidade',
+            idSubprocesso: 101,
+            conhecimentos: []
+        },
+        {id: 2, descricao: 'Especificação de sistemas administrativos', idSubprocesso: 101, conhecimentos: []},
+    ],
+}));
+
+// Mock de processos.json
+vi.mock('@/mocks/processos.json', () => ({
+    default: [
+        {
+            id: 1,
+            descricao: 'Processo Teste',
+            tipo: ProcessoTipo.MAPEAMENTO,
+            dataLimite: '2025-12-31',
+            situacao: 'Finalizado'
+        },
+    ],
+}));
+
+// Mock de subprocessos.json
+vi.mock('@/mocks/subprocessos.json', () => ({
+    default: [
+        {
+            id: 101,
+            idProcesso: 1,
+            unidade: 'UN1',
+            situacao: 'Em andamento',
+            dataLimiteEtapa1: '2025-12-20',
+            dataLimiteEtapa2: '2025-12-25',
+            dataFimEtapa1: null,
+            dataFimEtapa2: null,
+            unidadeAtual: 'UN1',
+            unidadeAnterior: null
+        },
+        {
+            id: 102,
+            idProcesso: 1,
+            unidade: 'UN2',
+            situacao: 'Em andamento',
+            dataLimiteEtapa1: '2025-12-20',
+            dataLimiteEtapa2: '2025-12-25',
+            dataFimEtapa1: null,
+            dataFimEtapa2: null,
+            unidadeAtual: 'UN2',
+            unidadeAnterior: null
+        },
+    ],
+}));
+
 describe('CadAtividades.vue', () => {
     let atividadesStore: ReturnType<typeof useAtividadesStore>;
     let unidadesStore: ReturnType<typeof useUnidadesStore>;
@@ -38,72 +102,6 @@ describe('CadAtividades.vue', () => {
         processosStore = useProcessosStore();
 
         vi.clearAllMocks();
-
-        // Mock de dados iniciais para as stores
-        unidadesStore.unidades = [
-            {
-                id: 101,
-                sigla: 'UN1',
-                nome: 'Unidade Teste 1',
-                filhas: [],
-                titular: 1,
-                responsavel: null,
-                tipo: 'OPERACIONAL'
-            },
-            {
-                id: 102,
-                sigla: 'UN2',
-                nome: 'Unidade Teste 2',
-                filhas: [],
-                titular: 2,
-                responsavel: null,
-                tipo: 'OPERACIONAL'
-            },
-        ];
-        processosStore.processosUnidade = [
-            {
-                id: 101,
-                idProcesso: 1,
-                unidade: 'UN1',
-                situacao: 'Em andamento',
-                dataLimiteEtapa1: new Date(),
-                dataLimiteEtapa2: new Date(),
-                dataFimEtapa1: null,
-                dataFimEtapa2: null,
-                unidadeAtual: 'UN1',
-                unidadeAnterior: null
-            },
-            {
-                id: 102,
-                idProcesso: 1,
-                unidade: 'UN2',
-                situacao: 'Em andamento',
-                dataLimiteEtapa1: new Date(),
-                dataLimiteEtapa2: new Date(),
-                dataFimEtapa1: null,
-                dataFimEtapa2: null,
-                unidadeAtual: 'UN2',
-                unidadeAnterior: null
-            },
-        ];
-        processosStore.processos = [
-            {
-                id: 1,
-                descricao: 'Processo Teste',
-                tipo: ProcessoTipo.MAPEAMENTO,
-                situacao: 'Finalizado',
-                dataLimite: new Date()
-            },
-        ];
-
-        // Espionar métodos das stores
-        vi.spyOn(atividadesStore, 'adicionarAtividade');
-        vi.spyOn(atividadesStore, 'removerAtividade');
-        vi.spyOn(atividadesStore, 'adicionarConhecimento');
-        vi.spyOn(atividadesStore, 'removerConhecimento');
-        vi.spyOn(atividadesStore, 'setAtividades');
-        vi.spyOn(atividadesStore, 'adicionarMultiplasAtividades');
-        vi.spyOn(atividadesStore, 'fetchAtividadesPorSubprocesso');
 
         // Resetar o estado das stores para garantir isolamento entre os testes
         atividadesStore.$reset();
@@ -121,6 +119,7 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         expect(wrapper.text()).toContain('UN1 - Unidade Teste 1');
         expect(wrapper.find('h1').text()).toBe('Atividades e conhecimentos');
@@ -138,10 +137,12 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         const inputAtividade = wrapper.find('[data-testid="input-nova-atividade"]');
         await inputAtividade.setValue('Nova Atividade de Teste');
         await wrapper.find('[data-testid="btn-adicionar-atividade"]').trigger('submit');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.adicionarAtividade).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -163,10 +164,12 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         const inputAtividade = wrapper.find('[data-testid="input-nova-atividade"]');
         await inputAtividade.setValue('');
         await wrapper.find('[data-testid="btn-adicionar-atividade"]').trigger('submit');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.adicionarAtividade).not.toHaveBeenCalled();
     });
@@ -188,12 +191,13 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        // Esperar a renderização das atividades
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização das atividades
 
         // Encontrar o botão de remover da primeira atividade
         const removerBtn = wrapper.findAll('[data-testid="btn-remover-atividade"]')[0];
+        expect(removerBtn.exists()).toBe(true); // Verificar se o botão existe
         await removerBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.removerAtividade).toHaveBeenCalledWith(1);
     });
@@ -213,18 +217,23 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         // Iniciar edição
-        await wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
+        const editarBtn = wrapper.find('[data-testid="btn-editar-atividade"]');
+        expect(editarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await editarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
         expect(wrapper.find('[data-testid="input-editar-atividade"]').exists()).toBe(true);
 
         // Editar e salvar
         const inputEditar = wrapper.find('[data-testid="input-editar-atividade"]');
         await inputEditar.setValue('Atividade Editada');
-        await wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
+        const salvarBtn = wrapper.find('[data-testid="btn-salvar-edicao-atividade"]');
+        expect(salvarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await salvarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
-        // Verifica se setAtividades foi chamado com a atividade atualizada
         expect(atividadesStore.setAtividades).toHaveBeenCalledWith(
             101,
             expect.arrayContaining([
@@ -253,14 +262,20 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         // Iniciar edição
-        await wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
+        const editarBtn = wrapper.find('[data-testid="btn-editar-atividade"]');
+        expect(editarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await editarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
         expect(wrapper.find('[data-testid="input-editar-atividade"]').exists()).toBe(true);
 
         // Cancelar edição
-        await wrapper.find('[data-testid="btn-cancelar-edicao-atividade"]').trigger('click');
+        const cancelarBtn = wrapper.find('[data-testid="btn-cancelar-edicao-atividade"]');
+        expect(cancelarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await cancelarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(wrapper.find('[data-testid="input-editar-atividade"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="atividade-descricao"]').text()).toBe('Atividade Original');
@@ -281,11 +296,15 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         const inputNovoConhecimento = wrapper.find('[data-testid="input-novo-conhecimento"]');
+        expect(inputNovoConhecimento.exists()).toBe(true); // Verificar se o input existe
         await inputNovoConhecimento.setValue('Novo Conhecimento');
-        await wrapper.find('[data-testid="btn-adicionar-conhecimento"]').trigger('submit');
+        const adicionarConhecimentoBtn = wrapper.find('[data-testid="btn-adicionar-conhecimento"]');
+        expect(adicionarConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
+        await adicionarConhecimentoBtn.trigger('submit');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.adicionarConhecimento).toHaveBeenCalledWith(
             1,
@@ -316,10 +335,12 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         const removerConhecimentoBtn = wrapper.find('[data-testid="btn-remover-conhecimento"]');
+        expect(removerConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
         await removerConhecimentoBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.removerConhecimento).toHaveBeenCalledWith(1, 10);
     });
@@ -344,18 +365,23 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         // Iniciar edição
-        await wrapper.find('[data-testid="btn-editar-conhecimento"]').trigger('click');
+        const editarConhecimentoBtn = wrapper.find('[data-testid="btn-editar-conhecimento"]');
+        expect(editarConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
+        await editarConhecimentoBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
         expect(wrapper.find('[data-testid="input-editar-conhecimento"]').exists()).toBe(true);
 
         // Editar e salvar
-        const inputEditar = wrapper.find('[data-testid="input-editar-conhecimento"]');
-        await inputEditar.setValue('Conhecimento Editado');
-        await wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
+        const inputEditarConhecimento = wrapper.find('[data-testid="input-editar-conhecimento"]');
+        await inputEditarConhecimento.setValue('Conhecimento Editado');
+        const salvarConhecimentoBtn = wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]');
+        expect(salvarConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
+        await salvarConhecimentoBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
-        // Verifica se setAtividades foi chamado com o conhecimento atualizado
         expect(atividadesStore.setAtividades).toHaveBeenCalledWith(
             101,
             expect.arrayContaining([
@@ -394,14 +420,20 @@ describe('CadAtividades.vue', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
         // Iniciar edição
-        await wrapper.find('[data-testid="btn-editar-conhecimento"]').trigger('click');
+        const editarConhecimentoBtn = wrapper.find('[data-testid="btn-editar-conhecimento"]');
+        expect(editarConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
+        await editarConhecimentoBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
         expect(wrapper.find('[data-testid="input-editar-conhecimento"]').exists()).toBe(true);
 
         // Cancelar edição
-        await wrapper.find('[data-testid="btn-cancelar-edicao-conhecimento"]').trigger('click');
+        const cancelarConhecimentoBtn = wrapper.find('[data-testid="btn-cancelar-edicao-conhecimento"]');
+        expect(cancelarConhecimentoBtn.exists()).toBe(true); // Verificar se o botão existe
+        await cancelarConhecimentoBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(wrapper.find('[data-testid="input-editar-conhecimento"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="conhecimento-descricao"]').text()).toBe('Conhecimento Original');
@@ -414,6 +446,7 @@ describe('CadAtividades.vue', () => {
             props: {idProcesso: 1, sigla: 'UN1'},
             global: {plugins: [createPinia()]},
         });
+        await wrapperAdmin.vm.$nextTick(); // Esperar a renderização
         expect(wrapperAdmin.find('button[title="Importar"]').exists()).toBe(true);
 
         // @ts-ignore
@@ -422,6 +455,7 @@ describe('CadAtividades.vue', () => {
             props: {idProcesso: 1, sigla: 'UN1'},
             global: {plugins: [createPinia()]},
         });
+        await wrapperServidor.vm.$nextTick(); // Esperar a renderização
         expect(wrapperServidor.find('button[title="Importar"]').exists()).toBe(false);
     });
 
@@ -435,9 +469,12 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
-        await wrapper.find('button[title="Importar"]').trigger('click');
-        await wrapper.vm.$nextTick();
+        const importarBtn = wrapper.find('button[title="Importar"]');
+        expect(importarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await importarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a renderização do modal
 
         const options = wrapper.findAll('#processo-select option');
         expect(options.length).toBe(2);
@@ -481,12 +518,17 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
-        await wrapper.find('button[title="Importar"]').trigger('click');
-        await wrapper.vm.$nextTick();
+        const importarBtn = wrapper.find('button[title="Importar"]');
+        expect(importarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await importarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a renderização do modal
 
-        await wrapper.find('#processo-select').setValue(1);
-        await wrapper.vm.$nextTick();
+        const processoSelect = wrapper.find('#processo-select');
+        expect(processoSelect.exists()).toBe(true); // Verificar se o select existe
+        await processoSelect.setValue(1);
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         const options = wrapper.findAll('#unidade-select option');
         expect(options.length).toBe(3);
@@ -508,15 +550,22 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
-        await wrapper.find('button[title="Importar"]').trigger('click');
-        await wrapper.vm.$nextTick();
+        const importarBtn = wrapper.find('button[title="Importar"]');
+        expect(importarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await importarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a renderização do modal
 
-        await wrapper.find('#processo-select').setValue(1);
-        await wrapper.vm.$nextTick();
+        const processoSelect = wrapper.find('#processo-select');
+        expect(processoSelect.exists()).toBe(true); // Verificar se o select existe
+        await processoSelect.setValue(1);
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
-        await wrapper.find('#unidade-select').setValue(102);
-        await wrapper.vm.$nextTick();
+        const unidadeSelect = wrapper.find('#unidade-select');
+        expect(unidadeSelect.exists()).toBe(true); // Verificar se o select existe
+        await unidadeSelect.setValue(102);
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.fetchAtividadesPorSubprocesso).toHaveBeenCalledWith(102);
         expect(wrapper.find('.atividades-container').text()).toContain('Atividade Importada');
@@ -536,19 +585,35 @@ describe('CadAtividades.vue', () => {
                 plugins: [createPinia()],
             },
         });
+        await wrapper.vm.$nextTick(); // Esperar a renderização
 
-        await wrapper.find('button[title="Importar"]').trigger('click');
-        await wrapper.vm.$nextTick();
+        const importarBtn = wrapper.find('button[title="Importar"]');
+        expect(importarBtn.exists()).toBe(true); // Verificar se o botão existe
+        await importarBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a renderização do modal
 
-        await wrapper.find('#processo-select').setValue(1);
-        await wrapper.vm.$nextTick();
+        const processoSelect = wrapper.find('#processo-select');
+        expect(processoSelect.exists()).toBe(true); // Verificar se o select existe
+        await processoSelect.setValue(1);
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
-        await wrapper.find('#unidade-select').setValue(102);
-        await wrapper.vm.$nextTick();
+        const unidadeSelect = wrapper.find('#unidade-select');
+        expect(unidadeSelect.exists()).toBe(true); // Verificar se o select existe
+        await unidadeSelect.setValue(102);
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
-        await wrapper.find('#ativ-check-20').setValue(true);
+        // Seleciona a atividade para importar
+        const ativCheck = wrapper.find('#ativ-check-20');
+        expect(ativCheck.exists()).toBe(true); // Verificar se o checkbox existe
+        await ativCheck.setValue(true);
+
+        // Espiona o metodo hide do modal
         const modalHideSpy = vi.spyOn(mockModal.getInstance(), 'hide');
-        await wrapper.find('button.btn-outline-primary').trigger('click');
+
+        const importarAtividadesBtn = wrapper.find('button.btn-outline-primary');
+        expect(importarAtividadesBtn.exists()).toBe(true); // Verificar se o botão existe
+        await importarAtividadesBtn.trigger('click');
+        await wrapper.vm.$nextTick(); // Esperar a re-renderização
 
         expect(atividadesStore.adicionarMultiplasAtividades).toHaveBeenCalledWith(
             expect.arrayContaining([
@@ -559,21 +624,6 @@ describe('CadAtividades.vue', () => {
             ])
         );
         expect(modalHideSpy).toHaveBeenCalled();
-        // Corrigido: cast para HTMLSelectElement
         expect((wrapper.find('#processo-select').element as HTMLSelectElement).value).toBe('');
     });
-
-    // Teste removido pois a função não é exposta e não pode ser espionada diretamente
-    // it('deve chamar disponibilizarCadastro ao clicar no botão', async () => {
-    //   const wrapper = mount(CadAtividades, {
-    //     props: { idProcesso: 1, sigla: 'UN1' },
-    //     global: { plugins: [createPinia()] },
-    //   });
-    //
-    //   const disponibilizarCadastroSpy = vi.spyOn(wrapper.vm, 'disponibilizarCadastro');
-    //
-    //   await wrapper.find('button[title="Disponibilizar"]').trigger('click');
-    //
-    //   expect(disponibilizarCadastroSpy).toHaveBeenCalled();
-    // });
 });
