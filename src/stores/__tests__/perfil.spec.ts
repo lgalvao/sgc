@@ -27,7 +27,7 @@ describe('usePerfilStore', () => {
     beforeEach(() => {
         // Clear the mock localStorage before each test
         mockLocalStorage.clear();
-        mockLocalStorage.setItem('servidorId', '9'); // Set default for initial state
+        mockLocalStorage.setItem('idServidor', '9'); // Set default for initial state
 
         setActivePinia(createPinia());
         perfilStore = usePerfilStore();
@@ -42,7 +42,7 @@ describe('usePerfilStore', () => {
     });
 
     it('should initialize with values from localStorage if available', () => {
-        mockLocalStorage.setItem('servidorId', '10');
+        mockLocalStorage.setItem('idServidor', '10');
         mockLocalStorage.setItem('perfilSelecionado', 'USER');
         mockLocalStorage.setItem('unidadeSelecionada', 'XYZ');
 
@@ -56,10 +56,10 @@ describe('usePerfilStore', () => {
     });
 
     describe('actions', () => {
-        it('setServidorId should update servidorId and store it in localStorage', () => {
+        it('setServidorId should update idServidor and store it in localStorage', () => {
             perfilStore.setServidorId(15);
             expect(perfilStore.servidorId).toBe(15);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('servidorId', '15');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('idServidor', '15');
         });
 
         it('setPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage', () => {

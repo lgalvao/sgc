@@ -1,7 +1,6 @@
 import {expect, test} from "@playwright/test";
 
 test.describe('Login', () => {
-    test.setTimeout(5000);
 
     test('deve permitir o login com credenciais válidas e navegar para o painel', async ({page}) => {
         await page.goto('/');

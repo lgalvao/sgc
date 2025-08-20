@@ -26,7 +26,7 @@ funcionalidades já implementadas e outras em andamento.
 - **Perfis de Usuário**:
     - O perfil de usuário (ADMIN, GESTOR, CHEFE, SERVIDOR) é determinado dinamicamente com base na lotação do servidor
       logado, através do composable `usePerfil`.
-    - O `servidorId` do usuário logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
+    - O `idServidor` do usuário logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
 - **Login**:
     - A tela de login permite ao usuário "logar" como qualquer servidor cadastrado
     - Essa tela apresenta um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
@@ -65,7 +65,7 @@ funcionalidades já implementadas e outras em andamento.
       busca por mapa vigente (`getMapaVigentePorUnidade`).
     - `atividades.ts`: Gerencia atividades e conhecimentos.
     - `atribuicaoTemporaria.ts`: Gerencia atribuições temporárias.
-    - `perfil.ts`: Gerencia o `servidorId`, o perfil e a unidade selecionados do usuário logado, persistindo-os no
+    - `perfil.ts`: Gerencia o `idServidor`, o perfil e a unidade selecionados do usuário logado, persistindo-os no
       localStorage.
     - `servidores.ts`: Gerencia os dados dos servidores.
     - `unidades.ts`: Gerencia as unidades organizacionais e inclui a função `pesquisarUnidade` para busca hierárquica.

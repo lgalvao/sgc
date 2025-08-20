@@ -90,7 +90,7 @@ const servidoresDaUnidade = computed<Servidor[]>(() => {
 const servidoresElegiveis = computed<Servidor[]>(() => {
   const titularId = unidade.value?.titular
   return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidorId === servidor.id)
+    const jaTemAtribuicao = atribuicoes.value.some(a => a.idServidor === servidor.id)
     return servidor.id !== titularId && !jaTemAtribuicao
   })
 })
@@ -102,7 +102,7 @@ function criarAtribuicao() {
     return
   }
 
-  if (atribuicoes.value.some(a => a.servidorId === servidorSelecionado.value)) {
+  if (atribuicoes.value.some(a => a.idServidor === servidorSelecionado.value)) {
     erroServidor.value = "Este servidor já possui atribuição temporária nesta unidade."
     return
   }

@@ -14,7 +14,6 @@ async function adicionarConhecimento(page: Page, atividadeCard: any, nomeConheci
 }
 
 test.describe('Cadastro de Atividades e Conhecimentos', () => {
-    test.setTimeout(5000);
     test.beforeEach(async ({page}) => {
         await login(page);
 

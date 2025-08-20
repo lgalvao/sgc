@@ -36,7 +36,7 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(atribuicaoTemporariaStore.atribuicoes[0]).toEqual(novaAtribuicao);
         });
 
-        it('getAtribuicoesPorServidor should filter atribuicoes by servidorId', () => {
+        it('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
             const atribuicao1: AtribuicaoTemporaria = {
                 unidade: 'A', servidorId: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
             };
@@ -59,7 +59,7 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(result).not.toContain(atribuicao2); // This assertion should still work as it's a different object
         });
 
-        it('getAtribuicoesPorServidor should return an empty array if no matching servidorId', () => {
+        it('getAtribuicoesPorServidor should return an empty array if no matching idServidor', () => {
             const atribuicao1: AtribuicaoTemporaria = {
                 unidade: 'A', servidorId: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
             };

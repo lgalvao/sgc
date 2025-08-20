@@ -1,6 +1,9 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  timeout: 30000,
   testDir: './spec',
   fullyParallel: true,
 

@@ -1,7 +1,5 @@
-export type DataISO = Date;
-export type DataHoraISO = Date;
-
 // noinspection JSUnusedGlobalSymbols
+
 export enum ProcessoTipo {
     MAPEAMENTO = 'Mapeamento',
     REVISAO = 'Revisão',
@@ -12,19 +10,19 @@ export interface Processo {
     id: number;
     descricao: string;
     tipo: ProcessoTipo;
-    dataLimite: DataISO;
+    dataLimite: Date;
     situacao: string;
-    dataFinalizacao?: DataISO | null;
+    dataFinalizacao: Date | null;
 }
 
 export interface Subprocesso {
     id: number;
     idProcesso: number;
     unidade: string;
-    dataLimiteEtapa1: DataISO;
-    dataLimiteEtapa2: DataISO;
-    dataFimEtapa1: DataISO | null;
-    dataFimEtapa2: DataISO | null;
+    dataLimiteEtapa1: Date;
+    dataLimiteEtapa2: Date | null;
+    dataFimEtapa1: Date | null;
+    dataFimEtapa2: Date | null;
     situacao: string;
     unidadeAtual: string;
     unidadeAnterior: string | null;
@@ -60,9 +58,9 @@ export interface Mapa {
     situacao: string;
     idProcesso: number;
     competencias: Competencia[];
-    dataCriacao: DataISO;
-    dataDisponibilizacao: DataISO | null;
-    dataFinalizacao: DataISO | null;
+    dataCriacao: Date;
+    dataDisponibilizacao: Date | null;
+    dataFinalizacao: Date | null;
 }
 
 export interface Conhecimento {
@@ -82,15 +80,15 @@ export interface Alerta {
     id: number;
     unidadeOrigem: string;
     unidadeDestino: string;
-    dataHora: DataHoraISO;
+    dataHora: Date;
     idProcesso: number;
     descricao: string;
 }
 
 export interface AtribuicaoTemporaria {
     unidade: string;
-    servidorId: number;
-    dataInicio: DataISO;
-    dataTermino: DataISO;
+    idServidor: number;
+    dataInicio: Date;
+    dataTermino: Date;
     justificativa: string;
 }
