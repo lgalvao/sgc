@@ -1,9 +1,13 @@
-// noinspection JSUnusedGlobalSymbols
-
 export enum TipoProcesso {
     MAPEAMENTO = 'Mapeamento',
     REVISAO = 'Revisão',
     DIAGNOSTICO = 'Diagnóstico',
+}
+
+export enum SituacaoProcesso {
+    CRIADO = 'Criado',
+    EM_ANDAMENTO = 'Em andamento',
+    FINALIZADO = 'Finalizado',
 }
 
 export interface Processo {
@@ -11,7 +15,7 @@ export interface Processo {
     descricao: string;
     tipo: TipoProcesso;
     dataLimite: Date;
-    situacao: string;
+    situacao: SituacaoProcesso;
     dataFinalizacao: Date | null;
 }
 
@@ -19,13 +23,13 @@ export interface Subprocesso {
     id: number;
     idProcesso: number;
     unidade: string;
-    dataLimiteEtapa1: Date;
-    dataLimiteEtapa2: Date | null;
-    dataFimEtapa1: Date | null;
-    dataFimEtapa2: Date | null;
     situacao: string;
     unidadeAtual: string;
     unidadeAnterior: string | null;
+    dataLimiteEtapa1: Date;
+    dataFimEtapa1: Date | null;
+    dataLimiteEtapa2: Date | null;
+    dataFimEtapa2: Date | null;
 }
 
 export interface Unidade {

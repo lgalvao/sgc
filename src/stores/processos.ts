@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
-import type {Processo, Subprocesso} from '@/types/tipos'
+import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos'
 
 function parseProcessoDates(processo: any): Processo {
     return {
@@ -43,7 +43,7 @@ export const useProcessosStore = defineStore('processos', {
         finalizarProcesso(idProcesso: number) {
             const processo = this.processos.find(p => p.id === idProcesso);
             if (processo) {
-                processo.situacao = 'Finalizado';
+                processo.situacao = SituacaoProcesso.FINALIZADO;
                 processo.dataFinalizacao = new Date(); // Agora é um objeto Date
             }
         }

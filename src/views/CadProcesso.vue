@@ -91,7 +91,7 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
-import {TipoProcesso, Unidade} from '@/types/tipos'
+import {SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
@@ -141,15 +141,13 @@ function salvarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),
-    situacao: 'Não iniciado',
+    situacao: SituacaoProcesso.CRIADO,
     dataFinalizacao: null
   };
   processosStore.adicionarProcesso(novo);
   processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
   feedback.value = 'Processo salvo com sucesso!';
-  setTimeout(() => {
-    router.push('/painel');
-  }, 1000);
+  router.push('/painel');
   limparCampos();
 }
 
@@ -167,7 +165,7 @@ function iniciarProcesso() {
     idProcesso: novoidProcesso,
     unidade: unidadeSigla,
     dataLimiteEtapa1: new Date(dataLimite.value),
-    dataLimiteEtapa2: new Date(dataLimite.value),
+    dataLimiteEtapa2: null,
     dataFimEtapa1: null,
     dataFimEtapa2: null,
     unidadeAtual: unidadeSigla, // Inicializa com a própria unidade
@@ -180,16 +178,14 @@ function iniciarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),
-    situacao: 'Iniciado',
+    situacao: SituacaoProcesso.EM_ANDAMENTO,
     dataFinalizacao: null
   };
 
   processosStore.adicionarProcesso(novo);
   processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
   feedback.value = 'Processo iniciado! Notificações enviadas às unidades.'
-  setTimeout(() => {
-    router.push('/painel')
-  }, 1200)
+  router.push('/painel')
   limparCampos()
 }
 

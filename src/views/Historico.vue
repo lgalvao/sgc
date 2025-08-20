@@ -45,7 +45,7 @@ import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
-import {Processo, Subprocesso} from '@/types/tipos' // Import Processo and Subprocesso types
+import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos' // Import Processo and Subprocesso types
 
 type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
@@ -57,7 +57,7 @@ const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
 const processosFinalizados = computed(() =>
-    processos.value.filter((p: Processo) => p.situacao === 'Finalizado')
+    processos.value.filter((p: Processo) => p.situacao === SituacaoProcesso.FINALIZADO)
 )
 
 const processosFinalizadosOrdenados = computed(() => {

@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useProcessosStore} from '../processos';
-import {Processo, Subprocesso, TipoProcesso} from '@/types/tipos';
+import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 
 // Mock the JSON imports
 vi.mock('../../mocks/processos.json', () => ({
@@ -173,7 +173,7 @@ describe('useProcessosStore', () => {
                 descricao: 'Novo Processo de Teste',
                 tipo: TipoProcesso.DIAGNOSTICO,
                 dataLimite: new Date('2025-12-31'),
-                situacao: 'Em andamento',
+                situacao: SituacaoProcesso.EM_ANDAMENTO,
                 dataFinalizacao: null
             };
             const initialLength = processosStore.processos.length;
@@ -216,7 +216,7 @@ describe('useProcessosStore', () => {
             processosStore.finalizarProcesso(2); // Processo with id 2 is 'Em andamento'
 
             const processoFinalizado = processosStore.processos.find(p => p.id === 2);
-            expect(processoFinalizado?.situacao).toBe('Finalizado');
+            expect(processoFinalizado?.situacao).toBe(SituacaoProcesso.FINALIZADO);
             expect(processoFinalizado?.dataFinalizacao).toEqual(now);
 
             vi.useRealTimers();

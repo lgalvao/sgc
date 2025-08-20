@@ -2,8 +2,6 @@ import {expect, test} from "@playwright/test";
 import {login} from "./utils/auth";
 
 test.describe('Relatórios', () => {
-    test.setTimeout(5000);
-
     test.beforeEach(async ({page}) => {
         await login(page);
 

@@ -15,4 +15,7 @@ app.use(pinia);
 window.pinia = pinia;
 
 app.use(router);
-app.mount("#app");
+app.mount('#app')
+
+// Expose Pinia instance globally for Playwright testing (optional, for dev/test environments)
+(window as any).__pinia__ = pinia;

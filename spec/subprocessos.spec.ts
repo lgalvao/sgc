@@ -4,8 +4,6 @@ import {useMapasStore} from "../src/stores/mapas";
 import {createPinia, setActivePinia} from "pinia";
 
 test.describe('Detalhes da Unidade no Processo', () => {
-    test.setTimeout(5000);
-
     test.beforeEach(async ({page}) => {
         await login(page);
 

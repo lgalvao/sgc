@@ -1,7 +1,8 @@
 <template>
   <div class="container mt-4">
     <!-- Modal de Importação de Atividades -->
-    <div id="importarAtividadesModal" aria-hidden="true" aria-labelledby="importarAtividadesModalLabel" class="modal fade"
+    <div id="importarAtividadesModal" aria-hidden="true" aria-labelledby="importarAtividadesModalLabel"
+         class="modal fade"
          tabindex="-1">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -42,7 +43,8 @@
               <h6>Atividades para importar</h6>
               <div v-if="atividadesParaImportar.length" class="atividades-container border rounded p-2">
                 <div v-for="ativ in atividadesParaImportar" :key="ativ.id" class="form-check">
-                  <input :id="`ativ-check-${ativ.id}`" v-model="atividadesSelecionadas" :value="ativ" class="form-check-input"
+                  <input :id="`ativ-check-${ativ.id}`" v-model="atividadesSelecionadas" :value="ativ"
+                         class="form-check-input"
                          type="checkbox">
                   <label :for="`ativ-check-${ativ.id}`" class="form-check-label">
                     {{ ativ.descricao }}
@@ -88,7 +90,8 @@
     <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" data-testid="input-nova-atividade" placeholder="Nova atividade"
+        <input v-model="novaAtividade" class="form-control" data-testid="input-nova-atividade"
+               placeholder="Nova atividade"
                type="text"/>
       </div>
       <div class="col-auto">
@@ -122,8 +125,10 @@
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <button class="btn btn-sm btn-outline-primary botao-acao"
                       data-bs-toggle="tooltip" data-testid="btn-editar-atividade"
-                      title="Editar" @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip" data-testid="btn-remover-atividade"
+                      title="Editar" @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"><i
+                  class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
+                      data-testid="btn-remover-atividade"
                       title="Remover" @click="removerAtividade(idx)"><i
                   class="bi bi-trash"></i></button>
             </div>
@@ -152,7 +157,8 @@
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                 <button class="btn btn-sm btn-outline-primary botao-acao"
                         data-bs-toggle="tooltip"
-                        data-testid="btn-editar-conhecimento" title="Editar" @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"><i
+                        data-testid="btn-editar-conhecimento" title="Editar"
+                        @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"><i
                     class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
                         data-testid="btn-remover-conhecimento"
@@ -168,7 +174,8 @@
                      placeholder="Novo conhecimento" type="text"/>
             </div>
             <div class="col-auto">
-              <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"
+              <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
+                      data-testid="btn-adicionar-conhecimento"
                       title="Adicionar Conhecimento" type="submit"><i
                   class="bi bi-save"></i></button>
             </div>
@@ -186,7 +193,7 @@ import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {Atividade, Processo, TipoProcesso, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -398,7 +405,7 @@ watch(unidadeSelecionadaId, (newId) => {
 // Computed property para processos disponíveis para importação
 const processosDisponiveis = computed<Processo[]>(() => {
   return processosStore.processos.filter(p =>
-      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'Finalizado'
+      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === SituacaoProcesso.FINALIZADO
   )
 })
 

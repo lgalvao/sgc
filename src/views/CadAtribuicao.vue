@@ -25,7 +25,8 @@
 
           <div class="mb-3">
             <label class="form-label" for="justificativa">Justificativa</label>
-            <textarea id="justificativa" v-model="justificativa" class="form-control" data-testid="textarea-justificativa"
+            <textarea id="justificativa" v-model="justificativa" class="form-control"
+                      data-testid="textarea-justificativa"
                       required></textarea>
           </div>
           <button class="btn btn-primary" data-testid="btn-criar-atribuicao" type="submit">Criar</button>
@@ -108,7 +109,7 @@ function criarAtribuicao() {
   }
   atribuicaoStore.criarAtribuicao({
     unidade: sigla.value,
-    servidorId: servidorSelecionado.value,
+    idServidor: servidorSelecionado.value,
     dataInicio: new Date(),
     dataTermino: new Date(dataTermino.value),
     justificativa: justificativa.value
