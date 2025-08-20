@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-export enum ProcessoTipo {
+export enum TipoProcesso {
     MAPEAMENTO = 'Mapeamento',
     REVISAO = 'Revisão',
     DIAGNOSTICO = 'Diagnóstico',
@@ -9,7 +9,7 @@ export enum ProcessoTipo {
 export interface Processo {
     id: number;
     descricao: string;
-    tipo: ProcessoTipo;
+    tipo: TipoProcesso;
     dataLimite: Date;
     situacao: string;
     dataFinalizacao: Date | null;

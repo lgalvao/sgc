@@ -186,7 +186,7 @@ import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {Atividade, Processo, ProcessoTipo, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Processo, TipoProcesso, Subprocesso, Unidade} from '@/types/tipos'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -398,7 +398,7 @@ watch(unidadeSelecionadaId, (newId) => {
 // Computed property para processos disponíveis para importação
 const processosDisponiveis = computed<Processo[]>(() => {
   return processosStore.processos.filter(p =>
-      (p.tipo === ProcessoTipo.MAPEAMENTO || p.tipo === ProcessoTipo.REVISAO) && p.situacao === 'Finalizado'
+      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'Finalizado'
   )
 })
 

@@ -12,7 +12,7 @@
       <div class="mb-3">
         <label class="form-label" for="tipo">Tipo</label>
         <select id="tipo" v-model="tipo" class="form-select">
-          <option v-for="tipoOption in ProcessoTipo" :key="tipoOption" :value="tipoOption">
+          <option v-for="tipoOption in TipoProcesso" :key="tipoOption" :value="tipoOption">
             {{ tipoOption }}
           </option>
         </select>
@@ -91,11 +91,11 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
-import {ProcessoTipo, Unidade} from '@/types/tipos'
+import {TipoProcesso, Unidade} from '@/types/tipos'
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
-const tipo = ref<ProcessoTipo>(ProcessoTipo.MAPEAMENTO)
+const tipo = ref<TipoProcesso>(TipoProcesso.MAPEAMENTO)
 const dataLimite = ref<string>('')
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -104,7 +104,7 @@ const unidadesStore = useUnidadesStore()
 
 function limparCampos() {
   descricao.value = ''
-  tipo.value = ProcessoTipo.MAPEAMENTO
+  tipo.value = TipoProcesso.MAPEAMENTO
   dataLimite.value = ''
   unidadesSelecionadas.value = []
 }
@@ -141,7 +141,8 @@ function salvarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),
-    situacao: 'Não iniciado'
+    situacao: 'Não iniciado',
+    dataFinalizacao: null
   };
   processosStore.adicionarProcesso(novo);
   processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
@@ -179,7 +180,8 @@ function iniciarProcesso() {
     descricao: descricao.value,
     tipo: tipo.value,
     dataLimite: new Date(dataLimite.value),
-    situacao: 'Iniciado'
+    situacao: 'Iniciado',
+    dataFinalizacao: null
   };
 
   processosStore.adicionarProcesso(novo);

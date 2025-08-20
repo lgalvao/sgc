@@ -134,19 +134,13 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
 }
 
 function abrirDetalhesUnidade(item: any) {
-  // The @row-click event from TreeTable emits a generic object.
-  // We use `any` and perform runtime checks to safely handle the event payload.
   if (item && typeof item.id === 'string') {
     const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
     if (Subprocesso && Subprocesso.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
       router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
     } else if (Array.isArray(item.children) && item.children.length > 0) {
-      // Unidade INTERMEDIARIA: não navegar mais (link desabilitado)
-      console.log(`Unidade intermediária ${item.id}: navegação desabilitada.`)
     } else {
-      // Otherwise, do nothing (non-participating leaf unit)
-      console.log(`Unidade ${item.id} não é participante e não possui subordinadas participantes.`);
     }
   }
 }

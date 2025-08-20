@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useProcessosStore} from '../processos';
-import {Processo, ProcessoTipo, subprocesso} from '@/types/tipos';
+import {Processo, Subprocesso, TipoProcesso} from '@/types/tipos';
 
 // Mock the JSON imports
 vi.mock('../../mocks/processos.json', () => ({
@@ -74,7 +74,7 @@ describe('useProcessosStore', () => {
         dataFinalizacao: processo.dataFinalizacao ? new Date(processo.dataFinalizacao) : null,
     });
 
-    const parsesubprocessoDates = (pu: any): subprocesso => ({
+    const parsesubprocessoDates = (pu: any): Subprocesso => ({
         ...pu,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
@@ -171,9 +171,10 @@ describe('useProcessosStore', () => {
             const novoProcesso: Processo = {
                 id: 3,
                 descricao: 'Novo Processo de Teste',
-                tipo: ProcessoTipo.DIAGNOSTICO,
+                tipo: TipoProcesso.DIAGNOSTICO,
                 dataLimite: new Date('2025-12-31'),
-                situacao: 'Em andamento'
+                situacao: 'Em andamento',
+                dataFinalizacao: null
             };
             const initialLength = processosStore.processos.length;
 
@@ -184,7 +185,7 @@ describe('useProcessosStore', () => {
         });
 
         it('adicionarProcessosUnidade should add multiple subprocesso objects to the store', () => {
-            const novasProcessosUnidade: subprocesso[] = [
+            const novasProcessosUnidade: Subprocesso[] = [
                 {
                     id: 4, idProcesso: 3, unidade: 'NOVA1',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),

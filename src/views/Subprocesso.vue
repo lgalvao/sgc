@@ -22,7 +22,7 @@
     </div>
 
     <div class="row">
-      <template v-if="processoAtual?.tipo === ProcessoTipo.MAPEAMENTO || processoAtual?.tipo === ProcessoTipo.REVISAO">
+      <template v-if="processoAtual?.tipo === TipoProcesso.MAPEAMENTO || processoAtual?.tipo === TipoProcesso.REVISAO">
         <section class="col-md-4 mb-3">
           <div class="card h-100 card-actionable" @click="irParaAtividadesConhecimentos">
             <div class="card-body">
@@ -58,7 +58,7 @@
         </section>
       </template>
 
-      <template v-else-if="processoAtual?.tipo === ProcessoTipo.DIAGNOSTICO">
+      <template v-else-if="processoAtual?.tipo === TipoProcesso.DIAGNOSTICO">
         <section class="col-md-4 mb-3">
           <div class="card h-100 card-actionable">
             <div class="card-body">
@@ -97,7 +97,7 @@ import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
-import {Mapa, Processo, ProcessoTipo, Servidor, Subprocesso, Unidade} from "@/types/tipos";
+import {Mapa, Processo, TipoProcesso, Servidor, Subprocesso, Unidade} from "@/types/tipos";
 
 const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
 
