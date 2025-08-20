@@ -1,26 +1,59 @@
 {
   "compilerOptions": {
-    "allowJs": true, /* Allow JavaScript files to be compiled. */
-    "checkJs": true,  /* Enable error reporting in .js files. */
-    "noEmit": true,   /* Do not emit outputs. */
-    "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */
-    "resolveJsonModule": true, /* Enable importing .json files. */
-    "allowSyntheticDefaultImports": true, /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
-    "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
-    "strict": true,   /* Enable all strict type-checking options. */
-    "skipLibCheck": true,  /* Skip type checking all .d.ts files. */
-    "moduleResolution": "node", /* Resolve modules using Node.js style. */
-    "target": "esnext", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "esnext", /* Specify what module code is generated. */
-    "isolatedModules": true, /* Ensure that each file can be safely transpiled without relying on other imports. */
-    "jsx": "preserve", /* Specify what JSX code is generated. */
-    "lib": ["esnext", "dom", "dom.iterable"], /* Specify a list of bundled library declaration files that should be included in the compilation. */
-    "types": ["vitest/globals"],
-    "baseUrl": ".", /* Specify the base directory to resolve non-relative module names. */
+    "allowJs": true,
+    /* Allow JavaScript files to be compiled. */
+    "checkJs": true,
+    /* Enable error reporting in .js files. */
+    "noEmit": true,
+    /* Do not emit outputs. */
+    "esModuleInterop": true,
+    /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */
+    "resolveJsonModule": true,
+    /* Enable importing .json files. */
+    "allowSyntheticDefaultImports": true,
+    /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "forceConsistentCasingInFileNames": true,
+    /* Ensure that casing is correct in imports. */
+    "strict": true,
+    /* Enable all strict type-checking options. */
+    "skipLibCheck": true,
+    /* Skip type checking all .d.ts files. */
+    "moduleResolution": "node",
+    /* Resolve modules using Node.js style. */
+    "target": "esnext",
+    /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "module": "esnext",
+    /* Specify what module code is generated. */
+    "isolatedModules": true,
+    /* Ensure that each file can be safely transpiled without relying on other imports. */
+    "jsx": "preserve",
+    /* Specify what JSX code is generated. */
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable"
+    ],
+    /* Specify a list of bundled library declaration files that should be included in the compilation. */
+    "types": [
+      "vitest/globals"
+    ],
+    "baseUrl": ".",
+    /* Specify the base directory to resolve non-relative module names. */
     "paths": {
-      "@/*": ["src/*"]
-    } /* Specify a set of entries that re-map imports to lookup locations relative to the 'baseUrl'. */
+      "@/*": [
+        "src/*"
+      ]
+    }
+    /* Specify a set of entries that re-map imports to lookup locations relative to the 'baseUrl'. */
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.vue", "src/**/*.json"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.vue",
+    "src/**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

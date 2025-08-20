@@ -88,7 +88,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
@@ -170,25 +170,25 @@ function badgeClass(situacao: string): string {
 
 function criarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({name: 'SubprocessoMapa', params: {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value}})
   }
 }
 
 function editarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({name: 'SubprocessoMapa', params: {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value}})
   }
 }
 
 function visualizarMapa() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'SubprocessoMapa', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({name: 'SubprocessoMapa', params: {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value}})
   }
 }
 
 function irParaAtividadesConhecimentos() {
   if (sigla.value && processoAtual.value) {
-    router.push({ name: 'SubprocessoCadastro', params: { idProcesso: processoAtual.value.id, siglaUnidade: sigla.value } })
+    router.push({name: 'SubprocessoCadastro', params: {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value}})
   }
 }
 </script>

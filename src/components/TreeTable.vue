@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="d-flex justify-content-between align-items-center mb-3" v-if="title">
+    <div v-if="title" class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">{{ title }}</h4>
 
       <div>
-        <button @click="expandAll" class="btn btn-outline-primary btn-sm me-2">
+        <button class="btn btn-outline-primary btn-sm me-2" @click="expandAll">
           <i class="bi bi-arrows-expand"></i>
         </button>
-        <button @click="collapseAll" class="btn btn-outline-secondary btn-sm">
+        <button class="btn btn-outline-secondary btn-sm" @click="collapseAll">
           <i class="bi bi-arrows-collapse"></i>
         </button>
       </div>
@@ -28,9 +28,9 @@
         <tbody>
         <template v-for="item in internalData" :key="item.id">
           <TreeRow
+              :columns="columns"
               :item="item"
               :level="0"
-              :columns="columns"
               @toggle="toggleExpand"
               @row-click="handleTreeRowClick"
           />
@@ -41,7 +41,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {ref, watch} from 'vue'
 import TreeRow from './TreeRow.vue'
 

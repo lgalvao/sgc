@@ -24,7 +24,8 @@
       </thead>
 
       <tbody>
-      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id" class="clickable-row" @click="abrirProcesso(processo.id)">
+      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id" class="clickable-row"
+          @click="abrirProcesso(processo.id)">
         <td>{{ processo.descricao }}</td>
         <td>{{ processo.tipo }}</td>
         <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
@@ -39,7 +40,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'

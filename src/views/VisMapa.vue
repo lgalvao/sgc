@@ -24,7 +24,7 @@
           <div class="card-body py-2">
             <div
                 class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card">
-              <strong data-testid="competencia-descricao" class="competencia-descricao"> {{ comp.descricao }}</strong>
+              <strong class="competencia-descricao" data-testid="competencia-descricao"> {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
               <div v-for="atvId in comp.atividadesAssociadas" :key="atvId"
@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue'
 import {useRoute} from 'vue-router'
 

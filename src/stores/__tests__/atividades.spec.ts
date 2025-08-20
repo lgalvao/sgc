@@ -64,14 +64,14 @@ describe('useAtividadesStore', () => {
     });
 
     describe('getters', () => {
-        it('getAtividadesPorProcessoUnidade should filter activities by idSubprocesso', () => {
+        it('getAtividadesPorsubprocesso should filter activities by idSubprocesso', () => {
             const atividades = atividadesStore.getAtividadesPorSubprocesso(3);
             expect(atividades.length).toBe(2);
             expect(atividades[0].id).toBe(1);
             expect(atividades[1].id).toBe(2);
         });
 
-        it('getAtividadesPorProcessoUnidade should return empty array if no matching idSubprocesso', () => {
+        it('getAtividadesPorsubprocesso should return empty array if no matching idSubprocesso', () => {
             const atividades = atividadesStore.getAtividadesPorSubprocesso(999);
             expect(atividades.length).toBe(0);
         });
@@ -173,7 +173,7 @@ describe('useAtividadesStore', () => {
             expect(atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length).toBe(initialConhecimentosLength);
         });
 
-        it('fetchAtividadesPorProcessoUnidade should fetch and add activities without duplication', async () => {
+        it('fetchAtividadesPorsubprocesso should fetch and add activities without duplication', async () => {
             // Create a fresh store instance for this test
             setActivePinia(createPinia());
             const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
@@ -190,7 +190,7 @@ describe('useAtividadesStore', () => {
             }));
             testAtividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
 
-            // Spy on the fetchAtividadesPorProcessoUnidade action and mock its implementation
+            // Spy on the fetchAtividadesPorsubprocesso action and mock its implementation
             const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: number) {
                 const fetchedActivities: Atividade[] = [
                     {id: 4, descricao: "Fetched Activity 1", idSubprocesso: 3, conhecimentos: []},

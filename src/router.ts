@@ -35,7 +35,10 @@ const routes = [
         path: '/processo/:idProcesso/:siglaUnidade',
         name: 'Subprocesso',
         component: () => import('./views/Subprocesso.vue'),
-        props: (route: RouteLocationNormalized) => ({ idProcesso: Number(route.params.idProcesso), siglaUnidade: route.params.siglaUnidade }),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            siglaUnidade: route.params.siglaUnidade
+        }),
         meta: {
             title: 'Processos da Unidade',
             breadcrumb: (route: RouteLocationNormalized) => `${route.params.siglaUnidade ?? ''}`
@@ -45,28 +48,40 @@ const routes = [
         path: '/processo/:idProcesso/:siglaUnidade/mapa',
         name: 'SubprocessoMapa',
         component: () => import('./views/CadMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({sigla: route.params.siglaUnidade, idProcesso: Number(route.params.idProcesso)}),
+        props: (route: RouteLocationNormalized) => ({
+            sigla: route.params.siglaUnidade,
+            idProcesso: Number(route.params.idProcesso)
+        }),
         meta: {title: 'Mapa', breadcrumb: 'Mapa'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
         name: 'SubprocessoVisMapa',
         component: () => import('./views/VisMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            sigla: route.params.siglaUnidade
+        }),
         meta: {title: 'Visualização de Mapa', breadcrumb: 'Visualização de Mapa'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/cadastro',
         name: 'SubprocessoCadastro',
         component: () => import('./views/CadAtividades.vue'),
-        props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            sigla: route.params.siglaUnidade
+        }),
         meta: {title: 'Cadastro', breadcrumb: 'Cadastro'},
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
         name: 'SubprocessoVisCadastro',
         component: () => import('./views/VisAtividades.vue'),
-        props: (route: RouteLocationNormalized) => ({idProcesso: Number(route.params.idProcesso), sigla: route.params.siglaUnidade}),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            sigla: route.params.siglaUnidade
+        }),
         meta: {title: 'Visualização de Atividades', breadcrumb: 'Visualização de Atividades'},
     },
     {
@@ -83,7 +98,10 @@ const routes = [
         path: '/unidade/:siglaUnidade/mapa',
         name: 'Mapa',
         component: () => import('./views/CadMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({sigla: route.params.siglaUnidade, idProcesso: Number(route.query.idProcesso)}),
+        props: (route: RouteLocationNormalized) => ({
+            sigla: route.params.siglaUnidade,
+            idProcesso: Number(route.query.idProcesso)
+        }),
         meta: {title: 'Mapa', breadcrumb: 'Mapa'},
     },
     {

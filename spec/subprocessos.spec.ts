@@ -6,7 +6,7 @@ import {createPinia, setActivePinia} from "pinia";
 test.describe('Detalhes da Unidade no Processo', () => {
     test.setTimeout(5000);
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         await login(page);
 
         const pinia = createPinia(); // Inicializa o Pinia
@@ -30,18 +30,18 @@ test.describe('Detalhes da Unidade no Processo', () => {
         await page.waitForLoadState('networkidle');
     });
 
-    test('deve exibir os detalhes da unidade e os cards de funcionalidade', async ({ page }) => {
+    test('deve exibir os detalhes da unidade e os cards de funcionalidade', async ({page}) => {
         await expect(page.getByText('Responsável:')).toBeVisible();
 
         await expect(page.getByTestId('card-atividades-conhecimentos')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Mapa de Competências' })).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Mapa de Competências'})).toBeVisible();
     });
 
-    test('deve navegar para a página de atividades ao clicar no card', async ({ page }) => {
+    test('deve navegar para a página de atividades ao clicar no card', async ({page}) => {
         await page.getByTestId('card-atividades-conhecimentos').click();
         await page.waitForURL(/.*\/processo\/\d+\/SESEL\/cadastro/);
-        await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 
-    
+
 });

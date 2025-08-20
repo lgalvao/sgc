@@ -7,13 +7,13 @@
         <form class="p-0" @submit.prevent="handleLogin">
           <div class="mb-3">
             <label class="form-label" for="titulo">Título eleitoral</label>
-            <input id="titulo" v-model="titulo" autocomplete="username" class="form-control" type="text"
-                   placeholder="Digite seu título" :disabled="loginStep > 1"/>
+            <input id="titulo" v-model="titulo" :disabled="loginStep > 1" autocomplete="username" class="form-control"
+                   placeholder="Digite seu título" type="text"/>
           </div>
           <div class="mb-3">
             <label class="form-label" for="senha">Senha</label>
-            <input id="senha" v-model="senha" autocomplete="current-password" class="form-control" type="password"
-                   placeholder="Digite sua senha" :disabled="loginStep > 1"/>
+            <input id="senha" v-model="senha" :disabled="loginStep > 1" autocomplete="current-password" class="form-control"
+                   placeholder="Digite sua senha" type="password"/>
           </div>
 
           <div v-if="loginStep === 2 && paresDisponiveis.length > 1" class="mb-3">
@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useServidoresStore} from '@/stores/servidores'

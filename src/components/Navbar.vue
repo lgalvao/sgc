@@ -35,16 +35,16 @@
         <ul class="navbar-nav align-items-center">
           <li class="nav-item me-3 d-flex align-items-center">
             <i class="bi bi-person-circle me-2 fs-5"></i>
-            <span v-if="!isEditingProfile && servidorLogado" @click="startEditingProfile" class="nav-link"
-                  style="cursor: pointer;">
+            <span v-if="!isEditingProfile && servidorLogado" class="nav-link" style="cursor: pointer;"
+                  @click="startEditingProfile">
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
             <select v-else
                     ref="profileSelect"
                     :value="servidorLogado?.id"
-                    @change="handleProfileChange"
+                    class="form-select form-select-sm"
                     @blur="stopEditingProfile"
-                    class="form-select form-select-sm">
+                    @change="handleProfileChange">
               <option v-for="servidor in servidoresComPerfil" :key="servidor.id" :value="servidor.id">
                 {{ servidor.perfil }} - {{ servidor.unidade }} ({{ servidor.nome }})
               </option>
@@ -52,13 +52,14 @@
           </li>
 
           <li class="nav-item me-2">
-            <a class="nav-link" href="#" @click.prevent="navigateFromNavbar('/configuracoes')" title="Configurações do sistema">
+            <a class="nav-link" href="#" title="Configurações do sistema"
+               @click.prevent="navigateFromNavbar('/configuracoes')">
               <i class="bi bi-gear fs-5"></i>
             </a>
           </li>
 
           <li class="nav-item">
-            <router-link class="nav-link" to="/login" title="Sair">
+            <router-link class="nav-link" title="Sair" to="/login">
               <i class="bi bi-box-arrow-right fs-5"></i>
             </router-link>
           </li>
@@ -68,7 +69,7 @@
   </nav>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {nextTick, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {usePerfilStore} from '@/stores/perfil'
@@ -104,7 +105,10 @@ const handleProfileChange = (event: Event) => {
 }
 
 function navigateFromNavbar(path: string) {
-  try { sessionStorage.setItem('cameFromNavbar', '1') } catch {}
+  try {
+    sessionStorage.setItem('cameFromNavbar', '1')
+  } catch {
+  }
   router.push(path)
 }
 

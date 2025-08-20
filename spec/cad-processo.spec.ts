@@ -4,7 +4,7 @@ import {login} from "../utils/auth";
 test.describe('Cadastro de Processo', () => {
     test.setTimeout(5000);
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         await login(page);
 
         // Navegar para a página de cadastro de processo
@@ -12,16 +12,16 @@ test.describe('Cadastro de Processo', () => {
         await page.waitForLoadState('networkidle');
     });
 
-    test('deve exibir o formulário de cadastro de processo', async ({ page }) => {
+    test('deve exibir o formulário de cadastro de processo', async ({page}) => {
         await expect(page.getByText('Cadastro de processo')).toBeVisible();
         await expect(page.getByLabel('Descrição')).toBeVisible();
         await expect(page.getByLabel('Tipo')).toBeVisible();
         await expect(page.getByLabel('Data limite')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Salvar' })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Cancelar' })).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Salvar'})).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Cancelar'})).toBeVisible();
     });
 
-    test('deve permitir cadastrar um novo processo', async ({ page }) => {
+    test('deve permitir cadastrar um novo processo', async ({page}) => {
         const descricao = `Processo de Teste ${Date.now()}`;
 
         await page.getByLabel('Descrição').fill(descricao);
@@ -32,7 +32,7 @@ test.describe('Cadastro de Processo', () => {
         await page.getByLabel('STIC - Secretaria de Informática e Comunicações').check();
         await page.getByLabel('COSIS - Coordenadoria de Sistemas').check();
 
-        await page.getByRole('button', { name: 'Salvar' }).click();
+        await page.getByRole('button', {name: 'Salvar'}).click();
 
         // Verificar se houve redirecionamento para o painel e se o novo processo aparece na lista
         await page.waitForURL(`/painel`);

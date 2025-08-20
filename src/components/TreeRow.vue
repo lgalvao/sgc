@@ -1,10 +1,10 @@
 <!--suppress CssUnusedSymbol -->
 <template>
-  <tr @click="handleRowClick" :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]">
+  <tr :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]" @click="handleRowClick">
     <td v-for="(column, index) in columns" :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
-      <span v-if="index === 0 && item.children && item.children.length > 0" @click.stop="toggleExpand(item.id)"
-            class="toggle-icon">
+      <span v-if="index === 0 && item.children && item.children.length > 0" class="toggle-icon"
+            @click.stop="toggleExpand(item.id)">
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
       </span>
       {{ item[column.key] }}
@@ -14,16 +14,16 @@
     <TreeRow
         v-for="child in item.children"
         :key="child.id"
+        :columns="columns"
         :item="child"
         :level="level + 1"
-        :columns="columns"
         @toggle="toggleExpand"
         @row-click="handleChildRowClick"
     />
   </template>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import TreeRow from './TreeRow.vue';
 
 interface Column {

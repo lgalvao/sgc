@@ -4,27 +4,27 @@
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="display-6 mb-0" data-testid="titulo-processos">Processos</div>
-        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary"
-                     :to="{ name: 'CadProcesso' }" data-testid="btn-criar-processo">
+        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" :to="{ name: 'CadProcesso' }"
+                     class="btn btn-outline-primary" data-testid="btn-criar-processo">
           <i class="bi bi-plus-lg"></i> Criar processo
         </router-link>
       </div>
       <table class="table table-hover" data-testid="tabela-processos">
         <thead>
         <tr>
-          <th style="cursor:pointer" @click="ordenarPor('descricao')" data-testid="coluna-descricao">
+          <th data-testid="coluna-descricao" style="cursor:pointer" @click="ordenarPor('descricao')">
             Descrição
             <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('tipo')" data-testid="coluna-tipo">
+          <th data-testid="coluna-tipo" style="cursor:pointer" @click="ordenarPor('tipo')">
             Tipo
             <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('unidades')" data-testid="coluna-unidades">
+          <th data-testid="coluna-unidades" style="cursor:pointer" @click="ordenarPor('unidades')">
             Unidades participantes
             <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
           </th>
-          <th style="cursor:pointer" @click="ordenarPor('situacao')" data-testid="coluna-situacao">
+          <th data-testid="coluna-situacao" style="cursor:pointer" @click="ordenarPor('situacao')">
             Situação
             <span v-if="criterio === 'situacao'">{{ asc ? '↑' : '↓' }}</span>
           </th>
@@ -65,7 +65,7 @@
           <td>{{ alerta.unidade }}</td>
         </tr>
         <tr v-if="!alertas || alertas.length === 0">
-          <td colspan="4" class="text-center text-muted">Nenhum alerta no momento.</td>
+          <td class="text-center text-muted" colspan="4">Nenhum alerta no momento.</td>
         </tr>
         </tbody>
       </table>
@@ -73,7 +73,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'

@@ -9,19 +9,19 @@
 
     <nav v-if="shouldShowBreadcrumbs" aria-label="breadcrumb" data-testid="breadcrumbs">
       <ol class="breadcrumb mb-0">
-        <li v-for="(crumb, index) in crumbs" :key="index" class="breadcrumb-item"
-            :class="{ active: index === crumbs.length - 1 }" aria-current="page" data-testid="breadcrumb-item">
+        <li v-for="(crumb, index) in crumbs" :key="index" :class="{ active: index === crumbs.length - 1 }"
+            aria-current="page" class="breadcrumb-item" data-testid="breadcrumb-item">
           <template v-if="index < crumbs.length - 1">
             <template v-if="crumb.to">
-              <RouterLink :to="crumb.to" :title="crumb.title || undefined">
-                <i v-if="crumb.label === '__home__'" class="bi bi-house-door" aria-label="Início"
+              <RouterLink :title="crumb.title || undefined" :to="crumb.to">
+                <i v-if="crumb.label === '__home__'" aria-label="Início" class="bi bi-house-door"
                    data-testid="breadcrumb-home-icon"></i>
                 <span v-else>{{ crumb.label }}</span>
               </RouterLink>
             </template>
             <template v-else>
               <span :title="crumb.title || undefined">
-                <i v-if="crumb.label === '__home__'" class="bi bi-house-door" aria-label="Início"
+                <i v-if="crumb.label === '__home__'" aria-label="Início" class="bi bi-house-door"
                    data-testid="breadcrumb-home-icon"></i>
                 <span v-else>{{ crumb.label }}</span>
               </span>
@@ -30,7 +30,7 @@
           <template v-else>
             <span :title="crumb.title || undefined">
               <template v-if="crumb.label === '__home__'">
-                <i class="bi bi-house-door" aria-label="Início" data-testid="breadcrumb-home-icon"></i>
+                <i aria-label="Início" class="bi bi-house-door" data-testid="breadcrumb-home-icon"></i>
               </template>
               <template v-else>
                 {{ crumb.label }}
@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades'

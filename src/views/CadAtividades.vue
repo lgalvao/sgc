@@ -1,20 +1,20 @@
 <template>
   <div class="container mt-4">
     <!-- Modal de Importação de Atividades -->
-    <div class="modal fade" id="importarAtividadesModal" tabindex="-1" aria-labelledby="importarAtividadesModalLabel"
-         aria-hidden="true">
+    <div id="importarAtividadesModal" aria-hidden="true" aria-labelledby="importarAtividadesModalLabel" class="modal fade"
+         tabindex="-1">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="importarAtividadesModalLabel">Importação de atividades</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 id="importarAtividadesModalLabel" class="modal-title">Importação de atividades</h5>
+            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
           </div>
           <div class="modal-body">
 
             <!-- Etapa 1: Seleção de Processo -->
             <div class="mb-3">
-              <label for="processo-select" class="form-label">Processo</label>
-              <select id="processo-select" class="form-select" v-model="processoSelecionadoId">
+              <label class="form-label" for="processo-select">Processo</label>
+              <select id="processo-select" v-model="processoSelecionadoId" class="form-select">
                 <option disabled value="">Selecione</option>
                 <option v-for="proc in processosDisponiveis" :key="proc.id" :value="proc.id">
                   {{ proc.descricao }}
@@ -27,9 +27,9 @@
 
             <!-- Etapa 2: Seleção de Unidade -->
             <div class="mb-3">
-              <label for="unidade-select" class="form-label">Unidade</label>
-              <select id="unidade-select" class="form-select" v-model="unidadeSelecionadaId"
-                      :disabled="!processoSelecionado">
+              <label class="form-label" for="unidade-select">Unidade</label>
+              <select id="unidade-select" v-model="unidadeSelecionadaId" :disabled="!processoSelecionado"
+                      class="form-select">
                 <option disabled value="">Selecione</option>
                 <option v-for="pu in unidadesParticipantes" :key="pu.id" :value="pu.id">
                   {{ pu.unidade }}
@@ -42,9 +42,9 @@
               <h6>Atividades para importar</h6>
               <div v-if="atividadesParaImportar.length" class="atividades-container border rounded p-2">
                 <div v-for="ativ in atividadesParaImportar" :key="ativ.id" class="form-check">
-                  <input class="form-check-input" type="checkbox" :value="ativ" v-model="atividadesSelecionadas"
-                         :id="`ativ-check-${ativ.id}`">
-                  <label class="form-check-label" :for="`ativ-check-${ativ.id}`">
+                  <input :id="`ativ-check-${ativ.id}`" v-model="atividadesSelecionadas" :value="ativ" class="form-check-input"
+                         type="checkbox">
+                  <label :for="`ativ-check-${ativ.id}`" class="form-check-label">
                     {{ ativ.descricao }}
                   </label>
                 </div>
@@ -56,10 +56,10 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @click="resetModal">Cancelar
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button" @click="resetModal">Cancelar
             </button>
-            <button type="button" class="btn btn-outline-primary" @click="importarAtividades"
-                    :disabled="!atividadesSelecionadas.length">Importar
+            <button :disabled="!atividadesSelecionadas.length" class="btn btn-outline-primary" type="button"
+                    @click="importarAtividades">Importar
             </button>
           </div>
         </div>
@@ -74,11 +74,11 @@
       <h1 class="mb-0 display-6">Atividades e conhecimentos</h1>
 
       <div class="d-flex gap-2">
-        <button v-if="isChefe" class="btn btn-outline-primary" title="Importar"
-                data-bs-toggle="modal" data-bs-target="#importarAtividadesModal">
+        <button v-if="isChefe" class="btn btn-outline-primary" data-bs-target="#importarAtividadesModal"
+                data-bs-toggle="modal" title="Importar">
           Importar atividades
         </button>
-        <button class="btn btn-outline-success" title="Disponibilizar" data-bs-toggle="tooltip"
+        <button class="btn btn-outline-success" data-bs-toggle="tooltip" title="Disponibilizar"
                 @click="disponibilizarCadastro">
           Disponibilizar
         </button>
@@ -88,13 +88,13 @@
     <!-- Adicionar atividade -->
     <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" placeholder="Nova atividade" type="text"
-               data-testid="input-nova-atividade"/>
+        <input v-model="novaAtividade" class="form-control" data-testid="input-nova-atividade" placeholder="Nova atividade"
+               type="text"/>
       </div>
       <div class="col-auto">
-        <button class="btn btn-outline-primary btn-sm" type="submit" title="Adicionar atividade"
-                data-bs-toggle="tooltip"
-                data-testid="btn-adicionar-atividade"><i
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-testid="btn-adicionar-atividade"
+                title="Adicionar atividade"
+                type="submit"><i
             class="bi bi-save"></i></button>
       </div>
     </form>
@@ -107,13 +107,13 @@
           <template v-if="editandoAtividade === atividade.id">
             <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"
                    data-testid="input-editar-atividade"/>
-            <button class="btn btn-sm btn-outline-success me-1 botao-acao" @click="salvarEdicaoAtividade(atividade.id)"
-                    title="Salvar"
-                    data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-atividade"><i class="bi bi-save"></i>
+            <button class="btn btn-sm btn-outline-success me-1 botao-acao" data-bs-toggle="tooltip"
+                    data-testid="btn-salvar-edicao-atividade"
+                    title="Salvar" @click="salvarEdicaoAtividade(atividade.id)"><i class="bi bi-save"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary botao-acao" @click="cancelarEdicaoAtividade()"
-                    title="Cancelar"
-                    data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-atividade"><i class="bi bi-x"></i>
+            <button class="btn btn-sm btn-outline-secondary botao-acao" data-bs-toggle="tooltip"
+                    data-testid="btn-cancelar-edicao-atividade"
+                    title="Cancelar" @click="cancelarEdicaoAtividade()"><i class="bi bi-x"></i>
             </button>
           </template>
 
@@ -121,10 +121,10 @@
             <strong class="atividade-descricao" data-testid="atividade-descricao">{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
               <button class="btn btn-sm btn-outline-primary botao-acao"
-                      @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)" title="Editar"
-                      data-bs-toggle="tooltip" data-testid="btn-editar-atividade"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger botao-acao" @click="removerAtividade(idx)" title="Remover"
-                      data-bs-toggle="tooltip" data-testid="btn-remover-atividade"><i
+                      data-bs-toggle="tooltip" data-testid="btn-editar-atividade"
+                      title="Editar" @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip" data-testid="btn-remover-atividade"
+                      title="Remover" @click="removerAtividade(idx)"><i
                   class="bi bi-trash"></i></button>
             </div>
           </template>
@@ -136,27 +136,27 @@
                class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
               <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input"
-                     style="max-width: 300px;" data-testid="input-editar-conhecimento"/>
+                     data-testid="input-editar-conhecimento" style="max-width: 300px;"/>
               <button class="btn btn-sm btn-outline-success me-1 botao-acao"
-                      @click="salvarEdicaoConhecimento(idx, cidx)"
-                      title="Salvar"
-                      data-bs-toggle="tooltip" data-testid="btn-salvar-edicao-conhecimento"><i class="bi bi-save"></i>
+                      data-bs-toggle="tooltip"
+                      data-testid="btn-salvar-edicao-conhecimento"
+                      title="Salvar" @click="salvarEdicaoConhecimento(idx, cidx)"><i class="bi bi-save"></i>
               </button>
-              <button class="btn btn-sm btn-outline-secondary botao-acao" @click="cancelarEdicaoConhecimento"
-                      title="Cancelar"
-                      data-bs-toggle="tooltip" data-testid="btn-cancelar-edicao-conhecimento"><i class="bi bi-x"></i>
+              <button class="btn btn-sm btn-outline-secondary botao-acao" data-bs-toggle="tooltip"
+                      data-testid="btn-cancelar-edicao-conhecimento"
+                      title="Cancelar" @click="cancelarEdicaoConhecimento"><i class="bi bi-x"></i>
               </button>
             </template>
             <template v-else>
               <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
                 <button class="btn btn-sm btn-outline-primary botao-acao"
-                        @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
-                        title="Editar" data-bs-toggle="tooltip" data-testid="btn-editar-conhecimento"><i
+                        data-bs-toggle="tooltip"
+                        data-testid="btn-editar-conhecimento" title="Editar" @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"><i
                     class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger botao-acao" @click="removerConhecimento(idx, cidx)"
-                        title="Remover"
-                        data-bs-toggle="tooltip" data-testid="btn-remover-conhecimento"><i class="bi bi-trash"></i>
+                <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
+                        data-testid="btn-remover-conhecimento"
+                        title="Remover" @click="removerConhecimento(idx, cidx)"><i class="bi bi-trash"></i>
                 </button>
               </div>
             </template>
@@ -164,12 +164,12 @@
           <form class="row g-2 align-items-center" @submit.prevent="adicionarConhecimento(idx)">
             <div class="col">
               <input v-model="atividade.novoConhecimento" class="form-control form-control-sm"
-                     placeholder="Novo conhecimento"
-                     type="text" data-testid="input-novo-conhecimento"/>
+                     data-testid="input-novo-conhecimento"
+                     placeholder="Novo conhecimento" type="text"/>
             </div>
             <div class="col-auto">
-              <button class="btn btn-outline-secondary btn-sm" type="submit" title="Adicionar Conhecimento"
-                      data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"><i
+              <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" data-testid="btn-adicionar-conhecimento"
+                      title="Adicionar Conhecimento" type="submit"><i
                   class="bi bi-save"></i></button>
             </div>
           </form>
@@ -179,7 +179,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import {Modal} from 'bootstrap'
 import {usePerfil} from '@/composables/usePerfil'

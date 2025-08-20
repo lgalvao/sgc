@@ -8,8 +8,8 @@
         <strong>Situação:</strong> {{ processo.situacao }}<br>
       </div>
       <TreeTable
-          :data="dadosFormatados"
           :columns="colunasTabela"
+          :data="dadosFormatados"
           title="Unidades participantes"
           @row-click="abrirDetalhesUnidade"
       />
@@ -20,7 +20,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'

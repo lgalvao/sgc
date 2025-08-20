@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-outline-primary"
-                @click="irParaCriarAtribuicao" data-testid="btn-criar-atribuicao">
+                data-testid="btn-criar-atribuicao" @click="irParaCriarAtribuicao">
           Criar atribuição
         </button>
       </div>
@@ -23,7 +23,8 @@
 
     <div class="row mt-4">
       <div class="col-md-6 mb-4">
-        <div class="card h-100 cursor-pointer" @click="navegarParaAtividades" data-testid="card-atividades-conhecimentos">
+        <div class="card h-100 cursor-pointer" data-testid="card-atividades-conhecimentos"
+             @click="navegarParaAtividades">
           <div class="card-body d-flex flex-column justify-content-between">
             <h5 class="card-title">Atividades e conhecimentos</h5>
             <p class="card-text text-muted">Gerencie as atividades e conhecimentos da unidade.</p>
@@ -52,7 +53,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from 'vue'
 import {useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades.js'

@@ -1,6 +1,7 @@
 import {Page} from "@playwright/test";
 
 const baseUrl = "http://localhost:5173/"
+
 export async function login(page: Page) {
 
     await page.goto(baseUrl);

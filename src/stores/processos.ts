@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
-import processosUnidadesMock from '../mocks/subprocessos.json'
+import subprocessosMock from '../mocks/subprocessos.json'
 import type {Processo, Subprocesso} from '@/types/tipos'
 
 function parseProcessoDates(processo: any): Processo {
@@ -24,7 +24,7 @@ function parseSubprocessoDates(pu: any): Subprocesso {
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        processosUnidade: processosUnidadesMock.map(parseSubprocessoDates) as Subprocesso[]
+        processosUnidade: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[]
     }),
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {

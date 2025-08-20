@@ -28,9 +28,9 @@
                 <input
                     :id="`chk-${unidade.sigla}`"
                     :checked="getEstadoSelecao(unidade) === true"
-                    v-bind:indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
                     class="form-check-input"
                     type="checkbox"
+                    v-bind:indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
                     @change="() => toggleUnidade(unidade)"
                 />
                 <label :for="`chk-${unidade.sigla}`" class="form-check-label ms-2">
@@ -44,9 +44,9 @@
                     <input
                         :id="`chk-${filha.sigla}`"
                         :checked="getEstadoSelecao(filha) === true"
-                        v-bind:indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
                         class="form-check-input"
                         type="checkbox"
+                        v-bind:indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
                         @change="() => toggleUnidade(filha)"
                     />
                     <label :for="'chk-' + filha.sigla" class="form-check-label ms-2">
@@ -86,7 +86,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
