@@ -91,19 +91,19 @@ const handleLogin = () => {
   }
 }
 
-const finalizarLogin = (servidorId: number, perfil: string, unidadeSigla: string) => {
-  perfilStore.setServidorId(servidorId)
+const finalizarLogin = (idServidor: number, perfil: string, unidadeSigla: string) => {
+  perfilStore.setServidorId(idServidor)
   perfilStore.setPerfilUnidade(perfil, unidadeSigla)
   router.push('/painel')
 }
 
-const getPerfisEUnidades = (servidorId: number): Par[] => {
+const getPerfisEUnidades = (idServidor: number): Par[] => {
   const {servidoresComPerfil} = usePerfil()
-  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(servidorId)
+  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(idServidor)
 
   const pares: Par[] = []
 
-  const servidorComPerfil = servidoresComPerfil.value.find(s => s.id === servidorId)
+  const servidorComPerfil = servidoresComPerfil.value.find(s => s.id === idServidor)
   if (servidorComPerfil) {
     const unidadeTitular = unidadesStore.pesquisarUnidade(servidorComPerfil.unidade)
     if (unidadeTitular) {

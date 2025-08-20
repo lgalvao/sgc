@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos'
+import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 
 function parseProcessoDates(processo: any): Processo {
     return {
@@ -29,6 +30,17 @@ export const useProcessosStore = defineStore('processos', {
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
             return state.processosUnidade.filter(pu => pu.idProcesso === idProcesso);
+        },
+        isProcessoInativo: (state) => (processo: Processo): boolean => {
+            const configuracoesStore = useConfiguracoesStore();
+            if (processo.situacao === SituacaoProcesso.FINALIZADO && processo.dataFinalizacao) {
+                const finalizacaoDate = new Date(processo.dataFinalizacao);
+                const today = new Date();
+                const diffTime = Math.abs(today.getTime() - finalizacaoDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays > configuracoesStore.diasInativacaoProcesso;
+            }
+            return false;
         }
     },
     actions: {

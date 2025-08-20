@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia';
 import alertasMock from '../mocks/alertas.json';
 import type {Alerta} from '@/types/tipos';
+import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 
 function parseAlertaDates(alerta: any): Alerta {
     return {
@@ -13,6 +14,16 @@ export const useAlertasStore = defineStore('alertas', {
     state: () => ({
         alertas: alertasMock.map(parseAlertaDates) as Alerta[]
     }),
+    getters: {
+        isAlertaNovo: () => (alerta: Alerta): boolean => {
+            const configuracoesStore = useConfiguracoesStore();
+            const alertaDate = new Date(alerta.dataHora);
+            const today = new Date();
+            const diffTime = Math.abs(today.getTime() - alertaDate.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays <= configuracoesStore.diasAlertaNovo;
+        }
+    },
     actions: {
         pesquisarAlertas(query?: string): Alerta[] {
             if (!query) {

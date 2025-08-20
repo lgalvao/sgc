@@ -51,7 +51,7 @@
             </select>
           </li>
 
-          <li class="nav-item me-2">
+          <li class="nav-item me-2" v-if="perfilStore.perfilSelecionado === 'ADMIN'">
             <a class="nav-link" href="#" title="Configurações do sistema"
                @click.prevent="navigateFromNavbar('/configuracoes')">
               <i class="bi bi-gear fs-5"></i>

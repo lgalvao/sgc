@@ -5,10 +5,12 @@ export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', 
     state: () => ({
         atribuicoes: [] as AtribuicaoTemporaria[]
     }),
-    actions: {
-        getAtribuicoesPorServidor(servidorId: number): AtribuicaoTemporaria[] {
-            return this.atribuicoes.filter(a => a.servidorId === servidorId)
+    getters: {
+        getAtribuicoesPorServidor: (state) => (servidorId: number): AtribuicaoTemporaria[] => {
+            return state.atribuicoes.filter(a => Number(a.idServidor) === servidorId)
         },
+    },
+    actions: {
         criarAtribuicao(novaAtribuicao: AtribuicaoTemporaria) {
             this.atribuicoes.push(novaAtribuicao);
         }
