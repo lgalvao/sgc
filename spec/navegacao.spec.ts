@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test'
-import {login} from '../utils/auth'
+import {login} from "./utils/auth";
 
 async function getBreadcrumbItemsText(page) {
     const items = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]')

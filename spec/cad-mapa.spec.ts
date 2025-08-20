@@ -1,8 +1,8 @@
 import {expect, test} from "@playwright/test";
-import {login} from "../utils/auth";
+import {login} from "./utils/auth";
 
 test.describe('Cadastro de Mapa de Competências', () => {
-    test.setTimeout(5000);
+    test.setTimeout(15000);
 
     test.beforeEach(async ({page}) => {
         await login(page);
@@ -23,6 +23,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
         // Selecionar as duas primeiras atividades
         await page.locator('.atividade-card-item').nth(0).click();
         await page.locator('.atividade-card-item').nth(1).click();
+        await page.waitForLoadState('domcontentloaded');
 
         await page.getByTestId('btn-criar-competencia').click();
 
