@@ -8,8 +8,12 @@ exports.mockTrailPopTo = vitest_1.vi.fn();
 exports.mockTrailEnsureBase = vitest_1.vi.fn();
 exports.mockTrailPush = vitest_1.vi.fn(function (crumb) { return exports.mockTrailCrumbs.push(crumb); });
 exports.useNavigationTrail = vitest_1.vi.fn(function () { return ({
-    get crumbs() { return exports.mockTrailCrumbs; },
-    set crumbs(newCrumbs) { exports.mockTrailCrumbs = newCrumbs; },
+    get crumbs() {
+        return exports.mockTrailCrumbs;
+    },
+    set crumbs(newCrumbs) {
+        exports.mockTrailCrumbs = newCrumbs;
+    },
     reset: exports.mockTrailReset,
     popTo: exports.mockTrailPopTo,
     ensureBase: exports.mockTrailEnsureBase,
