@@ -76,6 +76,9 @@
       <h1 class="mb-0 display-6">Atividades e conhecimentos</h1>
 
       <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" @click="irParaImpactoMapa">
+          <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
+        </button>
         <button v-if="isChefe" class="btn btn-outline-primary" data-bs-target="#importarAtividadesModal"
                 data-bs-toggle="modal" title="Importar">
           Importar atividades
@@ -189,10 +192,12 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import {Modal} from 'bootstrap'
+import {useRouter} from 'vue-router'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
+import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
 
 interface AtividadeComEdicao extends Atividade {
@@ -210,6 +215,8 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
+const revisaoStore = useRevisaoStore()
+const router = useRouter()
 
 const unidade = computed(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
@@ -232,7 +239,7 @@ const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}
 const novaAtividade = ref('')
 
 const idSubprocesso = computed(() => {
-  const Subprocesso = (processosStore.processosUnidade as Subprocesso[]).find(
+  const Subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
       pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
   return Subprocesso?.id;
@@ -255,33 +262,67 @@ const atividades = computed<AtividadeComEdicao[]>({
 })
 
 function adicionarAtividade() {
+  console.log('CadAtividades: Função adicionarAtividade() executada!'); // Este log aparece
+  console.log('CadAtividades: novaAtividade.value:', novaAtividade.value); // Adicionado para depuração
+  console.log('CadAtividades: idSubprocesso.value:', idSubprocesso.value); // Adicionado para depuração
+
   if (novaAtividade.value && idSubprocesso.value !== undefined) {
-    atividadesStore.adicionarAtividade({
+    const novaAtividadeObj = {
       id: Date.now(),
       descricao: novaAtividade.value,
       idSubprocesso: idSubprocesso.value,
       conhecimentos: [],
-    })
-    novaAtividade.value = ''
+    };
+    atividadesStore.adicionarAtividade(novaAtividadeObj);
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.AtividadeAdicionada,
+      idAtividade: novaAtividadeObj.id,
+      descricaoAtividade: novaAtividadeObj.descricao,
+    });
+    console.log('CadAtividades: Após registrar mudança:', revisaoStore.mudancasRegistradas); // Adicionado para depuração
+    novaAtividade.value = '';
   }
 }
 
 function removerAtividade(idx: number) {
-  atividadesStore.removerAtividade(atividades.value[idx].id)
+  const atividadeRemovida = atividades.value[idx];
+  atividadesStore.removerAtividade(atividadeRemovida.id);
+  revisaoStore.registrarMudanca({
+    tipo: TipoMudanca.AtividadeRemovida,
+    idAtividade: atividadeRemovida.id,
+    descricaoAtividade: atividadeRemovida.descricao,
+  });
 }
 
 function adicionarConhecimento(idx: number) {
-  const atividade = atividades.value[idx]
+  const atividade = atividades.value[idx];
   if (atividade.novoConhecimento?.trim()) {
-    atividadesStore.adicionarConhecimento(atividade.id, {
+    const novoConhecimentoObj = {
       id: Date.now(),
       descricao: atividade.novoConhecimento
-    })
+    };
+    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj);
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.ConhecimentoAdicionado,
+      idAtividade: atividade.id,
+      idConhecimento: novoConhecimentoObj.id,
+      descricaoAtividade: atividade.descricao,
+      descricaoConhecimento: novoConhecimentoObj.descricao,
+    });
   }
 }
 
 function removerConhecimento(idx: number, cidx: number) {
-  atividadesStore.removerConhecimento(atividades.value[idx].id, atividades.value[idx].conhecimentos[cidx].id)
+  const atividade = atividades.value[idx];
+  const conhecimentoRemovido = atividade.conhecimentos[cidx];
+  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id);
+  revisaoStore.registrarMudanca({
+    tipo: TipoMudanca.ConhecimentoRemovido,
+    idAtividade: atividade.id,
+    idConhecimento: conhecimentoRemovido.id,
+    descricaoAtividade: atividade.descricao,
+    descricaoConhecimento: conhecimentoRemovido.descricao,
+  });
 }
 
 const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
@@ -299,9 +340,22 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
   if (conhecimentoEditado.value) {
     const newAtividades = [...atividades.value];
     const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos];
+    const conhecimentoOriginal = newConhecimentos[idxConhecimento];
+    const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
+
     newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
     newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
     atividades.value = newAtividades;
+
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.ConhecimentoAlterado,
+      idAtividade: newAtividades[idxAtividade].id,
+      idConhecimento: newConhecimentos[idxConhecimento].id,
+      descricaoAtividade: newAtividades[idxAtividade].descricao,
+      descricaoConhecimento: conhecimentoEditado.value,
+      valorAntigo: valorAntigo,
+      valorNovo: conhecimentoEditado.value,
+    });
   }
   cancelarEdicaoConhecimento()
 }
@@ -324,8 +378,19 @@ function salvarEdicaoAtividade(id: number) {
     const newAtividades = [...atividades.value];
     const atividadeIndex = newAtividades.findIndex(a => a.id === id);
     if (atividadeIndex !== -1) {
+      const atividadeOriginal = atividadesStore.atividades.find(a => a.id === id);
+      const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
+
       newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
       atividades.value = newAtividades;
+
+      revisaoStore.registrarMudanca({
+        tipo: TipoMudanca.AtividadeAlterada,
+        idAtividade: id,
+        descricaoAtividade: String(atividadeEditada.value),
+        valorAntigo: valorAntigo,
+        valorNovo: String(atividadeEditada.value),
+      });
     }
   }
   cancelarEdicaoAtividade()
@@ -371,13 +436,21 @@ const cleanupBackdrop = () => {
   document.body.style.paddingRight = '';
 };
 
-onMounted(() => {
+onMounted(async () => {
   modalElement.value = document.getElementById('importarAtividadesModal');
   modalElement.value?.addEventListener('hidden.bs.modal', cleanupBackdrop);
+
+  const processoAtual = processosStore.processos.find(p => p.id === idProcesso.value);
+  if (processoAtual && processoAtual.tipo === TipoProcesso.REVISAO) {
+    await atividadesStore.fetchAtividadesPorSubprocesso(idSubprocesso.value as number);
+    const atividadesAtuais = atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value as number);
+    atividadesStore.setAtividadesSnapshot(JSON.parse(JSON.stringify(atividadesAtuais)));
+  }
 });
 
 onUnmounted(() => {
   modalElement.value?.removeEventListener('hidden.bs.modal', cleanupBackdrop);
+  revisaoStore.limparMudancas();
 });
 
 watch(processoSelecionadoId, (newId) => {
@@ -450,6 +523,25 @@ function importarAtividades() {
 }
 
 function disponibilizarCadastro() {
+}
+
+function irParaImpactoMapa() {
+  if (idProcesso.value && siglaUnidade.value) {
+    // Salvar o estado atual da revisaoStore no sessionStorage antes de navegar
+    sessionStorage.setItem('revisaoMudancas', JSON.stringify(revisaoStore.mudancasRegistradas));
+    console.log('CadAtividades: Salvando no sessionStorage:', sessionStorage.getItem('revisaoMudancas')); // Adicionado para depuração
+
+    router.push({
+      name: 'SubprocessoImpactoMapa',
+      params: {
+        idProcesso: idProcesso.value,
+        siglaUnidade: siglaUnidade.value
+      },
+      query: { // Adicionar query parameter
+        mudancas: JSON.stringify(revisaoStore.mudancasRegistradas)
+      }
+    });
+  }
 }
 </script>
 

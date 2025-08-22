@@ -16,7 +16,7 @@
   {
     "id": 3,
     "nome": "Fernanda Oliveira",
-    "unidade": "SGP",
+    "unidade": "SEDESENV",
     "email": "fernanda.oliveira@tre-pe.jus.br",
     "ramal": "3456"
   },
@@ -30,7 +30,7 @@
   {
     "id": 5,
     "nome": "Marina Dias",
-    "unidade": "SGP",
+    "unidade": "SEMARE",
     "email": "marina.dias@tre-pe.jus.br",
     "ramal": "5678"
   },
@@ -51,7 +51,7 @@
   {
     "id": 8,
     "nome": "Paulo Horta",
-    "unidade": "COSIS",
+    "unidade": "SEDESENV",
     "email": "paulo.horta@tre-pe.jus.br",
     "ramal": "7002"
   },
@@ -92,9 +92,9 @@
   },
   {
     "id": 14,
-    "nome": "Servidor Teste STIC",
+    "nome": "Maroca Silva",
     "unidade": "STIC",
-    "email": "teste.stic@tre-pe.jus.br",
+    "email": "maroca.silva@tre-pe.jus.br",
     "ramal": "7008"
   }
 ]

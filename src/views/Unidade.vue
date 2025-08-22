@@ -9,39 +9,35 @@
       </div>
     </div>
 
-    <div v-if="unidade" class="card mb-4">
+    <div v-if="unidadeComResponsavelDinamico" class="card mb-4">
       <div class="card-body">
-        <h2 class="display-6 mb-3">{{ unidade.sigla }} - {{ unidade.nome }}</h2>
-        <p><strong>Responsável:</strong> {{ responsavel }}</p>
-        <p><strong>Contato:</strong> {{ responsavelEmail }}</p>
-        <button v-if="mapaVigente" class="btn btn-info btn-sm" @click="visualizarMapa">Visualizar Mapa</button>
+        <h2 class="display-6 mb-3">{{ unidadeComResponsavelDinamico.sigla }} - {{
+            unidadeComResponsavelDinamico.nome
+          }}</h2>
+        <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
+        <p class="ms-3">
+          <i class="bi bi-telephone-fill me-2"></i>{{ titularDetalhes?.ramal }}
+          <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ titularDetalhes?.email }}
+        </p>
+        <template v-if="unidadeComResponsavelDinamico.responsavel &&
+                        unidadeComResponsavelDinamico.responsavel.idServidorResponsavel &&
+                        unidadeComResponsavelDinamico.responsavel.idServidorResponsavel !== unidadeComResponsavelDinamico.idServidorTitular">
+          <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
+          <p class="ms-3">
+            <i class="bi bi-telephone-fill me-2"></i>{{ responsavelDetalhes?.ramal }}
+            <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ responsavelDetalhes?.email }}
+          </p>
+        </template>
+        <button v-if="mapaVigente" class="btn btn-outline-success" @click="visualizarMapa"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Mapa vigente</button>
       </div>
     </div>
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
-    <div class="row mt-4">
-      <div class="col-md-6 mb-4">
-        <div class="card h-100 cursor-pointer" data-testid="card-atividades-conhecimentos"
-             @click="navegarParaAtividades">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h5 class="card-title">Atividades e conhecimentos</h5>
-            <p class="card-text text-muted">Gerencie as atividades e conhecimentos da unidade.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 mb-4">
-        <div class="card h-100 cursor-pointer" @click="visualizarMapa">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h5 class="card-title">Mapa de Competências</h5>
-            <p class="card-text text-muted">Visualize o mapa de competências da unidade.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="unidade && unidade.filhas && unidade.filhas.length > 0" class="mt-5">
+    <div
+        v-if="unidadeComResponsavelDinamico && unidadeComResponsavelDinamico.filhas && unidadeComResponsavelDinamico.filhas.length > 0"
+        class="mt-5">
       <TreeTable
           :columns="colunasTabela"
           :data="dadosFormatadosSubordinadas"
@@ -61,7 +57,8 @@ import {usePerfilStore} from '@/stores/perfil.js'
 import {useServidoresStore} from '@/stores/servidores.js'
 import {useMapasStore} from '@/stores/mapas.js'
 import TreeTable from '../components/TreeTable.vue'
-import {Mapa, Unidade} from '@/types/tipos';
+import {Mapa, Servidor, TipoResponsabilidade, Unidade} from '@/types/tipos';
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria.js'
 
 const props = defineProps<{ siglaUnidade: string }>();
 
@@ -71,21 +68,53 @@ const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 const servidoresStore = useServidoresStore()
 const mapasStore = useMapasStore()
+const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore() // Instanciar
 
-const unidade = computed<Unidade | null>(() => unidadesStore.pesquisarUnidade(sigla.value) || null)
-const responsavel = computed<string>(() => {
-  if (unidade.value && unidade.value.titular) {
-    return servidoresStore.getServidorById(unidade.value.titular)?.nome || 'Não definido'
-  }
-  return 'Não definido'
-})
+const unidadeOriginal = computed<Unidade | null>(() => unidadesStore.pesquisarUnidade(sigla.value) || null)
 
-const responsavelEmail = computed<string>(() => {
-  if (unidade.value && unidade.value.titular) {
-    return servidoresStore.getServidorById(unidade.value.titular)?.email || 'Não informado'
+const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
+  const unidade = unidadeOriginal.value;
+  if (!unidade) return null;
+
+  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorUnidade(unidade.sigla);
+  const hoje = new Date();
+
+  // Encontrar a atribuição temporária vigente
+  const atribuicaoVigente = atribuicoes.find(atrb => {
+    const dataInicio = new Date(atrb.dataInicio);
+    const dataTermino = new Date(atrb.dataTermino);
+    return hoje >= dataInicio && hoje <= dataTermino;
+  });
+
+  if (atribuicaoVigente) {
+    // Retorna uma nova unidade com o responsável da atribuição temporária
+    return {
+      ...unidade,
+      responsavel: {
+        idServidorResponsavel: atribuicaoVigente.idServidor,
+        tipo: TipoResponsabilidade.ATRIBUICAO, // Usar o enum
+        dataInicio: new Date(atribuicaoVigente.dataInicio),
+        dataFim: new Date(atribuicaoVigente.dataTermino),
+      }
+    };
   }
-  return 'Não informado'
-})
+
+  // Se não houver atribuição temporária vigente, retorna a unidade original
+  return unidade;
+});
+const titularDetalhes = computed<Servidor | null>(() => {
+  if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
+    return servidoresStore.getServidorById(unidadeOriginal.value.idServidorTitular) || null;
+  }
+  return null;
+});
+
+const responsavelDetalhes = computed<Servidor | null>(() => {
+  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.idServidorResponsavel) {
+    return null;
+  }
+  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.idServidorResponsavel) || null;
+});
 
 const mapaVigente = computed<Mapa | undefined>(() => mapasStore.getMapaVigentePorUnidade(sigla.value))
 
@@ -94,8 +123,8 @@ function irParaCriarAtribuicao() {
 }
 
 const dadosFormatadosSubordinadas = computed(() => {
-  if (!unidade.value || !unidade.value.filhas || unidade.value.filhas.length === 0) return []
-  return formatarDadosParaArvore(unidade.value.filhas)
+  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.filhas || unidadeComResponsavelDinamico.value.filhas.length === 0) return []
+  return formatarDadosParaArvore(unidadeComResponsavelDinamico.value.filhas)
 })
 
 const colunasTabela = [{key: 'nome', label: 'Unidade'}]
@@ -125,20 +154,6 @@ function navegarParaUnidadeSubordinada(item: { id: unknown }) {
   if (item && typeof item.id === 'string') router.push({path: `/unidade/${item.id}`});
 }
 
-function navegarParaAtividades() {
-  if (mapaVigente.value) {
-    router.push({
-      name: 'SubprocessoCadastro',
-      params: {
-        idProcesso: mapaVigente.value.idProcesso,
-        siglaUnidade: sigla.value
-      }
-    });
-  } else {
-    // Tratar o caso onde não há mapa vigente, talvez com um alerta ou desabilitando o card
-    console.warn('Não há mapa vigente para navegar para atividades.');
-  }
-}
 
 function visualizarMapa() {
   if (mapaVigente.value) {

@@ -32,13 +32,25 @@ export interface Subprocesso {
     dataFimEtapa2: Date | null;
 }
 
+export enum TipoResponsabilidade {
+    SUBSTITUICAO = 'Substituição',
+    ATRIBUICAO = 'Atribuição temporária'
+}
+
+export interface Responsavel {
+    idServidorResponsavel: number;
+    tipo: TipoResponsabilidade;
+    dataInicio: Date | null;
+    dataFim: Date | null;
+}
+
 export interface Unidade {
     id: number;
     sigla: string;
     tipo: string;
     nome: string;
-    titular: number;
-    responsavel: number | null;
+    idServidorTitular: number;
+    responsavel: Responsavel | null;
     filhas: Unidade[];
 }
 
@@ -90,8 +102,8 @@ export interface Alerta {
 }
 
 export interface AtribuicaoTemporaria {
-    unidade: string;
     idServidor: number;
+    unidade: string;
     dataInicio: Date;
     dataTermino: Date;
     justificativa: string;

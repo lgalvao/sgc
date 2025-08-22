@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { useConfiguracoesStore } from '@/stores/configuracoes';
+import {onMounted, ref} from 'vue';
+import {useConfiguracoesStore} from '@/stores/configuracoes';
 
 const configuracoesStore = useConfiguracoesStore();
 const mensagemSucesso = ref('');

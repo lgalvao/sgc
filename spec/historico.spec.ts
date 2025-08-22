@@ -23,7 +23,7 @@ test.describe('Histórico de Processos', () => {
     test('deve exibir processos no histórico', async ({page}) => {
         // Verifica se há pelo menos uma linha de dados na tabela (excluindo o cabeçalho)
         const rows = page.locator('tbody').getByRole('row');
-        await expect(rows).toHaveCount(3); // Assumindo que há 3 processos no snapshot
+        await expect(rows).toHaveCount(2); // Assumindo que há 2 processos no snapshot
     });
 
     test('deve navegar para os detalhes do processo ao clicar em uma linha', async ({page}) => {

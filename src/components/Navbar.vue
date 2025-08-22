@@ -39,14 +39,15 @@
                   @click="startEditingProfile">
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
+
             <select v-else
                     ref="profileSelect"
-                    :value="servidorLogado?.id"
+                    :value="selectedProfileKey"
                     class="form-select form-select-sm"
                     @blur="stopEditingProfile"
                     @change="handleProfileChange">
-              <option v-for="servidor in servidoresComPerfil" :key="servidor.id" :value="servidor.id">
-                {{ servidor.perfil }} - {{ servidor.unidade }} ({{ servidor.nome }})
+              <option v-for="perfil in perfisDisponiveis" :key="perfil.id" :value="perfil.id">
+                {{ perfil.perfil }} - {{ perfil.unidade }} ({{ perfil.nome }})
               </option>
             </select>
           </li>
@@ -70,17 +71,38 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue'
+import {computed, nextTick, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {usePerfilStore} from '@/stores/perfil'
+import {useServidoresStore} from '@/stores/servidores'
 import {usePerfil} from '@/composables/usePerfil'
 
 const router = useRouter()
-
-const {servidorLogado, servidoresComPerfil, perfilSelecionado, unidadeSelecionada} = usePerfil()
 const perfilStore = usePerfilStore()
+const servidoresStore = useServidoresStore()
+
+const {servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor} = usePerfil()
+
 const isEditingProfile = ref(false)
 const profileSelect = ref<HTMLSelectElement | null>(null)
+
+const perfisDisponiveis = computed(() => {
+  return servidoresStore.servidores.flatMap(servidor => {
+    const pares = getPerfisDoServidor(servidor.id)
+    return pares.map(par => ({
+      id: `${servidor.id}-${par.perfil}-${par.unidade}`,
+      servidorId: servidor.id,
+      nome: servidor.nome,
+      perfil: par.perfil,
+      unidade: par.unidade,
+    }))
+  })
+})
+
+const selectedProfileKey = computed(() => {
+  if (!servidorLogado.value || !perfilSelecionado.value || !unidadeSelecionada.value) return ''
+  return `${perfilStore.servidorId}-${perfilSelecionado.value}-${unidadeSelecionada.value}`
+})
 
 const startEditingProfile = () => {
   isEditingProfile.value = true
@@ -94,21 +116,19 @@ const stopEditingProfile = () => {
 }
 
 const handleProfileChange = (event: Event) => {
-  const selectedId = Number((event.target as HTMLSelectElement).value);
-  const selectedServidor = servidoresComPerfil.value.find(s => s.id === selectedId);
-  if (selectedServidor) {
-    perfilStore.setServidorId(selectedId);
-    perfilStore.setPerfilUnidade(selectedServidor.perfil, selectedServidor.unidade);
-    router.push('/painel'); // Redireciona para o Painel
+  const selectedKey = (event.target as HTMLSelectElement).value
+  const selectedPerfil = perfisDisponiveis.value.find(p => p.id === selectedKey)
+
+  if (selectedPerfil) {
+    perfilStore.setServidorId(selectedPerfil.servidorId)
+    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade)
+    router.push('/painel')
   }
-  stopEditingProfile();
+  stopEditingProfile()
 }
 
 function navigateFromNavbar(path: string) {
-  try {
-    sessionStorage.setItem('cameFromNavbar', '1')
-  } catch {
-  }
+  sessionStorage.setItem('cameFromNavbar', '1')
   router.push(path)
 }
 

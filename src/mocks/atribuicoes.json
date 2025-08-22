@@ -1,0 +1,16 @@
+[
+  {
+    "unidade": "SENIC",
+    "idServidor": 8,
+    "dataInicio": "2025-08-01",
+    "dataTermino": "2025-10-31",
+    "justificativa": "Apoio temporário."
+  },
+  {
+    "unidade": "SEMARE",
+    "idServidor": 13,
+    "dataInicio": "2025-08-01",
+    "dataTermino": "2025-09-30",
+    "justificativa": "Quase todos de férias."
+  }
+]

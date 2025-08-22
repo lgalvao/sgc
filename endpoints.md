@@ -6,36 +6,48 @@
     - Componente: Painel.vue
     - Tela inicial (no estilo de 'dashboard') com lista de processos e alertas.
 
+- /processo/cadastro
+    - Componente: CadProcesso.vue
+    - Tela para cadastro de novos processos.
+
 - /processo/:idProcesso
     - Componente: Processo.vue
     - Mostra detalhes do processo e a tabela/árvore de unidades participantes.
 
-- /processo/:idProcesso/:siglaUnidadeUnidade
+- /processo/:idProcesso/:siglaUnidade
     - Componente: Subprocesso.vue
     - Mostra o contexto do processo para a unidade (responsável, ações disponíveis etc.).
 
-- /processo/:idProcesso/:siglaUnidadeUnidade/mapa
+- /processo/:idProcesso/:siglaUnidade/mapa
     - Componente: CadMapa.vue
     - Edição/criação do mapa de competências no contexto do processo
 
-- /processo/:idProcesso/:siglaUnidadeUnidade/cadastro
+- /processo/:idProcesso/:siglaUnidade/vis-mapa
+    - Componente: VisMapa.vue
+    - Visualização do mapa de competências no contexto do processo
+
+- /processo/:idProcesso/:siglaUnidade/cadastro
     - Componente: CadAtividades.vue
     - Cadastro de atividades e conhecimentos para a unidade dentro do processo
 
-- /processo/:idProcesso/:siglaUnidadeUnidade/vis-cadastro
-    - Componente: CadAtividades.vue
-    - Cadastro de atividades e conhecimentos para a unidade dentro do processo
+- /processo/:idProcesso/:siglaUnidade/vis-cadastro
+    - Componente: VisAtividades.vue
+    - Visualização de atividades e conhecimentos para a unidade dentro do processo
 
-- /unidade/:siglaUnidadeUnidade
+- /processo/:idProcesso/:siglaUnidade/impacto-mapa
+    - Componente: ImpactoMapa.vue
+    - Exibe o impacto das mudanças de atividades e conhecimentos no mapa de competências.
+
+- /unidade/:siglaUnidade
     - Componente: Unidade.vue
     - Detalhes da unidade fora do processo (responsável, mapa vigente e subordinadas, se houver); para ADMIN, dá acesso
       ao cad. de atribuição temporária
 
-- /unidade/:siglaUnidadeUnidade/atribuicao
+- /unidade/:siglaUnidade/atribuicao
     - Componente: CadAtribuicao.vue
     - Cadastra e edita atribuição temporárias, permitindo acesso excepcional com perfil CHEFE
 
-- /unidade/:siglaUnidadeUnidade/mapa
+- /unidade/:siglaUnidade/mapa
     - Componente: CadMapa.vue
     - Edição/criação do mapa de competências da unidade (fora do contexto de um processo específico).
 
@@ -44,7 +56,7 @@
     - Painel de relatórios.
 
 - /historico
-    - Componente: HistoricoProcessos.vue
+    - Componente: Historico.vue
     - Tabela de processos inativados, com navegação para mapas e detalhes do processo.
 
 - /configuracoes

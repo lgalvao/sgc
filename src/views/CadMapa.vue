@@ -186,7 +186,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
 const idSubprocesso = computed(() => {
-  const Subprocesso = processosStore.processosUnidade.find(
+  const Subprocesso = processosStore.subprocessos.find(
       (pu: any) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
   return Subprocesso?.id;
@@ -282,7 +282,7 @@ function adicionarOuAtualizarCompetencia() {
       unidade: sigla.value,
       idProcesso: idProcesso.value,
       competencias: competencias.value,
-      situacao: 'em_andamento',
+      situacao: './utils/auth',
       dataCriacao: new Date(),
       dataDisponibilizacao: null,
       dataFinalizacao: null,

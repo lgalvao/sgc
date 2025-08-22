@@ -3,7 +3,8 @@
     "sigla": "SEDOC",
     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
     "tipo": "ADMINISTRATIVA",
-    "idServidorTitular": 7,
+    "idServidorTitular": 1,
+    "responsavel": { "idServidorResponsavel": 8, "tipo": 0, "dataInicio": "2025-01-01", "dataFim": "2025-12-31" },
     "filhas": [
       {
         "sigla": "SGP",
@@ -81,7 +82,7 @@
           {
             "sigla": "COSINF",
             "nome": "Coordenadoria de Suporte e Infraestrutura",
-            "tipo": "INTERMEDIARIA",
+            "tipo": "OPERACIONAL",
             "idServidorTitular": 12,
             "responsavel": null,
             "filhas": [
@@ -89,7 +90,7 @@
                 "sigla": "SENIC",
                 "nome": "Seção de Infraestrutura",
                 "tipo": "OPERACIONAL",
-                "idServidorTitular": 13,
+                "idServidorTitular": 1,
                 "responsavel": null,
                 "filhas": [],
                 "id": 12

@@ -14,7 +14,8 @@ export const useAtividadesStore = defineStore('atividades', {
         });
         return {
             atividades: atividades,
-            nextId: maxId + 1
+            nextId: maxId + 1,
+            atividadesSnapshot: [] as Atividade[], // Adicionado para armazenar o snapshot
         };
     },
     getters: {
@@ -32,7 +33,9 @@ export const useAtividadesStore = defineStore('atividades', {
         },
         adicionarAtividade(atividade: Atividade) {
             atividade.id = this.nextId++;
-            this.atividades.push(atividade);
+            // Substituir o array para garantir reatividade
+            this.atividades = [...this.atividades, atividade];
+            console.log('AtividadesStore: Atividade adicionada. Estado atual:', this.atividades); // Adicionado para depuração
         },
         removerAtividade(atividadeId: number) {
             this.atividades = this.atividades.filter(a => a.id !== atividadeId);
@@ -77,6 +80,9 @@ export const useAtividadesStore = defineStore('atividades', {
                 return novaAtividade;
             });
             this.atividades.push(...novasAtividadesComId);
+        },
+        setAtividadesSnapshot(snapshot: Atividade[]) {
+            this.atividadesSnapshot = snapshot;
         }
     }
 });

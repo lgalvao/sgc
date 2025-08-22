@@ -9,37 +9,47 @@ vi.mock('../../mocks/unidades.json', () => ({
             "sigla": "SEDOC",
             "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
             "tipo": "ADMINISTRATIVA",
-            "titular": 7,
-            "responsavel": null,
+            "idServidorTitular": 1,
+            "responsavel": {"idServidorResponsavel": 8, "tipo": 0, "dataInicio": "2025-01-01", "dataFim": "2025-12-31"},
             "filhas": [
                 {
                     "sigla": "SGP",
                     "nome": "Secretaria de Gestao de Pessoas",
                     "tipo": "INTERMEDIARIA",
-                    "titular": 2,
-                    "responsavel": null,
+                    "idServidorTitular": 2,
+                    "responsavel": {
+                        "idServidorResponsavel": 13,
+                        "tipo": 1,
+                        "dataInicio": "2025-01-01",
+                        "dataFim": "2025-12-31"
+                    },
                     "filhas": []
                 },
                 {
                     "sigla": "STIC",
                     "nome": "Secretaria de Informática e Comunicações",
                     "tipo": "INTEROPERACIONAL",
-                    "titular": 8,
+                    "idServidorTitular": 5,
                     "responsavel": null,
                     "filhas": [
                         {
                             "sigla": "COSIS",
                             "nome": "Coordenadoria de Sistemas",
                             "tipo": "INTERMEDIARIA",
-                            "titular": 9,
+                            "idServidorTitular": 6,
                             "responsavel": null,
                             "filhas": [
                                 {
                                     "sigla": "SEDESENV",
                                     "nome": "Seção de Desenvolvimento de Sistemas",
                                     "tipo": "OPERACIONAL",
-                                    "titular": 10,
-                                    "responsavel": 5,
+                                    "idServidorTitular": 7,
+                                    "responsavel": {
+                                        "idServidorResponsavel": 8,
+                                        "tipo": 0,
+                                        "dataInicio": "2025-01-01",
+                                        "dataFim": "2025-12-31"
+                                    },
                                     "filhas": []
                                 }
                             ]
@@ -64,37 +74,52 @@ describe('useUnidadesStore', () => {
                     "sigla": "SEDOC",
                     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
                     "tipo": "ADMINISTRATIVA",
-                    "titular": 7,
-                    "responsavel": null,
+                    "idServidorTitular": 1,
+                    "responsavel": {
+                        "idServidorResponsavel": 8,
+                        "tipo": 0,
+                        "dataInicio": "2025-01-01",
+                        "dataFim": "2025-12-31"
+                    },
                     "filhas": [
                         {
                             "sigla": "SGP",
                             "nome": "Secretaria de Gestao de Pessoas",
                             "tipo": "INTERMEDIARIA",
-                            "titular": 2,
-                            "responsavel": null,
+                            "idServidorTitular": 2,
+                            "responsavel": {
+                                "idServidorResponsavel": 13,
+                                "tipo": 1,
+                                "dataInicio": "2025-01-01",
+                                "dataFim": "2025-12-31"
+                            },
                             "filhas": []
                         },
                         {
                             "sigla": "STIC",
                             "nome": "Secretaria de Informática e Comunicações",
                             "tipo": "INTEROPERACIONAL",
-                            "titular": 8,
+                            "idServidorTitular": 5,
                             "responsavel": null,
                             "filhas": [
                                 {
                                     "sigla": "COSIS",
                                     "nome": "Coordenadoria de Sistemas",
                                     "tipo": "INTERMEDIARIA",
-                                    "titular": 9,
+                                    "idServidorTitular": 6,
                                     "responsavel": null,
                                     "filhas": [
                                         {
                                             "sigla": "SEDESENV",
                                             "nome": "Seção de Desenvolvimento de Sistemas",
                                             "tipo": "OPERACIONAL",
-                                            "titular": 10,
-                                            "responsavel": 5,
+                                            "idServidorTitular": 7,
+                                            "responsavel": {
+                                                "idServidorResponsavel": 8,
+                                                "tipo": 0,
+                                                "dataInicio": "2025-01-01",
+                                                "dataFim": "2025-12-31"
+                                            },
                                             "filhas": []
                                         }
                                     ]
@@ -136,37 +161,52 @@ describe('useUnidadesStore', () => {
                     "sigla": "SEDOC",
                     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
                     "tipo": "ADMINISTRATIVA",
-                    "titular": 7,
-                    "responsavel": null,
+                    "idServidorTitular": 1,
+                    "responsavel": {
+                        "idServidorResponsavel": 8,
+                        "tipo": 0,
+                        "dataInicio": "2025-01-01",
+                        "dataFim": "2025-12-31"
+                    },
                     "filhas": [
                         {
                             "sigla": "SGP",
                             "nome": "Secretaria de Gestao de Pessoas",
                             "tipo": "INTERMEDIARIA",
-                            "titular": 2,
-                            "responsavel": null,
+                            "idServidorTitular": 2,
+                            "responsavel": {
+                                "idServidorResponsavel": 13,
+                                "tipo": 1,
+                                "dataInicio": "2025-01-01",
+                                "dataFim": "2025-12-31"
+                            },
                             "filhas": []
                         },
                         {
                             "sigla": "STIC",
                             "nome": "Secretaria de Informática e Comunicações",
                             "tipo": "INTEROPERACIONAL",
-                            "titular": 8,
+                            "idServidorTitular": 5,
                             "responsavel": null,
                             "filhas": [
                                 {
                                     "sigla": "COSIS",
                                     "nome": "Coordenadoria de Sistemas",
                                     "tipo": "INTERMEDIARIA",
-                                    "titular": 9,
+                                    "idServidorTitular": 6,
                                     "responsavel": null,
                                     "filhas": [
                                         {
                                             "sigla": "SEDESENV",
                                             "nome": "Seção de Desenvolvimento de Sistemas",
                                             "tipo": "OPERACIONAL",
-                                            "titular": 10,
-                                            "responsavel": 5,
+                                            "idServidorTitular": 7,
+                                            "responsavel": {
+                                                "idServidorResponsavel": 8,
+                                                "tipo": 0,
+                                                "dataInicio": "2025-01-01",
+                                                "dataFim": "2025-12-31"
+                                            },
                                             "filhas": []
                                         }
                                     ]
@@ -178,7 +218,7 @@ describe('useUnidadesStore', () => {
             ];
             const sticUnit = mockData[0].filhas.find(u => u.sigla === 'STIC');
             expect(sticUnit).toBeDefined();
-            const cosisUnit = unidadesStore.pesquisarUnidade('COSIS', [sticUnit!]);
+            const cosisUnit = unidadesStore.pesquisarUnidade('COSIS');
             expect(cosisUnit).toBeDefined();
             expect(cosisUnit?.sigla).toBe('COSIS');
         });

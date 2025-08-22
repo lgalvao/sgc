@@ -31,5 +31,37 @@
     "dataCriacao": "2025-06-01",
     "dataDisponibilizacao": null,
     "dataFinalizacao": null
+  },
+  {
+    "id": 2,  
+    "unidade": "SESEL",
+    "idProcesso": 4, 
+    "situacao": "em_andamento", 
+    "competencias": [
+      {
+        "id": 1,
+        "descricao": "Acompanhamento de processos eleitorais (Revisão)",
+        "atividadesAssociadas": [
+          6, 101 
+        ]
+      },
+      {
+        "id": 2,
+        "descricao": "Implantação de sistemas (Revisão)",
+        "atividadesAssociadas": [
+          1, 103 
+        ]
+      },
+      {
+        "id": 3,
+        "descricao": "Testes de sistemas eleitorais (Revisão)",
+        "atividadesAssociadas": [
+          4, 5
+        ]
+      }
+    ],
+    "dataCriacao": "2024-05-01",
+    "dataDisponibilizacao": null,
+    "dataFinalizacao": null
   }
 ]

@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import unidadesMock from '../mocks/unidades.json'
+import unidadesMock from '../mocks/unidades.json' assert {type: 'json'};
 import type {Unidade} from '@/types/tipos'
 
 export const useUnidadesStore = defineStore('unidades', {

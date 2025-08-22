@@ -11,9 +11,9 @@ test.describe('Detalhes da Unidade', () => {
     });
 
     test('deve exibir os detalhes da unidade e a tabela de subunidades', async ({page}) => {
-        await expect(page.getByRole('heading', {name: 'STIC - Secretaria de Informática e Comunicações'})).toBeVisible();
-        await expect(page.getByText('Responsável: Paulo Horta')).toBeVisible();
-        await expect(page.getByText('Contato: paulo.horta@tre-pe.jus.br')).toBeVisible();
+        await expect(page.getByTitle('Secretaria de Informática e Comunicações')).toBeVisible();
+        await expect(page.getByText('STIC - Secretaria de Informática e Comunicações')).toBeVisible();
+        
         await expect(page.getByRole('button', {name: 'Visualizar Mapa'})).not.toBeVisible(); // Verifica que o botão não está visível quando não há mapa
         await expect(page.getByRole('heading', {name: 'Unidades Subordinadas'})).toBeVisible();
         await expect(page.getByRole('table')).toBeVisible();

@@ -37,8 +37,6 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useServidoresStore} from '@/stores/servidores'
 import {usePerfilStore} from '@/stores/perfil'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
 import {usePerfil} from '@/composables/usePerfil'
 import {Servidor} from '@/types/tipos';
 
@@ -50,9 +48,7 @@ interface Par {
 const router = useRouter()
 const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
-const unidadesStore = useUnidadesStore()
-const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
-
+const {getPerfisDoServidor} = usePerfil()
 
 const titulo = ref('1') // Preenchido para teste com Ana Paula Souza
 const senha = ref('123') // Preenchido para teste
@@ -71,7 +67,7 @@ const handleLogin = () => {
     servidor.value = servidoresStore.getServidorById(Number(titulo.value))
 
     if (servidor.value) {
-      paresDisponiveis.value = getPerfisEUnidades(servidor.value.id)
+      paresDisponiveis.value = getPerfisDoServidor(servidor.value.id)
 
       if (paresDisponiveis.value.length > 1) {
         loginStep.value = 2
@@ -95,34 +91,6 @@ const finalizarLogin = (idServidor: number, perfil: string, unidadeSigla: string
   perfilStore.setServidorId(idServidor)
   perfilStore.setPerfilUnidade(perfil, unidadeSigla)
   router.push('/painel')
-}
-
-const getPerfisEUnidades = (idServidor: number): Par[] => {
-  const {servidoresComPerfil} = usePerfil()
-  const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(idServidor)
-
-  const pares: Par[] = []
-
-  const servidorComPerfil = servidoresComPerfil.value.find(s => s.id === idServidor)
-  if (servidorComPerfil) {
-    const unidadeTitular = unidadesStore.pesquisarUnidade(servidorComPerfil.unidade)
-    if (unidadeTitular) {
-      pares.push({perfil: servidorComPerfil.perfil, unidade: unidadeTitular.sigla})
-    }
-  }
-
-  atribuicoes.forEach(atrb => {
-    const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade)
-    if (unidadeAtribuicao) {
-      // Adiciona apenas se o par perfil-unidade ainda não existe
-      const existe = pares.some(p => p.perfil === 'SERVIDOR' && p.unidade === unidadeAtribuicao.sigla)
-      if (!existe) {
-        pares.push({perfil: 'SERVIDOR', unidade: unidadeAtribuicao.sigla})
-      }
-    }
-  })
-
-  return pares
 }
 
 </script>

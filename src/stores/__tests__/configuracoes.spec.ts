@@ -1,6 +1,6 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { useConfiguracoesStore } from '../configuracoes';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {useConfiguracoesStore} from '../configuracoes';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {

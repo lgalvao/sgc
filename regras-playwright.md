@@ -18,5 +18,11 @@ garantem que os fluxos críticos da aplicação funcionem corretamente do ponto 
     - Use o botão "Voltar" global nos testes (role/button com nome "Voltar"), não data-testids locais.
     - Prefira rotas nomeadas e seletores `data-testid` estáveis para formulários e botões.
     - Endpoints atualizados conforme a lista acima; não usar mais endpoints legados ou redirects.
-- **timeouts**: Os testes E2E devem ter timeouts curtos, de no máximo 5000ms, pois não há backend e está tudo mockado.
+- **Timeouts**: Os testes E2E devem ter timeouts curtos, de no máximo 5000ms, pois não há backend e está tudo mockado.
   Se um teste não passar, o problema geralmente estará em outro lugar, não no timeout.
+- **Estabilidade do Ambiente**: Antes de executar testes E2E, certifique-se de que o servidor de desenvolvimento (Vite)
+  esteja estável e a aplicação carregue sem erros críticos no console do navegador (ex: `TypeError: app.mount is not a function`).
+  Problemas no servidor ou na inicialização da aplicação podem levar a falhas inconsistentes nos testes E2E.
+- **Seletores Robustos**: Prefira seletores baseados em `role` (ex: `page.getByRole('button', { name: 'Salvar' })`) ou
+  `label` (ex: `page.getByLabel('Dias para inativação de processos:')`) para interagir com elementos da UI.
+  Evite seletores baseados em classes CSS ou IDs gerados dinamicamente, pois são menos estáveis.

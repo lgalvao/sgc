@@ -5,6 +5,7 @@ import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import BarraNavegacao from '../BarraNavegacao.vue';
 import {useNavigationTrail} from '@/stores/navigationTrail';
 import {useUnidadesStore} from '@/stores/unidades';
+import {TipoResponsabilidade} from '@/types/tipos';
 
 const routes: RouteRecordRaw[] = [
     {path: '/painel', name: 'Painel', component: {template: '<div>Painel</div>'}},
@@ -56,8 +57,8 @@ describe('BarraNavegacao.vue', () => {
             sigla,
             nome: `Unidade ${sigla}`,
             tipo: 'Tipo',
-            titular: 1,
-            responsavel: null,
+            idServidorTitular: 1,
+            responsavel: { idServidorResponsavel: 1, tipo: TipoResponsabilidade.ATRIBUICAO, dataInicio: new Date('2025-01-01'), dataFim: new Date('2025-12-31') },
             filhas: []
         }));
 

@@ -84,7 +84,7 @@ const unidade = computed<Unidade | null>(() => {
 })
 
 const idSubprocesso = computed(() => {
-  const Subprocesso = processosStore.processosUnidade.find(
+  const Subprocesso = processosStore.subprocessos.find(
       (pu: any) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
   return Subprocesso?.id;
@@ -111,12 +111,12 @@ function getConhecimentosAtividade(id: number): Conhecimento[] {
 
 function validarCadastro() {
   // Lógica para validar o cadastro
-  console.log('Validar cadastro de mapa');
+
 }
 
 function devolverCadastro() {
   // Lógica para devolver o cadastro
-  console.log('Devolver cadastro de mapa');
+
 }
 </script>
 

@@ -41,9 +41,9 @@
     "unidade": "STIC",
     "dataLimiteEtapa1": "2025-07-15",
     "dataLimiteEtapa2": "2025-08-15",
-    "dataFimEtapa1": null,
+    "dataFimEtapa1": "2025-07-15",
     "dataFimEtapa2": null,
-    "situacao": "Cadastro em andamento",
+    "situacao": "Mapa disponibilizado",
     "unidadeAtual": "STIC",
     "unidadeAnterior": null
   },

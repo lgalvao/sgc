@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 
 interface ConfiguracoesState {
   diasInativacaoProcesso: number;
@@ -30,7 +30,7 @@ export const useConfiguracoesStore = defineStore('configuracoes', {
           diasAlertaNovo: this.diasAlertaNovo,
         };
         localStorage.setItem('appConfiguracoes', JSON.stringify(configToSave));
-        console.log('Configurações salvas com sucesso!');
+        
         return true;
       } catch (e) {
         console.error('Erro ao salvar configurações no localStorage:', e);

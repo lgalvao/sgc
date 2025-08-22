@@ -104,7 +104,7 @@ describe('useProcessosStore', () => {
                     "situacao": "Em andamento"
                 }
             ].map(parseProcessoDates),
-            processosUnidade: [
+            subprocessos: [
                 {
                     "id": 1,
                     "idProcesso": 1,
@@ -145,15 +145,15 @@ describe('useProcessosStore', () => {
         });
     });
 
-    it('should initialize with mock processos and processosUnidade with parsed dates', () => {
+    it('should initialize with mock processos and subprocessos with parsed dates', () => {
         expect(processosStore.processos.length).toBe(2); // Directly use the expected length
         expect(processosStore.processos[0].dataLimite).toBeInstanceOf(Date);
-        expect(processosStore.processosUnidade.length).toBe(3); // Directly use the expected length
-        expect(processosStore.processosUnidade[0].dataLimiteEtapa1).toBeInstanceOf(Date);
+        expect(processosStore.subprocessos.length).toBe(3); // Directly use the expected length
+        expect(processosStore.subprocessos[0].dataLimiteEtapa1).toBeInstanceOf(Date);
     });
 
     describe('getters', () => {
-        it('getUnidadesDoProcesso should filter processosUnidade by idProcesso', () => {
+        it('getUnidadesDoProcesso should filter subprocessos by idProcesso', () => {
             const unidades = processosStore.getUnidadesDoProcesso(1);
             expect(unidades.length).toBe(2);
             expect(unidades[0].unidade).toBe('SESEL');
@@ -184,8 +184,8 @@ describe('useProcessosStore', () => {
             expect(processosStore.processos[initialLength]).toEqual(novoProcesso);
         });
 
-        it('adicionarProcessosUnidade should add multiple subprocesso objects to the store', () => {
-            const novasProcessosUnidade: Subprocesso[] = [
+        it('adicionarsubprocessos should add multiple subprocesso objects to the store', () => {
+            const novassubprocessos: Subprocesso[] = [
                 {
                     id: 4, idProcesso: 3, unidade: 'NOVA1',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
@@ -199,13 +199,13 @@ describe('useProcessosStore', () => {
                     situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnterior: null
                 }
             ];
-            const initialLength = processosStore.processosUnidade.length;
+            const initialLength = processosStore.subprocessos.length;
 
-            processosStore.adicionarProcessosUnidade(novasProcessosUnidade);
+            processosStore.adicionarsubprocessos(novassubprocessos);
 
-            expect(processosStore.processosUnidade.length).toBe(initialLength + 2);
-            expect(processosStore.processosUnidade[initialLength]).toEqual(novasProcessosUnidade[0]);
-            expect(processosStore.processosUnidade[initialLength + 1]).toEqual(novasProcessosUnidade[1]);
+            expect(processosStore.subprocessos.length).toBe(initialLength + 2);
+            expect(processosStore.subprocessos[initialLength]).toEqual(novassubprocessos[0]);
+            expect(processosStore.subprocessos[initialLength + 1]).toEqual(novassubprocessos[1]);
         });
 
         it('finalizarProcesso should update situacao and dataFinalizacao for a process', () => {

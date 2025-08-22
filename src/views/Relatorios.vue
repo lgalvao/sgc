@@ -32,8 +32,7 @@
 
 <script lang="ts" setup>
 
-function navegarPara(rota: string) {
-  console.log(`Navegando para ${rota}...`);
+function navegarPara() {
 }
 </script>
 

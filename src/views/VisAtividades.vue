@@ -8,6 +8,9 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" @click="irParaImpactoMapa">
+          <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
+        </button>
         <button class="btn btn-secondary" title="Devolver para ajustes" @click="devolverCadastro">
           Devolver para ajustes
         </button>
@@ -75,7 +78,7 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
 
 const idSubprocesso = computed(() => {
-  const Subprocesso = (processosStore.processosUnidade as Subprocesso[]).find(
+  const Subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
       pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
   return Subprocesso?.id;
@@ -88,12 +91,24 @@ const atividades = computed<Atividade[]>(() => {
 
 function validarCadastro() {
   // Lógica para validar o cadastro
-  console.log('Validar cadastro');
+
 }
 
 function devolverCadastro() {
   // Lógica para devolver o cadastro
-  console.log('Devolver cadastro');
+
+}
+
+function irParaImpactoMapa() {
+  if (idProcesso.value && siglaUnidade.value) {
+    router.push({
+      name: 'SubprocessoImpactoMapa',
+      params: {
+        idProcesso: idProcesso.value,
+        siglaUnidade: siglaUnidade.value
+      }
+    });
+  }
 }
 </script>
 

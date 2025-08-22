@@ -37,6 +37,10 @@ ambiente de teste antes de cada teste, garantindo isolamento e consistência.
   certifique-se de que os mocks sejam consistentes entre os testes. Se um mock retorna uma nova instância de `vi.fn()` a
   cada chamada, os spies podem não capturar as chamadas corretas. É melhor definir os `vi.fn()` globalmente e
   atribuí-los ao mock.
+* **Reatividade de Mocks:** Ao mockar valores reativos (ex: `ref`) que afetam a renderização condicional (`v-if`),
+  garanta que o mock seja definido *antes* da montagem do componente ou que o componente seja explicitamente atualizado
+  (`await wrapper.vm.$nextTick()`) após a alteração do mock. Em casos persistentes, considere passar o valor mockado
+  diretamente como prop para o componente em teste, se aplicável.
 
 ### 2.3. Composables
 
@@ -49,31 +53,14 @@ ambiente de teste antes de cada teste, garantindo isolamento e consistência.
   `vi.spyOn(window.localStorage, 'getItem')`, etc.) são essenciais para isolar os testes de efeitos colaterais no
   armazenamento do navegador. Considere criar um mock global para `localStorage` que simule seu comportamento e permita
   limpar o estado entre os testes.
+* **Ordem de Mocking:** Ao mockar `localStorage` ou `sessionStorage` e testar stores que os utilizam, certifique-se de
+  que o `vi.spyOn` seja configurado *antes* da instância da store ser criada no teste, para que o mock seja efetivo.
 
 ### 2.5. Stubs de Componentes
 
 * Use stubs (`stubs: { Componente: { template: '...' } }`) para isolar o componente em teste de seus filhos. No entanto,
   tenha cuidado ao stubbar componentes que têm comportamento intrínseco (ex: `RouterLink`). Se o comportamento real do
   componente stubbado for crucial para o teste (como a navegação do `RouterLink`), é melhor não stubbá-lo.
-
-### 2.6. Mocking de Importações JSON
-
-* **Problema de Hoisting:** `vi.mock` é içado para o topo do arquivo. Se você tentar mockar um módulo JSON usando uma
-  variável definida no mesmo arquivo, mas *após* a chamada `vi.mock`, ocorrerá um `ReferenceError`.
-* **Solução:** Defina os dados mockados diretamente dentro da função de fábrica do `vi.mock`. Isso garante que os dados
-  estejam disponíveis quando o mock é processado.
-  ```typescript
-  // Exemplo:
-  vi.mock('../../mocks/meu-mock.json', () => ({
-    default: [
-      { id: 1, nome: 'Item Mockado' },
-      { id: 2, nome: 'Outro Item' }
-    ]
-  }));
-  ```
-* **Mocks Dinâmicos/Re-mocking:** Para cenários onde você precisa de diferentes dados mockados para o mesmo módulo JSON
-  em testes específicos, use `vi.doMock` e `vi.importActual` dentro do teste ou de um `beforeEach` aninhado. Lembre-se
-  de que `vi.importActual` deve ser usado para obter a versão "real" do módulo após o mock ser aplicado.
 
 ## 3. Lidando com Assincronicidade
 
@@ -158,3 +145,18 @@ roteamento/store.
 * **Mocking de Ações Assíncronas de Store:** Ao mockar ações assíncronas de store (ex: `fetchAtividadesPorSubprocesso`),
   certifique-se de que a implementação mockada retorne uma `Promise` (ex: `Promise.resolve(...)`) para simular
   corretamente o comportamento assíncrono.
+* **Problemas de Reatividade com Mocks de `ref` e `v-if`:** Em testes de componentes, quando um `v-if` depende de um
+  `ref` mockado (ex: de um composable ou store), pode ser necessário garantir que o `ref` seja definido *antes* da
+  montagem do componente, ou que o componente seja explicitamente atualizado (`await wrapper.vm.$nextTick()`) após a
+  alteração do `ref` mockado para forçar a re-renderização. Em casos persistentes, pode ser necessário investigar o uso
+  de `@pinia/testing` para um controle mais direto do estado da store no ambiente de teste.
+* **Depuração de Testes Persistentes:** Quando um teste falha de forma persistente e a causa não é óbvia, utilize
+  `console.log` para inspecionar o estado dos mocks e do componente em diferentes pontos do teste. Se o problema for
+  com a reatividade ou a interação com o ambiente de teste (como JSDOM), considere simplificar o teste ou, como último
+  recurso, ignorá-lo temporariamente para permitir que outros testes passem, enquanto aprofunda a investigação em um
+  momento oportuno.
+* **Inconsistências de Ambiente de Teste (Playwright vs. Vitest/JSDOM):** Erros que aparecem em um ambiente (ex: Playwright)
+  mas não em outro (ex: Vitest/JSDOM) podem indicar diferenças na forma como o código é executado ou no ambiente DOM.
+  Priorize a correção de erros que afetam a funcionalidade real da aplicação. Para erros específicos do ambiente de teste,
+  considere abordagens de depuração mais aprofundadas ou, se necessário, ignorar temporariamente o teste com uma nota
+  explicativa.

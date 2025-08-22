@@ -2,7 +2,8 @@ import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {useServidoresStore} from '@/stores/servidores';
 import {useUnidadesStore} from '@/stores/unidades';
-import type {Servidor, Unidade} from '@/types/tipos';
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria';
+import type {Unidade} from '@/types/tipos';
 
 // Função auxiliar para achatar a hierarquia de unidades
 function flattenUnidades(unidades: Unidade[]): Unidade[] {
@@ -14,19 +15,11 @@ function flattenUnidades(unidades: Unidade[]): Unidade[] {
     return flat;
 }
 
-// Função para determinar o perfil de um servidor
-function getPerfil(servidor: Servidor, unidadesFlat: Unidade[]): string {
-    const unidade = unidadesFlat.find(u => u.titular === servidor.id);
-    if (unidade) {
-        if (unidade.sigla === 'SEDOC') return 'ADMIN';
-
-        // Regras para CHEFE e GESTOR baseadas no tipo da unidade
-        if (unidade.tipo === 'INTERMEDIARIA') {
-            return 'GESTOR';
-        } else if (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL') {
-            return 'CHEFE';
-        }
-    }
+// Função para determinar o perfil para uma unidade específica
+function getPerfilDaUnidade(unidade: Unidade): string {
+    if (unidade.sigla === 'SEDOC') return 'ADMIN';
+    if (unidade.tipo === 'INTERMEDIARIA') return 'GESTOR';
+    if (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL') return 'CHEFE';
     return 'SERVIDOR';
 }
 
@@ -34,20 +27,63 @@ export function usePerfil() {
     const perfilStore = usePerfilStore();
     const servidoresStore = useServidoresStore();
     const unidadesStore = useUnidadesStore();
+    const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
     const unidadesFlat = computed<Unidade[]>(() => flattenUnidades(unidadesStore.unidades));
 
-    const servidoresComPerfil = computed(() => {
-        return servidoresStore.servidores.map((s: Servidor) => ({
-            ...s,
-            perfil: getPerfil(s, unidadesFlat.value)
-        }));
-    });
+    const getPerfisDoServidor = (idServidor: number) => {
+        const servidor = servidoresStore.getServidorById(idServidor);
+        if (!servidor) return [];
+
+        const pares: { perfil: string, unidade: string }[] = [];
+
+        // 1. Adiciona perfis de titular (chefe/gestor/admin)
+        const unidadesChefiadas = unidadesFlat.value.filter(u => u.idServidorTitular === idServidor);
+        unidadesChefiadas.forEach(unidade => {
+            pares.push({perfil: getPerfilDaUnidade(unidade), unidade: unidade.sigla});
+        });
+
+        // 2. Adiciona perfis de atribuições temporárias
+        const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(idServidor);
+        atribuicoes.forEach(atrb => {
+            const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade);
+            if (unidadeAtribuicao) {
+                const perfilAtribuicao = unidadeAtribuicao.tipo === 'INTERMEDIARIA' ? 'GESTOR' : 'CHEFE';
+                pares.push({perfil: perfilAtribuicao, unidade: atrb.unidade});
+            }
+        });
+
+        // 3. Adiciona o perfil SERVIDOR para a unidade de lotação principal,
+        // SOMENTE SE essa unidade não tiver já um perfil de titular ou CHEFE por atribuição.
+        const unidadePrincipal = unidadesStore.pesquisarUnidade(servidor.unidade);
+        if (unidadePrincipal) {
+            const isOperacional = unidadePrincipal.tipo === 'OPERACIONAL' || unidadePrincipal.tipo === 'INTEROPERACIONAL';
+            // Verifica se a unidade principal já foi adicionada com um perfil diferente de SERVIDOR
+            const hasNonServidorProfileForPrincipalUnit = pares.some(
+                p => p.unidade === unidadePrincipal.sigla && p.perfil !== 'SERVIDOR'
+            );
+
+            if (isOperacional && !hasNonServidorProfileForPrincipalUnit) {
+                pares.push({perfil: 'SERVIDOR', unidade: unidadePrincipal.sigla});
+            }
+        }
+
+        // 4. Remove duplicatas exatas (mesmo perfil, mesma unidade)
+        return pares.filter((par, index, self) =>
+            index === self.findIndex((p) => (
+                p.perfil === par.perfil && p.unidade === par.unidade
+            ))
+        );
+    };
 
     const servidorLogado = computed(() => {
-        return servidoresComPerfil.value.find((s: Servidor & {
-            perfil: string;
-        }) => s.id === perfilStore.servidorId);
+        const servidor = servidoresStore.getServidorById(perfilStore.servidorId);
+        if (!servidor) return null;
+        return {
+            ...servidor,
+            perfil: perfilStore.perfilSelecionado,
+            unidade: perfilStore.unidadeSelecionada,
+        };
     });
 
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
@@ -55,8 +91,8 @@ export function usePerfil() {
 
     return {
         servidorLogado,
-        servidoresComPerfil,
         perfilSelecionado,
         unidadeSelecionada,
+        getPerfisDoServidor,
     };
 }

@@ -89,7 +89,7 @@ const servidoresDaUnidade = computed<Servidor[]>(() => {
 })
 
 const servidoresElegiveis = computed<Servidor[]>(() => {
-  const titularId = unidade.value?.titular
+  const titularId = unidade.value?.idServidorTitular
   return servidoresDaUnidade.value.filter(servidor => {
     const jaTemAtribuicao = atribuicoes.value.some(a => a.idServidor === servidor.id)
     return servidor.id !== titularId && !jaTemAtribuicao

@@ -123,7 +123,7 @@ function salvarProcesso() {
   const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
+  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
     idProcesso: novoidProcesso,
     unidade: unidadeSigla,
@@ -145,7 +145,7 @@ function salvarProcesso() {
     dataFinalizacao: null
   };
   processosStore.adicionarProcesso(novo);
-  processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
+  processosStore.adicionarsubprocessos(novossubprocessosObjetos);
   feedback.value = 'Processo salvo com sucesso!';
   router.push('/painel');
   limparCampos();
@@ -160,7 +160,7 @@ function iniciarProcesso() {
   const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novosProcessosUnidadeObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
+  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
     id: Date.now() + index, // Simple unique ID generation
     idProcesso: novoidProcesso,
     unidade: unidadeSigla,
@@ -183,7 +183,7 @@ function iniciarProcesso() {
   };
 
   processosStore.adicionarProcesso(novo);
-  processosStore.adicionarProcessosUnidade(novosProcessosUnidadeObjetos);
+  processosStore.adicionarsubprocessos(novossubprocessosObjetos);
   feedback.value = 'Processo iniciado! Notificações enviadas às unidades.'
   router.push('/painel')
   limparCampos()

@@ -25,13 +25,13 @@ function parseSubprocessoDates(pu: any): Subprocesso {
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        processosUnidade: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[]
+        subprocessos: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[]
     }),
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
-            return state.processosUnidade.filter(pu => pu.idProcesso === idProcesso);
+            return state.subprocessos.filter(pu => pu.idProcesso === idProcesso);
         },
-        isProcessoInativo: (state) => (processo: Processo): boolean => {
+        isProcessoInativo: () => (processo: Processo): boolean => {
             const configuracoesStore = useConfiguracoesStore();
             if (processo.situacao === SituacaoProcesso.FINALIZADO && processo.dataFinalizacao) {
                 const finalizacaoDate = new Date(processo.dataFinalizacao);
@@ -47,9 +47,9 @@ export const useProcessosStore = defineStore('processos', {
         adicionarProcesso(novoProcesso: Processo) {
             this.processos.push(novoProcesso);
         },
-        adicionarProcessosUnidade(processosUnidadeArray: Subprocesso[]) {
-            processosUnidadeArray.forEach((pu: Subprocesso) => {
-                this.processosUnidade.push(pu);
+        adicionarsubprocessos(subprocessosArray: Subprocesso[]) {
+            subprocessosArray.forEach((pu: Subprocesso) => {
+                this.subprocessos.push(pu);
             });
         },
         finalizarProcesso(idProcesso: number) {

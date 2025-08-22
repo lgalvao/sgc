@@ -15,6 +15,7 @@ app.use(pinia);
 window.pinia = pinia;
 
 app.use(router);
+
 // @ts-ignore
 app.mount('#app')
 

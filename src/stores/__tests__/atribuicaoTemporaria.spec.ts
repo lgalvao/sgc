@@ -23,7 +23,7 @@ describe('useAtribuicaoTemporariaStore', () => {
         it('criarAtribuicao should add a new atribuicao to the store', () => {
             const novaAtribuicao: AtribuicaoTemporaria = {
                 unidade: 'COSIS',
-                servidorId: 1,
+                idServidor: 1,
                 dataInicio: new Date('2025-01-01'),
                 dataTermino: new Date('2025-01-31'),
                 justificativa: 'Teste de criação'
@@ -38,13 +38,25 @@ describe('useAtribuicaoTemporariaStore', () => {
 
         it.skip('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A', servidorId: 1, dataInicio: new Date('2025-01-01'), dataTermino: new Date('2025-01-31'), justificativa: 'J1'
+                unidade: 'A',
+                idServidor: 1,
+                dataInicio: new Date('2025-01-01'),
+                dataTermino: new Date('2025-01-31'),
+                justificativa: 'J1'
             };
             const atribuicao2: AtribuicaoTemporaria = {
-                unidade: 'B', servidorId: 2, dataInicio: new Date('2025-02-01'), dataTermino: new Date('2025-02-28'), justificativa: 'J2'
+                unidade: 'B',
+                idServidor: 2,
+                dataInicio: new Date('2025-02-01'),
+                dataTermino: new Date('2025-02-28'),
+                justificativa: 'J2'
             };
             const atribuicao3: AtribuicaoTemporaria = {
-                unidade: 'C', servidorId: 1, dataInicio: new Date('2025-03-01'), dataTermino: new Date('2025-03-31'), justificativa: 'J3'
+                unidade: 'C',
+                idServidor: 1,
+                dataInicio: new Date('2025-03-01'),
+                dataTermino: new Date('2025-03-31'),
+                justificativa: 'J3'
             };
 
             atribuicaoTemporariaStore.$patch({
@@ -57,14 +69,11 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(manuallyFiltered.length).toBe(2);
             expect(manuallyFiltered[0]).toEqual(atribuicao1);
             expect(manuallyFiltered[1]).toEqual(atribuicao3);
-
-            // Now, test the getter
-            const result = atribuicaoTemporariaStore.getAtribuicoesPorServidor(1);
         });
 
         it('getAtribuicoesPorServidor should return an empty array if no matching idServidor', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A', servidorId: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
+                unidade: 'A', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
             };
             atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
 
