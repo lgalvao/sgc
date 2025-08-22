@@ -9,10 +9,7 @@ describe('useAtribuicaoTemporariaStore', () => {
     beforeEach(() => {
         setActivePinia(createPinia());
         atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
-        // Reset the store state before each test
-        atribuicaoTemporariaStore.$patch({
-            atribuicoes: [] // Start with an empty array for consistent tests
-        });
+        atribuicaoTemporariaStore.$patch({atribuicoes: []});
     });
 
     it('should initialize with an empty array of atribuicoes', () => {
@@ -36,7 +33,7 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(atribuicaoTemporariaStore.atribuicoes[0]).toEqual(novaAtribuicao);
         });
 
-        it.skip('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
+        it('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
             const atribuicao1: AtribuicaoTemporaria = {
                 unidade: 'A',
                 idServidor: 1,
@@ -63,9 +60,7 @@ describe('useAtribuicaoTemporariaStore', () => {
                 atribuicoes: [atribuicao1, atribuicao2, atribuicao3]
             });
 
-            // Manually filter the array to verify content
             const manuallyFiltered = atribuicaoTemporariaStore.atribuicoes.filter(a => Number(a.idServidor) === 1);
-
             expect(manuallyFiltered.length).toBe(2);
             expect(manuallyFiltered[0]).toEqual(atribuicao1);
             expect(manuallyFiltered[1]).toEqual(atribuicao3);
