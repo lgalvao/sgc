@@ -131,7 +131,7 @@ describe('useAtividadesStore', () => {
             const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId)?.conhecimentos.length || 0;
             const expectedNextId = atividadesStore.nextId;
 
-            atividadesStore.adicionarConhecimento(atividadeId, novoConhecimento);
+            atividadesStore.adicionarConhecimento(atividadeId, novoConhecimento, []);
 
             const atividadeAtualizada = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId);
             expect(atividadeAtualizada?.conhecimentos.length).toBe(initialConhecimentosLength + 1);
@@ -143,7 +143,7 @@ describe('useAtividadesStore', () => {
         it('adicionarConhecimento should not add knowledge if activity not found', () => {
             const initialNextId = atividadesStore.nextId;
             const initialLength = atividadesStore.atividades.length;
-            atividadesStore.adicionarConhecimento(999, {id: 0, descricao: 'Non Existent'});
+            atividadesStore.adicionarConhecimento(999, {id: 0, descricao: 'Non Existent'}, []);
             expect(atividadesStore.atividades.length).toBe(initialLength);
             expect(atividadesStore.nextId).toBe(initialNextId);
         });
@@ -153,7 +153,7 @@ describe('useAtividadesStore', () => {
             const conhecimentoId = 1; // ID of "Criação de testes de integração em Cypress"
             const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId)?.conhecimentos.length || 0;
 
-            atividadesStore.removerConhecimento(atividadeId, conhecimentoId);
+            atividadesStore.removerConhecimento(atividadeId, conhecimentoId, []);
 
             const atividadeAtualizada = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId);
             expect(atividadeAtualizada?.conhecimentos.length).toBe(initialConhecimentosLength - 1);
@@ -164,11 +164,11 @@ describe('useAtividadesStore', () => {
             const initialLength = atividadesStore.atividades.length;
             const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length || 0;
 
-            atividadesStore.removerConhecimento(999, 1); // Non-existent activity
+            atividadesStore.removerConhecimento(999, 1, []); // Non-existent activity
             expect(atividadesStore.atividades.length).toBe(initialLength);
             expect(atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length).toBe(initialConhecimentosLength);
 
-            atividadesStore.removerConhecimento(1, 999); // Non-existent knowledge
+            atividadesStore.removerConhecimento(1, 999, []); // Non-existent knowledge
             expect(atividadesStore.atividades.length).toBe(initialLength);
             expect(atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length).toBe(initialConhecimentosLength);
         });
