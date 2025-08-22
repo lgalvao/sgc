@@ -40,23 +40,28 @@
     "competencias": [
       {
         "id": 1,
-        "descricao": "Acompanhamento de processos eleitorais (Revisão)",
+        "descricao": "Acompanhamento de processos eleitorais",
         "atividadesAssociadas": [
-          6, 101 
+          6,
+          201 
         ]
       },
       {
         "id": 2,
-        "descricao": "Implantação de sistemas (Revisão)",
+        "descricao": "Implantação de sistemas",
         "atividadesAssociadas": [
-          1, 103 
+          1,
+          200,
+          202 
         ]
       },
       {
         "id": 3,
-        "descricao": "Testes de sistemas eleitorais (Revisão)",
+        "descricao": "Testes de sistemas eleitorais",
         "atividadesAssociadas": [
-          4, 5
+          4,
+          5,
+          218 
         ]
       }
     ],

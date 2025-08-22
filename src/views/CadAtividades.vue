@@ -76,7 +76,7 @@
       <h1 class="mb-0 display-6">Atividades e conhecimentos</h1>
 
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @click="irParaImpactoMapa">
+        <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
           <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
         </button>
         <button v-if="isChefe" class="btn btn-outline-primary" data-bs-target="#importarAtividadesModal"
@@ -186,6 +186,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Impacto no Mapa -->
+    <ImpactoMapaModal 
+      :mostrar="mostrarModalImpacto" 
+      :id-processo="idProcesso" 
+      :sigla-unidade="siglaUnidade" 
+      @fechar="fecharModalImpacto" />
   </div>
 </template>
 
@@ -198,7 +205,9 @@ import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
+import {useMapasStore} from '@/stores/mapas'
 import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
+import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -216,7 +225,23 @@ const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
+const mapasStore = useMapasStore()
 const router = useRouter()
+
+// Helper function to get impacted competency IDs
+function getImpactedCompetencyIds(atividadeId: number): number[] {
+  const impactedIds: number[] = [];
+  const currentMap = mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value);
+
+  if (currentMap) {
+    currentMap.competencias.forEach(comp => {
+      if (comp.atividadesAssociadas.includes(atividadeId)) {
+        impactedIds.push(comp.id);
+      }
+    });
+  }
+  return impactedIds;
+}
 
 const unidade = computed(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
@@ -286,11 +311,13 @@ function adicionarAtividade() {
 
 function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
+  const impactedCompetencyIds = getImpactedCompetencyIds(atividadeRemovida.id);
   atividadesStore.removerAtividade(atividadeRemovida.id);
   revisaoStore.registrarMudanca({
     tipo: TipoMudanca.AtividadeRemovida,
     idAtividade: atividadeRemovida.id,
     descricaoAtividade: atividadeRemovida.descricao,
+    competenciasImpactadasIds: impactedCompetencyIds,
   });
 }
 
@@ -301,28 +328,16 @@ function adicionarConhecimento(idx: number) {
       id: Date.now(),
       descricao: atividade.novoConhecimento
     };
-    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj);
-    revisaoStore.registrarMudanca({
-      tipo: TipoMudanca.ConhecimentoAdicionado,
-      idAtividade: atividade.id,
-      idConhecimento: novoConhecimentoObj.id,
-      descricaoAtividade: atividade.descricao,
-      descricaoConhecimento: novoConhecimentoObj.descricao,
-    });
+    const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
+    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, impactedCompetencyIds);
   }
 }
 
 function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
-  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id);
-  revisaoStore.registrarMudanca({
-    tipo: TipoMudanca.ConhecimentoRemovido,
-    idAtividade: atividade.id,
-    idConhecimento: conhecimentoRemovido.id,
-    descricaoAtividade: atividade.descricao,
-    descricaoConhecimento: conhecimentoRemovido.descricao,
-  });
+  const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
+  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, impactedCompetencyIds);
 }
 
 const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
@@ -343,6 +358,9 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
     const conhecimentoOriginal = newConhecimentos[idxConhecimento];
     const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
 
+    // Get impacted competencies before updating the store
+    const impactedCompetencyIds = getImpactedCompetencyIds(newAtividades[idxAtividade].id);
+
     newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
     newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
     atividades.value = newAtividades;
@@ -355,6 +373,7 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
       descricaoConhecimento: conhecimentoEditado.value,
       valorAntigo: valorAntigo,
       valorNovo: conhecimentoEditado.value,
+      competenciasImpactadasIds: impactedCompetencyIds,
     });
   }
   cancelarEdicaoConhecimento()
@@ -381,6 +400,9 @@ function salvarEdicaoAtividade(id: number) {
       const atividadeOriginal = atividadesStore.atividades.find(a => a.id === id);
       const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
 
+      // Get impacted competencies before updating the store
+      const impactedCompetencyIds = getImpactedCompetencyIds(id);
+
       newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
       atividades.value = newAtividades;
 
@@ -390,6 +412,7 @@ function salvarEdicaoAtividade(id: number) {
         descricaoAtividade: String(atividadeEditada.value),
         valorAntigo: valorAntigo,
         valorNovo: String(atividadeEditada.value),
+        competenciasImpactadasIds: impactedCompetencyIds,
       });
     }
   }
@@ -424,6 +447,7 @@ const unidadeSelecionada = ref<Subprocesso | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
 const atividadesSelecionadas = ref<Atividade[]>([])
+const mostrarModalImpacto = ref(false)
 
 const modalElement = ref<HTMLElement | null>(null)
 const cleanupBackdrop = () => {
@@ -525,23 +549,16 @@ function importarAtividades() {
 function disponibilizarCadastro() {
 }
 
-function irParaImpactoMapa() {
+function abrirModalImpacto() {
   if (idProcesso.value && siglaUnidade.value) {
-    // Salvar o estado atual da revisaoStore no sessionStorage antes de navegar
-    sessionStorage.setItem('revisaoMudancas', JSON.stringify(revisaoStore.mudancasRegistradas));
-    console.log('CadAtividades: Salvando no sessionStorage:', sessionStorage.getItem('revisaoMudancas')); // Adicionado para depuração
-
-    router.push({
-      name: 'SubprocessoImpactoMapa',
-      params: {
-        idProcesso: idProcesso.value,
-        siglaUnidade: siglaUnidade.value
-      },
-      query: { // Adicionar query parameter
-        mudancas: JSON.stringify(revisaoStore.mudancasRegistradas)
-      }
-    });
+    revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
+    mostrarModalImpacto.value = true;
   }
+}
+
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
+  revisaoStore.setMudancasParaImpacto([]);
 }
 </script>
 

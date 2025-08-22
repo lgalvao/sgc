@@ -554,17 +554,5 @@
         "descricao": "Habilidade em prototipagem rápida"
       }
     ]
-  },
-  {
-    "id": 101,
-    "descricao": "Atividade Removida 1 (Simulação)",
-    "idSubprocesso": 12,
-    "conhecimentos": []
-  },
-  {
-    "id": 103,
-    "descricao": "Atividade Removida 2 (Simulação)",
-    "idSubprocesso": 12,
-    "conhecimentos": []
   }
 ]

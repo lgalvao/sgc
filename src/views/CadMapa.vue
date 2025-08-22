@@ -41,8 +41,19 @@
               <div v-for="atvId in comp.atividadesAssociadas" :key="atvId"
                    class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada">
                 <div class="card-body d-flex align-items-center py-1 px-2">
-                  <span class="atividade-associada-descricao me-2">{{ descricaoAtividade(atvId) }}</span>
-                  <button class="btn btn-sm btn-outline-secondary botao-acao-inline fade-group"
+                  <span class="atividade-associada-descricao me-2 d-flex align-items-center">
+                    {{ descricaoAtividade(atvId) }}
+                    <span v-if="getAtividadeCompleta(atvId)?.conhecimentos.length > 0"
+                          class="badge bg-secondary ms-2"
+                          :data-bs-title="getConhecimentosTooltip(atvId)"
+                          :data-bs-html="true"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-custom-class="conhecimentos-tooltip">
+                      {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
+                    </span>
+                  </span>
+                  <button class="btn btn-sm btn-outline-secondary botao-acao-inline"
                           data-bs-toggle="tooltip" title="Remover Atividade"
                           @click="removerAtividadeAssociada(comp.id, atvId)"><i class="bi bi-trash"></i></button>
                 </div>
@@ -57,7 +68,8 @@
     </div>
 
     <!-- Modal de Criar Nova Competência -->
-    <div v-if="mostrarModalCriarNovaCompetencia" aria-labelledby="criarCompetenciaModalLabel" aria-modal="true" class="modal fade show"
+    <div v-if="mostrarModalCriarNovaCompetencia" aria-labelledby="criarCompetenciaModalLabel" aria-modal="true"
+         class="modal fade show"
          role="dialog" style="display: block;" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -94,8 +106,17 @@
                            data-testid="atividade-checkbox"
                            hidden
                            type="checkbox">
-                    <label class="form-check-label mb-0">
+                    <label class="form-check-label mb-0 d-flex align-items-center">
                       {{ atividade.descricao }}
+                      <span v-if="atividade.conhecimentos.length > 0"
+                            class="badge bg-secondary ms-2"
+                            :data-bs-title="getConhecimentosModal(atividade)"
+                            :data-bs-html="true"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                            data-bs-custom-class="conhecimentos-tooltip">
+                        {{ atividade.conhecimentos.length }}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -118,7 +139,8 @@
     <div v-if="mostrarModalCriarNovaCompetencia" class="modal-backdrop fade show"></div>
 
     <!-- Modal de Disponibilizar -->
-    <div v-if="mostrarModalDisponibilizar" aria-labelledby="disponibilizarModalLabel" aria-modal="true" class="modal fade show"
+    <div v-if="mostrarModalDisponibilizar" aria-labelledby="disponibilizarModalLabel" aria-modal="true"
+         class="modal fade show"
          role="dialog" style="display: block;" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -152,7 +174,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {storeToRefs} from 'pinia'
 
 import {useMapasStore} from '@/stores/mapas'
@@ -237,6 +259,16 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
     atividadesSelecionadas.value = [];
     competenciaSendoEditada.value = null;
   }
+
+  // Inicializar tooltips do modal
+  setTimeout(() => {
+    import('bootstrap').then(({Tooltip}) => {
+      const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
+      modalTooltips.forEach(tooltipEl => {
+        new Tooltip(tooltipEl)
+      })
+    })
+  }, 100)
 }
 
 function fecharModalCriarNovaCompetencia() {
@@ -253,6 +285,35 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 function descricaoAtividade(id: number): string {
   const atv = atividades.value.find(a => a.id === id)
   return atv ? atv.descricao : 'Atividade não encontrada'
+}
+
+function getConhecimentosTooltip(atividadeId: number): string {
+  const atividade = atividades.value.find(a => a.id === atividadeId)
+  if (!atividade || !atividade.conhecimentos.length) {
+    return 'Nenhum conhecimento cadastrado'
+  }
+
+  const conhecimentosHtml = atividade.conhecimentos
+      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join('')
+
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
+}
+
+function getAtividadeCompleta(id: number): Atividade | undefined {
+  return atividades.value.find(a => a.id === id)
+}
+
+function getConhecimentosModal(atividade: Atividade): string {
+  if (!atividade.conhecimentos.length) {
+    return 'Nenhum conhecimento'
+  }
+
+  const conhecimentosHtml = atividade.conhecimentos
+      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join('')
+
+  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }
 
 function adicionarOuAtualizarCompetencia() {
@@ -369,6 +430,17 @@ function fecharModalDisponibilizar() {
   notificacaoDisponibilizacao.value = ''; // Limpa a notificação ao fechar
 }
 
+onMounted(() => {
+  // Inicializar tooltips após o componente ser montado
+  import('bootstrap').then(({Tooltip}) => {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipTriggerList.forEach(tooltipTriggerEl => {
+      new Tooltip(tooltipTriggerEl)
+    })
+  })
+})
+
+
 </script>
 
 <style scoped>
@@ -409,10 +481,6 @@ function fecharModalDisponibilizar() {
 .botao-acao:hover {
   background: #f0f4fa;
   box-shadow: 0 0 0 2px #e3f0ff;
-}
-
-.fade-group {
-  transition: opacity 0.2s;
 }
 
 .competencia-descricao {
@@ -467,11 +535,16 @@ function fecharModalDisponibilizar() {
 
 .atividade-card-item .form-check-label {
   cursor: pointer;
+  padding: 0.25rem 0;
 }
 
 .atividade-card-item.checked .form-check-label {
   font-weight: bold;
   color: #007bff;
+}
+
+.atividade-card-item .card-body {
+  padding: 0.5rem 0.75rem;
 }
 
 .atividade-associada-card-item {
@@ -495,12 +568,6 @@ function fecharModalDisponibilizar() {
   font-size: 0.8rem;
   border-width: 1px;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
-  opacity: 0;
-  pointer-events: none;
 }
 
-.group-atividade-associada:hover .botao-acao-inline {
-  opacity: 1;
-  pointer-events: auto;
-}
 </style>

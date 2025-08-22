@@ -41,10 +41,11 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o card da atividade recém-adicionada
         const atividadeCard = page.locator('.atividade-card', {hasText: atividadeOriginal});
         await atividadeCard.hover(); // Simula o hover para exibir os botões
-        await atividadeCard.getByTestId('btn-editar-atividade').waitFor({state: 'visible'}); // Espera o botão de edição ficar visível
-
-        // Inicia a edição
-        await atividadeCard.getByTestId('btn-editar-atividade').click({force: true});
+        await page.waitForTimeout(100); // Adiciona um pequeno delay
+        const btnEditarAtividade = atividadeCard.getByTestId('btn-editar-atividade');
+        await expect(btnEditarAtividade).toBeVisible();
+        await expect(btnEditarAtividade).toBeEnabled();
+        await btnEditarAtividade.click({ force: true });
         const atividadeEditada = `Atividade Editada ${Date.now()}`;
         await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
         await page.getByTestId('btn-salvar-edicao-atividade').click();
@@ -59,10 +60,11 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o card da atividade recém-adicionada
         const atividadeCard = page.locator('.atividade-card', {hasText: atividadeParaRemover});
         await atividadeCard.hover(); // Simula o hover para exibir os botões
-        await atividadeCard.getByTestId('btn-remover-atividade').waitFor({state: 'visible'}); // Espera o botão de remover ficar visível
-
-        // Remove a atividade
-        await atividadeCard.getByTestId('btn-remover-atividade').click({force: true});
+        await page.waitForTimeout(100); // Adiciona um pequeno delay
+        const btnRemoverAtividade = atividadeCard.getByTestId('btn-remover-atividade');
+        await expect(btnRemoverAtividade).toBeVisible();
+        await expect(btnRemoverAtividade).toBeEnabled();
+        await btnRemoverAtividade.click({ force: true });
         await expect(page.getByText(atividadeParaRemover)).not.toBeAttached();
     });
 
@@ -89,14 +91,15 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o conhecimento recém-adicionado e simula o hover
         const conhecimentoRow = atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoOriginal});
         await conhecimentoRow.hover();
-        await conhecimentoRow.getByTestId('btn-editar-conhecimento')
-            .waitFor({state: 'visible'}); // Espera o botão de edição do conhecimento ficar visível
-
-        // Inicia a edição do conhecimento
-        await conhecimentoRow.getByTestId('btn-editar-conhecimento').click({force: true});
+        await page.waitForTimeout(100); // Adiciona um pequeno delay
+        const btnEditarConhecimento = conhecimentoRow.getByTestId('btn-editar-conhecimento');
+        await expect(btnEditarConhecimento).toBeVisible();
+        await expect(btnEditarConhecimento).toBeEnabled();
+        await btnEditarConhecimento.click();
         const conhecimentoEditado = `Conhecimento Editado ${Date.now()}`;
         await page.getByTestId('input-editar-conhecimento').fill(conhecimentoEditado);
         await page.getByTestId('btn-salvar-edicao-conhecimento').click();
+        await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(page.getByText(conhecimentoEditado)).toBeVisible();
     });
 
@@ -112,11 +115,12 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         // Localiza o conhecimento recém-adicionado e simula o hover
         const conhecimentoRow = atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover});
         await conhecimentoRow.hover();
-        await conhecimentoRow.getByTestId('btn-remover-conhecimento')
-            .waitFor({state: 'visible'}); // Espera o botão de remover conhecimento ficar visível
-
-        // Remove o conhecimento
-        await conhecimentoRow.getByTestId('btn-remover-conhecimento').click({force: true});
+        await page.waitForTimeout(100); // Adiciona um pequeno delay
+        const btnRemoverConhecimento = conhecimentoRow.getByTestId('btn-remover-conhecimento');
+        await expect(btnRemoverConhecimento).toBeVisible();
+        await expect(btnRemoverConhecimento).toBeEnabled();
+        await btnRemoverConhecimento.click();
+        await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(page.getByText(conhecimentoParaRemover)).not.toBeAttached();
     });
 });

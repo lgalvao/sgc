@@ -27,16 +27,18 @@
               <strong class="competencia-descricao" data-testid="competencia-descricao"> {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
-              <div v-for="atvId in comp.atividadesAssociadas" :key="atvId"
-                   class="card atividade-associada-card-item d-flex flex-column group-atividade-associada">
-                <div class="card-body d-flex align-items-center py-1 px-2">
-                  <span class="atividade-associada-descricao me-2">{{ getAtividadeCompleta(atvId)?.descricao }}</span>
-                </div>
-                <div class="conhecimentos-atividade px-2 pb-2 ps-3">
-                  <span v-for="conhecimento in getConhecimentosAtividade(atvId)" :key="conhecimento.id"
-                        class="me-3 mb-1">
-                    {{ conhecimento.descricao }}
-                  </span>
+              <div v-for="atvId in comp.atividadesAssociadas" :key="atvId">
+                <div v-if="getAtividadeCompleta(atvId)"
+                     class="card atividade-associada-card-item d-flex flex-column group-atividade-associada">
+                  <div class="card-body d-flex align-items-center py-1 px-2">
+                    <span class="atividade-associada-descricao me-2">{{ getAtividadeCompleta(atvId)?.descricao }}</span>
+                  </div>
+                  <div class="conhecimentos-atividade px-2 pb-2 ps-3">
+                    <span v-for="conhecimento in getConhecimentosAtividade(atvId)" :key="conhecimento.id"
+                          class="me-3 mb-1">
+                      {{ conhecimento.descricao }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

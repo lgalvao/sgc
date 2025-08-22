@@ -49,8 +49,11 @@ const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 
 
-const idProcesso = computed(() => Number((route.params as any).idProcesso || (route.params as any).id || route.query.idProcesso))
+const idProcesso = computed(() =>
+    Number((route.params as any).idProcesso || (route.params as any).id || route.query.idProcesso))
+
 const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === idProcesso.value))
+
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
   return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)

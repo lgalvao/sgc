@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @click="irParaImpactoMapa">
+        <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
           <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
         </button>
         <button class="btn btn-secondary" title="Devolver para ajustes" @click="devolverCadastro">
@@ -37,15 +37,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Impacto no Mapa -->
+    <ImpactoMapaModal 
+      :mostrar="mostrarModalImpacto" 
+      :id-processo="idProcesso" 
+      :sigla-unidade="siglaUnidade" 
+      @fechar="fecharModalImpacto" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
+import {useRevisaoStore} from '@/stores/revisao'
 import {Atividade, Subprocesso, Unidade} from '@/types/tipos'
+import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const props = defineProps<{
   idProcesso: number | string,
@@ -58,6 +67,9 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
+const revisaoStore = useRevisaoStore()
+
+const mostrarModalImpacto = ref(false)
 
 const unidade = computed(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
@@ -99,16 +111,15 @@ function devolverCadastro() {
 
 }
 
-function irParaImpactoMapa() {
-  if (idProcesso.value && siglaUnidade.value) {
-    router.push({
-      name: 'SubprocessoImpactoMapa',
-      params: {
-        idProcesso: idProcesso.value,
-        siglaUnidade: siglaUnidade.value
-      }
-    });
-  }
+function abrirModalImpacto() {
+  // Para VisAtividades, não há mudanças registradas, então mostra vazio
+  revisaoStore.setMudancasParaImpacto([]);
+  mostrarModalImpacto.value = true;
+}
+
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
+  revisaoStore.setMudancasParaImpacto([]);
 }
 </script>
 

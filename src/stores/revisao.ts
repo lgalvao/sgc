@@ -18,6 +18,7 @@ export interface Mudanca {
     descricaoConhecimento?: string; // Descrição do conhecimento no momento da mudança
     valorAntigo?: string; // Valor antigo (para alterações)
     valorNovo?: string; // Valor novo (para alterações)
+    competenciasImpactadasIds?: number[]; // IDs das competências impactadas pela mudança
 }
 
 export const useRevisaoStore = defineStore('revisao', {
@@ -25,9 +26,13 @@ export const useRevisaoStore = defineStore('revisao', {
         const storedMudancas = sessionStorage.getItem('revisaoMudancas');
         return {
             mudancasRegistradas: storedMudancas ? JSON.parse(storedMudancas) : [] as Mudanca[],
+            mudancasParaImpacto: [] as Mudanca[],
         };
     },
     actions: {
+        setMudancasParaImpacto(mudancas: Mudanca[]) {
+            this.mudancasParaImpacto = mudancas;
+        },
         registrarMudanca(mudanca: Omit<Mudanca, 'id'>) {
             this.mudancasRegistradas.push({...mudanca, id: Date.now()});
             sessionStorage.setItem('revisaoMudancas', JSON.stringify(this.mudancasRegistradas)); // Salva após cada registro
