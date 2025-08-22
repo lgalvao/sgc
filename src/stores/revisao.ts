@@ -44,5 +44,4 @@ export const useRevisaoStore = defineStore('revisao', {
     },
 });
 
-// Expor a store globalmente para depuração em testes
-(window as any).revisaoStoreParaTeste = useRevisaoStore();
+
