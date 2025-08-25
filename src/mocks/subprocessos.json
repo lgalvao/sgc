@@ -142,5 +142,29 @@
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDIA",
     "unidadeAnterior": "STIC"
+  },
+  {
+    "id": 16,
+    "idProcesso": 5,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-08-10",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Não iniciado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": "STIC"
+  },
+  {
+    "id": 17,
+    "idProcesso": 2,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Não iniciado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": "STIC"
   }
 ]

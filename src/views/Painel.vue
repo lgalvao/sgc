@@ -123,7 +123,17 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
 }
 
 function abrirDetalhesProcesso(processo: Processo) {
-  router.push({name: 'Processo', params: {idProcesso: processo.id}})
+  const perfilUsuario = perfil.perfilSelecionado;
+  if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
+    router.push({name: 'Processo', params: {idProcesso: processo.id}})
+  } else { // CHEFE ou SERVIDOR
+    const siglaUnidade = perfil.unidadeSelecionada;
+    if (siglaUnidade) {
+      router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
+    } else {
+      console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
+    }
+  }
 }
 
 const alertasFormatados = computed(() => {

@@ -38,7 +38,7 @@ export enum TipoResponsabilidade {
 }
 
 export interface Responsavel {
-    idServidorResponsavel: number;
+    idServidor: number;
     tipo: TipoResponsabilidade;
     dataInicio: Date | null;
     dataFim: Date | null;

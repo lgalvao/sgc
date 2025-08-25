@@ -1,11 +1,18 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
+import {
+    createRouter,
+    createWebHistory,
+    RouteLocationNormalized,
+    type RouteRecordRaw,
+    RouterLink,
+    useRouter
+} from 'vue-router';
 import BarraNavegacao from '../BarraNavegacao.vue';
-import {useNavigationTrail} from '@/stores/navigationTrail';
 import {useUnidadesStore} from '@/stores/unidades';
 import {TipoResponsabilidade} from '@/types/tipos';
+import {computed} from "vue";
 
 const routes: RouteRecordRaw[] = [
     {path: '/painel', name: 'Painel', component: {template: '<div>Painel</div>'}},
@@ -22,11 +29,60 @@ const routes: RouteRecordRaw[] = [
         component: {template: '<div>Processo</div>'},
         meta: {breadcrumb: 'Processo'}
     },
+
+    {
+        path: '/processo/:idProcesso/:siglaUnidade',
+        name: 'Subprocesso',
+        component: {template: '<div>Subprocesso</div>'},
+        meta: {breadcrumb: (route: RouteLocationNormalized) => route.params.siglaUnidade as string}
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/mapa',
+        name: 'SubprocessoMapa',
+        component: {template: '<div>Mapa</div>'},
+        meta: {breadcrumb: 'Mapa'}
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
+        name: 'SubprocessoVisMapa',
+        component: {template: '<div>Visualização de Mapa</div>'},
+        meta: {breadcrumb: 'Visualização de Mapa'}
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/cadastro',
+        name: 'SubprocessoCadastro',
+        component: {template: '<div>Cadastro</div>'},
+        meta: {breadcrumb: 'Cadastro'}
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
+        name: 'SubprocessoVisCadastro',
+        component: {template: '<div>Visualização de Atividades</div>'},
+        meta: {breadcrumb: 'Visualização de Atividades'}
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/impacto-mapa',
+        name: 'SubprocessoImpactoMapa',
+        component: {template: '<div>Impacto no Mapa</div>'},
+        meta: {breadcrumb: 'Impacto no Mapa'}
+    },
     {
         path: '/unidade/:siglaUnidade',
         name: 'Unidade',
         component: {template: '<div>Unidade</div>'},
-        meta: {breadcrumb: 'Unidade'}
+        meta: {breadcrumb: (route: RouteLocationNormalized) => route.params.siglaUnidade as string}
+    },
+    {
+        path: '/unidade/:siglaUnidade/atribuicao',
+        name: 'AtribuicaoTemporariaForm',
+        component: {template: '<div>Atribuição Temporária</div>'},
+        meta: {breadcrumb: 'Atribuição'}
+    },
+    {
+        path: '/unidade/:siglaUnidade/mapa',
+        name: 'Mapa',
+        component: {template: '<div>Mapa da Unidade</div>'},
+        meta: {breadcrumb: 'Mapa'}
     },
     {
         path: '/relatorios',
@@ -36,6 +92,7 @@ const routes: RouteRecordRaw[] = [
     },
     {path: '/custom', name: 'Custom', component: {template: '<div>Custom</div>'}},
 ];
+
 
 describe('BarraNavegacao.vue', () => {
     let router: ReturnType<typeof createRouter>;
@@ -59,7 +116,7 @@ describe('BarraNavegacao.vue', () => {
             tipo: 'Tipo',
             idServidorTitular: 1,
             responsavel: {
-                idServidorResponsavel: 1,
+                idServidor: 1,
                 tipo: TipoResponsabilidade.ATRIBUICAO,
                 dataInicio: new Date('2025-01-01'),
                 dataFim: new Date('2025-12-31')
@@ -67,12 +124,10 @@ describe('BarraNavegacao.vue', () => {
             filhas: []
         }));
 
-        // Mock sessionStorage
+        // Mock sessionStorage - not strictly needed for this component anymore, but good practice if other parts rely on it
         vi.spyOn(sessionStorage, 'getItem').mockReturnValue(null);
-
         vi.spyOn(sessionStorage, 'removeItem').mockImplementation(() => {
         });
-
         vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
         });
     });
@@ -82,7 +137,24 @@ describe('BarraNavegacao.vue', () => {
             global: {
                 plugins: [router, pinia],
                 stubs: {
-                    RouterLink: {template: '<a><slot /></a>'},
+                    RouterLink: {
+                        template: '<a :href="resolvedTo"><slot /></a>',
+                        props: ['to'],
+                        setup(props) {
+                            const router = useRouter();
+                            const resolvedTo = computed(() => {
+                                console.log('RouterLink Stub: props.to', props.to);
+                                if (typeof props.to === 'string') {
+                                    return props.to;
+                                }
+                                const resolved = router.resolve(props.to);
+                                console.log('RouterLink Stub: resolved', resolved);
+                                console.log('RouterLink Stub: resolved.fullPath', resolved.fullPath);
+                                return resolved.fullPath;
+                            });
+                            return {resolvedTo};
+                        },
+                    },
                 },
             },
         });
@@ -104,31 +176,24 @@ describe('BarraNavegacao.vue', () => {
             expect(wrapper.find('button.btn-outline-secondary').exists()).toBe(false);
         });
 
-        it('deve exibir o botão Voltar em outras páginas', async () => {
+        it('não deve exibir o botão Voltar na página de painel', async () => {
             await router.push('/painel');
+            const wrapper = await mountComponent();
+            expect(wrapper.find('button.btn-outline-secondary').exists()).toBe(false);
+        });
+
+        it('deve exibir o botão Voltar em outras páginas', async () => {
+            await router.push('/alguma-pagina');
             const wrapper = await mountComponent();
             expect(wrapper.find('button.btn-outline-secondary').exists()).toBe(true);
         });
 
-        it('deve navegar para o painel se não houver crumbs anteriores', async () => {
+        it('deve chamar router.back() ao clicar no botão Voltar', async () => {
             await router.push('/alguma-pagina');
             const wrapper = await mountComponent();
-            const pushSpy = vi.spyOn(router, 'push');
+            const routerBackSpy = vi.spyOn(router, 'back');
             await wrapper.find('button.btn-outline-secondary').trigger('click');
-            expect(pushSpy).toHaveBeenCalledWith({path: '/painel'});
-        });
-
-        it('deve navegar para o crumb pai se houver', async () => {
-            const trailStore = useNavigationTrail();
-            trailStore.set([
-                {label: '__home__', to: '/painel'},
-                {label: 'Página Atual', to: '/alguma-pagina'}
-            ]);
-            await router.push('/alguma-pagina');
-            const pushSpy = vi.spyOn(router, 'push'); // Move spy creation here
-            const wrapper = await mountComponent();
-            await wrapper.find('button.btn-outline-secondary').trigger('click');
-            expect(pushSpy).toHaveBeenCalledWith('/painel');
+            expect(routerBackSpy).toHaveBeenCalled();
         });
     });
 
@@ -153,85 +218,93 @@ describe('BarraNavegacao.vue', () => {
     });
 
     describe('Lógica de Breadcrumbs (crumbs)', () => {
-        it('deve iniciar com o crumb home por padrão', async () => {
+        it('deve exibir o breadcrumb home e o da página atual para uma rota simples', async () => {
             await router.push('/alguma-pagina');
             const wrapper = await mountComponent();
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(2); // Home + Página Atual
+            expect(breadcrumbItems.length).toBe(2);
             expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
             expect(breadcrumbItems[1].text()).toBe('Alguma Página');
         });
 
-        it('deve resetar a trilha se veio da navbar', async () => {
-            const trailStore = useNavigationTrail();
-            const resetSpy = vi.spyOn(trailStore, 'reset');
-            vi.spyOn(sessionStorage, 'getItem').mockReturnValue('1');
-            trailStore.set([{label: 'Old Crumb', to: '/old'}]);
-            await router.push('/alguma-pagina');
-            await mountComponent();
-            expect(resetSpy).toHaveBeenCalled();
-            expect(sessionStorage.removeItem).toHaveBeenCalledWith('cameFromNavbar');
-        });
-
         it('deve popular a trilha para uma rota de processo', async () => {
-            const trailStore = useNavigationTrail();
-            const ensureBaseSpy = vi.spyOn(trailStore, 'ensureBase');
-            const pushSpy = vi.spyOn(trailStore, 'push');
             await router.push('/processo/123');
             const wrapper = await mountComponent();
-            expect(ensureBaseSpy).toHaveBeenCalled();
-            expect(pushSpy).toHaveBeenCalledWith({
-                label: 'Processo',
-                to: {name: 'Processo', params: {idProcesso: 123}}
-            });
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
             expect(breadcrumbItems.length).toBe(2);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
             expect(breadcrumbItems[1].text()).toBe('Processo');
+            expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
+        });
+
+        it('deve popular a trilha para uma rota de subprocesso', async () => {
+            await router.push('/processo/123/ABC');
+            const wrapper = await mountComponent();
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(3);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('Processo');
+            expect(breadcrumbItems[1].findComponent(RouterLink).props().to).toEqual({
+                name: 'Processo',
+                params: {idProcesso: 123}
+            });
+            expect(breadcrumbItems[2].text()).toBe('ABC');
+            expect(breadcrumbItems[2].find('a').exists()).toBe(false); // Last crumb is not a link
+        });
+
+        it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa)', async () => {
+            await router.push('/processo/123/ABC/mapa');
+            const wrapper = await mountComponent();
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(4);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('Processo');
+            expect(breadcrumbItems[1].findComponent(RouterLink).props().to).toEqual({
+                name: 'Processo',
+                params: {idProcesso: 123}
+            });
+            expect(breadcrumbItems[2].text()).toBe('ABC');
+            expect(breadcrumbItems[2].findComponent(RouterLink).props().to).toEqual({
+                name: 'Subprocesso',
+                params: {idProcesso: 123, siglaUnidade: 'ABC'}
+            });
+            expect(breadcrumbItems[3].text()).toBe('Mapa');
+            expect(breadcrumbItems[3].find('a').exists()).toBe(false); // Last crumb is not a link
         });
 
         it('deve popular a trilha para uma rota de unidade', async () => {
-            const trailStore = useNavigationTrail();
-            const ensureBaseSpy = vi.spyOn(trailStore, 'ensureBase');
-            const pushSpy = vi.spyOn(trailStore, 'push');
-            await router.push('/unidade/ABC');
+            await router.push('/unidade/XYZ');
             const wrapper = await mountComponent();
-            expect(ensureBaseSpy).toHaveBeenCalled();
-            expect(pushSpy).toHaveBeenCalledWith({
-                label: 'ABC',
-                to: {path: '/unidade/ABC'},
-                title: 'Unidade ABC'
-            });
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
             expect(breadcrumbItems.length).toBe(2);
-            expect(breadcrumbItems[1].text()).toBe('ABC');
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('XYZ');
+            expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
         });
 
-        it('deve popular a trilha para uma rota genérica com breadcrumb meta', async () => {
-            const trailStore = useNavigationTrail();
-            const ensureBaseSpy = vi.spyOn(trailStore, 'ensureBase');
-            const pushSpy = vi.spyOn(trailStore, 'push');
+        it('deve popular a trilha para uma rota de unidade com sub-página (atribuicao)', async () => {
+            await router.push('/unidade/XYZ/atribuicao');
+            const wrapper = await mountComponent();
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(3);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('XYZ');
+            expect(breadcrumbItems[1].findComponent(RouterLink).props().to).toEqual({
+                name: 'Unidade',
+                params: {siglaUnidade: 'XYZ'}
+            });
+            expect(breadcrumbItems[2].text()).toBe('Atribuição');
+            expect(breadcrumbItems[2].find('a').exists()).toBe(false); // Last crumb is not a link
+        });
+
+        it('deve popular a trilha para uma rota genérica com meta breadcrumb', async () => {
             await router.push('/relatorios');
             const wrapper = await mountComponent();
-            expect(ensureBaseSpy).toHaveBeenCalled();
-            expect(pushSpy).toHaveBeenCalledWith({label: 'Relatórios', to: '/relatorios'});
-
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
             expect(breadcrumbItems.length).toBe(2);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
             expect(breadcrumbItems[1].text()).toBe('Relatórios');
-        });
-
-        it('deve usar a trilha da store se ela já estiver populada', async () => {
-            const trailStore = useNavigationTrail();
-            trailStore.set([
-                {label: '__home__', to: '/painel'},
-                {label: 'Custom Crumb', to: '/custom'}
-            ]);
-            await router.push('/custom');
-
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(2);
-            expect(breadcrumbItems[1].text()).toBe('Custom Crumb');
+            expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
         });
     });
 });

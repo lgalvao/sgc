@@ -20,8 +20,8 @@
           <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ titularDetalhes?.email }}
         </p>
         <template v-if="unidadeComResponsavelDinamico.responsavel &&
-                        unidadeComResponsavelDinamico.responsavel.idServidorResponsavel &&
-                        unidadeComResponsavelDinamico.responsavel.idServidorResponsavel !== unidadeComResponsavelDinamico.idServidorTitular">
+                        unidadeComResponsavelDinamico.responsavel.idServidor &&
+                        unidadeComResponsavelDinamico.responsavel.idServidor !== unidadeComResponsavelDinamico.idServidorTitular">
           <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
           <p class="ms-3">
             <i class="bi bi-telephone-fill me-2"></i>{{ responsavelDetalhes?.ramal }}
@@ -112,10 +112,10 @@ const titularDetalhes = computed<Servidor | null>(() => {
 });
 
 const responsavelDetalhes = computed<Servidor | null>(() => {
-  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.idServidorResponsavel) {
+  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.idServidor) {
     return null;
   }
-  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.idServidorResponsavel) || null;
+  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.idServidor) || null;
 });
 
 const mapaVigente = computed<Mapa | undefined>(() => mapasStore.getMapaVigentePorUnidade(sigla.value))
