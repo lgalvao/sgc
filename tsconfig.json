@@ -6,12 +6,14 @@
     "skipLibCheck": true,
     "allowJs": true,
     "checkJs": true,
+
     // Modules
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+
     // Language & Environment
     "target": "ESNext",
     "lib": [

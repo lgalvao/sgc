@@ -155,10 +155,3 @@ roteamento/store.
   com a reatividade ou a interação com o ambiente de teste (como JSDOM), considere simplificar o teste ou, como último
   recurso, ignorá-lo temporariamente para permitir que outros testes passem, enquanto aprofunda a investigação em um
   momento oportuno.
-* **Inconsistências de Ambiente de Teste (Playwright vs. Vitest/JSDOM):** Erros que aparecem em um ambiente (ex:
-  Playwright)
-  mas não em outro (ex: Vitest/JSDOM) podem indicar diferenças na forma como o código é executado ou no ambiente DOM.
-  Priorize a correção de erros que afetam a funcionalidade real da aplicação. Para erros específicos do ambiente de
-  teste,
-  considere abordagens de depuração mais aprofundadas ou, se necessário, ignorar temporariamente o teste com uma nota
-  explicativa.
