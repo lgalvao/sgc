@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {useRevisaoStore, TipoMudanca} from '../revisao';
+import {TipoMudanca, useRevisaoStore} from '../revisao';
 
 describe('useRevisaoStore', () => {
     let revisaoStore: ReturnType<typeof useRevisaoStore>;

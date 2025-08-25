@@ -1,7 +1,7 @@
 # AGENTS.md para o Projeto SGC
 
-Este documento serve como um guia para agentes de codificação que trabalham no projeto Sistema de Gestão de 
-Competências (SGC) do TRE-PE. Ele fornece informações essenciais para entender a arquitetura, 
+Este documento serve como um guia para agentes de codificação que trabalham no projeto Sistema de Gestão de
+Competências (SGC) do TRE-PE. Ele fornece informações essenciais para entender a arquitetura,
 as convenções e as ferramentas utilizadas.
 
 ## 1. Visão Geral do Projeto
@@ -102,6 +102,7 @@ persistido no `localStorage`.
 ## 9. Endpoints Principais (Vue Router)
 
 Veja `endpoints.md` para mais detalhes. Resumo:
+
 * `/login`: `Login.vue`
 * `/painel`: `Painel.vue`
 * `/processo/:idProcesso`: `Processo.vue`

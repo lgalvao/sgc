@@ -33,17 +33,17 @@
     "dataFinalizacao": null
   },
   {
-    "id": 2,  
+    "id": 2,
     "unidade": "SESEL",
-    "idProcesso": 4, 
-    "situacao": "em_andamento", 
+    "idProcesso": 4,
+    "situacao": "em_andamento",
     "competencias": [
       {
         "id": 1,
         "descricao": "Acompanhamento de processos eleitorais",
         "atividadesAssociadas": [
           6,
-          201 
+          201
         ]
       },
       {
@@ -52,7 +52,7 @@
         "atividadesAssociadas": [
           1,
           200,
-          202 
+          202
         ]
       },
       {
@@ -61,7 +61,7 @@
         "atividadesAssociadas": [
           4,
           5,
-          218 
+          218
         ]
       }
     ],

@@ -70,9 +70,9 @@ export function usePerfil() {
 
         // 4. Remove duplicatas exatas (mesmo perfil, mesma unidade)
         return pares.filter((par, index, self) =>
-            index === self.findIndex((p) => (
-                p.perfil === par.perfil && p.unidade === par.unidade
-            ))
+                index === self.findIndex((p) => (
+                    p.perfil === par.perfil && p.unidade === par.unidade
+                ))
         );
     };
 

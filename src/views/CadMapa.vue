@@ -44,12 +44,12 @@
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span v-if="getAtividadeCompleta(atvId)?.conhecimentos.length > 0"
-                          class="badge bg-secondary ms-2"
-                          :data-bs-title="getConhecimentosTooltip(atvId)"
                           :data-bs-html="true"
-                          data-bs-toggle="tooltip"
+                          :data-bs-title="getConhecimentosTooltip(atvId)"
+                          class="badge bg-secondary ms-2"
+                          data-bs-custom-class="conhecimentos-tooltip"
                           data-bs-placement="top"
-                          data-bs-custom-class="conhecimentos-tooltip">
+                          data-bs-toggle="tooltip">
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
                   </span>
@@ -109,12 +109,12 @@
                     <label class="form-check-label mb-0 d-flex align-items-center">
                       {{ atividade.descricao }}
                       <span v-if="atividade.conhecimentos.length > 0"
-                            class="badge bg-secondary ms-2"
-                            :data-bs-title="getConhecimentosModal(atividade)"
                             :data-bs-html="true"
-                            data-bs-toggle="tooltip"
+                            :data-bs-title="getConhecimentosModal(atividade)"
+                            class="badge bg-secondary ms-2"
+                            data-bs-custom-class="conhecimentos-tooltip"
                             data-bs-placement="right"
-                            data-bs-custom-class="conhecimentos-tooltip">
+                            data-bs-toggle="tooltip">
                         {{ atividade.conhecimentos.length }}
                       </span>
                     </label>

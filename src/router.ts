@@ -74,7 +74,7 @@ const routes = [
         }),
         meta: {title: 'Cadastro', breadcrumb: 'Cadastro'},
     },
-        {
+    {
         path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
         name: 'SubprocessoVisCadastro',
         component: () => import('./views/VisAtividades.vue'),

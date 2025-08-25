@@ -10,7 +10,12 @@
         "nome": "Secretaria de Gestao de Pessoas",
         "tipo": "INTERMEDIARIA",
         "idServidorTitular": 2,
-        "responsavel": { "idServidorResponsavel": 13, "tipo": 1, "dataInicio": "2025-01-01", "dataFim": "2025-12-31" },
+        "responsavel": {
+          "idServidorResponsavel": 13,
+          "tipo": 1,
+          "dataInicio": "2025-01-01",
+          "dataFim": "2025-12-31"
+        },
         "filhas": [
           {
             "sigla": "COEDE",
@@ -53,7 +58,12 @@
                 "nome": "Seção de Desenvolvimento de Sistemas",
                 "tipo": "OPERACIONAL",
                 "idServidorTitular": 7,
-                "responsavel": { "idServidorResponsavel": 8, "tipo": 0, "dataInicio": "2025-01-01", "dataFim": "2025-12-31" },
+                "responsavel": {
+                  "idServidorResponsavel": 8,
+                  "tipo": 0,
+                  "dataInicio": "2025-01-01",
+                  "dataFim": "2025-12-31"
+                },
                 "filhas": [],
                 "id": 8
               },

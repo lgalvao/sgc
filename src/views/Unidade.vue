@@ -28,7 +28,9 @@
             <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ responsavelDetalhes?.email }}
           </p>
         </template>
-        <button v-if="mapaVigente" class="btn btn-outline-success" @click="visualizarMapa"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Mapa vigente</button>
+        <button v-if="mapaVigente" class="btn btn-outline-success" @click="visualizarMapa"><i
+            class="bi bi-file-earmark-spreadsheet me-2"></i>Mapa vigente
+        </button>
       </div>
     </div>
     <div v-else>

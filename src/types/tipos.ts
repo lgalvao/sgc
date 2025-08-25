@@ -85,10 +85,10 @@ export interface Conhecimento {
 }
 
 export interface Atividade {
-  id: number;
-  descricao: string;
-  idSubprocesso: number;
-  conhecimentos: Conhecimento[];
+    id: number;
+    descricao: string;
+    idSubprocesso: number;
+    conhecimentos: Conhecimento[];
 }
 
 export interface Alerta {

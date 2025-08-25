@@ -59,14 +59,14 @@ test.describe('Impacto no Mapa de Competências', () => {
     test('deve exibir tela vazia quando não há mudanças', async ({page}) => {
         await page.goto(`/processo/1/SESEL/cadastro`);
         await page.waitForLoadState('networkidle');
-        
+
         // Abrir modal de impacto sem fazer mudanças
         await page.getByText('Impacto no mapa').click();
-        
+
         await expect(page.getByText('Impacto no Mapa de Competências')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas')).not.toBeVisible();
         await expect(page.getByTestId('msg-nenhuma-competencia')).toBeVisible();
-        
+
         // Fechar modal
         await page.getByText('Fechar').click();
     });
@@ -74,16 +74,16 @@ test.describe('Impacto no Mapa de Competências', () => {
     test('deve exibir apenas atividades inseridas quando não há competências', async ({page}) => {
         await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
-        
+
         // Adicionar apenas uma atividade
         await adicionarAtividade(page, 'Atividade Teste');
-        
+
         await page.getByText('Impacto no mapa').click();
-        
+
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Atividade Teste')).toBeVisible();
         await expect(page.getByTestId('msg-nenhuma-competencia')).toBeVisible();
-        
+
         // Fechar modal
         await page.getByText('Fechar').click();
     });
@@ -91,22 +91,22 @@ test.describe('Impacto no Mapa de Competências', () => {
     test('deve exibir conhecimentos de atividades inseridas', async ({page}) => {
         await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
-        
+
         // Criar atividade com conhecimentos
         await adicionarAtividade(page, 'Atividade Nova');
         const atividadeCard = page.locator('.atividade-card', {hasText: 'Atividade Nova'});
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento A');
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento B');
-        
+
         await page.getByText('Impacto no mapa').click();
-        
+
         // Verificar se a atividade e seus conhecimentos aparecem
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Atividade Nova')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByTestId('label-conhecimentos-adicionados')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Conhecimento A')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Conhecimento B')).toBeVisible();
-        
+
         // Fechar modal
         await page.getByText('Fechar').click();
     });
@@ -118,12 +118,12 @@ test.describe('Impacto no Mapa de Competências', () => {
         const atividadeExistente = `Atividade Existente ${Date.now()}`;
         const conhecimentoExistente = `Conhecimento Existente ${Date.now()}`;
         const atividadeParaRemover = `Atividade Para Remover ${Date.now()}`;
-        
+
         // Criar atividades e conhecimentos iniciais
         await adicionarAtividade(page, atividadeExistente);
         const atividadeCard = page.locator('.atividade-card', {hasText: atividadeExistente});
         await adicionarConhecimento(page, atividadeCard, conhecimentoExistente);
-        
+
         await adicionarAtividade(page, atividadeParaRemover);
 
         // 1. Alterar descrição de um conhecimento
@@ -172,10 +172,10 @@ test.describe('Impacto no Mapa de Competências', () => {
         await expect(page.getByTestId('secao-atividades-inseridas').getByTestId('label-conhecimentos-adicionados').first()).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Conhecimento A de X')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Conhecimento B de X')).toBeVisible();
-        
+
         // Verificar se há competências impactadas ou apenas atividades inseridas
         const hasCompetenciasImpactadas = await page.getByTestId('msg-nenhuma-competencia').isVisible();
-        
+
         if (!hasCompetenciasImpactadas) {
             // Verificar mudanças específicas nas competências impactadas
             await expect(page.getByText('Conhecimento alterado')).toBeVisible();
@@ -184,7 +184,7 @@ test.describe('Impacto no Mapa de Competências', () => {
             await expect(page.getByText('Atividade alterada')).toBeVisible();
             await expect(page.getByText('Atividade removida')).toBeVisible();
         }
-        
+
         // Fechar modal
         await page.getByText('Fechar').click();
     });

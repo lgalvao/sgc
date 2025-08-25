@@ -14,7 +14,7 @@ test.describe('Configurações', () => {
         // Verificar campo Dias para inativação de processos
         const diasInativacaoProcessoInput = page.getByLabel('Dias para inativação de processos');
         await expect(diasInativacaoProcessoInput).toBeVisible();
-        await expect(diasInativacaoProcessoInput).toHaveValue('30'); // Valor padrão do store
+        await expect(diasInativacaoProcessoInput).toHaveValue('10'); // Valor padrão do store
 
         // Verificar campo Dias para indicação de alerta como novo
         const diasAlertaNovoInput = page.getByLabel('Dias para indicação de alerta como novo');

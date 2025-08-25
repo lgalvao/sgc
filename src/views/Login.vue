@@ -12,7 +12,8 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="senha">Senha</label>
-            <input id="senha" v-model="senha" :disabled="loginStep > 1" autocomplete="current-password" class="form-control"
+            <input id="senha" v-model="senha" :disabled="loginStep > 1" autocomplete="current-password"
+                   class="form-control"
                    placeholder="Digite sua senha" type="password"/>
           </div>
 

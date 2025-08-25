@@ -58,7 +58,12 @@ describe('BarraNavegacao.vue', () => {
             nome: `Unidade ${sigla}`,
             tipo: 'Tipo',
             idServidorTitular: 1,
-            responsavel: { idServidorResponsavel: 1, tipo: TipoResponsabilidade.ATRIBUICAO, dataInicio: new Date('2025-01-01'), dataFim: new Date('2025-12-31') },
+            responsavel: {
+                idServidorResponsavel: 1,
+                tipo: TipoResponsabilidade.ATRIBUICAO,
+                dataInicio: new Date('2025-01-01'),
+                dataFim: new Date('2025-12-31')
+            },
             filhas: []
         }));
 

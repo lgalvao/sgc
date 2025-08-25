@@ -1,17 +1,18 @@
 <template>
-  <div v-if="mostrar" class="modal fade show" style="display: block;" tabindex="-1" aria-modal="true">
+  <div v-if="mostrar" aria-modal="true" class="modal fade show" style="display: block;" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Impacto no Mapa de Competências</h5>
-          <button type="button" class="btn-close" @click="fechar"></button>
+          <button class="btn-close" type="button" @click="fechar"></button>
         </div>
         <div class="modal-body">
           <template v-if="unidade && processo">
             <div class="mt-3">
               <!-- Seção de Atividades Inseridas -->
               <div v-if="atividadesInseridas.length > 0" data-testid="secao-atividades-inseridas">
-                <h5 class="mb-3" data-testid="titulo-atividades-inseridas"><i class="bi bi-plus-circle me-2"></i>Atividades inseridas</h5>
+                <h5 class="mb-3" data-testid="titulo-atividades-inseridas"><i class="bi bi-plus-circle me-2"></i>Atividades
+                  inseridas</h5>
                 <div class="list-group mb-4">
                   <div v-for="atividade in atividadesInseridas" :key="atividade.id"
                        class="list-group-item flex-column align-items-start">
@@ -23,9 +24,11 @@
                         </p>
                         <!-- Conhecimentos da atividade inserida -->
                         <div v-if="conhecimentosAtividade(atividade.idAtividade).length > 0" class="mt-2 ms-3">
-                          <small class="text-muted" data-testid="label-conhecimentos-adicionados">Conhecimentos adicionados:</small>
+                          <small class="text-muted" data-testid="label-conhecimentos-adicionados">Conhecimentos
+                            adicionados:</small>
                           <ul class="list-unstyled mt-1">
-                            <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)" :key="conhecimento.id" class="d-flex align-items-center mb-1">
+                            <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)"
+                                :key="conhecimento.id" class="d-flex align-items-center mb-1">
                               <i class="bi bi-plus-circle-fill text-success me-2" style="font-size: 0.875rem;"></i>
                               <small><strong>{{ conhecimento.descricaoConhecimento }}</strong></small>
                             </li>
@@ -38,7 +41,8 @@
               </div>
 
               <!-- Seção de Competências Impactadas -->
-              <h5 class="mb-3" data-testid="titulo-competencias-impactadas"><i class="bi bi-bullseye me-2"></i>Competências impactadas</h5>
+              <h5 class="mb-3" data-testid="titulo-competencias-impactadas"><i class="bi bi-bullseye me-2"></i>Competências
+                impactadas</h5>
               <div v-if="competenciasImpactadas.size === 0">
                 <p class="text-muted" data-testid="msg-nenhuma-competencia">Nenhuma competência foi impactada.</p>
               </div>
@@ -51,8 +55,8 @@
                   <ul class="list-group list-group-flush">
                     <li v-for="mudanca in mudancasCompetencia" :key="mudanca.id"
                         class="list-group-item d-flex align-items-center">
-                      <i class="bi me-3"
-                         :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"></i>
+                      <i :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"
+                         class="bi me-3"></i>
                       <small>
                         <template
                             v-if="mudanca.tipo === TipoMudanca.AtividadeAdicionada || mudanca.tipo === TipoMudanca.AtividadeRemovida">
@@ -89,7 +93,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="fechar">Fechar</button>
+          <button class="btn btn-secondary" type="button" @click="fechar">Fechar</button>
         </div>
       </div>
     </div>
@@ -162,9 +166,9 @@ const atividadesInseridas = computed(() => {
 
 const conhecimentosAtividade = (idAtividade: number | undefined) => {
   if (!idAtividade) return [];
-  return mudancas.value.filter(m => 
-    m.tipo === TipoMudanca.ConhecimentoAdicionado && 
-    m.idAtividade === idAtividade
+  return mudancas.value.filter(m =>
+      m.tipo === TipoMudanca.ConhecimentoAdicionado &&
+      m.idAtividade === idAtividade
   );
 };
 

@@ -50,7 +50,7 @@
         </section>
 
         <section class="col-md-4 mb-3">
-          <div class="card h-100 card-actionable" :class="{ 'disabled-card': !mapa }" @click="navegarParaMapa()">
+          <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" @click="navegarParaMapa()">
             <div class="card-body">
               <h5 class="card-title">Mapa de Competências</h5>
               <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>

@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import atividadesMock from '../mocks/atividades.json';
 import type {Atividade, Conhecimento} from '@/types/tipos';
-import {useRevisaoStore, TipoMudanca} from './revisao';
+import {TipoMudanca, useRevisaoStore} from './revisao';
 
 export const useAtividadesStore = defineStore('atividades', {
     state: () => {
@@ -58,7 +58,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     descricaoAtividade: atividade.descricao,
                     idConhecimento: conhecimento.id,
                     descricaoConhecimento: conhecimento.descricao,
-                    competenciasImpactadasIds: impactedCompetencyIds 
+                    competenciasImpactadasIds: impactedCompetencyIds
                 });
             }
         },
@@ -75,7 +75,7 @@ export const useAtividadesStore = defineStore('atividades', {
                         descricaoAtividade: atividade.descricao,
                         idConhecimento: conhecimentoRemovido.id,
                         descricaoConhecimento: conhecimentoRemovido.descricao,
-                        competenciasImpactadasIds: impactedCompetencyIds 
+                        competenciasImpactadasIds: impactedCompetencyIds
                     });
                 }
             }

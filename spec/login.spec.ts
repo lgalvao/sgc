@@ -2,7 +2,7 @@ import {expect, test} from "@playwright/test";
 
 test.describe('Login', () => {
 
-    test('deve permitir o login com credenciais válidas e navegar para o painel', async ({ page }) => {
+    test('deve permitir o login com credenciais válidas e navegar para o painel', async ({page}) => {
         // Navegar para a página de login
         await page.goto('/');
 
@@ -11,7 +11,7 @@ test.describe('Login', () => {
         await page.getByLabel('Senha').fill('123');
 
         // Clicar no botão de login (primeira vez)
-        await page.getByRole('button', { name: 'Entrar' }).click();
+        await page.getByRole('button', {name: 'Entrar'}).click();
 
         // ETAPA 2: Lidar com a seleção de múltiplos perfis
         // Verificar se o seletor de perfil/unidade apareceu
@@ -19,10 +19,10 @@ test.describe('Login', () => {
         await expect(seletorDePerfil).toBeVisible();
 
         // Selecionar um perfil específico para garantir a consistência do teste
-        await seletorDePerfil.selectOption({ label: 'ADMIN - SEDOC' });
+        await seletorDePerfil.selectOption({label: 'ADMIN - SEDOC'});
 
         // Clicar no botão de login (segunda vez)
-        await page.getByRole('button', { name: 'Entrar' }).click();
+        await page.getByRole('button', {name: 'Entrar'}).click();
 
         // Verificar se a navegação para a página /painel ocorreu
         await expect(page).toHaveURL(`/painel`);

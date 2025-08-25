@@ -21,7 +21,8 @@ garantem que os fluxos críticos da aplicação funcionem corretamente do ponto 
 - **Timeouts**: Os testes E2E devem ter timeouts curtos, de no máximo 5000ms, pois não há backend e está tudo mockado.
   Se um teste não passar, o problema geralmente estará em outro lugar, não no timeout.
 - **Estabilidade do Ambiente**: Antes de executar testes E2E, certifique-se de que o servidor de desenvolvimento (Vite)
-  esteja estável e a aplicação carregue sem erros críticos no console do navegador (ex: `TypeError: app.mount is not a function`).
+  esteja estável e a aplicação carregue sem erros críticos no console do navegador (ex:
+  `TypeError: app.mount is not a function`).
   Problemas no servidor ou na inicialização da aplicação podem levar a falhas inconsistentes nos testes E2E.
 - **Seletores Robustos**: Prefira seletores baseados em `role` (ex: `page.getByRole('button', { name: 'Salvar' })`) ou
   `label` (ex: `page.getByLabel('Dias para inativação de processos:')`) para interagir com elementos da UI.

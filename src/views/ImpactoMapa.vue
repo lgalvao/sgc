@@ -20,7 +20,8 @@
                   <div v-if="conhecimentosAtividade(atividade.idAtividade).length > 0" class="mt-2 ms-3">
                     <small class="text-muted">Conhecimentos adicionados:</small>
                     <ul class="list-unstyled mt-1">
-                      <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)" :key="conhecimento.id" class="d-flex align-items-center mb-1">
+                      <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)" :key="conhecimento.id"
+                          class="d-flex align-items-center mb-1">
                         <i class="bi bi-plus-circle-fill text-success me-2" style="font-size: 0.875rem;"></i>
                         <small><strong>{{ conhecimento.descricaoConhecimento }}</strong></small>
                       </li>
@@ -46,8 +47,8 @@
             <ul class="list-group list-group-flush">
               <li v-for="mudanca in mudancasCompetencia" :key="mudanca.id"
                   class="list-group-item d-flex align-items-center">
-                <i class="bi me-3"
-                   :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"></i>
+                <i :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"
+                   class="bi me-3"></i>
                 <small>
                   <template
                       v-if="mudanca.tipo === TipoMudanca.AtividadeAdicionada || mudanca.tipo === TipoMudanca.AtividadeRemovida">
@@ -147,9 +148,9 @@ const atividadesInseridas = computed(() => {
 
 const conhecimentosAtividade = (idAtividade: number | undefined) => {
   if (!idAtividade) return [];
-  return mudancas.value.filter(m => 
-    m.tipo === TipoMudanca.ConhecimentoAdicionado && 
-    m.idAtividade === idAtividade
+  return mudancas.value.filter(m =>
+      m.tipo === TipoMudanca.ConhecimentoAdicionado &&
+      m.idAtividade === idAtividade
   );
 };
 

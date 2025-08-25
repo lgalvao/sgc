@@ -45,7 +45,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnEditarAtividade = atividadeCard.getByTestId('btn-editar-atividade');
         await expect(btnEditarAtividade).toBeVisible();
         await expect(btnEditarAtividade).toBeEnabled();
-        await btnEditarAtividade.click({ force: true });
+        await btnEditarAtividade.click({force: true});
         const atividadeEditada = `Atividade Editada ${Date.now()}`;
         await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
         await page.getByTestId('btn-salvar-edicao-atividade').click();
@@ -64,7 +64,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnRemoverAtividade = atividadeCard.getByTestId('btn-remover-atividade');
         await expect(btnRemoverAtividade).toBeVisible();
         await expect(btnRemoverAtividade).toBeEnabled();
-        await btnRemoverAtividade.click({ force: true });
+        await btnRemoverAtividade.click({force: true});
         await expect(page.getByText(atividadeParaRemover)).not.toBeAttached();
     });
 

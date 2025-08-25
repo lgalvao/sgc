@@ -39,11 +39,11 @@
     </div>
 
     <!-- Modal de Impacto no Mapa -->
-    <ImpactoMapaModal 
-      :mostrar="mostrarModalImpacto" 
-      :id-processo="idProcesso" 
-      :sigla-unidade="siglaUnidade" 
-      @fechar="fecharModalImpacto" />
+    <ImpactoMapaModal
+        :id-processo="idProcesso"
+        :mostrar="mostrarModalImpacto"
+        :sigla-unidade="siglaUnidade"
+        @fechar="fecharModalImpacto"/>
   </div>
 </template>
 
