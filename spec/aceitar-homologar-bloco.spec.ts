@@ -79,7 +79,7 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
         // Verificar se o botão de confirmação está presente
-        await expect(page.getByRole('button', {name: 'Confirmar Aceite'})).toBeVisible();
+        await expect(page.locator('button.btn-primary:has-text("Aceitar")')).toBeVisible();
     });
 
     test('deve abrir modal de confirmação ao clicar em "Homologar em bloco"', async ({page}) => {
@@ -100,10 +100,10 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
         // Verificar se o botão de confirmação está presente
-        await expect(page.getByRole('button', {name: 'Confirmar Homologação'})).toBeVisible();
+        await expect(page.locator('button.btn-success:has-text("Homologar")')).toBeVisible();
     });
 
-    test('deve permitir adicionar observação geral no modal', async ({page}) => {
+    test('deve permitir selecionar unidades no modal', async ({page}) => {
         // Logar como ADMIN
         await loginComoUsuario(page, '7', '123', 'ADMIN - SEDOC');
 
@@ -114,12 +114,19 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         // Clicar no botão "Homologar em bloco"
         await page.getByRole('button', {name: 'Homologar em bloco'}).click();
 
-        // Adicionar observação
-        const observacao = `Observação de teste ${Date.now()}`;
-        await page.locator('textarea').fill(observacao);
+        // Verificar que há checkboxes para selecionar unidades
+        await expect(page.locator('input[type="checkbox"]')).toBeVisible();
 
-        // Verificar que a observação foi preenchida
-        await expect(page.locator('textarea')).toHaveValue(observacao);
+        // Verificar que pelo menos uma unidade está selecionada por padrão
+        const checkboxes = await page.locator('input[type="checkbox"]').all();
+        let selected = false;
+        for (const checkbox of checkboxes) {
+            if (await checkbox.isChecked()) {
+                selected = true;
+                break;
+            }
+        }
+        expect(selected).toBeTruthy();
     });
 
     test('deve fechar modal ao clicar em "Cancelar"', async ({page}) => {
@@ -154,8 +161,8 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         // Clicar no botão "Homologar em bloco"
         await page.getByRole('button', {name: 'Homologar em bloco'}).click();
 
-        // Clicar em "Confirmar Homologação"
-        await page.getByRole('button', {name: 'Confirmar Homologação'}).click();
+        // Clicar em "Homologar"
+        await page.locator('button.btn-success:has-text("Homologar")').click();
 
         // Verificar mensagem de sucesso
         await expect(page.getByText('Cadastros homologados em bloco com sucesso!')).toBeVisible();

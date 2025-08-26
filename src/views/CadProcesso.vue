@@ -92,6 +92,7 @@ import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
+import {generateUniqueId} from '@/utils/idGenerator'
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
@@ -123,16 +124,16 @@ function salvarProcesso() {
   const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
-    id: Date.now() + index, // Simple unique ID generation
+  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
+    id: generateUniqueId(),
     idProcesso: novoidProcesso,
     unidade: unidadeSigla,
     dataLimiteEtapa1: new Date(dataLimite.value),
     dataLimiteEtapa2: new Date(dataLimite.value),
     dataFimEtapa1: null,
     dataFimEtapa2: null,
-    unidadeAtual: unidadeSigla, // Inicializa com a própria unidade
-    unidadeAnterior: null, // Não há unidade anterior no início
+    unidadeAtual: unidadeSigla,
+    unidadeAnterior: null,
     situacao: 'Não iniciado'
   }));
 
@@ -160,16 +161,16 @@ function iniciarProcesso() {
   const novoidProcesso = processosStore.processos.length + 1;
   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla, index) => ({
-    id: Date.now() + index, // Simple unique ID generation
+  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
+    id: generateUniqueId(),
     idProcesso: novoidProcesso,
     unidade: unidadeSigla,
     dataLimiteEtapa1: new Date(dataLimite.value),
     dataLimiteEtapa2: null,
     dataFimEtapa1: null,
     dataFimEtapa2: null,
-    unidadeAtual: unidadeSigla, // Inicializa com a própria unidade
-    unidadeAnterior: null, // Não há unidade anterior no início
+    unidadeAtual: unidadeSigla,
+    unidadeAnterior: null,
     situacao: 'Aguardando preenchimento do mapa'
   }));
 
@@ -246,6 +247,7 @@ function toggleUnidade(unidade: Unidade) {
 <style scoped>
 input[type="checkbox"]:indeterminate {
   background-color: #0d6efd;
+}d6efd;
   border-color: #0d6efd;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10h8'/%3e%3c/svg%3e");
 }

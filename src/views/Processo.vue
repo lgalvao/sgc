@@ -145,8 +145,7 @@ const perfilStore = usePerfilStore()
 const mostrarBotoesBloco = ref(false)
 const mostrarModalBloco = ref(false)
 const tipoAcaoBloco = ref<'aceitar' | 'homologar'>('aceitar')
-const unidadesSelecionadasBloco = ref<Array<{sigla: string, nome: string, situacao: string}>>([])
-const observacaoBloco = ref('')
+const unidadesSelecionadasBloco = ref<Array<{sigla: string, nome: string, situacao: string, selecionada: boolean}>>([])
 const mostrarAlertaSucesso = ref(false)
 
 const idProcesso = computed(() =>
@@ -300,7 +299,6 @@ function prepararUnidadesParaBloco() {
 
 function fecharModalBloco() {
   mostrarModalBloco.value = false
-  observacaoBloco.value = ''
 }
 
 async function confirmarAcaoBloco() {
@@ -319,7 +317,6 @@ async function confirmarAcaoBloco() {
       idProcesso: idProcesso.value,
       unidades: unidadesSelecionadas,
       tipoAcao: tipoAcaoBloco.value,
-      observacao: observacaoBloco.value,
       unidadeUsuario: perfilStore.unidadeSelecionada || ''
     })
     
