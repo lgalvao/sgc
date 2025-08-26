@@ -166,5 +166,29 @@
     "situacao": "Não iniciado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC"
+  },
+  {
+    "id": 18,
+    "idProcesso": 1,
+    "unidade": "SEMARE",
+    "dataLimiteEtapa1": "2025-09-15",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SEMARE",
+    "unidadeAnterior": "SESEL"
+  },
+  {
+    "id": 19,
+    "idProcesso": 2,
+    "unidade": "SEMARE",
+    "dataLimiteEtapa1": "2025-09-20",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Não iniciado",
+    "unidadeAtual": "SEMARE",
+    "unidadeAnterior": "SENIC"
   }
 ]

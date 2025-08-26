@@ -9,39 +9,13 @@
           <i class="bi bi-plus-lg"></i> Criar processo
         </router-link>
       </div>
-      <table class="table table-hover" data-testid="tabela-processos">
-        <thead>
-        <tr>
-          <th data-testid="coluna-descricao" style="cursor:pointer" @click="ordenarPor('descricao')">
-            Descrição
-            <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
-          </th>
-          <th data-testid="coluna-tipo" style="cursor:pointer" @click="ordenarPor('tipo')">
-            Tipo
-            <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
-          </th>
-          <th data-testid="coluna-unidades" style="cursor:pointer" @click="ordenarPor('unidades')">
-            Unidades participantes
-            <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
-          </th>
-          <th data-testid="coluna-situacao" style="cursor:pointer" @click="ordenarPor('situacao')">
-            Situação
-            <span v-if="criterio === 'situacao'">{{ asc ? '↑' : '↓' }}</span>
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="processo in processosOrdenados" :key="processo.id" style="cursor:pointer;"
-            @click="abrirDetalhesProcesso(processo)">
-          <td>
-            {{ processo.descricao }}
-          </td>
-          <td>{{ processo.tipo }}</td>
-          <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
-          <td>{{ processo.situacao }}</td>
-        </tr>
-        </tbody>
-      </table>
+      <TabelaProcessos
+          :processos="processosOrdenadosComUnidades"
+          :criterioOrdenacao="criterio"
+          :direcaoOrdenacaoAsc="asc"
+          @ordenar="ordenarPor"
+          @selecionarProcesso="abrirDetalhesProcesso"
+      />
     </div>
 
     <div>
@@ -81,11 +55,14 @@ import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
 import {Alerta, Perfil, Processo} from '@/types/tipos'
+import TabelaProcessos from '@/components/TabelaProcessos.vue';
+import { useProcessosFiltrados } from '@/composables/useProcessosFiltrados'; // Importar o novo composable
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
-const {processos} = storeToRefs(processosStore)
 const alertasStore = useAlertasStore()
+
+const {processos} = storeToRefs(processosStore) // Manter para alertas, mas não para a tabela de processos
 const {alertas} = storeToRefs(alertasStore)
 
 const router = useRouter()
@@ -93,9 +70,8 @@ const router = useRouter()
 const criterio = ref<keyof Processo | 'unidades'>('descricao')
 const asc = ref(true)
 
-const processosFiltrados = computed<Processo[]>(() => {
-  return processos.value as Processo[]
-})
+// Usar o novo composable para obter os processos filtrados
+const { processosFiltrados } = useProcessosFiltrados();
 
 const processosOrdenados = computed<Processo[]>(() => {
   return [...processosFiltrados.value].sort((a, b) => {
@@ -112,6 +88,14 @@ const processosOrdenados = computed<Processo[]>(() => {
     return 0
   })
 })
+
+// Novo computed para formatar as unidades antes de passar para o componente filho
+const processosOrdenadosComUnidades = computed(() => {
+  return processosOrdenados.value.map(p => ({
+    ...p,
+    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', ')
+  }));
+});
 
 function ordenarPor(campo: keyof Processo | 'unidades') {
   if (criterio.value === campo) {

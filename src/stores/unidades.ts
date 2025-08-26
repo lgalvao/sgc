@@ -16,6 +16,23 @@ export const useUnidadesStore = defineStore('unidades', {
                 }
             }
             return null
+        },
+        getUnidadesSubordinadas(siglaUnidade: string): string[] {
+            const unidadesEncontradas: string[] = [];
+
+            const findAndCollect = (unidade: Unidade) => {
+                unidadesEncontradas.push(unidade.sigla);
+                if (unidade.filhas) {
+                    unidade.filhas.forEach(findAndCollect);
+                }
+            };
+
+            const unidadeRaiz = this.pesquisarUnidade(siglaUnidade);
+            if (unidadeRaiz) {
+                findAndCollect(unidadeRaiz);
+            }
+
+            return unidadesEncontradas;
         }
     }
-}) 
+})

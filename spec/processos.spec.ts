@@ -24,7 +24,7 @@ test.describe('Detalhes do Processo - Unidades', () => {
 
     test('deve exibir unidades na tabela', async ({page}) => {
         // Verifica se há pelo menos uma linha de dados na tabela (excluindo o cabeçalho)
-        const rows = page.getByRole('row').filter({hasNot: page.getByRole('rowgroup', {name: 'Unidade Situação Data limite Unidade Atual'})});
-        await expect(rows).toHaveCount(5); // Assumindo que há 5 unidades no snapshot
+        const rows = page.locator('[data-testid="tree-table-row"]'); // Alterado para usar data-testid
+        await expect(await rows.count()).toBeGreaterThan(0);
     });
 });

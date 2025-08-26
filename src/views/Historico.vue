@@ -1,40 +1,16 @@
 <template>
   <div class="container mt-4">
     <h2 class="display-6">Histórico de processos</h2>
-    <table class="table table-striped table-hover mt-4">
-      <thead role="rowgroup">
-      <tr>
-        <th style="cursor:pointer" @click="ordenarPor('descricao')">
-          Descrição
-          <span v-if="criterio === 'descricao'">{{ asc ? '↑' : '↓' }}</span>
-        </th>
-        <th style="cursor:pointer" @click="ordenarPor('tipo')">
-          Tipo
-          <span v-if="criterio === 'tipo'">{{ asc ? '↑' : '↓' }}</span>
-        </th>
-        <th style="cursor:pointer" @click="ordenarPor('unidades')">
-          Unidades participantes
-          <span v-if="criterio === 'unidades'">{{ asc ? '↑' : '↓' }}</span>
-        </th>
-        <th style="cursor:pointer" @click="ordenarPor('dataFinalizacao')">
-          Finalizado em
-          <span v-if="criterio === 'dataFinalizacao'">{{ asc ? '↑' : '↓' }}</span>
-        </th>
-      </tr>
-      </thead>
+    <TabelaProcessos
+        :processos="processosFinalizadosOrdenadosComFormatacao"
+        :criterioOrdenacao="criterio"
+        :direcaoOrdenacaoAsc="asc"
+        :showDataFinalizacao="true"
+        @ordenar="ordenarPor"
+        @selecionarProcesso="abrirProcesso"
+    />
 
-      <tbody>
-      <tr v-for="processo in processosFinalizadosOrdenados" :key="processo.id" class="clickable-row"
-          @click="abrirProcesso(processo.id)">
-        <td>{{ processo.descricao }}</td>
-        <td>{{ processo.tipo }}</td>
-        <td>{{ processosStore.getUnidadesDoProcesso(processo.id).map(pu => pu.unidade).join(', ') }}</td>
-        <td>{{ processo.dataFinalizacao ? new Date(processo.dataFinalizacao).toLocaleDateString('pt-BR') : '' }}</td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div v-if="processosFinalizadosOrdenados.length === 0" class="alert alert-info mt-4">
+    <div v-if="processosFinalizadosOrdenadosComFormatacao.length === 0" class="alert alert-info mt-4">
       Nenhum processo finalizado.
     </div>
   </div>
@@ -45,23 +21,25 @@ import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
-import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos' // Import Processo and Subprocesso types
+import {usePerfilStore} from '@/stores/perfil'
+import {Perfil, Processo, Subprocesso} from '@/types/tipos'
+import TabelaProcessos from '@/components/TabelaProcessos.vue';
+import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados';
 
 type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
+const perfil = usePerfilStore()
 
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
-const processosFinalizados = computed(() =>
-    processos.value.filter((p: Processo) => p.situacao === SituacaoProcesso.FINALIZADO)
-)
+const {processosFiltrados} = useProcessosFiltrados(ref(true));
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFinalizados.value].sort((a: Processo, b: Processo) => {
+  return [...processosFiltrados.value].sort((a: Processo, b: Processo) => {
     let valA: any;
     let valB: any;
 
@@ -74,11 +52,10 @@ const processosFinalizadosOrdenados = computed(() => {
       valA = dateA && !isNaN(dateA.getTime()) ? dateA.getTime() : null;
       valB = dateB && !isNaN(dateB.getTime()) ? dateB.getTime() : null;
 
-      // Handle nulls for date comparison
       if (valA === null && valB === null) return 0;
-      if (valA === null) return asc.value ? -1 : 1; // nulls come first if asc, last if desc
+      if (valA === null) return asc.value ? -1 : 1;
       if (valB === null) return asc.value ? 1 : -1;
-      return (valA - valB) * (asc.value ? 1 : -1); // Compare timestamps
+      return (valA - valB) * (asc.value ? 1 : -1);
     } else if (criterio.value === 'descricao') {
       valA = a.descricao;
       valB = b.descricao;
@@ -87,12 +64,20 @@ const processosFinalizadosOrdenados = computed(() => {
       valB = b.tipo;
     }
 
-    // General comparison for strings and numbers (after date specific handling)
     if (valA < valB) return asc.value ? -1 : 1;
     if (valA > valB) return asc.value ? 1 : -1;
     return 0;
   });
 });
+
+const processosFinalizadosOrdenadosComFormatacao = computed(() => {
+  return processosFinalizadosOrdenados.value.map(p => ({
+    ...p,
+    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', '),
+    dataFinalizacaoFormatada: p.dataFinalizacao ? new Date(p.dataFinalizacao).toLocaleDateString('pt-BR') : null
+  }));
+});
+
 
 function ordenarPor(campo: SortCriteria) {
   if (criterio.value === campo) {
@@ -103,14 +88,23 @@ function ordenarPor(campo: SortCriteria) {
   }
 }
 
-function abrirProcesso(processoId: number) {
-  router.push({name: 'Processo', params: {idProcesso: processoId}})
-}
+function abrirProcesso(processo: Processo) {
+  const perfilUsuario = perfil.perfilSelecionado;
+  console.log('Perfil do usuário:', perfilUsuario); // LOG
+  console.log('Processo ID:', processo.id); // LOG
 
+  if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
+    console.log('Navegando para /processo/' + processo.id); // LOG
+    // Usar name e params explicitamente, garantindo que apenas idProcesso seja passado
+    router.push({name: 'Processo', params: {idProcesso: processo.id as any}}); // <-- Alterado aqui
+  } else { // CHEFE ou SERVIDOR
+    const siglaUnidade = perfil.unidadeSelecionada;
+    console.log('Navegando para /subprocesso/' + processo.id + '/' + siglaUnidade); // LOG
+    if (siglaUnidade) {
+      router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
+    } else {
+      console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
+    }
+  }
+}
 </script>
-
-<style scoped>
-.clickable-row {
-  cursor: pointer;
-}
-</style>

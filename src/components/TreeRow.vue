@@ -1,6 +1,5 @@
-<!--suppress CssUnusedSymbol -->
 <template>
-  <tr :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]" @click="handleRowClick">
+  <tr :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]" @click="handleRowClick" data-testid="tree-table-row">
     <td v-for="(column, index) in columns" :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
       <span v-if="index === 0 && item.children && item.children.length > 0" class="toggle-icon"

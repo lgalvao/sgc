@@ -27,3 +27,11 @@ garantem que os fluxos críticos da aplicação funcionem corretamente do ponto 
 - **Seletores Robustos**: Prefira seletores baseados em `role` (ex: `page.getByRole('button', { name: 'Salvar' })`) ou
   `label` (ex: `page.getByLabel('Dias para inativação de processos:')`) para interagir com elementos da UI.
   Evite seletores baseados em classes CSS ou IDs gerados dinamicamente, pois são menos estáveis.
+- **Login e Perfis**: Use sempre IDs de servidores válidos que existem nos dados mockados. Verifique os perfis disponíveis
+  para cada servidor antes de criar testes. Exemplo: servidor ID 7 tem perfil ADMIN-SEDOC, servidor ID 2 tem GESTOR-SGP.
+- **Navegação Simplificada**: Evite aguardar navegação automática após login. Use `page.goto()` diretamente para as páginas
+  necessárias após autenticação. O sistema é rápido e não precisa de timeouts longos.
+- **Dados Mockados**: Trabalhe com os dados existentes nos arquivos JSON ao invés de tentar interceptar ou mockar dados.
+  Verifique sempre o conteúdo dos arquivos de mock antes de escrever asserções.
+- **Testes Dinâmicos**: Para elementos que podem ou não existir (como listas vazias), use verificações condicionais
+  ao invés de asserções fixas. Exemplo: verificar se há linhas na tabela antes de testar ordenação.
