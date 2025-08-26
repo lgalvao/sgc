@@ -5,6 +5,7 @@ import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
 import {ref} from 'vue';
 import {useServidoresStore} from '@/stores/servidores';
+import {Perfil} from "@/types/tipos";
 
 // Mock do composable usePerfil
 const mockServidorLogadoRef = ref<any>({});
@@ -85,19 +86,19 @@ describe('Navbar.vue', () => {
             ];
 
             mockGetPerfisDoServidor.mockImplementation((id) => {
-                if (id === 1) return [{perfil: 'ADMIN', unidade: 'ABC'}];
+                if (id === 1) return [{perfil: Perfil.ADMIN, unidade: 'ABC'}];
                 if (id === 2) return [{perfil: 'USER', unidade: 'XYZ'}];
                 return [];
             });
 
             mockServidorLogadoRef.value = {id: 1, nome: 'Teste Admin'};
-            mockPerfilSelecionadoRef.value = 'ADMIN';
+            mockPerfilSelecionadoRef.value = Perfil.ADMIN;
             mockUnidadeSelecionadaRef.value = 'ABC';
         });
 
         it('deve exibir o perfil e unidade selecionados', async () => {
             const wrapper = await mountComponent();
-            expect(wrapper.text()).toContain('ADMIN - ABC');
+            expect(wrapper.text()).toContain(`${Perfil.ADMIN} - ABC`);
             expect(wrapper.find('select').exists()).toBe(false);
         });
 

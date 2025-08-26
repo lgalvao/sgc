@@ -63,13 +63,9 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
         await page.waitForLoadState('networkidle')
 
         const items = await getBreadcrumbItemsText(page)
-        // Esperado: [home], Processo, SESEL
-        expect(items[1]).toContain('Processo')
-        expect(items[2]).toContain('SESEL')
-
-        // Link de "Processo" deve apontar para /processo/1
-        const hrefProcesso = await breadcrumbLinkHrefAt(page, 1)
-        expect(hrefProcesso).toMatch(/\/processo\/1$/)
+        // Esperado: [home], SESEL
+        expect(items.length).toBe(2)
+        expect(items[1]).toContain('SESEL')
 
         // Último breadcrumb (SESEL) não é link
         expect(await lastBreadcrumbHasLink(page)).toBeFalsy()
@@ -80,15 +76,13 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
         await page.waitForLoadState('networkidle')
 
         const items = await getBreadcrumbItemsText(page)
-        // Esperado: [home], Processo, SESEL, Mapa
-        expect(items[1]).toContain('Processo')
-        expect(items[2]).toContain('SESEL')
-        expect(items[3]).toContain('Mapa')
+        // Esperado: [home], SESEL, Mapa
+        expect(items.length).toBe(3)
+        expect(items[1]).toContain('SESEL')
+        expect(items[2]).toContain('Mapa')
 
         // Links intermediários atualizados
-        const hrefProcesso = await breadcrumbLinkHrefAt(page, 1)
-        const hrefSigla = await breadcrumbLinkHrefAt(page, 2)
-        expect(hrefProcesso).toMatch(/\/processo\/1$/)
+        const hrefSigla = await breadcrumbLinkHrefAt(page, 1)
         expect(hrefSigla).toMatch(/\/processo\/1\/SESEL$/)
 
         // Último breadcrumb (Mapa) não é link

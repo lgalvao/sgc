@@ -206,7 +206,7 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {useMapasStore} from '@/stores/mapas'
-import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
+import {Atividade, Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 interface AtividadeComEdicao extends Atividade {
@@ -437,7 +437,7 @@ function handleImportAtividades(atividadesImportadas: Atividade[]) {
 
 const {perfilSelecionado} = usePerfil()
 
-const isChefe = computed(() => perfilSelecionado.value === 'CHEFE')
+const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE)
 
 // Variáveis reativas para o modal de importação
 const processoSelecionado = ref<Processo | null>(null)

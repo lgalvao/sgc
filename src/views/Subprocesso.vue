@@ -18,7 +18,9 @@
         </p>
 
         <template
-            v-if="unidadeComResponsavelDinamico.responsavel && unidadeComResponsavelDinamico.responsavel.idServidor && unidadeComResponsavelDinamico.responsavel.idServidor !== unidadeComResponsavelDinamico.idServidorTitular">
+            v-if="unidadeComResponsavelDinamico.responsavel &&
+             unidadeComResponsavelDinamico.responsavel.idServidor &&
+             unidadeComResponsavelDinamico.responsavel.idServidor !== unidadeComResponsavelDinamico.idServidorTitular">
           <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
           <p class="ms-3">
             <i class="bi bi-telephone-fill me-2"></i>{{ responsavelDetalhes?.ramal }}
@@ -236,7 +238,7 @@ function irParaAtividadesConhecimentos() {
   const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
-  if (perfilStore.perfilSelecionado === 'CHEFE' && perfilStore.unidadeSelecionada === sigla.value) {
+  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === sigla.value) {
     router.push({name: 'SubprocessoCadastro', params}); // Abre CadAtividades.vue
   } else {
     router.push({name: 'SubprocessoVisCadastro', params}); // Abre VisAtividades.vue

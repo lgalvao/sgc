@@ -1,3 +1,10 @@
+export enum Perfil {
+    ADMIN = 'ADMIN',
+    GESTOR = 'GESTOR',
+    CHEFE = 'CHEFE',
+    SERVIDOR = 'SERVIDOR',
+}
+
 export enum TipoProcesso {
     MAPEAMENTO = 'Mapeamento',
     REVISAO = 'Revisão',

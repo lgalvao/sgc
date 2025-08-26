@@ -39,7 +39,7 @@ import {useRouter} from 'vue-router'
 import {useServidoresStore} from '@/stores/servidores'
 import {usePerfilStore} from '@/stores/perfil'
 import {usePerfil} from '@/composables/usePerfil'
-import {Servidor} from '@/types/tipos';
+import {Perfil, Servidor} from '@/types/tipos';
 
 interface Par {
   perfil: string;
@@ -88,7 +88,7 @@ const handleLogin = () => {
   }
 }
 
-const finalizarLogin = (idServidor: number, perfil: string, unidadeSigla: string) => {
+const finalizarLogin = (idServidor: number, perfil: Perfil, unidadeSigla: string) => {
   perfilStore.setServidorId(idServidor)
   perfilStore.setPerfilUnidade(perfil, unidadeSigla)
   router.push('/painel')

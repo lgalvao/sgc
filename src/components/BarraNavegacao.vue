@@ -1,7 +1,3 @@
-<!--
-O conteúdo deste arquivo foi simplificado para remover a complexidade da store `navigationTrail`
-e derivar os breadcrumbs diretamente da rota atual, conforme solicitado.
--->
 <template>
   <div class="d-flex align-items-center gap-3">
     <button v-if="shouldShowBackButton"
@@ -31,6 +27,8 @@ e derivar os breadcrumbs diretamente da rota atual, conforme solicitado.
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useRoute, useRouter, type RouteLocationNamedRaw } from 'vue-router';
+import {usePerfilStore} from "@/stores/perfil";
+import {Perfil} from "@/types/tipos";
 
 const route = useRoute();
 const router = useRouter();
@@ -52,9 +50,11 @@ const shouldShowBreadcrumbs = computed(() => route.path !== '/login' && route.pa
 const crumbs = computed((): Breadcrumb[] => {
   const breadcrumbs: Breadcrumb[] = [{ label: 'Painel', to: { name: 'Painel' }, isHome: true }];
   const params = route.params;
+  const perfil = usePerfilStore();
+  const perfilUsuario = perfil.perfilSelecionado;
 
   // Processo crumb
-  if (params.idProcesso) {
+  if (params.idProcesso && (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR)) {
     breadcrumbs.push({
       label: 'Processo',
       to: { name: 'Processo', params: { idProcesso: Number(params.idProcesso) } }

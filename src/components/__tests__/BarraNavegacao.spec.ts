@@ -11,8 +11,9 @@ import {
 } from 'vue-router';
 import BarraNavegacao from '../BarraNavegacao.vue';
 import {useUnidadesStore} from '@/stores/unidades';
-import {TipoResponsabilidade} from '@/types/tipos';
+import {Perfil, TipoResponsabilidade} from '@/types/tipos';
 import {computed} from "vue";
+import {usePerfilStore} from "@/stores/perfil";
 
 const routes: RouteRecordRaw[] = [
     {path: '/painel', name: 'Painel', component: {template: '<div>Painel</div>'}},
@@ -143,13 +144,10 @@ describe('BarraNavegacao.vue', () => {
                         setup(props) {
                             const router = useRouter();
                             const resolvedTo = computed(() => {
-                                console.log('RouterLink Stub: props.to', props.to);
                                 if (typeof props.to === 'string') {
                                     return props.to;
                                 }
                                 const resolved = router.resolve(props.to);
-                                console.log('RouterLink Stub: resolved', resolved);
-                                console.log('RouterLink Stub: resolved.fullPath', resolved.fullPath);
                                 return resolved.fullPath;
                             });
                             return {resolvedTo};
@@ -218,6 +216,12 @@ describe('BarraNavegacao.vue', () => {
     });
 
     describe('Lógica de Breadcrumbs (crumbs)', () => {
+        let perfilStore: ReturnType<typeof usePerfilStore>;
+
+        beforeEach(() => {
+            perfilStore = usePerfilStore();
+        })
+
         it('deve exibir o breadcrumb home e o da página atual para uma rota simples', async () => {
             await router.push('/alguma-pagina');
             const wrapper = await mountComponent();
@@ -237,7 +241,8 @@ describe('BarraNavegacao.vue', () => {
             expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
         });
 
-        it('deve popular a trilha para uma rota de subprocesso', async () => {
+        it('deve popular a trilha para uma rota de subprocesso para ADMIN', async () => {
+            perfilStore.perfilSelecionado = Perfil.ADMIN;
             await router.push('/processo/123/ABC');
             const wrapper = await mountComponent();
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
@@ -252,7 +257,19 @@ describe('BarraNavegacao.vue', () => {
             expect(breadcrumbItems[2].find('a').exists()).toBe(false); // Last crumb is not a link
         });
 
-        it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa)', async () => {
+        it('deve popular a trilha para uma rota de subprocesso para CHEFE sem o crumb Processo', async () => {
+            perfilStore.perfilSelecionado = Perfil.CHEFE;
+            await router.push('/processo/123/ABC');
+            const wrapper = await mountComponent();
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(2);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('ABC');
+        });
+
+
+        it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa) para GESTOR', async () => {
+            perfilStore.perfilSelecionado = Perfil.GESTOR;
             await router.push('/processo/123/ABC/mapa');
             const wrapper = await mountComponent();
             const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
@@ -270,6 +287,17 @@ describe('BarraNavegacao.vue', () => {
             });
             expect(breadcrumbItems[3].text()).toBe('Mapa');
             expect(breadcrumbItems[3].find('a').exists()).toBe(false); // Last crumb is not a link
+        });
+
+        it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa) para SERVIDOR sem o crumb Processo', async () => {
+            perfilStore.perfilSelecionado = Perfil.SERVIDOR;
+            await router.push('/processo/123/ABC/mapa');
+            const wrapper = await mountComponent();
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(3);
+            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
+            expect(breadcrumbItems[1].text()).toBe('ABC');
+            expect(breadcrumbItems[2].text()).toBe('Mapa');
         });
 
         it('deve popular a trilha para uma rota de unidade', async () => {

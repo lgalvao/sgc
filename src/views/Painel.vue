@@ -80,7 +80,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Alerta, Processo} from '@/types/tipos'
+import {Alerta, Perfil, Processo} from '@/types/tipos'
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
@@ -124,7 +124,7 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
 
 function abrirDetalhesProcesso(processo: Processo) {
   const perfilUsuario = perfil.perfilSelecionado;
-  if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
+  if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
     router.push({name: 'Processo', params: {idProcesso: processo.id}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;

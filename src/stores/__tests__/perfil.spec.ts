@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {usePerfilStore} from '../perfil';
+import {Perfil} from "@/types/tipos";
 
 // Mock localStorage globally
 const mockLocalStorage = (() => {
@@ -63,10 +64,10 @@ describe('usePerfilStore', () => {
         });
 
         it('setPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage', () => {
-            perfilStore.setPerfilUnidade('ADMIN', 'ABC');
-            expect(perfilStore.perfilSelecionado).toBe('ADMIN');
+            perfilStore.setPerfilUnidade(Perfil.ADMIN, 'ABC');
+            expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(perfilStore.unidadeSelecionada).toBe('ABC');
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('perfilSelecionado', 'ADMIN');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('perfilSelecionado', Perfil.ADMIN);
             expect(mockLocalStorage.setItem).toHaveBeenCalledWith('unidadeSelecionada', 'ABC');
         });
     });

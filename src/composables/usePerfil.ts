@@ -3,7 +3,7 @@ import {usePerfilStore} from '@/stores/perfil';
 import {useServidoresStore} from '@/stores/servidores';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria';
-import type {Unidade} from '@/types/tipos';
+import {Perfil, Unidade} from '@/types/tipos';
 
 // Função auxiliar para achatar a hierarquia de unidades
 function flattenUnidades(unidades: Unidade[]): Unidade[] {
@@ -48,7 +48,7 @@ export function usePerfil() {
         atribuicoes.forEach(atrb => {
             const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade);
             if (unidadeAtribuicao) {
-                const perfilAtribuicao = unidadeAtribuicao.tipo === 'INTERMEDIARIA' ? 'GESTOR' : 'CHEFE';
+                const perfilAtribuicao = unidadeAtribuicao.tipo === 'INTERMEDIARIA' ? Perfil.GESTOR : Perfil.CHEFE;
                 pares.push({perfil: perfilAtribuicao, unidade: atrb.unidade});
             }
         });
@@ -60,11 +60,11 @@ export function usePerfil() {
             const isOperacional = unidadePrincipal.tipo === 'OPERACIONAL' || unidadePrincipal.tipo === 'INTEROPERACIONAL';
             // Verifica se a unidade principal já foi adicionada com um perfil diferente de SERVIDOR
             const hasNonServidorProfileForPrincipalUnit = pares.some(
-                p => p.unidade === unidadePrincipal.sigla && p.perfil !== 'SERVIDOR'
+                p => p.unidade === unidadePrincipal.sigla && p.perfil !== Perfil.SERVIDOR
             );
 
             if (isOperacional && !hasNonServidorProfileForPrincipalUnit) {
-                pares.push({perfil: 'SERVIDOR', unidade: unidadePrincipal.sigla});
+                pares.push({perfil: Perfil.SERVIDOR, unidade: unidadePrincipal.sigla});
             }
         }
 
