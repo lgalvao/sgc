@@ -112,7 +112,16 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil' // Importar usePerfilStore
-import {Mapa, Processo, Servidor, Subprocesso, TipoProcesso, TipoResponsabilidade, Unidade} from "@/types/tipos";
+import {
+  Mapa,
+  Perfil,
+  Processo,
+  Servidor,
+  Subprocesso,
+  TipoProcesso,
+  TipoResponsabilidade,
+  Unidade
+} from "@/types/tipos";
 
 const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
 
@@ -174,7 +183,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
     return {
       ...unidade,
       responsavel: {
-        idServidorResponsavel: atribuicaoVigente.idServidor,
+        idServidor: atribuicaoVigente.idServidor,
         tipo: TipoResponsabilidade.ATRIBUICAO, // Usar o enum
         dataInicio: new Date(atribuicaoVigente.dataInicio),
         dataFim: new Date(atribuicaoVigente.dataTermino),

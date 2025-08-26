@@ -42,7 +42,7 @@ import {usePerfil} from '@/composables/usePerfil'
 import {Perfil, Servidor} from '@/types/tipos';
 
 interface Par {
-  perfil: string;
+  perfil: Perfil;
   unidade: string;
 }
 

@@ -199,7 +199,6 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import {Modal} from 'bootstrap'
-import {useRouter} from 'vue-router'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -226,7 +225,6 @@ const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const mapasStore = useMapasStore()
-const router = useRouter()
 
 // Helper function to get impacted competency IDs
 function getImpactedCompetencyIds(atividadeId: number): number[] {

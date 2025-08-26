@@ -93,7 +93,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
     return {
       ...unidade,
       responsavel: {
-        idServidorResponsavel: atribuicaoVigente.idServidor,
+        idServidor: atribuicaoVigente.idServidor,
         tipo: TipoResponsabilidade.ATRIBUICAO, // Usar o enum
         dataInicio: new Date(atribuicaoVigente.dataInicio),
         dataFim: new Date(atribuicaoVigente.dataTermino),
