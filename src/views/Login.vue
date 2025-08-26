@@ -51,8 +51,9 @@ const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
 const {getPerfisDoServidor} = usePerfil()
 
-const titulo = ref('1') // Preenchido para teste com Ana Paula Souza
-const senha = ref('123') // Preenchido para teste
+// Credenciais de teste - remover em produção
+const titulo = ref(import.meta.env.DEV ? '1' : '')
+const senha = ref(import.meta.env.DEV ? '123' : '')
 const loginStep = ref(1)
 const servidor = ref<Servidor | null | undefined>(null)
 const paresDisponiveis = ref<Par[]>([])

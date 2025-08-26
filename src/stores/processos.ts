@@ -41,6 +41,22 @@ export const useProcessosStore = defineStore('processos', {
                 return diffDays > configuracoesStore.diasInativacaoProcesso;
             }
             return false;
+        },
+        // Subprocessos elegíveis para aceitação em bloco (GESTOR)
+        getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
+            return state.subprocessos.filter(pu => 
+                pu.idProcesso === idProcesso && 
+                pu.unidadeAtual === siglaUnidadeUsuario &&
+                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
+            );
+        },
+        
+        // Subprocessos elegíveis para homologação em bloco (ADMIN)
+        getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
+            return state.subprocessos.filter(pu => 
+                pu.idProcesso === idProcesso && 
+                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
+            );
         }
     },
     actions: {
@@ -58,6 +74,72 @@ export const useProcessosStore = defineStore('processos', {
                 processo.situacao = SituacaoProcesso.FINALIZADO;
                 processo.dataFinalizacao = new Date(); // Agora é um objeto Date
             }
+        },
+        async processarCadastroBloco(payload: {
+            idProcesso: number,
+            unidades: string[],
+            tipoAcao: 'aceitar' | 'homologar',
+            observacao?: string,
+            unidadeUsuario: string
+        }) {
+            const { idProcesso, unidades, tipoAcao, observacao, unidadeUsuario } = payload;
+            
+            // Processar cada unidade
+            for (const siglaUnidade of unidades) {
+                const subprocessoIndex = this.subprocessos.findIndex(
+                    pu => pu.idProcesso === idProcesso && pu.unidade === siglaUnidade
+                );
+                
+                if (subprocessoIndex !== -1) {
+                    const subprocesso = this.subprocessos[subprocessoIndex];
+                    
+                    if (tipoAcao === 'aceitar') {
+                        // Para GESTOR - aceitar e encaminhar
+                        // Registrar análise
+                        console.log(`[SIMULAÇÃO] Registrando análise de aceite para unidade ${siglaUnidade}`);
+                        console.log(`Observação: ${observacao || 'Nenhuma'}`);
+                        
+                        // Registrar movimentação
+                        console.log(`[SIMULAÇÃO] Registrando movimentação:`);
+                        console.log(`  De: ${unidadeUsuario}`);
+                        console.log(`  Para: Unidade superior hierárquica`);
+                        console.log(`  Descrição: Cadastro de atividades e conhecimentos validado em bloco`);
+                        
+                        // Atualizar situação do subprocesso
+                        this.subprocessos[subprocessoIndex] = {
+                            ...subprocesso,
+                            // Manter a mesma situação por enquanto, já que estamos simulando
+                        };
+                    } else {
+                        // Para ADMIN - homologar
+                        // Registrar movimentação
+                        console.log(`[SIMULAÇÃO] Registrando movimentação:`);
+                        console.log(`  De: SEDOC`);
+                        console.log(`  Para: SEDOC`);
+                        console.log(`  Descrição: Cadastro de atividades e conhecimentos homologado em bloco`);
+                        
+                        // Atualizar situação do subprocesso
+                        const novaSituacao = subprocesso.situacao.includes('Revisão') 
+                            ? 'Revisão do cadastro homologada' 
+                            : 'Cadastro homologado';
+                            
+                        this.subprocessos[subprocessoIndex] = {
+                            ...subprocesso,
+                            situacao: novaSituacao
+                        };
+                        
+                        console.log(`[SIMULAÇÃO] Subprocesso ${siglaUnidade} atualizado para: ${novaSituacao}`);
+                    }
+                }
+            }
+            
+            // Simular criação de alertas
+            console.log(`[SIMULAÇÃO] Criando alertas para ${unidades.length} unidades`);
+            
+            // Simular envio de notificações
+            console.log(`[SIMULAÇÃO] Enviando notificações para unidades superiores`);
+            
+            return Promise.resolve();
         }
     }
 })

@@ -7,21 +7,114 @@
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
       </div>
+      
       <TreeTable
           :columns="colunasTabela"
           :data="dadosFormatados"
           title="Unidades participantes"
           @row-click="abrirDetalhesUnidade"
       />
+      
+      <!-- Botões de ação em bloco -->
+      <div v-if="mostrarBotoesBloco" class="mt-3 d-flex gap-2">
+        <button 
+          v-if="perfilStore.perfilSelecionado === 'GESTOR'" 
+          class="btn btn-outline-primary"
+          @click="abrirModalAceitarBloco"
+        >
+          <i class="bi bi-check-circle me-1"></i>
+          Aceitar em bloco
+        </button>
+        <button 
+          v-if="perfilStore.perfilSelecionado === 'ADMIN'" 
+          class="btn btn-outline-success"
+          @click="abrirModalHomologarBloco"
+        >
+          <i class="bi bi-check-all me-1"></i>
+          Homologar em bloco
+        </button>
+      </div>
     </div>
     <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-danger mt-3" @click="finalizarProcesso">
       Finalizar processo
     </button>
+    
+    <!-- Modal de confirmação -->
+    <div v-if="mostrarModalBloco" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'"></i>
+              {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco' }}
+            </h5>
+            <button type="button" class="btn-close" @click="fecharModalBloco"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              Selecione as unidades que terão seus cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }}:
+            </div>
+            
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Selecionar</th>
+                    <th>Sigla</th>
+                    <th>Nome</th>
+                    <th>Situação Atual</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="unidade in unidadesSelecionadasBloco" :key="unidade.sigla">
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        :id="'chk-' + unidade.sigla"
+                        v-model="unidade.selecionada"
+                        class="form-check-input"
+                      >
+                    </td>
+                    <td><strong>{{ unidade.sigla }}</strong></td>
+                    <td>{{ unidade.nome }}</td>
+                    <td>{{ unidade.situacao }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalBloco">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+            <button 
+              type="button" 
+              class="btn"
+              :class="tipoAcaoBloco === 'aceitar' ? 'btn-primary' : 'btn-success'"
+              @click="confirmarAcaoBloco"
+            >
+              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"></i>
+              {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar' : 'Homologar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarModalBloco" class="modal-backdrop fade show"></div>
+    
+    <!-- Alerta de sucesso -->
+    <div v-if="mostrarAlertaSucesso" class="alert alert-success alert-dismissible fade show position-fixed" 
+         style="top: 20px; right: 20px; z-index: 9999;">
+      <i class="bi bi-check-circle"></i>
+      Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco com sucesso!
+      <button type="button" class="btn-close" @click="mostrarAlertaSucesso = false"></button>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
@@ -48,6 +141,13 @@ const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 
+// Dados reativos para o CDU-14
+const mostrarBotoesBloco = ref(false)
+const mostrarModalBloco = ref(false)
+const tipoAcaoBloco = ref<'aceitar' | 'homologar'>('aceitar')
+const unidadesSelecionadasBloco = ref<Array<{sigla: string, nome: string, situacao: string}>>([])
+const observacaoBloco = ref('')
+const mostrarAlertaSucesso = ref(false)
 
 const idProcesso = computed(() =>
     Number((route.params as any).idProcesso || (route.params as any).id || route.query.idProcesso))
@@ -57,6 +157,21 @@ const processo = computed<Processo | undefined>(() => (processos.value as Proces
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
   return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)
+})
+
+// Computed para identificar subprocessos elegíveis
+const subprocessosElegiveis = computed(() => {
+  if (!idProcesso.value) return []
+  
+  if (perfilStore.perfilSelecionado === 'GESTOR' && perfilStore.unidadeSelecionada) {
+    return processosStore.getSubprocessosElegiveisAceiteBloco(
+      idProcesso.value, 
+      perfilStore.unidadeSelecionada
+    )
+  } else if (perfilStore.perfilSelecionado === 'ADMIN') {
+    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value)
+  }
+  return []
 })
 
 function filtrarHierarquiaPorParticipantes(unidades: Unidade[], participantes: string[]): Unidade[] {
@@ -156,5 +271,81 @@ function finalizarProcesso() {
     }
   }
 }
+
+// Funções para controle do modal (CDU-14)
+function abrirModalAceitarBloco() {
+  tipoAcaoBloco.value = 'aceitar'
+  prepararUnidadesParaBloco()
+  mostrarModalBloco.value = true
+}
+
+function abrirModalHomologarBloco() {
+  tipoAcaoBloco.value = 'homologar'
+  prepararUnidadesParaBloco()
+  mostrarModalBloco.value = true
+}
+
+function prepararUnidadesParaBloco() {
+  unidadesSelecionadasBloco.value = subprocessosElegiveis.value.map(pu => {
+    // Obter nome da unidade
+    const unidade = unidadesStore.pesquisarUnidade(pu.unidade)
+    return {
+      sigla: pu.unidade,
+      nome: unidade ? unidade.nome : pu.unidade,
+      situacao: pu.situacao,
+      selecionada: true // Por padrão, todas selecionadas
+    }
+  })
+}
+
+function fecharModalBloco() {
+  mostrarModalBloco.value = false
+  observacaoBloco.value = ''
+}
+
+async function confirmarAcaoBloco() {
+  try {
+    // Filtrar apenas unidades selecionadas
+    const unidadesSelecionadas = unidadesSelecionadasBloco.value
+      .filter(u => u.selecionada)
+      .map(u => u.sigla);
+    
+    if (unidadesSelecionadas.length === 0) {
+      alert('Selecione ao menos uma unidade para processar.');
+      return;
+    }
+    
+    await processosStore.processarCadastroBloco({
+      idProcesso: idProcesso.value,
+      unidades: unidadesSelecionadas,
+      tipoAcao: tipoAcaoBloco.value,
+      observacao: observacaoBloco.value,
+      unidadeUsuario: perfilStore.unidadeSelecionada || ''
+    })
+    
+    // Mostrar mensagem de sucesso
+    mostrarAlertaSucesso.value = true
+    
+    // Fechar modal
+    fecharModalBloco()
+    
+    // Recarregar dados
+    // Forçar atualização dos dados
+    setTimeout(() => {
+      mostrarAlertaSucesso.value = false
+      // Redirecionar para o painel
+      router.push('/painel')
+    }, 2000)
+    
+  } catch (error) {
+    console.error('Erro ao processar cadastro em bloco:', error)
+    alert('Ocorreu um erro ao processar os cadastros em bloco.')
+  }
+}
+
+// Watch para mostrar/esconder botões
+watch(subprocessosElegiveis, (novosSubprocessos) => {
+  mostrarBotoesBloco.value = novosSubprocessos.length > 0
+}, { immediate: true })
 
 </script>
