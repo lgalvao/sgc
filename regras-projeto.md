@@ -25,7 +25,7 @@ funcionalidades já implementadas e outras em andamento.
     - A funcionalidade de algumas telas pode depender da existência de dados específicos nos mocks (ex: atividades para
       uma unidade para habilitar o botão "Disponibilizar" em mapas de competência).
 - **Perfis de Usuário**:
-    - O perfil de usuário (ADMIN, GESTOR, CHEFE, SERVIDOR) é determinado dinamicamente com base na lotação do servidor
+    - O perfil de usuário (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`), definido no enum `Perfil` em `src/types/tipos.ts`, é determinado dinamicamente com base na lotação do servidor
       logado, através do composable `usePerfil`.
     - O `idServidor` do usuário logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
 - **Login**:
