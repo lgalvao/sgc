@@ -4,13 +4,13 @@ import {login} from "./utils/auth";
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
     await page.getByTestId('btn-adicionar-atividade').click();
-    await expect(page.getByText(nomeAtividade)).toBeVisible();
+    await expect(page.locator('.atividade-card', {hasText: nomeAtividade})).toBeVisible();
 }
 
 async function adicionarConhecimento(page: Page, atividadeCard: any, nomeConhecimento: string) {
     await atividadeCard.locator('[data-testid="input-novo-conhecimento"]').fill(nomeConhecimento);
     await atividadeCard.locator('[data-testid="btn-adicionar-conhecimento"]').click();
-    await expect(page.getByText(nomeConhecimento)).toBeVisible();
+    await expect(atividadeCard.locator('.group-conhecimento', {hasText: nomeConhecimento})).toBeVisible();
 }
 
 async function editarAtividade(page: Page, atividadeOriginal: string, atividadeEditada: string) {
@@ -20,7 +20,7 @@ async function editarAtividade(page: Page, atividadeOriginal: string, atividadeE
     await atividadeCard.getByTestId('btn-editar-atividade').click({force: true});
     await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
     await page.getByTestId('btn-salvar-edicao-atividade').click();
-    await expect(page.getByText(atividadeEditada)).toBeVisible();
+    await expect(page.locator('.atividade-card', {hasText: atividadeEditada})).toBeVisible();
 }
 
 async function removerAtividade(page: Page, atividadeParaRemover: string) {
@@ -28,7 +28,7 @@ async function removerAtividade(page: Page, atividadeParaRemover: string) {
     await atividadeCard.hover();
     await page.waitForTimeout(100);
     await atividadeCard.getByTestId('btn-remover-atividade').click({force: true});
-    await expect(page.getByText(atividadeParaRemover)).not.toBeAttached();
+    await expect(atividadeCard).not.toBeAttached();
 }
 
 async function editarConhecimento(page: Page, atividadeNome: string, conhecimentoOriginal: string, conhecimentoEditado: string) {
@@ -39,7 +39,7 @@ async function editarConhecimento(page: Page, atividadeNome: string, conheciment
     await conhecimentoRow.getByTestId('btn-editar-conhecimento').click();
     await page.getByTestId('input-editar-conhecimento').fill(conhecimentoEditado);
     await page.getByTestId('btn-salvar-edicao-conhecimento').click();
-    await expect(page.getByText(conhecimentoEditado)).toBeVisible();
+    await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoEditado})).toBeVisible();
 }
 
 async function removerConhecimento(page: Page, atividadeNome: string, conhecimentoParaRemover: string) {
@@ -48,7 +48,7 @@ async function removerConhecimento(page: Page, atividadeNome: string, conhecimen
     await conhecimentoRow.hover();
     await page.waitForTimeout(100);
     await conhecimentoRow.getByTestId('btn-remover-conhecimento').click();
-    await expect(page.getByText(conhecimentoParaRemover)).not.toBeAttached();
+    await expect(conhecimentoRow).not.toBeAttached();
 }
 
 test.describe('Impacto no Mapa de Competências', () => {

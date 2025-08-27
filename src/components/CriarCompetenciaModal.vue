@@ -65,8 +65,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
-import { Atividade, Competencia } from '@/types/tipos'
+import {ref, watch} from 'vue'
+import {Atividade, Competencia} from '@/types/tipos'
 
 const props = defineProps<{
   mostrar: boolean
@@ -79,7 +79,7 @@ const emit = defineEmits<{
   salvar: [competencia: { descricao: string, atividadesSelecionadas: number[] }]
 }>()
 
-const novaCompetencia = ref({ descricao: '' })
+const novaCompetencia = ref({descricao: ''})
 const atividadesSelecionadas = ref<number[]>([])
 const competenciaSendoEditada = ref<Competencia | null>(null)
 
@@ -94,10 +94,10 @@ watch(() => props.mostrar, (mostrar) => {
       atividadesSelecionadas.value = []
       competenciaSendoEditada.value = null
     }
-    
+
     // Inicializar tooltips do modal
     setTimeout(() => {
-      import('bootstrap').then(({ Tooltip }) => {
+      import('bootstrap').then(({Tooltip}) => {
         const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
         modalTooltips.forEach(tooltipEl => {
           new Tooltip(tooltipEl)
@@ -122,8 +122,8 @@ function getConhecimentosModal(atividade: Atividade): string {
   }
 
   const conhecimentosHtml = atividade.conhecimentos
-    .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-    .join('')
+      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
+      .join('')
 
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }

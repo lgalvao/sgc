@@ -31,7 +31,6 @@
 
   <SubprocessoModal
       :mostrarModal="mostrarModalAlterarDataLimite"
-      :mostrarAlertaSucesso="false"
       :dataLimiteAtual="dataLimiteAtual"
       :etapaAtual="etapaAtual"
       :situacaoEtapaAtual="SubprocessoDetalhes?.situacao || 'Não informado'"

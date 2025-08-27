@@ -4,13 +4,14 @@ import {login} from "./utils/auth";
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
     await page.getByTestId('btn-adicionar-atividade').click();
-    await expect(page.getByText(nomeAtividade)).toBeVisible();
+    // Look specifically for the activity card, not just any text
+    await expect(page.locator('.atividade-card', {hasText: nomeAtividade})).toBeVisible();
 }
 
 async function adicionarConhecimento(page: Page, atividadeCard: any, nomeConhecimento: string) {
     await atividadeCard.locator('[data-testid="input-novo-conhecimento"]').fill(nomeConhecimento);
     await atividadeCard.locator('[data-testid="btn-adicionar-conhecimento"]').click();
-    await expect(page.getByText(nomeConhecimento)).toBeVisible();
+    await expect(atividadeCard.locator('.group-conhecimento', {hasText: nomeConhecimento})).toBeVisible();
 }
 
 test.describe('Cadastro de Atividades e Conhecimentos', () => {
@@ -49,7 +50,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const atividadeEditada = `Atividade Editada ${Date.now()}`;
         await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
         await page.getByTestId('btn-salvar-edicao-atividade').click();
-        await expect(page.getByText(atividadeEditada)).toBeVisible();
+        await expect(page.locator('.atividade-card', {hasText: atividadeEditada})).toBeVisible();
     });
 
     test('deve permitir remover uma atividade', async ({page}) => {
@@ -65,7 +66,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         await expect(btnRemoverAtividade).toBeVisible();
         await expect(btnRemoverAtividade).toBeEnabled();
         await btnRemoverAtividade.click({force: true});
-        await expect(page.getByText(atividadeParaRemover)).not.toBeAttached();
+        await expect(page.locator('.atividade-card', {hasText: atividadeParaRemover})).not.toBeAttached();
     });
 
     test('deve permitir adicionar um novo conhecimento a uma atividade', async ({page}) => {
@@ -100,7 +101,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         await page.getByTestId('input-editar-conhecimento').fill(conhecimentoEditado);
         await page.getByTestId('btn-salvar-edicao-conhecimento').click();
         await page.waitForLoadState('networkidle'); // Adicionado para sincronização
-        await expect(page.getByText(conhecimentoEditado)).toBeVisible();
+        await expect(page.locator('.group-conhecimento', {hasText: conhecimentoEditado})).toBeVisible();
     });
 
     test('deve permitir remover um conhecimento', async ({page}) => {
@@ -121,6 +122,6 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         await expect(btnRemoverConhecimento).toBeEnabled();
         await btnRemoverConhecimento.click();
         await page.waitForLoadState('networkidle'); // Adicionado para sincronização
-        await expect(page.getByText(conhecimentoParaRemover)).not.toBeAttached();
+        await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover})).not.toBeAttached();
     });
 });

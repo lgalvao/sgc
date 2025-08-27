@@ -55,20 +55,17 @@ import { computed, ref, watch } from 'vue';
 import { formatDateForInput, formatDateBR, isDateValidAndFuture, parseDate } from '@/utils/dateUtils';
 
 interface Props {
-  mostrarModal: boolean;
-  mostrarAlertaSucesso: boolean;
-  dataLimiteAtual: Date | null;
-  etapaAtual: number | null;
-  situacaoEtapaAtual: string;
+   mostrarModal: boolean;
+   dataLimiteAtual: Date | null;
+   etapaAtual: number | null;
+   situacaoEtapaAtual: string;
 }
 
 const props = defineProps<Props>();
 
 defineEmits<{
-  fecharModal: [];
-  confirmarAlteracao: [novaData: string];
-  fecharAlerta: [];
-  sucesso: [mensagem: string];
+   fecharModal: [];
+   confirmarAlteracao: [novaData: string];
 }>();
 
 const novaDataLimite = ref('');

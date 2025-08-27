@@ -39,6 +39,7 @@ import {useRouter} from 'vue-router'
 import {useServidoresStore} from '@/stores/servidores'
 import {usePerfilStore} from '@/stores/perfil'
 import {usePerfil} from '@/composables/usePerfil'
+import {useNotificacoesStore} from '@/stores/notificacoes'
 import {Perfil, Servidor} from '@/types/tipos';
 
 interface Par {
@@ -49,6 +50,7 @@ interface Par {
 const router = useRouter()
 const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
+const notificacoesStore = useNotificacoesStore()
 const {getPerfisDoServidor} = usePerfil()
 
 // Credenciais de teste - remover em produção
@@ -62,7 +64,10 @@ const parSelecionado = ref<Par | null>(null)
 const handleLogin = () => {
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
-      alert('Por favor, preencha título e senha.')
+      notificacoesStore.erro(
+        'Dados incompletos',
+        'Por favor, preencha título e senha.'
+      );
       return
     }
 
@@ -77,10 +82,16 @@ const handleLogin = () => {
       } else if (paresDisponiveis.value.length === 1) {
         finalizarLogin(servidor.value.id, paresDisponiveis.value[0].perfil, paresDisponiveis.value[0].unidade)
       } else {
-        alert('Nenhum perfil/unidade disponível para este usuário.')
+        notificacoesStore.erro(
+          'Perfis indisponíveis',
+          'Nenhum perfil/unidade disponível para este usuário.'
+        );
       }
     } else {
-      alert('Usuário não encontrado.')
+      notificacoesStore.erro(
+        'Usuário não encontrado',
+        'Verifique se o título eleitoral está correto.'
+      );
     }
   } else {
     if (servidor.value && parSelecionado.value) {

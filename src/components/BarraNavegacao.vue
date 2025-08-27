@@ -11,7 +11,7 @@
       <ol class="breadcrumb mb-0">
         <li v-for="(crumb, index) in crumbs" :key="index" :class="{ active: index === crumbs.length - 1 }"
             aria-current="page" class="breadcrumb-item" data-testid="breadcrumb-item">
-          <router-link v-if="index < crumbs.length - 1" :to="crumb.to">
+          <router-link v-if="index < crumbs.length - 1 && crumb.to" :to="crumb.to">
             <i v-if="crumb.isHome" aria-label="Início" class="bi bi-house-door" data-testid="breadcrumb-home-icon"></i>
             <span v-else>{{ crumb.label }}</span>
           </router-link>

@@ -78,8 +78,8 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         // Verificar se a lista de unidades está presente
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
-        // Verificar se o botão de confirmação está presente
-        await expect(page.getByRole('button', { name: 'Aceitar' })).toBeVisible();
+        // Verificar se o botão de confirmação está presente no modal
+        await expect(page.locator('.modal.show').getByRole('button', { name: 'Aceitar' })).toBeVisible();
     });
 
     test('deve abrir modal de confirmação ao clicar em "Homologar em bloco"', async ({page}) => {
@@ -99,8 +99,8 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         // Verificar se a lista de unidades está presente
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
-        // Verificar se o botão de confirmação está presente
-        await expect(page.getByRole('button', { name: 'Homologar' })).toBeVisible();
+        // Verificar se o botão de confirmação está presente no modal
+        await expect(page.locator('.modal.show').getByRole('button', { name: 'Homologar' })).toBeVisible();
     });
 
     test('deve permitir selecionar unidades no modal', async ({page}) => {

@@ -75,22 +75,6 @@ const iconeTipo = (tipo: TipoNotificacao): string => {
   animation: slideIn 0.3s ease-out;
 }
 
-.notification-success {
-  border-left-color: #198754;
-}
-
-.notification-error {
-  border-left-color: #dc3545;
-}
-
-.notification-warning {
-  border-left-color: #ffc107;
-}
-
-.notification-info {
-  border-left-color: #0dcaf0;
-}
-
 .notification-content {
   padding: 15px;
 }
@@ -109,26 +93,6 @@ const iconeTipo = (tipo: TipoNotificacao): string => {
   font-size: 13px;
   color: #666;
   line-height: 1.4;
-}
-
-/* Animações */
-.notification-enter-active,
-.notification-leave-active {
-  transition: all 0.3s ease;
-}
-
-.notification-enter-from {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-.notification-leave-to {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-.notification-move {
-  transition: transform 0.3s ease;
 }
 
 @keyframes slideIn {

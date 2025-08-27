@@ -11,17 +11,26 @@ export function parseDate(dateString: string | null | undefined): Date | null {
   if (!dateString) return null;
 
   try {
-    // Tenta formato ISO primeiro
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-      return date;
-    }
-
-    // Tenta formato brasileiro DD/MM/YYYY
+    // Tenta formato brasileiro DD/MM/YYYY primeiro
     const brMatch = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     if (brMatch) {
       const [, day, month, year] = brMatch;
-      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const dayNum = parseInt(day);
+      const monthNum = parseInt(month) - 1;
+      const yearNum = parseInt(year);
+
+      // Valida ranges básicos
+      if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > 2100) {
+        return null;
+      }
+
+      return new Date(yearNum, monthNum, dayNum);
+    }
+
+    // Tenta formato ISO
+    const date = new Date(dateString + 'T00:00:00.000Z'); // Força UTC para evitar timezone issues
+    if (!isNaN(date.getTime())) {
+      return date;
     }
 
     return null;
@@ -48,7 +57,7 @@ export function formatDateBR(
 
   try {
     const dateObj = typeof date === 'string' ? parseDate(date) : date;
-    if (!dateObj) return 'Data inválida';
+    if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
 
     return dateObj.toLocaleDateString('pt-BR', options);
   } catch {
@@ -62,7 +71,7 @@ export function formatDateBR(
  * @returns String no formato YYYY-MM-DD ou vazia se null
  */
 export function formatDateForInput(date: Date | null | undefined): string {
-  if (!date) return '';
+  if (!date || isNaN(date.getTime())) return '';
 
   try {
     const year = date.getFullYear();

@@ -16,11 +16,11 @@ function flattenUnidades(unidades: Unidade[]): Unidade[] {
 }
 
 // Função para determinar o perfil para uma unidade específica
-function getPerfilDaUnidade(unidade: Unidade): string {
-    if (unidade.sigla === 'SEDOC') return 'ADMIN';
-    if (unidade.tipo === 'INTERMEDIARIA') return 'GESTOR';
-    if (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL') return 'CHEFE';
-    return 'SERVIDOR';
+function getPerfilDaUnidade(unidade: Unidade): Perfil {
+    if (unidade.sigla === 'SEDOC') return Perfil.ADMIN;
+    if (unidade.tipo === 'INTERMEDIARIA') return Perfil.GESTOR;
+    if (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL') return Perfil.CHEFE;
+    return Perfil.SERVIDOR;
 }
 
 export function usePerfil() {
@@ -35,7 +35,7 @@ export function usePerfil() {
         const servidor = servidoresStore.getServidorById(idServidor);
         if (!servidor) return [];
 
-        const pares: { perfil: string, unidade: string }[] = [];
+        const pares: { perfil: Perfil, unidade: string }[] = [];
 
         // 1. Adiciona perfis de titular (chefe/gestor/admin)
         const unidadesChefiadas = unidadesFlat.value.filter(u => u.idServidorTitular === idServidor);
