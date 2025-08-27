@@ -124,6 +124,8 @@ describe('useNotificacoesStore', () => {
 
     describe('convenience methods', () => {
         it('sucesso should add success notification', () => {
+            notificacoesStore.sucesso('Sucesso!', 'Operação realizada com sucesso');
+
             expect(notificacoesStore.notificacoes).toHaveLength(1);
             const notificacao = notificacoesStore.notificacoes[0];
             expect(notificacao.tipo).toBe('success');
@@ -132,6 +134,8 @@ describe('useNotificacoesStore', () => {
         });
 
         it('erro should add error notification', () => {
+            notificacoesStore.erro('Erro!', 'Ocorreu um erro');
+
             expect(notificacoesStore.notificacoes).toHaveLength(1);
             const notificacao = notificacoesStore.notificacoes[0];
             expect(notificacao.tipo).toBe('error');
@@ -140,6 +144,8 @@ describe('useNotificacoesStore', () => {
         });
 
         it('aviso should add warning notification', () => {
+            notificacoesStore.aviso('Aviso!', 'Atenção necessária');
+
             expect(notificacoesStore.notificacoes).toHaveLength(1);
             const notificacao = notificacoesStore.notificacoes[0];
             expect(notificacao.tipo).toBe('warning');
@@ -148,6 +154,8 @@ describe('useNotificacoesStore', () => {
         });
 
         it('info should add info notification', () => {
+            notificacoesStore.info('Informação', 'Informação importante');
+
             expect(notificacoesStore.notificacoes).toHaveLength(1);
             const notificacao = notificacoesStore.notificacoes[0];
             expect(notificacao.tipo).toBe('info');

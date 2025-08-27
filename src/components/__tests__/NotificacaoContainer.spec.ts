@@ -32,6 +32,9 @@ describe('NotificacaoContainer.vue', () => {
         });
 
         it('should render notification with correct structure', async () => {
+            // Add notification before mounting
+            notificacoesStore.sucesso('Sucesso!', 'Operação realizada com sucesso');
+
             const wrapper = mountComponent();
 
             // Wait for reactivity
@@ -98,6 +101,9 @@ describe('NotificacaoContainer.vue', () => {
 
     describe('close button', () => {
         it('should call removerNotificacao when close button is clicked', async () => {
+            // Add notification before mounting
+            notificacoesStore.sucesso('Teste', 'Mensagem');
+
             const wrapper = mountComponent();
 
             await wrapper.vm.$nextTick();
@@ -110,6 +116,10 @@ describe('NotificacaoContainer.vue', () => {
         });
 
         it('should remove specific notification when close button is clicked', async () => {
+            // Add multiple notifications before mounting
+            notificacoesStore.sucesso('Teste 1', 'Mensagem 1');
+            notificacoesStore.erro('Teste 2', 'Mensagem 2');
+
             const wrapper = mountComponent();
 
             await wrapper.vm.$nextTick();
