@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.vue'
 import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
 import BarraNavegacao from './components/BarraNavegacao.vue';
+import NotificacaoContainer from './components/NotificacaoContainer.vue';
 
 const route = useRoute()
 
@@ -40,4 +41,5 @@ const shouldShowNavBarExtras = computed(() => {
     </div>
   </div>
   <router-view/>
+  <NotificacaoContainer />
 </template>

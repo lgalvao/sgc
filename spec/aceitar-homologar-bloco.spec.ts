@@ -79,7 +79,7 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
         // Verificar se o botão de confirmação está presente
-        await expect(page.locator('button.btn-primary:has-text("Aceitar")')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Aceitar' })).toBeVisible();
     });
 
     test('deve abrir modal de confirmação ao clicar em "Homologar em bloco"', async ({page}) => {
@@ -100,7 +100,7 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         await expect(page.locator('table.table-bordered')).toBeVisible();
 
         // Verificar se o botão de confirmação está presente
-        await expect(page.locator('button.btn-success:has-text("Homologar")')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Homologar' })).toBeVisible();
     });
 
     test('deve permitir selecionar unidades no modal', async ({page}) => {
@@ -161,8 +161,11 @@ test.describe('Aceitar/Homologar Cadastro em Bloco', () => {
         // Clicar no botão "Homologar em bloco"
         await page.getByRole('button', {name: 'Homologar em bloco'}).click();
 
+        // Esperar o modal abrir
+        await page.waitForSelector('.modal.show');
+
         // Clicar em "Homologar"
-        await page.locator('button.btn-success:has-text("Homologar")').click();
+        await page.locator('.modal-footer').getByRole('button', { name: 'Homologar' }).click();
 
         // Verificar mensagem de sucesso
         await expect(page.getByText('Cadastros homologados em bloco com sucesso!')).toBeVisible();

@@ -1,7 +1,6 @@
 <template>
   <div class="container mt-4">
     <h2>Cadastro de processo</h2>
-    <div v-if="feedback" class="alert alert-info mt-3">{{ feedback }}</div>
 
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
       <div class="mb-3">
@@ -93,6 +92,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {generateUniqueId} from '@/utils/idGenerator'
+import {useNotificacoesStore} from '@/stores/notificacoes'
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
@@ -100,8 +100,8 @@ const tipo = ref<TipoProcesso>(TipoProcesso.MAPEAMENTO)
 const dataLimite = ref<string>('')
 const router = useRouter()
 const processosStore = useProcessosStore()
-const feedback = ref<string>('')
 const unidadesStore = useUnidadesStore()
+const notificacoesStore = useNotificacoesStore()
 
 function limparCampos() {
   descricao.value = ''
@@ -116,78 +116,94 @@ function isUnidadeIntermediaria(sigla: string): boolean {
 }
 
 function salvarProcesso() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
-    feedback.value = 'Preencha todos os campos e selecione ao menos uma unidade.'
-    return
-  }
+   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
+     notificacoesStore.erro(
+       'Dados incompletos',
+       'Preencha todos os campos e selecione ao menos uma unidade.'
+     );
+     return
+   }
 
-  const novoidProcesso = processosStore.processos.length + 1;
-  const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
+   const novoidProcesso = processosStore.processos.length + 1;
+   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
-    id: generateUniqueId(),
-    idProcesso: novoidProcesso,
-    unidade: unidadeSigla,
-    dataLimiteEtapa1: new Date(dataLimite.value),
-    dataLimiteEtapa2: new Date(dataLimite.value),
-    dataFimEtapa1: null,
-    dataFimEtapa2: null,
-    unidadeAtual: unidadeSigla,
-    unidadeAnterior: null,
-    situacao: 'Não iniciado'
-  }));
+   const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
+     id: generateUniqueId(),
+     idProcesso: novoidProcesso,
+     unidade: unidadeSigla,
+     dataLimiteEtapa1: new Date(dataLimite.value),
+     dataLimiteEtapa2: new Date(dataLimite.value),
+     dataFimEtapa1: null,
+     dataFimEtapa2: null,
+     unidadeAtual: unidadeSigla,
+     unidadeAnterior: null,
+     situacao: 'Não iniciado'
+   }));
 
-  const novo = {
-    id: novoidProcesso,
-    descricao: descricao.value,
-    tipo: tipo.value,
-    dataLimite: new Date(dataLimite.value),
-    situacao: SituacaoProcesso.CRIADO,
-    dataFinalizacao: null
-  };
-  processosStore.adicionarProcesso(novo);
-  processosStore.adicionarsubprocessos(novossubprocessosObjetos);
-  feedback.value = 'Processo salvo com sucesso!';
-  router.push('/painel');
-  limparCampos();
+   const novo = {
+     id: novoidProcesso,
+     descricao: descricao.value,
+     tipo: tipo.value,
+     dataLimite: new Date(dataLimite.value),
+     situacao: SituacaoProcesso.CRIADO,
+     dataFinalizacao: null
+   };
+   processosStore.adicionarProcesso(novo);
+   processosStore.adicionarsubprocessos(novossubprocessosObjetos);
+
+   notificacoesStore.sucesso(
+     'Processo salvo',
+     'O processo foi salvo com sucesso!'
+   );
+
+   router.push('/painel');
+   limparCampos();
 }
 
 function iniciarProcesso() {
-  if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
-    feedback.value = 'Preencha todos os campos e selecione ao menos uma unidade.'
-    return
-  }
+   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
+     notificacoesStore.erro(
+       'Dados incompletos',
+       'Preencha todos os campos e selecione ao menos uma unidade.'
+     );
+     return
+   }
 
-  const novoidProcesso = processosStore.processos.length + 1;
-  const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
+   const novoidProcesso = processosStore.processos.length + 1;
+   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
-  const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
-    id: generateUniqueId(),
-    idProcesso: novoidProcesso,
-    unidade: unidadeSigla,
-    dataLimiteEtapa1: new Date(dataLimite.value),
-    dataLimiteEtapa2: null,
-    dataFimEtapa1: null,
-    dataFimEtapa2: null,
-    unidadeAtual: unidadeSigla,
-    unidadeAnterior: null,
-    situacao: 'Aguardando preenchimento do mapa'
-  }));
+   const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
+     id: generateUniqueId(),
+     idProcesso: novoidProcesso,
+     unidade: unidadeSigla,
+     dataLimiteEtapa1: new Date(dataLimite.value),
+     dataLimiteEtapa2: null,
+     dataFimEtapa1: null,
+     dataFimEtapa2: null,
+     unidadeAtual: unidadeSigla,
+     unidadeAnterior: null,
+     situacao: 'Aguardando preenchimento do mapa'
+   }));
 
-  const novo = {
-    id: novoidProcesso,
-    descricao: descricao.value,
-    tipo: tipo.value,
-    dataLimite: new Date(dataLimite.value),
-    situacao: SituacaoProcesso.EM_ANDAMENTO,
-    dataFinalizacao: null
-  };
+   const novo = {
+     id: novoidProcesso,
+     descricao: descricao.value,
+     tipo: tipo.value,
+     dataLimite: new Date(dataLimite.value),
+     situacao: SituacaoProcesso.EM_ANDAMENTO,
+     dataFinalizacao: null
+   };
 
-  processosStore.adicionarProcesso(novo);
-  processosStore.adicionarsubprocessos(novossubprocessosObjetos);
-  feedback.value = 'Processo iniciado! Notificações enviadas às unidades.'
-  router.push('/painel')
-  limparCampos()
+   processosStore.adicionarProcesso(novo);
+   processosStore.adicionarsubprocessos(novossubprocessosObjetos);
+
+   notificacoesStore.sucesso(
+     'Processo iniciado',
+     'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
+   );
+
+   router.push('/painel')
+   limparCampos()
 }
 
 function getTodasSubunidades(unidade: Unidade): string[] {
@@ -247,7 +263,6 @@ function toggleUnidade(unidade: Unidade) {
 <style scoped>
 input[type="checkbox"]:indeterminate {
   background-color: #0d6efd;
-}d6efd;
   border-color: #0d6efd;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10h8'/%3e%3c/svg%3e");
 }

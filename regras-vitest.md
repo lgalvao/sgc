@@ -93,7 +93,63 @@ roteamento/store.
   `wrapper.find('button').trigger('click')`) em vez de chamar métodos internos do componente diretamente, a menos que
   seja para depuração.
 
-## 5. Lições Aprendidas (Erros Comuns)
+## 5. Testando Novos Utilitários e Funcionalidades
+
+### 5.1. Utilitários de Data (dateUtils.ts)
+
+- **Testes de Parsing**: Verificar conversão correta de strings para Date objects
+  - Testar formatos brasileiro (DD/MM/YYYY) e ISO
+  - Verificar tratamento de datas inválidas (deve retornar null)
+  - Testar casos edge como datas vazias ou mal formatadas
+
+- **Testes de Formatação**: Validar formatos de saída
+  - Formatação em português brasileiro com opções de localização
+  - Formatação para campos input (YYYY-MM-DD)
+  - Formatação de data e hora combinadas
+
+- **Testes de Validação**: Verificar regras de negócio
+  - Datas futuras vs datas passadas
+  - Comparação de intervalos entre datas
+  - Tratamento de fusos horários
+
+- **Mocks de Data**: Usar `vi.useFakeTimers()` para testes determinísticos
+  - Controlar `Date.now()` em testes
+  - Simular passagem de tempo com `vi.advanceTimersByTime()`
+
+### 5.2. Sistema de Notificações
+
+- **Testes de Store**: Verificar gerenciamento de estado
+  - Adição de notificações com diferentes tipos
+  - Remoção manual e automática de notificações
+  - Limpeza de todas as notificações
+  - Configuração de duração customizada
+
+- **Testes de Componente**: Verificar renderização e interações
+  - Exibição correta de diferentes tipos de notificação
+  - Animações de entrada e saída
+  - Interação com botão de fechar
+  - Responsividade em diferentes tamanhos de tela
+
+- **Testes de Integração**: Verificar comunicação entre store e componente
+  - Emissão de eventos do componente para o store
+  - Atualização reativa da lista de notificações
+  - Auto-remoção após timeout
+
+### 5.3. Constantes Centralizadas
+
+- **Testes de Importação**: Verificar se constantes são importadas corretamente
+  - Testar importação de enums e objetos de constantes
+  - Verificar que valores não são undefined
+
+- **Testes de Valores**: Validar que constantes têm valores esperados
+  - Comparar valores de constantes com valores esperados
+  - Verificar integridade de objetos de configuração
+
+- **Mantenibilidade**: Estratégias para atualizar testes quando constantes mudarem
+  - Usar constantes em testes para evitar duplicação
+  - Criar testes parametrizados para validar múltiplos valores
+
+## 6. Lições Aprendidas (Erros Comuns)
 
 * **Duplicação de Testes:** Copiar e colar blocos de teste pode levar a duplicação e dificultar a manutenção. Use
   funções auxiliares e `beforeEach` para evitar isso.

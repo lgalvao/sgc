@@ -1,109 +1,47 @@
 <template>
   <div class="container mt-4">
-    <div v-if="unidadeComResponsavelDinamico" class="card mb-4">
-      <div class="card-body">
-        <p class="text-muted small mb-1">Processo: {{ processoAtual?.descricao }}</p>
-        <h2 class="display-6 mb-3">{{ unidadeComResponsavelDinamico.sigla }} - {{
-            unidadeComResponsavelDinamico.nome
-          }}</h2>
-        <p>
-          <span class="fw-bold me-1">Situação:</span>
-          <span :class="badgeClass(situacaoUnidadeNoProcesso)" class="badge">{{ situacaoUnidadeNoProcesso }}</span>
-        </p>
-
-        <p><strong>Titular:</strong> {{ titularDetalhes?.nome }}</p>
-        <p class="ms-3">
-          <i class="bi bi-telephone-fill me-2"></i>{{ titularDetalhes?.ramal }}
-          <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ titularDetalhes?.email }}
-        </p>
-
-        <template
-            v-if="unidadeComResponsavelDinamico.responsavel &&
-             unidadeComResponsavelDinamico.responsavel.idServidor &&
-             unidadeComResponsavelDinamico.responsavel.idServidor !== unidadeComResponsavelDinamico.idServidorTitular">
-          <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
-          <p class="ms-3">
-            <i class="bi bi-telephone-fill me-2"></i>{{ responsavelDetalhes?.ramal }}
-            <i class="bi bi-envelope-fill ms-3 me-2"></i>{{ responsavelDetalhes?.email }}
-          </p>
-        </template>
-
-        <p v-if="SubprocessoDetalhes">
-          <strong>Unidade atual:</strong> {{ SubprocessoDetalhes.unidadeAtual || 'Não informado' }}
-        </p>
-      </div>
-    </div>
+    <SubprocessoHeader
+        v-if="unidadeComResponsavelDinamico"
+        :processoDescricao="processoAtual?.descricao || ''"
+        :unidadeSigla="unidadeComResponsavelDinamico.sigla"
+        :unidadeNome="unidadeComResponsavelDinamico.nome"
+        :situacao="situacaoUnidadeNoProcesso"
+        :titularNome="titularDetalhes?.nome || ''"
+        :titularRamal="titularDetalhes?.ramal || ''"
+        :titularEmail="titularDetalhes?.email || ''"
+        :responsavelNome="responsavelDetalhes?.nome || ''"
+        :responsavelRamal="responsavelDetalhes?.ramal || ''"
+        :responsavelEmail="responsavelDetalhes?.email || ''"
+        :unidadeAtual="SubprocessoDetalhes?.unidadeAtual || ''"
+        :perfilUsuario="perfilStore.perfilSelecionado"
+        :isSubprocessoEmAndamento="isSubprocessoEmAndamento"
+        @alterarDataLimite="abrirModalAlterarDataLimite"
+    />
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
-    <div class="row">
-      <template v-if="processoAtual?.tipo === TipoProcesso.MAPEAMENTO || processoAtual?.tipo === TipoProcesso.REVISAO">
-        <section class="col-md-4 mb-3">
-          <div class="card h-100 card-actionable" @click="irParaAtividadesConhecimentos">
-            <div class="card-body">
-              <h5 class="card-title">Atividades e conhecimentos</h5>
-              <p class="card-text text-muted">Cadastro de atividades e conhecimentos da unidade</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge bg-secondary">Cadastro disponibilizado</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="col-md-4 mb-3">
-          <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" @click="navegarParaMapa()">
-            <div class="card-body">
-              <h5 class="card-title">Mapa de Competências</h5>
-              <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>
-              <div v-if="mapa">
-                <div v-if="mapa.situacao === 'em_andamento'">
-                  <span class="badge bg-warning text-dark">Em andamento</span>
-                </div>
-                <div v-else-if="mapa.situacao === 'disponivel_validacao'">
-                  <span class="badge bg-success">Disponibilizado</span>
-                </div>
-              </div>
-              <div v-else>
-                <span class="badge bg-secondary">Não disponibilizado</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      </template>
-
-      <template v-else-if="processoAtual?.tipo === TipoProcesso.DIAGNOSTICO">
-        <section class="col-md-4 mb-3">
-          <div class="card h-100 card-actionable">
-            <div class="card-body">
-              <h5 class="card-title">Diagnóstico da Equipe</h5>
-              <p class="card-text text-muted">Diagnóstico das competências pelos servidores da unidade</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge bg-secondary">Não disponibilizado</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="col-md-4 mb-3">
-          <div class="card h-100 card-actionable">
-            <div class="card-body">
-              <h5 class="card-title">Ocupações Críticas</h5>
-              <p class="card-text text-muted">Identificação das ocupações críticas da unidade</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge bg-secondary">Não disponibilizado</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      </template>
-
-    </div>
+    <SubprocessoCards
+        :tipoProcesso="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
+        :mapa="mapa"
+        @irParaAtividades="irParaAtividadesConhecimentos"
+        @navegarParaMapa="navegarParaMapa"
+    />
   </div>
+
+  <SubprocessoModal
+      :mostrarModal="mostrarModalAlterarDataLimite"
+      :mostrarAlertaSucesso="false"
+      :dataLimiteAtual="dataLimiteAtual"
+      :etapaAtual="etapaAtual"
+      :situacaoEtapaAtual="SubprocessoDetalhes?.situacao || 'Não informado'"
+      @fecharModal="fecharModalAlterarDataLimite"
+      @confirmarAlteracao="confirmarAlteracaoDataLimite"
+  />
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -111,7 +49,7 @@ import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
-import {usePerfilStore} from '@/stores/perfil' // Importar usePerfilStore
+import {usePerfilStore} from '@/stores/perfil'
 import {
   Mapa,
   Perfil,
@@ -122,6 +60,12 @@ import {
   TipoResponsabilidade,
   Unidade
 } from "@/types/tipos";
+import {parseDate} from '@/utils/dateUtils';
+import {SITUACOES_EM_ANDAMENTO} from '@/constants/situacoes';
+import {useNotificacoesStore} from '@/stores/notificacoes';
+import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
+import SubprocessoCards from '@/components/SubprocessoCards.vue';
+import SubprocessoModal from '@/components/SubprocessoModal.vue';
 
 const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
 
@@ -129,13 +73,16 @@ const router = useRouter()
 const idProcesso = computed(() => props.idProcesso)
 const siglaParam = computed<string | undefined>(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
-const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore(); // Instanciar
+const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
-const perfilStore = usePerfilStore() // Instanciar perfilStore
+const perfilStore = usePerfilStore()
+const notificacoesStore = useNotificacoesStore()
 const {processos} = storeToRefs(processosStore)
 
+// Estados reativos para o modal de alteração de data limite
+const mostrarModalAlterarDataLimite = ref(false)
 
 const SubprocessoDetalhes = computed<Subprocesso | undefined>(() => {
   return processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === siglaParam.value);
@@ -218,12 +165,43 @@ const mapa = computed<Mapa | null>(() => {
   return mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.sigla, processoAtual.value.id) || null;
 });
 
-function badgeClass(situacao: string): string {
-  if (situacao === 'Aguardando' || situacao === 'Em andamento' || situacao === 'Aguardando validação') return 'bg-warning text-dark'
-  if (situacao === 'Finalizado' || situacao === 'Validado') return 'bg-success'
-  if (situacao === 'Devolvido') return 'bg-danger'
-  return 'bg-secondary'
-}
+// Computed para verificar se o subprocesso está em andamento
+const isSubprocessoEmAndamento = computed(() => {
+  if (!SubprocessoDetalhes.value) return false;
+  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao as any);
+});
+
+// Computed para identificar a etapa atual e sua data limite
+const etapaAtual = computed(() => {
+  if (!SubprocessoDetalhes.value) return null;
+
+  // Se etapa 1 ainda não terminou, é a etapa 1
+  if (!SubprocessoDetalhes.value.dataFimEtapa1) {
+    return 1;
+  }
+
+  // Se etapa 1 terminou mas etapa 2 não começou ou não terminou, é a etapa 2
+  if (SubprocessoDetalhes.value.dataLimiteEtapa2 && !SubprocessoDetalhes.value.dataFimEtapa2) {
+    return 2;
+  }
+
+  // Se ambas as etapas terminaram, não há etapa em andamento
+  return null;
+});
+
+const dataLimiteAtual = computed(() => {
+  if (!SubprocessoDetalhes.value || !etapaAtual.value) return null;
+
+  if (etapaAtual.value === 1) {
+    return SubprocessoDetalhes.value.dataLimiteEtapa1;
+  } else if (etapaAtual.value === 2) {
+    return SubprocessoDetalhes.value.dataLimiteEtapa2;
+  }
+
+  return null;
+});
+
+// Computed properties movidos para os componentes específicos
 
 function navegarParaMapa() {
   if (!sigla.value || !processoAtual.value || !mapa.value) {
@@ -253,21 +231,47 @@ function irParaAtividadesConhecimentos() {
     router.push({name: 'SubprocessoVisCadastro', params}); // Abre VisAtividades.vue
   }
 }
+
+// Funções para o modal de alteração de data limite
+function abrirModalAlterarDataLimite() {
+  mostrarModalAlterarDataLimite.value = true;
+}
+
+function fecharModalAlterarDataLimite() {
+  mostrarModalAlterarDataLimite.value = false;
+}
+
+async function confirmarAlteracaoDataLimite(novaData: string) {
+  if (!novaData || !SubprocessoDetalhes.value) {
+    return;
+  }
+
+  try {
+    // Chamar a store para atualizar a data limite
+    await processosStore.alterarDataLimiteSubprocesso({
+      idProcesso: SubprocessoDetalhes.value.idProcesso,
+      unidade: SubprocessoDetalhes.value.unidade,
+      etapa: etapaAtual.value || 1,
+      novaDataLimite: parseDate(novaData) || new Date()
+    });
+
+    // Fechar modal
+    fecharModalAlterarDataLimite();
+
+    // Mostrar notificação de sucesso
+    notificacoesStore.sucesso(
+        'Data limite alterada',
+        'A data limite foi alterada com sucesso!'
+    );
+
+  } catch (error) {
+    console.error('Erro ao alterar data limite:', error);
+    notificacoesStore.erro(
+        'Erro ao alterar data limite',
+        'Ocorreu um erro ao alterar a data limite. Tente novamente.'
+    );
+  }
+}
 </script>
 
-<style scoped>
-.card-actionable {
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.card-actionable:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.card-actionable.disabled-card {
-  pointer-events: none;
-  opacity: 0.6;
-}
-</style>
+// Estilos movidos para os componentes específicos

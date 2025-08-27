@@ -1,13 +1,14 @@
 import {defineStore} from 'pinia'
 import mapasData from '../mocks/mapas.json' assert {type: 'json'};
 import type {Mapa} from '@/types/tipos'
+import { parseDate } from '@/utils/dateUtils'
 
 function parseMapaDates(mapa: any): Mapa {
     return {
         ...mapa,
-        dataCriacao: new Date(mapa.dataCriacao),
-        dataDisponibilizacao: mapa.dataDisponibilizacao ? new Date(mapa.dataDisponibilizacao) : null,
-        dataFinalizacao: mapa.dataFinalizacao ? new Date(mapa.dataFinalizacao) : null,
+        dataCriacao: parseDate(mapa.dataCriacao) || new Date(),
+        dataDisponibilizacao: parseDate(mapa.dataDisponibilizacao),
+        dataFinalizacao: parseDate(mapa.dataFinalizacao),
     };
 }
 

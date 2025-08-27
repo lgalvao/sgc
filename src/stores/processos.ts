@@ -3,22 +3,23 @@ import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos'
 import {useConfiguracoesStore} from './configuracoes'; // Import the new store
+import { parseDate } from '@/utils/dateUtils'
 
 function parseProcessoDates(processo: any): Processo {
     return {
         ...processo,
-        dataLimite: new Date(processo.dataLimite),
-        dataFinalizacao: processo.dataFinalizacao ? new Date(processo.dataFinalizacao) : null,
+        dataLimite: parseDate(processo.dataLimite) || new Date(),
+        dataFinalizacao: parseDate(processo.dataFinalizacao),
     };
 }
 
 function parseSubprocessoDates(pu: any): Subprocesso {
     return {
         ...pu,
-        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
-        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
-        dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
-        dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
+        dataLimiteEtapa1: parseDate(pu.dataLimiteEtapa1),
+        dataLimiteEtapa2: parseDate(pu.dataLimiteEtapa2),
+        dataFimEtapa1: parseDate(pu.dataFimEtapa1),
+        dataFimEtapa2: parseDate(pu.dataFimEtapa2),
     };
 }
 
@@ -140,6 +141,60 @@ export const useProcessosStore = defineStore('processos', {
             console.log(`[SIMULAÇÃO] Enviando notificações para unidades superiores`);
             
             return Promise.resolve();
+        },
+        async alterarDataLimiteSubprocesso(payload: {
+            idProcesso: number,
+            unidade: string,
+            etapa: number,
+            novaDataLimite: Date
+        }) {
+            const { idProcesso, unidade, etapa, novaDataLimite } = payload;
+            
+            const subprocessoIndex = this.subprocessos.findIndex(
+                pu => pu.idProcesso === idProcesso && pu.unidade === unidade
+            );
+            
+            if (subprocessoIndex !== -1) {
+                const subprocesso = this.subprocessos[subprocessoIndex];
+                
+                // Atualizar a data limite da etapa especificada
+                if (etapa === 1) {
+                    this.subprocessos[subprocessoIndex] = {
+                        ...subprocesso,
+                        dataLimiteEtapa1: novaDataLimite
+                    };
+                } else if (etapa === 2) {
+                    this.subprocessos[subprocessoIndex] = {
+                        ...subprocesso,
+                        dataLimiteEtapa2: novaDataLimite
+                    };
+                }
+                
+                // Registrar movimentação
+                console.log(`[SIMULAÇÃO] Registrando movimentação:`);
+                console.log(`  De: SEDOC`);
+                console.log(`  Para: SEDOC`);
+                console.log(`  Descrição: Data limite da etapa ${etapa} alterada para ${novaDataLimite.toISOString().split('T')[0]}`);
+                
+                // Criar alerta
+                console.log(`[SIMULAÇÃO] Criando alerta:`);
+                console.log(`  Descrição: Data limite da etapa ${etapa} alterada para ${novaDataLimite.toISOString().split('T')[0]}`);
+                console.log(`  Processo: ${idProcesso}`);
+                console.log(`  Data/hora: ${new Date().toISOString()}`);
+                console.log(`  Unidade de origem: SEDOC`);
+                console.log(`  Unidade de destino: ${unidade}`);
+                
+                // Enviar notificação
+                console.log(`[SIMULAÇÃO] Enviando notificação por e-mail para a unidade ${unidade}:`);
+                console.log(`  Assunto: SGC: Data limite de etapa alterada - ${unidade}`);
+                console.log(`  Prezado(a) responsável pela ${unidade},`);
+                console.log(`  A data limite da etapa ${etapa} no processo foi alterada para ${novaDataLimite.toISOString().split('T')[0]}.`);
+                console.log(`  Mais informações no Sistema de Gestão de Competências.`);
+                
+                return Promise.resolve();
+            }
+            
+            return Promise.reject(new Error('Subprocesso não encontrado'));
         }
     }
 })

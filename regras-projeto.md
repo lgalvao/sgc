@@ -29,8 +29,14 @@ funcionalidades já implementadas e outras em andamento.
       logado, através do composable `usePerfil`.
     - O `idServidor` do usuário logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
 - **Login**:
-    - A tela de login permite ao usuário "logar" como qualquer servidor cadastrado
-    - Essa tela apresenta um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
+     - A tela de login permite ao usuário "logar" como qualquer servidor cadastrado
+     - Essa tela apresenta um único seletor para pares "perfil - unidade" quando múltiplas opções estão disponíveis.
+- **Sistema de Notificações**:
+     - Sistema elegante de notificações substitui `alert()` nativo
+     - Notificações categorizadas por tipo: `success`, `error`, `warning`, `info`
+     - Exibição global através do `NotificacaoContainer.vue`
+     - Gerenciamento de estado via store Pinia `notificacoes.ts`
+     - Auto-remoção após tempo configurável
 
 ## Estrutura de Diretórios:
 
@@ -38,7 +44,10 @@ funcionalidades já implementadas e outras em andamento.
 - `/src/views/`: Páginas/rotas da aplicação
 - `/src/stores/`: Gerenciamento de estado com Pinia
 - `/src/mocks/`: Dados simulados em JSON
-- `/src/composables/`: Lógica reutilizável, como o `usePerfil.ts` que calcula o perfil do usuário.
+- `/src/composables/`: Lógica reutilizável, como o `usePerfil.ts` que calcula o perfil do usuário
+- `/src/constants/`: Constantes e enums centralizados para situações, tipos e configurações
+- `/src/utils/`: Utilitários auxiliares (dateUtils, idGenerator) para funcionalidades comuns
+- `/src/types/`: Definições de tipos TypeScript
 
 ## Telas e Componentes Principais
 
@@ -58,32 +67,47 @@ funcionalidades já implementadas e outras em andamento.
 ## Arquitetura e Componentização
 
 - **Dados**: Mockados em JSON, importados apenas nos stores do Pinia.
+- **Utilitários Centralizados**: Funções comuns em `/src/utils/` para evitar duplicação de código.
+- **Constantes**: Valores constantes centralizados em `/src/constants/` para facilitar manutenção.
+- **Sistema de Notificações**: Substituição elegante de `alert()` nativo com UX profissional.
 
 - **Stores**: Cada domínio (processo, mapa, unidade, perfil etc.) possui um store dedicado.
-    - `processos.ts`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `Subprocesso` e o
-      acesso a `subprocessos.json`.
-    - `mapas.ts`: Gerencia os mapas de competência, incluindo a busca por unidade e processo (`getMapaByUnidadeId`) e a
-      busca por mapa vigente (`getMapaVigentePorUnidade`).
-    - `atividades.ts`: Gerencia atividades e conhecimentos.
-    - `atribuicaoTemporaria.ts`: Gerencia atribuições temporárias.
-    - `perfil.ts`: Gerencia o `idServidor`, o perfil e a unidade selecionados do usuário logado, persistindo-os no
-      localStorage.
-    - `servidores.ts`: Gerencia os dados dos servidores.
-    - `unidades.ts`: Gerencia as unidades organizacionais e inclui a função `pesquisarUnidade` para busca hierárquica.
-    - `revisao.ts`: Gerencia o estado das mudanças realizadas durante a revisão de um mapa de competências, registrando
-      todas as alterações em atividades e conhecimentos.
-    - `alertas.ts`: Fornece dados mockados para o painel (ex: alertas).
+     - `processos.ts`: Gerencia o estado dos processos, incluindo a relação com as unidades através de `Subprocesso` e o
+       acesso a `subprocessos.json`.
+     - `mapas.ts`: Gerencia os mapas de competência, incluindo a busca por unidade e processo (`getMapaByUnidadeId`) e a
+       busca por mapa vigente (`getMapaVigentePorUnidade`).
+     - `atividades.ts`: Gerencia atividades e conhecimentos.
+     - `atribuicaoTemporaria.ts`: Gerencia atribuições temporárias.
+     - `perfil.ts`: Gerencia o `idServidor`, o perfil e a unidade selecionados do usuário logado, persistindo-os no
+       localStorage.
+     - `servidores.ts`: Gerencia os dados dos servidores.
+     - `unidades.ts`: Gerencia as unidades organizacionais e inclui a função `pesquisarUnidade` para busca hierárquica.
+     - `revisao.ts`: Gerencia o estado das mudanças realizadas durante a revisão de um mapa de competências, registrando
+       todas as alterações em atividades e conhecimentos.
+     - `alertas.ts`: Fornece dados mockados para o painel (ex: alertas).
+     - `notificacoes.ts`: Gerencia o sistema de notificações da aplicação.
+
+- **Utilitários**:
+     - `dateUtils.ts`: Funções para parsing, formatação e validação de datas em português brasileiro.
+     - `idGenerator.ts`: Geração de IDs únicos para novas entidades do sistema.
+
+- **Constantes**:
+     - `situacoes.ts`: Constantes para situações de processos, mapas e atividades, incluindo labels e classes CSS.
 
 - **Componentes**:
-    - `BarraNavegacao.vue`: Componente que agrupa o botão "Voltar" e breadcrumbs. O botão "Voltar" retorna ao histórico
-      de navegação ou para o Painel. A trilha de navegação é dinâmica, sensível ao contexto (processos/unidades) e
-      gerenciada por stores Pinia.
-    - `TreeTable.vue`: Tabela hierárquica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta
-      ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados
-      corretamente.
-    - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique
-      corretamente.
-    - `Navbar.vue`: Barra de navegação que exibe o perfil e a unidade selecionados, com um seletor de perfil oculto.
+     - `BarraNavegacao.vue`: Componente que agrupa o botão "Voltar" e breadcrumbs. O botão "Voltar" retorna ao histórico
+       de navegação ou para o Painel. A trilha de navegação é dinâmica, sensível ao contexto (processos/unidades) e
+       gerenciada por stores Pinia.
+     - `TreeTable.vue`: Tabela hierárquica que renderiza cabeçalhos e linhas com base nas colunas fornecidas. Suporta
+       ocultar cabeçalhos e larguras de coluna dinâmicas. Eventos de clique em itens aninhados são propagados
+       corretamente.
+     - `TreeRow.vue`: Linha de uma tabela hierárquica que renderiza suas células dinamicamente. Propaga eventos de clique
+       corretamente.
+     - `Navbar.vue`: Barra de navegação que exibe o perfil e a unidade selecionados, com um seletor de perfil oculto.
+     - `NotificacaoContainer.vue`: Container global para exibição de notificações do sistema.
+     - `SubprocessoHeader.vue`: Cabeçalho da página de subprocesso com informações da unidade e responsável.
+     - `SubprocessoCards.vue`: Cards de navegação baseados no tipo de processo (mapeamento, revisão, diagnóstico).
+     - `SubprocessoModal.vue`: Modal para alteração de data limite de subprocessos.
 
 - **Views**:
     - `Login.vue`: Tela de login que permite ao autenticar o usuário (simulado) como qualquer servidor cadastrado. Com
@@ -118,3 +142,17 @@ funcionalidades já implementadas e outras em andamento.
 - Para o contexto do usuário logado (perfil e unidade), utilize sempre `perfilStore.perfilSelecionado` e
   `perfilStore.unidadeSelecionada`.
 - Unidades do tipo `INTERMEDIARIA` (como COSIS) não devem ter `subprocessos` associados a elas.
+
+## Utilitários e Constantes
+
+- **Utilitários Centralizados**: Use `dateUtils.ts` para todas as operações com datas (parsing, formatação, validação).
+- **Constantes**: Utilize as constantes em `/src/constants/` para situações, tipos e configurações em vez de strings mágicas.
+- **Sistema de Notificações**: Use o sistema de notificações (`useNotificacoesStore`) em vez de `alert()` nativo.
+- **Geração de IDs**: Use `idGenerator.ts` para criar novos IDs únicos no sistema.
+
+## Melhores Práticas de Arquitetura
+
+- **Componentização**: Quebre componentes grandes em partes menores e reutilizáveis quando apropriado.
+- **Separação de Responsabilidades**: Mantenha lógica de negócio em stores/composables, apresentação em componentes.
+- **Consistência**: Use os utilitários centralizados para manter padrões consistentes em toda a aplicação.
+- **Reutilização**: Crie componentes genéricos que possam ser reutilizados em diferentes contextos.

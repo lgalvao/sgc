@@ -33,7 +33,7 @@
         </thead>
         <tbody>
         <tr v-for="(alerta, index) in alertasFormatados" :key="index">
-          <td>{{ formatarDataHora(alerta.data) }}</td>
+          <td>{{ alerta.dataFormatada }}</td>
           <td>{{ alerta.descricao }}</td>
           <td>{{ alerta.processo }}</td>
           <td>{{ alerta.unidade }}</td>
@@ -57,6 +57,7 @@ import {useRouter} from 'vue-router'
 import {Alerta, Perfil, Processo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import { useProcessosFiltrados } from '@/composables/useProcessosFiltrados'; // Importar o novo composable
+import { formatDateTimeBR } from '@/utils/dateUtils';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
@@ -128,19 +129,11 @@ const alertasFormatados = computed(() => {
       data: alerta.dataHora,
       processo: processo ? processo.descricao : 'Processo não encontrado',
       unidade: alerta.unidadeOrigem,
-      descricao: alerta.descricao
+      descricao: alerta.descricao,
+      dataFormatada: formatDateTimeBR(alerta.dataHora)
     };
   });
 });
 
-function formatarDataHora(data: Date) {
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  };
-  return data.toLocaleString('pt-BR', options);
-}
+// Removida função formatarDataHora - usando utilitário centralizado
 </script>

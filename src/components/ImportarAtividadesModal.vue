@@ -1,11 +1,10 @@
 <template>
-  <div v-if="mostrar" id="importarAtividadesModal" aria-hidden="true" aria-labelledby="importarAtividadesModalLabel"
-       class="modal fade show" style="display: block;" tabindex="-1">
+  <div v-if="mostrar" class="modal fade show" style="display: block;" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 id="importarAtividadesModalLabel" class="modal-title">Importação de atividades</h5>
-          <button aria-label="Close" class="btn-close" type="button" @click="fechar"></button>
+          <h5 class="modal-title">Importação de atividades</h5>
+          <button type="button" class="btn-close" @click="fechar"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -23,8 +22,7 @@
 
           <div class="mb-3">
             <label class="form-label" for="unidade-select">Unidade</label>
-            <select id="unidade-select" v-model="unidadeSelecionadaId" :disabled="!processoSelecionado"
-                    class="form-select">
+            <select id="unidade-select" v-model="unidadeSelecionadaId" :disabled="!processoSelecionado" class="form-select">
               <option disabled value="">Selecione</option>
               <option v-for="pu in unidadesParticipantes" :key="pu.id" :value="pu.id">
                 {{ pu.unidade }}
@@ -36,8 +34,7 @@
             <h6>Atividades para importar</h6>
             <div v-if="atividadesParaImportar.length" class="atividades-container border rounded p-2">
               <div v-for="ativ in atividadesParaImportar" :key="ativ.id" class="form-check">
-                <input :id="`ativ-check-${ativ.id}`" v-model="atividadesSelecionadas" :value="ativ"
-                       class="form-check-input" type="checkbox">
+                <input :id="`ativ-check-${ativ.id}`" v-model="atividadesSelecionadas" :value="ativ" class="form-check-input" type="checkbox">
                 <label :for="`ativ-check-${ativ.id}`" class="form-check-label">
                   {{ ativ.descricao }}
                 </label>
@@ -50,9 +47,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary" type="button" @click="cancelar">Cancelar</button>
-          <button :disabled="!atividadesSelecionadas.length" class="btn btn-outline-primary" type="button"
-                  @click="importar">Importar</button>
+          <button class="btn btn-outline-secondary" type="button" @click="fechar">Cancelar</button>
+          <button :disabled="!atividadesSelecionadas.length" class="btn btn-outline-primary" type="button" @click="importar">Importar</button>
         </div>
       </div>
     </div>
@@ -61,10 +57,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useProcessosStore } from '@/stores/processos'
 import { useAtividadesStore } from '@/stores/atividades'
-import { Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso } from '@/types/tipos'
+import { Atividade, Processo, Subprocesso, SituacaoProcesso, TipoProcesso } from '@/types/tipos'
 
 const props = defineProps<{
   mostrar: boolean
@@ -90,6 +86,12 @@ const processosDisponiveis = computed<Processo[]>(() => {
   return processosStore.processos.filter(p =>
     (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === SituacaoProcesso.FINALIZADO
   )
+})
+
+watch(() => props.mostrar, (mostrar) => {
+  if (mostrar) {
+    resetModal()
+  }
 })
 
 watch(processoSelecionadoId, (newId) => {
@@ -146,15 +148,12 @@ function fechar() {
   emit('fechar')
 }
 
-function cancelar() {
-  resetModal()
-  fechar()
-}
-
 function importar() {
+  if (atividadesSelecionadas.value.length === 0) {
+    alert('Selecione ao menos uma atividade para importar.')
+    return
+  }
   emit('importar', atividadesSelecionadas.value)
-  resetModal()
-  fechar()
 }
 </script>
 
