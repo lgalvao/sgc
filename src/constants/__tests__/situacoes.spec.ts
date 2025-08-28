@@ -23,10 +23,13 @@ describe('situacoes.ts constants', () => {
       expect(SITUACOES_SUBPROCESSO).toHaveProperty('MAPA_EM_ANDAMENTO', 'Mapa em andamento');
       expect(SITUACOES_SUBPROCESSO).toHaveProperty('REVISAO_MAPA_DISPONIBILIZADA', 'Revisão do mapa disponibilizada');
       expect(SITUACOES_SUBPROCESSO).toHaveProperty('REVISAO_MAPA_EM_ANDAMENTO', 'Revisão do mapa em andamento');
+      expect(SITUACOES_SUBPROCESSO).toHaveProperty('MAPA_VALIDADO', 'Mapa validado');
+      expect(SITUACOES_SUBPROCESSO).toHaveProperty('MAPA_HOMOLOGADO', 'Mapa homologado');
+      expect(SITUACOES_SUBPROCESSO).toHaveProperty('MAPA_CRIADO', 'Mapa criado');
     });
 
     it('should have correct number of situations', () => {
-      expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(13);
+      expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(16);
     });
   });
 
@@ -48,6 +51,18 @@ describe('situacoes.ts constants', () => {
         'Cadastro disponibilizado'
       );
       expect(LABELS_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+        'Mapa validado'
+      );
+      expect(LABELS_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
+        'Mapa homologado'
+      );
+      expect(LABELS_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_CRIADO,
+        'Mapa criado'
+      );
+      expect(LABELS_SITUACAO).toHaveProperty(
         SITUACOES_MAPA.EM_ANDAMENTO,
         'Em andamento'
       );
@@ -59,7 +74,7 @@ describe('situacoes.ts constants', () => {
     });
 
     it('should have correct number of labels', () => {
-      expect(Object.keys(LABELS_SITUACAO)).toHaveLength(4);
+      expect(Object.keys(LABELS_SITUACAO)).toHaveLength(7);
     });
   });
 
@@ -72,16 +87,17 @@ describe('situacoes.ts constants', () => {
       expect(SITUACOES_EM_ANDAMENTO).toContain(SITUACOES_SUBPROCESSO.MAPA_EM_ANDAMENTO);
       expect(SITUACOES_EM_ANDAMENTO).toContain(SITUACOES_SUBPROCESSO.REVISAO_MAPA_DISPONIBILIZADA);
       expect(SITUACOES_EM_ANDAMENTO).toContain(SITUACOES_SUBPROCESSO.REVISAO_MAPA_EM_ANDAMENTO);
+      expect(SITUACOES_EM_ANDAMENTO).toContain(SITUACOES_SUBPROCESSO.MAPA_CRIADO);
     });
 
     it('should have correct number of situations', () => {
-      expect(SITUACOES_EM_ANDAMENTO).toHaveLength(7);
+      expect(SITUACOES_EM_ANDAMENTO).toHaveLength(8);
     });
 
     it('should be readonly array', () => {
       // Test that the array has the expected length and we can't modify it in strict mode
       const originalLength = SITUACOES_EM_ANDAMENTO.length;
-      expect(SITUACOES_EM_ANDAMENTO).toHaveLength(7);
+      expect(SITUACOES_EM_ANDAMENTO).toHaveLength(8);
       expect(SITUACOES_EM_ANDAMENTO.length).toBe(originalLength);
     });
   });
@@ -112,10 +128,22 @@ describe('situacoes.ts constants', () => {
         SITUACOES_SUBPROCESSO.DEVOLVIDO,
         'bg-danger'
       );
+      expect(CLASSES_BADGE_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+        'bg-success'
+      );
+      expect(CLASSES_BADGE_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
+        'bg-success'
+      );
+      expect(CLASSES_BADGE_SITUACAO).toHaveProperty(
+        SITUACOES_SUBPROCESSO.MAPA_CRIADO,
+        'bg-info'
+      );
     });
 
     it('should have correct number of CSS classes', () => {
-      expect(Object.keys(CLASSES_BADGE_SITUACAO)).toHaveLength(6);
+      expect(Object.keys(CLASSES_BADGE_SITUACAO)).toHaveLength(9);
     });
   });
 

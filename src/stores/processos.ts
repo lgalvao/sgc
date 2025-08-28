@@ -3,7 +3,9 @@ import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos'
 import {useConfiguracoesStore} from './configuracoes'; // Import the new store
+import {useUnidadesStore} from './unidades'
 import { parseDate } from '@/utils/dateUtils'
+import { SITUACOES_SUBPROCESSO } from '@/constants/situacoes'
 
 function parseProcessoDates(processo: any): Processo {
     return {
@@ -194,6 +196,110 @@ export const useProcessosStore = defineStore('processos', {
                 return Promise.resolve();
             }
             
+            return Promise.reject(new Error('Subprocesso não encontrado'));
+        },
+        async aceitarMapa(payload: {
+            idProcesso: number,
+            unidade: string,
+            observacao?: string
+        }) {
+            const { idProcesso, unidade, observacao } = payload;
+            const unidadesStore = useUnidadesStore();
+
+            const subprocessoIndex = this.subprocessos.findIndex(
+                pu => pu.idProcesso === idProcesso && pu.unidade === unidade
+            );
+
+            if (subprocessoIndex !== -1) {
+                const subprocesso = this.subprocessos[subprocessoIndex];
+                const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(unidade);
+
+                if (!unidadeSuperior) {
+                    throw new Error('Unidade superior não encontrada');
+                }
+
+                // Registrar análise
+                console.log(`[SIMULAÇÃO] Registrando análise de aceite para unidade ${unidade}`);
+                console.log(`Observação: ${observacao || 'Nenhuma'}`);
+
+                // Registrar movimentação
+                console.log(`[SIMULAÇÃO] Registrando movimentação:`);
+                console.log(`  De: ${unidade}`);
+                console.log(`  Para: ${unidadeSuperior}`);
+                console.log(`  Descrição: Mapa de competências aceito`);
+
+                // Atualizar situação baseado na unidade superior
+                let novaSituacao: string;
+                if (unidadeSuperior === 'SEDOC') {
+                    novaSituacao = SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO;
+                } else {
+                    novaSituacao = SITUACOES_SUBPROCESSO.MAPA_VALIDADO;
+                }
+
+                // Atualizar subprocesso
+                this.subprocessos[subprocessoIndex] = {
+                    ...subprocesso,
+                    unidadeAtual: unidadeSuperior,
+                    unidadeAnterior: unidade,
+                    situacao: novaSituacao
+                };
+
+                console.log(`[SIMULAÇÃO] Subprocesso ${unidade} atualizado para: ${novaSituacao}`);
+                console.log(`[SIMULAÇÃO] Movido para unidade: ${unidadeSuperior}`);
+
+                return Promise.resolve();
+            }
+
+            return Promise.reject(new Error('Subprocesso não encontrado'));
+        },
+        async rejeitarMapa(payload: {
+            idProcesso: number,
+            unidade: string
+        }) {
+            const { idProcesso, unidade } = payload;
+
+            const subprocessoIndex = this.subprocessos.findIndex(
+                pu => pu.idProcesso === idProcesso && pu.unidade === unidade
+            );
+
+            if (subprocessoIndex !== -1) {
+                const subprocesso = this.subprocessos[subprocessoIndex];
+                const unidadeInferior = subprocesso.unidadeAnterior;
+
+                if (!unidadeInferior) {
+                    throw new Error('Unidade anterior não encontrada');
+                }
+
+                // Registrar movimentação
+                console.log(`[SIMULAÇÃO] Registrando movimentação:`);
+                console.log(`  De: ${unidade}`);
+                console.log(`  Para: ${unidadeInferior}`);
+                console.log(`  Descrição: Mapa de competências devolvido para ajustes`);
+
+                // Determinar nova situação
+                let novaSituacao: string;
+                if (unidadeInferior === subprocesso.unidade) {
+                    // Retornando para a própria unidade
+                    novaSituacao = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
+                } else {
+                    // Retornando para unidade diferente (SEDOC fazendo ajustes)
+                    novaSituacao = SITUACOES_SUBPROCESSO.MAPA_CRIADO;
+                }
+
+                // Atualizar subprocesso
+                this.subprocessos[subprocessoIndex] = {
+                    ...subprocesso,
+                    unidadeAtual: unidadeInferior,
+                    unidadeAnterior: unidade,
+                    situacao: novaSituacao
+                };
+
+                console.log(`[SIMULAÇÃO] Subprocesso ${unidade} atualizado para: ${novaSituacao}`);
+                console.log(`[SIMULAÇÃO] Movido para unidade: ${unidadeInferior}`);
+
+                return Promise.resolve();
+            }
+
             return Promise.reject(new Error('Subprocesso não encontrado'));
         }
     }

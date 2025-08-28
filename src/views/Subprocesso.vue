@@ -24,6 +24,7 @@
     <SubprocessoCards
         :tipoProcesso="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
         :mapa="mapa"
+        :situacao="situacaoUnidadeNoProcesso"
         @irParaAtividades="irParaAtividadesConhecimentos"
         @navegarParaMapa="navegarParaMapa"
     />

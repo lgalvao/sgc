@@ -4,7 +4,7 @@ import SubprocessoCards from '../SubprocessoCards.vue';
 import { TipoProcesso } from '@/types/tipos';
 
 describe('SubprocessoCards.vue', () => {
-  const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: any }) => {
+  const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: any; situacao?: string }) => {
     return mount(SubprocessoCards, {
       props
     });
@@ -14,7 +14,8 @@ describe('SubprocessoCards.vue', () => {
     it.each([TipoProcesso.MAPEAMENTO, TipoProcesso.REVISAO])('should render both cards for %s', (tipoProcesso) => {
       const wrapper = mountComponent({
         tipoProcesso,
-        mapa: null
+        mapa: null,
+        situacao: 'Mapa disponibilizado'
       });
 
       expect(wrapper.findAll('.card')).toHaveLength(2);
@@ -25,7 +26,8 @@ describe('SubprocessoCards.vue', () => {
     it('should emit irParaAtividades when atividades card is clicked', async () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
+        situacao: 'Mapa disponibilizado'
       });
 
       const atividadesCard = wrapper.findAll('.card')[0];
@@ -38,7 +40,8 @@ describe('SubprocessoCards.vue', () => {
     it('should emit navegarParaMapa when mapa card is clicked and mapa exists', async () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' }
+        mapa: { situacao: 'em_andamento' },
+        situacao: 'Mapa em andamento'
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -53,7 +56,8 @@ describe('SubprocessoCards.vue', () => {
     it('should disable mapa card when mapa is null', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
+        situacao: 'Mapa disponibilizado'
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -64,7 +68,8 @@ describe('SubprocessoCards.vue', () => {
     it('should enable mapa card when mapa exists', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' }
+        mapa: { situacao: 'em_andamento' },
+        situacao: 'Mapa em andamento'
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -74,7 +79,8 @@ describe('SubprocessoCards.vue', () => {
     it('should show EM_ANDAMENTO badge when mapa situacao is EM_ANDAMENTO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' }
+        mapa: { situacao: 'em_andamento' },
+        situacao: 'Mapa em andamento'
       });
 
       expect(wrapper.text()).toContain('Em andamento');
@@ -84,7 +90,8 @@ describe('SubprocessoCards.vue', () => {
     it('should show DISPONIVEL_VALIDACAO badge when mapa situacao is DISPONIVEL_VALIDACAO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'disponivel_validacao' }
+        mapa: { situacao: 'disponivel_validacao' },
+        situacao: 'Mapa disponibilizado'
       });
 
       expect(wrapper.text()).toContain('Disponibilizado');

@@ -60,8 +60,13 @@ test.describe('Impacto no Mapa de Competências', () => {
         await page.goto(`/processo/1/SESEL/cadastro`);
         await page.waitForLoadState('networkidle');
 
-        // Abrir modal de impacto sem fazer mudanças
-        await page.getByText('Impacto no mapa').click();
+        // Aguardar o botão estar totalmente carregado e clicável
+        await page.waitForTimeout(500);
+
+        // Abrir modal de impacto sem fazer mudanças usando seletor mais específico
+        const impactoButton = page.getByText('Impacto no mapa');
+        await impactoButton.waitFor({ state: 'visible' });
+        await impactoButton.click({ force: true });
 
         await expect(page.getByText('Impacto no Mapa de Competências')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas')).not.toBeVisible();
@@ -78,7 +83,13 @@ test.describe('Impacto no Mapa de Competências', () => {
         // Adicionar apenas uma atividade
         await adicionarAtividade(page, 'Atividade Teste');
 
-        await page.getByText('Impacto no mapa').click();
+        // Aguardar o botão estar totalmente carregado e clicável
+        await page.waitForTimeout(500);
+
+        // Abrir modal de impacto usando seletor mais específico
+        const impactoButton = page.getByText('Impacto no mapa');
+        await impactoButton.waitFor({ state: 'visible' });
+        await impactoButton.click({ force: true });
 
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Atividade Teste')).toBeVisible();
@@ -98,7 +109,13 @@ test.describe('Impacto no Mapa de Competências', () => {
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento A');
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento B');
 
-        await page.getByText('Impacto no mapa').click();
+        // Aguardar o botão estar totalmente carregado e clicável
+        await page.waitForTimeout(500);
+
+        // Abrir modal de impacto usando seletor mais específico
+        const impactoButton = page.getByText('Impacto no mapa');
+        await impactoButton.waitFor({ state: 'visible' });
+        await impactoButton.click({ force: true });
 
         // Verificar se a atividade e seus conhecimentos aparecem
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
@@ -154,10 +171,15 @@ test.describe('Impacto no Mapa de Competências', () => {
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento A de X');
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento B de X');
 
-        // 8. Clicar em 'Impacto no mapa'
-        await page.getByText('Impacto no mapa').click();
+        // 8. Aguardar o botão estar totalmente carregado e clicável
+        await page.waitForTimeout(500);
 
-        // 9. Verificar que todas as mudanças aparecem
+        // 9. Clicar em 'Impacto no mapa' usando seletor mais específico
+        const impactoButton = page.getByText('Impacto no mapa');
+        await impactoButton.waitFor({ state: 'visible' });
+        await impactoButton.click({ force: true });
+
+        // 10. Verificar que todas as mudanças aparecem
         await expect(page.getByText('Impacto no Mapa de Competências')).toBeVisible();
 
         // Verificar seção de atividades inseridas

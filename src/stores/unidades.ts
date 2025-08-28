@@ -33,6 +33,27 @@ export const useUnidadesStore = defineStore('unidades', {
             }
 
             return unidadesEncontradas;
+        },
+        getUnidadeSuperior(siglaUnidade: string): string | null {
+            const findSuperior = (unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null => {
+                for (const unidade of unidades) {
+                    if (unidade.sigla === targetSigla) {
+                        return parentSigla;
+                    }
+                    if (unidade.filhas) {
+                        const superior = findSuperior(unidade.filhas, targetSigla, unidade.sigla);
+                        if (superior !== null) {
+                            return superior;
+                        }
+                    }
+                }
+                return null;
+            };
+
+            return findSuperior(this.unidades, siglaUnidade);
+        },
+        getUnidadeImediataSuperior(siglaUnidade: string): string | null {
+            return this.getUnidadeSuperior(siglaUnidade);
         }
     }
 })

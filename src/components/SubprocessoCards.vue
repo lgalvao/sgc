@@ -19,11 +19,17 @@
             <h5 class="card-title">Mapa de Competências</h5>
             <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>
             <div v-if="mapa">
-              <div v-if="mapa.situacao === SITUACOES_MAPA.EM_ANDAMENTO">
-                <span class="badge bg-warning text-dark">{{ LABELS_SITUACAO[SITUACOES_MAPA.EM_ANDAMENTO] }}</span>
+              <div v-if="situacao === 'Mapa em andamento'">
+                <span class="badge bg-warning text-dark">Em andamento</span>
               </div>
-              <div v-else-if="mapa.situacao === SITUACOES_MAPA.DISPONIVEL_VALIDACAO">
-                <span class="badge bg-success">{{ LABELS_SITUACAO[SITUACOES_MAPA.DISPONIVEL_VALIDACAO] }}</span>
+              <div v-else-if="situacao === 'Mapa disponibilizado'">
+                <span class="badge bg-success">Disponibilizado</span>
+              </div>
+              <div v-else-if="situacao">
+                <span class="badge bg-secondary">{{ situacao }}</span>
+              </div>
+              <div v-else>
+                <span class="badge bg-secondary">Disponibilizado</span>
               </div>
             </div>
             <div v-else>
@@ -69,6 +75,7 @@ import { SITUACOES_MAPA, LABELS_SITUACAO } from '@/constants/situacoes';
 interface Props {
   tipoProcesso: TipoProcesso;
   mapa: Mapa | null;
+  situacao?: string;
 }
 
 defineProps<Props>();

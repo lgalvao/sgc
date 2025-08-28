@@ -3,11 +3,11 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6">Mapa de competências técnicas</div>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" title="Devolver para ajustes" @click="devolverCadastro">
+        <button class="btn btn-outline-secondary" title="Devolver para ajustes" @click="rejeitarMapa">
           Devolver para ajustes
         </button>
-        <button class="btn btn-outline-success" title="Validar" @click="validarCadastro">
-          Validar
+        <button class="btn btn-outline-success" title="Aceitar" @click="abrirModalAceitar">
+          Aceitar
         </button>
       </div>
     </div>
@@ -49,26 +49,39 @@
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
+
+    <AceitarMapaModal
+      :mostrarModal="mostrarModalAceitar"
+      @fecharModal="fecharModalAceitar"
+      @confirmarAceitacao="confirmarAceitacao"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {useRoute} from 'vue-router'
+import {computed, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 
 import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
+import {useNotificacoesStore} from "@/stores/notificacoes";
 import {Atividade, Competencia, Conhecimento, Unidade} from '@/types/tipos';
+import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
+const router = useRouter()
 const sigla = computed(() => route.params.siglaUnidade as string)
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
+const notificacoesStore = useNotificacoesStore()
+
+// Estados reativos para o modal
+const mostrarModalAceitar = ref(false)
 
 const unidade = computed<Unidade | null>(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
@@ -111,14 +124,73 @@ function getConhecimentosAtividade(id: number): Conhecimento[] {
   return atividade ? atividade.conhecimentos : []
 }
 
-function validarCadastro() {
-  // Lógica para validar o cadastro
-
+function abrirModalAceitar() {
+  mostrarModalAceitar.value = true
 }
 
-function devolverCadastro() {
-  // Lógica para devolver o cadastro
+function fecharModalAceitar() {
+  mostrarModalAceitar.value = false
+}
 
+async function confirmarAceitacao(observacao: string) {
+  try {
+    await processosStore.aceitarMapa({
+      idProcesso: idProcesso.value,
+      unidade: sigla.value,
+      observacao: observacao || undefined
+    })
+
+    fecharModalAceitar()
+
+    // Determinar mensagem baseada na unidade superior
+    const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(sigla.value)
+    let mensagem = 'Mapa aceito e submetido para análise da unidade superior'
+    if (unidadeSuperior === 'SEDOC') {
+      mensagem = 'Mapa homologado'
+    }
+
+    notificacoesStore.sucesso('Mapa aceito', mensagem)
+
+    // Redirecionar para a tela de detalhes do subprocesso
+    router.push({
+      name: 'Subprocesso',
+      params: { idProcesso: idProcesso.value, siglaUnidade: sigla.value }
+    })
+
+  } catch (error) {
+    console.error('Erro ao aceitar mapa:', error)
+    notificacoesStore.erro(
+      'Erro ao aceitar mapa',
+      'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
+    )
+  }
+}
+
+async function rejeitarMapa() {
+  try {
+    await processosStore.rejeitarMapa({
+      idProcesso: idProcesso.value,
+      unidade: sigla.value
+    })
+
+    notificacoesStore.sucesso(
+      'Mapa devolvido',
+      'Mapa devolvido à unidade subordinada, para ajustes'
+    )
+
+    // Redirecionar para a tela de detalhes do subprocesso
+    router.push({
+      name: 'Subprocesso',
+      params: { idProcesso: idProcesso.value, siglaUnidade: sigla.value }
+    })
+
+  } catch (error) {
+    console.error('Erro ao rejeitar mapa:', error)
+    notificacoesStore.erro(
+      'Erro ao devolver mapa',
+      'Ocorreu um erro ao devolver o mapa. Tente novamente.'
+    )
+  }
 }
 </script>
 
