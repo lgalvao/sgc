@@ -1,5 +1,4 @@
-import {expect, Page, test} from "@playwright/test";
-import {login} from "./utils/auth";
+import {expect, test, Locator} from "@playwright/test";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
@@ -7,7 +6,7 @@ async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await expect(page.locator('.atividade-card', {hasText: nomeAtividade})).toBeVisible();
 }
 
-async function adicionarConhecimento(page: Page, atividadeCard: any, nomeConhecimento: string) {
+async function adicionarConhecimento(page: Page, atividadeCard: Locator, nomeConhecimento: string) {
     await atividadeCard.locator('[data-testid="input-novo-conhecimento"]').fill(nomeConhecimento);
     await atividadeCard.locator('[data-testid="btn-adicionar-conhecimento"]').click();
     await expect(atividadeCard.locator('.group-conhecimento', {hasText: nomeConhecimento})).toBeVisible();

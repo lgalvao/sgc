@@ -163,7 +163,7 @@ test.describe('CDU-21 - Analisar validação de mapa de competências', () => {
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
     });
 
-    test('deve mostrar mensagem de validação quando superior não é SEDOC', async ({page}) => {
+    test('deve mostrar mensagem de validação quando superior não é SEDOC', async () => {
         // Este teste verifica o fluxo de validação intermediária
         // Quando o superior não é SEDOC, deve mostrar "Mapa aceito e submetido para análise da unidade superior"
         test.skip();

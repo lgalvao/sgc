@@ -1,10 +1,7 @@
-package sgc.modelo.acomp;
+package sgc.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import sgc.modelo.pessoas.Unidade;
-import sgc.modelo.base.EntidadeBase;
-import sgc.modelo.base.Subprocesso;
 
 import java.time.LocalDateTime;
 

@@ -76,8 +76,8 @@ const { processosFiltrados } = useProcessosFiltrados();
 
 const processosOrdenados = computed<Processo[]>(() => {
   return [...processosFiltrados.value].sort((a, b) => {
-    let valA: any = a[criterio.value as keyof Processo]
-    let valB: any = b[criterio.value as keyof Processo]
+    let valA: string | number | Date | null = a[criterio.value as keyof Processo]
+    let valB: string | number | Date | null = b[criterio.value as keyof Processo]
 
     if (criterio.value === 'unidades') {
       valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidade).join(', ')

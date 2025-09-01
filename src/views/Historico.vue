@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
+
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
 import {Perfil, Processo, Subprocesso} from '@/types/tipos'
@@ -30,7 +30,7 @@ type SortCriteria = 'descricao' | 'tipo' | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
-const {processos} = storeToRefs(processosStore)
+
 const perfil = usePerfilStore()
 
 const criterio = ref<SortCriteria>('descricao')
@@ -40,8 +40,8 @@ const {processosFiltrados} = useProcessosFiltrados(ref(true));
 
 const processosFinalizadosOrdenados = computed(() => {
   return [...processosFiltrados.value].sort((a: Processo, b: Processo) => {
-    let valA: any;
-    let valB: any;
+    let valA: string | number | null;
+    let valB: string | number | null;
 
     if (criterio.value === 'unidades') {
       valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
@@ -96,7 +96,7 @@ function abrirProcesso(processo: Processo) {
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
     console.log('Navegando para /processo/' + processo.id); // LOG
     // Usar name e params explicitamente, garantindo que apenas idProcesso seja passado
-    router.push({name: 'Processo', params: {idProcesso: processo.id as any}}); // <-- Alterado aqui
+    router.push({name: 'Processo', params: {idProcesso: processo.id.toString()}}); // <-- Alterado aqui
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     console.log('Navegando para /subprocesso/' + processo.id + '/' + siglaUnidade); // LOG

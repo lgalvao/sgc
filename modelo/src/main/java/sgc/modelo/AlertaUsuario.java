@@ -1,11 +1,9 @@
-package sgc.modelo.acomp;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import sgc.modelo.pessoas.Usuario;
-import sgc.modelo.base.EntidadeBase;
 
 @Getter
 @Entity

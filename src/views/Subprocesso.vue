@@ -168,7 +168,7 @@ const mapa = computed<Mapa | null>(() => {
 // Computed para verificar se o subprocesso está em andamento
 const isSubprocessoEmAndamento = computed(() => {
   if (!SubprocessoDetalhes.value) return false;
-  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao as any);
+  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao);
 });
 
 // Computed para identificar a etapa atual e sua data limite

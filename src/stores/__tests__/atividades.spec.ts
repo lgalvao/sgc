@@ -201,7 +201,7 @@ describe('useAtividadesStore', () => {
 
                 atividadesDoProcesso.forEach((novaAtividade: Atividade) => {
                     if (!testAtividadesStore.atividades.some((a: Atividade) => a.id === novaAtividade.id)) {
-                        (this as any).atividades.push(novaAtividade);
+                        this.atividades.push(novaAtividade);
                     }
                 });
             });

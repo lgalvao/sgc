@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import lombok.Getter;
 

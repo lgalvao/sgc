@@ -198,7 +198,7 @@ describe('NotificacaoContainer.vue', () => {
             const wrapper = mountComponent();
 
             // Access the component's iconeTipo method
-            const vm = wrapper.vm as any;
+            const vm = wrapper.vm as InstanceType<typeof NotificacaoContainer>;
 
             expect(vm.iconeTipo('success')).toBe('bi bi-check-circle-fill text-success');
             expect(vm.iconeTipo('error')).toBe('bi bi-exclamation-triangle-fill text-danger');

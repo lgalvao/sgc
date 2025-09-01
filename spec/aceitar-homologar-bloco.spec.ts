@@ -1,6 +1,6 @@
-import {expect, test} from "@playwright/test";
+import {expect, test, Page} from "@playwright/test";
 
-export async function loginComoUsuario(page: any, titulo: string, senha: string, perfil?: string) {
+export async function loginComoUsuario(page: Page, titulo: string, senha: string, perfil?: string) {
     await page.goto('/');
     await page.getByLabel('Título eleitoral').fill(titulo);
     await page.getByLabel('Senha').fill(senha);

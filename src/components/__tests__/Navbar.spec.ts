@@ -5,10 +5,10 @@ import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
 import {ref} from 'vue';
 import {useServidoresStore} from '@/stores/servidores';
-import {Perfil} from "@/types/tipos";
+import {Perfil, Servidor} from "@/types/tipos";
 
 // Mock do composable usePerfil
-const mockServidorLogadoRef = ref<any>({});
+const mockServidorLogadoRef = ref<Servidor | {}>({});
 const mockPerfilSelecionadoRef = ref('');
 const mockUnidadeSelecionadaRef = ref('');
 const mockGetPerfisDoServidor = vi.fn();
@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
 describe('Navbar.vue', () => {
     let router: ReturnType<typeof createRouter>;
     let pinia: ReturnType<typeof createPinia>;
-    let pushSpy: MockInstance<any>;
+    let pushSpy: MockInstance<[string], Promise<void>>;
 
     beforeEach(() => {
         pinia = createPinia();

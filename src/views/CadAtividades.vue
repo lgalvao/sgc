@@ -124,7 +124,7 @@
         :mostrar="mostrarModalImportar"
         @fechar="mostrarModalImportar = false"
         @importar="handleImportAtividades"/>
-    
+
     <ImpactoMapaModal
         :id-processo="idProcesso"
         :mostrar="mostrarModalImpacto"
@@ -135,7 +135,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
-import {Modal} from 'bootstrap'
+
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -217,7 +217,7 @@ const atividades = computed<AtividadeComEdicao[]>({
   set: (val: AtividadeComEdicao[]) => {
     if (idSubprocesso.value === undefined) return
     const storeVal = val.map(a => {
-      const {novoConhecimento, ...rest} = a
+      const {novoConhecimento: _, ...rest} = a
       return rest
     })
     atividadesStore.setAtividades(idSubprocesso.value, storeVal)
@@ -225,85 +225,85 @@ const atividades = computed<AtividadeComEdicao[]>({
 })
 
 function adicionarAtividade() {
-   console.log('CadAtividades: Função adicionarAtividade() executada!'); // Este log aparece
-   console.log('CadAtividades: novaAtividade.value:', novaAtividade.value); // Adicionado para depuração
-   console.log('CadAtividades: idSubprocesso.value:', idSubprocesso.value); // Adicionado para depuração
+  console.log('CadAtividades: Função adicionarAtividade() executada!'); // Este log aparece
+  console.log('CadAtividades: novaAtividade.value:', novaAtividade.value); // Adicionado para depuração
+  console.log('CadAtividades: idSubprocesso.value:', idSubprocesso.value); // Adicionado para depuração
 
-   if (novaAtividade.value && idSubprocesso.value !== undefined) {
-     const novaAtividadeObj = {
-       id: Date.now(),
-       descricao: novaAtividade.value,
-       idSubprocesso: idSubprocesso.value,
-       conhecimentos: [],
-     };
-     atividadesStore.adicionarAtividade(novaAtividadeObj);
-     revisaoStore.registrarMudanca({
-       tipo: TipoMudanca.AtividadeAdicionada,
-       idAtividade: novaAtividadeObj.id,
-       descricaoAtividade: novaAtividadeObj.descricao,
-     });
-     console.log('CadAtividades: Após registrar mudança:', revisaoStore.mudancasRegistradas); // Adicionado para depuração
+  if (novaAtividade.value && idSubprocesso.value !== undefined) {
+    const novaAtividadeObj = {
+      id: Date.now(),
+      descricao: novaAtividade.value,
+      idSubprocesso: idSubprocesso.value,
+      conhecimentos: [],
+    };
+    atividadesStore.adicionarAtividade(novaAtividadeObj);
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.AtividadeAdicionada,
+      idAtividade: novaAtividadeObj.id,
+      descricaoAtividade: novaAtividadeObj.descricao,
+    });
+    console.log('CadAtividades: Após registrar mudança:', revisaoStore.mudancasRegistradas); // Adicionado para depuração
 
-     // Notificação de sucesso
-     notificacoesStore.sucesso(
-       'Atividade adicionada',
-       `A atividade "${novaAtividade.value}" foi adicionada com sucesso!`
-     );
+    // Notificação de sucesso
+    notificacoesStore.sucesso(
+        'Atividade adicionada',
+        `A atividade "${novaAtividade.value}" foi adicionada com sucesso!`
+    );
 
-     novaAtividade.value = '';
-   }
+    novaAtividade.value = '';
+  }
 }
 
 function removerAtividade(idx: number) {
-   const atividadeRemovida = atividades.value[idx];
-   const impactedCompetencyIds = getImpactedCompetencyIds(atividadeRemovida.id);
-   atividadesStore.removerAtividade(atividadeRemovida.id);
-   revisaoStore.registrarMudanca({
-     tipo: TipoMudanca.AtividadeRemovida,
-     idAtividade: atividadeRemovida.id,
-     descricaoAtividade: atividadeRemovida.descricao,
-     competenciasImpactadasIds: impactedCompetencyIds,
-   });
+  const atividadeRemovida = atividades.value[idx];
+  const impactedCompetencyIds = getImpactedCompetencyIds(atividadeRemovida.id);
+  atividadesStore.removerAtividade(atividadeRemovida.id);
+  revisaoStore.registrarMudanca({
+    tipo: TipoMudanca.AtividadeRemovida,
+    idAtividade: atividadeRemovida.id,
+    descricaoAtividade: atividadeRemovida.descricao,
+    competenciasImpactadasIds: impactedCompetencyIds,
+  });
 
-   // Notificação de sucesso
-   notificacoesStore.sucesso(
-     'Atividade removida',
-     `A atividade "${atividadeRemovida.descricao}" foi removida com sucesso!`
-   );
+  // Notificação de sucesso
+  notificacoesStore.sucesso(
+      'Atividade removida',
+      `A atividade "${atividadeRemovida.descricao}" foi removida com sucesso!`
+  );
 }
 
 function adicionarConhecimento(idx: number) {
-   const atividade = atividades.value[idx];
-   if (atividade.novoConhecimento?.trim()) {
-     const novoConhecimentoObj = {
-       id: Date.now(),
-       descricao: atividade.novoConhecimento
-     };
-     const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
-     atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, impactedCompetencyIds);
+  const atividade = atividades.value[idx];
+  if (atividade.novoConhecimento?.trim()) {
+    const novoConhecimentoObj = {
+      id: Date.now(),
+      descricao: atividade.novoConhecimento
+    };
+    const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
+    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, impactedCompetencyIds);
 
-     // Notificação de sucesso
-     notificacoesStore.sucesso(
-       'Conhecimento adicionado',
-       `O conhecimento "${atividade.novoConhecimento}" foi adicionado com sucesso!`
-     );
+    // Notificação de sucesso
+    notificacoesStore.sucesso(
+        'Conhecimento adicionado',
+        `O conhecimento "${atividade.novoConhecimento}" foi adicionado com sucesso!`
+    );
 
-     // Limpar o campo
-     atividade.novoConhecimento = '';
-   }
+    // Limpar o campo
+    atividade.novoConhecimento = '';
+  }
 }
 
 function removerConhecimento(idx: number, cidx: number) {
-   const atividade = atividades.value[idx];
-   const conhecimentoRemovido = atividade.conhecimentos[cidx];
-   const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
-   atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, impactedCompetencyIds);
+  const atividade = atividades.value[idx];
+  const conhecimentoRemovido = atividade.conhecimentos[cidx];
+  const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
+  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, impactedCompetencyIds);
 
-   // Notificação de sucesso
-   notificacoesStore.sucesso(
-     'Conhecimento removido',
-     `O conhecimento "${conhecimentoRemovido.descricao}" foi removido com sucesso!`
-   );
+  // Notificação de sucesso
+  notificacoesStore.sucesso(
+      'Conhecimento removido',
+      `O conhecimento "${conhecimentoRemovido.descricao}" foi removido com sucesso!`
+  );
 }
 
 const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
@@ -318,37 +318,37 @@ function iniciarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number
 }
 
 function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number) {
-   if (conhecimentoEditado.value) {
-     const newAtividades = [...atividades.value];
-     const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos];
-     const conhecimentoOriginal = newConhecimentos[idxConhecimento];
-     const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
+  if (conhecimentoEditado.value) {
+    const newAtividades = [...atividades.value];
+    const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos];
+    const conhecimentoOriginal = newConhecimentos[idxConhecimento];
+    const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
 
-     // Get impacted competencies before updating the store
-     const impactedCompetencyIds = getImpactedCompetencyIds(newAtividades[idxAtividade].id);
+    // Get impacted competencies before updating the store
+    const impactedCompetencyIds = getImpactedCompetencyIds(newAtividades[idxAtividade].id);
 
-     newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
-     newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
-     atividades.value = newAtividades;
+    newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
+    newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
+    atividades.value = newAtividades;
 
-     revisaoStore.registrarMudanca({
-       tipo: TipoMudanca.ConhecimentoAlterado,
-       idAtividade: newAtividades[idxAtividade].id,
-       idConhecimento: newConhecimentos[idxConhecimento].id,
-       descricaoAtividade: newAtividades[idxAtividade].descricao,
-       descricaoConhecimento: conhecimentoEditado.value,
-       valorAntigo: valorAntigo,
-       valorNovo: conhecimentoEditado.value,
-       competenciasImpactadasIds: impactedCompetencyIds,
-     });
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.ConhecimentoAlterado,
+      idAtividade: newAtividades[idxAtividade].id,
+      idConhecimento: newConhecimentos[idxConhecimento].id,
+      descricaoAtividade: newAtividades[idxAtividade].descricao,
+      descricaoConhecimento: conhecimentoEditado.value,
+      valorAntigo: valorAntigo,
+      valorNovo: conhecimentoEditado.value,
+      competenciasImpactadasIds: impactedCompetencyIds,
+    });
 
-     // Notificação de sucesso
-     notificacoesStore.sucesso(
-       'Conhecimento editado',
-       `O conhecimento foi alterado para "${conhecimentoEditado.value}" com sucesso!`
-     );
-   }
-   cancelarEdicaoConhecimento()
+    // Notificação de sucesso
+    notificacoesStore.sucesso(
+        'Conhecimento editado',
+        `O conhecimento foi alterado para "${conhecimentoEditado.value}" com sucesso!`
+    );
+  }
+  cancelarEdicaoConhecimento()
 }
 
 function cancelarEdicaoConhecimento() {
@@ -365,36 +365,36 @@ function iniciarEdicaoAtividade(id: number, valorAtual: string) {
 }
 
 function salvarEdicaoAtividade(id: number) {
-   if (String(atividadeEditada.value).trim()) {
-     const newAtividades = [...atividades.value];
-     const atividadeIndex = newAtividades.findIndex(a => a.id === id);
-     if (atividadeIndex !== -1) {
-       const atividadeOriginal = atividadesStore.atividades.find(a => a.id === id);
-       const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
+  if (String(atividadeEditada.value).trim()) {
+    const newAtividades = [...atividades.value];
+    const atividadeIndex = newAtividades.findIndex(a => a.id === id);
+    if (atividadeIndex !== -1) {
+      const atividadeOriginal = atividadesStore.atividades.find(a => a.id === id);
+      const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
 
-       // Get impacted competencies before updating the store
-       const impactedCompetencyIds = getImpactedCompetencyIds(id);
+      // Get impacted competencies before updating the store
+      const impactedCompetencyIds = getImpactedCompetencyIds(id);
 
-       newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
-       atividades.value = newAtividades;
+      newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
+      atividades.value = newAtividades;
 
-       revisaoStore.registrarMudanca({
-         tipo: TipoMudanca.AtividadeAlterada,
-         idAtividade: id,
-         descricaoAtividade: String(atividadeEditada.value),
-         valorAntigo: valorAntigo,
-         valorNovo: String(atividadeEditada.value),
-         competenciasImpactadasIds: impactedCompetencyIds,
-       });
+      revisaoStore.registrarMudanca({
+        tipo: TipoMudanca.AtividadeAlterada,
+        idAtividade: id,
+        descricaoAtividade: String(atividadeEditada.value),
+        valorAntigo: valorAntigo,
+        valorNovo: String(atividadeEditada.value),
+        competenciasImpactadasIds: impactedCompetencyIds,
+      });
 
-       // Notificação de sucesso
-       notificacoesStore.sucesso(
-         'Atividade editada',
-         `A atividade foi alterada para "${atividadeEditada.value}" com sucesso!`
-       );
-     }
-   }
-   cancelarEdicaoAtividade()
+      // Notificação de sucesso
+      notificacoesStore.sucesso(
+          'Atividade editada',
+          `A atividade foi alterada para "${atividadeEditada.value}" com sucesso!`
+      );
+    }
+  }
+  cancelarEdicaoAtividade()
 }
 
 function cancelarEdicaoAtividade() {
@@ -403,20 +403,20 @@ function cancelarEdicaoAtividade() {
 }
 
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
-   if (idSubprocesso.value === undefined) return;
+  if (idSubprocesso.value === undefined) return;
 
-   const novasAtividades = atividadesImportadas.map(atividade => ({
-     ...atividade,
-     idSubprocesso: idSubprocesso.value as number,
-   }));
+  const novasAtividades = atividadesImportadas.map(atividade => ({
+    ...atividade,
+    idSubprocesso: idSubprocesso.value as number,
+  }));
 
-   atividadesStore.adicionarMultiplasAtividades(novasAtividades);
+  atividadesStore.adicionarMultiplasAtividades(novasAtividades);
 
-   // Notificação de sucesso
-   notificacoesStore.sucesso(
-     'Atividades importadas',
-     `${novasAtividades.length} atividade(s) foi(ram) importada(s) com sucesso!`
-   );
+  // Notificação de sucesso
+  notificacoesStore.sucesso(
+      'Atividades importadas',
+      `${novasAtividades.length} atividade(s) foi(ram) importada(s) com sucesso!`
+  );
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -430,7 +430,7 @@ const unidadesParticipantes = ref<Subprocesso[]>([])
 const unidadeSelecionada = ref<Subprocesso | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
-const atividadesSelecionadas = ref<Atividade[]>([])
+
 const mostrarModalImpacto = ref(false)
 const mostrarModalImportar = ref(false)
 
@@ -492,15 +492,7 @@ const processosDisponiveis = computed<Processo[]>(() => {
 })
 
 // Funções do modal
-function resetModal() {
-  processoSelecionado.value = null
-  processoSelecionadoId.value = null
-  unidadesParticipantes.value = []
-  unidadeSelecionada.value = null
-  unidadeSelecionadaId.value = null
-  atividadesParaImportar.value = []
-  atividadesSelecionadas.value = []
-}
+
 
 function selecionarProcesso(processo: Processo | null) {
   processoSelecionado.value = processo
@@ -520,25 +512,15 @@ async function selecionarUnidade(unidadePu: Subprocesso | null) {
   }
 }
 
-function importarAtividades() {
-  handleImportAtividades(atividadesSelecionadas.value)
-  // Fechar o modal
-  const modalElement = document.getElementById('importarAtividadesModal')
-  if (modalElement) {
-    const modal = Modal.getInstance(modalElement) || new Modal(modalElement)
-    modal.hide()
-  }
-  resetModal()
-}
 
 function disponibilizarCadastro() {
-   // Simulação de disponibilização do cadastro
-   // Em um sistema real, isso enviaria os dados para validação
+  // Simulação de disponibilização do cadastro
+  // Em um sistema real, isso enviaria os dados para validação
 
-   notificacoesStore.sucesso(
-     'Cadastro disponibilizado',
-     'O cadastro de atividades e conhecimentos foi disponibilizado para validação com sucesso!'
-   );
+  notificacoesStore.sucesso(
+      'Cadastro disponibilizado',
+      'O cadastro de atividades e conhecimentos foi disponibilizado para validação com sucesso!'
+  );
 }
 
 function abrirModalImpacto() {
@@ -555,11 +537,6 @@ function fecharModalImpacto() {
 </script>
 
 <style>
-.atividades-container {
-  max-height: 250px;
-  overflow-y: auto;
-}
-
 .atividade-edicao-input {
   flex-grow: 1;
   min-width: 0;

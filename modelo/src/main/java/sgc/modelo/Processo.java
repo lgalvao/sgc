@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

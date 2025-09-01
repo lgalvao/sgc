@@ -68,13 +68,13 @@ describe('useProcessosStore', () => {
     let processosStore: ReturnType<typeof useProcessosStore>;
 
     // Helper to parse dates in mock data for comparison
-    const parseProcessoDates = (processo: any): Processo => ({
+    const parseProcessoDates = (processo: { dataLimite: string, dataFinalizacao?: string | null }): Processo => ({
         ...processo,
         dataLimite: new Date(processo.dataLimite),
         dataFinalizacao: processo.dataFinalizacao ? new Date(processo.dataFinalizacao) : null,
     });
 
-    const parsesubprocessoDates = (pu: any): Subprocesso => ({
+    const parsesubprocessoDates = (pu: { dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null }): Subprocesso => ({
         ...pu,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,

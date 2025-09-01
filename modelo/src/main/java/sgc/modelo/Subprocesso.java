@@ -1,8 +1,7 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import sgc.modelo.pessoas.Unidade;
 
 import java.time.LocalDate;
 
@@ -15,6 +14,9 @@ public class Subprocesso extends EntidadeBase {
 
     @ManyToOne
     Unidade unidade;
+
+    @OneToOne
+    Mapa mapa;
 
     @Enumerated(EnumType.STRING)
     SituacaoSubprocesso situacao;

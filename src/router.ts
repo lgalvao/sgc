@@ -147,7 +147,7 @@ const router = createRouter({
 });
 
 router.afterEach((to) => {
-    const meta: any = to.meta || {}
+    const meta = to.meta || {}
     const titleBase = typeof meta.title === 'string' ? meta.title : (to.name as string) || 'SGC'
     document.title = `${titleBase} - SGC`
 })

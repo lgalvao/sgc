@@ -3,12 +3,12 @@ import mapasData from '../mocks/mapas.json' assert {type: 'json'};
 import type {Mapa} from '@/types/tipos'
 import { parseDate } from '@/utils/dateUtils'
 
-function parseMapaDates(mapa: any): Mapa {
+function parseMapaDates(mapa: Omit<Mapa, 'dataCriacao' | 'dataDisponibilizacao' | 'dataFinalizacao'> & { dataCriacao: string, dataDisponibilizacao?: string | null, dataFinalizacao?: string | null }): Mapa {
     return {
         ...mapa,
         dataCriacao: parseDate(mapa.dataCriacao) || new Date(),
-        dataDisponibilizacao: parseDate(mapa.dataDisponibilizacao),
-        dataFinalizacao: parseDate(mapa.dataFinalizacao),
+        dataDisponibilizacao: mapa.dataDisponibilizacao ? parseDate(mapa.dataDisponibilizacao) : null,
+        dataFinalizacao: mapa.dataFinalizacao ? parseDate(mapa.dataFinalizacao) : null,
     };
 }
 

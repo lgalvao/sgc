@@ -1,17 +1,20 @@
-package sgc.modelo.pessoas;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import sgc.modelo.base.EntidadeBase;
 
 @Getter
 @Entity
 @Table(name = "USUARIO")
-public class Usuario extends EntidadeBase {
+public class Usuario {
+    @Id
+    String titulo;
+
     @ManyToOne
-    Unidade unidadeLotacao;
+    Unidade unidade;
 
     String nome;
     String email;

@@ -33,8 +33,9 @@ interface TreeItem {
   id: number | string;
   expanded?: boolean;
   children?: TreeItem[];
+  clickable?: boolean;
 
-  [key: string]: any; // Para permitir acesso a propriedades dinâmicas como item[column.key]
+  [key: string]: string | number | boolean | TreeItem[] | undefined; // Para permitir acesso a propriedades dinâmicas como item[column.key]
 }
 
 const props = withDefaults(defineProps<{
@@ -53,7 +54,7 @@ const emit = defineEmits(['toggle', 'row-click']);
 const toggleExpand = (id: number | string) => emit('toggle', id);
 
 const handleRowClick = () => {
-  if (!(props.item as any).clickable) return;
+  if (!props.item.clickable) return;
   emit('row-click', props.item);
 };
 

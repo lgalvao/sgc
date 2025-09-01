@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import SubprocessoCards from '../SubprocessoCards.vue';
-import { TipoProcesso } from '@/types/tipos';
+import { TipoProcesso, Mapa } from '@/types/tipos';
 
 describe('SubprocessoCards.vue', () => {
-  const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: any; situacao?: string }) => {
+  const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: Mapa | null; situacao?: string }) => {
     return mount(SubprocessoCards, {
       props
     });

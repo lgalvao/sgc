@@ -1,10 +1,9 @@
-package sgc.modelo.pessoas;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import sgc.modelo.base.EntidadeBase;
 
 import java.time.LocalDate;
 

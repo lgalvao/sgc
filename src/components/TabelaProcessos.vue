@@ -45,7 +45,7 @@
 import { defineProps, defineEmits } from 'vue';
 import { Processo } from '@/types/tipos';
 
-const props = defineProps<{
+defineProps<{
   processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
   criterioOrdenacao: keyof Processo | 'unidades' | 'dataFinalizacao';
   direcaoOrdenacaoAsc: boolean;

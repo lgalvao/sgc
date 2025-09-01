@@ -19,7 +19,7 @@ export async function login(page: Page) {
 
     try {
         await seletorDePerfil.waitFor({state: 'visible', timeout: 1500});
-    } catch (e) {
+    } catch {
         // Seletor não apareceu, significa que é um usuário com perfil único. Segue o fluxo.
     }
 

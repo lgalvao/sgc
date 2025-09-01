@@ -1,9 +1,8 @@
-package sgc.modelo.pessoas;
+package sgc.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import sgc.modelo.base.EntidadeBase;
 
 import java.time.LocalDateTime;
 

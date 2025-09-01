@@ -1,4 +1,4 @@
-package sgc.modelo.pessoas;
+package sgc.modelo;
 
 public enum TipoResponsabilidade {
     TITULAR,

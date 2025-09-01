@@ -1,9 +1,8 @@
-package sgc.modelo.config;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import sgc.modelo.base.EntidadeBase;
 
 @Getter
 @Entity

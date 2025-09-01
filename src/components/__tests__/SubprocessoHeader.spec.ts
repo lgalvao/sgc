@@ -153,7 +153,7 @@ describe('SubprocessoHeader.vue', () => {
         situacao: 'EM_ANDAMENTO'
       });
 
-      const vm = wrapper.vm as any;
+      const vm = wrapper.vm as InstanceType<typeof SubprocessoHeader>;
       const badgeClass = vm.badgeClass('EM_ANDAMENTO');
 
       // Since we can't easily mock the constants, we'll test that the function exists and returns a string
@@ -164,7 +164,7 @@ describe('SubprocessoHeader.vue', () => {
     it('should return default class for unknown situacao', () => {
       const wrapper = mountComponent();
 
-      const vm = wrapper.vm as any;
+      const vm = wrapper.vm as InstanceType<typeof SubprocessoHeader>;
       const badgeClass = vm.badgeClass('UNKNOWN_SITUACAO');
 
       expect(badgeClass).toBe('bg-secondary');
@@ -177,21 +177,21 @@ describe('SubprocessoHeader.vue', () => {
       const wrapperAdmin = mountComponent({
         perfilUsuario: Perfil.ADMIN
       });
-      const vmAdmin = wrapperAdmin.vm as any;
+      const vmAdmin = wrapperAdmin.vm as InstanceType<typeof SubprocessoHeader>;
       expect(vmAdmin.mostrarBotaoAlterarData).toBe(true);
 
       // Test non-ADMIN user
       const wrapperGestor = mountComponent({
         perfilUsuario: Perfil.GESTOR
       });
-      const vmGestor = wrapperGestor.vm as any;
+      const vmGestor = wrapperGestor.vm as InstanceType<typeof SubprocessoHeader>;
       expect(vmGestor.mostrarBotaoAlterarData).toBe(false);
 
       // Test null perfil
       const wrapperNull = mountComponent({
         perfilUsuario: null
       });
-      const vmNull = wrapperNull.vm as any;
+      const vmNull = wrapperNull.vm as InstanceType<typeof SubprocessoHeader>;
       expect(vmNull.mostrarBotaoAlterarData).toBe(false);
     });
   });

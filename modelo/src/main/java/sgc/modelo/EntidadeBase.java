@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,5 +15,5 @@ import java.io.Serializable;
 public abstract class EntidadeBase implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Integer id;
+    protected Integer codigo;
 }

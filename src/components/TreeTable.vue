@@ -50,7 +50,7 @@ interface TreeItem {
   expanded?: boolean;
   children?: TreeItem[];
 
-  [key: string]: any; // Para permitir outras propriedades nos itens da árvore
+  [key: string]: string | number | boolean | TreeItem[] | undefined; // Para permitir outras propriedades nos itens da árvore
 }
 
 interface Column {

@@ -209,7 +209,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
 const idSubprocesso = computed(() => {
   const Subprocesso = processosStore.subprocessos.find(
-      (pu: any) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
+      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
   return Subprocesso?.id;
 });

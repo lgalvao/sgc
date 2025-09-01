@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -10,13 +10,13 @@ import java.util.Set;
 
 @Getter
 @Entity
-@Table(name = "COMPETENCIA")
-public class Competencia extends EntidadeBase {
+@Table(name = "ATIVIDADE")
+public class Atividade extends EntidadeBase {
     @ManyToOne
     Mapa mapa;
 
     String descricao;
 
-    @ManyToMany
-    Set<Atividade> atividades;
+    @ManyToMany(mappedBy = "atividades")
+    Set<Competencia> competencias;
 }

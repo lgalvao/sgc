@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 public enum TipoProcesso {
     MAPEAMENTO,

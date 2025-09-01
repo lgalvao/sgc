@@ -1,7 +1,6 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
@@ -11,9 +10,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "MAPA")
 public class Mapa extends EntidadeBase {
-    @ManyToOne
-    Subprocesso subprocesso;
-
     LocalDateTime dataHoraDisponibilizado;
     LocalDateTime dataHoraHomologado;
 }

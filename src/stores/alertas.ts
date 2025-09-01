@@ -3,7 +3,7 @@ import alertasMock from '../mocks/alertas.json';
 import type {Alerta} from '@/types/tipos';
 import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 
-function parseAlertaDates(alerta: any): Alerta {
+function parseAlertaDates(alerta: Omit<Alerta, 'dataHora'> & { dataHora: string }): Alerta {
     return {
         ...alerta,
         dataHora: new Date(alerta.dataHora),

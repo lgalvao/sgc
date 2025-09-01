@@ -1,23 +1,17 @@
-package sgc.modelo.pessoas;
+package sgc.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import sgc.modelo.base.EntidadeBase;
-import sgc.modelo.base.Mapa;
 
 import java.util.Set;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "UNIDADE")
 public class Unidade extends EntidadeBase {
     String sigla;
     String nome;
-    String tipo;
+    TipoUnidade tipo;
 
     @ManyToOne
     Usuario titular;
@@ -33,4 +27,7 @@ public class Unidade extends EntidadeBase {
 
     @OneToMany(mappedBy = "unidadeSuperior")
     Set<Unidade> unidadesSubordinadas;
+
+    @Enumerated
+    SituacaoUnidade situacao;
 }

@@ -7,7 +7,7 @@ export const useUnidadesStore = defineStore('unidades', {
         unidades: unidadesMock as unknown as Unidade[]
     }),
     actions: {
-        pesquisarUnidade(this: any, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
+        pesquisarUnidade(this: ReturnType<typeof useUnidadesStore>, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
             for (const unit of units) {
                 if (unit.sigla === sigla) return unit
                 if (unit.filhas) {

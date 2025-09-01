@@ -1,4 +1,4 @@
-package sgc.modelo.base;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -7,10 +7,8 @@ import lombok.Getter;
 
 @Getter
 @Entity
-@Table(name = "CONHECIMENTO")
-public class Conhecimento extends EntidadeBase {
-    String descricao;
-
+@Table(name = "ADMINISTRADOR")
+public class Administrador extends EntidadeBase {
     @ManyToOne
-    Atividade atividade;
+    Usuario usuario;
 }

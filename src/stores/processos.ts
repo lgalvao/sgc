@@ -1,27 +1,47 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
-import {Processo, SituacaoProcesso, Subprocesso} from '@/types/tipos'
+import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 import {useUnidadesStore} from './unidades'
 import { parseDate } from '@/utils/dateUtils'
 import { SITUACOES_SUBPROCESSO } from '@/constants/situacoes'
 
-function parseProcessoDates(processo: any): Processo {
+function mapTipoProcesso(tipo: string): TipoProcesso {
+    switch (tipo) {
+        case 'Mapeamento': return TipoProcesso.MAPEAMENTO;
+        case 'Revisão': return TipoProcesso.REVISAO;
+        case 'Diagnóstico': return TipoProcesso.DIAGNOSTICO;
+        default: return TipoProcesso.MAPEAMENTO;
+    }
+}
+
+function mapSituacaoProcesso(situacao: string): SituacaoProcesso {
+    switch (situacao) {
+        case 'Criado': return SituacaoProcesso.CRIADO;
+        case 'Em andamento': return SituacaoProcesso.EM_ANDAMENTO;
+        case 'Finalizado': return SituacaoProcesso.FINALIZADO;
+        default: return SituacaoProcesso.CRIADO;
+    }
+}
+
+function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinalizacao' | 'tipo' | 'situacao'> & { dataLimite: string, dataFinalizacao?: string | null, tipo: string, situacao: string }): Processo {
     return {
         ...processo,
+        tipo: mapTipoProcesso(processo.tipo),
+        situacao: mapSituacaoProcesso(processo.situacao),
         dataLimite: parseDate(processo.dataLimite) || new Date(),
-        dataFinalizacao: parseDate(processo.dataFinalizacao),
+        dataFinalizacao: processo.dataFinalizacao ? parseDate(processo.dataFinalizacao) : null,
     };
 }
 
-function parseSubprocessoDates(pu: any): Subprocesso {
+function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & { dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null }): Subprocesso {
     return {
         ...pu,
-        dataLimiteEtapa1: parseDate(pu.dataLimiteEtapa1),
-        dataLimiteEtapa2: parseDate(pu.dataLimiteEtapa2),
-        dataFimEtapa1: parseDate(pu.dataFimEtapa1),
-        dataFimEtapa2: parseDate(pu.dataFimEtapa2),
+        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
+        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
+        dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
+        dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
     };
 }
 

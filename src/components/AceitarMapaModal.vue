@@ -51,7 +51,7 @@ interface Props {
   mostrarModal: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 defineEmits<{
   fecharModal: [];

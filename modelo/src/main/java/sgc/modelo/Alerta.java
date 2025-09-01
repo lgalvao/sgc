@@ -1,12 +1,9 @@
-package sgc.modelo.acomp;
+package sgc.modelo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
-import sgc.modelo.pessoas.Unidade;
-import sgc.modelo.base.EntidadeBase;
-import sgc.modelo.base.Processo;
 
 import java.time.LocalDateTime;
 
