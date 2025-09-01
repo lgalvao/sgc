@@ -60,13 +60,13 @@ test.describe('Impacto no Mapa de Competências', () => {
         await page.goto(`/processo/1/SESEL/cadastro`);
         await page.waitForLoadState('networkidle');
 
-        // Aguardar o botão estar totalmente carregado e clicável
-        await page.waitForTimeout(500);
+        // Verificar que a página carregou corretamente
+        await expect(page.getByTestId('input-nova-atividade')).toBeVisible();
 
-        // Abrir modal de impacto sem fazer mudanças usando seletor mais específico
-        const impactoButton = page.getByText('Impacto no mapa');
+        // Aguardar o botão estar totalmente carregado e clicável
+        const impactoButton = page.locator('button', {hasText: 'Impacto no mapa'});
         await impactoButton.waitFor({ state: 'visible' });
-        await impactoButton.click({ force: true });
+        await impactoButton.click();
 
         await expect(page.getByText('Impacto no Mapa de Competências')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas')).not.toBeVisible();
@@ -80,16 +80,16 @@ test.describe('Impacto no Mapa de Competências', () => {
         await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
 
+        // Verificar que a página carregou corretamente
+        await expect(page.getByTestId('input-nova-atividade')).toBeVisible();
+
         // Adicionar apenas uma atividade
         await adicionarAtividade(page, 'Atividade Teste');
 
         // Aguardar o botão estar totalmente carregado e clicável
-        await page.waitForTimeout(500);
-
-        // Abrir modal de impacto usando seletor mais específico
-        const impactoButton = page.getByText('Impacto no mapa');
+        const impactoButton = page.locator('button', {hasText: 'Impacto no mapa'});
         await impactoButton.waitFor({ state: 'visible' });
-        await impactoButton.click({ force: true });
+        await impactoButton.click();
 
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
         await expect(page.getByTestId('secao-atividades-inseridas').getByText('Atividade Teste')).toBeVisible();
@@ -103,19 +103,22 @@ test.describe('Impacto no Mapa de Competências', () => {
         await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
 
+        // Verificar que a página carregou corretamente
+        await expect(page.getByTestId('input-nova-atividade')).toBeVisible();
+
         // Criar atividade com conhecimentos
         await adicionarAtividade(page, 'Atividade Nova');
         const atividadeCard = page.locator('.atividade-card', {hasText: 'Atividade Nova'});
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento A');
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento B');
 
-        // Aguardar mais tempo para garantir que todas as mudanças sejam registradas
-        await page.waitForTimeout(1000);
+        // Aguardar que as mudanças sejam processadas
+        await page.waitForLoadState('networkidle');
 
         // Abrir modal de impacto usando seletor mais específico
-        const impactoButton = page.getByText('Impacto no mapa');
+        const impactoButton = page.locator('button', {hasText: 'Impacto no mapa'});
         await impactoButton.waitFor({ state: 'visible' });
-        await impactoButton.click({ force: true });
+        await impactoButton.click();
 
         // Verificar se a atividade e seus conhecimentos aparecem
         await expect(page.getByTestId('titulo-atividades-inseridas')).toBeVisible();
@@ -171,13 +174,16 @@ test.describe('Impacto no Mapa de Competências', () => {
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento A de X');
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento B de X');
 
-        // 8. Aguardar mais tempo para garantir que todas as mudanças sejam registradas
-        await page.waitForTimeout(1500);
+        // 8. Aguardar que as mudanças sejam processadas
+        await page.waitForLoadState('networkidle');
+
+        // Verificar que a página ainda está carregada corretamente
+        await expect(page.getByTestId('input-nova-atividade')).toBeVisible();
 
         // 9. Clicar em 'Impacto no mapa' usando seletor mais específico
-        const impactoButton = page.getByText('Impacto no mapa');
+        const impactoButton = page.locator('button', {hasText: 'Impacto no mapa'});
         await impactoButton.waitFor({ state: 'visible' });
-        await impactoButton.click({ force: true });
+        await impactoButton.click();
 
         // 10. Verificar que todas as mudanças aparecem
         await expect(page.getByText('Impacto no Mapa de Competências')).toBeVisible();
