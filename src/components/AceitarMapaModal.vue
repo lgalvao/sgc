@@ -12,8 +12,9 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Observações <small class="text-muted">(opcional)</small></label>
+            <label for="observacao-textarea" class="form-label">Observações <small class="text-muted">(opcional)</small></label>
             <textarea
+              id="observacao-textarea"
               v-model="observacao"
               class="form-control"
               rows="4"

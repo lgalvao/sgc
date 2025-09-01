@@ -7,6 +7,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
+declare global {
+  interface Window {
+    pinia: ReturnType<typeof createPinia>;
+    __pinia__: ReturnType<typeof createPinia>;
+  }
+}
+
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
@@ -19,4 +26,4 @@ app.use(router);
 app.mount('#app');
 
 // Expose Pinia instance globally for Playwright testing (optional, for dev/test environments)
-(window as any).__pinia__ = pinia;
+window.__pinia__ = pinia;

@@ -68,5 +68,41 @@
     "dataCriacao": "2024-05-01",
     "dataDisponibilizacao": null,
     "dataFinalizacao": null
+  },
+  {
+    "id": 3,
+    "unidade": "STIC",
+    "idProcesso": 2,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 4,
+        "descricao": "Desenvolvimento de sistemas",
+        "atividadesAssociadas": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": 5,
+        "descricao": "Manutenção de infraestrutura",
+        "atividadesAssociadas": [
+          4,
+          5
+        ]
+      },
+      {
+        "id": 6,
+        "descricao": "Suporte técnico",
+        "atividadesAssociadas": [
+          6,
+          7
+        ]
+      }
+    ],
+    "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": "2025-07-15",
+    "dataFinalizacao": null
   }
 ]

@@ -258,7 +258,7 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
 }
 
 function abrirDetalhesUnidade(item: TreeTableItem) {
-  if (item && true) {
+  if (item) {
     const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
     if (Subprocesso && Subprocesso.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo

@@ -68,15 +68,19 @@ describe('useProcessosStore', () => {
     let processosStore: ReturnType<typeof useProcessosStore>;
 
     // Helper to parse dates in mock data for comparison
-    const parseProcessoDates = (processo: { dataLimite: string, dataFinalizacao?: string | null }): Processo => ({
+    const parseProcessoDates = (processo: { id: number, descricao: string, tipo: string, dataLimite: string, dataFinalizacao?: string | null, situacao: string }): Processo => ({
         ...processo,
+        tipo: processo.tipo === 'Mapeamento' ? TipoProcesso.MAPEAMENTO :
+              processo.tipo === 'Revisão' ? TipoProcesso.REVISAO : TipoProcesso.DIAGNOSTICO,
+        situacao: processo.situacao === 'Finalizado' ? SituacaoProcesso.FINALIZADO :
+                  processo.situacao === 'Em andamento' ? SituacaoProcesso.EM_ANDAMENTO : SituacaoProcesso.CRIADO,
         dataLimite: new Date(processo.dataLimite),
         dataFinalizacao: processo.dataFinalizacao ? new Date(processo.dataFinalizacao) : null,
     });
 
-    const parsesubprocessoDates = (pu: { dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null }): Subprocesso => ({
+    const parsesubprocessoDates = (pu: { id: number, idProcesso: number, unidade: string, dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null, situacao: string, unidadeAtual: string, unidadeAnterior: string | null }): Subprocesso => ({
         ...pu,
-        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : null,
+        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : new Date(),
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
@@ -150,6 +154,7 @@ describe('useProcessosStore', () => {
         expect(processosStore.processos[0].dataLimite).toBeInstanceOf(Date);
         expect(processosStore.subprocessos.length).toBe(3); // Directly use the expected length
         expect(processosStore.subprocessos[0].dataLimiteEtapa1).toBeInstanceOf(Date);
+        expect(processosStore.subprocessos[0].dataLimiteEtapa1).not.toBeNull();
     });
 
     describe('getters', () => {

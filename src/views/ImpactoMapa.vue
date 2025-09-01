@@ -5,8 +5,8 @@
     <template v-if="unidade && processo">
       <div class="mt-5">
         <!-- Seção de Atividades Inseridas -->
-        <div v-if="atividadesInseridas.length > 0">
-          <h4 class="mb-3"><i class="bi bi-plus-circle me-2"></i>Atividades inseridas</h4>
+        <div v-if="atividadesInseridas.length > 0" data-testid="secao-atividades-inseridas">
+          <h4 class="mb-3" data-testid="titulo-atividades-inseridas"><i class="bi bi-plus-circle me-2"></i>Atividades inseridas</h4>
           <div class="list-group mb-5">
             <div v-for="atividade in atividadesInseridas" :key="atividade.id"
                  class="list-group-item flex-column align-items-start">
@@ -18,7 +18,7 @@
                   </p>
                   <!-- Conhecimentos da atividade inserida -->
                   <div v-if="conhecimentosAtividade(atividade.idAtividade).length > 0" class="mt-2 ms-3">
-                    <small class="text-muted">Conhecimentos adicionados:</small>
+                    <small class="text-muted" data-testid="label-conhecimentos-adicionados">Conhecimentos adicionados:</small>
                     <ul class="list-unstyled mt-1">
                       <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)" :key="conhecimento.id"
                           class="d-flex align-items-center mb-1">
@@ -34,9 +34,9 @@
         </div>
 
         <!-- Seção de Competências Impactadas -->
-        <h4 class="mb-3"><i class="bi bi-bullseye me-2"></i>Competências impactadas</h4>
+        <h4 class="mb-3" data-testid="titulo-competencias-impactadas"><i class="bi bi-bullseye me-2"></i>Competências impactadas</h4>
         <div v-if="competenciasImpactadas.size === 0">
-          <p class="text-muted">Nenhuma competência foi impactada.</p>
+          <p class="text-muted" data-testid="msg-nenhuma-competencia">Nenhuma competência foi impactada.</p>
         </div>
         <div v-else>
           <div v-for="[comp_id, { competencia, mudancas: mudancasCompetencia }] in competenciasImpactadas"

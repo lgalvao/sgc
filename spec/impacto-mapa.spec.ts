@@ -1,4 +1,5 @@
-import {expect, test, Locator} from "@playwright/test";
+import {expect, test, Locator, Page} from "@playwright/test";
+import {login} from "./utils/auth";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
@@ -108,8 +109,8 @@ test.describe('Impacto no Mapa de Competências', () => {
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento A');
         await adicionarConhecimento(page, atividadeCard, 'Conhecimento B');
 
-        // Aguardar o botão estar totalmente carregado e clicável
-        await page.waitForTimeout(500);
+        // Aguardar mais tempo para garantir que todas as mudanças sejam registradas
+        await page.waitForTimeout(1000);
 
         // Abrir modal de impacto usando seletor mais específico
         const impactoButton = page.getByText('Impacto no mapa');
@@ -170,8 +171,8 @@ test.describe('Impacto no Mapa de Competências', () => {
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento A de X');
         await adicionarConhecimento(page, atividadeXCard, 'Conhecimento B de X');
 
-        // 8. Aguardar o botão estar totalmente carregado e clicável
-        await page.waitForTimeout(500);
+        // 8. Aguardar mais tempo para garantir que todas as mudanças sejam registradas
+        await page.waitForTimeout(1500);
 
         // 9. Clicar em 'Impacto no mapa' usando seletor mais específico
         const impactoButton = page.getByText('Impacto no mapa');
