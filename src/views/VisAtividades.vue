@@ -9,13 +9,13 @@
       <h2 class="mb-0">Atividades e conhecimentos</h2>
       <div class="d-flex gap-2">
         <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
-          <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
+          <i class="bi bi-arrow-right-circle me-2"></i>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </button>
         <button class="btn btn-secondary" title="Devolver para ajustes" @click="devolverCadastro">
           Devolver para ajustes
         </button>
         <button class="btn btn-success" title="Validar" @click="validarCadastro">
-          Validar
+          {{ isRevisao ? 'Registrar aceite' : 'Validar' }}
         </button>
       </div>
     </div>
@@ -44,6 +44,54 @@
         :mostrar="mostrarModalImpacto"
         :sigla-unidade="siglaUnidade"
         @fechar="fecharModalImpacto"/>
+
+    <!-- Modal de Validação -->
+    <div v-if="mostrarModalValidar" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro' }}</h5>
+            <button type="button" class="btn-close" @click="fecharModalValidar"></button>
+          </div>
+          <div class="modal-body">
+            <p>{{ isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?' }}</p>
+            <div class="mb-3">
+              <label class="form-label" for="observacaoValidacao">Observação (opcional)</label>
+              <textarea id="observacaoValidacao" v-model="observacaoValidacao" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalValidar">Cancelar</button>
+            <button type="button" class="btn btn-success" @click="confirmarValidacao">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Devolução -->
+    <div v-if="mostrarModalDevolver" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}</h5>
+            <button type="button" class="btn-close" @click="fecharModalDevolver"></button>
+          </div>
+          <div class="modal-body">
+            <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
+            <div class="mb-3">
+              <label class="form-label" for="observacaoDevolucao">Observação (opcional)</label>
+              <textarea id="observacaoDevolucao" v-model="observacaoDevolucao" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalDevolver">Cancelar</button>
+            <button type="button" class="btn btn-danger" @click="confirmarDevolucao">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="mostrarModalValidar || mostrarModalDevolver" class="modal-backdrop fade show"></div>
   </div>
 </template>
 
@@ -53,7 +101,10 @@ import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
-import {Atividade, Subprocesso, Unidade} from '@/types/tipos'
+import {useNotificacoesStore} from '@/stores/notificacoes'
+import {useAlertasStore} from '@/stores/alertas'
+import {useRouter} from 'vue-router'
+import {Atividade, Processo, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const props = defineProps<{
@@ -68,8 +119,15 @@ const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
+const notificacoesStore = useNotificacoesStore()
+const alertasStore = useAlertasStore()
+const router = useRouter()
 
 const mostrarModalImpacto = ref(false)
+const mostrarModalValidar = ref(false)
+const mostrarModalDevolver = ref(false)
+const observacaoValidacao = ref('')
+const observacaoDevolucao = ref('')
 
 const unidade = computed(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
@@ -101,19 +159,157 @@ const atividades = computed<Atividade[]>(() => {
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
-function validarCadastro() {
-  // Lógica para validar o cadastro
+const processoAtual = computed<Processo | null>(() => {
+  if (!idSubprocesso.value) return null;
+  return (processosStore.processos as Processo[]).find(p => p.id === idProcesso.value) || null;
+});
 
+const isRevisao = computed(() => processoAtual.value?.tipo === 'Revisão');
+
+function validarCadastro() {
+  mostrarModalValidar.value = true;
 }
 
 function devolverCadastro() {
-  // Lógica para devolver o cadastro
+  mostrarModalDevolver.value = true;
+}
 
+function confirmarValidacao() {
+  if (!idSubprocesso.value) return;
+
+  const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value);
+  const isRevisao = processoAtual.value?.tipo === 'Revisão';
+
+  // Alterar situação do subprocesso
+  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+  if (subprocessoIndex !== -1) {
+    let novaSituacao: string;
+    if (isRevisao) {
+      novaSituacao = unidadeSuperior === 'SEDOC' ? 'Revisão do cadastro homologada' : 'Revisão do cadastro aceita';
+    } else {
+      novaSituacao = unidadeSuperior === 'SEDOC' ? 'Cadastro homologado' : 'Cadastro aceito';
+    }
+    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+    processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSuperior || 'SEDOC';
+  }
+
+  // Registrar movimentação
+  processosStore.addMovement({
+    idSubprocesso: idSubprocesso.value,
+    unidadeOrigem: siglaUnidade.value,
+    unidadeDestino: unidadeSuperior || 'SEDOC',
+    descricao: isRevisao ? 'Revisão do cadastro de atividades e conhecimentos aceita' : 'Cadastro de atividades e conhecimentos aceito'
+  });
+
+
+  // Enviar notificação por e-mail
+  const assunto = isRevisao
+    ? `SGC: Revisão do cadastro de atividades e conhecimentos aceita: ${siglaUnidade.value}`
+    : `SGC: Cadastro de atividades e conhecimentos aceito: ${siglaUnidade.value}`;
+
+  const corpo = isRevisao
+    ? `A revisão do cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi aceita.`
+    : `O cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi aceito.`;
+
+  notificacoesStore.email(assunto, `Responsável pela ${unidadeSuperior}`, corpo);
+
+  // Criar alerta
+  alertasStore.criarAlerta({
+    idProcesso: idProcesso.value,
+    unidadeOrigem: siglaUnidade.value,
+    unidadeDestino: unidadeSuperior || 'SEDOC',
+    descricao: isRevisao
+      ? `Revisão do cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} aceita`
+      : `Cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} aceito`,
+    dataHora: new Date()
+  });
+
+  const mensagemSucesso = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro validado';
+
+  notificacoesStore.sucesso(
+      mensagemSucesso,
+      'A análise foi registrada com sucesso!'
+  );
+
+  fecharModalValidar();
+  router.push('/painel');
+}
+
+function confirmarDevolucao() {
+  if (!idSubprocesso.value) return;
+
+  const isRevisao = processoAtual.value?.tipo === 'Revisão';
+
+  // Alterar situação do subprocesso
+  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+  if (subprocessoIndex !== -1) {
+    const novaSituacao = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
+    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+    processosStore.subprocessos[subprocessoIndex].unidadeAtual = siglaUnidade.value;
+  }
+
+  // Registrar movimentação
+  processosStore.addMovement({
+    idSubprocesso: idSubprocesso.value,
+    unidadeOrigem: 'SEDOC', // Unidade que está fazendo a análise
+    unidadeDestino: siglaUnidade.value,
+    descricao: isRevisao ? 'Devolução da revisão do cadastro de atividades e conhecimentos para ajustes' : 'Devolução do cadastro de atividades e conhecimentos para ajustes'
+  });
+
+  // Enviar notificação por e-mail
+  const assunto = isRevisao
+    ? `SGC: Revisão do cadastro de atividades e conhecimentos devolvida: ${siglaUnidade.value}`
+    : `SGC: Cadastro de atividades e conhecimentos devolvido: ${siglaUnidade.value}`;
+
+  const corpo = isRevisao
+    ? `A revisão do cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi devolvida para ajustes.`
+    : `O cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi devolvido para ajustes.`;
+
+  notificacoesStore.email(assunto, `Responsável pela ${siglaUnidade.value}`, corpo);
+
+  // Criar alerta
+  alertasStore.criarAlerta({
+    idProcesso: idProcesso.value,
+    unidadeOrigem: 'SEDOC',
+    unidadeDestino: siglaUnidade.value,
+    descricao: isRevisao
+      ? `Revisão do cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} devolvida para ajustes`
+      : `Cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} devolvido para ajustes`,
+    dataHora: new Date()
+  });
+
+  const mensagemSucesso = isRevisao ? 'Revisão do cadastro devolvida' : 'Cadastro devolvido';
+
+  notificacoesStore.sucesso(
+      mensagemSucesso,
+      'O cadastro foi devolvido para ajustes!'
+  );
+
+  fecharModalDevolver();
+  router.push('/painel');
+}
+
+function fecharModalValidar() {
+  mostrarModalValidar.value = false;
+  observacaoValidacao.value = '';
+}
+
+function fecharModalDevolver() {
+  mostrarModalDevolver.value = false;
+  observacaoDevolucao.value = '';
 }
 
 function abrirModalImpacto() {
-  // Para VisAtividades, não há mudanças registradas, então mostra vazio
-  revisaoStore.setMudancasParaImpacto([]);
+  if (isRevisao.value) {
+    // Para revisões, buscar mudanças registradas durante a edição
+    // Como estamos na tela de visualização, buscar mudanças do subprocesso
+    ('[SIMULAÇÃO] Buscando mudanças registradas para subprocesso:', idSubprocesso.value);
+    // Em produção, isso seria buscado do backend ou de um store persistente
+    revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
+  } else {
+    // Para mapeamento inicial, não há mudanças para mostrar
+    revisaoStore.setMudancasParaImpacto([]);
+  }
   mostrarModalImpacto.value = true;
 }
 

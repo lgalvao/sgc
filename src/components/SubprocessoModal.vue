@@ -51,8 +51,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import { formatDateForInput, formatDateBR, isDateValidAndFuture, parseDate } from '@/utils/dateUtils';
+import {computed, ref, watch} from 'vue';
+import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils/dateUtils';
 
 interface Props {
    mostrarModal: boolean;

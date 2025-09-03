@@ -4,7 +4,7 @@
       <h4 class="mb-0">{{ title }}</h4>
 
       <div>
-        <button class="btn btn-outline-primary btn-sm me-2" @click="expandAll">
+        <button class="btn btn-outline-primary btn-sm me-2" @click="expandAll" data-testid="btn-expandir-todas">
           <i class="bi bi-arrows-expand"></i>
         </button>
         <button class="btn btn-outline-secondary btn-sm" @click="collapseAll">
@@ -26,15 +26,15 @@
         </tr>
         </thead>
         <tbody>
-        <template v-for="item in internalData" :key="item.id">
-          <TreeRow
-              :columns="columns"
-              :item="item"
-              :level="0"
-              @toggle="toggleExpand"
-              @row-click="handleTreeRowClick"
-          />
-        </template>
+        <TreeRow
+            v-for="item in flattenedData"
+            :key="item.id"
+            :columns="columns"
+            :item="item"
+            :level="item.level"
+            @toggle="toggleExpand"
+            @row-click="handleTreeRowClick"
+        />
         </tbody>
       </table>
     </div>
@@ -42,15 +42,16 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
+import {computed, nextTick, ref, watch} from 'vue'
 import TreeRow from './TreeRow.vue'
 
 interface TreeItem {
   id: number | string;
   expanded?: boolean;
   children?: TreeItem[];
+  level?: number;
 
-  [key: string]: string | number | boolean | TreeItem[] | undefined; // Para permitir outras propriedades nos itens da árvore
+  [key: string]: any;
 }
 
 interface Column {
@@ -71,25 +72,39 @@ const emit = defineEmits<{ (e: 'row-click', item: TreeItem): void; }>()
 
 const internalData = ref<TreeItem[]>([])
 
-// Initialize internal data with expanded property
-const initializeData = (data: TreeItem[]): TreeItem[] => {
-  return data.map(item => ({
+const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
+  return items.map(item => ({
     ...item,
-    expanded: item.expanded || false,
-    children: item.children ? initializeData(item.children) : []
-  }))
-}
+    expanded: item.expanded !== undefined ? item.expanded : false,
+    children: item.children ? initializeExpanded(item.children) : [],
+  }));
+};
 
-// Watch for prop changes
 watch(() => props.data,
-    (newData) => internalData.value = initializeData(newData),
-    {immediate: true, deep: true})
+    (newData) => {
+      internalData.value = initializeExpanded(JSON.parse(JSON.stringify(newData)))
+    },
+    { immediate: true, deep: true }
+)
 
-// Find item by ID recursively
+const flattenedData = computed(() => {
+  const flattened: TreeItem[] = []
+  const flatten = (items: TreeItem[], level: number) => {
+    for (const item of items) {
+      flattened.push({ ...item, level })
+      if (item.expanded && item.children) {
+        flatten(item.children, level + 1)
+      }
+    }
+  }
+  flatten(internalData.value, 0)
+  return flattened
+})
+
 const findItemById = (items: TreeItem[], id: number | string): TreeItem | null => {
-  for (let item of items) {
+  for (const item of items) {
     if (item.id === id) return item
-    if (item.children && item.children.length > 0) {
+    if (item.children) {
       const found = findItemById(item.children, id)
       if (found) return found
     }
@@ -97,13 +112,13 @@ const findItemById = (items: TreeItem[], id: number | string): TreeItem | null =
   return null
 }
 
-// Toggle expand/collapse
 const toggleExpand = (id: number | string) => {
   const item = findItemById(internalData.value, id)
-  if (item) item.expanded = !item.expanded
+  if (item) {
+    item.expanded = !item.expanded
+  }
 }
 
-// Expand all items recursively
 const expandAll = () => {
   const expand = (items: TreeItem[]) => {
     items.forEach(item => {
@@ -114,9 +129,11 @@ const expandAll = () => {
     })
   }
   expand(internalData.value)
+  nextTick(() => {
+    internalData.value = [...internalData.value]
+  })
 }
 
-// Collapse all items recursively
 const collapseAll = () => {
   const collapse = (items: TreeItem[]) => {
     items.forEach(item => {
@@ -127,10 +144,12 @@ const collapseAll = () => {
     })
   }
   collapse(internalData.value)
+  nextTick(() => {
+    internalData.value = [...internalData.value]
+  })
 }
 
 const handleTreeRowClick = (clickedItem: TreeItem) => {
   emit('row-click', clickedItem)
 }
-
 </script>

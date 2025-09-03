@@ -28,11 +28,11 @@
               <strong class="competencia-descricao" data-testid="competencia-descricao"> {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <button class="btn btn-sm btn-outline-primary botao-acao"
-                        data-bs-toggle="tooltip" data-testid="btn-editar-competencia"
+                        data-bs-toggle="tooltip" data-testid="editar-competencia"
                         title="Editar" @click="iniciarEdicaoCompetencia(comp)"><i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
-                        data-testid="btn-excluir-competencia"
+                        data-testid="excluir-competencia"
                         title="Excluir" @click="excluirCompetencia(comp.id)"><i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -43,13 +43,14 @@
                 <div class="card-body d-flex align-items-center py-1 px-2">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
-                    <span v-if="getAtividadeCompleta(atvId)?.conhecimentos.length > 0"
+                    <span v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
                           :data-bs-html="true"
                           :data-bs-title="getConhecimentosTooltip(atvId)"
                           class="badge bg-secondary ms-2"
                           data-bs-custom-class="conhecimentos-tooltip"
                           data-bs-placement="top"
-                          data-bs-toggle="tooltip">
+                          data-bs-toggle="tooltip"
+                          data-testid="badge-conhecimentos">
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
                   </span>
@@ -98,6 +99,7 @@
                 <div v-for="atividade in atividades" :key="atividade.id"
                      :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
                      class="card atividade-card-item"
+                     :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
                      @click="toggleAtividade(atividade.id)">
                   <div class="card-body d-flex align-items-center py-2">
                     <input :id="`atv-${atividade.id}`" v-model="atividadesSelecionadas"
@@ -114,7 +116,8 @@
                             class="badge bg-secondary ms-2"
                             data-bs-custom-class="conhecimentos-tooltip"
                             data-bs-placement="right"
-                            data-bs-toggle="tooltip">
+                            data-bs-toggle="tooltip"
+                            data-testid="badge-conhecimentos">
                         {{ atividade.conhecimentos.length }}
                       </span>
                     </label>
@@ -181,7 +184,8 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
-import {Atividade, Competencia, Unidade} from '@/types/tipos';
+import {useNotificacoesStore} from "@/stores/notificacoes";
+import {Atividade, Competencia, Subprocesso, Unidade} from '@/types/tipos';
 
 const props = defineProps<{ sigla: string, idProcesso: number }>()
 
@@ -416,13 +420,68 @@ function disponibilizarMapa() {
   const currentMapa = mapa.value;
   const currentUnidade = unidade.value;
 
+  // Validações conforme plano
+  const competenciasSemAtividades = competencias.value.filter(comp => comp.atividadesAssociadas.length === 0);
+  if (competenciasSemAtividades.length > 0) {
+    notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
+    return;
+  }
+
+  const atividadesIds = atividades.value.map(a => a.id);
+  const atividadesAssociadas = competencias.value.flatMap(comp => comp.atividadesAssociadas);
+  const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
+
+  if (atividadesNaoAssociadas.length > 0) {
+    const descricoesNaoAssociadas = atividadesNaoAssociadas.map(id => descricaoAtividade(id)).join(', ');
+    notificacaoDisponibilizacao.value = `Erro: As seguintes atividades não estão associadas a nenhuma competência: ${descricoesNaoAssociadas}`;
+    return;
+  }
+
+  // Alterar situação do subprocesso para 'Mapa disponibilizado'
+  const subprocesso = processosStore.subprocessos.find(
+    pu => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
+  );
+  if (subprocesso) {
+    subprocesso.situacao = 'Mapa disponibilizado';
+    subprocesso.dataLimiteEtapa2 = new Date(dataLimiteValidacao.value);
+
+    // Registrar movimentação
+    processosStore.addMovement({
+      idSubprocesso: subprocesso.id,
+      unidadeOrigem: 'SEDOC',
+      unidadeDestino: sigla.value,
+      descricao: 'Disponibilização do mapa de competências'
+    });
+  }
+
+  // Atualizar mapa
   mapaStore.editarMapa(currentMapa.id, {
     situacao: 'disponivel_validacao',
     dataDisponibilizacao: new Date(),
-  })
+  });
 
-  notificacaoDisponibilizacao.value = `Notificação: O mapa de competências da unidade ${currentUnidade.sigla}
-                       foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}. (Simulação)`
+  // Simular notificações por e-mail
+  const notificacoesStore = useNotificacoesStore();
+  notificacoesStore.email(
+    'SGC: Mapa de competências disponibilizado',
+    `Responsável pela ${currentUnidade.sigla}`,
+    `Prezado(a) responsável pela ${currentUnidade.sigla},\n\nO mapa de competências foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.\n\nAcompanhe o processo no sistema SGC.`
+  );
+
+  // Simular notificações para superiores
+  notificacoesStore.email(
+    `SGC: Mapa de competências disponibilizado - ${currentUnidade.sigla}`,
+    'Unidades superiores',
+    `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
+  );
+
+  notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
+
+  // Fechar modal e redirecionar para Painel
+  setTimeout(() => {
+    fecharModalDisponibilizar();
+    // Aqui seria o redirecionamento para Painel, mas como é simulação, apenas fechamos o modal
+  }, 2000);
 }
 
 function fecharModalDisponibilizar() {

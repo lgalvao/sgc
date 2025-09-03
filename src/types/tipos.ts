@@ -37,6 +37,7 @@ export interface Subprocesso {
     dataFimEtapa1: Date | null;
     dataLimiteEtapa2: Date | null;
     dataFimEtapa2: Date | null;
+    sugestoes?: string;
 }
 
 export enum TipoResponsabilidade {
@@ -107,10 +108,36 @@ export interface Alerta {
     descricao: string;
 }
 
+export interface AlertaServidor {
+    id: number;
+    idAlerta: number;
+    idServidor: number;
+    lido: boolean;
+    dataLeitura: Date | null;
+}
+
 export interface AtribuicaoTemporaria {
     idServidor: number;
     unidade: string;
     dataInicio: Date;
     dataTermino: Date;
     justificativa: string;
+}
+
+export interface Movimentacao {
+    id: number;
+    idSubprocesso: number;
+    dataHora: Date;
+    unidadeOrigem: string;
+    unidadeDestino: string;
+    descricao: string;
+}
+
+export interface AnaliseValidacao {
+    id: number;
+    idSubprocesso: number;
+    dataHora: Date;
+    unidade: string;
+    resultado: 'Devolução' | 'Aceite';
+    observacao?: string;
 }

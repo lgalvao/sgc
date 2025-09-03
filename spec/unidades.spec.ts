@@ -21,6 +21,6 @@ test.describe('Detalhes da Unidade', () => {
     test('deve exibir subunidades na tabela', async ({page}) => {
         // Verifica se há pelo menos uma linha de dados na tabela (excluindo o cabeçalho)
         const rows = page.getByRole('row').filter({hasNot: page.getByRole('rowgroup', {name: 'Unidade'})});
-        await expect(rows).toHaveCount(6); // Assumindo que há 6 subunidades no snapshot para STIC
+        await expect(rows).toHaveCount(9); // STIC tem 9 subunidades no total
     });
 });

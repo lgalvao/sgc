@@ -32,13 +32,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(alerta, index) in alertasFormatados" :key="index">
+        <tr v-for="(alerta, index) in alertasFormatados" :key="index"
+            :class="{ 'fw-bold': !alerta.lido }"
+            @click="marcarComoLido(alerta.id)"
+            style="cursor: pointer;">
           <td>{{ alerta.dataFormatada }}</td>
           <td>{{ alerta.descricao }}</td>
           <td>{{ alerta.processo }}</td>
           <td>{{ alerta.unidade }}</td>
         </tr>
-        <tr v-if="!alertas || alertas.length === 0">
+        <tr v-if="!alertasFormatados || alertasFormatados.length === 0">
           <td class="text-center text-muted" colspan="4">Nenhum alerta no momento.</td>
         </tr>
         </tbody>
@@ -54,10 +57,10 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Alerta, Perfil, Processo} from '@/types/tipos'
+import {Perfil, Processo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import { useProcessosFiltrados } from '@/composables/useProcessosFiltrados'; // Importar o novo composable
-import { formatDateTimeBR } from '@/utils/dateUtils';
+import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados'; // Importar o novo composable
+import {formatDateTimeBR} from '@/utils/dateUtils';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
@@ -122,18 +125,26 @@ function abrirDetalhesProcesso(processo: Processo) {
 }
 
 const alertasFormatados = computed(() => {
-  return (alertas.value as Alerta[]).map(alerta => {
+  const alertasDoServidor = alertasStore.getAlertasDoServidor();
+
+  return alertasDoServidor.map(alerta => {
     const processo = processos.value.find(p => p.id === alerta.idProcesso);
 
     return {
+      id: alerta.id,
       data: alerta.dataHora,
       processo: processo ? processo.descricao : 'Processo não encontrado',
       unidade: alerta.unidadeOrigem,
       descricao: alerta.descricao,
-      dataFormatada: formatDateTimeBR(alerta.dataHora)
+      dataFormatada: formatDateTimeBR(alerta.dataHora),
+      lido: alerta.lido
     };
   });
 });
 
 // Removida função formatarDataHora - usando utilitário centralizado
+
+function marcarComoLido(idAlerta: number) {
+  alertasStore.marcarAlertaComoLido(idAlerta);
+}
 </script>

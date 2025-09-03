@@ -90,16 +90,10 @@ function ordenarPor(campo: SortCriteria) {
 
 function abrirProcesso(processo: Processo) {
   const perfilUsuario = perfil.perfilSelecionado;
-  console.log('Perfil do usuário:', perfilUsuario); // LOG
-  console.log('Processo ID:', processo.id); // LOG
-
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    console.log('Navegando para /processo/' + processo.id); // LOG
-    // Usar name e params explicitamente, garantindo que apenas idProcesso seja passado
     router.push({name: 'Processo', params: {idProcesso: processo.id.toString()}}); // <-- Alterado aqui
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
-    console.log('Navegando para /subprocesso/' + processo.id + '/' + siglaUnidade); // LOG
     if (siglaUnidade) {
       router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
     } else {

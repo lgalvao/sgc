@@ -19,7 +19,7 @@
     "dataLimiteEtapa2": "2025-07-30",
     "dataFimEtapa1": "2025-06-30",
     "dataFimEtapa2": null,
-    "situacao": "Cadastro disponibilizado",
+    "situacao": "Mapa validado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC"
   },
@@ -28,10 +28,10 @@
     "idProcesso": 1,
     "unidade": "SEDESENV",
     "dataLimiteEtapa1": "2025-06-30",
-    "dataLimiteEtapa2": null,
+    "dataLimiteEtapa2": "2025-07-30",
     "dataFimEtapa1": "2025-06-30",
     "dataFimEtapa2": null,
-    "situacao": "Cadastro homologado",
+    "situacao": "Mapa validado",
     "unidadeAtual": "SEDESENV",
     "unidadeAnterior": "SESEL"
   },
@@ -43,9 +43,21 @@
     "dataLimiteEtapa2": "2025-08-15",
     "dataFimEtapa1": "2025-07-15",
     "dataFimEtapa2": null,
-    "situacao": "Mapa disponibilizado",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "STIC",
     "unidadeAnterior": null
+  },
+  {
+    "id": 26,
+    "idProcesso": 2,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataLimiteEtapa2": "2025-08-15",
+    "dataFimEtapa1": "2025-07-15",
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": "STIC"
   },
   {
     "id": 6,
@@ -55,7 +67,7 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Cadastro em andamento",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "COINF",
     "unidadeAnterior": "STIC"
   },
@@ -67,7 +79,7 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Revisão do cadastro disponibilizada",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "SENIC",
     "unidadeAnterior": "COINF"
   },
@@ -136,10 +148,10 @@
     "idProcesso": 5,
     "unidade": "SEDIA",
     "dataLimiteEtapa1": "2025-08-10",
-    "dataLimiteEtapa2": null,
-    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": "2025-09-10",
+    "dataFimEtapa1": "2025-08-10",
     "dataFimEtapa2": null,
-    "situacao": "Cadastro em andamento",
+    "situacao": "Mapa disponibilizado",
     "unidadeAtual": "SEDIA",
     "unidadeAnterior": "STIC"
   },
@@ -163,7 +175,7 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Cadastro disponibilizado",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC"
   },
@@ -187,7 +199,7 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Não iniciado",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "SEMARE",
     "unidadeAnterior": "SENIC"
   },
@@ -199,8 +211,92 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Cadastro disponibilizado",
+    "situacao": "Mapa homologado",
     "unidadeAtual": "COSIS",
     "unidadeAnterior": "STIC"
+  },
+  {
+    "id": 27,
+    "idProcesso": 2,
+    "unidade": "SEDESENV",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataLimiteEtapa2": "2025-08-15",
+    "dataFimEtapa1": "2025-07-15",
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "SEDESENV",
+    "unidadeAnterior": "COSIS"
+  },
+  {
+    "id": 28,
+    "idProcesso": 2,
+    "unidade": "SEDOC",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataLimiteEtapa2": "2025-08-15",
+    "dataFimEtapa1": "2025-07-15",
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "SEDOC",
+    "unidadeAnterior": "STIC"
+  },
+  {
+    "id": 21,
+    "idProcesso": 1,
+    "unidade": "SEDOC",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SEDOC",
+    "unidadeAnterior": null
+  },
+  {
+    "id": 22,
+    "idProcesso": 4,
+    "unidade": "SEDOC",
+    "dataLimiteEtapa1": "2024-05-10",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SEDOC",
+    "unidadeAnterior": null
+  },
+  {
+    "id": 23,
+    "idProcesso": 1,
+    "unidade": "SGP",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SGP",
+    "unidadeAnterior": null
+  },
+  {
+    "id": 24,
+    "idProcesso": 4,
+    "unidade": "SGP",
+    "dataLimiteEtapa1": "2024-05-10",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SGP",
+    "unidadeAnterior": null
+  },
+  {
+    "id": 25,
+    "idProcesso": 1,
+    "unidade": "SEDIA",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro em andamento",
+    "unidadeAtual": "SEDIA",
+    "unidadeAnterior": null
   }
 ]

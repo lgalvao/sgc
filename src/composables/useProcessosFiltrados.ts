@@ -1,9 +1,9 @@
-import { computed, Ref, ref } from 'vue';
-import { storeToRefs } from 'pinia';
-import { usePerfilStore } from '@/stores/perfil';
-import { useProcessosStore } from '@/stores/processos';
-import { useUnidadesStore } from '@/stores/unidades';
-import { Processo, Perfil, SituacaoProcesso } from '@/types/tipos';
+import {computed, Ref, ref} from 'vue';
+import {storeToRefs} from 'pinia';
+import {usePerfilStore} from '@/stores/perfil';
+import {useProcessosStore} from '@/stores/processos';
+import {useUnidadesStore} from '@/stores/unidades';
+import {Perfil, Processo, SituacaoProcesso} from '@/types/tipos';
 
 export function useProcessosFiltrados(filterBySituacaoFinalizado: Ref<boolean> = ref(false)) {
   const perfil = usePerfilStore();

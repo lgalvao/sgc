@@ -3,24 +3,41 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="display-6">Mapa de competências técnicas</div>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" title="Devolver para ajustes" @click="rejeitarMapa">
+        <button v-if="podeValidar" class="btn btn-outline-warning" title="Apresentar sugestões"
+                @click="abrirModalSugestoes" data-testid="apresentar-sugestoes-btn">
+          Apresentar sugestões
+        </button>
+        <button v-if="podeValidar" class="btn btn-outline-success" title="Validar mapa" @click="abrirModalValidar" data-testid="validar-btn">
+          Validar
+        </button>
+
+        <!-- Botões para GESTOR/ADMIN (CDU-20 - Analisar validação) -->
+        <button v-if="podeAnalisar" class="btn btn-outline-info" title="Ver sugestões" @click="verSugestoes"
+                v-show="podeVerSugestoes" data-testid="ver-sugestoes-btn">
+          Ver sugestões
+        </button>
+        <button v-if="podeAnalisar" class="btn btn-outline-secondary" title="Histórico de análise"
+                @click="verHistorico" data-testid="historico-analise-btn">
+          Histórico de análise
+        </button>
+        <button v-if="podeAnalisar" class="btn btn-outline-danger" title="Devolver para ajustes" @click="abrirModalDevolucao" data-testid="devolver-ajustes-btn">
           Devolver para ajustes
         </button>
-        <button class="btn btn-outline-success" title="Aceitar" @click="abrirModalAceitar">
-          Aceitar
+        <button v-if="podeAnalisar" class="btn btn-outline-success" title="Aceitar" @click="abrirModalAceitar" data-testid="registrar-aceite-btn">
+          {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
         </button>
       </div>
     </div>
 
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
-        <div class="fs-5">{{ unidade.sigla }} - {{ unidade.nome }}</div>
+        <div class="fs-5" data-testid="unidade-info">{{ unidade.sigla }} - {{ unidade.nome }}</div>
       </div>
 
       <div class="mb-4 mt-3">
         <div v-if="competencias.length === 0">Nenhuma competência cadastrada.</div>
         <div v-for="comp in competencias" :key="comp.id" class="card mb-3 competencia-card"
-             data-testid="competencia-item">
+             data-testid="competencia-block">
           <div class="card-body py-2">
             <div
                 class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card">
@@ -29,13 +46,14 @@
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
               <div v-for="atvId in comp.atividadesAssociadas" :key="atvId">
                 <div v-if="getAtividadeCompleta(atvId)"
-                     class="card atividade-associada-card-item d-flex flex-column group-atividade-associada">
+                     class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
+                     data-testid="atividade-item">
                   <div class="card-body d-flex align-items-center py-1 px-2">
                     <span class="atividade-associada-descricao me-2">{{ getAtividadeCompleta(atvId)?.descricao }}</span>
                   </div>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span v-for="conhecimento in getConhecimentosAtividade(atvId)" :key="conhecimento.id"
-                          class="me-3 mb-1">
+                          class="me-3 mb-1" data-testid="conhecimento-item">
                       {{ conhecimento.descricao }}
                     </span>
                   </div>
@@ -51,10 +69,156 @@
     </div>
 
     <AceitarMapaModal
-      :mostrarModal="mostrarModalAceitar"
-      @fecharModal="fecharModalAceitar"
-      @confirmarAceitacao="confirmarAceitacao"
+        :mostrarModal="mostrarModalAceitar"
+        :perfil="perfilSelecionado || undefined"
+        @fecharModal="fecharModalAceitar"
+        @confirmarAceitacao="confirmarAceitacao"
     />
+
+    <!-- Modal para apresentar sugestões (CDU-19) -->
+    <div class="modal fade" :class="{ 'show': mostrarModalSugestoes }"
+          :style="{ display: mostrarModalSugestoes ? 'block' : 'none' }" tabindex="-1" data-testid="modal-apresentar-sugestoes">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-apresentar-sugestoes-title">Apresentar Sugestões</h5>
+            <button type="button" class="btn-close" @click="fecharModalSugestoes" data-testid="modal-apresentar-sugestoes-close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="sugestoesTextarea" class="form-label">Sugestões para o mapa de competências:</label>
+              <textarea
+                  id="sugestoesTextarea"
+                  v-model="sugestoes"
+                  class="form-control"
+                  rows="5"
+                  placeholder="Digite suas sugestões para o mapa de competências..."
+                  data-testid="sugestoes-textarea"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalSugestoes" data-testid="modal-apresentar-sugestoes-cancelar">Cancelar</button>
+            <button type="button" class="btn btn-primary" @click="confirmarSugestoes" data-testid="modal-apresentar-sugestoes-confirmar">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para ver sugestões (CDU-20) -->
+    <div class="modal fade" :class="{ 'show': mostrarModalVerSugestoes }"
+          :style="{ display: mostrarModalVerSugestoes ? 'block' : 'none' }" tabindex="-1" data-testid="modal-sugestoes">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-sugestoes-title">Sugestões</h5>
+            <button type="button" class="btn-close" @click="fecharModalVerSugestoes" data-testid="modal-sugestoes-close"></button>
+          </div>
+          <div class="modal-body" data-testid="modal-sugestoes-body">
+            <div class="mb-3">
+              <label class="form-label">Sugestões registradas para o mapa de competências:</label>
+              <textarea
+                  v-model="sugestoesVisualizacao"
+                  class="form-control"
+                  rows="5"
+                  readonly
+                  data-testid="sugestoes-visualizacao-textarea"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalVerSugestoes" data-testid="modal-sugestoes-fechar">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para validar mapa (CDU-19) -->
+    <div class="modal fade" :class="{ 'show': mostrarModalValidar }"
+          :style="{ display: mostrarModalValidar ? 'block' : 'none' }" tabindex="-1" data-testid="modal-validar">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-validar-title">Validar Mapa de Competências</h5>
+            <button type="button" class="btn-close" @click="fecharModalValidar" data-testid="modal-validar-close"></button>
+          </div>
+          <div class="modal-body" data-testid="modal-validar-body">
+            <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalValidar" data-testid="modal-validar-cancelar">Cancelar</button>
+            <button type="button" class="btn btn-success" @click="confirmarValidacao" data-testid="modal-validar-confirmar">Validar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para devolver para ajustes (CDU-20) -->
+    <div class="modal fade" :class="{ 'show': mostrarModalDevolucao }"
+          :style="{ display: mostrarModalDevolucao ? 'block' : 'none' }" tabindex="-1" data-testid="modal-devolucao">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-devolucao-title">Devolução</h5>
+            <button type="button" class="btn-close" @click="fecharModalDevolucao" data-testid="modal-devolucao-close"></button>
+          </div>
+          <div class="modal-body" data-testid="modal-devolucao-body">
+            <p>Confirma a devolução da validação do mapa para ajustes?</p>
+            <div class="mb-3">
+              <label for="observacaoDevolucao" class="form-label">Observação (opcional):</label>
+              <textarea
+                  id="observacaoDevolucao"
+                  v-model="observacaoDevolucao"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Digite observações sobre a devolução..."
+                  data-testid="observacao-devolucao-textarea"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalDevolucao" data-testid="modal-devolucao-cancelar">Cancelar</button>
+            <button type="button" class="btn btn-danger" @click="confirmarDevolucao" data-testid="modal-devolucao-confirmar">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para histórico de análise (CDU-20) -->
+    <div class="modal fade" :class="{ 'show': mostrarModalHistorico }"
+          :style="{ display: mostrarModalHistorico ? 'block' : 'none' }" tabindex="-1" data-testid="modal-historico">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-historico-title">Histórico de Análise</h5>
+            <button type="button" class="btn-close" @click="fecharModalHistorico" data-testid="modal-historico-close"></button>
+          </div>
+          <div class="modal-body" data-testid="modal-historico-body">
+            <table class="table table-striped" data-testid="tabela-historico">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Unidade</th>
+                  <th>Resultado</th>
+                  <th>Observações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in historicoAnalise" :key="item.id" data-testid="historico-item">
+                  <td>{{ item.data }}</td>
+                  <td>{{ item.unidade }}</td>
+                  <td>{{ item.resultado }}</td>
+                  <td>{{ item.observacao }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalHistorico" data-testid="modal-historico-fechar">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -67,7 +231,9 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
 import {useNotificacoesStore} from "@/stores/notificacoes";
-import {Atividade, Competencia, Conhecimento, Unidade} from '@/types/tipos';
+import {useAnalisesStore} from "@/stores/analises";
+import {usePerfil} from "@/composables/usePerfil";
+import {Atividade, Competencia, Conhecimento, Subprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -79,9 +245,19 @@ const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
+const analisesStore = useAnalisesStore()
+const {perfilSelecionado} = usePerfil()
 
 // Estados reativos para o modal
 const mostrarModalAceitar = ref(false)
+const mostrarModalSugestoes = ref(false)
+const mostrarModalVerSugestoes = ref(false)
+const mostrarModalValidar = ref(false)
+const mostrarModalDevolucao = ref(false)
+const mostrarModalHistorico = ref(false)
+const sugestoes = ref('')
+const sugestoesVisualizacao = ref('')
+const observacaoDevolucao = ref('')
 
 const unidade = computed<Unidade | null>(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
@@ -99,10 +275,10 @@ const unidade = computed<Unidade | null>(() => {
 })
 
 const idSubprocesso = computed(() => {
-  const Subprocesso = processosStore.subprocessos.find(
+  const subprocesso = processosStore.subprocessos.find(
       (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
   );
-  return Subprocesso?.id;
+  return subprocesso?.id;
 });
 
 const atividades = computed<Atividade[]>(() => {
@@ -114,6 +290,37 @@ const atividades = computed<Atividade[]>(() => {
 
 const mapa = computed(() => mapaStore.mapas.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
 const competencias = computed<Competencia[]>(() => mapa.value ? mapa.value.competencias : [])
+
+const subprocesso = computed(() => processosStore.subprocessos.find(
+    (sp: Subprocesso) => sp.idProcesso === idProcesso.value && sp.unidade === sigla.value
+))
+
+// Computed para determinar quais botões mostrar baseado no perfil e situação
+const podeValidar = computed(() => {
+  return perfilSelecionado.value === 'CHEFE' &&
+      subprocesso.value?.situacao === 'Mapa disponibilizado'
+})
+
+const podeAnalisar = computed(() => {
+  return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
+      (subprocesso.value?.situacao === 'Mapa validado' || subprocesso.value?.situacao === 'Mapa com sugestões')
+})
+
+const podeVerSugestoes = computed(() => {
+  return subprocesso.value?.situacao === 'Mapa com sugestões'
+})
+
+const historicoAnalise = computed(() => {
+  if (!idSubprocesso.value) return []
+
+  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
+    id: analise.id,
+    data: analise.dataHora.toLocaleString('pt-BR'),
+    unidade: analise.unidade,
+    resultado: analise.resultado,
+    observacao: analise.observacao || ''
+  }))
+})
 
 function getAtividadeCompleta(id: number): Atividade | undefined {
   return atividades.value.find(a => a.id === id)
@@ -132,36 +339,142 @@ function fecharModalAceitar() {
   mostrarModalAceitar.value = false
 }
 
+function abrirModalSugestoes() {
+  mostrarModalSugestoes.value = true
+}
+
+function fecharModalSugestoes() {
+  mostrarModalSugestoes.value = false
+  sugestoes.value = ''
+}
+
+function fecharModalVerSugestoes() {
+  mostrarModalVerSugestoes.value = false
+  sugestoesVisualizacao.value = ''
+}
+
+function abrirModalValidar() {
+  mostrarModalValidar.value = true
+}
+
+function fecharModalValidar() {
+  mostrarModalValidar.value = false
+}
+
+function abrirModalDevolucao() {
+  mostrarModalDevolucao.value = true
+}
+
+function fecharModalDevolucao() {
+  mostrarModalDevolucao.value = false
+  observacaoDevolucao.value = ''
+}
+
+function abrirModalHistorico() {
+  mostrarModalHistorico.value = true
+}
+
+function fecharModalHistorico() {
+  mostrarModalHistorico.value = false
+}
+
+function verSugestoes() {
+  // Buscar sugestões do subprocesso
+  const sugestoes = subprocesso.value?.sugestoes || "Nenhuma sugestão registrada.";
+
+  // Mostrar modal de visualização com sugestões
+  mostrarModalVerSugestoes.value = true;
+  sugestoesVisualizacao.value = sugestoes;
+}
+
+function verHistorico() {
+  // Abrir modal de histórico
+  abrirModalHistorico();
+}
+
+async function confirmarSugestoes() {
+  try {
+    await processosStore.apresentarSugestoes({
+      idProcesso: idProcesso.value,
+      unidade: sigla.value,
+      sugestoes: sugestoes.value
+    })
+
+    fecharModalSugestoes()
+
+    notificacoesStore.sucesso(
+        'Sugestões apresentadas',
+        'Sugestões submetidas para análise da unidade superior'
+    )
+
+    await router.push({
+      name: 'Subprocesso',
+      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+    })
+
+  } catch (error) {
+    notificacoesStore.erro(
+        'Erro ao apresentar sugestões',
+        'Ocorreu um erro. Tente novamente.'
+    )
+  }
+}
+
+async function confirmarValidacao() {
+  try {
+    await processosStore.validarMapa({
+      idProcesso: idProcesso.value,
+      unidade: sigla.value
+    })
+
+    fecharModalValidar()
+
+    notificacoesStore.sucesso(
+        'Mapa validado',
+        'Mapa validado e submetido para análise da unidade superior'
+    )
+
+    await router.push({
+      name: 'Subprocesso',
+      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+    })
+
+  } catch (error) {
+    notificacoesStore.erro(
+        'Erro ao validar mapa',
+        'Ocorreu um erro. Tente novamente.'
+    )
+  }
+}
+
 async function confirmarAceitacao(observacao: string) {
   try {
     await processosStore.aceitarMapa({
       idProcesso: idProcesso.value,
       unidade: sigla.value,
-      observacao: observacao || undefined
+      observacao: observacao || undefined,
+      perfil: perfilSelecionado.value || ''
     })
 
     fecharModalAceitar()
 
-    // Determinar mensagem baseada na unidade superior
-    const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(sigla.value)
+    // Determinar mensagem baseada no perfil
+    let titulo = 'Aceite registrado'
     let mensagem = 'Mapa aceito e submetido para análise da unidade superior'
-    if (unidadeSuperior === 'SEDOC') {
+    if (perfilSelecionado.value === 'ADMIN') {
+      titulo = 'Homologação efetivada'
       mensagem = 'Mapa homologado'
     }
 
-    notificacoesStore.sucesso('Mapa aceito', mensagem)
+    notificacoesStore.sucesso(titulo, mensagem)
 
-    // Redirecionar para a tela de detalhes do subprocesso
-    router.push({
-      name: 'Subprocesso',
-      params: { idProcesso: idProcesso.value, siglaUnidade: sigla.value }
-    })
+    // Redirecionar para o painel
+    await router.push({ name: 'Painel' })
 
   } catch (error) {
-    console.error('Erro ao aceitar mapa:', error)
     notificacoesStore.erro(
-      'Erro ao aceitar mapa',
-      'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
+        'Erro ao aceitar mapa',
+        'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
     )
   }
 }
@@ -174,21 +487,46 @@ async function rejeitarMapa() {
     })
 
     notificacoesStore.sucesso(
-      'Mapa devolvido',
-      'Mapa devolvido à unidade subordinada, para ajustes'
+        'Mapa devolvido',
+        'Mapa devolvido à unidade subordinada, para ajustes'
     )
 
     // Redirecionar para a tela de detalhes do subprocesso
-    router.push({
+    await router.push({
       name: 'Subprocesso',
-      params: { idProcesso: idProcesso.value, siglaUnidade: sigla.value }
+      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch (error) {
-    console.error('Erro ao rejeitar mapa:', error)
     notificacoesStore.erro(
-      'Erro ao devolver mapa',
-      'Ocorreu um erro ao devolver o mapa. Tente novamente.'
+        'Erro ao devolver mapa',
+        'Ocorreu um erro ao devolver o mapa. Tente novamente.'
+    )
+  }
+}
+
+async function confirmarDevolucao() {
+  try {
+    await processosStore.rejeitarMapa({
+      idProcesso: idProcesso.value,
+      unidade: sigla.value,
+      observacao: observacaoDevolucao.value || undefined
+    })
+
+    fecharModalDevolucao()
+
+    notificacoesStore.sucesso(
+        'Devolução realizada',
+        'Validação devolvida para ajustes'
+    )
+
+    // Redirecionar para o painel
+    await router.push({ name: 'Painel' })
+
+  } catch (error) {
+    notificacoesStore.erro(
+        'Erro ao devolver validação',
+        'Ocorreu um erro. Tente novamente.'
     )
   }
 }

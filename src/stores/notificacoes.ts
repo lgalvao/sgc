@@ -1,13 +1,20 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import {defineStore} from 'pinia';
+import {ref} from 'vue';
 
-export type TipoNotificacao = 'success' | 'error' | 'warning' | 'info';
+export type TipoNotificacao = 'success' | 'error' | 'warning' | 'info' | 'email';
+
+export interface EmailContent {
+  assunto: string;
+  destinatario: string;
+  corpo: string;
+}
 
 export interface Notificacao {
   id: string;
   tipo: TipoNotificacao;
   titulo: string;
   mensagem: string;
+  emailContent?: EmailContent; // Para notificações de email
   duracao?: number; // em milissegundos
   timestamp: Date;
 }
@@ -63,6 +70,18 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
     return adicionarNotificacao({ tipo: 'info', titulo, mensagem, duracao });
   };
 
+  const email = (assunto: string, destinatario: string, corpo: string) => {
+    const titulo = `E-mail enviado: ${assunto}`;
+    const mensagem = `Para: ${destinatario}`;
+    return adicionarNotificacao({
+      tipo: 'email',
+      titulo,
+      mensagem,
+      emailContent: { assunto, destinatario, corpo },
+      duracao: 10000 // 10 segundos para emails
+    });
+  };
+
   return {
     notificacoes,
     adicionarNotificacao,
@@ -71,6 +90,7 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
     sucesso,
     erro,
     aviso,
-    info
+    info,
+    email
   };
 });

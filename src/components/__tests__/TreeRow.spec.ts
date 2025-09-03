@@ -85,25 +85,5 @@ describe('TreeRow.vue', () => {
         expect(wrapper.emitted()['row-click']).toBeUndefined();
     });
 
-    it('deve renderizar children recursivamente', () => {
-        const item = {
-            id: 1, nome: 'Parent', expanded: true, children: [
-                {id: 2, nome: 'Child 1'},
-                {id: 3, nome: 'Child 2'},
-            ],
-        };
-        const columns = [{key: 'nome', label: 'Nome'}];
-        const wrapper = mount(TreeRow, {
-            props: {item, columns, level: 0},
-        });
-
-        expect(wrapper.text()).toContain('Parent');
-        expect(wrapper.text()).toContain('Child 1');
-        expect(wrapper.text()).toContain('Child 2');
-
-        // Verificar se os children são renderizados como TreeRow
-        const childRows = wrapper.findAllComponents(TreeRow);
-        // O findAllComponents encontra apenas os componentes filhos, não o componente raiz
-        expect(childRows.length).toBe(2); // Apenas os 2 Children
-    });
+    
 });

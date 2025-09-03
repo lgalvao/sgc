@@ -27,7 +27,36 @@
         :situacao="situacaoUnidadeNoProcesso"
         @irParaAtividades="irParaAtividadesConhecimentos"
         @navegarParaMapa="navegarParaMapa"
+        @irParaDiagnosticoEquipe="irParaDiagnosticoEquipe"
+        @irParaOcupacoesCriticas="irParaOcupacoesCriticas"
     />
+
+
+    <!-- Seção de Movimentações do Processo -->
+    <div class="mt-4">
+      <h4>Movimentações do Processo</h4>
+      <div v-if="movements.length === 0" class="alert alert-info">
+        Nenhuma movimentação registrada para este subprocesso.
+      </div>
+      <table v-else class="table table-striped">
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Unidade Origem</th>
+            <th>Unidade Destino</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="movement in movements" :key="movement.id">
+            <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
+            <td>{{ movement.unidadeOrigem }}</td>
+            <td>{{ movement.unidadeDestino }}</td>
+            <td>{{ movement.descricao }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <SubprocessoModal
@@ -52,6 +81,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
 import {
   Mapa,
+  Movimentacao,
   Perfil,
   Processo,
   Servidor,
@@ -60,7 +90,7 @@ import {
   TipoResponsabilidade,
   Unidade
 } from "@/types/tipos";
-import {parseDate} from '@/utils/dateUtils';
+import {formatDateTimeBR, parseDate} from '@/utils/dateUtils';
 import {SITUACOES_EM_ANDAMENTO} from '@/constants/situacoes';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
@@ -168,7 +198,7 @@ const mapa = computed<Mapa | null>(() => {
 // Computed para verificar se o subprocesso está em andamento
 const isSubprocessoEmAndamento = computed(() => {
   if (!SubprocessoDetalhes.value) return false;
-  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao);
+  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao as any);
 });
 
 // Computed para identificar a etapa atual e sua data limite
@@ -203,18 +233,18 @@ const dataLimiteAtual = computed(() => {
 
 // Computed properties movidos para os componentes específicos
 
+const movements = computed<Movimentacao[]>(() => {
+  if (!SubprocessoDetalhes.value) return [];
+  return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.id);
+});
+
 function navegarParaMapa() {
   if (!sigla.value || !processoAtual.value || !mapa.value) {
     return;
   }
 
   const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
-
-  if (perfilStore.perfilSelecionado === 'ADMIN') {
-    router.push({name: 'SubprocessoMapa', params});
-  } else {
-    router.push({name: 'SubprocessoVisMapa', params});
-  }
+  router.push({name: 'SubprocessoVisMapa', params});
 }
 
 function irParaAtividadesConhecimentos() {
@@ -230,6 +260,24 @@ function irParaAtividadesConhecimentos() {
   } else {
     router.push({name: 'SubprocessoVisCadastro', params}); // Abre VisAtividades.vue
   }
+}
+
+function irParaDiagnosticoEquipe() {
+  if (!sigla.value || !processoAtual.value) {
+    return;
+  }
+
+  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  router.push({name: 'DiagnosticoEquipe', params});
+}
+
+function irParaOcupacoesCriticas() {
+  if (!sigla.value || !processoAtual.value) {
+    return;
+  }
+
+  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  router.push({name: 'OcupacoesCriticas', params});
 }
 
 // Funções para o modal de alteração de data limite
@@ -265,7 +313,6 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     );
 
   } catch (error) {
-    console.error('Erro ao alterar data limite:', error);
     notificacoesStore.erro(
         'Erro ao alterar data limite',
         'Ocorreu um erro ao alterar a data limite. Tente novamente.'

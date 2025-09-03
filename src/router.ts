@@ -95,6 +95,26 @@ const routes = [
         meta: {title: 'Impacto no Mapa', breadcrumb: 'Impacto no Mapa'},
     },
     {
+        path: '/processo/:idProcesso/:siglaUnidade/diagnostico-equipe',
+        name: 'DiagnosticoEquipe',
+        component: () => import('./views/DiagnosticoEquipe.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            siglaUnidade: route.params.siglaUnidade
+        }),
+        meta: {title: 'Diagnóstico da Equipe', breadcrumb: 'Diagnóstico da Equipe'},
+    },
+    {
+        path: '/processo/:idProcesso/:siglaUnidade/ocupacoes-criticas',
+        name: 'OcupacoesCriticas',
+        component: () => import('./views/OcupacoesCriticas.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            idProcesso: Number(route.params.idProcesso),
+            siglaUnidade: route.params.siglaUnidade
+        }),
+        meta: {title: 'Ocupações Críticas', breadcrumb: 'Ocupações Críticas'},
+    },
+    {
         path: '/unidade/:siglaUnidade',
         name: 'Unidade',
         component: () => import('./views/Unidade.vue'),

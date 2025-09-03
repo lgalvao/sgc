@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import {ref, watch} from 'vue'
 
 interface UnidadeBloco {
   sigla: string

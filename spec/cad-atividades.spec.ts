@@ -1,4 +1,4 @@
-import {expect, Page, test, Locator} from "@playwright/test";
+import {expect, Locator, Page, test} from "@playwright/test";
 import {login} from "./utils/auth";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {

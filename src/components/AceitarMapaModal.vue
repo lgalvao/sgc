@@ -4,21 +4,23 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">
+          <h5 class="modal-title" data-testid="modal-aceite-title">
             <i class="bi bi-check-circle text-success me-2"></i>
-            Aceitar Mapa de Competências
+            {{ tituloModal }}
           </h5>
-          <button type="button" class="btn-close" @click="$emit('fecharModal')"></button>
+          <button type="button" class="btn-close" @click="$emit('fecharModal')" data-testid="modal-aceite-close"></button>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="observacao-textarea" class="form-label">Observações <small class="text-muted">(opcional)</small></label>
+        <div class="modal-body" data-testid="modal-aceite-body">
+          <p v-if="perfil === 'ADMIN'">{{ corpoModal }}</p>
+          <div v-else class="mb-3">
+            <label for="observacao-textarea" class="form-label">{{ corpoModal }}</label>
             <textarea
               id="observacao-textarea"
               v-model="observacao"
               class="form-control"
               rows="4"
               placeholder="Digite suas observações sobre o mapa..."
+              data-testid="observacao-aceite-textarea"
             ></textarea>
             <div class="form-text">
               As observações serão registradas junto com a validação do mapa.
@@ -26,7 +28,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="$emit('fecharModal')">
+          <button type="button" class="btn btn-secondary" @click="$emit('fecharModal')" data-testid="modal-aceite-cancelar">
             <i class="bi bi-x-circle me-1"></i>
             Cancelar
           </button>
@@ -34,6 +36,7 @@
             type="button"
             class="btn btn-success"
             @click="$emit('confirmarAceitacao', observacao)"
+            data-testid="modal-aceite-confirmar"
           >
             <i class="bi bi-check-circle me-1"></i>
             Aceitar
@@ -46,13 +49,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {computed, ref} from 'vue';
 
 interface Props {
   mostrarModal: boolean;
+  perfil?: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 defineEmits<{
   fecharModal: [];
@@ -60,6 +64,20 @@ defineEmits<{
 }>();
 
 const observacao = ref('');
+
+const tituloModal = computed(() => {
+  return props.perfil === 'ADMIN' ? 'Homologação' : 'Aceitar Mapa de Competências';
+});
+
+const corpoModal = computed(() => {
+  return props.perfil === 'ADMIN'
+    ? 'Confirma a homologação do mapa de competências?'
+    : 'Observações <small class="text-muted">(opcional)</small>';
+});
+
+const mostrarCampoObservacao = computed(() => {
+  return props.perfil !== 'ADMIN';
+});
 </script>
 
 <style scoped>

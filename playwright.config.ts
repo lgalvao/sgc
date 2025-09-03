@@ -4,7 +4,7 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 15000,
+    timeout: 5000,
     testDir: './spec',
     fullyParallel: true,
     reporter: 'dot',
@@ -18,8 +18,8 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:5173/',
         trace: 'on-first-retry',
-        actionTimeout: 10000,
-        navigationTimeout: 10000,
+        actionTimeout: 3000,
+        navigationTimeout: 3000,
     },
     projects: [{
         name: 'chromium',

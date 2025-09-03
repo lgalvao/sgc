@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
-import { Processo } from '@/types/tipos';
+import {Processo} from '@/types/tipos';
 
 // Mock de dados de processo
 const mockProcessos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[] = [

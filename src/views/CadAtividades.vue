@@ -27,7 +27,7 @@
       <div class="col">
         <input v-model="novaAtividade" class="form-control" data-testid="input-nova-atividade"
                placeholder="Nova atividade"
-               type="text"/>
+               type="text" aria-label="Nova atividade"/>
       </div>
       <div class="col-auto">
         <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-testid="btn-adicionar-atividade"
@@ -44,7 +44,7 @@
             class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
           <template v-if="editandoAtividade === atividade.id">
             <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"
-                   data-testid="input-editar-atividade"/>
+                   data-testid="input-editar-atividade" aria-label="Editar atividade"/>
             <button class="btn btn-sm btn-outline-success me-1 botao-acao" data-bs-toggle="tooltip"
                     data-testid="btn-salvar-edicao-atividade"
                     title="Salvar" @click="salvarEdicaoAtividade(atividade.id)"><i class="bi bi-save"></i>
@@ -106,7 +106,7 @@
             <div class="col">
               <input v-model="atividade.novoConhecimento" class="form-control form-control-sm"
                      data-testid="input-novo-conhecimento"
-                     placeholder="Novo conhecimento" type="text"/>
+                     placeholder="Novo conhecimento" type="text" aria-label="Novo conhecimento"/>
             </div>
             <div class="col-auto">
               <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
@@ -130,6 +130,32 @@
         :mostrar="mostrarModalImpacto"
         :sigla-unidade="siglaUnidade"
         @fechar="fecharModalImpacto"/>
+
+    <!-- Modal de Confirmação de Disponibilização -->
+    <div v-if="mostrarModalConfirmacao" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro' }}</h5>
+            <button type="button" class="btn-close" @click="fecharModalConfirmacao"></button>
+          </div>
+          <div class="modal-body">
+            <p>{{ isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?' }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.</p>
+            <div v-if="atividadesSemConhecimento.length > 0" class="alert alert-warning">
+              <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
+              <ul>
+                <li v-for="atividade in atividadesSemConhecimento" :key="atividade.id">{{ atividade.descricao }}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalConfirmacao">Cancelar</button>
+            <button type="button" class="btn btn-success" @click="confirmarDisponibilizacao">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarModalConfirmacao" class="modal-backdrop fade show"></div>
   </div>
 </template>
 
@@ -142,8 +168,10 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {useMapasStore} from '@/stores/mapas'
+import {useAlertasStore} from '@/stores/alertas'
 import {Atividade, Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
+import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue'
 
@@ -164,7 +192,9 @@ const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const mapasStore = useMapasStore()
+const alertasStore = useAlertasStore()
 const notificacoesStore = useNotificacoesStore()
+const router = useRouter()
 
 // Helper function to get impacted competency IDs
 function getImpactedCompetencyIds(atividadeId: number): number[] {
@@ -224,11 +254,14 @@ const atividades = computed<AtividadeComEdicao[]>({
   }
 })
 
-function adicionarAtividade() {
-  console.log('CadAtividades: Função adicionarAtividade() executada!'); // Este log aparece
-  console.log('CadAtividades: novaAtividade.value:', novaAtividade.value); // Adicionado para depuração
-  console.log('CadAtividades: idSubprocesso.value:', idSubprocesso.value); // Adicionado para depuração
+const processoAtual = computed<Processo | null>(() => {
+  if (!idSubprocesso.value) return null;
+  return (processosStore.processos as Processo[]).find(p => p.id === idProcesso.value) || null;
+});
 
+const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
+
+function adicionarAtividade() {
   if (novaAtividade.value && idSubprocesso.value !== undefined) {
     const novaAtividadeObj = {
       id: Date.now(),
@@ -242,7 +275,6 @@ function adicionarAtividade() {
       idAtividade: novaAtividadeObj.id,
       descricaoAtividade: novaAtividadeObj.descricao,
     });
-    console.log('CadAtividades: Após registrar mudança:', revisaoStore.mudancasRegistradas); // Adicionado para depuração
 
     // Notificação de sucesso
     notificacoesStore.sucesso(
@@ -433,6 +465,8 @@ const atividadesParaImportar = ref<Atividade[]>([])
 
 const mostrarModalImpacto = ref(false)
 const mostrarModalImportar = ref(false)
+const mostrarModalConfirmacao = ref(false)
+const atividadesSemConhecimento = ref<Atividade[]>([])
 
 const modalElement = ref<HTMLElement | null>(null)
 const cleanupBackdrop = () => {
@@ -513,14 +547,91 @@ async function selecionarUnidade(unidadePu: Subprocesso | null) {
 }
 
 
+function validarAtividades(): Atividade[] {
+  return atividades.value.filter(atividade => atividade.conhecimentos.length === 0);
+}
+
+function obterUnidadeSuperior(): string | null {
+  if (!unidade.value) return null;
+  // Simulação: em um sistema real, isso seria obtido da hierarquia
+  return 'SEDOC'; // Para simplificação, assumindo SEDOC como superior
+}
+
 function disponibilizarCadastro() {
-  // Simulação de disponibilização do cadastro
-  // Em um sistema real, isso enviaria os dados para validação
+  atividadesSemConhecimento.value = validarAtividades();
+  mostrarModalConfirmacao.value = true;
+}
+
+function fecharModalConfirmacao() {
+  mostrarModalConfirmacao.value = false;
+  atividadesSemConhecimento.value = [];
+}
+
+function confirmarDisponibilizacao() {
+  if (!idSubprocesso.value) return;
+
+  const isRevisao = processoAtual.value?.tipo === TipoProcesso.REVISAO;
+  const unidadeSuperior = obterUnidadeSuperior();
+
+  // Para processos de revisão, verificar se há impactos no mapa
+  if (isRevisao && revisaoStore.mudancasRegistradas.length === 0) {
+    notificacoesStore.aviso(
+        'Atenção',
+        'Não foram detectadas alterações no cadastro. Considere se realmente é necessário prosseguir com a revisão.'
+    );
+  }
+
+  // Alterar situação do subprocesso
+  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+  if (subprocessoIndex !== -1) {
+    const novaSituacao = isRevisao ? 'Revisão do cadastro disponibilizada' : 'Cadastro disponibilizado';
+    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+
+    // Definir data/hora de conclusão da etapa 1
+    processosStore.subprocessos[subprocessoIndex].dataFimEtapa1 = new Date();
+  }
+
+  // Registrar movimentação
+  if (unidadeSuperior) {
+    processosStore.addMovement({
+      idSubprocesso: idSubprocesso.value,
+      unidadeOrigem: siglaUnidade.value,
+      unidadeDestino: unidadeSuperior,
+      descricao: isRevisao ? 'Disponibilização da revisão do cadastro de atividades' : 'Disponibilização do cadastro de atividades'
+    });
+  }
+
+  // Enviar notificação por e-mail
+  const assunto = isRevisao
+    ? `SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: ${siglaUnidade.value}`
+    : `SGC: Cadastro de atividades e conhecimentos disponibilizado: ${siglaUnidade.value}`;
+
+  const corpo = isRevisao
+    ? `A unidade ${siglaUnidade.value} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`
+    : `A unidade ${siglaUnidade.value} disponibilizou o cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`;
+
+  notificacoesStore.email(assunto, `Responsável pela ${unidadeSuperior}`, corpo);
+
+  // Criar alerta
+  alertasStore.criarAlerta({
+    idProcesso: idProcesso.value,
+    unidadeOrigem: siglaUnidade.value,
+    unidadeDestino: unidadeSuperior || 'SEDOC',
+    descricao: `Cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} disponibilizado para análise`,
+    dataHora: new Date()
+  });
+
+  const mensagemSucesso = isRevisao
+    ? 'Revisão do cadastro de atividades disponibilizada'
+    : 'Cadastro de atividades disponibilizado';
 
   notificacoesStore.sucesso(
-      'Cadastro disponibilizado',
-      'O cadastro de atividades e conhecimentos foi disponibilizado para validação com sucesso!'
+      mensagemSucesso,
+      'O cadastro foi disponibilizado para análise das unidades superiores com sucesso!'
   );
+
+  fecharModalConfirmacao();
+  router.push('/painel');
 }
 
 function abrirModalImpacto() {

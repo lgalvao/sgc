@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {
-  parseDate,
-  formatDateBR,
-  formatDateForInput,
-  formatDateTimeBR,
-  isDateValidAndFuture,
-  diffInDays
+    diffInDays,
+    formatDateBR,
+    formatDateForInput,
+    formatDateTimeBR,
+    isDateValidAndFuture,
+    parseDate
 } from '../dateUtils';
 
 describe('dateUtils', () => {

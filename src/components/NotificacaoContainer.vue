@@ -18,21 +18,122 @@
           </div>
           <div class="notification-body">
             {{ notificacao.mensagem }}
+            <div v-if="notificacao.tipo === 'email' && notificacao.emailContent" class="mt-2">
+              <button class="btn btn-sm btn-outline-primary" @click="mostrarEmail(notificacao)">
+                Ver e-mail completo
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </TransitionGroup>
+
+    <!-- Modal para visualizar e-mail completo -->
+    <div v-if="emailModalVisivel" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-envelope me-2"></i>
+              E-mail Simulado
+            </h5>
+            <button type="button" class="btn-close" @click="fecharEmailModal"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="emailAtual">
+              <div class="mb-3">
+                <strong>Assunto:</strong> {{ emailAtual.assunto }}
+              </div>
+              <div class="mb-3">
+                <strong>Destinatário:</strong> {{ emailAtual.destinatario }}
+              </div>
+              <div class="mb-3">
+                <strong>Corpo:</strong>
+                <div class="mt-2 p-3 bg-light rounded">
+                  <pre style="white-space: pre-wrap; font-family: inherit;">{{ emailAtual.corpo }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharEmailModal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="emailModalVisivel" class="modal-backdrop fade show"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {storeToRefs} from 'pinia';
-import {type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
+// Observar mudanças nas notificações para configurar auto-hide
+import {onMounted, onUnmounted, ref, watch} from 'vue';
+import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
 
 const notificacoesStore = useNotificacoesStore();
 const {notificacoes} = storeToRefs(notificacoesStore);
 
 const {removerNotificacao} = notificacoesStore;
+
+// Estado para modal de email
+const emailModalVisivel = ref(false);
+const emailAtual = ref<EmailContent | null>(null);
+
+// Auto-hide para notificações de sucesso após 3 segundos
+let autoHideTimeouts: Map<string, number> = new Map();
+
+const scheduleAutoHide = (notificacao: any) => {
+  // Só auto-hide para notificações de sucesso
+  if (notificacao.tipo === 'success') {
+    const timeoutId = window.setTimeout(() => {
+      removerNotificacao(notificacao.id);
+      autoHideTimeouts.delete(notificacao.id);
+    }, 3000); // 3 segundos
+
+    autoHideTimeouts.set(notificacao.id, timeoutId);
+  }
+};
+
+const cancelAutoHide = (notificacaoId: string) => {
+  const timeoutId = autoHideTimeouts.get(notificacaoId);
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+    autoHideTimeouts.delete(notificacaoId);
+  }
+};
+
+// Configurar auto-hide para notificações existentes
+onMounted(() => {
+  notificacoes.value.forEach(scheduleAutoHide);
+});
+
+// Limpar timeouts quando o componente for desmontado
+onUnmounted(() => {
+  autoHideTimeouts.forEach((timeoutId) => {
+    clearTimeout(timeoutId);
+  });
+  autoHideTimeouts.clear();
+});
+
+watch(notificacoes, (novasNotificacoes, notificacoesAntigas) => {
+  // Verificar notificações adicionadas
+  novasNotificacoes.forEach(notificacao => {
+    const existsInOld = notificacoesAntigas.some(old => old.id === notificacao.id);
+    if (!existsInOld) {
+      scheduleAutoHide(notificacao);
+    }
+  });
+
+  // Verificar notificações removidas
+  notificacoesAntigas.forEach(notificacao => {
+    const existsInNew = novasNotificacoes.some(newNot => newNot.id === notificacao.id);
+    if (!existsInNew) {
+      cancelAutoHide(notificacao.id);
+    }
+  });
+});
 
 const iconeTipo = (tipo: TipoNotificacao): string => {
   switch (tipo) {
@@ -44,9 +145,23 @@ const iconeTipo = (tipo: TipoNotificacao): string => {
       return 'bi bi-exclamation-triangle-fill text-warning';
     case 'info':
       return 'bi bi-info-circle-fill text-info';
+    case 'email':
+      return 'bi bi-envelope-fill text-primary';
     default:
       return 'bi bi-bell-fill';
   }
+};
+
+const mostrarEmail = (notificacao: Notificacao) => {
+  if (notificacao.emailContent) {
+    emailAtual.value = notificacao.emailContent;
+    emailModalVisivel.value = true;
+  }
+};
+
+const fecharEmailModal = () => {
+  emailModalVisivel.value = false;
+  emailAtual.value = null;
 };
 </script>
 

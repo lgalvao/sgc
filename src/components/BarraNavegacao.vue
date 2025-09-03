@@ -25,8 +25,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { useRoute, useRouter, type RouteLocationNamedRaw } from 'vue-router';
+import {computed} from 'vue';
+import {type RouteLocationNamedRaw, useRoute, useRouter} from 'vue-router';
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/tipos";
 

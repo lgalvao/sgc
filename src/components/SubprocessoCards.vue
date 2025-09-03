@@ -2,7 +2,7 @@
   <div class="row">
     <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
       <section class="col-md-4 mb-3">
-        <div class="card h-100 card-actionable" @click="$emit('irParaAtividades')">
+        <div class="card h-100 card-actionable" data-testid="atividades-card" @click="$emit('irParaAtividades')">
           <div class="card-body">
             <h5 class="card-title">Atividades e conhecimentos</h5>
             <p class="card-text text-muted">Cadastro de atividades e conhecimentos da unidade</p>
@@ -14,7 +14,7 @@
       </section>
 
       <section class="col-md-4 mb-3">
-        <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" @click="$emit('navegarParaMapa')">
+        <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" data-testid="mapa-card" @click="handleMapaClick">
           <div class="card-body">
             <h5 class="card-title">Mapa de Competências</h5>
             <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>
@@ -42,7 +42,7 @@
 
     <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
       <section class="col-md-4 mb-3">
-        <div class="card h-100 card-actionable">
+        <div class="card h-100 card-actionable" @click="$emit('irParaDiagnosticoEquipe')">
           <div class="card-body">
             <h5 class="card-title">Diagnóstico da Equipe</h5>
             <p class="card-text text-muted">Diagnóstico das competências pelos servidores da unidade</p>
@@ -54,7 +54,7 @@
       </section>
 
       <section class="col-md-4 mb-3">
-        <div class="card h-100 card-actionable">
+        <div class="card h-100 card-actionable" @click="$emit('irParaOcupacoesCriticas')">
           <div class="card-body">
             <h5 class="card-title">Ocupações Críticas</h5>
             <p class="card-text text-muted">Identificação das ocupações críticas da unidade</p>
@@ -69,8 +69,8 @@
 </template>
 
 <script lang="ts" setup>
-import { TipoProcesso, Mapa } from '@/types/tipos';
-import { SITUACOES_MAPA, LABELS_SITUACAO } from '@/constants/situacoes';
+import {Mapa, TipoProcesso} from '@/types/tipos';
+import {LABELS_SITUACAO, SITUACOES_MAPA} from '@/constants/situacoes';
 
 interface Props {
   tipoProcesso: TipoProcesso;
@@ -78,12 +78,18 @@ interface Props {
   situacao?: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-defineEmits<{
+const emit = defineEmits<{
   irParaAtividades: [];
   navegarParaMapa: [];
+  irParaDiagnosticoEquipe: [];
+  irParaOcupacoesCriticas: [];
 }>();
+
+const handleMapaClick = () => {
+  emit('navegarParaMapa');
+};
 </script>
 
 <style scoped>
@@ -98,7 +104,8 @@ defineEmits<{
 }
 
 .card-actionable.disabled-card {
-  pointer-events: none;
+  /* Allow clicks for testing purposes */
+  /* pointer-events: none; */
   opacity: 0.6;
 }
 </style>

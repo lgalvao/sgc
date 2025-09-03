@@ -90,6 +90,9 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
+import {useMapasStore} from '@/stores/mapas'
+import {useServidoresStore} from '@/stores/servidores'
+import {useAlertasStore} from '@/stores/alertas'
 import {SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {generateUniqueId} from '@/utils/idGenerator'
 import {useNotificacoesStore} from '@/stores/notificacoes'
@@ -101,6 +104,9 @@ const dataLimite = ref<string>('')
 const router = useRouter()
 const processosStore = useProcessosStore()
 const unidadesStore = useUnidadesStore()
+const mapasStore = useMapasStore()
+const servidoresStore = useServidoresStore()
+const alertasStore = useAlertasStore()
 const notificacoesStore = useNotificacoesStore()
 
 function limparCampos() {
@@ -115,6 +121,28 @@ function isUnidadeIntermediaria(sigla: string): boolean {
   return !!(unidade && unidade.tipo === 'INTERMEDIARIA');
 }
 
+function unidadeTemMapaVigente(sigla: string): boolean {
+  return !!mapasStore.getMapaVigentePorUnidade(sigla);
+}
+
+function unidadeTemServidores(sigla: string): boolean {
+  return servidoresStore.servidores.filter(s => s.unidade === sigla).length > 0;
+}
+
+function validarUnidadesParaProcesso(tipo: TipoProcesso, unidadesSelecionadas: string[]): string[] {
+  let unidadesValidas = unidadesSelecionadas.filter(sigla => !isUnidadeIntermediaria(sigla));
+
+  if (tipo === TipoProcesso.REVISAO || tipo === TipoProcesso.DIAGNOSTICO) {
+    unidadesValidas = unidadesValidas.filter(sigla => unidadeTemMapaVigente(sigla));
+  }
+
+  if (tipo === TipoProcesso.DIAGNOSTICO) {
+    unidadesValidas = unidadesValidas.filter(sigla => unidadeTemServidores(sigla));
+  }
+
+  return unidadesValidas;
+}
+
 function salvarProcesso() {
    if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
      notificacoesStore.erro(
@@ -124,8 +152,17 @@ function salvarProcesso() {
      return
    }
 
+   const unidadesFiltradas = validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
+
+   if (unidadesFiltradas.length === 0) {
+     notificacoesStore.erro(
+       'Unidades inválidas',
+       'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+     );
+     return
+   }
+
    const novoidProcesso = processosStore.processos.length + 1;
-   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
 
    const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
      id: generateUniqueId(),
@@ -169,21 +206,41 @@ function iniciarProcesso() {
      return
    }
 
-   const novoidProcesso = processosStore.processos.length + 1;
-   const unidadesFiltradas = unidadesSelecionadas.value.filter(sigla => !isUnidadeIntermediaria(sigla));
+   const unidadesFiltradas = validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
 
-   const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
-     id: generateUniqueId(),
-     idProcesso: novoidProcesso,
-     unidade: unidadeSigla,
-     dataLimiteEtapa1: new Date(dataLimite.value),
-     dataLimiteEtapa2: null,
-     dataFimEtapa1: null,
-     dataFimEtapa2: null,
-     unidadeAtual: unidadeSigla,
-     unidadeAnterior: null,
-     situacao: 'Aguardando preenchimento do mapa'
-   }));
+   if (unidadesFiltradas.length === 0) {
+     notificacoesStore.erro(
+       'Unidades inválidas',
+       'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+     );
+     return
+   }
+
+   const novoidProcesso = processosStore.processos.length + 1;
+
+   // Criar subprocessos com situações corretas conforme PDF
+   const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => {
+     let situacaoInicial = 'Não iniciado';
+
+     if (tipo.value === TipoProcesso.REVISAO) {
+       situacaoInicial = 'Não iniciado'; // Para revisão também começa como 'Não iniciado'
+     }
+
+     return {
+       id: generateUniqueId(),
+       idProcesso: novoidProcesso,
+       unidade: unidadeSigla,
+       dataLimiteEtapa1: new Date(dataLimite.value),
+       dataLimiteEtapa2: null,
+       dataFimEtapa1: null,
+       dataFimEtapa2: null,
+       unidadeAtual: unidadeSigla,
+       unidadeAnterior: null,
+       situacao: situacaoInicial,
+       observacoes: '',
+       sugestoes: ''
+     };
+   });
 
    const novo = {
      id: novoidProcesso,
@@ -197,6 +254,28 @@ function iniciarProcesso() {
    processosStore.adicionarProcesso(novo);
    processosStore.adicionarsubprocessos(novossubprocessosObjetos);
 
+   // Para processos de revisão, criar cópia dos mapas vigentes
+   if (tipo.value === TipoProcesso.REVISAO) {
+     unidadesFiltradas.forEach(unidadeSigla => {
+       const mapaVigente = mapasStore.getMapaVigentePorUnidade(unidadeSigla);
+       if (mapaVigente) {
+         const novoMapa = {
+           ...mapaVigente,
+           id: generateUniqueId(),
+           idProcesso: novoidProcesso,
+           dataCriacao: new Date(),
+           dataDisponibilizacao: null,
+           dataFinalizacao: null,
+           situacao: 'em_andamento'
+         };
+         mapasStore.adicionarMapa(novoMapa);
+       }
+     });
+   }
+
+   // Registrar movimentações e enviar notificações conforme CDU-04/CDU-05
+   enviarNotificacoesIniciarProcesso(novo, unidadesFiltradas);
+
    notificacoesStore.sucesso(
      'Processo iniciado',
      'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
@@ -204,6 +283,75 @@ function iniciarProcesso() {
 
    router.push('/painel')
    limparCampos()
+}
+
+function enviarNotificacoesIniciarProcesso(processo: any, unidadesParticipantes: string[]) {
+  const isRevisao = processo.tipo === TipoProcesso.REVISAO;
+  const assunto = isRevisao
+    ? `SGC: Início de processo de revisão do mapa de competências`
+    : `SGC: Início de processo de mapeamento de competências`;
+
+  unidadesParticipantes.forEach(unidadeSigla => {
+    const unidade = unidadesStore.pesquisarUnidade(unidadeSigla);
+    if (!unidade) return;
+
+    const isOperacionalOuInteroperacional = unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL';
+    const isIntermediaria = unidade.tipo === 'INTERMEDIARIA';
+
+    if (isOperacionalOuInteroperacional) {
+      // Notificação para unidades operacionais/interoperacionais
+      const corpo = isRevisao
+        ? `Comunicamos o início do processo ${processo.descricao} para a sua unidade. Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos no sistema. O prazo para conclusão desta etapa do processo é ${processo.dataLimite.toLocaleDateString('pt-BR')}.`
+        : `Comunicamos o início do processo ${processo.descricao} para a sua unidade. Já é possível realizar o cadastro de atividades e conhecimentos no sistema. O prazo para conclusão desta etapa do processo é ${processo.dataLimite.toLocaleDateString('pt-BR')}.`;
+
+      notificacoesStore.email(assunto, `Responsável pela ${unidadeSigla}`, corpo);
+
+      // Criar alerta
+      alertasStore.criarAlerta({
+        idProcesso: processo.id,
+        unidadeOrigem: 'SEDOC',
+        unidadeDestino: unidadeSigla,
+        descricao: 'Início do processo',
+        dataHora: new Date()
+      });
+
+      // Registrar movimentação
+      const subprocesso = processosStore.subprocessos.find(sp => sp.idProcesso === processo.id && sp.unidade === unidadeSigla);
+      if (subprocesso) {
+        processosStore.addMovement({
+          idSubprocesso: subprocesso.id,
+          unidadeOrigem: 'SEDOC',
+          unidadeDestino: unidadeSigla,
+          descricao: 'Processo iniciado'
+        });
+      }
+    }
+
+    if (isIntermediaria || unidade.tipo === 'INTEROPERACIONAL') {
+      // Para unidades intermediárias, buscar unidades subordinadas
+      const unidadesSubordinadas = unidadesStore.getUnidadesSubordinadas(unidadeSigla)
+        .filter(sigla => unidadesParticipantes.includes(sigla));
+
+      if (unidadesSubordinadas.length > 0) {
+        const siglasSubordinadas = unidadesSubordinadas.join(', ');
+
+        const corpo = isRevisao
+          ? `Comunicamos o início do processo ${processo.descricao} nas unidades ${siglasSubordinadas}. Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos. À medida que estas revisões forem sendo disponibilizadas, será possível visualizar e realizar a sua validação. O prazo para conclusão desta etapa do processo é ${processo.dataLimite.toLocaleDateString('pt-BR')}. Acompanhe o processo no sistema.`
+          : `Comunicamos o início do processo ${processo.descricao} nas unidades ${siglasSubordinadas}. Estas unidades já podem iniciar o cadastro de atividades e conhecimentos. À medida que estes cadastros forem sendo disponibilizados, será possível visualizar e realizar a sua validação. O prazo para conclusão desta etapa do processo é ${processo.dataLimite.toLocaleDateString('pt-BR')}. Acompanhe o processo no sistema.`;
+
+        notificacoesStore.email(assunto, `Responsável pela ${unidadeSigla}`, corpo);
+
+        // Criar alerta para unidade intermediária
+        alertasStore.criarAlerta({
+          idProcesso: processo.id,
+          unidadeOrigem: 'SEDOC',
+          unidadeDestino: unidadeSigla,
+          descricao: 'Início do processo em unidade(s) subordinada(s)',
+          dataHora: new Date()
+        });
+      }
+    }
+  });
 }
 
 function getTodasSubunidades(unidade: Unidade): string[] {

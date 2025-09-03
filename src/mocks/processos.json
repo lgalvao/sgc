@@ -4,8 +4,8 @@
     "descricao": "Mapeamento de competências - 2025",
     "tipo": "Mapeamento",
     "dataLimite": "2025-06-30",
-    "dataFinalizacao": "2025-10-15",
-    "situacao": "Finalizado"
+    "dataFinalizacao": null,
+    "situacao": "Em andamento"
   },
   {
     "id": 2,
@@ -27,7 +27,43 @@
     "descricao": "Diagnóstico de competências - 2025",
     "tipo": "Diagnóstico",
     "dataLimite": "2025-08-10",
-    "dataFinalizacao": "2025-08-15",
-    "situacao": "Finalizado"
+    "dataFinalizacao": null,
+    "situacao": "Em andamento"
+  },
+  {
+    "id": 6,
+    "descricao": "Mapeamento inicial COJUR - 2025",
+    "tipo": "Mapeamento",
+    "dataLimite": "2025-09-15",
+    "situacao": "Criado"
+  },
+  {
+    "id": 7,
+    "descricao": "Revisão anual de competências - 2025",
+    "tipo": "Revisão",
+    "dataLimite": "2025-10-30",
+    "situacao": "Em andamento"
+  },
+  {
+    "id": 8,
+    "descricao": "Mapeamento de competências COSIS - 2025",
+    "tipo": "Mapeamento",
+    "dataLimite": "2025-11-20",
+    "situacao": "Criado"
+  },
+  {
+    "id": 9,
+    "descricao": "Diagnóstico de gaps organizacionais - 2025",
+    "tipo": "Diagnóstico",
+    "dataLimite": "2025-12-05",
+    "situacao": "Em andamento"
+  },
+  {
+    "id": 10,
+    "descricao": "Revisão de mapa STIC - 2024",
+    "tipo": "Revisão",
+    "dataLimite": "2024-12-15",
+    "dataFinalizacao": null,
+    "situacao": "Em andamento"
   }
 ]

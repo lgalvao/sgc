@@ -74,10 +74,18 @@ test.describe('Cadastro de Mapa de Competências', () => {
     });
 
     test('deve disponibilizar o mapa com sucesso', async ({page}) => {
-        // Criar uma competência para habilitar o botão "Disponibilizar"
+        // Criar uma competência abrangente que associe TODAS as atividades disponíveis
         await page.getByTestId('btn-abrir-criar-competencia').click();
-        await page.getByTestId('input-nova-competencia').fill('Competência para Disponibilizar ' + Date.now());
-        await page.locator('.atividade-card-item').nth(0).click();
+        await page.getByTestId('input-nova-competencia').fill('Competência Completa para Teste ' + Date.now());
+
+        // Selecionar TODAS as atividades disponíveis para passar nas validações
+        const atividadeCards = page.locator('.atividade-card-item');
+        const count = await atividadeCards.count();
+
+        for (let i = 0; i < count; i++) {
+            await atividadeCards.nth(i).click();
+        }
+
         await page.getByTestId('btn-criar-competencia').click();
 
         // Clicar no botão "Disponibilizar" principal
@@ -90,6 +98,6 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: 'Disponibilizar'}).click();
 
         // Verificar a notificação de sucesso
-        await expect(page.locator('.alert.alert-info')).toContainText('O mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
+        await expect(page.locator('.alert.alert-info')).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
     });
 });

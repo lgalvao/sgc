@@ -36,7 +36,6 @@ export const useAtividadesStore = defineStore('atividades', {
             atividade.id = this.nextId++;
             // Substituir o array para garantir reatividade
             this.atividades = [...this.atividades, atividade];
-            console.log('AtividadesStore: Atividade adicionada. Estado atual:', this.atividades); // Adicionado para depuração
         },
         removerAtividade(atividadeId: number) {
             this.atividades = this.atividades.filter(a => a.id !== atividadeId);

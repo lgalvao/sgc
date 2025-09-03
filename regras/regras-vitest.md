@@ -200,7 +200,7 @@ roteamento/store.
   aceitável. Prefira soluções baseadas em código para correções de teste isoladas.
 * **Mocking de Ações Assíncronas de Store:** Ao mockar ações assíncronas de store (ex: `fetchAtividadesPorSubprocesso`),
   certifique-se de que a implementação mockada retorne uma `Promise` (ex: `Promise.resolve(...)`) para simular
-  corretamente o comportamento assíncrono.
+  corretamente o comportamento assíncrono
 * **Problemas de Reatividade com Mocks de `ref` e `v-if`:** Em testes de componentes, quando um `v-if` depende de um
   `ref` mockado (ex: de um composable ou store), pode ser necessário garantir que o `ref` seja definido *antes* da
   montagem do componente, ou que o componente seja explicitamente atualizado (`await wrapper.vm.$nextTick()`) após a

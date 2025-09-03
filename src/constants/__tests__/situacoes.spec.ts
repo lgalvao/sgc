@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {
-  SITUACOES_SUBPROCESSO,
-  SITUACOES_MAPA,
-  LABELS_SITUACAO,
-  SITUACOES_EM_ANDAMENTO,
-  CLASSES_BADGE_SITUACAO
+    CLASSES_BADGE_SITUACAO,
+    LABELS_SITUACAO,
+    SITUACOES_EM_ANDAMENTO,
+    SITUACOES_MAPA,
+    SITUACOES_SUBPROCESSO
 } from '../situacoes';
 
 describe('situacoes.ts constants', () => {
@@ -29,7 +29,7 @@ describe('situacoes.ts constants', () => {
     });
 
     it('should have correct number of situations', () => {
-      expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(16);
+      expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(17);
     });
   });
 
@@ -143,7 +143,7 @@ describe('situacoes.ts constants', () => {
     });
 
     it('should have correct number of CSS classes', () => {
-      expect(Object.keys(CLASSES_BADGE_SITUACAO)).toHaveLength(9);
+      expect(Object.keys(CLASSES_BADGE_SITUACAO)).toHaveLength(10);
     });
   });
 

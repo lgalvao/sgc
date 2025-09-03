@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-import { Processo } from '@/types/tipos';
+import {defineEmits, defineProps} from 'vue';
+import {Processo} from '@/types/tipos';
 
 defineProps<{
   processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];

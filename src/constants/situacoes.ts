@@ -18,6 +18,7 @@ export const SITUACOES_SUBPROCESSO = {
   REVISAO_MAPA_DISPONIBILIZADA: 'Revisão do mapa disponibilizada',
   REVISAO_MAPA_EM_ANDAMENTO: 'Revisão do mapa em andamento',
   MAPA_VALIDADO: 'Mapa validado',
+  MAPA_COM_SUGESTOES: 'Mapa com sugestões',
   MAPA_HOMOLOGADO: 'Mapa homologado',
   MAPA_CRIADO: 'Mapa criado'
 } as const;
@@ -60,6 +61,7 @@ export const CLASSES_BADGE_SITUACAO = {
   [SITUACOES_SUBPROCESSO.VALIDADO]: 'bg-success',
   [SITUACOES_SUBPROCESSO.DEVOLVIDO]: 'bg-danger',
   [SITUACOES_SUBPROCESSO.MAPA_VALIDADO]: 'bg-success',
+  [SITUACOES_SUBPROCESSO.MAPA_COM_SUGESTOES]: 'bg-warning text-dark',
   [SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO]: 'bg-success',
   [SITUACOES_SUBPROCESSO.MAPA_CRIADO]: 'bg-info'
 } as const;

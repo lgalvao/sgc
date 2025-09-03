@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
+import {mount} from '@vue/test-utils';
 import SubprocessoHeader from '../SubprocessoHeader.vue';
-import { Perfil } from '@/types/tipos';
+import {Perfil} from '@/types/tipos';
 
 describe('SubprocessoHeader.vue', () => {
   const defaultProps = {

@@ -1,11 +1,11 @@
 <template>
-  <div class="card mb-4">
+  <div class="card mb-4" data-testid="subprocesso-header">
     <div class="card-body">
-      <p class="text-muted small mb-1">Processo: {{ processoDescricao }}</p>
-      <h2 class="display-6 mb-3">{{ unidadeSigla }} - {{ unidadeNome }}</h2>
+      <p class="text-muted small mb-1" data-testid="processo-info">Processo: {{ processoDescricao }}</p>
+      <h2 class="display-6 mb-3" data-testid="unidade-info">{{ unidadeSigla }} - {{ unidadeNome }}</h2>
       <p>
         <span class="fw-bold me-1">Situação:</span>
-        <span :class="badgeClass(situacao)" class="badge">{{ situacao }}</span>
+        <span :class="badgeClass(situacao)" class="badge" data-testid="situacao-badge">{{ situacao }}</span>
       </p>
 
       <p><strong>Titular:</strong> {{ titularNome }}</p>

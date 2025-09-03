@@ -96,5 +96,117 @@
     "unidade": "STIC",
     "email": "maroca.silva@tre-pe.jus.br",
     "ramal": "7008"
+  },
+  {
+    "id": 15,
+    "nome": "Roberto Santos",
+    "unidade": "COJUR",
+    "email": "roberto.santos@tre-pe.jus.br",
+    "ramal": "7009"
+  },
+  {
+    "id": 16,
+    "nome": "Luciana Pereira",
+    "unidade": "COSIS",
+    "email": "luciana.pereira@tre-pe.jus.br",
+    "ramal": "7010"
+  },
+  {
+    "id": 17,
+    "nome": "Fernando Costa",
+    "unidade": "SESEL",
+    "email": "fernando.costa@tre-pe.jus.br",
+    "ramal": "7011"
+  },
+  {
+    "id": 18,
+    "nome": "Amanda Rodrigues",
+    "unidade": "COJUR",
+    "email": "amanda.rodrigues@tre-pe.jus.br",
+    "ramal": "7012"
+  },
+  {
+    "id": 19,
+    "nome": "Diego Fernandes",
+    "unidade": "COSIS",
+    "email": "diego.fernandes@tre-pe.jus.br",
+    "ramal": "7013"
+  },
+  {
+    "id": 20,
+    "nome": "Juliana Almeida",
+    "unidade": "STIC",
+    "email": "juliana.almeida@tre-pe.jus.br",
+    "ramal": "7014"
+  },
+  {
+    "id": 21,
+    "nome": "Rafael Moreira",
+    "unidade": "SEDOC",
+    "email": "rafael.moreira@tre-pe.jus.br",
+    "ramal": "7015"
+  },
+  {
+    "id": 22,
+    "nome": "Camila Barbosa",
+    "unidade": "SESEL",
+    "email": "camila.barbosa@tre-pe.jus.br",
+    "ramal": "7016"
+  },
+  {
+    "id": 23,
+    "nome": "Thiago Carvalho",
+    "unidade": "COJUR",
+    "email": "thiago.carvalho@tre-pe.jus.br",
+    "ramal": "7017"
+  },
+  {
+    "id": 24,
+    "nome": "Patrícia Lima",
+    "unidade": "COSIS",
+    "email": "patricia.lima@tre-pe.jus.br",
+    "ramal": "7018"
+  },
+  {
+    "id": 25,
+    "nome": "Lucas Mendes",
+    "unidade": "STIC",
+    "email": "lucas.mendes@tre-pe.jus.br",
+    "ramal": "7019"
+  },
+  {
+    "id": 26,
+    "nome": "Beatriz Santos",
+    "unidade": "SEDOC",
+    "email": "beatriz.santos@tre-pe.jus.br",
+    "ramal": "7020"
+  },
+  {
+    "id": 27,
+    "nome": "Gustavo Oliveira",
+    "unidade": "SESEL",
+    "email": "gustavo.oliveira@tre-pe.jus.br",
+    "ramal": "7021"
+  },
+  {
+    "id": 28,
+    "nome": "Carolina Souza",
+    "unidade": "COJUR",
+    "email": "carolina.souza@tre-pe.jus.br",
+    "ramal": "7022"
+  },
+  {
+    "id": 29,
+    "nome": "Bruno Rodrigues",
+    "unidade": "COSIS",
+    "email": "bruno.rodrigues@tre-pe.jus.br",
+    "ramal": "7023"
+  },
+  {
+    "id": 30,
+    "nome": "Mariana Costa",
+    "unidade": "STIC",
+    "email": "mariana.costa@tre-pe.jus.br",
+    "ramal": "7024"
   }
 ]

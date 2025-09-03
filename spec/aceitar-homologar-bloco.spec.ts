@@ -1,4 +1,4 @@
-import {expect, test, Page} from "@playwright/test";
+import {expect, Page, test} from "@playwright/test";
 
 export async function loginComoUsuario(page: Page, titulo: string, senha: string, perfil?: string) {
     await page.goto('/');

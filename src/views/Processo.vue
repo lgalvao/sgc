@@ -2,7 +2,8 @@
   <div class="container mt-4">
     <div v-if="processo">
       <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo</span>
-      <h2 class="display-6">{{ processo.descricao }}</h2>
+      <h1 class="display-6 mb-3">Detalhes do processo</h1>
+      <h2 class="display-6" data-testid="processo-info">{{ processo.descricao }}</h2>
       <div class="mb-4 mt-3">
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
@@ -35,7 +36,7 @@
         </button>
       </div>
     </div>
-    <button v-if="perfilStore.perfilSelecionado === 'ADMIN'" class="btn btn-danger mt-3" @click="finalizarProcesso">
+    <button v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === 'Em andamento'" class="btn btn-danger mt-3" @click="finalizarProcesso">
       Finalizar processo
     </button>
 
@@ -105,6 +106,43 @@
     </div>
     <div v-if="mostrarModalBloco" class="modal-backdrop fade show"></div>
 
+    <!-- Modal de finalização do processo CDU-21 -->
+    <div v-if="mostrarModalFinalizacao" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-check-circle text-success"></i>
+              Finalização de processo
+            </h5>
+            <button type="button" class="btn-close" @click="fecharModalFinalizacao"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              Confirma a finalização do processo <strong>{{ processo?.descricao }}</strong>?<br>
+              Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalFinalizacao" data-testid="btn-cancelar-finalizacao">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-success"
+                @click="confirmarFinalizacao"
+                data-testid="btn-confirmar-finalizacao"
+            >
+              <i class="bi bi-check-circle"></i>
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarModalFinalizacao" class="modal-backdrop fade show"></div>
+
     <!-- Alerta de sucesso -->
     <div v-if="mostrarAlertaSucesso" class="alert alert-success alert-dismissible fade show position-fixed"
          style="top: 20px; right: 20px; z-index: 9999;">
@@ -122,18 +160,24 @@ import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
+import {useNotificacoesStore} from '@/stores/notificacoes'
+import {useAlertasStore} from '@/stores/alertas'
+import {useMapasStore} from '@/stores/mapas'
+import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
 import {Processo, Subprocesso, Unidade} from '@/types/tipos'
 
 interface TreeTableItem {
-  id: string;
+  id: number | string;
   nome: string;
   situacao: string;
   dataLimite: string;
   unidadeAtual: string;
   expanded: boolean;
   children: TreeTableItem[];
+  clickable?: boolean;
+  [key: string]: any; // Para compatibilidade com TreeItem
 }
 
 const route = useRoute()
@@ -142,6 +186,9 @@ const processosStore = useProcessosStore()
 const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
+const notificacoesStore = useNotificacoesStore()
+const alertasStore = useAlertasStore()
+const mapasStore = useMapasStore()
 
 // Dados reativos para o CDU-14
 const mostrarBotoesBloco = ref(false)
@@ -154,6 +201,9 @@ const unidadesSelecionadasBloco = ref<Array<{
   selecionada: boolean
 }>>([])
 const mostrarAlertaSucesso = ref(false)
+
+// Dados reativos para modal de finalização CDU-21
+const mostrarModalFinalizacao = ref(false)
 
 const idProcesso = computed(() =>
     Number(route.params.idProcesso || route.params.id || route.query.idProcesso))
@@ -269,13 +319,122 @@ function abrirDetalhesUnidade(item: TreeTableItem) {
   }
 }
 
-function finalizarProcesso() {
-  if (confirm('Tem certeza que deseja finalizar este processo?')) {
-    if (processo.value) {
-      processosStore.finalizarProcesso(processo.value.id);
-      router.push('/painel');
-    }
+async function finalizarProcesso() {
+  if (!processo.value) return;
+
+  const processoAtual = processo.value;
+
+  // Verificar se todos os subprocessos de unidades operacionais/interoperacionais estão em 'Mapa homologado'
+  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
+  const subprocessosOperacionais = subprocessos.filter(pu => {
+    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
+    return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');
+  });
+
+  const todosHomologados = subprocessosOperacionais.every(pu => pu.situacao === 'Mapa homologado');
+
+  if (!todosHomologados) {
+    notificacoesStore.erro(
+      'Não é possível encerrar o processo',
+      'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado.'
+    );
+    return;
   }
+
+  // Mostrar modal de confirmação
+  abrirModalFinalizacao();
+}
+
+async function executarFinalizacao() {
+  if (!processo.value) return;
+
+  const processoAtual = processo.value;
+
+  // Obter subprocessos novamente (já verificados anteriormente)
+  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
+  const subprocessosOperacionais = subprocessos.filter(pu => {
+    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
+    return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');
+  });
+
+  try {
+    // Alterar situação do processo para 'Finalizado'
+    processosStore.finalizarProcesso(processo.value.id);
+
+    // Definir mapas vigentes para as unidades participantes
+    subprocessosOperacionais.forEach(pu => {
+      mapasStore.definirMapaComoVigente(pu.unidade, processoAtual.id);
+    });
+
+    // Enviar notificações por e-mail conforme especificações
+    const unidadesAgrupadas = agruparUnidadesPorSuperior(subprocessosOperacionais);
+
+    for (const [unidadeSuperior, unidadesSubordinadas] of unidadesAgrupadas) {
+      if (unidadeSuperior === 'SEDOC') {
+        // Notificar unidades operacionais/interoperacionais diretamente
+        unidadesSubordinadas.forEach(siglaUnidade => {
+          notificacoesStore.email(
+            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao, siglaUnidade),
+            `Responsável pela ${siglaUnidade}`,
+            EMAIL_TEMPLATES.CORPO_EMAIL_OPERACIONAL(processoAtual.descricao, siglaUnidade)
+          );
+        });
+      } else {
+        // Notificar unidades superiores com lista de subordinadas
+        notificacoesStore.email(
+          EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior),
+          `Responsável pela ${unidadeSuperior}`,
+          EMAIL_TEMPLATES.CORPO_EMAIL_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior, unidadesSubordinadas)
+        );
+      }
+    }
+
+    // Criar alertas para todas as unidades participantes
+    subprocessos.forEach(pu => {
+      alertasStore.criarAlerta({
+        idProcesso: processoAtual.id,
+        unidadeOrigem: 'SEDOC',
+        unidadeDestino: pu.unidade,
+        descricao: `Processo ${processoAtual.descricao} finalizado - mapa de competências vigente`,
+        dataHora: new Date()
+      });
+    });
+
+    notificacoesStore.sucesso(
+      'Processo finalizado',
+      'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
+    );
+
+    router.push('/painel');
+
+  } catch (error) {
+    console.error('Erro ao finalizar processo:', error);
+    notificacoesStore.erro(
+      'Erro ao finalizar processo',
+      'Ocorreu um erro durante a finalização. Tente novamente.'
+    );
+  }
+}
+
+// Função auxiliar para agrupar unidades por superior hierárquica
+function agruparUnidadesPorSuperior(subprocessos: Subprocesso[]): Map<string, string[]> {
+  const agrupamento = new Map<string, string[]>();
+
+  subprocessos.forEach(pu => {
+    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
+    if (unidade) {
+      // Para unidades operacionais, a superior é a raiz (SEDOC)
+      // Para interoperacionais, pode ter subordinadas, então também notificamos diretamente
+      const superior = unidade.tipo === 'OPERACIONAL' ? 'SEDOC' : pu.unidade;
+
+      if (!agrupamento.has(superior)) {
+        agrupamento.set(superior, []);
+      }
+      agrupamento.get(superior)!.push(pu.unidade);
+    }
+  });
+
+  return agrupamento;
 }
 
 // Funções para controle do modal (CDU-14)
@@ -306,6 +465,20 @@ function prepararUnidadesParaBloco() {
 
 function fecharModalBloco() {
   mostrarModalBloco.value = false
+}
+
+// Funções para modal de finalização CDU-21
+function abrirModalFinalizacao() {
+  mostrarModalFinalizacao.value = true
+}
+
+function fecharModalFinalizacao() {
+  mostrarModalFinalizacao.value = false
+}
+
+function confirmarFinalizacao() {
+  fecharModalFinalizacao()
+  executarFinalizacao()
 }
 
 async function confirmarAcaoBloco() {

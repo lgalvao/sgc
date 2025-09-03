@@ -3,7 +3,7 @@ package sgc.modelo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 

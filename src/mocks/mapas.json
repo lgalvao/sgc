@@ -3,7 +3,7 @@
     "id": 1,
     "unidade": "SESEL",
     "idProcesso": 1,
-    "situacao": "em_andamento",
+    "situacao": "disponibilizado",
     "competencias": [
       {
         "id": 1,
@@ -29,7 +29,7 @@
       }
     ],
     "dataCriacao": "2025-06-01",
-    "dataDisponibilizacao": null,
+    "dataDisponibilizacao": "2025-07-15",
     "dataFinalizacao": null
   },
   {
@@ -102,6 +102,189 @@
       }
     ],
     "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": "2025-07-15",
+    "dataFinalizacao": null
+  },
+  {
+    "id": 4,
+    "unidade": "SEDESENV",
+    "idProcesso": 1,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 1,
+        "descricao": "Acompanhamento de processos eleitorais",
+        "atividadesAssociadas": [
+          6
+        ]
+      },
+      {
+        "id": 2,
+        "descricao": "Implantação de sistemas",
+        "atividadesAssociadas": [
+          1
+        ]
+      },
+      {
+        "id": 3,
+        "descricao": "Testes de sistemas eleitorais",
+        "atividadesAssociadas": [
+          4,
+          5
+        ]
+      }
+    ],
+    "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": "2025-07-15",
+    "dataFinalizacao": null
+  },
+  {
+    "id": 5,
+    "unidade": "SESEL",
+    "idProcesso": 2,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 4,
+        "descricao": "Desenvolvimento de sistemas",
+        "atividadesAssociadas": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": 5,
+        "descricao": "Manutenção de infraestrutura",
+        "atividadesAssociadas": [
+          4,
+          5
+        ]
+      },
+      {
+        "id": 6,
+        "descricao": "Suporte técnico",
+        "atividadesAssociadas": [
+          6,
+          7
+        ]
+      }
+    ],
+    "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": "2025-07-15",
+    "dataFinalizacao": null
+  },
+  {
+    "id": 6,
+    "unidade": "SEDIA",
+    "idProcesso": 1,
+    "situacao": "em_andamento",
+    "competencias": [
+      {
+        "id": 1,
+        "descricao": "Acompanhamento de processos eleitorais",
+        "atividadesAssociadas": [
+          6
+        ]
+      },
+      {
+        "id": 2,
+        "descricao": "Implantação de sistemas",
+        "atividadesAssociadas": [
+          1
+        ]
+      },
+      {
+        "id": 3,
+        "descricao": "Testes de sistemas eleitorais",
+        "atividadesAssociadas": [
+          4,
+          5
+        ]
+      }
+    ],
+    "dataCriacao": "2025-06-01",
+    "dataDisponibilizacao": null,
+    "dataFinalizacao": null
+  },
+  {
+    "id": 7,
+    "unidade": "SEDIA",
+    "idProcesso": 5,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 7,
+        "descricao": "Gestão de competências",
+        "atividadesAssociadas": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 8,
+        "descricao": "Análise de dados",
+        "atividadesAssociadas": [
+          3,
+          4
+        ]
+      }
+    ],
+    "dataCriacao": "2025-08-01",
+    "dataDisponibilizacao": "2025-08-15",
+    "dataFinalizacao": null
+  },
+  {
+    "id": 8,
+    "unidade": "SEDESENV",
+    "idProcesso": 2,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 9,
+        "descricao": "Desenvolvimento de software",
+        "atividadesAssociadas": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 10,
+        "descricao": "Testes e qualidade",
+        "atividadesAssociadas": [
+          3,
+          4
+        ]
+      }
+    ],
+    "dataCriacao": "2025-07-01",
+    "dataDisponibilizacao": "2025-07-15",
+    "dataFinalizacao": null
+  },
+  {
+    "id": 9,
+    "unidade": "SEDOC",
+    "idProcesso": 2,
+    "situacao": "disponibilizado",
+    "competencias": [
+      {
+        "id": 11,
+        "descricao": "Gestão organizacional",
+        "atividadesAssociadas": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 12,
+        "descricao": "Planejamento estratégico",
+        "atividadesAssociadas": [
+          3,
+          4
+        ]
+      }
+    ],
+    "dataCriacao": "2025-07-01",
     "dataDisponibilizacao": "2025-07-15",
     "dataFinalizacao": null
   }

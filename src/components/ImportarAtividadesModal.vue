@@ -57,10 +57,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
-import { useProcessosStore } from '@/stores/processos'
-import { useAtividadesStore } from '@/stores/atividades'
-import { Atividade, Processo, Subprocesso, SituacaoProcesso, TipoProcesso } from '@/types/tipos'
+import {computed, ref, watch} from 'vue'
+import {useProcessosStore} from '@/stores/processos'
+import {useAtividadesStore} from '@/stores/atividades'
+import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 
 const props = defineProps<{
   mostrar: boolean
