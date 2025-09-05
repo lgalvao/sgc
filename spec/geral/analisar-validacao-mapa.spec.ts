@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test'
-import {login} from './utils/auth'
+import {login} from '~/utils/auth'
 
 test.describe('CDU-21 - Analisar validação de mapa de competências', () => {
     test('deve permitir aceitar mapa com observações', async ({ page }) => {
@@ -153,12 +153,6 @@ test.describe('CDU-21 - Analisar validação de mapa de competências', () => {
         // Verificar se há competências exibidas (pode haver ou não competências específicas)
         // Esta verificação é mais genérica pois depende dos dados de mock
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible()
-    })
-
-    test('deve mostrar mensagem de validação quando superior não é SEDOC', async ({ page }) => {
-        // Este teste verifica o fluxo de validação intermediária
-        // Quando o superior não é SEDOC, deve mostrar "Mapa aceito e submetido para análise da unidade superior"
-        test.skip()
     })
 
     test('deve navegar corretamente através do fluxo completo', async ({ page }) => {

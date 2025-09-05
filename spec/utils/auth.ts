@@ -99,27 +99,6 @@ export async function loginAsChefe(page: Page) {
     await expect(page.getByTestId('titulo-processos')).toBeVisible();
 }
 
-export async function loginAsGestorCOSIS(page: Page) {
-    await page.goto(baseUrl, );
-    await page.waitForLoadState('domcontentloaded', );
-
-    // Preencher usuário e senha (usa o servidor 6 - Ricardo Alves que tem perfil GESTOR de STIC)
-    const tituloInputGestorCOSIS = page.getByTestId('input-titulo');
-    await tituloInputGestorCOSIS.clear();
-    await tituloInputGestorCOSIS.fill('6');
-
-    const senhaInputGestorCOSIS = page.getByTestId('input-senha');
-    await senhaInputGestorCOSIS.clear();
-    await senhaInputGestorCOSIS.fill('123');
-
-    // Clicar no botão Entrar
-    await page.getByTestId('botao-entrar').click();
-
-    // GESTOR tem perfil único, deve ir direto para o painel
-    await page.waitForURL(`${baseUrl}painel`, );
-    await expect(page.getByTestId('titulo-processos')).toBeVisible();
-}
-
 export async function loginAsServidor(page: Page) {
     await page.goto(baseUrl, );
     await page.waitForLoadState('domcontentloaded', );

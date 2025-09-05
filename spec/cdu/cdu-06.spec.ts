@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
+import {loginAsAdmin} from '~/utils/auth';
 
 test.describe('CDU-06: Detalhar processo', () => {
   test('deve mostrar detalhes do processo para ADMIN', async ({ page }) => {

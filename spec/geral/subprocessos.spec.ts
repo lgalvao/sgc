@@ -1,6 +1,6 @@
 import {expect, test} from "@playwright/test";
-import {login} from "./utils/auth";
-import {useMapasStore} from "../src/stores/mapas";
+import {login} from "~/utils/auth";
+import {useMapasStore} from "@/stores/mapas";
 import {createPinia, setActivePinia} from "pinia";
 
 test.describe('Detalhes da Unidade no Processo', () => {

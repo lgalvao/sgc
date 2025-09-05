@@ -1,7 +1,7 @@
-import {expect, test} from '@playwright/test'
-import {login} from "./utils/auth";
+import {expect, test, Page} from '@playwright/test'
+import {login} from "~/utils/auth";
 
-async function getBreadcrumbItemsText(page) {
+async function getBreadcrumbItemsText(page: Page) {
     const items = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]')
     const count = await items.count()
     const texts: string[] = []
@@ -13,12 +13,12 @@ async function getBreadcrumbItemsText(page) {
     return texts
 }
 
-async function lastBreadcrumbHasLink(page) {
+async function lastBreadcrumbHasLink(page: Page) {
     const lastItem = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]').last()
     return await lastItem.locator('a').count() > 0
 }
 
-async function breadcrumbLinkHrefAt(page, index: number) {
+async function breadcrumbLinkHrefAt(page: Page, index: number) {
     const item = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]').nth(index)
     const link = item.locator('a').first()
     if (await link.count() === 0) return null

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
+import {loginAsAdmin} from '~/utils/auth';
 import {LABELS, TEXTS, URLS} from './test-constants';
 import {expectTextVisible, expectUrl} from './test-helpers';
 

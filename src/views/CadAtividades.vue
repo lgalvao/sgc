@@ -584,8 +584,7 @@ function confirmarDisponibilizacao() {
   // Alterar situação do subprocesso
   const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
   if (subprocessoIndex !== -1) {
-    const novaSituacao = isRevisao ? 'Revisão do cadastro disponibilizada' : 'Cadastro disponibilizado';
-    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+    processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro disponibilizada' : 'Cadastro disponibilizado';
 
     // Definir data/hora de conclusão da etapa 1
     processosStore.subprocessos[subprocessoIndex].dataFimEtapa1 = new Date();

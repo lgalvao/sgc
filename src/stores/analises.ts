@@ -21,10 +21,6 @@ export const useAnalisesStore = defineStore('analises', {
             }
             this.analises.push(novaAnalise)
             return novaAnalise
-        },
-
-        getAnaliseById(id: number): AnaliseValidacao | undefined {
-            return this.analises.find(analise => analise.id === id)
         }
     }
 })

@@ -1,5 +1,5 @@
 import {expect, Locator, Page, test} from "@playwright/test";
-import {login} from "./utils/auth";
+import {login} from "~/utils/auth";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);

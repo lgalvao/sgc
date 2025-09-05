@@ -2,7 +2,6 @@ import {defineStore} from 'pinia';
 import alertasMock from '../mocks/alertas.json';
 import alertasServidorMock from '../mocks/alertas-servidor.json';
 import type {Alerta, AlertaServidor} from '@/types/tipos';
-import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 import {usePerfilStore} from './perfil';
 
 function parseAlertaDates(alerta: Omit<Alerta, 'dataHora'> & { dataHora: string }): Alerta {
@@ -12,7 +11,9 @@ function parseAlertaDates(alerta: Omit<Alerta, 'dataHora'> & { dataHora: string 
     };
 }
 
-function parseAlertaServidorDates(alertaServidor: Omit<AlertaServidor, 'dataLeitura'> & { dataLeitura: string | null }): AlertaServidor {
+function parseAlertaServidorDates(alertaServidor: Omit<AlertaServidor, 'dataLeitura'> & {
+    dataLeitura: string | null
+}): AlertaServidor {
     return {
         ...alertaServidor,
         dataLeitura: alertaServidor.dataLeitura ? new Date(alertaServidor.dataLeitura) : null,
@@ -25,14 +26,6 @@ export const useAlertasStore = defineStore('alertas', {
         alertasServidor: alertasServidorMock.map(parseAlertaServidorDates) as AlertaServidor[]
     }),
     getters: {
-        isAlertaNovo: () => (alerta: Alerta): boolean => {
-            const configuracoesStore = useConfiguracoesStore();
-            const alertaDate = new Date(alerta.dataHora);
-            const today = new Date();
-            const diffTime = Math.abs(today.getTime() - alertaDate.getTime());
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays <= configuracoesStore.diasAlertaNovo;
-        },
         getAlertasDoServidor: (state) => () => {
             const perfilStore = usePerfilStore();
             const servidorLogado = perfilStore.servidorId;

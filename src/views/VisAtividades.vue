@@ -243,8 +243,7 @@ function confirmarDevolucao() {
   // Alterar situação do subprocesso
   const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
   if (subprocessoIndex !== -1) {
-    const novaSituacao = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
-    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+    processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
     processosStore.subprocessos[subprocessoIndex].unidadeAtual = siglaUnidade.value;
   }
 
@@ -301,10 +300,6 @@ function fecharModalDevolver() {
 
 function abrirModalImpacto() {
   if (isRevisao.value) {
-    // Para revisões, buscar mudanças registradas durante a edição
-    // Como estamos na tela de visualização, buscar mudanças do subprocesso
-    ('[SIMULAÇÃO] Buscando mudanças registradas para subprocesso:', idSubprocesso.value);
-    // Em produção, isso seria buscado do backend ou de um store persistente
     revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   } else {
     // Para mapeamento inicial, não há mudanças para mostrar

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
+import {loginAsAdmin} from '~/utils/auth';
 
 test.describe('CDU-04: Iniciar processo de mapeamento', () => {
    test('deve iniciar processo de mapeamento', async ({ page }) => {

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin, loginAsGestor} from '../utils/auth';
+import {loginAsAdmin, loginAsGestor} from '~/utils/auth';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
   test('deve mostrar botões de análise como GESTOR', async ({ page }) => {

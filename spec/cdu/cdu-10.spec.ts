@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsChefe} from '../utils/auth';
+import {loginAsChefe} from '~/utils/auth';
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
   test('deve disponibilizar revisão do cadastro com sucesso', async ({ page }) => {

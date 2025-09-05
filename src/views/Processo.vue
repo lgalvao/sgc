@@ -405,7 +405,7 @@ async function executarFinalizacao() {
       'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
     );
 
-    router.push('/painel');
+    await router.push('/painel');
 
   } catch (error) {
     console.error('Erro ao finalizar processo:', error);

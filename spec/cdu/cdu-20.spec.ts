@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin, loginAsGestor} from '../utils/auth';
+import {loginAsAdmin, loginAsGestor} from '~/utils/auth';
 
 // Strings usados nos testes
 const MODAL_DEVOLUCAO_TITLE = 'Devolução';

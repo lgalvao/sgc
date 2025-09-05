@@ -75,7 +75,7 @@ const corpoModal = computed(() => {
     : 'Observações <small class="text-muted">(opcional)</small>';
 });
 
-const mostrarCampoObservacao = computed(() => {
+computed(() => {
   return props.perfil !== 'ADMIN';
 });
 </script>

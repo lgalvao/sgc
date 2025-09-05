@@ -1,5 +1,5 @@
 import {expect, Locator, Page, test} from "@playwright/test";
-import {login} from "./utils/auth";
+import {login} from "~/utils/auth";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
@@ -13,23 +13,6 @@ async function adicionarConhecimento(page: Page, atividadeCard: Locator, nomeCon
     await expect(atividadeCard.locator('.group-conhecimento', {hasText: nomeConhecimento})).toBeVisible();
 }
 
-async function editarAtividade(page: Page, atividadeOriginal: string, atividadeEditada: string) {
-    const atividadeCard = page.locator('.atividade-card', {hasText: atividadeOriginal});
-    await atividadeCard.hover();
-    await page.waitForTimeout(100);
-    await atividadeCard.getByTestId('btn-editar-atividade').click({force: true});
-    await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
-    await page.getByTestId('btn-salvar-edicao-atividade').click();
-    await expect(page.locator('.atividade-card', {hasText: atividadeEditada})).toBeVisible();
-}
-
-async function removerAtividade(page: Page, atividadeParaRemover: string) {
-    const atividadeCard = page.locator('.atividade-card', {hasText: atividadeParaRemover});
-    await atividadeCard.hover();
-    await page.waitForTimeout(100);
-    await atividadeCard.getByTestId('btn-remover-atividade').click({force: true});
-    await expect(atividadeCard).not.toBeAttached();
-}
 
 async function editarConhecimento(page: Page, atividadeNome: string, conhecimentoOriginal: string, conhecimentoEditado: string) {
     const atividadeCard = page.locator('.atividade-card', {hasText: atividadeNome});
@@ -42,14 +25,6 @@ async function editarConhecimento(page: Page, atividadeNome: string, conheciment
     await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoEditado})).toBeVisible();
 }
 
-async function removerConhecimento(page: Page, atividadeNome: string, conhecimentoParaRemover: string) {
-    const atividadeCard = page.locator('.atividade-card', {hasText: atividadeNome});
-    const conhecimentoRow = atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover});
-    await conhecimentoRow.hover();
-    await page.waitForTimeout(100);
-    await conhecimentoRow.getByTestId('btn-remover-conhecimento').click();
-    await expect(conhecimentoRow).not.toBeAttached();
-}
 
 test.describe('Impacto no Mapa de Competências', () => {
     test.beforeEach(async ({page}) => {

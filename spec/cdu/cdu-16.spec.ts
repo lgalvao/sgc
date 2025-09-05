@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
+import {loginAsAdmin} from '~/utils/auth';
 
 test.describe('CDU-16: Ajustar mapa de competências', () => {
   test('deve acessar tela de ajuste do mapa de competências', async ({ page }) => {

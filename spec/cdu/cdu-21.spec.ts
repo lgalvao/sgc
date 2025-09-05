@@ -1,10 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
-
-// Constantes para os testes
-const PROCESSO_COM_UNIDADES_NAO_HOMOLOGADAS = 'Mapeamento de competências - 2025';
-const PROCESSO_PRONTO_PARA_FINALIZACAO = 'Revisão de mapeamento STIC/COINF - 2025';
-const PROCESSO_CRIADO = 'Mapeamento inicial COJUR - 2025';
+import {loginAsAdmin} from '~/utils/auth';
 
 test.describe('CDU-21: Finalizar processo de mapeamento ou de revisão', () => {
   test('deve acessar tela de detalhes do processo em andamento', async ({ page }) => {

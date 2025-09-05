@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '../utils/auth';
+import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '~/utils/auth';
 import {SELECTORS, URLS} from './test-constants';
 import {expectNotVisible, expectUrl, expectVisible} from './test-helpers';
 

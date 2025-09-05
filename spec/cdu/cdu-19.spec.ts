@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsChefe} from '../utils/auth';
+import {loginAsChefe} from '~/utils/auth';
 
 test.describe('CDU-19: Validar mapa de competências', () => {
   // Helper function to navigate to competency map

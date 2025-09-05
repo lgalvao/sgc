@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsChefe} from '../utils/auth';
+import {loginAsChefe} from '~/utils/auth';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
    test('deve mostrar detalhes do subprocesso para CHEFE', async ({ page }) => {

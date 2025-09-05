@@ -32,6 +32,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "~/*": [
+        "spec/*"
       ]
     },
     "forceConsistentCasingInFileNames": true
@@ -40,6 +43,8 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.vue",
+    "spec/**/*.ts",
+    "spec/**/*.d.ts",
     "vite.config.js",
     "vitest.setup.ts",
     "playwright.config.ts"

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin} from '../utils/auth';
+import {loginAsAdmin} from '~/utils/auth';
 
 test.describe('CDU-05: Iniciar processo de revisão', () => {
   test('deve iniciar processo de revisão', async ({ page }) => {

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin, loginAsChefe, loginAsGestor} from '../utils/auth';
+import {loginAsAdmin, loginAsChefe, loginAsGestor} from '~/utils/auth';
 
 test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
   test('deve verificar impactos como CHEFE', async ({ page }) => {

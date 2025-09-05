@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '../utils/auth';
+import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '~/utils/auth';
 
 test.describe('CDU-11: Visualizar cadastro de atividades e conhecimentos', () => {
   test('deve visualizar cadastro como ADMIN', async ({ page }) => {
