@@ -84,16 +84,7 @@ const routes = [
         }),
         meta: {title: 'Visualização de Atividades', breadcrumb: 'Visualização de Atividades'},
     },
-    {
-        path: '/processo/:idProcesso/:siglaUnidade/impacto-mapa',
-        name: 'SubprocessoImpactoMapa',
-        component: () => import('./views/ImpactoMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
-            siglaUnidade: route.params.siglaUnidade
-        }),
-        meta: {title: 'Impacto no Mapa', breadcrumb: 'Impacto no Mapa'},
-    },
+
     {
         path: '/processo/:idProcesso/:siglaUnidade/diagnostico-equipe',
         name: 'DiagnosticoEquipe',

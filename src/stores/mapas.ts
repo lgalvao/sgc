@@ -21,7 +21,7 @@ export const useMapasStore = defineStore('mapas', {
             return state.mapas.find(m => m.unidade === unidadeId && m.idProcesso === idProcesso)
         },
         getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade === unidadeId && m.situacao === 'vigente')
+            return state.mapas.find(m => m.unidade === unidadeId && (m.situacao === 'vigente' || m.situacao === 'em_andamento'))
         }
     },
     actions: {

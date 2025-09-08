@@ -115,8 +115,6 @@ function criarAtribuicao() {
     justificativa: justificativa.value
   })
   sucesso.value = true
-  setTimeout(() => {
-    router.push(`/unidade/${sigla.value}`)
-  }, 1200)
+  router.push(`/unidade/${sigla.value}`)
 }
 </script>

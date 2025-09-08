@@ -15,7 +15,8 @@
           Unidades participantes
           <span v-if="criterioOrdenacao === 'unidades'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
         </th>
-        <th v-if="showDataFinalizacao" data-testid="coluna-data-finalizacao" style="cursor:pointer" @click="emit('ordenar', 'dataFinalizacao')">
+        <th v-if="showDataFinalizacao" data-testid="coluna-data-finalizacao" style="cursor:pointer"
+            @click="emit('ordenar', 'dataFinalizacao')">
           Finalizado em
           <span v-if="criterioOrdenacao === 'dataFinalizacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
         </th>
@@ -42,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import {defineEmits, defineProps} from 'vue';
 import {Processo} from '@/types/tipos';
 
 defineProps<{

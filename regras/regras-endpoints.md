@@ -34,10 +34,6 @@
     - Componente: VisAtividades.vue
     - Visualização de atividades e conhecimentos para a unidade dentro do processo
 
-- /processo/:idProcesso/:siglaUnidade/impacto-mapa
-    - Componente: ImpactoMapa.vue
-    - Exibe o impacto das mudanças de atividades e conhecimentos no mapa de competências.
-
 - /unidade/:siglaUnidade
     - Componente: Unidade.vue
     - Detalhes da unidade fora do processo (responsável, mapa vigente e subordinadas, se houver); para ADMIN, dá acesso
@@ -47,6 +43,7 @@
     - Componente: CadAtribuicao.vue
     - Cadastra e edita atribuição temporárias, permitindo acesso excepcional com perfil CHEFE
 
+// TODO esse endpoint esta estranho!
 - /unidade/:siglaUnidade/mapa
     - Componente: CadMapa.vue
     - Edição/criação do mapa de competências da unidade (fora do contexto de um processo específico).

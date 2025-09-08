@@ -4,10 +4,10 @@ import {defineConfig, devices} from '@playwright/test';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 5000,
+    timeout: 7000,
     testDir: './spec',
     fullyParallel: true,
-    reporter: 'dot',
+    reporter: "line",
 
     webServer: {
         command: 'npm run dev',

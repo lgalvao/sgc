@@ -79,7 +79,9 @@
         <input id="dataLimite" v-model="dataLimite" class="form-control" type="date"/>
       </div>
       <button class="btn btn-primary" type="button" @click="salvarProcesso">Salvar</button>
-      <button class="btn btn-success ms-2" type="button" @click="iniciarProcesso">Iniciar processo</button>
+      <button class="btn btn-success ms-2" data-testid="btn-iniciar-processo" type="button" @click="iniciarProcesso">
+        Iniciar processo
+      </button>
       <router-link class="btn btn-secondary ms-2" to="/painel">Cancelar</router-link>
     </form>
   </div>

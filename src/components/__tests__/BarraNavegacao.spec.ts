@@ -61,12 +61,7 @@ const routes: RouteRecordRaw[] = [
         component: {template: '<div>Visualização de Atividades</div>'},
         meta: {breadcrumb: 'Visualização de Atividades'}
     },
-    {
-        path: '/processo/:idProcesso/:siglaUnidade/impacto-mapa',
-        name: 'SubprocessoImpactoMapa',
-        component: {template: '<div>Impacto no Mapa</div>'},
-        meta: {breadcrumb: 'Impacto no Mapa'}
-    },
+
     {
         path: '/unidade/:siglaUnidade',
         name: 'Unidade',

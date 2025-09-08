@@ -28,11 +28,11 @@
               <strong class="competencia-descricao" data-testid="competencia-descricao"> {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <button class="btn btn-sm btn-outline-primary botao-acao"
-                        data-bs-toggle="tooltip" data-testid="editar-competencia"
+                        data-bs-toggle="tooltip" data-testid="btn-editar-competencia"
                         title="Editar" @click="iniciarEdicaoCompetencia(comp)"><i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
-                        data-testid="excluir-competencia"
+                        data-testid="btn-excluir-competencia"
                         title="Excluir" @click="excluirCompetencia(comp.id)"><i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -156,7 +156,8 @@
               <label class="form-label" for="dataLimite">Data limite para validação</label>
               <input id="dataLimite" v-model="dataLimiteValidacao" class="form-control" type="date"/>
             </div>
-            <div v-if="notificacaoDisponibilizacao" class="alert alert-info mt-3">
+            <div v-if="notificacaoDisponibilizacao" class="alert alert-info mt-3"
+                 data-testid="notificacao-disponibilizacao">
               {{ notificacaoDisponibilizacao }}
             </div>
           </div>

@@ -1,4 +1,4 @@
-import {expect, test, Page} from '@playwright/test'
+import {expect, Page, test} from '@playwright/test'
 import {login} from "~/utils/auth";
 
 async function getBreadcrumbItemsText(page: Page) {
@@ -63,9 +63,14 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
         await page.waitForLoadState('networkidle')
 
         const items = await getBreadcrumbItemsText(page)
-        // Esperado: [home], SESEL
-        expect(items.length).toBe(2)
-        expect(items[1]).toContain('SESEL')
+        // Esperado: [home], Processo, SESEL
+        expect(items.length).toBe(3)
+        expect(items[1]).toContain('Processo')
+        expect(items[2]).toContain('SESEL')
+
+        // Link do Processo deve estar correto
+        const hrefProcesso = await breadcrumbLinkHrefAt(page, 1)
+        expect(hrefProcesso).toMatch(/\/processo\/1$/)
 
         // Último breadcrumb (SESEL) não é link
         expect(await lastBreadcrumbHasLink(page)).toBeFalsy()
@@ -76,13 +81,16 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
         await page.waitForLoadState('networkidle')
 
         const items = await getBreadcrumbItemsText(page)
-        // Esperado: [home], SESEL, Mapa
-        expect(items.length).toBe(3)
-        expect(items[1]).toContain('SESEL')
-        expect(items[2]).toContain('Mapa')
+        // Esperado: [home], Processo, SESEL, Mapa
+        expect(items.length).toBe(4)
+        expect(items[1]).toContain('Processo')
+        expect(items[2]).toContain('SESEL')
+        expect(items[3]).toContain('Mapa')
 
         // Links intermediários atualizados
-        const hrefSigla = await breadcrumbLinkHrefAt(page, 1)
+        const hrefProcesso = await breadcrumbLinkHrefAt(page, 1)
+        expect(hrefProcesso).toMatch(/\/processo\/1$/)
+        const hrefSigla = await breadcrumbLinkHrefAt(page, 2)
         expect(hrefSigla).toMatch(/\/processo\/1\/SESEL$/)
 
         // Último breadcrumb (Mapa) não é link

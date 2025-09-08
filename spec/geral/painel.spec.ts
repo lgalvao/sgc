@@ -30,7 +30,7 @@ test.describe('Painel Principal', () => {
         // Clica no primeiro processo da lista (assumindo que há pelo menos um)
         await page.locator('[data-testid="tabela-processos"] tbody tr:first-child td:first-child').click();
         // Verifica se a URL mudou para a página de detalhes do processo (novo padrão)
-        await expect(page).toHaveURL(/.*\/processo\/\d+\/\w+$/);
+        await expect(page).toHaveURL(/.*\/processo\/\d+$/);
     });
 
     test('deve exibir alertas com status de leitura correto', async ({page}) => {

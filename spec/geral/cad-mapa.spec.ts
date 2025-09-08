@@ -39,7 +39,8 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await expect(page.getByText(competenciaOriginal)).toBeVisible();
 
         // Clicar no botão de editar da competência recém-criada
-        const competenciaItem = page.getByTestId('competencia-item').filter({hasText: competenciaOriginal});
+        const competenciaItem = page.locator('.competencia-card', {hasText: competenciaOriginal});
+        await competenciaItem.hover();
         await competenciaItem.getByTestId('btn-editar-competencia').click();
 
         const competenciaEditada = 'Competência Editada ' + Date.now();
@@ -67,6 +68,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
         // Clicar no botão de excluir da competência recém-criada
         const competenciaItem = page.getByTestId('competencia-item').filter({hasText: competenciaParaExcluir});
+        await competenciaItem.hover();
         await competenciaItem.getByTestId('btn-excluir-competencia').click();
 
         // Verificar se a competência não está mais visível
@@ -98,6 +100,6 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: 'Disponibilizar'}).click();
 
         // Verificar a notificação de sucesso
-        await expect(page.locator('.alert.alert-info')).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
+        await expect(page.getByTestId('notificacao-disponibilizacao')).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
     });
 });
