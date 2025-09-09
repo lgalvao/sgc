@@ -1,14 +1,23 @@
 <template>
   <!-- Modal para alterar data limite -->
-  <div v-if="mostrarModal" class="modal fade show" style="display: block;" tabindex="-1">
+  <div
+      v-if="mostrarModal"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
-            <i class="bi bi-calendar text-primary me-2"></i>
+            <i class="bi bi-calendar text-primary me-2"/>
             Alterar data limite
           </h5>
-          <button type="button" class="btn-close" @click="$emit('fecharModal')"></button>
+          <button
+              type="button"
+              class="btn-close"
+              @click="$emit('fecharModal')"
+          />
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -23,14 +32,21 @@
               Data limite atual: {{ dataLimiteAtualFormatada }}
             </div>
           </div>
-          <div v-if="etapaAtual" class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
+          <div
+              v-if="etapaAtual"
+              class="alert alert-info"
+          >
+            <i class="bi bi-info-circle me-2"/>
             Alterando data limite da etapa {{ etapaAtual }}: {{ situacaoEtapaAtual }}
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="$emit('fecharModal')">
-            <i class="bi bi-x-circle me-1"></i>
+          <button
+              type="button"
+              class="btn btn-secondary"
+              @click="$emit('fecharModal')"
+          >
+            <i class="bi bi-x-circle me-1"/>
             Cancelar
           </button>
           <button
@@ -39,15 +55,17 @@
             :disabled="!novaDataLimite || !isDataValida"
             @click="$emit('confirmarAlteracao', novaDataLimite)"
           >
-            <i class="bi bi-check-circle me-1"></i>
+            <i class="bi bi-check-circle me-1"/>
             Confirmar
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="mostrarModal" class="modal-backdrop fade show"></div>
-
+  <div
+      v-if="mostrarModal"
+      class="modal-backdrop fade show"
+  />
 </template>
 
 <script lang="ts" setup>

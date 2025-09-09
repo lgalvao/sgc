@@ -6,32 +6,56 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Atividades e conhecimentos</h2>
+      <h2 class="mb-0">
+        Atividades e conhecimentos
+      </h2>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
-          <i class="bi bi-arrow-right-circle me-2"></i>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
+        <button
+            class="btn btn-outline-secondary"
+            @click="abrirModalImpacto"
+        >
+          <i class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </button>
-        <button class="btn btn-secondary" title="Devolver para ajustes" @click="devolverCadastro">
+        <button
+            class="btn btn-secondary"
+            title="Devolver para ajustes"
+            @click="devolverCadastro"
+        >
           Devolver para ajustes
         </button>
-        <button class="btn btn-success" title="Validar" @click="validarCadastro">
+        <button
+            class="btn btn-success"
+            title="Validar"
+            @click="validarCadastro"
+        >
           {{ isRevisao ? 'Registrar aceite' : 'Validar' }}
         </button>
       </div>
     </div>
 
     <!-- Lista de atividades -->
-    <div v-for="(atividade, idx) in atividades" :key="atividade.id || idx" class="card mb-3 atividade-card">
+    <div
+        v-for="(atividade, idx) in atividades"
+        :key="atividade.id || idx"
+        class="card mb-3 atividade-card"
+    >
       <div class="card-body py-2">
         <div
-            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
-          <strong class="atividade-descricao" data-testid="atividade-descricao">{{ atividade.descricao }}</strong>
+            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+        >
+          <strong
+              class="atividade-descricao"
+              data-testid="atividade-descricao"
+          >{{ atividade.descricao }}</strong>
         </div>
 
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
-          <div v-for="(conhecimento) in atividade.conhecimentos" :key="conhecimento.id"
-               class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
+          <div
+              v-for="(conhecimento) in atividade.conhecimentos"
+              :key="conhecimento.id"
+              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+          >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
         </div>
@@ -43,55 +67,121 @@
         :id-processo="idProcesso"
         :mostrar="mostrarModalImpacto"
         :sigla-unidade="siglaUnidade"
-        @fechar="fecharModalImpacto"/>
+        @fechar="fecharModalImpacto"
+    />
 
     <!-- Modal de Validação -->
-    <div v-if="mostrarModalValidar" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalValidar"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro' }}</h5>
-            <button type="button" class="btn-close" @click="fecharModalValidar"></button>
+            <h5 class="modal-title">
+              {{ isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro' }}
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalValidar"
+            />
           </div>
           <div class="modal-body">
             <p>{{ isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?' }}</p>
             <div class="mb-3">
-              <label class="form-label" for="observacaoValidacao">Observação (opcional)</label>
-              <textarea id="observacaoValidacao" v-model="observacaoValidacao" class="form-control" rows="3"></textarea>
+              <label
+                  class="form-label"
+                  for="observacaoValidacao"
+              >Observação (opcional)</label>
+              <textarea
+                  id="observacaoValidacao"
+                  v-model="observacaoValidacao"
+                  class="form-control"
+                  rows="3"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalValidar">Cancelar</button>
-            <button type="button" class="btn btn-success" @click="confirmarValidacao">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalValidar"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-success"
+                @click="confirmarValidacao"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal de Devolução -->
-    <div v-if="mostrarModalDevolver" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalDevolver"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}</h5>
-            <button type="button" class="btn-close" @click="fecharModalDevolver"></button>
+            <h5 class="modal-title">
+              {{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalDevolver"
+            />
           </div>
           <div class="modal-body">
             <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
             <div class="mb-3">
-              <label class="form-label" for="observacaoDevolucao">Observação (opcional)</label>
-              <textarea id="observacaoDevolucao" v-model="observacaoDevolucao" class="form-control" rows="3"></textarea>
+              <label
+                  class="form-label"
+                  for="observacaoDevolucao"
+              >Observação (opcional)</label>
+              <textarea
+                  id="observacaoDevolucao"
+                  v-model="observacaoDevolucao"
+                  class="form-control"
+                  rows="3"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalDevolver">Cancelar</button>
-            <button type="button" class="btn btn-danger" @click="confirmarDevolucao">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalDevolver"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-danger"
+                @click="confirmarDevolucao"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="mostrarModalValidar || mostrarModalDevolver" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalValidar || mostrarModalDevolver"
+        class="modal-backdrop fade show"
+    />
   </div>
 </template>
 

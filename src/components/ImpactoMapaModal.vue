@@ -1,35 +1,73 @@
 <template>
-  <div v-if="mostrar" aria-modal="true" class="modal fade show" style="display: block;" tabindex="-1">
+  <div
+      v-if="mostrar"
+      aria-modal="true"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+  >
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Impacto no Mapa de Competências</h5>
-          <button class="btn-close" type="button" @click="fechar"></button>
+          <h5 class="modal-title">
+            Impacto no Mapa de Competências
+          </h5>
+          <button
+              class="btn-close"
+              type="button"
+              @click="fechar"
+          />
         </div>
         <div class="modal-body">
           <template v-if="unidade && processo">
             <div class="mt-3">
               <!-- Seção de Atividades Inseridas -->
-              <div v-if="atividadesInseridas.length > 0" data-testid="secao-atividades-inseridas">
-                <h5 class="mb-3" data-testid="titulo-atividades-inseridas"><i class="bi bi-plus-circle me-2"></i>Atividades
-                  inseridas</h5>
+              <div
+                  v-if="atividadesInseridas.length > 0"
+                  data-testid="secao-atividades-inseridas"
+              >
+                <h5
+                    class="mb-3"
+                    data-testid="titulo-atividades-inseridas"
+                >
+                  <i class="bi bi-plus-circle me-2"/>Atividades
+                  inseridas
+                </h5>
                 <div class="list-group mb-4">
-                  <div v-for="atividade in atividadesInseridas" :key="atividade.id"
-                       class="list-group-item flex-column align-items-start">
+                  <div
+                      v-for="atividade in atividadesInseridas"
+                      :key="atividade.id"
+                      class="list-group-item flex-column align-items-start"
+                  >
                     <div class="d-flex w-100 justify-content-start align-items-start">
-                      <i class="bi fs-5 me-3 bi-plus-circle-fill text-success" style="margin-top: 2px;"></i>
+                      <i
+                          class="bi fs-5 me-3 bi-plus-circle-fill text-success"
+                          style="margin-top: 2px;"
+                      />
                       <div class="flex-grow-1">
                         <p class="mb-1">
                           <strong>{{ atividade.descricaoAtividade }}</strong>
                         </p>
                         <!-- Conhecimentos da atividade inserida -->
-                        <div v-if="conhecimentosAtividade(atividade.idAtividade).length > 0" class="mt-2 ms-3">
-                          <small class="text-muted" data-testid="label-conhecimentos-adicionados">Conhecimentos
+                        <div
+                            v-if="conhecimentosAtividade(atividade.idAtividade).length > 0"
+                            class="mt-2 ms-3"
+                        >
+                          <small
+                              class="text-muted"
+                              data-testid="label-conhecimentos-adicionados"
+                          >Conhecimentos
                             adicionados:</small>
                           <ul class="list-unstyled mt-1">
-                            <li v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)"
-                                :key="conhecimento.id" class="d-flex align-items-center mb-1">
-                              <i class="bi bi-plus-circle-fill text-success me-2" style="font-size: 0.875rem;"></i>
+                            <li
+                                v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)"
+                                :key="conhecimento.id"
+                                class="d-flex align-items-center mb-1"
+                            >
+                              <i
+                                  class="bi bi-plus-circle-fill text-success me-2"
+                                  style="font-size: 0.875rem;"
+                              />
                               <small><strong>{{ conhecimento.descricaoConhecimento }}</strong></small>
                             </li>
                           </ul>
@@ -41,25 +79,46 @@
               </div>
 
               <!-- Seção de Competências Impactadas -->
-              <h5 class="mb-3" data-testid="titulo-competencias-impactadas"><i class="bi bi-bullseye me-2"></i>Competências
-                impactadas</h5>
+              <h5
+                  class="mb-3"
+                  data-testid="titulo-competencias-impactadas"
+              >
+                <i class="bi bi-bullseye me-2"/>Competências
+                impactadas
+              </h5>
               <div v-if="competenciasImpactadas.size === 0">
-                <p class="text-muted" data-testid="msg-nenhuma-competencia">Nenhuma competência foi impactada.</p>
+                <p
+                    class="text-muted"
+                    data-testid="msg-nenhuma-competencia"
+                >
+                  Nenhuma competência foi impactada.
+                </p>
               </div>
               <div v-else>
-                <div v-for="[comp_id, { competencia, mudancas: mudancasCompetencia }] in competenciasImpactadas"
-                     :key="comp_id" class="card mb-3">
+                <div
+                    v-for="[comp_id, { competencia, mudancas: mudancasCompetencia }] in competenciasImpactadas"
+                    :key="comp_id"
+                    class="card mb-3"
+                >
                   <div class="card-header bg-light">
-                    <h6 class="card-title mb-0">{{ competencia.descricao }}</h6>
+                    <h6 class="card-title mb-0">
+                      {{ competencia.descricao }}
+                    </h6>
                   </div>
                   <ul class="list-group list-group-flush">
-                    <li v-for="mudanca in mudancasCompetencia" :key="mudanca.id"
-                        class="list-group-item d-flex align-items-center">
-                      <i :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"
-                         class="bi me-3"></i>
+                    <li
+                        v-for="mudanca in mudancasCompetencia"
+                        :key="mudanca.id"
+                        class="list-group-item d-flex align-items-center"
+                    >
+                      <i
+                          :class="[changeDetails[mudanca.tipo].icon, changeDetails[mudanca.tipo].color]"
+                          class="bi me-3"
+                      />
                       <small>
                         <template
-                            v-if="mudanca.tipo === TipoMudanca.AtividadeAdicionada || mudanca.tipo === TipoMudanca.AtividadeRemovida">
+                            v-if="mudanca.tipo === TipoMudanca.AtividadeAdicionada || mudanca.tipo === TipoMudanca.AtividadeRemovida"
+                        >
                           {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoAtividade }}</strong>
                         </template>
                         <template v-else-if="mudanca.tipo === TipoMudanca.AtividadeAlterada">
@@ -69,7 +128,8 @@
                             }}"</small>
                         </template>
                         <template
-                            v-else-if="mudanca.tipo === TipoMudanca.ConhecimentoAdicionado || mudanca.tipo === TipoMudanca.ConhecimentoRemovido">
+                            v-else-if="mudanca.tipo === TipoMudanca.ConhecimentoAdicionado || mudanca.tipo === TipoMudanca.ConhecimentoRemovido"
+                        >
                           {{ changeDetails[mudanca.tipo].text }}: <strong>{{ mudanca.descricaoConhecimento }}</strong>
                         </template>
                         <template v-else-if="mudanca.tipo === TipoMudanca.ConhecimentoAlterado">
@@ -85,20 +145,37 @@
               </div>
             </div>
           </template>
-          <div v-else class="text-center">
-            <div class="spinner-border" role="status">
+          <div
+              v-else
+              class="text-center"
+          >
+            <div
+                class="spinner-border"
+                role="status"
+            >
               <span class="visually-hidden">Carregando...</span>
             </div>
-            <p class="mt-2">Carregando informações do processo e unidade...</p>
+            <p class="mt-2">
+              Carregando informações do processo e unidade...
+            </p>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" @click="fechar">Fechar</button>
+          <button
+              class="btn btn-secondary"
+              type="button"
+              @click="fechar"
+          >
+            Fechar
+          </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="mostrar" class="modal-backdrop fade show"></div>
+  <div
+      v-if="mostrar"
+      class="modal-backdrop fade show"
+  />
 </template>
 
 <script lang="ts" setup>

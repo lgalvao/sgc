@@ -1,19 +1,43 @@
 <template>
   <!-- Modal para aceitar mapa com observações -->
-  <div v-if="mostrarModal" class="modal fade show" style="display: block;" tabindex="-1">
+  <div
+      v-if="mostrarModal"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" data-testid="modal-aceite-title">
-            <i class="bi bi-check-circle text-success me-2"></i>
+          <h5
+              class="modal-title"
+              data-testid="modal-aceite-title"
+          >
+            <i class="bi bi-check-circle text-success me-2"/>
             {{ tituloModal }}
           </h5>
-          <button type="button" class="btn-close" @click="$emit('fecharModal')" data-testid="modal-aceite-close"></button>
+          <button
+              type="button"
+              class="btn-close"
+              data-testid="modal-aceite-close"
+              @click="$emit('fecharModal')"
+          />
         </div>
-        <div class="modal-body" data-testid="modal-aceite-body">
-          <p v-if="perfil === 'ADMIN'">{{ corpoModal }}</p>
-          <div v-else class="mb-3">
-            <label for="observacao-textarea" class="form-label">{{ corpoModal }}</label>
+        <div
+            class="modal-body"
+            data-testid="modal-aceite-body"
+        >
+          <p v-if="perfil === 'ADMIN'">
+            {{ corpoModal }}
+          </p>
+          <div
+              v-else
+              class="mb-3"
+          >
+            <label
+                for="observacao-textarea"
+                class="form-label"
+            >{{ corpoModal }}</label>
             <textarea
               id="observacao-textarea"
               v-model="observacao"
@@ -21,31 +45,39 @@
               rows="4"
               placeholder="Digite suas observações sobre o mapa..."
               data-testid="observacao-aceite-textarea"
-            ></textarea>
+            />
             <div class="form-text">
               As observações serão registradas junto com a validação do mapa.
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="$emit('fecharModal')" data-testid="modal-aceite-cancelar">
-            <i class="bi bi-x-circle me-1"></i>
+          <button
+              type="button"
+              class="btn btn-secondary"
+              data-testid="modal-aceite-cancelar"
+              @click="$emit('fecharModal')"
+          >
+            <i class="bi bi-x-circle me-1"/>
             Cancelar
           </button>
           <button
             type="button"
             class="btn btn-success"
-            @click="$emit('confirmarAceitacao', observacao)"
             data-testid="modal-aceite-confirmar"
+            @click="$emit('confirmarAceitacao', observacao)"
           >
-            <i class="bi bi-check-circle me-1"></i>
+            <i class="bi bi-check-circle me-1"/>
             Aceitar
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="mostrarModal" class="modal-backdrop fade show"></div>
+  <div
+      v-if="mostrarModal"
+      class="modal-backdrop fade show"
+  />
 </template>
 
 <script lang="ts" setup>

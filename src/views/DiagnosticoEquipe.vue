@@ -2,48 +2,88 @@
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
-        <h2 class="mb-0">Diagnóstico da Equipe</h2>
+        <h2 class="mb-0">
+          Diagnóstico da Equipe
+        </h2>
         <small class="text-muted">{{ siglaUnidade }} - {{ nomeUnidade }}</small>
       </div>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-success" @click="finalizarDiagnostico">
-          <i class="bi bi-check-circle me-2"></i>Finalizar Diagnóstico
+        <button
+            class="btn btn-outline-success"
+            @click="finalizarDiagnostico"
+        >
+          <i class="bi bi-check-circle me-2"/>Finalizar Diagnóstico
         </button>
       </div>
     </div>
 
     <div class="alert alert-info">
-      <i class="bi bi-info-circle me-2"></i>
+      <i class="bi bi-info-circle me-2"/>
       Nesta etapa, os servidores da unidade devem avaliar a importância e o domínio das competências da unidade.
     </div>
 
     <!-- Lista de competências para avaliação -->
-    <div v-if="competencias.length > 0" class="row">
-      <div v-for="competencia in competencias" :key="competencia.id" class="col-md-6 mb-4">
+    <div
+        v-if="competencias.length > 0"
+        class="row"
+    >
+      <div
+          v-for="competencia in competencias"
+          :key="competencia.id"
+          class="col-md-6 mb-4"
+      >
         <div class="card h-100">
           <div class="card-header">
-            <h5 class="card-title mb-0">{{ competencia.descricao }}</h5>
+            <h5 class="card-title mb-0">
+              {{ competencia.descricao }}
+            </h5>
           </div>
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
-              <select v-model="avaliacoes[competencia.id].importancia" class="form-select">
-                <option value="1">1 - Muito baixa</option>
-                <option value="2">2 - Baixa</option>
-                <option value="3">3 - Média</option>
-                <option value="4">4 - Alta</option>
-                <option value="5">5 - Muito alta</option>
+              <select
+                  v-model="avaliacoes[competencia.id].importancia"
+                  class="form-select"
+              >
+                <option value="1">
+                  1 - Muito baixa
+                </option>
+                <option value="2">
+                  2 - Baixa
+                </option>
+                <option value="3">
+                  3 - Média
+                </option>
+                <option value="4">
+                  4 - Alta
+                </option>
+                <option value="5">
+                  5 - Muito alta
+                </option>
               </select>
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
-              <select v-model="avaliacoes[competencia.id].dominio" class="form-select">
-                <option value="1">1 - Muito baixo</option>
-                <option value="2">2 - Baixo</option>
-                <option value="3">3 - Médio</option>
-                <option value="4">4 - Alto</option>
-                <option value="5">5 - Muito alto</option>
+              <select
+                  v-model="avaliacoes[competencia.id].dominio"
+                  class="form-select"
+              >
+                <option value="1">
+                  1 - Muito baixo
+                </option>
+                <option value="2">
+                  2 - Baixo
+                </option>
+                <option value="3">
+                  3 - Médio
+                </option>
+                <option value="4">
+                  4 - Alto
+                </option>
+                <option value="5">
+                  5 - Muito alto
+                </option>
               </select>
             </div>
 
@@ -54,43 +94,80 @@
                 class="form-control"
                 rows="2"
                 placeholder="Comentários sobre esta competência..."
-              ></textarea>
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else class="alert alert-warning">
-      <i class="bi bi-exclamation-triangle me-2"></i>
+    <div
+        v-else
+        class="alert alert-warning"
+    >
+      <i class="bi bi-exclamation-triangle me-2"/>
       Nenhum mapa de competências disponível para diagnóstico.
     </div>
 
     <!-- Modal de confirmação -->
-    <div v-if="mostrarModalConfirmacao" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalConfirmacao"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Finalizar Diagnóstico</h5>
-            <button type="button" class="btn-close" @click="fecharModalConfirmacao"></button>
+            <h5 class="modal-title">
+              Finalizar Diagnóstico
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalConfirmacao"
+            />
           </div>
           <div class="modal-body">
             <p>Confirma a finalização do diagnóstico da equipe? Esta ação não poderá ser desfeita.</p>
-            <div v-if="avaliacoesPendentes.length > 0" class="alert alert-warning">
+            <div
+                v-if="avaliacoesPendentes.length > 0"
+                class="alert alert-warning"
+            >
               <strong>Atenção:</strong> As seguintes competências ainda não foram avaliadas:
               <ul class="mb-0 mt-2">
-                <li v-for="comp in avaliacoesPendentes" :key="comp.id">{{ comp.descricao }}</li>
+                <li
+                    v-for="comp in avaliacoesPendentes"
+                    :key="comp.id"
+                >
+                  {{ comp.descricao }}
+                </li>
               </ul>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalConfirmacao">Cancelar</button>
-            <button type="button" class="btn btn-success" @click="confirmarFinalizacao">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalConfirmacao"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-success"
+                @click="confirmarFinalizacao"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalConfirmacao" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalConfirmacao"
+        class="modal-backdrop fade show"
+    />
   </div>
 </template>
 

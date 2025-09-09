@@ -6,14 +6,20 @@
           :checked="isChecked(unidade.sigla)"
           class="form-check-input"
           type="checkbox"
-          v-bind:indeterminate="isIndeterminate(unidade)"
+          :indeterminate="isIndeterminate(unidade)"
           @change="() => toggleUnidade(unidade)"
-      />
-      <label :for="`chk-${unidade.sigla}`" class="form-check-label ms-2">
+      >
+      <label
+          :for="`chk-${unidade.sigla}`"
+          class="form-check-label ms-2"
+      >
         <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
       </label>
     </div>
-    <div v-if="unidade.filhas && unidade.filhas.length" class="ms-4">
+    <div
+        v-if="unidade.filhas && unidade.filhas.length"
+        class="ms-4"
+    >
       <UnidadeTreeItem
           v-for="filha in unidade.filhas"
           :key="filha.sigla"

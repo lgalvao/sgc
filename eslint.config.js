@@ -15,7 +15,11 @@ export default [
       "__mocks__/**"
     ],
   },
-  // Main configuration for Vue, TS, JS files
+    // Configurações recomendadas do TypeScript-ESLint
+    ...tseslint.configs.recommended,
+    // Configurações recomendadas do Vue
+    ...pluginVue.configs['flat/recommended'],
+    // Configuração principal para Vue, TS, JS files
   {
     files: ["**/*.{js,ts,vue}"],
     plugins: {
@@ -34,9 +38,6 @@ export default [
       },
     },
     rules: {
-      // Spread recommended rules here
-      ...tseslint.configs.recommended.rules,
-      ...pluginVue.configs['flat/recommended'].rules,
       // Custom overrides
       "vue/multi-word-component-names": "off",
       "@typescript-eslint/no-explicit-any": "warn",

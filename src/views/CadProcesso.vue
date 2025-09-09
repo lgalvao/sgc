@@ -4,14 +4,34 @@
 
     <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
       <div class="mb-3">
-        <label class="form-label" for="descricao">Descrição</label>
-        <input id="descricao" v-model="descricao" class="form-control" placeholder="Descreva o processo" type="text"/>
+        <label
+            class="form-label"
+            for="descricao"
+        >Descrição</label>
+        <input
+            id="descricao"
+            v-model="descricao"
+            class="form-control"
+            placeholder="Descreva o processo"
+            type="text"
+        >
       </div>
 
       <div class="mb-3">
-        <label class="form-label" for="tipo">Tipo</label>
-        <select id="tipo" v-model="tipo" class="form-select">
-          <option v-for="tipoOption in TipoProcesso" :key="tipoOption" :value="tipoOption">
+        <label
+            class="form-label"
+            for="tipo"
+        >Tipo</label>
+        <select
+            id="tipo"
+            v-model="tipo"
+            class="form-select"
+        >
+          <option
+              v-for="tipoOption in TipoProcesso"
+              :key="tipoOption"
+              :value="tipoOption"
+          >
             {{ tipoOption }}
           </option>
         </select>
@@ -21,23 +41,38 @@
         <label class="form-label">Unidades participantes</label>
         <div class="border rounded p-3">
           <div>
-            <template v-for="unidade in unidadesStore.unidades" :key="unidade.sigla">
-              <div :style="{ marginLeft: '0px' }" class="form-check">
+            <template
+                v-for="unidade in unidadesStore.unidades"
+                :key="unidade.sigla"
+            >
+              <div
+                  :style="{ marginLeft: '0px' }"
+                  class="form-check"
+              >
                 <!--suppress HtmlUnknownAttribute -->
                 <input
                     :id="`chk-${unidade.sigla}`"
                     :checked="getEstadoSelecao(unidade) === true"
                     class="form-check-input"
                     type="checkbox"
-                    v-bind:indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
+                    :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
                     @change="() => toggleUnidade(unidade)"
-                />
-                <label :for="`chk-${unidade.sigla}`" class="form-check-label ms-2">
+                >
+                <label
+                    :for="`chk-${unidade.sigla}`"
+                    class="form-check-label ms-2"
+                >
                   <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
                 </label>
               </div>
-              <div v-if="unidade.filhas && unidade.filhas.length" class="ms-4">
-                <template v-for="filha in unidade.filhas" :key="filha.sigla">
+              <div
+                  v-if="unidade.filhas && unidade.filhas.length"
+                  class="ms-4"
+              >
+                <template
+                    v-for="filha in unidade.filhas"
+                    :key="filha.sigla"
+                >
                   <div class="form-check">
                     <!--suppress HtmlUnknownAttribute -->
                     <input
@@ -45,24 +80,37 @@
                         :checked="getEstadoSelecao(filha) === true"
                         class="form-check-input"
                         type="checkbox"
-                        v-bind:indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
+                        :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
                         @change="() => toggleUnidade(filha)"
-                    />
-                    <label :for="'chk-' + filha.sigla" class="form-check-label ms-2">
+                    >
+                    <label
+                        :for="'chk-' + filha.sigla"
+                        class="form-check-label ms-2"
+                    >
                       <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
                     </label>
                   </div>
 
-                  <div v-if="filha.filhas && filha.filhas.length" class="ms-4">
-                    <div v-for="neta in filha.filhas" :key="neta.sigla" class="form-check">
+                  <div
+                      v-if="filha.filhas && filha.filhas.length"
+                      class="ms-4"
+                  >
+                    <div
+                        v-for="neta in filha.filhas"
+                        :key="neta.sigla"
+                        class="form-check"
+                    >
                       <input
                           :id="'chk-' + neta.sigla"
                           :checked="isChecked(neta.sigla)"
                           class="form-check-input"
                           type="checkbox"
                           @change="() => toggleUnidade(neta)"
-                      />
-                      <label :for="'chk-' + neta.sigla" class="form-check-label ms-2">
+                      >
+                      <label
+                          :for="'chk-' + neta.sigla"
+                          class="form-check-label ms-2"
+                      >
                         <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
                       </label>
                     </div>
@@ -75,14 +123,38 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label" for="dataLimite">Data limite</label>
-        <input id="dataLimite" v-model="dataLimite" class="form-control" type="date"/>
+        <label
+            class="form-label"
+            for="dataLimite"
+        >Data limite</label>
+        <input
+            id="dataLimite"
+            v-model="dataLimite"
+            class="form-control"
+            type="date"
+        >
       </div>
-      <button class="btn btn-primary" type="button" @click="salvarProcesso">Salvar</button>
-      <button class="btn btn-success ms-2" data-testid="btn-iniciar-processo" type="button" @click="iniciarProcesso">
+      <button
+          class="btn btn-primary"
+          type="button"
+          @click="salvarProcesso"
+      >
+        Salvar
+      </button>
+      <button
+          class="btn btn-success ms-2"
+          data-testid="btn-iniciar-processo"
+          type="button"
+          @click="iniciarProcesso"
+      >
         Iniciar processo
       </button>
-      <router-link class="btn btn-secondary ms-2" to="/painel">Cancelar</router-link>
+      <router-link
+          class="btn btn-secondary ms-2"
+          to="/painel"
+      >
+        Cancelar
+      </router-link>
     </form>
   </div>
 </template>

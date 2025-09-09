@@ -1,29 +1,65 @@
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="display-6">Mapa de competências técnicas</div>
+      <div class="display-6">
+        Mapa de competências técnicas
+      </div>
       <div class="d-flex gap-2">
-        <button v-if="podeValidar" class="btn btn-outline-warning" title="Apresentar sugestões"
-                @click="abrirModalSugestoes" data-testid="apresentar-sugestoes-btn">
+        <button
+            v-if="podeValidar"
+            class="btn btn-outline-warning"
+            title="Apresentar sugestões"
+            data-testid="apresentar-sugestoes-btn"
+            @click="abrirModalSugestoes"
+        >
           Apresentar sugestões
         </button>
-        <button v-if="podeValidar" class="btn btn-outline-success" title="Validar mapa" @click="abrirModalValidar" data-testid="validar-btn">
+        <button
+            v-if="podeValidar"
+            class="btn btn-outline-success"
+            title="Validar mapa"
+            data-testid="validar-btn"
+            @click="abrirModalValidar"
+        >
           Validar
         </button>
 
         <!-- Botões para GESTOR/ADMIN (CDU-20 - Analisar validação) -->
-        <button v-if="podeAnalisar" class="btn btn-outline-info" title="Ver sugestões" @click="verSugestoes"
-                v-show="podeVerSugestoes" data-testid="ver-sugestoes-btn">
+        <button
+            v-if="podeAnalisar"
+            v-show="podeVerSugestoes"
+            class="btn btn-outline-info"
+            title="Ver sugestões"
+            data-testid="ver-sugestoes-btn"
+            @click="verSugestoes"
+        >
           Ver sugestões
         </button>
-        <button v-if="podeAnalisar" class="btn btn-outline-secondary" title="Histórico de análise"
-                @click="verHistorico" data-testid="historico-analise-btn">
+        <button
+            v-if="podeAnalisar"
+            class="btn btn-outline-secondary"
+            title="Histórico de análise"
+            data-testid="historico-analise-btn"
+            @click="verHistorico"
+        >
           Histórico de análise
         </button>
-        <button v-if="podeAnalisar" class="btn btn-outline-danger" title="Devolver para ajustes" @click="abrirModalDevolucao" data-testid="devolver-ajustes-btn">
+        <button
+            v-if="podeAnalisar"
+            class="btn btn-outline-danger"
+            title="Devolver para ajustes"
+            data-testid="devolver-ajustes-btn"
+            @click="abrirModalDevolucao"
+        >
           Devolver para ajustes
         </button>
-        <button v-if="podeAnalisar" class="btn btn-outline-success" title="Aceitar" @click="abrirModalAceitar" data-testid="registrar-aceite-btn">
+        <button
+            v-if="podeAnalisar"
+            class="btn btn-outline-success"
+            title="Aceitar"
+            data-testid="registrar-aceite-btn"
+            @click="abrirModalAceitar"
+        >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}
         </button>
       </div>
@@ -31,29 +67,53 @@
 
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
-        <div class="fs-5" data-testid="unidade-info">{{ unidade.sigla }} - {{ unidade.nome }}</div>
+        <div
+            class="fs-5"
+            data-testid="unidade-info"
+        >
+          {{ unidade.sigla }} - {{ unidade.nome }}
+        </div>
       </div>
 
       <div class="mb-4 mt-3">
-        <div v-if="competencias.length === 0">Nenhuma competência cadastrada.</div>
-        <div v-for="comp in competencias" :key="comp.id" class="card mb-3 competencia-card"
-             data-testid="competencia-block">
+        <div v-if="competencias.length === 0">
+          Nenhuma competência cadastrada.
+        </div>
+        <div
+            v-for="comp in competencias"
+            :key="comp.id"
+            class="card mb-3 competencia-card"
+            data-testid="competencia-block"
+        >
           <div class="card-body py-2">
             <div
-                class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card">
-              <strong class="competencia-descricao" data-testid="competencia-descricao"> {{ comp.descricao }}</strong>
+                class="card-title fs-5 d-flex align-items-center position-relative competencia-titulo-card"
+            >
+              <strong
+                  class="competencia-descricao"
+                  data-testid="competencia-descricao"
+              > {{ comp.descricao }}</strong>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2 ps-3">
-              <div v-for="atvId in comp.atividadesAssociadas" :key="atvId">
-                <div v-if="getAtividadeCompleta(atvId)"
-                     class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
-                     data-testid="atividade-item">
+              <div
+                  v-for="atvId in comp.atividadesAssociadas"
+                  :key="atvId"
+              >
+                <div
+                    v-if="getAtividadeCompleta(atvId)"
+                    class="card atividade-associada-card-item d-flex flex-column group-atividade-associada"
+                    data-testid="atividade-item"
+                >
                   <div class="card-body d-flex align-items-center py-1 px-2">
                     <span class="atividade-associada-descricao me-2">{{ getAtividadeCompleta(atvId)?.descricao }}</span>
                   </div>
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
-                    <span v-for="conhecimento in getConhecimentosAtividade(atvId)" :key="conhecimento.id"
-                          class="me-3 mb-1" data-testid="conhecimento-item">
+                    <span
+                        v-for="conhecimento in getConhecimentosAtividade(atvId)"
+                        :key="conhecimento.id"
+                        class="me-3 mb-1"
+                        data-testid="conhecimento-item"
+                    >
                       {{ conhecimento.descricao }}
                     </span>
                   </div>
@@ -69,24 +129,42 @@
     </div>
 
     <AceitarMapaModal
-        :mostrarModal="mostrarModalAceitar"
+        :mostrar-modal="mostrarModalAceitar"
         :perfil="perfilSelecionado || undefined"
-        @fecharModal="fecharModalAceitar"
-        @confirmarAceitacao="confirmarAceitacao"
+        @fechar-modal="fecharModalAceitar"
+        @confirmar-aceitacao="confirmarAceitacao"
     />
 
     <!-- Modal para apresentar sugestões (CDU-19) -->
-    <div class="modal fade" :class="{ 'show': mostrarModalSugestoes }"
-          :style="{ display: mostrarModalSugestoes ? 'block' : 'none' }" tabindex="-1" data-testid="modal-apresentar-sugestoes">
+    <div
+        class="modal fade"
+        :class="{ 'show': mostrarModalSugestoes }"
+        :style="{ display: mostrarModalSugestoes ? 'block' : 'none' }"
+        tabindex="-1"
+        data-testid="modal-apresentar-sugestoes"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-apresentar-sugestoes-title">Apresentar Sugestões</h5>
-            <button type="button" class="btn-close" @click="fecharModalSugestoes" data-testid="modal-apresentar-sugestoes-close"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-apresentar-sugestoes-title"
+            >
+              Apresentar Sugestões
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-testid="modal-apresentar-sugestoes-close"
+                @click="fecharModalSugestoes"
+            />
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="sugestoesTextarea" class="form-label">Sugestões para o mapa de competências:</label>
+              <label
+                  for="sugestoesTextarea"
+                  class="form-label"
+              >Sugestões para o mapa de competências:</label>
               <textarea
                   id="sugestoesTextarea"
                   v-model="sugestoes"
@@ -94,27 +172,59 @@
                   rows="5"
                   placeholder="Digite suas sugestões para o mapa de competências..."
                   data-testid="sugestoes-textarea"
-              ></textarea>
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalSugestoes" data-testid="modal-apresentar-sugestoes-cancelar">Cancelar</button>
-            <button type="button" class="btn btn-primary" @click="confirmarSugestoes" data-testid="modal-apresentar-sugestoes-confirmar">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="modal-apresentar-sugestoes-cancelar"
+                @click="fecharModalSugestoes"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-primary"
+                data-testid="modal-apresentar-sugestoes-confirmar"
+                @click="confirmarSugestoes"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal para ver sugestões (CDU-20) -->
-    <div class="modal fade" :class="{ 'show': mostrarModalVerSugestoes }"
-          :style="{ display: mostrarModalVerSugestoes ? 'block' : 'none' }" tabindex="-1" data-testid="modal-sugestoes">
+    <div
+        class="modal fade"
+        :class="{ 'show': mostrarModalVerSugestoes }"
+        :style="{ display: mostrarModalVerSugestoes ? 'block' : 'none' }"
+        tabindex="-1"
+        data-testid="modal-sugestoes"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-sugestoes-title">Sugestões</h5>
-            <button type="button" class="btn-close" @click="fecharModalVerSugestoes" data-testid="modal-sugestoes-close"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-sugestoes-title"
+            >
+              Sugestões
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-testid="modal-sugestoes-close"
+                @click="fecharModalVerSugestoes"
+            />
           </div>
-          <div class="modal-body" data-testid="modal-sugestoes-body">
+          <div
+              class="modal-body"
+              data-testid="modal-sugestoes-body"
+          >
             <div class="mb-3">
               <label class="form-label">Sugestões registradas para o mapa de competências:</label>
               <textarea
@@ -123,49 +233,109 @@
                   rows="5"
                   readonly
                   data-testid="sugestoes-visualizacao-textarea"
-              ></textarea>
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalVerSugestoes" data-testid="modal-sugestoes-fechar">Fechar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="modal-sugestoes-fechar"
+                @click="fecharModalVerSugestoes"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal para validar mapa (CDU-19) -->
-    <div class="modal fade" :class="{ 'show': mostrarModalValidar }"
-          :style="{ display: mostrarModalValidar ? 'block' : 'none' }" tabindex="-1" data-testid="modal-validar">
+    <div
+        class="modal fade"
+        :class="{ 'show': mostrarModalValidar }"
+        :style="{ display: mostrarModalValidar ? 'block' : 'none' }"
+        tabindex="-1"
+        data-testid="modal-validar"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-validar-title">Validar Mapa de Competências</h5>
-            <button type="button" class="btn-close" @click="fecharModalValidar" data-testid="modal-validar-close"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-validar-title"
+            >
+              Validar Mapa de Competências
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-testid="modal-validar-close"
+                @click="fecharModalValidar"
+            />
           </div>
-          <div class="modal-body" data-testid="modal-validar-body">
+          <div
+              class="modal-body"
+              data-testid="modal-validar-body"
+          >
             <p>Confirma a validação do mapa de competências? Essa ação habilitará a análise por unidades superiores.</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalValidar" data-testid="modal-validar-cancelar">Cancelar</button>
-            <button type="button" class="btn btn-success" @click="confirmarValidacao" data-testid="modal-validar-confirmar">Validar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="modal-validar-cancelar"
+                @click="fecharModalValidar"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-success"
+                data-testid="modal-validar-confirmar"
+                @click="confirmarValidacao"
+            >
+              Validar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal para devolver para ajustes (CDU-20) -->
-    <div class="modal fade" :class="{ 'show': mostrarModalDevolucao }"
-          :style="{ display: mostrarModalDevolucao ? 'block' : 'none' }" tabindex="-1" data-testid="modal-devolucao">
+    <div
+        class="modal fade"
+        :class="{ 'show': mostrarModalDevolucao }"
+        :style="{ display: mostrarModalDevolucao ? 'block' : 'none' }"
+        tabindex="-1"
+        data-testid="modal-devolucao"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-devolucao-title">Devolução</h5>
-            <button type="button" class="btn-close" @click="fecharModalDevolucao" data-testid="modal-devolucao-close"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-devolucao-title"
+            >
+              Devolução
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-testid="modal-devolucao-close"
+                @click="fecharModalDevolucao"
+            />
           </div>
-          <div class="modal-body" data-testid="modal-devolucao-body">
+          <div
+              class="modal-body"
+              data-testid="modal-devolucao-body"
+          >
             <p>Confirma a devolução da validação do mapa para ajustes?</p>
             <div class="mb-3">
-              <label for="observacaoDevolucao" class="form-label">Observação (opcional):</label>
+              <label
+                  for="observacaoDevolucao"
+                  class="form-label"
+              >Observação (opcional):</label>
               <textarea
                   id="observacaoDevolucao"
                   v-model="observacaoDevolucao"
@@ -173,28 +343,63 @@
                   rows="3"
                   placeholder="Digite observações sobre a devolução..."
                   data-testid="observacao-devolucao-textarea"
-              ></textarea>
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalDevolucao" data-testid="modal-devolucao-cancelar">Cancelar</button>
-            <button type="button" class="btn btn-danger" @click="confirmarDevolucao" data-testid="modal-devolucao-confirmar">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="modal-devolucao-cancelar"
+                @click="fecharModalDevolucao"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-danger"
+                data-testid="modal-devolucao-confirmar"
+                @click="confirmarDevolucao"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal para histórico de análise (CDU-20) -->
-    <div class="modal fade" :class="{ 'show': mostrarModalHistorico }"
-          :style="{ display: mostrarModalHistorico ? 'block' : 'none' }" tabindex="-1" data-testid="modal-historico">
+    <div
+        class="modal fade"
+        :class="{ 'show': mostrarModalHistorico }"
+        :style="{ display: mostrarModalHistorico ? 'block' : 'none' }"
+        tabindex="-1"
+        data-testid="modal-historico"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-historico-title">Histórico de Análise</h5>
-            <button type="button" class="btn-close" @click="fecharModalHistorico" data-testid="modal-historico-close"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-historico-title"
+            >
+              Histórico de Análise
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-testid="modal-historico-close"
+                @click="fecharModalHistorico"
+            />
           </div>
-          <div class="modal-body" data-testid="modal-historico-body">
-            <table class="table table-striped" data-testid="tabela-historico">
+          <div
+              class="modal-body"
+              data-testid="modal-historico-body"
+          >
+            <table
+                class="table table-striped"
+                data-testid="tabela-historico"
+            >
               <thead>
                 <tr>
                   <th>Data/Hora</th>
@@ -204,7 +409,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in historicoAnalise" :key="item.id" data-testid="historico-item">
+              <tr
+                  v-for="item in historicoAnalise"
+                  :key="item.id"
+                  data-testid="historico-item"
+              >
                   <td>{{ item.data }}</td>
                   <td>{{ item.unidade }}</td>
                   <td>{{ item.resultado }}</td>
@@ -214,7 +423,14 @@
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalHistorico" data-testid="modal-historico-fechar">Fechar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="modal-historico-fechar"
+                @click="fecharModalHistorico"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       </div>

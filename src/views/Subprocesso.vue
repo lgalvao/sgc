@@ -2,43 +2,49 @@
   <div class="container mt-4">
     <SubprocessoHeader
         v-if="unidadeComResponsavelDinamico"
-        :processoDescricao="processoAtual?.descricao || ''"
-        :unidadeSigla="unidadeComResponsavelDinamico.sigla"
-        :unidadeNome="unidadeComResponsavelDinamico.nome"
+        :processo-descricao="processoAtual?.descricao || ''"
+        :unidade-sigla="unidadeComResponsavelDinamico.sigla"
+        :unidade-nome="unidadeComResponsavelDinamico.nome"
         :situacao="situacaoUnidadeNoProcesso"
-        :titularNome="titularDetalhes?.nome || ''"
-        :titularRamal="titularDetalhes?.ramal || ''"
-        :titularEmail="titularDetalhes?.email || ''"
-        :responsavelNome="responsavelDetalhes?.nome || ''"
-        :responsavelRamal="responsavelDetalhes?.ramal || ''"
-        :responsavelEmail="responsavelDetalhes?.email || ''"
-        :unidadeAtual="SubprocessoDetalhes?.unidadeAtual || ''"
-        :perfilUsuario="perfilStore.perfilSelecionado"
-        :isSubprocessoEmAndamento="isSubprocessoEmAndamento"
-        @alterarDataLimite="abrirModalAlterarDataLimite"
+        :titular-nome="titularDetalhes?.nome || ''"
+        :titular-ramal="titularDetalhes?.ramal || ''"
+        :titular-email="titularDetalhes?.email || ''"
+        :responsavel-nome="responsavelDetalhes?.nome || ''"
+        :responsavel-ramal="responsavelDetalhes?.ramal || ''"
+        :responsavel-email="responsavelDetalhes?.email || ''"
+        :unidade-atual="SubprocessoDetalhes?.unidadeAtual || ''"
+        :perfil-usuario="perfilStore.perfilSelecionado"
+        :is-subprocesso-em-andamento="isSubprocessoEmAndamento"
+        @alterar-data-limite="abrirModalAlterarDataLimite"
     />
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
     <SubprocessoCards
-        :tipoProcesso="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
+        :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
         :mapa="mapa"
         :situacao="situacaoUnidadeNoProcesso"
-        @irParaAtividades="irParaAtividadesConhecimentos"
-        @navegarParaMapa="navegarParaMapa"
-        @irParaDiagnosticoEquipe="irParaDiagnosticoEquipe"
-        @irParaOcupacoesCriticas="irParaOcupacoesCriticas"
+        @ir-para-atividades="irParaAtividadesConhecimentos"
+        @navegar-para-mapa="navegarParaMapa"
+        @ir-para-diagnostico-equipe="irParaDiagnosticoEquipe"
+        @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
     />
 
 
     <!-- Seção de Movimentações do Processo -->
     <div class="mt-4">
       <h4>Movimentações do Processo</h4>
-      <div v-if="movements.length === 0" class="alert alert-info">
+      <div
+          v-if="movements.length === 0"
+          class="alert alert-info"
+      >
         Nenhuma movimentação registrada para este subprocesso.
       </div>
-      <table v-else class="table table-striped">
+      <table
+          v-else
+          class="table table-striped"
+      >
         <thead>
           <tr>
             <th>Data/Hora</th>
@@ -48,7 +54,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="movement in movements" :key="movement.id">
+        <tr
+            v-for="movement in movements"
+            :key="movement.id"
+        >
             <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
             <td>{{ movement.unidadeOrigem }}</td>
             <td>{{ movement.unidadeDestino }}</td>
@@ -60,12 +69,12 @@
   </div>
 
   <SubprocessoModal
-      :mostrarModal="mostrarModalAlterarDataLimite"
-      :dataLimiteAtual="dataLimiteAtual"
-      :etapaAtual="etapaAtual"
-      :situacaoEtapaAtual="SubprocessoDetalhes?.situacao || 'Não informado'"
-      @fecharModal="fecharModalAlterarDataLimite"
-      @confirmarAlteracao="confirmarAlteracaoDataLimite"
+      :mostrar-modal="mostrarModalAlterarDataLimite"
+      :data-limite-atual="dataLimiteAtual"
+      :etapa-atual="etapaAtual"
+      :situacao-etapa-atual="SubprocessoDetalhes?.situacao || 'Não informado'"
+      @fechar-modal="fecharModalAlterarDataLimite"
+      @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
 </template>
 

@@ -1,52 +1,109 @@
 <template>
   <div class="container mt-4">
-    <h2 class="display-6 mb-4">Relatórios</h2>
+    <h2 class="display-6 mb-4">
+      Relatórios
+    </h2>
 
     <!-- Filtros -->
     <div class="row mb-4">
       <div class="col-md-4">
-        <label for="filtroTipo" class="form-label">Tipo de Processo</label>
-        <select id="filtroTipo" v-model="filtroTipo" class="form-select">
-          <option value="">Todos</option>
-          <option value="Mapeamento">Mapeamento</option>
-          <option value="Revisão">Revisão</option>
-          <option value="Diagnóstico">Diagnóstico</option>
+        <label
+            for="filtroTipo"
+            class="form-label"
+        >Tipo de Processo</label>
+        <select
+            id="filtroTipo"
+            v-model="filtroTipo"
+            class="form-select"
+        >
+          <option value="">
+            Todos
+          </option>
+          <option value="Mapeamento">
+            Mapeamento
+          </option>
+          <option value="Revisão">
+            Revisão
+          </option>
+          <option value="Diagnóstico">
+            Diagnóstico
+          </option>
         </select>
       </div>
       <div class="col-md-4">
-        <label for="filtroDataInicio" class="form-label">Data Início</label>
-        <input type="date" id="filtroDataInicio" v-model="filtroDataInicio" class="form-control">
+        <label
+            for="filtroDataInicio"
+            class="form-label"
+        >Data Início</label>
+        <input
+            id="filtroDataInicio"
+            v-model="filtroDataInicio"
+            type="date"
+            class="form-control"
+        >
       </div>
       <div class="col-md-4">
-        <label for="filtroDataFim" class="form-label">Data Fim</label>
-        <input type="date" id="filtroDataFim" v-model="filtroDataFim" class="form-control">
+        <label
+            for="filtroDataFim"
+            class="form-label"
+        >Data Fim</label>
+        <input
+            id="filtroDataFim"
+            v-model="filtroDataFim"
+            type="date"
+            class="form-control"
+        >
       </div>
     </div>
 
     <div class="row">
       <div class="col-md-4 mb-4">
-        <div class="card h-100" style="cursor: pointer;" @click="abrirModalMapasVigentes">
+        <div
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalMapasVigentes"
+        >
           <div class="card-body">
-            <h5 class="card-title">Mapas Vigentes</h5>
-            <p class="card-text">Visualize os mapas de competências atualmente vigentes em todas as unidades.</p>
+            <h5 class="card-title">
+              Mapas Vigentes
+            </h5>
+            <p class="card-text">
+              Visualize os mapas de competências atualmente vigentes em todas as unidades.
+            </p>
             <small class="text-muted">{{ mapasVigentes.length }} mapas encontrados</small>
           </div>
         </div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="card h-100" style="cursor: pointer;" @click="abrirModalDiagnosticosGaps">
+        <div
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalDiagnosticosGaps"
+        >
           <div class="card-body">
-            <h5 class="card-title">Diagnósticos de Gaps</h5>
-            <p class="card-text">Analise os gaps de competências identificados nos processos de diagnóstico.</p>
+            <h5 class="card-title">
+              Diagnósticos de Gaps
+            </h5>
+            <p class="card-text">
+              Analise os gaps de competências identificados nos processos de diagnóstico.
+            </p>
             <small class="text-muted">{{ diagnosticosGaps.length }} diagnósticos encontrados</small>
           </div>
         </div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="card h-100" style="cursor: pointer;" @click="abrirModalAndamentoGeral">
+        <div
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalAndamentoGeral"
+        >
           <div class="card-body">
-            <h5 class="card-title">Andamento Geral</h5>
-            <p class="card-text">Acompanhe o andamento de todos os processos de mapeamento e revisão.</p>
+            <h5 class="card-title">
+              Andamento Geral
+            </h5>
+            <p class="card-text">
+              Acompanhe o andamento de todos os processos de mapeamento e revisão.
+            </p>
             <small class="text-muted">{{ processosFiltrados.length }} processos encontrados</small>
           </div>
         </div>
@@ -54,17 +111,30 @@
     </div>
 
     <!-- Modal Mapas Vigentes -->
-    <div class="modal fade" id="modalMapasVigentes" tabindex="-1">
+    <div
+        id="modalMapasVigentes"
+        class="modal fade"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Mapas Vigentes</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">
+              Mapas Vigentes
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+            />
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <button class="btn btn-outline-primary btn-sm" @click="exportarMapasVigentes">
-                <i class="bi bi-download"></i> Exportar CSV
+              <button
+                  class="btn btn-outline-primary btn-sm"
+                  @click="exportarMapasVigentes"
+              >
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -79,7 +149,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="mapa in mapasVigentes" :key="mapa.id">
+                <tr
+                    v-for="mapa in mapasVigentes"
+                    :key="mapa.id"
+                >
                     <td>{{ mapa.unidade }}</td>
                     <td>{{ mapa.idProcesso }}</td>
                     <td>{{ mapa.competencias?.length || 0 }}</td>
@@ -95,17 +168,30 @@
     </div>
 
     <!-- Modal Diagnósticos de Gaps -->
-    <div class="modal fade" id="modalDiagnosticosGaps" tabindex="-1">
+    <div
+        id="modalDiagnosticosGaps"
+        class="modal fade"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Diagnósticos de Gaps</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">
+              Diagnósticos de Gaps
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+            />
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <button class="btn btn-outline-primary btn-sm" @click="exportarDiagnosticosGaps">
-                <i class="bi bi-download"></i> Exportar CSV
+              <button
+                  class="btn btn-outline-primary btn-sm"
+                  @click="exportarDiagnosticosGaps"
+              >
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -123,7 +209,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="diagnostico in diagnosticosGapsFiltrados" :key="diagnostico.id">
+                <tr
+                    v-for="diagnostico in diagnosticosGapsFiltrados"
+                    :key="diagnostico.id"
+                >
                     <td>{{ diagnostico.processo }}</td>
                     <td>{{ diagnostico.unidade }}</td>
                     <td>{{ diagnostico.gaps }}</td>
@@ -150,17 +239,30 @@
     </div>
 
     <!-- Modal Andamento Geral -->
-    <div class="modal fade" id="modalAndamentoGeral" tabindex="-1">
+    <div
+        id="modalAndamentoGeral"
+        class="modal fade"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Andamento Geral dos Processos</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">
+              Andamento Geral dos Processos
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+            />
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <button class="btn btn-outline-primary btn-sm" @click="exportarAndamentoGeral">
-                <i class="bi bi-download"></i> Exportar CSV
+              <button
+                  class="btn btn-outline-primary btn-sm"
+                  @click="exportarAndamentoGeral"
+              >
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -176,7 +278,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="processo in processosFiltrados" :key="processo.id">
+                <tr
+                    v-for="processo in processosFiltrados"
+                    :key="processo.id"
+                >
                     <td>{{ processo.descricao }}</td>
                     <td>{{ processo.tipo }}</td>
                     <td>{{ processo.situacao }}</td>

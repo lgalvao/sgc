@@ -2,7 +2,6 @@ import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Movimentacao, Processo, ResultadoAnalise, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
-import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 import {useUnidadesStore} from './unidades'
 import {useAnalisesStore} from './analises'
 import {useAlertasStore} from './alertas'
@@ -13,23 +12,36 @@ import {useNotificacoesStore} from './notificacoes'
 
 function mapTipoProcesso(tipo: string): TipoProcesso {
     switch (tipo) {
-        case 'Mapeamento': return TipoProcesso.MAPEAMENTO;
-        case 'Revisão': return TipoProcesso.REVISAO;
-        case 'Diagnóstico': return TipoProcesso.DIAGNOSTICO;
-        default: return TipoProcesso.MAPEAMENTO;
+        case 'Mapeamento':
+            return TipoProcesso.MAPEAMENTO;
+        case 'Revisão':
+            return TipoProcesso.REVISAO;
+        case 'Diagnóstico':
+            return TipoProcesso.DIAGNOSTICO;
+        default:
+            return TipoProcesso.MAPEAMENTO;
     }
 }
 
 function mapSituacaoProcesso(situacao: string): SituacaoProcesso {
     switch (situacao) {
-        case 'Criado': return SituacaoProcesso.CRIADO;
-        case 'Em andamento': return SituacaoProcesso.EM_ANDAMENTO;
-        case 'Finalizado': return SituacaoProcesso.FINALIZADO;
-        default: return SituacaoProcesso.CRIADO;
+        case 'Criado':
+            return SituacaoProcesso.CRIADO;
+        case 'Em andamento':
+            return SituacaoProcesso.EM_ANDAMENTO;
+        case 'Finalizado':
+            return SituacaoProcesso.FINALIZADO;
+        default:
+            return SituacaoProcesso.CRIADO;
     }
 }
 
-function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinalizacao' | 'tipo' | 'situacao'> & { dataLimite: string, dataFinalizacao?: string | null, tipo: string, situacao: string }): Processo {
+function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinalizacao' | 'tipo' | 'situacao'> & {
+    dataLimite: string,
+    dataFinalizacao?: string | null,
+    tipo: string,
+    situacao: string
+}): Processo {
     return {
         ...processo,
         tipo: mapTipoProcesso(processo.tipo),
@@ -39,7 +51,12 @@ function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinaliz
     };
 }
 
-function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & { dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null }): Subprocesso {
+function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
+    dataLimiteEtapa1?: string | null,
+    dataLimiteEtapa2?: string | null,
+    dataFimEtapa1?: string | null,
+    dataFimEtapa2?: string | null
+}): Subprocesso {
     return {
         ...pu,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
@@ -60,26 +77,15 @@ export const useProcessosStore = defineStore('processos', {
         getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
             return state.subprocessos.filter(pu => pu.idProcesso === idProcesso);
         },
-        isProcessoInativo: () => (processo: Processo): boolean => {
-            const configuracoesStore = useConfiguracoesStore();
-            if (processo.situacao === SituacaoProcesso.FINALIZADO && processo.dataFinalizacao) {
-                const finalizacaoDate = new Date(processo.dataFinalizacao);
-                const today = new Date();
-                const diffTime = Math.abs(today.getTime() - finalizacaoDate.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays > configuracoesStore.diasInativacaoProcesso;
-            }
-            return false;
-        },
         // Subprocessos elegíveis para aceitação em bloco (GESTOR)
         getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
-            return state.subprocessos.filter(pu => 
-                pu.idProcesso === idProcesso && 
+            return state.subprocessos.filter(pu =>
+                pu.idProcesso === idProcesso &&
                 pu.unidadeAtual === siglaUnidadeUsuario &&
                 (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
             );
         },
-        
+
         // Subprocessos elegíveis para homologação em bloco (ADMIN)
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             return state.subprocessos.filter(pu =>
@@ -114,16 +120,16 @@ export const useProcessosStore = defineStore('processos', {
             unidadeUsuario: string
         }) {
             const {idProcesso, unidades, tipoAcao, unidadeUsuario} = payload;
-            
+
             // Processar cada unidade
             for (const siglaUnidade of unidades) {
                 const subprocessoIndex = this.subprocessos.findIndex(
                     pu => pu.idProcesso === idProcesso && pu.unidade === siglaUnidade
                 );
-                
+
                 if (subprocessoIndex !== -1) {
                     const subprocesso = this.subprocessos[subprocessoIndex];
-                    
+
                     if (tipoAcao === 'aceitar') {
                         // Registrar movimentação
                         const subprocessoAceite = this.subprocessos.find(pu => pu.idProcesso === idProcesso && pu.unidade === siglaUnidade);
@@ -135,7 +141,7 @@ export const useProcessosStore = defineStore('processos', {
                                 descricao: 'Cadastro de atividades e conhecimentos validado em bloco'
                             });
                         }
-                        
+
                         // Atualizar situação do subprocesso
                         this.subprocessos[subprocessoIndex] = {
                             ...subprocesso,
@@ -153,12 +159,12 @@ export const useProcessosStore = defineStore('processos', {
                                 descricao: 'Cadastro de atividades e conhecimentos homologado em bloco'
                             });
                         }
-                        
+
                         // Atualizar situação do subprocesso
-                        const novaSituacao = subprocesso.situacao.includes('Revisão') 
-                            ? 'Revisão do cadastro homologada' 
+                        const novaSituacao = subprocesso.situacao.includes('Revisão')
+                            ? 'Revisão do cadastro homologada'
                             : 'Cadastro homologado';
-                            
+
                         this.subprocessos[subprocessoIndex] = {
                             ...subprocesso,
                             situacao: novaSituacao
@@ -174,15 +180,15 @@ export const useProcessosStore = defineStore('processos', {
             etapa: number,
             novaDataLimite: Date
         }) {
-            const { idProcesso, unidade, etapa, novaDataLimite } = payload;
-            
+            const {idProcesso, unidade, etapa, novaDataLimite} = payload;
+
             const subprocessoIndex = this.subprocessos.findIndex(
                 pu => pu.idProcesso === idProcesso && pu.unidade === unidade
             );
-            
+
             if (subprocessoIndex !== -1) {
                 const subprocesso = this.subprocessos[subprocessoIndex];
-                
+
                 // Atualizar a data limite da etapa especificada
                 if (etapa === 1) {
                     this.subprocessos[subprocessoIndex] = {
@@ -195,7 +201,7 @@ export const useProcessosStore = defineStore('processos', {
                         dataLimiteEtapa2: novaDataLimite
                     };
                 }
-                
+
                 // Registrar movimentação
                 this.addMovement({
                     idSubprocesso: subprocesso.id,
@@ -211,10 +217,10 @@ export const useProcessosStore = defineStore('processos', {
                     `Responsável pela ${unidade}`,
                     `Prezado(a) responsável pela ${unidade},\n\nA data limite da etapa ${etapa} no processo foi alterada para ${novaDataLimite.toISOString().split('T')[0]}.\n\nMais informações no Sistema de Gestão de Competências.`
                 );
-                
+
                 return Promise.resolve();
             }
-            
+
             return Promise.reject(new Error('Subprocesso não encontrado'));
         },
         async aceitarMapa(payload: {
@@ -223,7 +229,7 @@ export const useProcessosStore = defineStore('processos', {
             observacao?: string,
             perfil: string
         }) {
-            const { idProcesso, unidade, observacao, perfil } = payload;
+            const {idProcesso, unidade, observacao, perfil} = payload;
             const unidadesStore = useUnidadesStore();
             const analisesStore = useAnalisesStore();
             const alertasStore = useAlertasStore();
@@ -300,7 +306,7 @@ export const useProcessosStore = defineStore('processos', {
             unidade: string,
             observacao?: string
         }) {
-            const { idProcesso, unidade, observacao } = payload;
+            const {idProcesso, unidade, observacao} = payload;
             const analisesStore = useAnalisesStore();
 
             const subprocessoIndex = this.subprocessos.findIndex(
@@ -385,7 +391,7 @@ export const useProcessosStore = defineStore('processos', {
             unidade: string,
             sugestoes: string
         }) {
-            const { idProcesso, unidade, sugestoes } = payload;
+            const {idProcesso, unidade, sugestoes} = payload;
             const unidadesStore = useUnidadesStore();
 
             const subprocessoIndex = this.subprocessos.findIndex(
@@ -434,7 +440,7 @@ export const useProcessosStore = defineStore('processos', {
             idProcesso: number,
             unidade: string
         }) {
-            const { idProcesso, unidade } = payload;
+            const {idProcesso, unidade} = payload;
             const unidadesStore = useUnidadesStore();
 
             const subprocessoIndex = this.subprocessos.findIndex(

@@ -1,10 +1,20 @@
 <template>
-  <tr :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]" @click="handleRowClick" data-testid="tree-table-row">
-    <td v-for="(column, index) in columns" :key="column.key"
-        :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}">
-      <span v-if="index === 0 && item.children && item.children.length > 0" class="toggle-icon"
-            @click.stop="toggleExpand(item.id)">
-        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
+  <tr
+      :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
+      data-testid="tree-table-row"
+      @click="handleRowClick"
+  >
+    <td
+        v-for="(column, index) in columns"
+        :key="column.key"
+        :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}"
+    >
+      <span
+          v-if="index === 0 && item.children && item.children.length > 0"
+          class="toggle-icon"
+          @click.stop="toggleExpand(item.id)"
+      >
+        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
       </span>
       {{ item[column.key] }}
     </td>
@@ -54,17 +64,4 @@ const handleRowClick = () => {
   margin-right: 5px;
 }
 
-.tree-row:hover {
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-
-.tree-row-disabled {
-  cursor: not-allowed;
-  background-color: #fafafa;
-}
-
-.tree-row-disabled:hover {
-  background-color: #fafafa;
-}
 </style>

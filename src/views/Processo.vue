@@ -1,9 +1,19 @@
 <template>
   <div class="container mt-4">
     <div v-if="processo">
-      <span class="badge text-bg-secondary mb-2" style="border-radius: 0">Processo</span>
-      <h1 class="display-6 mb-3">Detalhes do processo</h1>
-      <h2 class="display-6" data-testid="processo-info">{{ processo.descricao }}</h2>
+      <span
+          class="badge text-bg-secondary mb-2"
+          style="border-radius: 0"
+      >Processo</span>
+      <h1 class="display-6 mb-3">
+        Detalhes do processo
+      </h1>
+      <h2
+          class="display-6"
+          data-testid="processo-info"
+      >
+        {{ processo.descricao }}
+      </h2>
       <div class="mb-4 mt-3">
         <strong>Tipo:</strong> {{ processo.tipo }}<br>
         <strong>Situação:</strong> {{ processo.situacao }}<br>
@@ -17,13 +27,16 @@
       />
 
       <!-- Botões de ação em bloco -->
-      <div v-if="mostrarBotoesBloco" class="mt-3 d-flex gap-2">
+      <div
+          v-if="mostrarBotoesBloco"
+          class="mt-3 d-flex gap-2"
+      >
         <button
             v-if="perfilStore.perfilSelecionado === 'GESTOR'"
             class="btn btn-outline-primary"
             @click="abrirModalAceitarBloco"
         >
-          <i class="bi bi-check-circle me-1"></i>
+          <i class="bi bi-check-circle me-1"/>
           Aceitar em bloco
         </button>
         <button
@@ -31,29 +44,42 @@
             class="btn btn-outline-success"
             @click="abrirModalHomologarBloco"
         >
-          <i class="bi bi-check-all me-1"></i>
+          <i class="bi bi-check-all me-1"/>
           Homologar em bloco
         </button>
       </div>
     </div>
-    <button v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === 'Em andamento'" class="btn btn-danger mt-3" @click="finalizarProcesso">
+    <button
+        v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === 'Em andamento'"
+        class="btn btn-danger mt-3"
+        @click="finalizarProcesso"
+    >
       Finalizar processo
     </button>
 
     <!-- Modal de confirmação -->
-    <div v-if="mostrarModalBloco" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalBloco"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'"></i>
+              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'"/>
               {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco' }}
             </h5>
-            <button type="button" class="btn-close" @click="fecharModalBloco"></button>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalBloco"
+            />
           </div>
           <div class="modal-body">
             <div class="alert alert-info">
-              <i class="bi bi-info-circle"></i>
+              <i class="bi bi-info-circle"/>
               Selecione as unidades que terão seus cadastros {{
                 tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados'
               }}:
@@ -70,12 +96,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="unidade in unidadesSelecionadasBloco" :key="unidade.sigla">
+                <tr
+                    v-for="unidade in unidadesSelecionadasBloco"
+                    :key="unidade.sigla"
+                >
                   <td>
                     <input
-                        type="checkbox"
                         :id="'chk-' + unidade.sigla"
                         v-model="unidade.selecionada"
+                        type="checkbox"
                         class="form-check-input"
                     >
                   </td>
@@ -88,8 +117,12 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalBloco">
-              <i class="bi bi-x-circle"></i> Cancelar
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalBloco"
+            >
+              <i class="bi bi-x-circle"/> Cancelar
             </button>
             <button
                 type="button"
@@ -97,58 +130,85 @@
                 :class="tipoAcaoBloco === 'aceitar' ? 'btn-primary' : 'btn-success'"
                 @click="confirmarAcaoBloco"
             >
-              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"></i>
+              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"/>
               {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar' : 'Homologar' }}
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalBloco" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalBloco"
+        class="modal-backdrop fade show"
+    />
 
     <!-- Modal de finalização do processo CDU-21 -->
-    <div v-if="mostrarModalFinalizacao" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalFinalizacao"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              <i class="bi bi-check-circle text-success"></i>
+              <i class="bi bi-check-circle text-success"/>
               Finalização de processo
             </h5>
-            <button type="button" class="btn-close" @click="fecharModalFinalizacao"></button>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalFinalizacao"
+            />
           </div>
           <div class="modal-body">
             <div class="alert alert-info">
-              <i class="bi bi-info-circle"></i>
+              <i class="bi bi-info-circle"/>
               Confirma a finalização do processo <strong>{{ processo?.descricao }}</strong>?<br>
               Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalFinalizacao" data-testid="btn-cancelar-finalizacao">
-              <i class="bi bi-x-circle"></i> Cancelar
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="btn-cancelar-finalizacao"
+                @click="fecharModalFinalizacao"
+            >
+              <i class="bi bi-x-circle"/> Cancelar
             </button>
             <button
                 type="button"
                 class="btn btn-success"
-                @click="confirmarFinalizacao"
                 data-testid="btn-confirmar-finalizacao"
+                @click="confirmarFinalizacao"
             >
-              <i class="bi bi-check-circle"></i>
+              <i class="bi bi-check-circle"/>
               Confirmar
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalFinalizacao" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalFinalizacao"
+        class="modal-backdrop fade show"
+    />
 
     <!-- Alerta de sucesso -->
-    <div v-if="mostrarAlertaSucesso" class="alert alert-success alert-dismissible fade show position-fixed"
-         style="top: 20px; right: 20px; z-index: 9999;">
-      <i class="bi bi-check-circle"></i>
+    <div
+        v-if="mostrarAlertaSucesso"
+        class="alert alert-success alert-dismissible fade show position-fixed"
+        style="top: 20px; right: 20px; z-index: 9999;"
+    >
+      <i class="bi bi-check-circle"/>
       Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco com sucesso!
-      <button type="button" class="btn-close" @click="mostrarAlertaSucesso = false"></button>
+      <button
+          type="button"
+          class="btn-close"
+          @click="mostrarAlertaSucesso = false"
+      />
     </div>
   </div>
 </template>

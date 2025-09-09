@@ -1,17 +1,26 @@
 <template>
-  <div v-if="mostrar" class="modal fade show" style="display: block;" tabindex="-1">
+  <div
+      v-if="mostrar"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+  >
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
-            <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'"></i>
+            <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'"/>
             {{ tipoAcao === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco' }}
           </h5>
-          <button type="button" class="btn-close" @click="fechar"></button>
+          <button
+              type="button"
+              class="btn-close"
+              @click="fechar"
+          />
         </div>
         <div class="modal-body">
           <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
+            <i class="bi bi-info-circle"/>
             Selecione as unidades que terão seus cadastros {{ tipoAcao === 'aceitar' ? 'aceitos' : 'homologados' }}:
           </div>
           
@@ -26,12 +35,15 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="unidade in unidades" :key="unidade.sigla">
+              <tr
+                  v-for="unidade in unidades"
+                  :key="unidade.sigla"
+              >
                   <td>
-                    <input 
-                      type="checkbox" 
-                      :id="'chk-' + unidade.sigla"
+                    <input
+                        :id="'chk-' + unidade.sigla"
                       v-model="unidade.selecionada"
+                        type="checkbox"
                       class="form-check-input"
                     >
                   </td>
@@ -44,8 +56,12 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="fechar">
-            <i class="bi bi-x-circle"></i> Cancelar
+          <button
+              type="button"
+              class="btn btn-secondary"
+              @click="fechar"
+          >
+            <i class="bi bi-x-circle"/> Cancelar
           </button>
           <button 
             type="button" 
@@ -53,14 +69,17 @@
             :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
             @click="confirmar"
           >
-            <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"></i>
+            <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'"/>
             {{ tipoAcao === 'aceitar' ? 'Aceitar' : 'Homologar' }}
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="mostrar" class="modal-backdrop fade show"></div>
+  <div
+      v-if="mostrar"
+      class="modal-backdrop fade show"
+  />
 </template>
 
 <script lang="ts" setup>

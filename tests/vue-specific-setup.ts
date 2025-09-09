@@ -1,7 +1,7 @@
-/// <reference path="../spec/global.d.ts" />
+import '../spec/global.d.ts';
 
 // tests/vue-specific-setup.js - Setup específico para Vue 3
-import {Page, test as base} from '@playwright/test'; // Adicionar importação de Page
+import {test as base} from '@playwright/test'; // Adicionar importação de Page
 
 export const vueTest = base.extend({
     page: async ({page}, use) => {
@@ -101,9 +101,3 @@ export const vueTest = base.extend({
         }
     },
 });
-
-// Helper para aguardar Vue estar pronto
-export async function waitForVueReady(page: Page) {
-    await page.evaluate(() => (window as any).waitForVue?.()); // eslint-disable-line @typescript-eslint/no-explicit-any
-    await page.waitForLoadState('networkidle');
-}

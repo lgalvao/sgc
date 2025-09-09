@@ -37,7 +37,7 @@ export async function expectSuccessMessage(page: Page, message: string): Promise
  * @param text The text to expect.
  */
 export async function expectTextVisible(page: Page, text: string): Promise<void> {
-  await expect(page.getByText(text)).toBeVisible();
+    await expect(page.getByText(text)).toBeVisible();
 }
 
 /**
@@ -49,21 +49,6 @@ export async function expectVisible(page: Page, testId: string): Promise<void> {
     await expect(page.getByTestId(testId)).toBeVisible();
 }
 
-/**
- * Helper function to wait for a notification (toast) to appear and then disappear.
- * @param page Playwright Page object.
- */
-export async function waitForNotification(page: Page) {
-    const notification = page.locator('.toast'); // Assuming toast is the class for notifications
-    try {
-        await expect(notification).toBeVisible({timeout: 5000}); // Wait for it to appear
-        await notification.click(); // Click to dismiss
-        await notification.waitFor({state: 'hidden', timeout: 5000}); // Wait for it to disappear
-    } catch (_e) {
-        // If toast doesn't appear within 5 seconds, it's fine, just continue
-        console.log("No toast appeared or it disappeared too fast.");
-    }
-}
 
 // Dummy functions to resolve import errors
 export async function expectUrl(page: Page, url: string): Promise<void> {
@@ -72,7 +57,7 @@ export async function expectUrl(page: Page, url: string): Promise<void> {
 }
 
 export async function expectNotVisible(page: Page, text: string): Promise<void> {
-  await expect(page.getByText(text)).not.toBeVisible();
+    await expect(page.getByText(text)).not.toBeVisible();
 }
 
 /**

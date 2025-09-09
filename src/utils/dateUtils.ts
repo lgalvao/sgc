@@ -32,7 +32,6 @@ export function parseDate(dateString: string | null | undefined): Date | null {
     if (!isNaN(date.getTime())) {
       return date;
     }
-
     return null;
   } catch {
     return null;

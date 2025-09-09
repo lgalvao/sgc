@@ -2,8 +2,6 @@ import {defineStore} from 'pinia'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Movimentacao, Subprocesso} from '@/types/tipos'
 import {parseDate} from '@/utils/dateUtils'
-import {generateUniqueId} from '@/utils/idGenerator'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 
 function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'movimentacoes'> & {
     dataLimiteEtapa1?: string | null,
@@ -25,7 +23,7 @@ function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataL
     };
 }
 
-export const useSubprocessosStore = defineStore('subprocessos', {
+defineStore('subprocessos', {
     state: () => {
         return {
             subprocessos: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[],
@@ -55,45 +53,8 @@ export const useSubprocessosStore = defineStore('subprocessos', {
         }
     },
     actions: {
-        adicionarSubprocessos(subprocessosArray: Subprocesso[]) {
-            subprocessosArray.forEach((pu: Subprocesso) => {
-                this.subprocessos.push(pu);
-            });
-        },
-        criarSubprocesso(idProcesso: number, siglaUnidade: string, dataLimiteEtapa1: Date): Subprocesso {
-            const novoSubprocesso: Subprocesso = {
-                id: generateUniqueId(),
-                idProcesso: idProcesso,
-                unidade: siglaUnidade,
-                situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
-                unidadeAtual: siglaUnidade,
-                unidadeAnterior: null,
-                dataLimiteEtapa1: dataLimiteEtapa1,
-                dataFimEtapa1: null,
-                dataLimiteEtapa2: null,
-                dataFimEtapa2: null,
-                sugestoes: '',
-                observacoes: '',
-                idMapaCopiado: undefined,
-                movimentacoes: []
-            };
-            this.subprocessos.push(novoSubprocesso);
-            return novoSubprocesso;
-        },
-        adicionarMovimentacao(idSubprocesso: number, movement: Omit<Movimentacao, 'id' | 'dataHora' | 'idSubprocesso'>) {
-            const subprocesso = this.subprocessos.find(sp => sp.id === idSubprocesso);
-            if (subprocesso) {
-                const newMovement: Movimentacao = {
-                    id: generateUniqueId(),
-                    dataHora: new Date(),
-                    idSubprocesso: idSubprocesso,
-                    ...movement
-                };
-                subprocesso.movimentacoes.push(newMovement);
-            }
-        },
         reset() {
             this.subprocessos = [];
         }
     }
-})
+});

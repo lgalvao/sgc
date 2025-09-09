@@ -3,26 +3,43 @@
     <!-- Tabela de Processos -->
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="display-6 mb-0" data-testid="titulo-processos">Processos</div>
-        <router-link v-if="perfil.perfilSelecionado === 'ADMIN'" :to="{ name: 'CadProcesso' }"
-                     class="btn btn-outline-primary" data-testid="btn-criar-processo">
-          <i class="bi bi-plus-lg"></i> Criar processo
+        <div
+            class="display-6 mb-0"
+            data-testid="titulo-processos"
+        >
+          Processos
+        </div>
+        <router-link
+            v-if="perfil.perfilSelecionado === 'ADMIN'"
+            :to="{ name: 'CadProcesso' }"
+            class="btn btn-outline-primary"
+            data-testid="btn-criar-processo"
+        >
+          <i class="bi bi-plus-lg"/> Criar processo
         </router-link>
       </div>
       <TabelaProcessos
           :processos="processosOrdenadosComUnidades"
-          :criterioOrdenacao="criterio"
-          :direcaoOrdenacaoAsc="asc"
+          :criterio-ordenacao="criterio"
+          :direcao-ordenacao-asc="asc"
           @ordenar="ordenarPor"
-          @selecionarProcesso="abrirDetalhesProcesso"
+          @selecionar-processo="abrirDetalhesProcesso"
       />
     </div>
 
     <div>
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="mb-0 display-6" data-testid="titulo-alertas">Alertas</div>
+        <div
+            class="mb-0 display-6"
+            data-testid="titulo-alertas"
+        >
+          Alertas
+        </div>
       </div>
-      <table class="table" data-testid="tabela-alertas">
+      <table
+          class="table"
+          data-testid="tabela-alertas"
+      >
         <thead>
         <tr>
           <th>Data/Hora</th>
@@ -32,17 +49,25 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(alerta, index) in alertasFormatados" :key="index"
+        <tr
+            v-for="(alerta, index) in alertasFormatados"
+            :key="index"
             :class="{ 'fw-bold': !alerta.lido }"
+            style="cursor: pointer;"
             @click="marcarComoLido(alerta.id)"
-            style="cursor: pointer;">
+        >
           <td>{{ alerta.dataFormatada }}</td>
           <td>{{ alerta.descricao }}</td>
           <td>{{ alerta.processo }}</td>
           <td>{{ alerta.unidade }}</td>
         </tr>
         <tr v-if="!alertasFormatados || alertasFormatados.length === 0">
-          <td class="text-center text-muted" colspan="4">Nenhum alerta no momento.</td>
+          <td
+              class="text-center text-muted"
+              colspan="4"
+          >
+            Nenhum alerta no momento.
+          </td>
         </tr>
         </tbody>
       </table>

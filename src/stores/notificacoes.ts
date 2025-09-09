@@ -25,7 +25,7 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
   const adicionarNotificacao = (notificacao: Omit<Notificacao, 'id' | 'timestamp'>) => {
     const novaNotificacao: Notificacao = {
       ...notificacao,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
       timestamp: new Date(),
       duracao: notificacao.duracao ?? 5000
     };

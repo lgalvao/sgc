@@ -1,16 +1,21 @@
 <template>
   <div class="container mt-4">
-    <h2 class="display-6">Histórico de processos</h2>
+    <h2 class="display-6">
+      Histórico de processos
+    </h2>
     <TabelaProcessos
         :processos="processosFinalizadosOrdenadosComFormatacao"
-        :criterioOrdenacao="criterio"
-        :direcaoOrdenacaoAsc="asc"
-        :showDataFinalizacao="true"
+        :criterio-ordenacao="criterio"
+        :direcao-ordenacao-asc="asc"
+        :show-data-finalizacao="true"
         @ordenar="ordenarPor"
-        @selecionarProcesso="abrirProcesso"
+        @selecionar-processo="abrirProcesso"
     />
 
-    <div v-if="processosFinalizadosOrdenadosComFormatacao.length === 0" class="alert alert-info mt-4">
+    <div
+        v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
+        class="alert alert-info mt-4"
+    >
       Nenhum processo finalizado.
     </div>
   </div>

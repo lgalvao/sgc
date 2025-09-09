@@ -18,7 +18,7 @@ const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
 
-// @ts-ignore
+
 window.pinia = pinia;
 
 app.use(router);

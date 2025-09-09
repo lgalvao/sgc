@@ -1,122 +1,232 @@
 <template>
   <div class="container mt-4">
-
     <div class="fs-5 w-100 mb-3">
       {{ siglaUnidade }} - {{ nomeUnidade }}
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="mb-0 display-6">Atividades e conhecimentos</h1>
+      <h1 class="mb-0 display-6">
+        Atividades e conhecimentos
+      </h1>
 
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
-          <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
+        <button
+            class="btn btn-outline-secondary"
+            @click="abrirModalImpacto"
+        >
+          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
         </button>
-        <button v-if="isChefe && historicoAnalises.length > 0" class="btn btn-outline-info"
-                @click="abrirModalHistorico">
+        <button
+            v-if="isChefe && historicoAnalises.length > 0"
+            class="btn btn-outline-info"
+            @click="abrirModalHistorico"
+        >
           Histórico de análise
         </button>
-        <button v-if="isChefe" class="btn btn-outline-primary" @click="mostrarModalImportar = true" title="Importar">
+        <button
+            v-if="isChefe"
+            class="btn btn-outline-primary"
+            title="Importar"
+            @click="mostrarModalImportar = true"
+        >
           Importar atividades
         </button>
-        <button v-if="isChefe" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Disponibilizar"
-                @click="disponibilizarCadastro">
+        <button
+            v-if="isChefe"
+            class="btn btn-outline-success"
+            data-bs-toggle="tooltip"
+            title="Disponibilizar"
+            @click="disponibilizarCadastro"
+        >
           Disponibilizar
         </button>
       </div>
     </div>
 
     <!-- Adicionar atividade -->
-    <form class="row g-2 align-items-center mb-4" @submit.prevent="adicionarAtividade">
+    <form
+        class="row g-2 align-items-center mb-4"
+        @submit.prevent="adicionarAtividade"
+    >
       <div class="col">
-        <input v-model="novaAtividade" class="form-control" data-testid="input-nova-atividade"
-               placeholder="Nova atividade"
-               type="text" aria-label="Nova atividade"/>
+        <input
+            v-model="novaAtividade"
+            class="form-control"
+            data-testid="input-nova-atividade"
+            placeholder="Nova atividade"
+            type="text"
+            aria-label="Nova atividade"
+        >
       </div>
       <div class="col-auto">
-        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" data-testid="btn-adicionar-atividade"
-                title="Adicionar atividade"
-                type="submit"><i
-            class="bi bi-save"></i></button>
+        <button
+            class="btn btn-outline-primary btn-sm"
+            data-bs-toggle="tooltip"
+            data-testid="btn-adicionar-atividade"
+            title="Adicionar atividade"
+            type="submit"
+        >
+          <i
+              class="bi bi-save"
+          />
+        </button>
       </div>
     </form>
 
     <!-- Lista de atividades -->
-    <div v-for="(atividade, idx) in atividades" :key="atividade.id || idx" class="card mb-3 atividade-card">
+    <div
+        v-for="(atividade, idx) in atividades"
+        :key="atividade.id || idx"
+        class="card mb-3 atividade-card"
+    >
       <div class="card-body py-2">
         <div
-            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
+            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+        >
           <template v-if="editandoAtividade === atividade.id">
-            <input v-model="atividadeEditada" class="form-control me-2 atividade-edicao-input"
-                   data-testid="input-editar-atividade" aria-label="Editar atividade"/>
-            <button class="btn btn-sm btn-outline-success me-1 botao-acao" data-bs-toggle="tooltip"
-                    data-testid="btn-salvar-edicao-atividade"
-                    title="Salvar" @click="salvarEdicaoAtividade(atividade.id)"><i class="bi bi-save"></i>
+            <input
+                v-model="atividadeEditada"
+                class="form-control me-2 atividade-edicao-input"
+                data-testid="input-editar-atividade"
+                aria-label="Editar atividade"
+            >
+            <button
+                class="btn btn-sm btn-outline-success me-1 botao-acao"
+                data-bs-toggle="tooltip"
+                data-testid="btn-salvar-edicao-atividade"
+                title="Salvar"
+                @click="salvarEdicaoAtividade(atividade.id)"
+            >
+              <i class="bi bi-save"/>
             </button>
-            <button class="btn btn-sm btn-outline-secondary botao-acao" data-bs-toggle="tooltip"
-                    data-testid="btn-cancelar-edicao-atividade"
-                    title="Cancelar" @click="cancelarEdicaoAtividade()"><i class="bi bi-x"></i>
+            <button
+                class="btn btn-sm btn-outline-secondary botao-acao"
+                data-bs-toggle="tooltip"
+                data-testid="btn-cancelar-edicao-atividade"
+                title="Cancelar"
+                @click="cancelarEdicaoAtividade()"
+            >
+              <i class="bi bi-x"/>
             </button>
           </template>
 
           <template v-else>
-            <strong class="atividade-descricao" data-testid="atividade-descricao">{{ atividade.descricao }}</strong>
+            <strong
+                class="atividade-descricao"
+                data-testid="atividade-descricao"
+            >{{ atividade.descricao }}</strong>
             <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao-atividade fade-group">
-              <button class="btn btn-sm btn-outline-primary botao-acao"
-                      data-bs-toggle="tooltip" data-testid="btn-editar-atividade"
-                      title="Editar" @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"><i
-                  class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
-                      data-testid="btn-remover-atividade"
-                      title="Remover" @click="removerAtividade(idx)"><i
-                  class="bi bi-trash"></i></button>
+              <button
+                  class="btn btn-sm btn-outline-primary botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-editar-atividade"
+                  title="Editar"
+                  @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"
+              >
+                <i
+                    class="bi bi-pencil"
+                />
+              </button>
+              <button
+                  class="btn btn-sm btn-outline-danger botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-remover-atividade"
+                  title="Remover"
+                  @click="removerAtividade(idx)"
+              >
+                <i
+                    class="bi bi-trash"
+                />
+              </button>
             </div>
           </template>
         </div>
 
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
-          <div v-for="(conhecimento, cidx) in atividade.conhecimentos" :key="conhecimento.id"
-               class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row">
+          <div
+              v-for="(conhecimento, cidx) in atividade.conhecimentos"
+              :key="conhecimento.id"
+              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+          >
             <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
-              <input v-model="conhecimentoEditado" class="form-control form-control-sm me-2 conhecimento-edicao-input"
-                     data-testid="input-editar-conhecimento" style="max-width: 300px;"/>
-              <button class="btn btn-sm btn-outline-success me-1 botao-acao"
-                      data-bs-toggle="tooltip"
-                      data-testid="btn-salvar-edicao-conhecimento"
-                      title="Salvar" @click="salvarEdicaoConhecimento(idx, cidx)"><i class="bi bi-save"></i>
+              <input
+                  v-model="conhecimentoEditado"
+                  class="form-control form-control-sm me-2 conhecimento-edicao-input"
+                  data-testid="input-editar-conhecimento"
+                  style="max-width: 300px;"
+              >
+              <button
+                  class="btn btn-sm btn-outline-success me-1 botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-salvar-edicao-conhecimento"
+                  title="Salvar"
+                  @click="salvarEdicaoConhecimento(idx, cidx)"
+              >
+                <i class="bi bi-save"/>
               </button>
-              <button class="btn btn-sm btn-outline-secondary botao-acao" data-bs-toggle="tooltip"
-                      data-testid="btn-cancelar-edicao-conhecimento"
-                      title="Cancelar" @click="cancelarEdicaoConhecimento"><i class="bi bi-x"></i>
+              <button
+                  class="btn btn-sm btn-outline-secondary botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-cancelar-edicao-conhecimento"
+                  title="Cancelar"
+                  @click="cancelarEdicaoConhecimento"
+              >
+                <i class="bi bi-x"/>
               </button>
             </template>
             <template v-else>
               <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
               <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-                <button class="btn btn-sm btn-outline-primary botao-acao"
-                        data-bs-toggle="tooltip"
-                        data-testid="btn-editar-conhecimento" title="Editar"
-                        @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"><i
-                    class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger botao-acao" data-bs-toggle="tooltip"
-                        data-testid="btn-remover-conhecimento"
-                        title="Remover" @click="removerConhecimento(idx, cidx)"><i class="bi bi-trash"></i>
+                <button
+                    class="btn btn-sm btn-outline-primary botao-acao"
+                    data-bs-toggle="tooltip"
+                    data-testid="btn-editar-conhecimento"
+                    title="Editar"
+                    @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
+                >
+                  <i
+                      class="bi bi-pencil"
+                  />
+                </button>
+                <button
+                    class="btn btn-sm btn-outline-danger botao-acao"
+                    data-bs-toggle="tooltip"
+                    data-testid="btn-remover-conhecimento"
+                    title="Remover"
+                    @click="removerConhecimento(idx, cidx)"
+                >
+                  <i class="bi bi-trash"/>
                 </button>
               </div>
             </template>
           </div>
-          <form class="row g-2 align-items-center" @submit.prevent="adicionarConhecimento(idx)">
+          <form
+              class="row g-2 align-items-center"
+              @submit.prevent="adicionarConhecimento(idx)"
+          >
             <div class="col">
-              <input v-model="atividade.novoConhecimento" class="form-control form-control-sm"
-                     data-testid="input-novo-conhecimento"
-                     placeholder="Novo conhecimento" type="text" aria-label="Novo conhecimento"/>
+              <input
+                  v-model="atividade.novoConhecimento"
+                  class="form-control form-control-sm"
+                  data-testid="input-novo-conhecimento"
+                  placeholder="Novo conhecimento"
+                  type="text"
+                  aria-label="Novo conhecimento"
+              >
             </div>
             <div class="col-auto">
-              <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
-                      data-testid="btn-adicionar-conhecimento"
-                      title="Adicionar Conhecimento" type="submit"><i
-                  class="bi bi-save"></i></button>
+              <button
+                  class="btn btn-outline-secondary btn-sm"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-adicionar-conhecimento"
+                  title="Adicionar Conhecimento"
+                  type="submit"
+              >
+                <i
+                    class="bi bi-save"
+                />
+              </button>
             </div>
           </form>
         </div>
@@ -127,52 +237,105 @@
     <ImportarAtividadesModal
         :mostrar="mostrarModalImportar"
         @fechar="mostrarModalImportar = false"
-        @importar="handleImportAtividades"/>
+        @importar="handleImportAtividades"
+    />
 
     <ImpactoMapaModal
         :id-processo="idProcesso"
         :mostrar="mostrarModalImpacto"
         :sigla-unidade="siglaUnidade"
-        @fechar="fecharModalImpacto"/>
+        @fechar="fecharModalImpacto"
+    />
 
     <!-- Modal de Confirmação de Disponibilização -->
-    <div v-if="mostrarModalConfirmacao" class="modal fade show" style="display: block;" tabindex="-1"
-         ref="confirmacaoModalRef">
+    <div
+        v-if="mostrarModalConfirmacao"
+        ref="confirmacaoModalRef"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro' }}</h5>
-            <button type="button" class="btn-close" @click="fecharModalConfirmacao"></button>
+            <h5 class="modal-title">
+              {{ isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro' }}
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalConfirmacao"
+            />
           </div>
           <div class="modal-body">
             <p>{{ isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?' }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.</p>
-            <div v-if="atividadesSemConhecimento.length > 0" class="alert alert-warning">
+            <div
+                v-if="atividadesSemConhecimento.length > 0"
+                class="alert alert-warning"
+            >
               <strong>Atenção:</strong> As seguintes atividades não têm conhecimentos associados:
               <ul>
-                <li v-for="atividade in atividadesSemConhecimento" :key="atividade.id">{{ atividade.descricao }}</li>
+                <li
+                    v-for="atividade in atividadesSemConhecimento"
+                    :key="atividade.id"
+                >
+                  {{ atividade.descricao }}
+                </li>
               </ul>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalConfirmacao">Cancelar</button>
-            <button type="button" class="btn btn-success" @click="confirmarDisponibilizacao">Confirmar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalConfirmacao"
+            >
+              Cancelar
+            </button>
+            <button
+                type="button"
+                class="btn btn-success"
+                @click="confirmarDisponibilizacao"
+            >
+              Confirmar
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalConfirmacao" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalConfirmacao"
+        class="modal-backdrop fade show"
+    />
 
     <!-- Modal de Histórico de Análise -->
-    <div v-if="mostrarModalHistorico" class="modal fade show" style="display: block;" tabindex="-1">
+    <div
+        v-if="mostrarModalHistorico"
+        class="modal fade show"
+        style="display: block;"
+        tabindex="-1"
+    >
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" data-testid="modal-historico-analise-titulo">Histórico de Análise</h5>
-            <button type="button" class="btn-close" @click="fecharModalHistorico"></button>
+            <h5
+                class="modal-title"
+                data-testid="modal-historico-analise-titulo"
+            >
+              Histórico de Análise
+            </h5>
+            <button
+                type="button"
+                class="btn-close"
+                @click="fecharModalHistorico"
+            />
           </div>
           <div class="modal-body">
             <div class="table-responsive">
-              <table class="table table-striped" data-testid="historico-analise-tabela">
+              <table
+                  class="table table-striped"
+                  data-testid="historico-analise-tabela"
+              >
                 <thead>
                 <tr>
                   <th>Data/Hora</th>
@@ -182,7 +345,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="analise in historicoAnalises" :key="analise.id">
+                <tr
+                    v-for="analise in historicoAnalises"
+                    :key="analise.id"
+                >
                   <td>{{ formatarData(analise.dataHora) }}</td>
                   <td>{{ analise.unidade }}</td>
                   <td>{{ analise.resultado }}</td>
@@ -193,12 +359,21 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="fecharModalHistorico">Fechar</button>
+            <button
+                type="button"
+                class="btn btn-secondary"
+                @click="fecharModalHistorico"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="mostrarModalHistorico" class="modal-backdrop fade show"></div>
+    <div
+        v-if="mostrarModalHistorico"
+        class="modal-backdrop fade show"
+    />
   </div>
 </template>
 

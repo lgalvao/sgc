@@ -8,7 +8,7 @@ import {useServidoresStore} from '@/stores/servidores';
 import {Perfil, Servidor} from "@/types/tipos";
 
 // Mock do composable usePerfil
-const mockServidorLogadoRef = ref<Servidor | {}>({});
+const mockServidorLogadoRef = ref<Servidor | Record<string, unknown>>({});
 const mockPerfilSelecionadoRef = ref('');
 const mockUnidadeSelecionadaRef = ref('');
 const mockGetPerfisDoServidor = vi.fn();
@@ -123,12 +123,11 @@ describe('Navbar.vue', () => {
             await wrapper.find('span[style="cursor: pointer;"]').trigger('click');
             await wrapper.vm.$nextTick();
 
+            await wrapper.vm.$nextTick(); // Garante que o select e as options estão renderizados
+
             const select = wrapper.find('select');
-            // The new value is a composite key: `${servidor.id}-${par.perfil}-${par.unidade}`
-            const newValue = '2-USER-XYZ';
-            await select.setValue(newValue);
-            await select.trigger('change');
-            await wrapper.vm.$nextTick();
+            await select.setValue('2-USER-XYZ'); // Simula a seleção da opção
+            await wrapper.vm.$nextTick(); // Aguarda a atualização do Vue
 
             expect(mockSetServidorId).toHaveBeenCalledWith(2);
             expect(mockSetPerfilUnidade).toHaveBeenCalledWith('USER', 'XYZ');

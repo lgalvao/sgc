@@ -35,7 +35,10 @@ const shouldShowNavBarExtras = computed(() => {
 
 <template>
   <Navbar v-if="route.path !== '/login'"/>
-  <div v-if="shouldShowNavBarExtras" class="bg-light border-bottom">
+  <div
+      v-if="shouldShowNavBarExtras"
+      class="bg-light border-bottom"
+  >
     <div class="container py-2">
       <BarraNavegacao/>
     </div>
