@@ -37,18 +37,10 @@ export const useConfiguracoesStore = defineStore('configuracoes', {
             }
         },
         setDiasInativacaoProcesso(dias: number) {
-            if (dias >= 1) {
-                this.diasInativacaoProcesso = dias;
-            } else {
-                console.warn('DIAS_INATIVACAO_PROCESSO deve ser 1 ou mais.');
-            }
+            if (dias >= 1) this.diasInativacaoProcesso = dias;
         },
         setDiasAlertaNovo(dias: number) {
-            if (dias >= 1) { // Assumindo que deve ser 1 ou mais, como DIAS_INATIVACAO_PROCESSO
-                this.diasAlertaNovo = dias;
-            } else {
-                console.warn('DIAS_ALERTA_NOVO deve ser 1 ou mais.');
-            }
+            if (dias >= 1) this.diasAlertaNovo = dias;
         },
     },
 });

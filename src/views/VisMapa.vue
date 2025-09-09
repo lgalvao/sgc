@@ -412,7 +412,7 @@ async function confirmarSugestoes() {
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
 
-  } catch (error) {
+  } catch {
     notificacoesStore.erro(
         'Erro ao apresentar sugestões',
         'Ocorreu um erro. Tente novamente.'
@@ -439,7 +439,7 @@ async function confirmarValidacao() {
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
 
-  } catch (error) {
+  } catch {
     notificacoesStore.erro(
         'Erro ao validar mapa',
         'Ocorreu um erro. Tente novamente.'
@@ -471,7 +471,7 @@ async function confirmarAceitacao(observacao: string) {
     // Redirecionar para o painel
     await router.push({ name: 'Painel' })
 
-  } catch (error) {
+  } catch {
     notificacoesStore.erro(
         'Erro ao aceitar mapa',
         'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
@@ -479,31 +479,7 @@ async function confirmarAceitacao(observacao: string) {
   }
 }
 
-async function rejeitarMapa() {
-  try {
-    await processosStore.rejeitarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value
-    })
 
-    notificacoesStore.sucesso(
-        'Mapa devolvido',
-        'Mapa devolvido à unidade subordinada, para ajustes'
-    )
-
-    // Redirecionar para a tela de detalhes do subprocesso
-    await router.push({
-      name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
-    })
-
-  } catch (error) {
-    notificacoesStore.erro(
-        'Erro ao devolver mapa',
-        'Ocorreu um erro ao devolver o mapa. Tente novamente.'
-    )
-  }
-}
 
 async function confirmarDevolucao() {
   try {
@@ -523,7 +499,7 @@ async function confirmarDevolucao() {
     // Redirecionar para o painel
     await router.push({ name: 'Painel' })
 
-  } catch (error) {
+  } catch {
     notificacoesStore.erro(
         'Erro ao devolver validação',
         'Ocorreu um erro. Tente novamente.'

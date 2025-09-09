@@ -198,13 +198,13 @@
 import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
-import {useUnidadesStore} from '@/stores/unidades'
+
 import {formatDateBR} from '@/utils/dateUtils'
 
 // Stores
 const processosStore = useProcessosStore()
 const mapasStore = useMapasStore()
-const unidadesStore = useUnidadesStore()
+
 
 // Filtros reativos
 const filtroTipo = ref('')
@@ -348,17 +348,17 @@ const calcularPercentualConcluido = (idProcesso: number) => {
 }
 
 const abrirModalMapasVigentes = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalMapasVigentes'))
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalMapasVigentes')) // eslint-disable-line @typescript-eslint/no-explicit-any
   modal.show()
 }
 
 const abrirModalDiagnosticosGaps = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDiagnosticosGaps'))
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDiagnosticosGaps')) // eslint-disable-line @typescript-eslint/no-explicit-any
   modal.show()
 }
 
 const abrirModalAndamentoGeral = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalAndamentoGeral'))
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalAndamentoGeral')) // eslint-disable-line @typescript-eslint/no-explicit-any
   modal.show()
 }
 
@@ -405,7 +405,7 @@ const exportarAndamentoGeral = () => {
   downloadCSV(csv, 'andamento-geral.csv')
 }
 
-const gerarCSV = (dados: any[]) => {
+const gerarCSV = (dados: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (dados.length === 0) return ''
 
   const headers = Object.keys(dados[0])

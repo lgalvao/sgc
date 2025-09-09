@@ -67,10 +67,10 @@
 </template>
 
 <script lang="ts" setup>
+import {type EmailContent, type Notificacao, useNotificacoesStore} from '@/stores/notificacoes';
+import {iconeTipo} from '@/utils/notificationIcons'; // Importar a função iconeTipo
 import {storeToRefs} from 'pinia';
-// Observar mudanças nas notificações para configurar auto-hide
 import {onMounted, onUnmounted, ref, watch} from 'vue';
-import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
 
 const notificacoesStore = useNotificacoesStore();
 const {notificacoes} = storeToRefs(notificacoesStore);
@@ -84,7 +84,7 @@ const emailAtual = ref<EmailContent | null>(null);
 // Auto-hide para notificações de sucesso após 3 segundos
 let autoHideTimeouts: Map<string, number> = new Map();
 
-const scheduleAutoHide = (notificacao: any) => {
+const scheduleAutoHide = (notificacao: Notificacao) => {
   // Só auto-hide para notificações de sucesso
   if (notificacao.tipo === 'success') {
     const timeoutId = window.setTimeout(() => {
@@ -134,23 +134,6 @@ watch(notificacoes, (novasNotificacoes, notificacoesAntigas) => {
     }
   });
 });
-
-const iconeTipo = (tipo: TipoNotificacao): string => {
-  switch (tipo) {
-    case 'success':
-      return 'bi bi-check-circle-fill text-success';
-    case 'error':
-      return 'bi bi-exclamation-triangle-fill text-danger';
-    case 'warning':
-      return 'bi bi-exclamation-triangle-fill text-warning';
-    case 'info':
-      return 'bi bi-info-circle-fill text-info';
-    case 'email':
-      return 'bi bi-envelope-fill text-primary';
-    default:
-      return 'bi bi-bell-fill';
-  }
-};
 
 const mostrarEmail = (notificacao: Notificacao) => {
   if (notificacao.emailContent) {

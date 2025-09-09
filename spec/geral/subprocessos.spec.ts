@@ -151,7 +151,11 @@ test.describe('Detalhes da Unidade no Processo', () => {
             descricao: 'Mapa de Teste',
             situacao: 'Ativo',
             tipo: 'MAPEAMENTO',
-            subprocessos: []
+            subprocessos: [],
+            competencias: [],
+            dataCriacao: new Date(),
+            dataDisponibilizacao: null,
+            dataFinalizacao: null
         }];
 
         test('deve exibir os detalhes da unidade e os cards de funcionalidade', async ({page}) => {

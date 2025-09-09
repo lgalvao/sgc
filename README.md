@@ -198,5 +198,9 @@ do código.
 - **Constantes e modelos de mensagens**: Utilize as constantes em `/src/constants/` para situações, tipos e
   configurações em vez de strings
   "mágicas".
-- **Notificações**: Use o sistema de notificações (`useNotificacoesStore`) em vez de `alert()` nativo.
+- **Notificações**: O sistema de notificações é gerenciado pela store `src/stores/notificacoes.ts`, acessível via
+  `useNotificacoesStore()`. Ele oferece métodos convenientes como `sucesso()`, `erro()`, `aviso()`, `info()` e `email()`
+  para disparar diferentes tipos de mensagens. As notificações são exibidas globalmente pelo `NotificacaoContainer.vue`
+  e são amplamente utilizadas em telas como `src/views/CadAtividades.vue` para feedback de operações (adição, remoção,
+  edição, importação de atividades e conhecimentos).
 - **Geração de IDs**: Use `idGenerator.ts` para criar novos IDs únicos no sistema.

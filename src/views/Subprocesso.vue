@@ -198,7 +198,7 @@ const mapa = computed<Mapa | null>(() => {
 // Computed para verificar se o subprocesso está em andamento
 const isSubprocessoEmAndamento = computed(() => {
   if (!SubprocessoDetalhes.value) return false;
-  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao as any);
+  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao);
 });
 
 // Computed para identificar a etapa atual e sua data limite
@@ -312,7 +312,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
         'A data limite foi alterada com sucesso!'
     );
 
-  } catch (error) {
+  } catch {
     notificacoesStore.erro(
         'Erro ao alterar data limite',
         'Ocorreu um erro ao alterar a data limite. Tente novamente.'

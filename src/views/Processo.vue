@@ -177,7 +177,8 @@ interface TreeTableItem {
   expanded: boolean;
   children: TreeTableItem[];
   clickable?: boolean;
-  [key: string]: any; // Para compatibilidade com TreeItem
+
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const route = useRoute()

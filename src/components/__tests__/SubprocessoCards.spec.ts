@@ -40,7 +40,16 @@ describe('SubprocessoCards.vue', () => {
     it('should emit navegarParaMapa when mapa card is clicked and mapa exists', async () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' },
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
         situacao: 'Mapa em andamento'
       });
 
@@ -68,7 +77,16 @@ describe('SubprocessoCards.vue', () => {
     it('should enable mapa card when mapa exists', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' },
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
         situacao: 'Mapa em andamento'
       });
 
@@ -79,7 +97,16 @@ describe('SubprocessoCards.vue', () => {
     it('should show EM_ANDAMENTO badge when mapa situacao is EM_ANDAMENTO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'em_andamento' },
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
         situacao: 'Mapa em andamento'
       });
 
@@ -90,7 +117,16 @@ describe('SubprocessoCards.vue', () => {
     it('should show DISPONIVEL_VALIDACAO badge when mapa situacao is DISPONIVEL_VALIDACAO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: { situacao: 'disponivel_validacao' },
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'disponivel_validacao',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
         situacao: 'Mapa disponibilizado'
       });
 
@@ -223,7 +259,16 @@ describe('SubprocessoCards.vue', () => {
     it('should handle empty mapa object', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: {}
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'alguma_situacao', // Pode ser qualquer string válida para a situação
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          }
       });
 
       const mapaCard = wrapper.findAll('.card')[1];

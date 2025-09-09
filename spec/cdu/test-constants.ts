@@ -47,7 +47,7 @@ export const TEXTS = {
   DETALHES_SUBPROCESSO: 'Detalhes do subprocesso',
 
   // Activities and knowledge
-  CADASTRO_ATIVIDADES_CONHECIMENTOS: 'Cadastro de atividades e conhecimentos',
+    CADASTRO_ATIVIDADES_CONHECIMENTOS: 'Atividades e conhecimentos',
   ADICIONAR_ATIVIDADE: 'Adicionar atividade',
   ADICIONAR_CONHECIMENTO: 'Adicionar conhecimento',
   EDITAR: 'Editar',

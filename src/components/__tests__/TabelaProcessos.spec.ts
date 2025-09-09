@@ -1,25 +1,25 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
-import {Processo} from '@/types/tipos';
+import {Processo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 // Mock de dados de processo
 const mockProcessos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[] = [
   {
     id: 1,
     descricao: 'Processo Alpha',
-    tipo: 'Mapeamento',
+      tipo: TipoProcesso.MAPEAMENTO,
     unidadesFormatadas: 'UNID1, UNID2',
-    situacao: 'Em andamento',
+      situacao: SituacaoProcesso.EM_ANDAMENTO,
     dataLimite: new Date(),
     dataFinalizacao: null,
   },
   {
     id: 2,
     descricao: 'Processo Beta',
-    tipo: 'Revisão',
+      tipo: TipoProcesso.REVISAO,
     unidadesFormatadas: 'UNID3',
-    situacao: 'Finalizado',
+      situacao: SituacaoProcesso.FINALIZADO,
     dataLimite: new Date(),
     dataFinalizacao: new Date('2024-08-26'),
     dataFinalizacaoFormatada: '26/08/2024',

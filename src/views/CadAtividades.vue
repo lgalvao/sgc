@@ -12,10 +12,14 @@
         <button class="btn btn-outline-secondary" @click="abrirModalImpacto">
           <i class="bi bi-arrow-right-circle me-2"></i>Impacto no mapa
         </button>
+        <button v-if="isChefe && historicoAnalises.length > 0" class="btn btn-outline-info"
+                @click="abrirModalHistorico">
+          Histórico de análise
+        </button>
         <button v-if="isChefe" class="btn btn-outline-primary" @click="mostrarModalImportar = true" title="Importar">
           Importar atividades
         </button>
-        <button class="btn btn-outline-success" data-bs-toggle="tooltip" title="Disponibilizar"
+        <button v-if="isChefe" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Disponibilizar"
                 @click="disponibilizarCadastro">
           Disponibilizar
         </button>
@@ -132,7 +136,8 @@
         @fechar="fecharModalImpacto"/>
 
     <!-- Modal de Confirmação de Disponibilização -->
-    <div v-if="mostrarModalConfirmacao" class="modal fade show" style="display: block;" tabindex="-1">
+    <div v-if="mostrarModalConfirmacao" class="modal fade show" style="display: block;" tabindex="-1"
+         ref="confirmacaoModalRef">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -156,12 +161,50 @@
       </div>
     </div>
     <div v-if="mostrarModalConfirmacao" class="modal-backdrop fade show"></div>
+
+    <!-- Modal de Histórico de Análise -->
+    <div v-if="mostrarModalHistorico" class="modal fade show" style="display: block;" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-testid="modal-historico-analise-titulo">Histórico de Análise</h5>
+            <button type="button" class="btn-close" @click="fecharModalHistorico"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-striped" data-testid="historico-analise-tabela">
+                <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Unidade</th>
+                  <th>Resultado</th>
+                  <th>Observações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="analise in historicoAnalises" :key="analise.id">
+                  <td>{{ formatarData(analise.dataHora) }}</td>
+                  <td>{{ analise.unidade }}</td>
+                  <td>{{ analise.resultado }}</td>
+                  <td>{{ analise.observacao || '-' }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="fecharModalHistorico">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarModalHistorico" class="modal-backdrop fade show"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
-
+import {Modal} from 'bootstrap' // Importar Modal do Bootstrap
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -169,6 +212,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {useMapasStore} from '@/stores/mapas'
 import {useAlertasStore} from '@/stores/alertas'
+import {useAnalisesStore} from '@/stores/analises'
 import {Atividade, Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useRouter} from 'vue-router'
@@ -193,6 +237,7 @@ const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const mapasStore = useMapasStore()
 const alertasStore = useAlertasStore()
+const analisesStore = useAnalisesStore()
 const notificacoesStore = useNotificacoesStore()
 const router = useRouter()
 
@@ -276,11 +321,6 @@ function adicionarAtividade() {
       descricaoAtividade: novaAtividadeObj.descricao,
     });
 
-    // Notificação de sucesso
-    notificacoesStore.sucesso(
-        'Atividade adicionada',
-        `A atividade "${novaAtividade.value}" foi adicionada com sucesso!`
-    );
 
     novaAtividade.value = '';
   }
@@ -297,11 +337,7 @@ function removerAtividade(idx: number) {
     competenciasImpactadasIds: impactedCompetencyIds,
   });
 
-  // Notificação de sucesso
-  notificacoesStore.sucesso(
-      'Atividade removida',
-      `A atividade "${atividadeRemovida.descricao}" foi removida com sucesso!`
-  );
+
 }
 
 function adicionarConhecimento(idx: number) {
@@ -314,11 +350,6 @@ function adicionarConhecimento(idx: number) {
     const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
     atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, impactedCompetencyIds);
 
-    // Notificação de sucesso
-    notificacoesStore.sucesso(
-        'Conhecimento adicionado',
-        `O conhecimento "${atividade.novoConhecimento}" foi adicionado com sucesso!`
-    );
 
     // Limpar o campo
     atividade.novoConhecimento = '';
@@ -331,11 +362,7 @@ function removerConhecimento(idx: number, cidx: number) {
   const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
   atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, impactedCompetencyIds);
 
-  // Notificação de sucesso
-  notificacoesStore.sucesso(
-      'Conhecimento removido',
-      `O conhecimento "${conhecimentoRemovido.descricao}" foi removido com sucesso!`
-  );
+
 }
 
 const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
@@ -374,11 +401,7 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
       competenciasImpactadasIds: impactedCompetencyIds,
     });
 
-    // Notificação de sucesso
-    notificacoesStore.sucesso(
-        'Conhecimento editado',
-        `O conhecimento foi alterado para "${conhecimentoEditado.value}" com sucesso!`
-    );
+
   }
   cancelarEdicaoConhecimento()
 }
@@ -419,11 +442,7 @@ function salvarEdicaoAtividade(id: number) {
         competenciasImpactadasIds: impactedCompetencyIds,
       });
 
-      // Notificação de sucesso
-      notificacoesStore.sucesso(
-          'Atividade editada',
-          `A atividade foi alterada para "${atividadeEditada.value}" com sucesso!`
-      );
+
     }
   }
   cancelarEdicaoAtividade()
@@ -444,11 +463,7 @@ function handleImportAtividades(atividadesImportadas: Atividade[]) {
 
   atividadesStore.adicionarMultiplasAtividades(novasAtividades);
 
-  // Notificação de sucesso
-  notificacoesStore.sucesso(
-      'Atividades importadas',
-      `${novasAtividades.length} atividade(s) foi(ram) importada(s) com sucesso!`
-  );
+
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -466,6 +481,7 @@ const atividadesParaImportar = ref<Atividade[]>([])
 const mostrarModalImpacto = ref(false)
 const mostrarModalImportar = ref(false)
 const mostrarModalConfirmacao = ref(false)
+const mostrarModalHistorico = ref(false)
 const atividadesSemConhecimento = ref<Atividade[]>([])
 
 const modalElement = ref<HTMLElement | null>(null)
@@ -551,23 +567,81 @@ function validarAtividades(): Atividade[] {
   return atividades.value.filter(atividade => atividade.conhecimentos.length === 0);
 }
 
-function obterUnidadeSuperior(): string | null {
-  if (!unidade.value) return null;
-  // Simulação: em um sistema real, isso seria obtido da hierarquia
-  return 'SEDOC'; // Para simplificação, assumindo SEDOC como superior
+const historicoAnalises = computed(() => {
+  if (!idSubprocesso.value) return []
+  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value)
+})
+
+function formatarData(data: Date): string {
+  return data.toLocaleString('pt-BR')
+}
+
+function abrirModalHistorico() {
+  mostrarModalHistorico.value = true
+}
+
+function fecharModalHistorico() {
+  mostrarModalHistorico.value = false
 }
 
 function disponibilizarCadastro() {
+  // 1. Verificação da situação do subprocesso
+  const subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
+  );
+
+  if (!subprocesso || subprocesso.situacao !== 'Revisão do cadastro em andamento') {
+    notificacoesStore.erro(
+        'Erro na Disponibilização',
+        'A disponibilização só pode ser feita quando o subprocesso está na situação "Revisão do cadastro em andamento".'
+    );
+    return;
+  }
+
+  // 2. Validação de atividades sem conhecimento
   atividadesSemConhecimento.value = validarAtividades();
+  if (atividadesSemConhecimento.value.length > 0) {
+    const atividadesDescricoes = atividadesSemConhecimento.value.map(a => `- ${a.descricao}`).join('\n');
+    notificacoesStore.erro(
+        'Atividades sem Conhecimento',
+        `As seguintes atividades não têm conhecimentos associados e precisam ser ajustadas antes da disponibilização:\n${atividadesDescricoes}`
+    );
+    return;
+  }
+
   mostrarModalConfirmacao.value = true;
 }
 
+const confirmacaoModalRef = ref<HTMLElement | null>(null); // Adicionar a referência
+
 function fecharModalConfirmacao() {
-  mostrarModalConfirmacao.value = false;
+  if (confirmacaoModalRef.value) {
+    const modalInstance = Modal.getInstance(confirmacaoModalRef.value) || new Modal(confirmacaoModalRef.value);
+    modalInstance.hide();
+  }
+  mostrarModalConfirmacao.value = false; // Manter para consistência do estado reativo
   atividadesSemConhecimento.value = [];
 }
 
-function confirmarDisponibilizacao() {
+function obterUnidadeSuperior(): string | null {
+  const buscarPai = (unidades: Unidade[], siglaFilha: string): string | null => {
+    for (const unidade of unidades) {
+      if (unidade.filhas && unidade.filhas.some(f => f.sigla === siglaFilha)) {
+        return unidade.sigla;
+      }
+      const paiEncontradoEmFilhas = buscarPai(unidade.filhas, siglaFilha);
+      if (paiEncontradoEmFilhas) {
+        return paiEncontradoEmFilhas;
+      }
+    }
+    return null;
+  };
+
+  const paiSigla = buscarPai(unidadesStore.unidades as Unidade[], siglaUnidade.value);
+  return paiSigla || 'SEDOC'; // Retorna 'SEDOC' se não encontrar um pai (unidade raiz ou não encontrada)
+}
+
+async function confirmarDisponibilizacao() {
   if (!idSubprocesso.value) return;
 
   const isRevisao = processoAtual.value?.tipo === TipoProcesso.REVISAO;
@@ -620,17 +694,16 @@ function confirmarDisponibilizacao() {
     dataHora: new Date()
   });
 
-  const mensagemSucesso = isRevisao
-    ? 'Revisão do cadastro de atividades disponibilizada'
-    : 'Cadastro de atividades disponibilizado';
+  // Excluir o histórico de análise do subprocesso (CDU-09, item 15)
+  if (idSubprocesso.value) {
+    analisesStore.removerAnalisesPorSubprocesso(idSubprocesso.value);
+  }
 
-  notificacoesStore.sucesso(
-      mensagemSucesso,
-      'O cadastro foi disponibilizado para análise das unidades superiores com sucesso!'
-  );
+  // Adicionar mensagem de sucesso
+  notificacoesStore.sucesso('Sucesso', 'Revisão do cadastro de atividades disponibilizada');
 
   fecharModalConfirmacao();
-  router.push('/painel');
+  await router.push('/painel');
 }
 
 function abrirModalImpacto() {

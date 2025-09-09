@@ -287,7 +287,7 @@ function iniciarProcesso() {
    limparCampos()
 }
 
-function enviarNotificacoesIniciarProcesso(processo: any, unidadesParticipantes: string[]) {
+function enviarNotificacoesIniciarProcesso(processo: Processo, unidadesParticipantes: string[]) {
   const isRevisao = processo.tipo === TipoProcesso.REVISAO;
   const assunto = isRevisao
     ? `SGC: Início de processo de revisão do mapa de competências`

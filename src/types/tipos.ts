@@ -38,6 +38,9 @@ export interface Subprocesso {
     dataLimiteEtapa2: Date | null;
     dataFimEtapa2: Date | null;
     sugestoes?: string;
+    observacoes?: string; // Adicionado
+    movimentacoes: Movimentacao[]; // Adicionado
+    idMapaCopiado?: number;
 }
 
 export enum TipoResponsabilidade {
@@ -85,6 +88,12 @@ export interface Mapa {
     dataCriacao: Date;
     dataDisponibilizacao: Date | null;
     dataFinalizacao: Date | null;
+    vigente?: boolean;
+    dataInicio?: Date;
+    dataFim?: Date | null;
+    descricao?: string;
+    tipo?: string;
+    subprocessos?: Subprocesso[];
 }
 
 export interface Conhecimento {
@@ -133,11 +142,16 @@ export interface Movimentacao {
     descricao: string;
 }
 
+export enum ResultadoAnalise {
+    DEVOLUCAO = 'Devolução',
+    ACEITE = 'Aceite',
+}
+
 export interface AnaliseValidacao {
     id: number;
     idSubprocesso: number;
     dataHora: Date;
     unidade: string;
-    resultado: 'Devolução' | 'Aceite';
+    resultado: ResultadoAnalise; // Usar o enum
     observacao?: string;
 }

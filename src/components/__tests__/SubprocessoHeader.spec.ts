@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import SubprocessoHeader from '../SubprocessoHeader.vue';
 import {Perfil} from '@/types/tipos';
+import {badgeClass} from '@/utils/badgeClasses';
 
 describe('SubprocessoHeader.vue', () => {
   const defaultProps = {
@@ -147,27 +148,22 @@ describe('SubprocessoHeader.vue', () => {
     });
   });
 
-  describe('badgeClass function', () => {
-    it('should return correct badge class for known situacao', () => {
-      const wrapper = mountComponent({
-        situacao: 'EM_ANDAMENTO'
-      });
 
-      const vm = wrapper.vm as InstanceType<typeof SubprocessoHeader>;
-      const badgeClass = vm.badgeClass('EM_ANDAMENTO');
+    describe('SubprocessoHeader.vue', () => {
+    it('should return correct badge class for known situacao', () => {
+        // Não precisamos montar o componente para testar uma função utilitária pura
+        const result = badgeClass('EM_ANDAMENTO');
 
       // Since we can't easily mock the constants, we'll test that the function exists and returns a string
-      expect(typeof badgeClass).toBe('string');
-      expect(badgeClass.length).toBeGreaterThan(0);
+        expect(typeof result).toBe('string');
+        expect(result.length).toBeGreaterThan(0);
     });
 
     it('should return default class for unknown situacao', () => {
-      const wrapper = mountComponent();
+        // Não precisamos montar o componente para testar uma função utilitária pura
+        const result = badgeClass('UNKNOWN_SITUACAO');
 
-      const vm = wrapper.vm as InstanceType<typeof SubprocessoHeader>;
-      const badgeClass = vm.badgeClass('UNKNOWN_SITUACAO');
-
-      expect(badgeClass).toBe('bg-secondary');
+        expect(result).toBe('bg-secondary');
     });
   });
 

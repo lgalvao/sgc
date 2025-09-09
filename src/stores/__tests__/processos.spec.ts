@@ -35,7 +35,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "dataFimEtapa2": "2025-06-15",
             "situacao": "Concluído",
             "unidadeAtual": "SESEL",
-            "unidadeAnterior": null
+            "unidadeAnterior": null,
+            "movimentacoes": []
         },
         {
             "id": 2,
@@ -47,7 +48,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "dataFimEtapa2": null,
             "situacao": "Em andamento",
             "unidadeAtual": "COSIS",
-            "unidadeAnterior": "SESEL"
+            "unidadeAnterior": "SESEL",
+            "movimentacoes": []
         },
         {
             "id": 3,
@@ -59,7 +61,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "dataFimEtapa2": null,
             "situacao": "Em andamento",
             "unidadeAtual": "SEDESENV",
-            "unidadeAnterior": null
+            "unidadeAnterior": null,
+            "movimentacoes": []
         }
     ]
 }));
@@ -84,6 +87,7 @@ describe('useProcessosStore', () => {
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
+        movimentacoes: [],
     });
 
     beforeEach(() => {
@@ -195,13 +199,15 @@ describe('useProcessosStore', () => {
                     id: 4, idProcesso: 3, unidade: 'NOVA1',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
                     dataFimEtapa1: null, dataFimEtapa2: null,
-                    situacao: 'Em andamento', unidadeAtual: 'NOVA1', unidadeAnterior: null
+                    situacao: 'Em andamento', unidadeAtual: 'NOVA1', unidadeAnterior: null,
+                    movimentacoes: []
                 },
                 {
                     id: 5, idProcesso: 3, unidade: 'NOVA2',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
                     dataFimEtapa1: null, dataFimEtapa2: null,
-                    situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnterior: null
+                    situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnterior: null,
+                    movimentacoes: []
                 }
             ];
             const initialLength = processosStore.subprocessos.length;

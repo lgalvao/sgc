@@ -3,6 +3,7 @@ import {mount} from '@vue/test-utils';
 import {createPinia, setActivePinia} from 'pinia';
 import NotificacaoContainer from '../NotificacaoContainer.vue';
 import {type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
+import {iconeTipo} from '@/utils/notificationIcons';
 
 describe('NotificacaoContainer.vue', () => {
     let notificacoesStore: ReturnType<typeof useNotificacoesStore>;
@@ -193,18 +194,16 @@ describe('NotificacaoContainer.vue', () => {
         });
     });
 
-    describe('iconeTipo function', () => {
+
+    describe('NotificacaoContainer.vue', () => {
         it('should return correct icon classes for each type', () => {
-            const wrapper = mountComponent();
-
-            // Access the component's iconeTipo method
-            const vm = wrapper.vm as InstanceType<typeof NotificacaoContainer>;
-
-            expect(vm.iconeTipo('success')).toBe('bi bi-check-circle-fill text-success');
-            expect(vm.iconeTipo('error')).toBe('bi bi-exclamation-triangle-fill text-danger');
-            expect(vm.iconeTipo('warning')).toBe('bi bi-exclamation-triangle-fill text-warning');
-            expect(vm.iconeTipo('info')).toBe('bi bi-info-circle-fill text-info');
-            expect(vm.iconeTipo('unknown' as TipoNotificacao)).toBe('bi bi-bell-fill');
+            // Não precisamos montar o componente para testar uma função utilitária pura
+            expect(iconeTipo('success')).toBe('bi bi-check-circle-fill text-success');
+            expect(iconeTipo('error')).toBe('bi bi-exclamation-triangle-fill text-danger');
+            expect(iconeTipo('warning')).toBe('bi bi-exclamation-triangle-fill text-warning');
+            expect(iconeTipo('info')).toBe('bi bi-info-circle-fill text-info');
+            expect(iconeTipo('email')).toBe('bi bi-envelope-fill text-primary'); // Adicionado o caso 'email'
+            expect(iconeTipo('unknown' as TipoNotificacao)).toBe('bi bi-bell-fill');
         });
     });
 

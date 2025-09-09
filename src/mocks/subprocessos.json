@@ -9,7 +9,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "STIC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 3,
@@ -21,7 +22,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa validado",
     "unidadeAtual": "SESEL",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 4,
@@ -33,7 +35,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa validado",
     "unidadeAtual": "SEDESENV",
-    "unidadeAnterior": "SESEL"
+    "unidadeAnterior": "SESEL",
+    "movimentacoes": []
   },
   {
     "id": 5,
@@ -43,9 +46,10 @@
     "dataLimiteEtapa2": "2025-08-15",
     "dataFimEtapa1": "2025-07-15",
     "dataFimEtapa2": null,
-    "situacao": "Mapa homologado",
+    "situacao": "Revisão do cadastro em andamento",
     "unidadeAtual": "STIC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 26,
@@ -57,7 +61,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SESEL",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 6,
@@ -69,7 +74,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "COINF",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 7,
@@ -81,7 +87,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SENIC",
-    "unidadeAnterior": "COINF"
+    "unidadeAnterior": "COINF",
+    "movimentacoes": []
   },
   {
     "id": 8,
@@ -93,7 +100,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "STIC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 10,
@@ -105,7 +113,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDESENV",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 11,
@@ -117,7 +126,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDIA",
-    "unidadeAnterior": "SEDESENV"
+    "unidadeAnterior": "SEDESENV",
+    "movimentacoes": []
   },
   {
     "id": 12,
@@ -129,7 +139,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SESEL",
-    "unidadeAnterior": "SEDIA"
+    "unidadeAnterior": "SEDIA",
+    "movimentacoes": []
   },
   {
     "id": 13,
@@ -141,7 +152,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "STIC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 15,
@@ -153,7 +165,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa disponibilizado",
     "unidadeAtual": "SEDIA",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 16,
@@ -165,7 +178,8 @@
     "dataFimEtapa2": null,
     "situacao": "Não iniciado",
     "unidadeAtual": "SESEL",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 17,
@@ -177,7 +191,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SESEL",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 18,
@@ -189,7 +204,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEMARE",
-    "unidadeAnterior": "SESEL"
+    "unidadeAnterior": "SESEL",
+    "movimentacoes": []
   },
   {
     "id": 19,
@@ -201,7 +217,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SEMARE",
-    "unidadeAnterior": "SENIC"
+    "unidadeAnterior": "SENIC",
+    "movimentacoes": []
   },
   {
     "id": 20,
@@ -213,7 +230,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "COSIS",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 27,
@@ -225,7 +243,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SEDESENV",
-    "unidadeAnterior": "COSIS"
+    "unidadeAnterior": "COSIS",
+    "movimentacoes": []
   },
   {
     "id": 28,
@@ -237,7 +256,8 @@
     "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SEDOC",
-    "unidadeAnterior": "STIC"
+    "unidadeAnterior": "STIC",
+    "movimentacoes": []
   },
   {
     "id": 21,
@@ -249,7 +269,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDOC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 22,
@@ -261,7 +282,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDOC",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 23,
@@ -273,7 +295,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SGP",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 24,
@@ -285,7 +308,8 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SGP",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   },
   {
     "id": 25,
@@ -297,6 +321,7 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDIA",
-    "unidadeAnterior": null
+    "unidadeAnterior": null,
+    "movimentacoes": []
   }
 ]

@@ -29,7 +29,7 @@ describe('situacoes.ts constants', () => {
     });
 
     it('should have correct number of situations', () => {
-      expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(17);
+        expect(Object.keys(SITUACOES_SUBPROCESSO)).toHaveLength(18);
     });
   });
 

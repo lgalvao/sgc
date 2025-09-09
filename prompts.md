@@ -1,10 +1,11 @@
 ## Alinhamento de especificações com protótipo
 
-Analise as especificações em @/reqs/cdu-21.md e verifique o que falta para a implementação atender a essas especificações. Desconsideere o teste e2e relacionado: ele ainda está em evolução. Como refs leia @regras-projeto e @regras-perfis.
+Analise as especificações em @/reqs/cdu-06.md e verifique o que falta para a implementação atender a essas
+especificações.
 
 ## Revisão dos teste e2e
 
-Reveja o teste @spec/cdu/cdu-21.spec.ts para que fique alinhado à especificação @reqs/cdu-21.md. Leve em conta o arquivo @licoes-aprendidas.md
+Reveja o teste @spec/cdu/cdu-21.spec.ts para que fique alinhado à especificação @reqs/cdu-21.md.
 
 ## Correcao de testes e2e
 Estou corrigindo os testes e2e baseados nas especificações. Eles estão em @spec/cdu e foram criados com base nos arquivos correspondentes em @reqs/, que são as especificações de casos de uso. A questão é que as especificações não batem exatamente com o protótipo. O protótipo precisa ser atualizado para que o sistema se comporte como na especificação.
@@ -16,4 +17,4 @@ Pode adicionar novos dados nos mocks e novos test-ids. Uma ressalva importante: 
 
 Uma ponto crucial nesses testes é a estrutura dos mocks: leia os arquivos de @mocks para entender como as unidades e processos se relacionam. @/src/types/tipos.ts também é importante.
 
-Como refs leia @regras-projeto, @regras-playwright e @regras-perfis.
+Como refs leia @README.md, @regras/regras-playwright e @regras/regras-perfis.

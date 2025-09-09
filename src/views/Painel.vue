@@ -67,7 +67,7 @@ const processosStore = useProcessosStore()
 const alertasStore = useAlertasStore()
 
 const {processos} = storeToRefs(processosStore) // Manter para alertas, mas não para a tabela de processos
-const {alertas} = storeToRefs(alertasStore)
+
 
 const router = useRouter()
 

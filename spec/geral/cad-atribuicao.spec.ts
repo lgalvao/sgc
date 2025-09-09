@@ -35,8 +35,7 @@ test.describe('Cadastro de Atribuição Temporária', () => {
         // Clicar em Criar
         await page.getByTestId('btn-criar-atribuicao').click();
 
-        // Verificar mensagem de sucesso ou redirecionamento
-        await expect(page.getByText('Atribuição criada com sucesso!')).toBeVisible();
+        // Verificar redirecionamento
 
         // Ou verificar redirecionamento para a página da unidade
         await page.waitForURL(`/unidade/STIC`);

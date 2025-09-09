@@ -51,7 +51,7 @@ interface TreeItem {
   children?: TreeItem[];
   level?: number;
 
-  [key: string]: any;
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface Column {

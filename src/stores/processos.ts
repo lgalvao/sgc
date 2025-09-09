@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
-import {Movimentacao, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
+import {Movimentacao, Processo, ResultadoAnalise, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 import {useConfiguracoesStore} from './configuracoes'; // Import the new store
 import {useUnidadesStore} from './unidades'
 import {useAnalisesStore} from './analises'
@@ -46,6 +46,7 @@ function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataL
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
+        movimentacoes: [],
     };
 }
 
@@ -110,10 +111,9 @@ export const useProcessosStore = defineStore('processos', {
             idProcesso: number,
             unidades: string[],
             tipoAcao: 'aceitar' | 'homologar',
-            observacao?: string,
             unidadeUsuario: string
         }) {
-            const { idProcesso, unidades, tipoAcao, observacao, unidadeUsuario } = payload;
+            const {idProcesso, unidades, tipoAcao, unidadeUsuario} = payload;
             
             // Processar cada unidade
             for (const siglaUnidade of unidades) {
@@ -246,7 +246,7 @@ export const useProcessosStore = defineStore('processos', {
                     idSubprocesso: subprocesso.id,
                     dataHora: new Date(),
                     unidade: unidade,
-                    resultado: 'Aceite',
+                    resultado: ResultadoAnalise.ACEITE,
                     observacao: observacao
                 });
 
@@ -320,7 +320,7 @@ export const useProcessosStore = defineStore('processos', {
                     idSubprocesso: subprocesso.id,
                     dataHora: new Date(),
                     unidade: unidade,
-                    resultado: 'Devolução',
+                    resultado: ResultadoAnalise.DEVOLUCAO,
                     observacao: observacao
                 });
 

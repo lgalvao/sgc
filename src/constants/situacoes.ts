@@ -20,7 +20,8 @@ export const SITUACOES_SUBPROCESSO = {
   MAPA_VALIDADO: 'Mapa validado',
   MAPA_COM_SUGESTOES: 'Mapa com sugestões',
   MAPA_HOMOLOGADO: 'Mapa homologado',
-  MAPA_CRIADO: 'Mapa criado'
+    MAPA_CRIADO: 'Mapa criado',
+    NAO_INICIADO: 'Não iniciado'
 } as const;
 
 // Situações de mapa

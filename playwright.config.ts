@@ -1,6 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {defineConfig, devices} from '@playwright/test';
+import {vueTest} from './tests/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
@@ -23,6 +24,9 @@ export default defineConfig({
     },
     projects: [{
         name: 'chromium',
-        use: {...devices['Desktop Chrome']},
+        use: {
+            ...devices['Desktop Chrome'],
+            ...vueTest, // Mover vueTest para dentro de 'use'
+        },
     }],
 });

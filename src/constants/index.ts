@@ -2,10 +2,10 @@
 export const URL_SISTEMA = 'http://localhost:5173'; // URL do sistema SGC
 
 export const EMAIL_TEMPLATES = {
-  FINALIZACAO_PROCESSO_OPERACIONAL: (processoDescricao: string, unidadeSigla: string) =>
+    FINALIZACAO_PROCESSO_OPERACIONAL: (processoDescricao: string, _unidadeSigla: string) =>
     `SGC: Conclusão do processo ${processoDescricao}`,
 
-  FINALIZACAO_PROCESSO_INTERMEDIARIA: (processoDescricao: string, unidadeSigla: string) =>
+    FINALIZACAO_PROCESSO_INTERMEDIARIA: (processoDescricao: string, _unidadeSigla: string) =>
     `SGC: Conclusão do processo ${processoDescricao} em unidades subordinadas`,
 
   CORPO_EMAIL_OPERACIONAL: (processoDescricao: string, unidadeSigla: string) =>

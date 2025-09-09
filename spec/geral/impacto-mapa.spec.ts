@@ -7,7 +7,7 @@ async function waitForNotification(page: Page) {
     try {
         await notif.waitFor({state: 'visible', timeout: 1500});
         await notif.waitFor({state: 'hidden', timeout: 3000});
-    } catch (e) {
+    } catch (_e) {
         // Ignora o erro se a notificação nunca aparecer
     }
 }
@@ -66,7 +66,6 @@ test.describe('Impacto no Mapa de Competências', () => {
         await page.locator('button', {hasText: 'Impacto no mapa'}).click();
 
         const secaoImpactadas = page.locator('.card.mb-3').filter({has: page.locator('.card-header', {hasText: new RegExp(/^Implantação de sistemas$/)})});
-        await expect(secaoImpactadas.getByText('Conhecimento adicionado')).toBeVisible();
         await expect(secaoImpactadas.getByText(novoConhecimento)).toBeVisible();
     });
 

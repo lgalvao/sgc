@@ -14,7 +14,8 @@
       </section>
 
       <section class="col-md-4 mb-3">
-        <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" data-testid="mapa-card" @click="handleMapaClick">
+        <div :class="{ 'disabled-card': !mapa }" class="card h-100 card-actionable" data-testid="mapa-card"
+             @click="handleMapaClick">
           <div class="card-body">
             <h5 class="card-title">Mapa de Competências</h5>
             <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>
@@ -72,13 +73,11 @@
 import {Mapa, TipoProcesso} from '@/types/tipos';
 import {LABELS_SITUACAO, SITUACOES_MAPA} from '@/constants/situacoes';
 
-interface Props {
+defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | null;
   situacao?: string;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   irParaAtividades: [];
@@ -86,6 +85,7 @@ const emit = defineEmits<{
   irParaDiagnosticoEquipe: [];
   irParaOcupacoesCriticas: [];
 }>();
+
 
 const handleMapaClick = () => {
   emit('navegarParaMapa');

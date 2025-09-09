@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
 describe('Navbar.vue', () => {
     let router: ReturnType<typeof createRouter>;
     let pinia: ReturnType<typeof createPinia>;
-    let pushSpy: MockInstance<[string], Promise<void>>;
+    let pushSpy: MockInstance; // Remover os argumentos de tipo
 
     beforeEach(() => {
         pinia = createPinia();

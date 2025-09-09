@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import {computed} from 'vue';
 import {Perfil} from '@/types/tipos';
-import {CLASSES_BADGE_SITUACAO} from '@/constants/situacoes';
+import {badgeClass} from '@/utils/badgeClasses'; // Importar a função badgeClass
 
 interface Props {
   processoDescricao: string;
@@ -65,8 +65,4 @@ defineEmits<{
 }>();
 
 const mostrarBotaoAlterarData = computed(() => props.perfilUsuario === Perfil.ADMIN);
-
-function badgeClass(situacao: string): string {
-  return CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] || 'bg-secondary';
-}
 </script>

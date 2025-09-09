@@ -111,7 +111,7 @@ import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useAlertasStore} from '@/stores/alertas';
-import {useNotificacoesStore} from '@/stores/notificacoes';
+
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 const configuracoesStore = useConfiguracoesStore();
@@ -119,7 +119,7 @@ const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
 const atividadesStore = useAtividadesStore();
 const alertasStore = useAlertasStore();
-const notificacoesStore = useNotificacoesStore();
+
 
 const mensagemSucesso = ref('');
 const mensagemCenario = ref('');

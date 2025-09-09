@@ -5,7 +5,13 @@ import {parseDate} from '@/utils/dateUtils'
 import {generateUniqueId} from '@/utils/idGenerator'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 
-function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'movimentacoes'> & { dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null, movimentacoes?: any[] }): Subprocesso {
+function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'movimentacoes'> & {
+    dataLimiteEtapa1?: string | null,
+    dataLimiteEtapa2?: string | null,
+    dataFimEtapa1?: string | null,
+    dataFimEtapa2?: string | null,
+    movimentacoes?: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string }>
+}): Subprocesso {
     return {
         ...pu,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
@@ -31,7 +37,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
             const subprocesso = state.subprocessos.find(sp => sp.id === idSubprocesso);
-            return subprocesso ? subprocesso.movimentacoes.sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
+            return subprocesso ? subprocesso.movimentacoes.sort((a: Movimentacao, b: Movimentacao) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
         },
         getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
             return state.subprocessos.filter(pu =>
