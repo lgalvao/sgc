@@ -1,10 +1,14 @@
 import '../spec/global.d.ts';
+import {ErrorReporter} from './utils/error-reporter';
 
 // tests/vue-specific-setup.js - Setup específico para Vue 3
 import {test as base} from '@playwright/test'; // Adicionar importação de Page
 
 export const vueTest = base.extend({
     page: async ({page}, use) => {
+        // Instanciar ErrorReporter
+        const errorReporter = new ErrorReporter();
+
         // Intercepta erros específicos do Vue 3
         await page.addInitScript(() => {
             // Captura erros do Vue antes mesmo da página carregar
@@ -15,8 +19,10 @@ export const vueTest = base.extend({
                     typeof arg === 'string' &&
                     (arg.includes('[Vue') || arg.includes('vue') || arg.includes('component'))
                 )) {
+                    errorReporter.addConsoleError(`[VUE] ${args.join(' ')}`, 'Console');
                     originalConsoleError.apply(console, ['🔥 VUE:', ...args]);
                 } else {
+                    errorReporter.addConsoleError(args.join(' '), 'Console');
                     originalConsoleError.apply(console, args);
                 }
             };
@@ -62,42 +68,26 @@ export const vueTest = base.extend({
 
             // Detecta erros de hidratação do Vue 3
             if (text.includes('hydration') || text.includes('Hydration')) {
-                hydrationErrors.push(text);
-                console.error(`💧 VUE HYDRATION ERROR: ${text}`);
+                errorReporter.addVueError(`[HYDRATION] ${text}`, 'Hydration');
             }
             // Outros erros do Vue
             else if (text.includes('[Vue') || (text.includes('vue') && msg.type() === 'error')) {
-                vueErrors.push(text);
-                console.error(`🔥 VUE ERROR: ${text}`);
+                errorReporter.addVueError(`[VUE] ${text}`, 'Vue');
             }
+            // Captura erros gerais de console que não são do Vue
+            else if (msg.type() === 'error') {
+                errorReporter.addConsoleError(text, 'Page Console');
+            }
+        });
+
+        // Captura erros de JavaScript não tratados na página
+        page.on('pageerror', error => {
+            errorReporter.addJavaScriptError(error);
         });
 
         await use(page);
 
-        // Relatório específico do Vue
-        if (vueErrors.length > 0 || hydrationErrors.length > 0) {
-            console.error('\n🎯 RELATÓRIO ESPECÍFICO VUE 3');
-            console.error('='.repeat(50));
-
-            if (hydrationErrors.length > 0) {
-                console.error(`\n💧 ERROS DE HIDRATAÇÃO (${hydrationErrors.length}):`);
-                hydrationErrors.forEach((error, i) => {
-                    console.error(`  ${i + 1}. ${error}`);
-                });
-                console.error('\n💡 DICA: Erros de hidratação geralmente indicam:');
-                console.error('   - Diferenças entre servidor e cliente');
-                console.error('   - Componentes que dependem de APIs do navegador');
-                console.error('   - Estados reativos não sincronizados');
-            }
-
-            if (vueErrors.length > 0) {
-                console.error(`\n🔥 OUTROS ERROS VUE (${vueErrors.length}):`);
-                vueErrors.forEach((error, i) => {
-                    console.error(`  ${i + 1}. ${error}`);
-                });
-            }
-
-            console.error('\n' + '='.repeat(50) + '\n');
-        }
+        // Gerar relatório de erros no final do teste
+        errorReporter.generateReport();
     },
 });
