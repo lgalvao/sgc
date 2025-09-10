@@ -303,6 +303,7 @@
 import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 import {formatDateBR} from '@/utils/dateUtils'
 
@@ -446,7 +447,7 @@ const calcularPercentualConcluido = (idProcesso: number) => {
   if (subprocessos.length === 0) return 0
 
   const concluidos = subprocessos.filter(sp =>
-    sp.situacao === 'Mapa homologado' || sp.situacao === 'Cadastro homologado'
+      sp.situacao === 'Mapa homologado' || sp.situacao === SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO
   ).length
 
   return Math.round((concluidos / subprocessos.length) * 100)

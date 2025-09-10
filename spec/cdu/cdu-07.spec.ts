@@ -1,14 +1,16 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsChefe} from '~/utils/auth';
+import {loginAndClickFirstProcess} from './test-helpers';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
-   test('deve mostrar detalhes do subprocesso para CHEFE', async ({ page }) => {
-     // Login como CHEFE
+    test.beforeEach(async ({page}) => {
      await loginAsChefe(page);
- 
+    });
+
+    test('deve mostrar detalhes do subprocesso para CHEFE', async ({page}) => {
      // Clicar em processo
-     const processoRow = page.locator('table tbody tr').first();
-     await processoRow.click();
+        await loginAndClickFirstProcess(page, loginAsChefe);
  
      // Deve mostrar subprocesso
      await expect(page).toHaveURL(/\/processo\/\d+\/[^/]+/);

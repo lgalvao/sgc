@@ -50,5 +50,11 @@ export default [
         }
       ],
     },
+  },
+    {
+        files: ["tests/vue-specific-setup.ts"],
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+        },
   }
 ];

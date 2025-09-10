@@ -25,7 +25,8 @@
     "types": [
       "vitest/globals",
       "node",
-      "vite/client"
+      "vite/client",
+      "@playwright/test"
     ],
     // Project
     "baseUrl": ".",

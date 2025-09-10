@@ -1,17 +1,16 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsAdmin} from '~/utils/auth';
-import {LABELS, TEXTS, URLS} from './test-constants';
-import {expectTextVisible, expectUrl} from './test-helpers';
+import {LABELS} from './test-constants';
+import {expectTextVisible, navigateToProcessCreation} from './test-helpers';
 
 test.describe('CDU-03: Manter processo', () => {
+    test.beforeEach(async ({page}) => {
+        await loginAsAdmin(page);
+    });
+
   test('deve acessar tela de criação de processo', async ({ page }) => {
-    await loginAsAdmin(page); // ADMIN
-
-    // Clicar em Criar processo
-    await page.getByText(TEXTS.CRIAR_PROCESSO).click();
-
-    // Deve navegar para tela de cadastro
-    await expectUrl(page, `**${URLS.PROCESSO_CADASTRO}`);
+      await navigateToProcessCreation(page);
 
     // Verificar elementos do formulário
     await expect(page.getByLabel(LABELS.DESCRICAO)).toBeVisible();
@@ -20,9 +19,7 @@ test.describe('CDU-03: Manter processo', () => {
   });
 
   test('deve mostrar erro para processo sem descrição', async ({ page }) => {
-    await loginAsAdmin(page); // ADMIN
-
-    await page.getByText('Criar processo').click();
+      await navigateToProcessCreation(page);
 
     // Deixar descrição vazia e tentar salvar
     await page.getByRole('button', { name: 'Salvar' }).click();
@@ -32,9 +29,7 @@ test.describe('CDU-03: Manter processo', () => {
   });
 
   test('deve mostrar erro para processo sem unidades', async ({ page }) => {
-    await loginAsAdmin(page); // ADMIN
-
-    await page.getByText('Criar processo').click();
+      await navigateToProcessCreation(page);
 
     // Preencher descrição mas não selecionar unidades
     await page.getByLabel('Descrição').fill('Processo Teste');

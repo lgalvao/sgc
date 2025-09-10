@@ -214,7 +214,8 @@ const carregarCenarioAndamento = () => {
       dataLimiteEtapa1: new Date('2025-12-31'),
       dataFimEtapa1: null,
       dataLimiteEtapa2: null,
-      dataFimEtapa2: null
+      dataFimEtapa2: null,
+      movimentacoes: []
     },
     {
       id: 2,
@@ -226,7 +227,8 @@ const carregarCenarioAndamento = () => {
       dataLimiteEtapa1: new Date('2025-12-31'),
       dataFimEtapa1: null,
       dataLimiteEtapa2: null,
-      dataFimEtapa2: null
+      dataFimEtapa2: null,
+      movimentacoes: []
     }
   ];
 
@@ -260,7 +262,8 @@ const carregarCenarioFinalizado = () => {
       dataLimiteEtapa1: new Date('2025-06-30'),
       dataFimEtapa1: new Date('2025-07-15'),
       dataLimiteEtapa2: new Date('2025-07-15'),
-      dataFimEtapa2: new Date('2025-07-15')
+      dataFimEtapa2: new Date('2025-07-15'),
+      movimentacoes: []
     },
     {
       id: 2,
@@ -272,7 +275,8 @@ const carregarCenarioFinalizado = () => {
       dataLimiteEtapa1: new Date('2025-06-30'),
       dataFimEtapa1: new Date('2025-07-15'),
       dataLimiteEtapa2: new Date('2025-07-15'),
-      dataFimEtapa2: new Date('2025-07-15')
+      dataFimEtapa2: new Date('2025-07-15'),
+      movimentacoes: []
     }
   ];
 
@@ -322,7 +326,8 @@ const carregarCenarioRevisao = () => {
       dataLimiteEtapa1: new Date('2025-11-30'),
       dataFimEtapa1: null,
       dataLimiteEtapa2: null,
-      dataFimEtapa2: null
+      dataFimEtapa2: null,
+      movimentacoes: []
     }
   ];
 

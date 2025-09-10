@@ -1,7 +1,8 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '~/utils/auth';
-import {LABELS, SELECTORS, TEXTS, URLS} from './test-constants';
-import {expectTextVisible, expectUrl, expectVisible} from './test-helpers';
+import {LABELS, TEXTS, URLS} from './test-constants';
+import {expectCommonDashboardElements, expectTextVisible, expectUrl} from './test-helpers';
 
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
    test('deve permitir login SERVIDOR e exibir estrutura da aplicação', async ({ page }) => {
@@ -9,8 +10,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
      await loginAsServidor(page);
 
      // Sistema exibe estrutura da aplicação
-     await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
-     await expectVisible(page, SELECTORS.TITULO_ALERTAS);
+       await expectCommonDashboardElements(page);
    });
 
    test('deve permitir login GESTOR e exibir estrutura da aplicação', async ({ page }) => {
@@ -18,8 +18,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
      await loginAsGestor(page);
 
      // Sistema exibe estrutura da aplicação
-     await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
-     await expectVisible(page, SELECTORS.TITULO_ALERTAS);
+       await expectCommonDashboardElements(page);
    });
 
    test('deve permitir login CHEFE e exibir estrutura da aplicação', async ({ page }) => {
@@ -27,8 +26,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
      await loginAsChefe(page);
 
      // Sistema exibe estrutura da aplicação
-     await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
-     await expectVisible(page, SELECTORS.TITULO_ALERTAS);
+       await expectCommonDashboardElements(page);
    });
 
    test('deve permitir login ADMIN e exibir estrutura da aplicação', async ({ page }) => {
@@ -36,8 +34,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
      await loginAsAdmin(page);
 
      // Sistema exibe estrutura da aplicação
-     await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
-     await expectVisible(page, SELECTORS.TITULO_ALERTAS);
+       await expectCommonDashboardElements(page);
    });
 
    test('deve carregar a página de login corretamente', async ({ page }) => {

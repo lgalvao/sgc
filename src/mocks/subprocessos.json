@@ -15,11 +15,6 @@
   {
     "id": 3,
     "idProcesso": 1,
-    "unidade": "SESEL",
-    "dataLimiteEtapa1": "2025-06-30",
-    "dataLimiteEtapa2": "2025-07-30",
-    "dataFimEtapa1": "2025-06-30",
-    "dataFimEtapa2": null,
     "situacao": "Mapa validado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC",

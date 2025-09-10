@@ -3,7 +3,8 @@ import mapasData from '../mocks/mapas.json' assert {type: 'json'};
 import type {Mapa} from '@/types/tipos'
 import {parseDate} from '@/utils/dateUtils'
 
-function parseMapaDates(mapa: Omit<Mapa, 'dataCriacao' | 'dataDisponibilizacao' | 'dataFinalizacao'> & { dataCriacao: string, dataDisponibilizacao?: string | null, dataFinalizacao?: string | null }): Mapa {
+function parseMapaDates(mapa: Omit<Mapa, 'dataCriacao' | 'dataDisponibilizacao' | 'dataFinalizacao'>
+    & { dataCriacao: string, dataDisponibilizacao?: string | null, dataFinalizacao?: string | null }): Mapa {
     return {
         ...mapa,
         dataCriacao: parseDate(mapa.dataCriacao) || new Date(),
@@ -32,12 +33,11 @@ export const useMapasStore = defineStore('mapas', {
             const idx = this.mapas.findIndex(m => m.id === id)
             if (idx !== -1) this.mapas[idx] = {...this.mapas[idx], ...novosDados}
         },
+
         definirMapaComoVigente(unidadeId: string, idProcesso: number) {
             // Primeiro, desmarcar qualquer mapa vigente anterior para esta unidade
             this.mapas.forEach(mapa => {
-                if (mapa.unidade === unidadeId && mapa.situacao === 'vigente') {
-                    mapa.situacao = 'disponibilizado';
-                }
+                if (mapa.unidade === unidadeId && mapa.situacao === 'vigente') mapa.situacao = 'disponibilizado';
             });
 
             // Definir o mapa do processo como vigente

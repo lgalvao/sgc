@@ -70,3 +70,29 @@ O trabalho foi dividido em duas fases principais, focando em dois arquivos de te
 5. **Considere a Instabilidade do Ambiente:** Se uma suíte de testes estável falhar catastroficamente de forma
    inesperada, considere a possibilidade de um problema externo antes de mergulhar em alterações de código. Uma nova
    execução pode economizar tempo de depuração.
+
+## Novas Lições Aprendidas (Correções Recentes)
+
+1. **Configuração ESLint e Tipos `any`:** Desabilitar explicitamente `@typescript-eslint/no-explicit-any` para arquivos
+   específicos no `eslint.config.js` é mais robusto do que usar comentários `eslint-disable-next-line`, especialmente
+   com `isolatedModules` ativado ou configurações ESLint complexas. Remova diretivas `eslint-disable` não utilizadas
+   para manter o código limpo.
+2. **Declarações de Tipos Globais (`.d.ts` files) e `isolatedModules`:**
+    * Arquivos `.d.ts` devem conter *apenas* declarações de tipo e diretivas `/// <reference>`. Eles *não* devem conter
+      declarações `import` ou `export` que os transformariam em módulos em tempo de execução, especialmente com
+      `isolatedModules` ativado no `tsconfig.json`. Isso evita `SyntaxError` em tempo de execução.
+    * Para disponibilizar tipos globais (como `Page` e `Locator` do Playwright) ao compilador TypeScript, adicione-os ao
+      array `types` no `tsconfig.json`. Não dependa de `import` ou `export` em `global.d.ts` para este fim se isso
+      causar erros em tempo de execução.
+3. **Compatibilidade de Tipos com Dados Mockados:** Ao mapear dados mockados sem tipo (ex: de arquivos JSON) para
+   interfaces fortemente tipadas, garanta que o `type cast` para os dados mockados corresponda precisamente ao tipo de
+   entrada esperado da função de parsing. Preste atenção especial às propriedades opcionais (`?`) versus obrigatórias na
+   interface de destino, especialmente para arrays.
+4. **Tratamento Robusto de Notificações em Testes Playwright:** Notificações (toasts) são difíceis de testar devido à
+   sua natureza transitória.
+    * Sempre use uma função auxiliar dedicada (ex: `waitForNotification`) que espere ativamente a notificação *aparecer*
+      e depois *desaparecer*.
+    * Esta função auxiliar deve ser flexível o suficiente para aceitar diferentes seletores (ex: `data-testid` ou nomes
+      de classe) para garantir a robustez.
+    * O `timeout` para esperar o aparecimento e desaparecimento deve ser generoso o suficiente para considerar atrasos
+      de renderização, mas não excessivamente longo para esconder bugs reais da aplicação.

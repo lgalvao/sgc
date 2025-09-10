@@ -11,6 +11,7 @@
       </h2>
       <div class="d-flex gap-2">
         <button
+            v-if="podeVerImpacto"
             class="btn btn-outline-secondary"
             @click="abrirModalImpacto"
         >
@@ -187,6 +188,7 @@
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
+import {usePerfilStore} from '@/stores/perfil';
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
@@ -194,7 +196,7 @@ import {useRevisaoStore} from '@/stores/revisao'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Atividade, Processo, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Perfil, Processo, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const props = defineProps<{
@@ -211,6 +213,7 @@ const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const notificacoesStore = useNotificacoesStore()
 const alertasStore = useAlertasStore()
+const perfilStore = usePerfilStore()
 const router = useRouter()
 
 const mostrarModalImpacto = ref(false)
@@ -236,6 +239,22 @@ const unidade = computed(() => {
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
+
+const subprocesso = computed(() => {
+  if (!idSubprocesso.value) return null;
+  return (processosStore.subprocessos as Subprocesso[]).find(p => p.id === idSubprocesso.value);
+});
+
+const podeVerImpacto = computed(() => {
+  if (!subprocesso.value || !perfilStore.perfilSelecionado) return false;
+
+  const perfil = perfilStore.perfilSelecionado;
+  const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
+  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada';
+  const localizacaoCorreta = subprocesso.value.unidadeAtual === perfilStore.unidadeSelecionada;
+
+  return podeVer && situacaoCorreta && localizacaoCorreta;
+});
 
 const idSubprocesso = computed(() => {
   const Subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
@@ -389,12 +408,12 @@ function fecharModalDevolver() {
 }
 
 function abrirModalImpacto() {
-  if (isRevisao.value) {
-    revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
-  } else {
-    // Para mapeamento inicial, não há mudanças para mostrar
-    revisaoStore.setMudancasParaImpacto([]);
+  if (revisaoStore.mudancasRegistradas.length === 0) {
+    notificacoesStore.info("Impacto no mapa", 'Nenhum impacto no mapa da unidade.');
+    return;
   }
+
+  revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   mostrarModalImpacto.value = true;
 }
 

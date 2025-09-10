@@ -1,8 +1,8 @@
-import {expect, test} from "@playwright/test";
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 test.describe('Cadastro de Atribuição Temporária', () => {
-
     test.beforeEach(async ({page}) => {
         await login(page);
 
@@ -36,8 +36,6 @@ test.describe('Cadastro de Atribuição Temporária', () => {
         await page.getByTestId('btn-criar-atribuicao').click();
 
         // Verificar redirecionamento
-
-        // Ou verificar redirecionamento para a página da unidade
         await page.waitForURL(`/unidade/STIC`);
     });
 });

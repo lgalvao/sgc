@@ -11,6 +11,7 @@
 
       <div class="d-flex gap-2">
         <button
+            v-if="podeVerImpacto"
             class="btn btn-outline-secondary"
             @click="abrirModalImpacto"
         >
@@ -268,7 +269,11 @@
             />
           </div>
           <div class="modal-body">
-            <p>{{ isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?' }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.</p>
+            <p>
+              {{
+                isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
+              }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
+            </p>
             <div
                 v-if="atividadesSemConhecimento.length > 0"
                 class="alert alert-warning"
@@ -410,26 +415,11 @@ const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
-const mapasStore = useMapasStore()
 const alertasStore = useAlertasStore()
 const analisesStore = useAnalisesStore()
 const notificacoesStore = useNotificacoesStore()
 const router = useRouter()
-
-// Helper function to get impacted competency IDs
-function getImpactedCompetencyIds(atividadeId: number): number[] {
-  const impactedIds: number[] = [];
-  const currentMap = mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value);
-
-  if (currentMap) {
-    currentMap.competencias.forEach(comp => {
-      if (comp.atividadesAssociadas.includes(atividadeId)) {
-        impactedIds.push(comp.id);
-      }
-    });
-  }
-  return impactedIds;
-}
+useMapasStore()
 
 const unidade = computed(() => {
   function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
@@ -503,13 +493,13 @@ function adicionarAtividade() {
 
 function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
-  const impactedCompetencyIds = getImpactedCompetencyIds(atividadeRemovida.id);
+  const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividadeRemovida.id, siglaUnidade.value, idProcesso.value);
   atividadesStore.removerAtividade(atividadeRemovida.id);
   revisaoStore.registrarMudanca({
     tipo: TipoMudanca.AtividadeRemovida,
     idAtividade: atividadeRemovida.id,
     descricaoAtividade: atividadeRemovida.descricao,
-    competenciasImpactadasIds: impactedCompetencyIds,
+    competenciasImpactadasIds: idsImpactados,
   });
 
 
@@ -522,8 +512,8 @@ function adicionarConhecimento(idx: number) {
       id: Date.now(),
       descricao: atividade.novoConhecimento
     };
-    const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
-    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, impactedCompetencyIds);
+    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
+    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, idsImpactados);
 
 
     // Limpar o campo
@@ -534,8 +524,8 @@ function adicionarConhecimento(idx: number) {
 function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
-  const impactedCompetencyIds = getImpactedCompetencyIds(atividade.id);
-  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, impactedCompetencyIds);
+  const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
+  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, idsImpactados);
 
 
 }
@@ -559,7 +549,7 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
     const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
 
     // Get impacted competencies before updating the store
-    const impactedCompetencyIds = getImpactedCompetencyIds(newAtividades[idxAtividade].id);
+    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(newAtividades[idxAtividade].id, siglaUnidade.value, idProcesso.value);
 
     newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
     newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
@@ -573,7 +563,7 @@ function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number)
       descricaoConhecimento: conhecimentoEditado.value,
       valorAntigo: valorAntigo,
       valorNovo: conhecimentoEditado.value,
-      competenciasImpactadasIds: impactedCompetencyIds,
+      competenciasImpactadasIds: idsImpactados,
     });
 
 
@@ -603,7 +593,7 @@ function salvarEdicaoAtividade(id: number) {
       const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
 
       // Get impacted competencies before updating the store
-      const impactedCompetencyIds = getImpactedCompetencyIds(id);
+      const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(id, siglaUnidade.value, idProcesso.value);
 
       newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
       atividades.value = newAtividades;
@@ -614,7 +604,7 @@ function salvarEdicaoAtividade(id: number) {
         descricaoAtividade: String(atividadeEditada.value),
         valorAntigo: valorAntigo,
         valorNovo: String(atividadeEditada.value),
-        competenciasImpactadasIds: impactedCompetencyIds,
+        competenciasImpactadasIds: idsImpactados,
       });
 
 
@@ -644,6 +634,16 @@ function handleImportAtividades(atividadesImportadas: Atividade[]) {
 const {perfilSelecionado} = usePerfil()
 
 const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE)
+
+const subprocesso = computed(() => {
+  if (!idSubprocesso.value) return null;
+  return (processosStore.subprocessos as Subprocesso[]).find(p => p.id === idSubprocesso.value);
+});
+
+const podeVerImpacto = computed(() => {
+  if (!isChefe.value || !subprocesso.value) return false;
+  return subprocesso.value.situacao === 'Revisão do cadastro em andamento';
+});
 
 // Variáveis reativas para o modal de importação
 const processoSelecionado = ref<Processo | null>(null)
@@ -851,12 +851,12 @@ async function confirmarDisponibilizacao() {
 
   // Enviar notificação por e-mail
   const assunto = isRevisao
-    ? `SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: ${siglaUnidade.value}`
-    : `SGC: Cadastro de atividades e conhecimentos disponibilizado: ${siglaUnidade.value}`;
+      ? `SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: ${siglaUnidade.value}`
+      : `SGC: Cadastro de atividades e conhecimentos disponibilizado: ${siglaUnidade.value}`;
 
   const corpo = isRevisao
-    ? `A unidade ${siglaUnidade.value} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`
-    : `A unidade ${siglaUnidade.value} disponibilizou o cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`;
+      ? `A unidade ${siglaUnidade.value} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`
+      : `A unidade ${siglaUnidade.value} disponibilizou o cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`;
 
   notificacoesStore.email(assunto, `Responsável pela ${unidadeSuperior}`, corpo);
 
@@ -882,6 +882,11 @@ async function confirmarDisponibilizacao() {
 }
 
 function abrirModalImpacto() {
+  if (revisaoStore.mudancasRegistradas.length === 0) {
+    notificacoesStore.info("Impacto", 'Nenhum impacto no mapa da unidade.');
+    return;
+  }
+
   if (idProcesso.value && siglaUnidade.value) {
     revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
     mostrarModalImpacto.value = true;

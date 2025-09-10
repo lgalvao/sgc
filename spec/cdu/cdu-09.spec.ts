@@ -1,19 +1,22 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsChefe} from '~/utils/auth';
 import {TEXTS} from './test-constants';
-import {expectTextVisible, fillFormField} from './test-helpers';
+import {
+    expectTextVisible,
+    fillFormField,
+    navigateToActivityRegistration,
+    navigateToMapeamentoActivityRegistration
+} from './test-helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', () => {
-    test('deve mostrar botão Histórico de análise quando houver análises e permitir disponibilização do cadastro', async ({page}) => {
-        // Login como CHEFE
+    test.beforeEach(async ({page}) => {
         await loginAsChefe(page);
+    });
 
+    test('deve mostrar botão Histórico de análise quando houver análises e permitir disponibilização do cadastro', async ({page}) => {
         // Navegar diretamente para a página de cadastro de atividades de um processo de Revisão com análises (Processo ID 2, Unidade STIC)
-        await page.goto('/processo/2/STIC/cadastro');
-
-        // Verificar que estamos na página de cadastro de atividades
-        await expect(page).toHaveURL(/\/processo\/\d+\/[^/]+\/cadastro/);
-        await expectTextVisible(page, TEXTS.CADASTRO_ATIVIDADES_CONHECIMENTOS);
+        await navigateToActivityRegistration(page, 2, 'STIC');
 
         // Verificar que o botão "Histórico de análise" está visível (condição para quando há análises)
         // Como estamos simulando um cenário com análises, o botão deve aparecer
@@ -73,22 +76,8 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', (
     });
 
     test('não deve mostrar botão Histórico de análise quando não houver análises', async ({page}) => {
-        // Login como CHEFE
-        await loginAsChefe(page);
-
         // Navegar para um processo do tipo Mapeamento (que não tem análises)
-        // Primeiro vamos para o painel
-        await page.goto('/painel');
-
-        // Encontrar e clicar em um processo do tipo "Mapeamento"
-        const processoMapeamento = page.locator('table tbody tr').filter({hasText: 'Mapeamento'}).first();
-        await processoMapeamento.click();
-
-        // Verificar que estamos na página do subprocesso
-        await expect(page).toHaveURL(/\/processo\/\d+\/[^/]+/);
-
-        // Clicar no card "Atividades e conhecimentos" usando o data-testid
-        await page.getByTestId('atividades-card').click();
+        await navigateToMapeamentoActivityRegistration(page);
 
         // Verificar que o botão "Histórico de análise" não está visível
         const botaoHistoricoAnalise = page.getByText('Histórico de análise');

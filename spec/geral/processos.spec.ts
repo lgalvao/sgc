@@ -1,4 +1,5 @@
-import {expect, test} from "@playwright/test";
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 test.describe('Detalhes do Processo - Unidades', () => {
@@ -24,7 +25,7 @@ test.describe('Detalhes do Processo - Unidades', () => {
 
     test('deve exibir unidades na tabela', async ({page}) => {
         // Verifica se há pelo menos uma linha de dados na tabela (excluindo o cabeçalho)
-        const rows = page.locator('[data-testid="tree-table-row"]'); // Alterado para usar data-testid
-        await expect(await rows.count()).toBeGreaterThan(0);
+        const rows = page.locator('[data-testid^="tree-table-row-"]'); // Alterado para usar data-testid
+        expect(await rows.count()).toBeGreaterThan(0);
     });
 });

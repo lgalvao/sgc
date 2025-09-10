@@ -1,7 +1,7 @@
 <template>
   <tr
       :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
-      data-testid="tree-table-row"
+      :data-testid="'tree-table-row-' + item.id"
       @click="handleRowClick"
   >
     <td
@@ -32,7 +32,7 @@ interface TreeItem {
   expanded?: boolean;
   children?: TreeItem[];
   clickable?: boolean;
-  level: number;
+  level?: number;
 
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }

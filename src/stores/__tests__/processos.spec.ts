@@ -83,6 +83,7 @@ describe('useProcessosStore', () => {
 
     const parsesubprocessoDates = (pu: { id: number, idProcesso: number, unidade: string, dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null, situacao: string, unidadeAtual: string, unidadeAnterior: string | null }): Subprocesso => ({
         ...pu,
+        situacao: pu.situacao as Subprocesso['situacao'],
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : new Date(),
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,

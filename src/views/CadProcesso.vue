@@ -167,9 +167,10 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
-import {SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
+import {Processo, SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {generateUniqueId} from '@/utils/idGenerator'
 import {useNotificacoesStore} from '@/stores/notificacoes'
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
@@ -248,7 +249,8 @@ function salvarProcesso() {
      dataFimEtapa2: null,
      unidadeAtual: unidadeSigla,
      unidadeAnterior: null,
-     situacao: 'Não iniciado'
+     situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
+     movimentacoes: []
    }));
 
    const novo = {
@@ -294,10 +296,10 @@ function iniciarProcesso() {
 
    // Criar subprocessos com situações corretas conforme PDF
    const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => {
-     let situacaoInicial = 'Não iniciado';
+     let situacaoInicial = SITUACOES_SUBPROCESSO.NAO_INICIADO;
 
      if (tipo.value === TipoProcesso.REVISAO) {
-       situacaoInicial = 'Não iniciado'; // Para revisão também começa como 'Não iniciado'
+       situacaoInicial = SITUACOES_SUBPROCESSO.NAO_INICIADO; // Para revisão também começa como 'Não iniciado'
      }
 
      return {
@@ -312,7 +314,8 @@ function iniciarProcesso() {
        unidadeAnterior: null,
        situacao: situacaoInicial,
        observacoes: '',
-       sugestoes: ''
+       sugestoes: '',
+       movimentacoes: []
      };
    });
 

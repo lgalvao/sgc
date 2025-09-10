@@ -74,6 +74,10 @@ interface TreeItem {
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+interface FlattenedTreeItem extends TreeItem {
+  level: number;
+}
+
 interface Column {
   key: string;
   label: string;
@@ -107,8 +111,8 @@ watch(() => props.data,
     { immediate: true, deep: true }
 )
 
-const flattenedData = computed(() => {
-  const flattened: TreeItem[] = []
+const flattenedData = computed((): FlattenedTreeItem[] => {
+  const flattened: FlattenedTreeItem[] = []
   const flatten = (items: TreeItem[], level: number) => {
     for (const item of items) {
       flattened.push({ ...item, level })

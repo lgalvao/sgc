@@ -1,39 +1,39 @@
 import '../spec/global.d.ts';
 import {ErrorReporter} from './utils/error-reporter';
+import {Page, test as base} from '@playwright/test';
 
-// tests/vue-specific-setup.js - Setup específico para Vue 3
-import {test as base} from '@playwright/test'; // Adicionar importação de Page
+// Definição de uma interface para a janela com propriedades customizadas
+interface CustomWindow extends Window {
+    Vue?: unknown;
+    __VUE__?: unknown;
+    waitForVue?: () => Promise<void>;
 
-export const vueTest = base.extend({
+    postMessage(message: any, targetOrigin: string, transfer?: Transferable[]): void;
+
+    postMessage(message: any, options?: WindowPostMessageOptions): void;
+}
+
+declare const window: CustomWindow;
+
+export const vueTest = base.extend<{ page: Page }>({
     page: async ({page}, use) => {
-        // Instanciar ErrorReporter
         const errorReporter = new ErrorReporter();
 
-        // Intercepta erros específicos do Vue 3
         await page.addInitScript(() => {
-            // Captura erros do Vue antes mesmo da página carregar
             const originalConsoleError = console.error;
-            console.error = function (...args) {
-                // Marca erros como vindos do Vue para fácil identificação
-                if (args.some(arg =>
-                    typeof arg === 'string' &&
-                    (arg.includes('[Vue') || arg.includes('vue') || arg.includes('component'))
-                )) {
-                    errorReporter.addConsoleError(`[VUE] ${args.join(' ')}`, 'Console');
+            console.error = function (...args: any[]) {
+                if (args.some(arg => typeof arg === 'string' && (arg.includes('[Vue') || arg.includes('vue') || arg.includes('component')))) {
+                    window.postMessage({type: 'VUE_ERROR', message: `[VUE] ${args.join(' ')}`}, '*');
                     originalConsoleError.apply(console, ['🔥 VUE:', ...args]);
                 } else {
-                    errorReporter.addConsoleError(args.join(' '), 'Console');
+                    window.postMessage({type: 'CONSOLE_ERROR', message: args.join(' ')}, '*');
                     originalConsoleError.apply(console, args);
                 }
             };
 
-            // Intercepta warnings do Vue
             const originalConsoleWarn = console.warn;
-            console.warn = function (...args) {
-                if (args.some(arg =>
-                    typeof arg === 'string' &&
-                    (arg.includes('[Vue') || arg.includes('vue'))
-                )) {
+            console.warn = function (...args: any[]) {
+                if (args.some(arg => typeof arg === 'string' && (arg.includes('[Vue') || arg.includes('vue')))) {
                     originalConsoleWarn.apply(console, ['⚠️  VUE WARNING:', ...args]);
                 } else {
                     originalConsoleWarn.apply(console, args);
@@ -41,15 +41,14 @@ export const vueTest = base.extend({
             };
         });
 
-        // Aguarda Vue estar pronto antes de qualquer interação
-        /* eslint-disable @typescript-eslint/no-explicit-any */
         await page.addInitScript(() => {
-            (window as any).waitForVue = () => {
-                return new Promise((resolve: (value: void) => void) => { // Tipar resolve
-                    if ((window as any).Vue || (window as any).__VUE__) {
+            window.waitForVue = () => {
+                return new Promise<void>((resolve) => {
+                    if (window.Vue || window.__VUE__) {
+                        resolve();
                     } else {
                         const checkVue = setInterval(() => {
-                            if ((window as any).Vue || (window as any).__VUE__) {
+                            if (window.Vue || window.__VUE__) {
                                 clearInterval(checkVue);
                                 resolve();
                             }
@@ -58,36 +57,30 @@ export const vueTest = base.extend({
                 });
             };
         });
-        /* eslint-enable @typescript-eslint/no-explicit-any */
-
-        const vueErrors: string[] = []; // Tipar
-        const hydrationErrors: string[] = []; // Tipar
 
         page.on('console', msg => {
             const text = msg.text();
+            const type = msg.type();
 
-            // Detecta erros de hidratação do Vue 3
             if (text.includes('hydration') || text.includes('Hydration')) {
                 errorReporter.addVueError(`[HYDRATION] ${text}`, 'Hydration');
-            }
-            // Outros erros do Vue
-            else if (text.includes('[Vue') || (text.includes('vue') && msg.type() === 'error')) {
+            } else if (text.includes('[Vue') || (text.includes('vue') && type === 'error')) {
                 errorReporter.addVueError(`[VUE] ${text}`, 'Vue');
-            }
-            // Captura erros gerais de console que não são do Vue
-            else if (msg.type() === 'error') {
+            } else if (type === 'error') {
                 errorReporter.addConsoleError(text, 'Page Console');
             }
         });
 
-        // Captura erros de JavaScript não tratados na página
         page.on('pageerror', error => {
             errorReporter.addJavaScriptError(error);
         });
 
+        page.on('requestfailed', request => {
+            errorReporter.addNetworkError(request.url(), request.failure()?.errorText || 'Unknown network error');
+        });
+
         await use(page);
 
-        // Gerar relatório de erros no final do teste
         errorReporter.generateReport();
     },
 });

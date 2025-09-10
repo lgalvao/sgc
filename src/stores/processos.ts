@@ -51,14 +51,16 @@ function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinaliz
     };
 }
 
-function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
+function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'situacao'> & {
     dataLimiteEtapa1?: string | null,
     dataLimiteEtapa2?: string | null,
     dataFimEtapa1?: string | null,
-    dataFimEtapa2?: string | null
+    dataFimEtapa2?: string | null,
+    situacao: string
 }): Subprocesso {
     return {
         ...pu,
+        situacao: pu.situacao as Subprocesso['situacao'],
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
@@ -70,7 +72,13 @@ function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataL
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        subprocessos: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[],
+        subprocessos: (subprocessosMock as (Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
+            dataLimiteEtapa1?: string | null;
+            dataLimiteEtapa2?: string | null;
+            dataFimEtapa1?: string | null;
+            dataFimEtapa2?: string | null;
+            movimentacoes: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string; }>;
+        })[]).map(parseSubprocessoDates) as Subprocesso[],
         movements: [] as Movimentacao[]
     }),
     getters: {
@@ -146,6 +154,7 @@ export const useProcessosStore = defineStore('processos', {
                         this.subprocessos[subprocessoIndex] = {
                             ...subprocesso,
                             // Manter a mesma situação por enquanto, já que estamos simulando
+                            movimentacoes: subprocesso.movimentacoes || [],
                         };
                     } else {
                         // Para ADMIN - homologar
@@ -167,7 +176,8 @@ export const useProcessosStore = defineStore('processos', {
 
                         this.subprocessos[subprocessoIndex] = {
                             ...subprocesso,
-                            situacao: novaSituacao
+                            situacao: novaSituacao,
+                            movimentacoes: subprocesso.movimentacoes || [],
                         };
                     }
                 }
@@ -193,12 +203,14 @@ export const useProcessosStore = defineStore('processos', {
                 if (etapa === 1) {
                     this.subprocessos[subprocessoIndex] = {
                         ...subprocesso,
-                        dataLimiteEtapa1: novaDataLimite
+                        dataLimiteEtapa1: novaDataLimite,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
                 } else if (etapa === 2) {
                     this.subprocessos[subprocessoIndex] = {
                         ...subprocesso,
-                        dataLimiteEtapa2: novaDataLimite
+                        dataLimiteEtapa2: novaDataLimite,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
                 }
 
@@ -260,7 +272,8 @@ export const useProcessosStore = defineStore('processos', {
                     // ADMIN: homologar diretamente
                     this.subprocessos[subprocessoIndex] = {
                         ...subprocesso,
-                        situacao: SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO
+                        situacao: SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
                 } else {
                     // GESTOR: enviar para superior
@@ -276,7 +289,8 @@ export const useProcessosStore = defineStore('processos', {
                         ...subprocesso,
                         unidadeAtual: unidadeSuperior,
                         unidadeAnterior: unidade,
-                        situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO
+                        situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
 
                     // Enviar email para unidade superior
@@ -339,7 +353,7 @@ export const useProcessosStore = defineStore('processos', {
                 });
 
                 // Determinar nova situação
-                let novaSituacao: string;
+                let novaSituacao: Subprocesso['situacao'];
                 if (unidadeInferior === subprocesso.unidade) {
                     // Retornando para a própria unidade
                     novaSituacao = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
@@ -349,7 +363,8 @@ export const useProcessosStore = defineStore('processos', {
                         unidadeAtual: unidadeInferior,
                         unidadeAnterior: unidade,
                         situacao: novaSituacao,
-                        dataFimEtapa2: null
+                        dataFimEtapa2: null,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
                 } else {
                     // Retornando para unidade diferente (SEDOC fazendo ajustes)
@@ -359,7 +374,8 @@ export const useProcessosStore = defineStore('processos', {
                         ...subprocesso,
                         unidadeAtual: unidadeInferior,
                         unidadeAnterior: unidade,
-                        situacao: novaSituacao
+                        situacao: novaSituacao,
+                        movimentacoes: subprocesso.movimentacoes || [],
                     };
                 }
 
@@ -420,7 +436,8 @@ export const useProcessosStore = defineStore('processos', {
                     unidadeAtual: unidadeSuperior,
                     unidadeAnterior: unidade,
                     situacao: SITUACOES_SUBPROCESSO.MAPA_COM_SUGESTOES,
-                    sugestoes: sugestoes
+                    sugestoes: sugestoes,
+                    movimentacoes: subprocesso.movimentacoes || [],
                 };
 
                 // Simular envio de e-mail
@@ -468,7 +485,8 @@ export const useProcessosStore = defineStore('processos', {
                     ...subprocesso,
                     unidadeAtual: unidadeSuperior,
                     unidadeAnterior: unidade,
-                    situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO
+                    situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+                    movimentacoes: subprocesso.movimentacoes || [],
                 };
 
                 // Simular envio de e-mail

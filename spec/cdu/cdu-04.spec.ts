@@ -1,15 +1,15 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsAdmin} from '~/utils/auth';
+import {navigateToProcessCreation} from './test-helpers';
 
 test.describe('CDU-04: Iniciar processo de mapeamento', () => {
+    test.beforeEach(async ({page}) => {
+        await loginAsAdmin(page);
+    });
+
    test('deve iniciar processo de mapeamento', async ({ page }) => {
-     await loginAsAdmin(page); // ADMIN
- 
-     // Clicar em Criar processo
-     await page.getByText('Criar processo').click();
- 
-     // Deve navegar para tela de cadastro
-     await expect(page).toHaveURL(/\/processo\/cadastro$/);
+       await navigateToProcessCreation(page);
  
      // Preencher formulário
      await page.getByLabel('Descrição').fill('Processo de Mapeamento Teste');

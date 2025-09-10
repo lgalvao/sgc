@@ -15,7 +15,7 @@ export const SELECTORS = {
     SUBPROCESSO_HEADER: 'subprocesso-header',
     PROCESSO_INFO: 'processo-info',
     UNIDADE_CARD: 'unidade-card',
-    TREE_TABLE_ROW: 'tree-table-row',
+    TREE_TABLE_ROW: '[data-testid^=tree-table-row-]',
     MAPA_CARD: 'mapa-card',
     COMPETENCIA_BLOCK: 'competencia-block',
     ATIVIDADE_ITEM: 'atividade-item',

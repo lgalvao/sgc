@@ -10,6 +10,13 @@
       </div>
       <div class="d-flex gap-2">
         <button
+            v-if="podeVerImpacto"
+            class="btn btn-outline-secondary"
+            @click="abrirModalImpacto"
+        >
+          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
+        </button>
+        <button
             :disabled="competencias.length === 0"
             class="btn btn-outline-success"
             @click="finalizarEdicao"
@@ -291,31 +298,79 @@
         v-if="mostrarModalDisponibilizar"
         class="modal-backdrop fade show"
     />
+
+    <ImpactoMapaModal
+        :id-processo="idProcesso"
+        :sigla-unidade="siglaUnidade"
+        :mostrar="mostrarModalImpacto"
+        @fechar="fecharModalImpacto"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
 import {storeToRefs} from 'pinia'
-
+import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
+import {useAtividadesStore} from '@/stores/atividades'
+import {useNotificacoesStore} from '@/stores/notificacoes'
+import {usePerfilStore} from '@/stores/perfil'
+import {useProcessosStore} from '@/stores/processos'
+import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useAtividadesStore} from "@/stores/atividades";
-import {useProcessosStore} from "@/stores/processos";
-import {useNotificacoesStore} from "@/stores/notificacoes";
-import {Atividade, Competencia, Subprocesso, Unidade} from '@/types/tipos';
+import {Atividade, Competencia, Perfil, Subprocesso, Unidade} from '@/types/tipos'
+import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
-const props = defineProps<{ sigla: string, idProcesso: number }>()
-
-const sigla = computed(() => props.sigla)
-const idProcesso = computed(() => props.idProcesso)
-const unidadesStore = useUnidadesStore()
-const mapaStore = useMapasStore()
-const {mapas} = storeToRefs(mapaStore)
+const route = useRoute()
+const mapasStore = useMapasStore()
+const {mapas} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
+const notificacoesStore = useNotificacoesStore()
+const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
-
+const revisaoStore = useRevisaoStore()
+const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
+
+const idProcesso = computed(() => Number(route.params.idProcesso))
+const siglaUnidade = computed(() => String(route.params.siglaUnidade))
+
+const subprocesso = computed(() => {
+  if (!idProcesso.value || !siglaUnidade.value) return null;
+  return (processosStore.subprocessos as Subprocesso[]).find(
+      (pu) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
+  );
+});
+
+const podeVerImpacto = computed(() => {
+  if (!perfilStore.perfilSelecionado || !subprocesso.value) return false;
+
+  const perfil = perfilStore.perfilSelecionado;
+  const situacao = subprocesso.value.situacao;
+
+  const isPermittedProfile = perfil === Perfil.ADMIN;
+  const isCorrectSituation = situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA || situacao === SITUACOES_SUBPROCESSO.MAPA_AJUSTADO;
+
+  return isPermittedProfile && isCorrectSituation;
+});
+
+const mostrarModalImpacto = ref(false);
+
+function abrirModalImpacto() {
+  if (revisaoStore.mudancasRegistradas.length === 0) {
+    notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
+    return;
+  }
+  revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
+  mostrarModalImpacto.value = true;
+}
+
+function fecharModalImpacto() {
+  mostrarModalImpacto.value = false;
+  revisaoStore.setMudancasParaImpacto([]);
+}
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
@@ -328,10 +383,10 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   return null
 }
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
+const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
 const idSubprocesso = computed(() => {
   const Subprocesso = processosStore.subprocessos.find(
-      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
+      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
   );
   return Subprocesso?.id;
 });
@@ -342,7 +397,7 @@ const atividades = computed<Atividade[]>(() => {
   }
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
-const mapa = computed(() => mapas.value.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
+const mapa = computed(() => mapas.value.find(m => m.unidade === siglaUnidade.value && m.idProcesso === idProcesso.value))
 const competencias = ref<Competencia[]>([])
 watch(mapa, (novoMapa) => {
   if (novoMapa) {
@@ -457,12 +512,12 @@ function adicionarOuAtualizarCompetencia() {
 
   // Persistir as mudanças no mapaStore
   if (mapa.value) {
-    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
   } else {
     // Se não houver mapa, cria um novo.
     const novoMapa = {
       id: Date.now(),
-      unidade: sigla.value,
+      unidade: siglaUnidade.value,
       idProcesso: idProcesso.value,
       competencias: competencias.value,
       situacao: './utils/auth',
@@ -471,7 +526,7 @@ function adicionarOuAtualizarCompetencia() {
       dataFinalizacao: null,
     };
     mapas.value.push(novoMapa);
-    mapaStore.adicionarMapa(novoMapa);
+    mapasStore.adicionarMapa(novoMapa);
   }
 
   novaCompetencia.value.descricao = '';
@@ -486,11 +541,11 @@ function adicionarCompetenciaEFecharModal() {
 
 function finalizarEdicao() {
   if (mapa.value) {
-    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value})
+    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value})
   } else {
     const novoMapa = {
       id: Date.now(),
-      unidade: sigla.value,
+      unidade: siglaUnidade.value,
       idProcesso: idProcesso.value,
       competencias: competencias.value,
       situacao: 'em_andamento',
@@ -508,7 +563,7 @@ function finalizarEdicao() {
 function excluirCompetencia(id: number) {
   competencias.value = competencias.value.filter(comp => comp.id !== id);
   if (mapa.value) {
-    mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
   }
 }
 
@@ -518,7 +573,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
     const competencia = competencias.value[competenciaIndex];
     competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
     if (mapa.value) {
-      mapaStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
     }
   }
 }
@@ -557,7 +612,7 @@ function disponibilizarMapa() {
 
   // Alterar situação do subprocesso para 'Mapa disponibilizado'
   const subprocesso = processosStore.subprocessos.find(
-    pu => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
   );
   if (subprocesso) {
     subprocesso.situacao = 'Mapa disponibilizado';
@@ -567,13 +622,13 @@ function disponibilizarMapa() {
     processosStore.addMovement({
       idSubprocesso: subprocesso.id,
       unidadeOrigem: 'SEDOC',
-      unidadeDestino: sigla.value,
+      unidadeDestino: siglaUnidade.value,
       descricao: 'Disponibilização do mapa de competências'
     });
   }
 
   // Atualizar mapa
-  mapaStore.editarMapa(currentMapa.id, {
+  mapasStore.editarMapa(currentMapa.id, {
     situacao: 'disponivel_validacao',
     dataDisponibilizacao: new Date(),
   });
@@ -581,16 +636,16 @@ function disponibilizarMapa() {
   // Simular notificações por e-mail
   const notificacoesStore = useNotificacoesStore();
   notificacoesStore.email(
-    'SGC: Mapa de competências disponibilizado',
-    `Responsável pela ${currentUnidade.sigla}`,
-    `Prezado(a) responsável pela ${currentUnidade.sigla},\n\nO mapa de competências foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.\n\nAcompanhe o processo no sistema SGC.`
+      'SGC: Mapa de competências disponibilizado',
+      `Responsável pela ${currentUnidade.sigla}`,
+      `Prezado(a) responsável pela ${currentUnidade.sigla},\n\nO mapa de competências foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.\n\nAcompanhe o processo no sistema SGC.`
   );
 
   // Simular notificações para superiores
   notificacoesStore.email(
-    `SGC: Mapa de competências disponibilizado - ${currentUnidade.sigla}`,
-    'Unidades superiores',
-    `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
+      `SGC: Mapa de competências disponibilizado - ${currentUnidade.sigla}`,
+      'Unidades superiores',
+      `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
   );
 
   notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;

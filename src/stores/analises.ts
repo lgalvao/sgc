@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia'
-import analisesMock from '../mocks/analises.json' // Import the mock data
+import analisesMock from '../mocks/analises.json'
 import type {AnaliseValidacao} from '@/types/tipos'
-import {ResultadoAnalise} from '@/types/tipos' // Importar o novo enum
+import {ResultadoAnalise} from '@/types/tipos'
 import {generateUniqueId} from '@/utils/idGenerator'
-import {parseDate} from '@/utils/dateUtils' // Assuming parseDate is available
+import {parseDate} from '@/utils/dateUtils'
 
 function mapResultadoAnalise(resultado: string): ResultadoAnalise {
     switch (resultado) {
@@ -12,7 +12,7 @@ function mapResultadoAnalise(resultado: string): ResultadoAnalise {
         case 'Aceite':
             return ResultadoAnalise.ACEITE;
         default:
-            return ResultadoAnalise.ACEITE; // Valor padrão, caso haja um resultado inesperado
+            return ResultadoAnalise.ACEITE;
     }
 }
 

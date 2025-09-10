@@ -5,7 +5,7 @@
         :processo-descricao="processoAtual?.descricao || ''"
         :unidade-sigla="unidadeComResponsavelDinamico.sigla"
         :unidade-nome="unidadeComResponsavelDinamico.nome"
-        :situacao="situacaoUnidadeNoProcesso"
+        :situacao="situacaoUnidadeNoProcesso as string"
         :titular-nome="titularDetalhes?.nome || ''"
         :titular-ramal="titularDetalhes?.ramal || ''"
         :titular-email="titularDetalhes?.email || ''"
@@ -24,7 +24,7 @@
     <SubprocessoCards
         :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
         :mapa="mapa"
-        :situacao="situacaoUnidadeNoProcesso"
+        :situacao="situacaoUnidadeNoProcesso as string"
         @ir-para-atividades="irParaAtividadesConhecimentos"
         @navegar-para-mapa="navegarParaMapa"
         @ir-para-diagnostico-equipe="irParaDiagnosticoEquipe"
@@ -100,7 +100,7 @@ import {
   Unidade
 } from "@/types/tipos";
 import {formatDateTimeBR, parseDate} from '@/utils/dateUtils';
-import {SITUACOES_EM_ANDAMENTO} from '@/constants/situacoes';
+import {SITUACOES_EM_ANDAMENTO, SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
@@ -196,7 +196,7 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
 });
 
 const situacaoUnidadeNoProcesso = computed<string>(() => {
-  return SubprocessoDetalhes.value?.situacao || 'Não informado';
+  return SubprocessoDetalhes.value?.situacao || SITUACOES_SUBPROCESSO.NAO_INICIADO;
 });
 
 const mapa = computed<Mapa | null>(() => {

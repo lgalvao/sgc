@@ -1,4 +1,6 @@
 import {defineStore} from 'pinia';
+import {useMapasStore} from './mapas';
+
 
 export enum TipoMudanca {
     AtividadeAdicionada = 'AtividadeAdicionada',
@@ -30,6 +32,20 @@ export const useRevisaoStore = defineStore('revisao', {
         };
     },
     actions: {
+        obterIdsCompetenciasImpactadas(atividadeId: number, siglaUnidade: string, idProcesso: number): number[] {
+            const mapasStore = useMapasStore();
+            const idsImpactados: number[] = [];
+            const mapaAtual = mapasStore.getMapaByUnidadeId(siglaUnidade, idProcesso);
+
+            if (mapaAtual) {
+                mapaAtual.competencias.forEach(comp => {
+                    if (comp.atividadesAssociadas.includes(atividadeId)) {
+                        idsImpactados.push(comp.id);
+                    }
+                });
+            }
+            return idsImpactados;
+        },
         setMudancasParaImpacto(mudancas: Mudanca[]) {
             this.mudancasParaImpacto = mudancas;
         },

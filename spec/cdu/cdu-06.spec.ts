@@ -1,16 +1,15 @@
-import {expect, test} from '@playwright/test';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsAdmin} from '~/utils/auth';
+import {navigateToProcessDetails} from './test-helpers';
 
 test.describe('CDU-06: Detalhar processo', () => {
-  test('deve mostrar detalhes do processo para ADMIN', async ({ page }) => {
+    test.beforeEach(async ({page}) => {
     await loginAsAdmin(page);
+    });
 
-    // Clicar em processo 'Revisão de mapeamento STIC/COINF'
-    const processoRow = page.locator('table tbody tr').filter({ hasText: 'STIC/COINF' }).first();
-    await processoRow.click();
-
-    // Deve mostrar tela de detalhes
-    await expect(page).toHaveURL(/\/processo\/\d+/);
+    test('deve mostrar detalhes do processo para ADMIN', async ({page}) => {
+        await navigateToProcessDetails(page, 'STIC/COINF');
 
     // Verificar seções
     await expect(page.getByText('Situação:')).toBeVisible();
@@ -21,13 +20,10 @@ test.describe('CDU-06: Detalhar processo', () => {
   });
 
   test('deve permitir clicar em unidade', async ({ page }) => {
-    await loginAsAdmin(page);
-
-    const processoRow = page.locator('table tbody tr').filter({ hasText: 'STIC/COINF' }).first();
-    await processoRow.click();
+      await navigateToProcessDetails(page, 'STIC/COINF');
 
     // Clicar em uma unidade participante
-    const unidadeRow = page.locator('[data-testid="tree-table-row"]').filter({ hasText: 'STIC' }).first();
+      const unidadeRow = page.locator('[data-testid^="tree-table-row-"]').filter({hasText: 'STIC'}).first();
     await unidadeRow.click();
 
     // Deve navegar para subprocesso

@@ -1,7 +1,8 @@
 ## Alinhamento de especificações com protótipo
 
-Analise as especificações em @/reqs/cdu-06.md e verifique o que falta para a implementação atender a essas
-especificações.
+Leia Leia @README.md e @regras/regras-perfis.md e @regras/regras-endpoints.md. Analise as especificações em
+@/reqs/cdu-12.md e verifique o que falta no projeto para concluir a implementação atender a essas especificações, e o
+que está diferente do especificado e precisa de ajustes.
 
 ## Revisão dos teste e2e
 

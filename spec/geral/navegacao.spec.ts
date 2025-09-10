@@ -1,10 +1,12 @@
-import {expect, Page, test} from '@playwright/test'
+import {expect, Page} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 async function getBreadcrumbItemsText(page: Page) {
     const items = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]')
     const count = await items.count()
     const texts: string[] = []
+
     for (let i = 0; i < count; i++) {
         const el = items.nth(i)
         const text = (await el.innerText()).trim()
@@ -25,12 +27,8 @@ async function breadcrumbLinkHrefAt(page: Page, index: number) {
     return await link.getAttribute('href')
 }
 
-// Importante: o servidor é iniciado pelo webServer do playwright (playwright.config.ts)
-
 test.describe('Breadcrumbs - cobertura de cenários', () => {
-    test.beforeEach(async ({page}) => {
-        await login(page)
-    })
+    test.beforeEach(async ({page}) => await login(page))
 
     test('painel não exibe breadcrumbs', async ({page}) => {
         // Após login estamos no /painel
@@ -40,6 +38,7 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
     test('navegação via navbar: breadcrumbs oculto na primeira renderização', async ({page}) => {
         // Clicar em Relatórios pela navbar (usa flag transitória)
         await page.getByRole('link', {name: /Relatórios/}).click()
+
         // Deve ocultar breadcrumbs nesta primeira renderização
         await expect(page.locator('[data-testid="breadcrumbs"]')).toHaveCount(0)
     })
@@ -81,6 +80,7 @@ test.describe('Breadcrumbs - cobertura de cenários', () => {
         await page.waitForLoadState('networkidle')
 
         const items = await getBreadcrumbItemsText(page)
+
         // Esperado: [home], Processo, SESEL, Mapa
         expect(items.length).toBe(4)
         expect(items[1]).toContain('Processo')

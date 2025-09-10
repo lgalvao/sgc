@@ -1,7 +1,15 @@
-import {expect, Page, test} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsChefe} from '~/utils/auth';
 import {TEXTS, URLS} from './test-constants';
-import {clickButton, expectErrorMessage, expectSuccessMessage, expectTextVisible, fillFormField} from './test-helpers';
+import {
+    clickButton,
+    expectConfirmationModal,
+    expectErrorMessage,
+    expectSuccessMessage,
+    expectTextVisible,
+    fillFormField
+} from './test-helpers';
 
 // Funções auxiliares para o teste
 async function adicionarAtividadeComConhecimento(page: Page, atividadeDesc: string, conhecimentoDesc: string) {
@@ -34,10 +42,8 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
         await clickButton(page, TEXTS.DISPONIBILIZAR);
 
         // Verificar que o modal de confirmação está visível
-        const modalConfirmacao = page.locator('.modal.show');
-        await expect(modalConfirmacao).toBeVisible();
-        await expectTextVisible(page, TEXTS.DISPONIBILIZACAO_CADASTRO);
-        await expectTextVisible(page, TEXTS.CONFIRMA_DISPONIBILIZACAO_REVISAO);
+        await expectConfirmationModal(page, TEXTS.DISPONIBILIZACAO_CADASTRO, TEXTS.CONFIRMA_DISPONIBILIZACAO_REVISAO);
+        const modalConfirmacao = page.locator('.modal.show'); // Ainda precisamos da referência para fechar o modal
 
         // Confirmar a disponibilização
         await clickButton(page, TEXTS.CONFIRMAR);

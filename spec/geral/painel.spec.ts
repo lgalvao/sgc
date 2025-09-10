@@ -1,10 +1,9 @@
-import {expect, test} from "@playwright/test";
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 test.describe('Painel Principal', () => {
-    test.beforeEach(async ({page}) => {
-        await login(page);
-    });
+    test.beforeEach(async ({page}) => await login(page));
 
     test('deve carregar a página e exibir os títulos das seções', async ({page}) => {
         await expect(page.getByTestId('titulo-processos')).toBeVisible();
@@ -19,8 +18,10 @@ test.describe('Painel Principal', () => {
     test('deve permitir ordenar a tabela de processos por descrição', async ({page}) => {
         // Clica na coluna Descrição para ordenar
         await page.getByTestId('coluna-descricao').click();
+
         // Verifica se o indicador de ordenação aparece (↑ ou ↓)
         await expect(page.getByTestId('coluna-descricao')).toContainText('Descrição');
+
         // Clica novamente para inverter a ordem
         await page.getByTestId('coluna-descricao').click();
         await expect(page.getByTestId('coluna-descricao')).toContainText('Descrição');
@@ -48,12 +49,9 @@ test.describe('Painel Principal', () => {
     });
 
     test('deve marcar alerta como lido ao clicar nele', async ({page}) => {
-        // Este teste simula o comportamento de marcar como lido
-        // Como é um teste E2E, verificamos apenas que o clique não quebra a aplicação
         const alertasRows = page.locator('[data-testid="tabela-alertas"] tbody tr');
 
         if (await alertasRows.count() > 0) {
-            // Clica no primeiro alerta
             await alertasRows.first().click();
 
             // Verifica se a página ainda está funcional (não quebrou)

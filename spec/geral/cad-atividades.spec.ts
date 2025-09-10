@@ -1,14 +1,15 @@
-import {expect, Locator, Page, test} from "@playwright/test";
+import {expect, Locator, Page} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 async function adicionarAtividade(page: Page, nomeAtividade: string) {
     await page.getByTestId('input-nova-atividade').fill(nomeAtividade);
     await page.getByTestId('btn-adicionar-atividade').click();
-    // Look specifically for the activity card, not just any text
+
     await expect(page.locator('.atividade-card', {hasText: nomeAtividade})).toBeVisible();
 }
 
-async function adicionarConhecimento(page: Page, atividadeCard: Locator, nomeConhecimento: string) {
+async function adicionarConhecimento(_page: Page, atividadeCard: Locator, nomeConhecimento: string) {
     await atividadeCard.locator('[data-testid="input-novo-conhecimento"]').fill(nomeConhecimento);
     await atividadeCard.locator('[data-testid="btn-adicionar-conhecimento"]').click();
     await expect(atividadeCard.locator('.group-conhecimento', {hasText: nomeConhecimento})).toBeVisible();
@@ -46,6 +47,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnEditarAtividade = atividadeCard.getByTestId('btn-editar-atividade');
         await expect(btnEditarAtividade).toBeVisible();
         await expect(btnEditarAtividade).toBeEnabled();
+
         await btnEditarAtividade.click({force: true});
         const atividadeEditada = `Atividade Editada ${Date.now()}`;
         await page.getByTestId('input-editar-atividade').fill(atividadeEditada);
@@ -96,6 +98,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnEditarConhecimento = conhecimentoRow.getByTestId('btn-editar-conhecimento');
         await expect(btnEditarConhecimento).toBeVisible();
         await expect(btnEditarConhecimento).toBeEnabled();
+
         await btnEditarConhecimento.click();
         const conhecimentoEditado = `Conhecimento Editado ${Date.now()}`;
         await page.getByTestId('input-editar-conhecimento').fill(conhecimentoEditado);
@@ -120,6 +123,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnRemoverConhecimento = conhecimentoRow.getByTestId('btn-remover-conhecimento');
         await expect(btnRemoverConhecimento).toBeVisible();
         await expect(btnRemoverConhecimento).toBeEnabled();
+
         await btnRemoverConhecimento.click();
         await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover})).not.toBeAttached();

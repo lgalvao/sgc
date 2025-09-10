@@ -112,8 +112,11 @@ const processosOrdenados = computed<Processo[]>(() => {
       valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidade).join(', ')
     }
 
-    if (valA < valB) return asc.value ? -1 : 1
-    if (valA > valB) return asc.value ? 1 : -1
+    const valAString = String(valA);
+    const valBString = String(valB);
+
+    if (valAString < valBString) return asc.value ? -1 : 1;
+    if (valAString > valBString) return asc.value ? 1 : -1;
     return 0
   })
 })

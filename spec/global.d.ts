@@ -1,4 +1,7 @@
+/// <reference types="@playwright/test" />
+
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Window {
     generateUniqueId: () => number;
       waitForVue: (page: object) => Promise<void>; // Adicionado

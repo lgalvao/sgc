@@ -4,10 +4,7 @@
       <span
           class="badge text-bg-secondary mb-2"
           style="border-radius: 0"
-      >Processo</span>
-      <h1 class="display-6 mb-3">
-        Detalhes do processo
-      </h1>
+      >Detalhes do processo</span>
       <h2
           class="display-6"
           data-testid="processo-info"
@@ -166,7 +163,8 @@
             <div class="alert alert-info">
               <i class="bi bi-info-circle"/>
               Confirma a finalização do processo <strong>{{ processo?.descricao }}</strong>?<br>
-              Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.
+              Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
+              participantes do processo.
             </div>
           </div>
           <div class="modal-footer">
@@ -368,7 +366,8 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
   })
 }
 
-function abrirDetalhesUnidade(item: TreeTableItem) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function abrirDetalhesUnidade(item: any) {
   if (item) {
     const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
     if (Subprocesso && Subprocesso.unidade) {
@@ -396,8 +395,8 @@ async function finalizarProcesso() {
 
   if (!todosHomologados) {
     notificacoesStore.erro(
-      'Não é possível encerrar o processo',
-      'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado.'
+        'Não é possível encerrar o processo',
+        'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado.'
     );
     return;
   }
@@ -435,17 +434,17 @@ async function executarFinalizacao() {
         // Notificar unidades operacionais/interoperacionais diretamente
         unidadesSubordinadas.forEach(siglaUnidade => {
           notificacoesStore.email(
-            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao, siglaUnidade),
-            `Responsável pela ${siglaUnidade}`,
-            EMAIL_TEMPLATES.CORPO_EMAIL_OPERACIONAL(processoAtual.descricao, siglaUnidade)
+              EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao, siglaUnidade),
+              `Responsável pela ${siglaUnidade}`,
+              EMAIL_TEMPLATES.CORPO_EMAIL_OPERACIONAL(processoAtual.descricao, siglaUnidade)
           );
         });
       } else {
         // Notificar unidades superiores com lista de subordinadas
         notificacoesStore.email(
-          EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior),
-          `Responsável pela ${unidadeSuperior}`,
-          EMAIL_TEMPLATES.CORPO_EMAIL_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior, unidadesSubordinadas)
+            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior),
+            `Responsável pela ${unidadeSuperior}`,
+            EMAIL_TEMPLATES.CORPO_EMAIL_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior, unidadesSubordinadas)
         );
       }
     }
@@ -462,8 +461,8 @@ async function executarFinalizacao() {
     });
 
     notificacoesStore.sucesso(
-      'Processo finalizado',
-      'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
+        'Processo finalizado',
+        'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
     );
 
     await router.push('/painel');
@@ -471,8 +470,8 @@ async function executarFinalizacao() {
   } catch (error) {
     console.error('Erro ao finalizar processo:', error);
     notificacoesStore.erro(
-      'Erro ao finalizar processo',
-      'Ocorreu um erro durante a finalização. Tente novamente.'
+        'Erro ao finalizar processo',
+        'Ocorreu um erro durante a finalização. Tente novamente.'
     );
   }
 }

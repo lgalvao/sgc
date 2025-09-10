@@ -26,7 +26,13 @@ function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataL
 defineStore('subprocessos', {
     state: () => {
         return {
-            subprocessos: subprocessosMock.map(parseSubprocessoDates) as Subprocesso[],
+            subprocessos: (subprocessosMock as (Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
+                dataLimiteEtapa1?: string | null;
+                dataLimiteEtapa2?: string | null;
+                dataFimEtapa1?: string | null;
+                dataFimEtapa2?: string | null;
+                movimentacoes: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string; }>;
+            })[]).map(parseSubprocessoDates) as Subprocesso[],
         };
     },
     getters: {
@@ -35,6 +41,7 @@ defineStore('subprocessos', {
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
             const subprocesso = state.subprocessos.find(sp => sp.id === idSubprocesso);
+
             return subprocesso ? subprocesso.movimentacoes.sort((a: Movimentacao, b: Movimentacao) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
         },
         getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {

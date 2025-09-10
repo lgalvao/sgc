@@ -1,3 +1,5 @@
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
+
 export enum Perfil {
     ADMIN = 'ADMIN',
     GESTOR = 'GESTOR',
@@ -30,7 +32,7 @@ export interface Subprocesso {
     id: number;
     idProcesso: number;
     unidade: string;
-    situacao: string;
+    situacao: typeof SITUACOES_SUBPROCESSO[keyof typeof SITUACOES_SUBPROCESSO];
     unidadeAtual: string;
     unidadeAnterior: string | null;
     dataLimiteEtapa1: Date;

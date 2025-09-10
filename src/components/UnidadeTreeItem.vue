@@ -6,7 +6,7 @@
           :checked="isChecked(unidade.sigla)"
           class="form-check-input"
           type="checkbox"
-          :indeterminate="isIndeterminate(unidade)"
+          :indeterminate.prop="isIndeterminate(unidade) !== false"
           @change="() => toggleUnidade(unidade)"
       >
       <label

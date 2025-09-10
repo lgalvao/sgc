@@ -1,17 +1,21 @@
-import {expect, test} from "@playwright/test";
-import {login} from "~/utils/auth";
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
+import {loginAsAdmin} from "~/utils/auth";
+import {waitForNotification} from '../cdu/test-helpers';
 
 test.describe('Cadastro de Mapa de Competências', () => {
     test.beforeEach(async ({page}) => {
-        await login(page);
+        await loginAsAdmin(page);
+        await page.waitForURL('**/painel');
+
         // Navega diretamente para o novo endpoint padronizado
-        await page.goto('/processo/1/SESEL');
-        await page.waitForLoadState('networkidle');
-        await page.goto('/processo/1/SESEL/mapa');
+        await page.goto('/processo/4/SESEL/mapa');
+        await page.waitForLoadState('domcontentloaded');
         await page.waitForLoadState('networkidle');
     });
 
     test('deve criar uma nova competência com sucesso', async ({page}) => {
+        await page.getByTestId('btn-abrir-criar-competencia').waitFor({state: 'visible'});
         await page.getByTestId('btn-abrir-criar-competencia').click();
         await page.getByTestId('input-nova-competencia').waitFor({state: 'visible'});
 
@@ -19,8 +23,8 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.getByTestId('input-nova-competencia').fill(competenciaDescricao);
 
         // Selecionar as duas primeiras atividades
-        await page.locator('.atividade-card-item').nth(0).click();
-        await page.locator('.atividade-card-item').nth(1).click();
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(0).click();
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(1).click();
         await page.waitForLoadState('domcontentloaded');
 
         await page.getByTestId('btn-criar-competencia').click();
@@ -31,10 +35,11 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve editar uma competência existente', async ({page}) => {
         // Criar uma competência para editar
+        await page.getByTestId('btn-abrir-criar-competencia').waitFor({state: 'visible'});
         await page.getByTestId('btn-abrir-criar-competencia').click();
         const competenciaOriginal = 'Competência para Edição ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaOriginal);
-        await page.locator('.atividade-card-item').nth(0).click();
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(0).click();
         await page.getByTestId('btn-criar-competencia').click();
         await expect(page.getByText(competenciaOriginal)).toBeVisible();
 
@@ -47,8 +52,8 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.getByTestId('input-nova-competencia').fill(competenciaEditada);
 
         // Desmarcar a primeira atividade e marcar a segunda
-        await page.locator('.atividade-card-item').nth(0).click(); // Desmarcar
-        await page.locator('.atividade-card-item').nth(1).click(); // Marcar
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(0).click(); // Desmarcar
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(1).click(); // Marcar
 
         await page.getByTestId('btn-criar-competencia').click(); // O mesmo botão "Salvar"
 
@@ -59,10 +64,11 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve excluir uma competência', async ({page}) => {
         // Criar uma competência para excluir
+        await page.getByTestId('btn-abrir-criar-competencia').waitFor({state: 'visible'});
         await page.getByTestId('btn-abrir-criar-competencia').click();
         const competenciaParaExcluir = 'Competência para Excluir ' + Date.now();
         await page.getByTestId('input-nova-competencia').fill(competenciaParaExcluir);
-        await page.locator('.atividade-card-item').nth(0).click();
+        await page.locator('[data-testid="atividade-nao-associada"] label').nth(0).click();
         await page.getByTestId('btn-criar-competencia').click();
         await expect(page.getByText(competenciaParaExcluir)).toBeVisible();
 
@@ -77,15 +83,17 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
     test('deve disponibilizar o mapa com sucesso', async ({page}) => {
         // Criar uma competência abrangente que associe TODAS as atividades disponíveis
+        await page.getByTestId('btn-abrir-criar-competencia').waitFor({state: 'visible'});
         await page.getByTestId('btn-abrir-criar-competencia').click();
+        await page.getByTestId('input-nova-competencia').waitFor({state: 'visible'}); // Esperar o modal abrir completamente
+
         await page.getByTestId('input-nova-competencia').fill('Competência Completa para Teste ' + Date.now());
 
         // Selecionar TODAS as atividades disponíveis para passar nas validações
-        const atividadeCards = page.locator('.atividade-card-item');
-        const count = await atividadeCards.count();
+        const atividadeCards = page.locator('[data-testid="atividade-nao-associada"] label');
 
-        for (let i = 0; i < count; i++) {
-            await atividadeCards.nth(i).click();
+        while (await atividadeCards.count() > 0) {
+            await atividadeCards.first().click();
         }
 
         await page.getByTestId('btn-criar-competencia').click();
@@ -100,6 +108,6 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: 'Disponibilizar'}).click();
 
         // Verificar a notificação de sucesso
-        await expect(page.getByTestId('notificacao-disponibilizacao')).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
+        await waitForNotification(page, 'info', 'Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.', 'notificacao-disponibilizacao');
     });
 });

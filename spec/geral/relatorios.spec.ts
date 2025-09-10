@@ -1,4 +1,5 @@
-import {expect, test} from "@playwright/test";
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
 import {login} from "~/utils/auth";
 
 test.describe('Relatórios', () => {
