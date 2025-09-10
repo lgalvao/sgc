@@ -1,37 +1,38 @@
 <template>
   <div class="notification-container">
     <TransitionGroup
-        name="notification"
-        tag="div"
-        class="notifications"
+      name="notification"
+      tag="div"
+      class="notifications"
     >
       <div
-          v-for="notificacao in notificacoes"
-          :key="notificacao.id"
-          :class="['notification', `notification-${notificacao.tipo}`]"
+        v-for="notificacao in notificacoes"
+        :key="notificacao.id"
+        :class="['notification', `notification-${notificacao.tipo}`]"
+        :data-testid="`notificacao-${notificacao.id}`"
       >
         <div class="notification-content">
           <div class="notification-header">
             <i
-                :class="iconeTipo(notificacao.tipo)"
-                class="me-2"
+              :class="iconeTipo(notificacao.tipo)"
+              class="me-2"
             />
             <strong>{{ notificacao.titulo }}</strong>
             <button
-                type="button"
-                class="btn-close btn-close-white ms-auto"
-                @click="removerNotificacao(notificacao.id)"
+              type="button"
+              class="btn-close btn-close-white ms-auto"
+              @click="removerNotificacao(notificacao.id)"
             />
           </div>
           <div class="notification-body">
             {{ notificacao.mensagem }}
             <div
-                v-if="notificacao.tipo === 'email' && notificacao.emailContent"
-                class="mt-2"
+              v-if="notificacao.tipo === 'email' && notificacao.emailContent"
+              class="mt-2"
             >
               <button
-                  class="btn btn-sm btn-outline-primary"
-                  @click="mostrarEmail(notificacao)"
+                class="btn btn-sm btn-outline-primary"
+                @click="mostrarEmail(notificacao)"
               >
                 Ver e-mail completo
               </button>
@@ -43,22 +44,22 @@
 
     <!-- Modal para visualizar e-mail completo -->
     <div
-        v-if="emailModalVisivel"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="emailModalVisivel"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              <i class="bi bi-envelope me-2"/>
+              <i class="bi bi-envelope me-2" />
               E-mail Simulado
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharEmailModal"
+              type="button"
+              class="btn-close"
+              @click="fecharEmailModal"
             />
           </div>
           <div class="modal-body">
@@ -79,9 +80,9 @@
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharEmailModal"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharEmailModal"
             >
               Fechar
             </button>
@@ -91,8 +92,8 @@
     </div>
 
     <div
-        v-if="emailModalVisivel"
-        class="modal-backdrop fade show"
+      v-if="emailModalVisivel"
+      class="modal-backdrop fade show"
     />
   </div>
 </template>

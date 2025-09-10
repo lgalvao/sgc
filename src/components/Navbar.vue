@@ -2,90 +2,90 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
     <div class="container">
       <router-link
-          class="navbar-brand"
-          to="/painel"
+        class="navbar-brand"
+        to="/painel"
       >
         SGC
       </router-link>
       <button
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Alternar navegação"
-          class="navbar-toggler"
-          data-bs-target="#navbarNav"
-          data-bs-toggle="collapse"
-          type="button"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Alternar navegação"
+        class="navbar-toggler"
+        data-bs-target="#navbarNav"
+        data-bs-toggle="collapse"
+        type="button"
       >
-        <span class="navbar-toggler-icon"/>
+        <span class="navbar-toggler-icon" />
       </button>
 
       <div
-          id="navbarNav"
-          class="collapse navbar-collapse"
+        id="navbarNav"
+        class="collapse navbar-collapse"
       >
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 left-nav">
           <li class="nav-item">
             <a
-                class="nav-link"
-                href="#"
-                @click.prevent="navigateFromNavbar('/painel')"
+              class="nav-link"
+              href="#"
+              @click.prevent="navigateFromNavbar('/painel')"
             >
-              <i class="bi bi-house-door"/> Painel
+              <i class="bi bi-house-door" /> Painel
             </a>
           </li>
           <li class="nav-item">
             <a
-                class="nav-link"
-                href="#"
-                @click.prevent="navigateFromNavbar(`/unidade/${unidadeSelecionada}`)"
+              class="nav-link"
+              href="#"
+              @click.prevent="navigateFromNavbar(`/unidade/${unidadeSelecionada}`)"
             >
-              <i class="bi bi-person"/> Minha unidade
+              <i class="bi bi-person" /> Minha unidade
             </a>
           </li>
           <li class="nav-item">
             <a
-                class="nav-link"
-                href="#"
-                @click.prevent="navigateFromNavbar('/relatorios')"
+              class="nav-link"
+              href="#"
+              @click.prevent="navigateFromNavbar('/relatorios')"
             >
-              <i class="bi bi-bar-chart-line"/> Relatórios
+              <i class="bi bi-bar-chart-line" /> Relatórios
             </a>
           </li>
           <li class="nav-item">
             <a
-                class="nav-link"
-                href="#"
-                @click.prevent="navigateFromNavbar('/historico')"
+              class="nav-link"
+              href="#"
+              @click.prevent="navigateFromNavbar('/historico')"
             >
-              <i class="bi bi-clock-history"/> Histórico
+              <i class="bi bi-clock-history" /> Histórico
             </a>
           </li>
         </ul>
 
         <ul class="navbar-nav align-items-center">
           <li class="nav-item me-3 d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 fs-5"/>
+            <i class="bi bi-person-circle me-2 fs-5" />
             <span
-                v-if="!isEditingProfile && servidorLogado"
-                class="nav-link"
-                style="cursor: pointer;"
-                @click="startEditingProfile"
+              v-if="!isEditingProfile && servidorLogado"
+              class="nav-link"
+              style="cursor: pointer;"
+              @click="startEditingProfile"
             >
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
 
             <select
-                v-else
-                ref="profileSelect"
-                :value="selectedProfileKey"
-                class="form-select form-select-sm"
-                @blur="stopEditingProfile"
-                @change="handleProfileChange"
+              v-else
+              ref="profileSelect"
+              :value="selectedProfileKey"
+              class="form-select form-select-sm"
+              @blur="stopEditingProfile"
+              @change="handleProfileChange"
             >
               <option
-                  v-for="perfil in perfisDisponiveis"
-                  :key="perfil.id"
-                  :value="perfil.id"
+                v-for="perfil in perfisDisponiveis"
+                :key="perfil.id"
+                :value="perfil.id"
               >
                 {{ perfil.perfil }} - {{ perfil.unidade }} ({{ perfil.nome }})
               </option>
@@ -93,26 +93,26 @@
           </li>
 
           <li
-              v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-              class="nav-item me-2"
+            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            class="nav-item me-2"
           >
             <a
-                class="nav-link"
-                href="#"
-                title="Configurações do sistema"
-                @click.prevent="navigateFromNavbar('/configuracoes')"
+              class="nav-link"
+              href="#"
+              title="Configurações do sistema"
+              @click.prevent="navigateFromNavbar('/configuracoes')"
             >
-              <i class="bi bi-gear fs-5"/>
+              <i class="bi bi-gear fs-5" />
             </a>
           </li>
 
           <li class="nav-item">
             <router-link
-                class="nav-link"
-                title="Sair"
-                to="/login"
+              class="nav-link"
+              title="Sair"
+              to="/login"
             >
-              <i class="bi bi-box-arrow-right fs-5"/>
+              <i class="bi bi-box-arrow-right fs-5" />
             </router-link>
           </li>
         </ul>

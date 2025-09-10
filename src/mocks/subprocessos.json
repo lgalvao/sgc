@@ -47,13 +47,6 @@
     "movimentacoes": []
   },
   {
-    "id": 26,
-    "idProcesso": 2,
-    "unidade": "SESEL",
-    "dataLimiteEtapa1": "2025-07-15",
-    "dataLimiteEtapa2": "2025-08-15",
-    "dataFimEtapa1": "2025-07-15",
-    "dataFimEtapa2": null,
     "situacao": "Mapa homologado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC",
@@ -184,7 +177,7 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Mapa homologado",
+    "situacao": "Revisão do cadastro homologada",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC",
     "movimentacoes": []

@@ -183,13 +183,61 @@ export async function expectConfirmationModal(page: Page, text1: string, text2: 
  * @param type The type of notification ('success', 'error', 'info').
  * @param message The message text to expect in the notification.
  */
-export async function waitForNotification(page: Page, type: 'success' | 'error' | 'info', message: string, testId?: string): Promise<void> {
-    const notificationLocator = testId ? page.getByTestId(testId) : page.locator(`.notification.notification-${type}`);
+export async function waitForNotification(page: Page, type: 'success' | 'error' | 'info' | 'warning', message: string, dataTestId: string) {
+    const notificationLocator = page.getByTestId(dataTestId);
 
     // Wait for the notification to appear
-    await expect(notificationLocator).toBeVisible({timeout: 10000}); // Increased timeout for appearance
+    await notificationLocator.waitFor({state: 'visible', timeout: 5000});
+
+    // Assert the message
     await expect(notificationLocator).toContainText(message);
 
     // Wait for the notification to disappear
     await notificationLocator.waitFor({state: 'hidden', timeout: 10000}); // Increased timeout for disappearance
 }
+
+/**
+ * Helper function to simulate login as ADMIN.
+ * @param page Playwright Page object.
+ */
+export async function loginAsAdmin(page: Page): Promise<void> {
+    await page.context().addInitScript(() => {
+        localStorage.setItem('idServidor', '6'); // Ricardo Alves
+        localStorage.setItem('perfilSelecionado', 'ADMIN');
+        localStorage.setItem('unidadeSelecionada', 'SEDOC');
+    });
+    await page.goto('/painel');
+    await expect(page).toHaveURL(/\/painel/);
+    await expectCommonPainelElements(page);
+}
+
+/**
+ * Helper function to simulate login as GESTOR.
+ * @param page Playwright Page object.
+ */
+export async function loginAsGestor(page: Page): Promise<void> {
+    await page.context().addInitScript(() => {
+        localStorage.setItem('idServidor', '1'); // Ana Paula Souza
+        localStorage.setItem('perfilSelecionado', 'GESTOR');
+        localStorage.setItem('unidadeSelecionada', 'SESEL');
+    });
+    await page.goto('/painel');
+    await expect(page).toHaveURL(/\/painel/);
+    await expectTextVisible(page, 'Painel');
+}
+
+/**
+ * Helper function to simulate login as CHEFE.
+ * @param page Playwright Page object.
+ */
+export async function loginAsChefe(page: Page): Promise<void> {
+    await page.context().addInitScript(() => {
+        localStorage.setItem('idServidor', '14'); // Maroca Silva
+        localStorage.setItem('perfilSelecionado', 'CHEFE');
+        localStorage.setItem('unidadeSelecionada', 'STIC');
+    });
+    await page.goto('/painel');
+    await expect(page).toHaveURL(/\/painel/);
+    await expectTextVisible(page, 'Painel');
+}
+

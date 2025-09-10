@@ -8,13 +8,13 @@
     <div class="row mb-4">
       <div class="col-md-4">
         <label
-            for="filtroTipo"
-            class="form-label"
+          for="filtroTipo"
+          class="form-label"
         >Tipo de Processo</label>
         <select
-            id="filtroTipo"
-            v-model="filtroTipo"
-            class="form-select"
+          id="filtroTipo"
+          v-model="filtroTipo"
+          class="form-select"
         >
           <option value="">
             Todos
@@ -32,26 +32,26 @@
       </div>
       <div class="col-md-4">
         <label
-            for="filtroDataInicio"
-            class="form-label"
+          for="filtroDataInicio"
+          class="form-label"
         >Data Início</label>
         <input
-            id="filtroDataInicio"
-            v-model="filtroDataInicio"
-            type="date"
-            class="form-control"
+          id="filtroDataInicio"
+          v-model="filtroDataInicio"
+          type="date"
+          class="form-control"
         >
       </div>
       <div class="col-md-4">
         <label
-            for="filtroDataFim"
-            class="form-label"
+          for="filtroDataFim"
+          class="form-label"
         >Data Fim</label>
         <input
-            id="filtroDataFim"
-            v-model="filtroDataFim"
-            type="date"
-            class="form-control"
+          id="filtroDataFim"
+          v-model="filtroDataFim"
+          type="date"
+          class="form-control"
         >
       </div>
     </div>
@@ -59,9 +59,9 @@
     <div class="row">
       <div class="col-md-4 mb-4">
         <div
-            class="card h-100"
-            style="cursor: pointer;"
-            @click="abrirModalMapasVigentes"
+          class="card h-100"
+          style="cursor: pointer;"
+          @click="abrirModalMapasVigentes"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -76,9 +76,9 @@
       </div>
       <div class="col-md-4 mb-4">
         <div
-            class="card h-100"
-            style="cursor: pointer;"
-            @click="abrirModalDiagnosticosGaps"
+          class="card h-100"
+          style="cursor: pointer;"
+          @click="abrirModalDiagnosticosGaps"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -93,9 +93,9 @@
       </div>
       <div class="col-md-4 mb-4">
         <div
-            class="card h-100"
-            style="cursor: pointer;"
-            @click="abrirModalAndamentoGeral"
+          class="card h-100"
+          style="cursor: pointer;"
+          @click="abrirModalAndamentoGeral"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -112,9 +112,9 @@
 
     <!-- Modal Mapas Vigentes -->
     <div
-        id="modalMapasVigentes"
-        class="modal fade"
-        tabindex="-1"
+      id="modalMapasVigentes"
+      class="modal fade"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -123,18 +123,18 @@
               Mapas Vigentes
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                  class="btn btn-outline-primary btn-sm"
-                  @click="exportarMapasVigentes"
+                class="btn btn-outline-primary btn-sm"
+                @click="exportarMapasVigentes"
               >
-                <i class="bi bi-download"/> Exportar CSV
+                <i class="bi bi-download" /> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -149,10 +149,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                <tr
+                  <tr
                     v-for="mapa in mapasVigentes"
                     :key="mapa.id"
-                >
+                  >
                     <td>{{ mapa.unidade }}</td>
                     <td>{{ mapa.idProcesso }}</td>
                     <td>{{ mapa.competencias?.length || 0 }}</td>
@@ -169,9 +169,9 @@
 
     <!-- Modal Diagnósticos de Gaps -->
     <div
-        id="modalDiagnosticosGaps"
-        class="modal fade"
-        tabindex="-1"
+      id="modalDiagnosticosGaps"
+      class="modal fade"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -180,18 +180,18 @@
               Diagnósticos de Gaps
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                  class="btn btn-outline-primary btn-sm"
-                  @click="exportarDiagnosticosGaps"
+                class="btn btn-outline-primary btn-sm"
+                @click="exportarDiagnosticosGaps"
               >
-                <i class="bi bi-download"/> Exportar CSV
+                <i class="bi bi-download" /> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -209,10 +209,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                <tr
+                  <tr
                     v-for="diagnostico in diagnosticosGapsFiltrados"
                     :key="diagnostico.id"
-                >
+                  >
                     <td>{{ diagnostico.processo }}</td>
                     <td>{{ diagnostico.unidade }}</td>
                     <td>{{ diagnostico.gaps }}</td>
@@ -240,9 +240,9 @@
 
     <!-- Modal Andamento Geral -->
     <div
-        id="modalAndamentoGeral"
-        class="modal fade"
-        tabindex="-1"
+      id="modalAndamentoGeral"
+      class="modal fade"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -251,18 +251,18 @@
               Andamento Geral dos Processos
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                  class="btn btn-outline-primary btn-sm"
-                  @click="exportarAndamentoGeral"
+                class="btn btn-outline-primary btn-sm"
+                @click="exportarAndamentoGeral"
               >
-                <i class="bi bi-download"/> Exportar CSV
+                <i class="bi bi-download" /> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
@@ -278,10 +278,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                <tr
+                  <tr
                     v-for="processo in processosFiltrados"
                     :key="processo.id"
-                >
+                  >
                     <td>{{ processo.descricao }}</td>
                     <td>{{ processo.tipo }}</td>
                     <td>{{ processo.situacao }}</td>

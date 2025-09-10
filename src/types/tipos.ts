@@ -42,6 +42,7 @@ export interface Subprocesso {
     sugestoes?: string;
     observacoes?: string; // Adicionado
     movimentacoes: Movimentacao[]; // Adicionado
+    analises: AnaliseValidacao[]; // Adicionado
     idMapaCopiado?: number;
 }
 

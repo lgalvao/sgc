@@ -4,17 +4,17 @@
       Histórico de processos
     </h2>
     <TabelaProcessos
-        :processos="processosFinalizadosOrdenadosComFormatacao"
-        :criterio-ordenacao="criterio"
-        :direcao-ordenacao-asc="asc"
-        :show-data-finalizacao="true"
-        @ordenar="ordenarPor"
-        @selecionar-processo="abrirProcesso"
+      :processos="processosFinalizadosOrdenadosComFormatacao"
+      :criterio-ordenacao="criterio"
+      :direcao-ordenacao-asc="asc"
+      :show-data-finalizacao="true"
+      @ordenar="ordenarPor"
+      @selecionar-processo="abrirProcesso"
     />
 
     <div
-        v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
-        class="alert alert-info mt-4"
+      v-if="processosFinalizadosOrdenadosComFormatacao.length === 0"
+      class="alert alert-info mt-4"
     >
       Nenhum processo finalizado.
     </div>

@@ -108,6 +108,9 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: 'Disponibilizar'}).click();
 
         // Verificar a notificação de sucesso
-        await waitForNotification(page, 'info', 'Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.', 'notificacao-disponibilizacao');
+        const notificacaoDisponibilizacaoLocator = page.getByTestId('notificacao-disponibilizacao');
+        await notificacaoDisponibilizacaoLocator.waitFor({state: 'visible', timeout: 5000});
+        await expect(notificacaoDisponibilizacaoLocator).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
+        // Não esperamos que ela desapareça automaticamente, pois é uma notificação local no modal.
     });
 });

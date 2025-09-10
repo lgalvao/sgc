@@ -9,16 +9,16 @@
       </div>
       <div class="d-flex gap-2">
         <button
-            class="btn btn-outline-success"
-            @click="finalizarIdentificacao"
+          class="btn btn-outline-success"
+          @click="finalizarIdentificacao"
         >
-          <i class="bi bi-check-circle me-2"/>Finalizar Identificação
+          <i class="bi bi-check-circle me-2" />Finalizar Identificação
         </button>
       </div>
     </div>
 
     <div class="alert alert-info">
-      <i class="bi bi-info-circle me-2"/>
+      <i class="bi bi-info-circle me-2" />
       Identifique as ocupações críticas da unidade baseadas nas competências avaliadas no diagnóstico.
     </div>
 
@@ -31,15 +31,15 @@
       </div>
       <div class="card-body">
         <div
-            v-if="ocupacoesCriticas.length === 0"
-            class="text-muted"
+          v-if="ocupacoesCriticas.length === 0"
+          class="text-muted"
         >
           Nenhuma ocupação crítica identificada ainda.
         </div>
         <div
-            v-for="(ocupacao, index) in ocupacoesCriticas"
-            :key="index"
-            class="border rounded p-3 mb-3"
+          v-for="(ocupacao, index) in ocupacoesCriticas"
+          :key="index"
+          class="border rounded p-3 mb-3"
         >
           <div class="d-flex justify-content-between align-items-start">
             <div class="flex-grow-1">
@@ -53,19 +53,19 @@
                 <strong>Competências críticas associadas:</strong>
                 <div class="d-flex flex-wrap gap-1 mt-1">
                   <span
-                      v-for="comp in ocupacao.competenciasCriticas"
-                      :key="comp"
-                      class="badge bg-warning text-dark"
+                    v-for="comp in ocupacao.competenciasCriticas"
+                    :key="comp"
+                    class="badge bg-warning text-dark"
                   >{{ comp }}</span>
                 </div>
               </div>
               <small class="text-muted">Nível de criticidade: {{ ocupacao.nivelCriticidade }}/5</small>
             </div>
             <button
-                class="btn btn-sm btn-outline-danger"
-                @click="removerOcupacao(index)"
+              class="btn btn-sm btn-outline-danger"
+              @click="removerOcupacao(index)"
             >
-              <i class="bi bi-trash"/>
+              <i class="bi bi-trash" />
             </button>
           </div>
         </div>
@@ -85,18 +85,18 @@
             <div class="col-md-6">
               <label class="form-label">Nome da Ocupação</label>
               <input
-                  v-model="novaOcupacao.nome"
-                  type="text"
-                  class="form-control"
-                  required
+                v-model="novaOcupacao.nome"
+                type="text"
+                class="form-control"
+                required
               >
             </div>
             <div class="col-md-6">
               <label class="form-label">Nível de Criticidade</label>
               <select
-                  v-model="novaOcupacao.nivelCriticidade"
-                  class="form-select"
-                  required
+                v-model="novaOcupacao.nivelCriticidade"
+                class="form-select"
+                required
               >
                 <option value="1">
                   1 - Baixo
@@ -118,19 +118,19 @@
             <div class="col-12">
               <label class="form-label">Descrição</label>
               <textarea
-                  v-model="novaOcupacao.descricao"
-                  class="form-control"
-                  rows="3"
-                  required
+                v-model="novaOcupacao.descricao"
+                class="form-control"
+                rows="3"
+                required
               />
             </div>
             <div class="col-12">
               <label class="form-label">Competências Críticas Associadas</label>
               <div class="border rounded p-3">
                 <div
-                    v-for="competencia in competencias"
-                    :key="competencia.id"
-                    class="form-check"
+                  v-for="competencia in competencias"
+                  :key="competencia.id"
+                  class="form-check"
                 >
                   <input
                     :id="'comp-' + competencia.id"
@@ -140,8 +140,8 @@
                     class="form-check-input"
                   >
                   <label
-                      :for="'comp-' + competencia.id"
-                      class="form-check-label"
+                    :for="'comp-' + competencia.id"
+                    class="form-check-label"
                   >
                     {{ competencia.descricao }}
                   </label>
@@ -150,10 +150,10 @@
             </div>
             <div class="col-12">
               <button
-                  type="submit"
-                  class="btn btn-primary"
+                type="submit"
+                class="btn btn-primary"
               >
-                <i class="bi bi-plus-circle me-2"/>Adicionar Ocupação
+                <i class="bi bi-plus-circle me-2" />Adicionar Ocupação
               </button>
             </div>
           </div>
@@ -163,10 +163,10 @@
 
     <!-- Modal de confirmação -->
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalConfirmacao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -175,9 +175,9 @@
               Finalizar Identificação
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn-close"
+              @click="fecharModalConfirmacao"
             />
           </div>
           <div class="modal-body">
@@ -185,16 +185,16 @@
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalConfirmacao"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-success"
-                @click="confirmarFinalizacao"
+              type="button"
+              class="btn btn-success"
+              @click="confirmarFinalizacao"
             >
               Confirmar
             </button>
@@ -203,8 +203,8 @@
       </div>
     </div>
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalConfirmacao"
+      class="modal-backdrop fade show"
     />
   </div>
 </template>

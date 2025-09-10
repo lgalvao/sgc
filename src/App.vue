@@ -34,15 +34,15 @@ const shouldShowNavBarExtras = computed(() => {
 </script>
 
 <template>
-  <Navbar v-if="route.path !== '/login'"/>
+  <Navbar v-if="route.path !== '/login'" />
   <div
-      v-if="shouldShowNavBarExtras"
-      class="bg-light border-bottom"
+    v-if="shouldShowNavBarExtras"
+    class="bg-light border-bottom"
   >
     <div class="container py-2">
-      <BarraNavegacao/>
+      <BarraNavegacao />
     </div>
   </div>
-  <router-view/>
+  <router-view />
   <NotificacaoContainer />
 </template>

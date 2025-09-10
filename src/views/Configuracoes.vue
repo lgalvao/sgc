@@ -4,16 +4,16 @@
     <form @submit.prevent="salvarConfiguracoes">
       <div class="mb-3">
         <label
-            class="form-label"
-            for="diasInativacaoProcesso"
+          class="form-label"
+          for="diasInativacaoProcesso"
         >Dias para inativação de processos:</label>
         <input
-            id="diasInativacaoProcesso"
-            v-model.number="configuracoesStore.diasInativacaoProcesso"
-            class="form-control"
-            min="1"
-            required
-            type="number"
+          id="diasInativacaoProcesso"
+          v-model.number="configuracoesStore.diasInativacaoProcesso"
+          class="form-control"
+          min="1"
+          required
+          type="number"
         >
         <div class="form-text">
           Dias depois da finalização de um processo para que seja considerado inativo.
@@ -22,16 +22,16 @@
 
       <div class="mb-3">
         <label
-            class="form-label"
-            for="diasAlertaNovo"
+          class="form-label"
+          for="diasAlertaNovo"
         >Dias para indicação de alerta como novo:</label>
         <input
-            id="diasAlertaNovo"
-            v-model.number="configuracoesStore.diasAlertaNovo"
-            class="form-control"
-            min="1"
-            required
-            type="number"
+          id="diasAlertaNovo"
+          v-model.number="configuracoesStore.diasAlertaNovo"
+          class="form-control"
+          min="1"
+          required
+          type="number"
         >
         <div class="form-text">
           Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como
@@ -40,16 +40,16 @@
       </div>
 
       <button
-          class="btn btn-primary"
-          type="submit"
+        class="btn btn-primary"
+        type="submit"
       >
         Salvar
       </button>
     </form>
     <div
-        v-if="mensagemSucesso"
-        class="alert alert-success mt-3"
-        role="alert"
+      v-if="mensagemSucesso"
+      class="alert alert-success mt-3"
+      role="alert"
     >
       {{ mensagemSucesso }}
     </div>
@@ -72,8 +72,8 @@
                 Processo de mapeamento ativo com unidades em diferentes etapas do fluxo.
               </p>
               <button
-                  class="btn btn-outline-primary"
-                  @click="carregarCenarioAndamento"
+                class="btn btn-outline-primary"
+                @click="carregarCenarioAndamento"
               >
                 Carregar Cenário
               </button>
@@ -91,8 +91,8 @@
                 Processo concluído com mapas vigentes para demonstração de relatórios.
               </p>
               <button
-                  class="btn btn-outline-success"
-                  @click="carregarCenarioFinalizado"
+                class="btn btn-outline-success"
+                @click="carregarCenarioFinalizado"
               >
                 Carregar Cenário
               </button>
@@ -110,8 +110,8 @@
                 Processo de revisão com alterações e validações em andamento.
               </p>
               <button
-                  class="btn btn-outline-warning"
-                  @click="carregarCenarioRevisao"
+                class="btn btn-outline-warning"
+                @click="carregarCenarioRevisao"
               >
                 Carregar Cenário
               </button>
@@ -129,8 +129,8 @@
                 Processo de diagnóstico com gaps identificados e relatórios completos.
               </p>
               <button
-                  class="btn btn-outline-info"
-                  @click="carregarCenarioDiagnostico"
+                class="btn btn-outline-info"
+                @click="carregarCenarioDiagnostico"
               >
                 Carregar Cenário
               </button>
@@ -141,18 +141,18 @@
 
       <div class="mt-3">
         <button
-            class="btn btn-outline-secondary"
-            @click="resetarDados"
+          class="btn btn-outline-secondary"
+          @click="resetarDados"
         >
-          <i class="bi bi-arrow-counterclockwise"/> Resetar Todos os Dados
+          <i class="bi bi-arrow-counterclockwise" /> Resetar Todos os Dados
         </button>
       </div>
     </div>
 
     <div
-        v-if="mensagemCenario"
-        class="alert alert-info mt-3"
-        role="alert"
+      v-if="mensagemCenario"
+      class="alert alert-info mt-3"
+      role="alert"
     >
       {{ mensagemCenario }}
     </div>

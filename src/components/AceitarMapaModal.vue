@@ -1,42 +1,42 @@
 <template>
   <!-- Modal para aceitar mapa com observações -->
   <div
-      v-if="mostrarModal"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    v-if="mostrarModal"
+    class="modal fade show"
+    style="display: block;"
+    tabindex="-1"
   >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5
-              class="modal-title"
-              data-testid="modal-aceite-title"
+            class="modal-title"
+            data-testid="modal-aceite-title"
           >
-            <i class="bi bi-check-circle text-success me-2"/>
+            <i class="bi bi-check-circle text-success me-2" />
             {{ tituloModal }}
           </h5>
           <button
-              type="button"
-              class="btn-close"
-              data-testid="modal-aceite-close"
-              @click="$emit('fecharModal')"
+            type="button"
+            class="btn-close"
+            data-testid="modal-aceite-close"
+            @click="$emit('fecharModal')"
           />
         </div>
         <div
-            class="modal-body"
-            data-testid="modal-aceite-body"
+          class="modal-body"
+          data-testid="modal-aceite-body"
         >
           <p v-if="perfil === 'ADMIN'">
             {{ corpoModal }}
           </p>
           <div
-              v-else
-              class="mb-3"
+            v-else
+            class="mb-3"
           >
             <label
-                for="observacao-textarea"
-                class="form-label"
+              for="observacao-textarea"
+              class="form-label"
             >{{ corpoModal }}</label>
             <textarea
               id="observacao-textarea"
@@ -53,12 +53,12 @@
         </div>
         <div class="modal-footer">
           <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="modal-aceite-cancelar"
-              @click="$emit('fecharModal')"
+            type="button"
+            class="btn btn-secondary"
+            data-testid="modal-aceite-cancelar"
+            @click="$emit('fecharModal')"
           >
-            <i class="bi bi-x-circle me-1"/>
+            <i class="bi bi-x-circle me-1" />
             Cancelar
           </button>
           <button
@@ -67,7 +67,7 @@
             data-testid="modal-aceite-confirmar"
             @click="$emit('confirmarAceitacao', observacao)"
           >
-            <i class="bi bi-check-circle me-1"/>
+            <i class="bi bi-check-circle me-1" />
             Aceitar
           </button>
         </div>
@@ -75,8 +75,8 @@
     </div>
   </div>
   <div
-      v-if="mostrarModal"
-      class="modal-backdrop fade show"
+    v-if="mostrarModal"
+    class="modal-backdrop fade show"
   />
 </template>
 

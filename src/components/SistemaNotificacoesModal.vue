@@ -1,21 +1,21 @@
 <template>
   <div
-      v-if="mostrarModal"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    v-if="mostrarModal"
+    class="modal fade show"
+    style="display: block;"
+    tabindex="-1"
   >
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
-            <i class="bi bi-bell me-2"/>
+            <i class="bi bi-bell me-2" />
             Sistema de Notificações
           </h5>
           <button
-              type="button"
-              class="btn-close"
-              @click="fecharModal"
+            type="button"
+            class="btn-close"
+            @click="fecharModal"
           />
         </div>
         <div class="modal-body">
@@ -23,38 +23,38 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h6>Notificações do Sistema</h6>
               <button
-                  class="btn btn-sm btn-outline-danger"
-                  @click="limparTodas"
+                class="btn btn-sm btn-outline-danger"
+                @click="limparTodas"
               >
-                <i class="bi bi-trash me-1"/>
+                <i class="bi bi-trash me-1" />
                 Limpar Todas
               </button>
             </div>
 
             <div
-                v-if="notificacoes.length === 0"
-                class="text-center text-muted py-4"
+              v-if="notificacoes.length === 0"
+              class="text-center text-muted py-4"
             >
-              <i class="bi bi-bell-slash display-4"/>
+              <i class="bi bi-bell-slash display-4" />
               <p class="mt-2">
                 Nenhuma notificação no momento.
               </p>
             </div>
 
             <div
-                v-else
-                class="list-group"
+              v-else
+              class="list-group"
             >
               <div
-                  v-for="notificacao in notificacoesOrdenadas"
-                  :key="notificacao.id"
-                  :class="['list-group-item list-group-item-action', classeNotificacao(notificacao)]"
+                v-for="notificacao in notificacoesOrdenadas"
+                :key="notificacao.id"
+                :class="['list-group-item list-group-item-action', classeNotificacao(notificacao)]"
               >
                 <div class="d-flex w-100 justify-content-between">
                   <div class="d-flex align-items-center">
                     <i
-                        :class="iconeTipo(notificacao.tipo)"
-                        class="me-2"
+                      :class="iconeTipo(notificacao.tipo)"
+                      class="me-2"
                     />
                     <h6 class="mb-1">
                       {{ notificacao.titulo }}
@@ -63,11 +63,11 @@
                   <div class="d-flex align-items-center">
                     <small class="text-muted me-2">{{ formatarDataHora(notificacao.timestamp) }}</small>
                     <button
-                        class="btn btn-sm btn-outline-secondary"
-                        title="Remover notificação"
-                        @click="removerNotificacao(notificacao.id)"
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Remover notificação"
+                      @click="removerNotificacao(notificacao.id)"
                     >
-                      <i class="bi bi-x"/>
+                      <i class="bi bi-x" />
                     </button>
                   </div>
                 </div>
@@ -75,14 +75,14 @@
                   {{ notificacao.mensagem }}
                 </p>
                 <div
-                    v-if="notificacao.tipo === 'email' && notificacao.emailContent"
-                    class="mt-2"
+                  v-if="notificacao.tipo === 'email' && notificacao.emailContent"
+                  class="mt-2"
                 >
                   <button
-                      class="btn btn-sm btn-outline-primary"
-                      @click="mostrarEmail(notificacao)"
+                    class="btn btn-sm btn-outline-primary"
+                    @click="mostrarEmail(notificacao)"
                   >
-                    <i class="bi bi-envelope me-1"/>
+                    <i class="bi bi-envelope me-1" />
                     Ver e-mail completo
                   </button>
                 </div>
@@ -92,9 +92,9 @@
         </div>
         <div class="modal-footer">
           <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModal"
+            type="button"
+            class="btn btn-secondary"
+            @click="fecharModal"
           >
             Fechar
           </button>
@@ -104,28 +104,28 @@
   </div>
 
   <div
-      v-if="mostrarModal"
-      class="modal-backdrop fade show"
+    v-if="mostrarModal"
+    class="modal-backdrop fade show"
   />
 
   <!-- Modal para visualizar e-mail completo -->
   <div
-      v-if="emailModalVisivel"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
+    v-if="emailModalVisivel"
+    class="modal fade show"
+    style="display: block;"
+    tabindex="-1"
   >
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
-            <i class="bi bi-envelope me-2"/>
+            <i class="bi bi-envelope me-2" />
             E-mail Simulado
           </h5>
           <button
-              type="button"
-              class="btn-close"
-              @click="fecharEmailModal"
+            type="button"
+            class="btn-close"
+            @click="fecharEmailModal"
           />
         </div>
         <div class="modal-body">
@@ -146,9 +146,9 @@
         </div>
         <div class="modal-footer">
           <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharEmailModal"
+            type="button"
+            class="btn btn-secondary"
+            @click="fecharEmailModal"
           >
             Fechar
           </button>
@@ -158,8 +158,8 @@
   </div>
 
   <div
-      v-if="emailModalVisivel"
-      class="modal-backdrop fade show"
+    v-if="emailModalVisivel"
+    class="modal-backdrop fade show"
   />
 </template>
 

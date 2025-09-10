@@ -1,20 +1,20 @@
 <template>
   <tr
-      :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
-      :data-testid="'tree-table-row-' + item.id"
-      @click="handleRowClick"
+    :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
+    :data-testid="'tree-table-row-' + item.id"
+    @click="handleRowClick"
   >
     <td
-        v-for="(column, index) in columns"
-        :key="column.key"
-        :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}"
+      v-for="(column, index) in columns"
+      :key="column.key"
+      :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}"
     >
       <span
-          v-if="index === 0 && item.children && item.children.length > 0"
-          class="toggle-icon"
-          @click.stop="toggleExpand(item.id)"
+        v-if="index === 0 && item.children && item.children.length > 0"
+        class="toggle-icon"
+        @click.stop="toggleExpand(item.id)"
       >
-        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']"/>
+        <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']" />
       </span>
       {{ item[column.key] }}
     </td>

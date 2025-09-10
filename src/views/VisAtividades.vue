@@ -11,51 +11,57 @@
       </h2>
       <div class="d-flex gap-2">
         <button
-            v-if="podeVerImpacto"
-            class="btn btn-outline-secondary"
-            @click="abrirModalImpacto"
+          v-if="podeVerImpacto"
+          class="btn btn-outline-secondary"
+          @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2"/>{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
+          <i class="bi bi-arrow-right-circle me-2" />{{ isRevisao ? 'Ver impactos' : 'Impacto no mapa' }}
         </button>
         <button
-            class="btn btn-secondary"
-            title="Devolver para ajustes"
-            @click="devolverCadastro"
+          class="btn btn-outline-info"
+          @click="abrirModalHistoricoAnalise"
+        >
+          Histórico de análise
+        </button>
+        <button
+          class="btn btn-secondary"
+          title="Devolver para ajustes"
+          @click="devolverCadastro"
         >
           Devolver para ajustes
         </button>
         <button
-            class="btn btn-success"
-            title="Validar"
-            @click="validarCadastro"
+          class="btn btn-success"
+          title="Validar"
+          @click="validarCadastro"
         >
-          {{ isRevisao ? 'Registrar aceite' : 'Validar' }}
+          {{ isRevisao ? 'Registrar aceite' : (perfilSelecionado === Perfil.ADMIN && unidadeSuperior === 'SEDOC' ? 'Homologar' : 'Validar') }}
         </button>
       </div>
     </div>
 
     <!-- Lista de atividades -->
     <div
-        v-for="(atividade, idx) in atividades"
-        :key="atividade.id || idx"
-        class="card mb-3 atividade-card"
+      v-for="(atividade, idx) in atividades"
+      :key="atividade.id || idx"
+      class="card mb-3 atividade-card"
     >
       <div class="card-body py-2">
         <div
-            class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
+          class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
           <strong
-              class="atividade-descricao"
-              data-testid="atividade-descricao"
+            class="atividade-descricao"
+            data-testid="atividade-descricao"
           >{{ atividade.descricao }}</strong>
         </div>
 
         <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
           <div
-              v-for="(conhecimento) in atividade.conhecimentos"
-              :key="conhecimento.id"
-              class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+            v-for="(conhecimento) in atividade.conhecimentos"
+            :key="conhecimento.id"
+            class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
           </div>
@@ -65,58 +71,68 @@
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
-        :id-processo="idProcesso"
-        :mostrar="mostrarModalImpacto"
-        :sigla-unidade="siglaUnidade"
-        @fechar="fecharModalImpacto"
+      :id-processo="idProcesso"
+      :mostrar="mostrarModalImpacto"
+      :sigla-unidade="siglaUnidade"
+      @fechar="fecharModalImpacto"
+    />
+
+    <!-- Modal de Histórico de Análise -->
+    <HistoricoAnaliseModal
+      :id-subprocesso="idSubprocesso"
+      :mostrar="mostrarModalHistoricoAnalise"
+      @fechar="fecharModalHistoricoAnalise"
     />
 
     <!-- Modal de Validação -->
     <div
-        v-if="mostrarModalValidar"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalValidar"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro' }}
+              {{ isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro') }}
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalValidar"
+              type="button"
+              class="btn-close"
+              @click="fecharModalValidar"
             />
           </div>
           <div class="modal-body">
-            <p>{{ isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?' }}</p>
-            <div class="mb-3">
+            <p>{{ isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?') }}</p>
+            <div
+              v-if="!isHomologacao"
+              class="mb-3"
+            >
               <label
-                  class="form-label"
-                  for="observacaoValidacao"
+                class="form-label"
+                for="observacaoValidacao"
               >Observação (opcional)</label>
               <textarea
-                  id="observacaoValidacao"
-                  v-model="observacaoValidacao"
-                  class="form-control"
-                  rows="3"
+                id="observacaoValidacao"
+                v-model="observacaoValidacao"
+                class="form-control"
+                rows="3"
               />
             </div>
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalValidar"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalValidar"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-success"
-                @click="confirmarValidacao"
+              type="button"
+              class="btn btn-success"
+              @click="confirmarValidacao"
             >
               Confirmar
             </button>
@@ -127,10 +143,10 @@
 
     <!-- Modal de Devolução -->
     <div
-        v-if="mostrarModalDevolver"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalDevolver"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -139,38 +155,38 @@
               {{ isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro' }}
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalDevolver"
+              type="button"
+              class="btn-close"
+              @click="fecharModalDevolver"
             />
           </div>
           <div class="modal-body">
             <p>{{ isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?' }}</p>
             <div class="mb-3">
               <label
-                  class="form-label"
-                  for="observacaoDevolucao"
+                class="form-label"
+                for="observacaoDevolucao"
               >Observação (opcional)</label>
               <textarea
-                  id="observacaoDevolucao"
-                  v-model="observacaoDevolucao"
-                  class="form-control"
-                  rows="3"
+                id="observacaoDevolucao"
+                v-model="observacaoDevolucao"
+                class="form-control"
+                rows="3"
               />
             </div>
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalDevolver"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalDevolver"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-danger"
-                @click="confirmarDevolucao"
+              type="button"
+              class="btn btn-danger"
+              @click="confirmarDevolucao"
             >
               Confirmar
             </button>
@@ -180,8 +196,8 @@
     </div>
 
     <div
-        v-if="mostrarModalValidar || mostrarModalDevolver"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalValidar || mostrarModalDevolver"
+      class="modal-backdrop fade show"
     />
   </div>
 </template>
@@ -196,8 +212,10 @@ import {useRevisaoStore} from '@/stores/revisao'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Atividade, Perfil, Processo, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Perfil, Processo, Subprocesso, Unidade, ResultadoAnalise} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
+import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
+import { URL_SISTEMA } from '@/constants/index';
 
 const props = defineProps<{
   idProcesso: number | string,
@@ -219,6 +237,7 @@ const router = useRouter()
 const mostrarModalImpacto = ref(false)
 const mostrarModalValidar = ref(false)
 const mostrarModalDevolver = ref(false)
+const mostrarModalHistoricoAnalise = ref(false)
 const observacaoValidacao = ref('')
 const observacaoDevolucao = ref('')
 
@@ -239,6 +258,11 @@ const unidade = computed(() => {
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
 
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
+
+const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
+const unidadeSuperior = computed(() => unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value));
+
+const isHomologacao = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN && unidadeSuperior.value === 'SEDOC');
 
 const subprocesso = computed(() => {
   if (!idSubprocesso.value) return null;
@@ -286,103 +310,126 @@ function devolverCadastro() {
 function confirmarValidacao() {
   if (!idSubprocesso.value) return;
 
-  const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value);
+  const unidadeAnalise = perfilStore.unidadeSelecionada; // Unidade do usuário logado
+  const unidadeSubprocesso = siglaUnidade.value; // Unidade do subprocesso que está sendo analisado
+  const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(unidadeSubprocesso);
   const isRevisao = processoAtual.value?.tipo === 'Revisão';
+  const perfilUsuario = perfilStore.perfilSelecionado;
 
-  // Alterar situação do subprocesso
-  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-  if (subprocessoIndex !== -1) {
-    let novaSituacao: string;
-    if (isRevisao) {
-      novaSituacao = unidadeSuperior === 'SEDOC' ? 'Revisão do cadastro homologada' : 'Revisão do cadastro aceita';
-    } else {
-      novaSituacao = unidadeSuperior === 'SEDOC' ? 'Cadastro homologado' : 'Cadastro aceito';
+  if (perfilUsuario === Perfil.ADMIN && unidadeSuperior === 'SEDOC') {
+    // 11. Homologar (perfil ADMIN)
+    // 11.5. Registrar movimentação
+    processosStore.addMovement({
+      idSubprocesso: idSubprocesso.value,
+      unidadeOrigem: 'SEDOC',
+      unidadeDestino: 'SEDOC',
+      descricao: isRevisao ? 'Revisão do cadastro de atividades e conhecimentos homologada' : 'Cadastro de atividades e conhecimentos homologado'
+    });
+
+    // 11.6. Alterar situação do subprocesso
+    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+    if (subprocessoIndex !== -1) {
+      processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro homologada' : 'Cadastro homologado';
     }
-    processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
-    processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSuperior || 'SEDOC';
+
+    notificacoesStore.sucesso('Homologação efetivada', 'O cadastro foi homologado com sucesso!');
+    fecharModalValidar();
+    router.push(`/processo/${idProcesso.value}/subprocesso/${idSubprocesso.value}`); // 11.7. Redirecionar para Detalhes do subprocesso
+  } else {
+    // 10. Aceitar (perfil GESTOR)
+    // 10.5. Registrar análise de cadastro
+    analisesStore.registrarAnalise({
+      idSubprocesso: idSubprocesso.value,
+      dataHora: new Date(),
+      unidade: unidadeAnalise,
+      resultado: ResultadoAnalise.ACEITE,
+      observacao: observacaoValidacao.value
+    });
+
+    // 10.6. Registrar movimentação
+    processosStore.addMovement({
+      idSubprocesso: idSubprocesso.value,
+      unidadeOrigem: unidadeAnalise,
+      unidadeDestino: unidadeSuperior || 'SEDOC',
+      descricao: isRevisao ? 'Revisão do cadastro de atividades e conhecimentos aceita' : 'Cadastro de atividades e conhecimentos aceito'
+    });
+
+    // Alterar situação do subprocesso
+    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+    if (subprocessoIndex !== -1) {
+      processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro aceito';
+      processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSuperior || 'SEDOC';
+    }
+
+    // 10.7. Enviar notificação por e-mail
+    const assuntoEmail = `SGC: Cadastro de atividades e conhecimentos da ${unidadeSubprocesso} submetido para análise`;
+    const corpoEmail = `Prezado(a) responsável pela ${unidadeSuperior},\n\nO cadastro de atividades e conhecimentos da ${unidadeSubprocesso} no processo ${processoAtual.value?.descricao || 'N/A'} foi submetido para análise por essa unidade.\nA análise já pode ser realizada no O sistema de Gestão de Competências: ${URL_SISTEMA}.`;
+
+    notificacoesStore.email(assuntoEmail, `Responsável pela ${unidadeSuperior}`, corpoEmail);
+
+    // 10.8. Criar alerta
+    alertasStore.criarAlerta({
+      idProcesso: idProcesso.value,
+      unidadeOrigem: unidadeAnalise,
+      unidadeDestino: unidadeSuperior || 'SEDOC',
+      descricao: `Cadastro de atividades e conhecimentos da unidade ${unidadeSubprocesso} submetido para análise`,
+      dataHora: new Date()
+    });
+
+    notificacoesStore.sucesso('Aceite registrado', 'A análise foi registrada com sucesso!');
+    fecharModalValidar();
+    router.push('/painel'); // 10.9. Redirecionar para o Painel
   }
-
-  // Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: idSubprocesso.value,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: unidadeSuperior || 'SEDOC',
-    descricao: isRevisao ? 'Revisão do cadastro de atividades e conhecimentos aceita' : 'Cadastro de atividades e conhecimentos aceito'
-  });
-
-
-  // Enviar notificação por e-mail
-  const assunto = isRevisao
-    ? `SGC: Revisão do cadastro de atividades e conhecimentos aceita: ${siglaUnidade.value}`
-    : `SGC: Cadastro de atividades e conhecimentos aceito: ${siglaUnidade.value}`;
-
-  const corpo = isRevisao
-    ? `A revisão do cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi aceita.`
-    : `O cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi aceito.`;
-
-  notificacoesStore.email(assunto, `Responsável pela ${unidadeSuperior}`, corpo);
-
-  // Criar alerta
-  alertasStore.criarAlerta({
-    idProcesso: idProcesso.value,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: unidadeSuperior || 'SEDOC',
-    descricao: isRevisao
-      ? `Revisão do cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} aceita`
-      : `Cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} aceito`,
-    dataHora: new Date()
-  });
-
-  const mensagemSucesso = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro validado';
-
-  notificacoesStore.sucesso(
-      mensagemSucesso,
-      'A análise foi registrada com sucesso!'
-  );
-
-  fecharModalValidar();
-  router.push('/painel');
 }
 
 function confirmarDevolucao() {
   if (!idSubprocesso.value) return;
 
   const isRevisao = processoAtual.value?.tipo === 'Revisão';
+  const unidadeAnalise = perfilStore.unidadeSelecionada; // Unidade do usuário logado
+  const unidadeSubprocesso = siglaUnidade.value; // Unidade do subprocesso que está sendo analisado
+
+  // 9.5. Registrar análise de cadastro
+  analisesStore.registrarAnalise({
+    idSubprocesso: idSubprocesso.value,
+    dataHora: new Date(),
+    unidade: unidadeAnalise,
+    resultado: ResultadoAnalise.DEVOLUCAO,
+    observacao: observacaoDevolucao.value
+  });
+
+  // 9.7. Registrar movimentação
+  processosStore.addMovement({
+    idSubprocesso: idSubprocesso.value,
+    unidadeOrigem: unidadeAnalise,
+    unidadeDestino: unidadeSubprocesso,
+    descricao: isRevisao ? 'Devolução da revisão do cadastro de atividades e conhecimentos para ajustes' : 'Devolução do cadastro de atividades e conhecimentos para ajustes'
+  });
 
   // Alterar situação do subprocesso
   const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
   if (subprocessoIndex !== -1) {
     processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
-    processosStore.subprocessos[subprocessoIndex].unidadeAtual = siglaUnidade.value;
+    processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSubprocesso;
+
+    // 9.8. Se a unidade de devolução for a própria unidade do subprocesso, apagar dataFimEtapa1
+    if (unidadeAnalise === unidadeSubprocesso) {
+      processosStore.subprocessos[subprocessoIndex].dataFimEtapa1 = null;
+    }
   }
 
-  // Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: idSubprocesso.value,
-    unidadeOrigem: 'SEDOC', // Unidade que está fazendo a análise
-    unidadeDestino: siglaUnidade.value,
-    descricao: isRevisao ? 'Devolução da revisão do cadastro de atividades e conhecimentos para ajustes' : 'Devolução do cadastro de atividades e conhecimentos para ajustes'
-  });
+  // 9.9. Enviar notificação por e-mail
+  const assuntoEmail = `SGC: Cadastro de atividades e conhecimentos da ${unidadeSubprocesso} devolvido para ajustes`;
+  const corpoEmail = `Prezado(a) responsável pela ${unidadeSubprocesso},\n\nO cadastro de atividades e conhecimentos da ${unidadeSubprocesso} no processo ${processoAtual.value?.descricao || 'N/A'} foi devolvido para ajustes.\nAcompanhe o processo no O sistema de Gestão de Competências: ${URL_SISTEMA}.`;
 
-  // Enviar notificação por e-mail
-  const assunto = isRevisao
-    ? `SGC: Revisão do cadastro de atividades e conhecimentos devolvida: ${siglaUnidade.value}`
-    : `SGC: Cadastro de atividades e conhecimentos devolvido: ${siglaUnidade.value}`;
+  notificacoesStore.email(assuntoEmail, `Responsável pela ${unidadeSubprocesso}`, corpoEmail);
 
-  const corpo = isRevisao
-    ? `A revisão do cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi devolvida para ajustes.`
-    : `O cadastro de atividades e conhecimentos da unidade ${siglaUnidade.value} no processo ${processoAtual.value?.descricao || 'N/A'} foi devolvido para ajustes.`;
-
-  notificacoesStore.email(assunto, `Responsável pela ${siglaUnidade.value}`, corpo);
-
-  // Criar alerta
+  // 9.10. Criar alerta
   alertasStore.criarAlerta({
     idProcesso: idProcesso.value,
-    unidadeOrigem: 'SEDOC',
-    unidadeDestino: siglaUnidade.value,
-    descricao: isRevisao
-      ? `Revisão do cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} devolvida para ajustes`
-      : `Cadastro de atividades/conhecimentos da unidade ${siglaUnidade.value} devolvido para ajustes`,
+    unidadeOrigem: unidadeAnalise,
+    unidadeDestino: unidadeSubprocesso,
+    descricao: `Cadastro de atividades e conhecimentos da unidade ${unidadeSubprocesso} devolvido para ajustes`,
     dataHora: new Date()
   });
 
@@ -420,6 +467,14 @@ function abrirModalImpacto() {
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
   revisaoStore.setMudancasParaImpacto([]);
+}
+
+function abrirModalHistoricoAnalise() {
+  mostrarModalHistoricoAnalise.value = true;
+}
+
+function fecharModalHistoricoAnalise() {
+  mostrarModalHistoricoAnalise.value = false;
 }
 </script>
 

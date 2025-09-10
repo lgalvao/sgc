@@ -3,9 +3,9 @@
     <template v-if="tipoProcesso === TipoProcesso.MAPEAMENTO || tipoProcesso === TipoProcesso.REVISAO">
       <section class="col-md-4 mb-3">
         <div
-            class="card h-100 card-actionable"
-            data-testid="atividades-card"
-            @click="$emit('irParaAtividades')"
+          class="card h-100 card-actionable"
+          data-testid="atividades-card"
+          @click="$emit('irParaAtividades')"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -23,10 +23,10 @@
 
       <section class="col-md-4 mb-3">
         <div
-            :class="{ 'disabled-card': !mapa }"
-            class="card h-100 card-actionable"
-            data-testid="mapa-card"
-            @click="handleMapaClick"
+          :class="{ 'disabled-card': !mapa }"
+          class="card h-100 card-actionable"
+          data-testid="mapa-card"
+          @click="handleMapaClick"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -60,8 +60,8 @@
     <template v-else-if="tipoProcesso === TipoProcesso.DIAGNOSTICO">
       <section class="col-md-4 mb-3">
         <div
-            class="card h-100 card-actionable"
-            @click="$emit('irParaDiagnosticoEquipe')"
+          class="card h-100 card-actionable"
+          @click="$emit('irParaDiagnosticoEquipe')"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -79,8 +79,8 @@
 
       <section class="col-md-4 mb-3">
         <div
-            class="card h-100 card-actionable"
-            @click="$emit('irParaOcupacoesCriticas')"
+          class="card h-100 card-actionable"
+          @click="$emit('irParaOcupacoesCriticas')"
         >
           <div class="card-body">
             <h5 class="card-title">

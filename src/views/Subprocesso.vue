@@ -1,34 +1,34 @@
 <template>
   <div class="container mt-4">
     <SubprocessoHeader
-        v-if="unidadeComResponsavelDinamico"
-        :processo-descricao="processoAtual?.descricao || ''"
-        :unidade-sigla="unidadeComResponsavelDinamico.sigla"
-        :unidade-nome="unidadeComResponsavelDinamico.nome"
-        :situacao="situacaoUnidadeNoProcesso as string"
-        :titular-nome="titularDetalhes?.nome || ''"
-        :titular-ramal="titularDetalhes?.ramal || ''"
-        :titular-email="titularDetalhes?.email || ''"
-        :responsavel-nome="responsavelDetalhes?.nome || ''"
-        :responsavel-ramal="responsavelDetalhes?.ramal || ''"
-        :responsavel-email="responsavelDetalhes?.email || ''"
-        :unidade-atual="SubprocessoDetalhes?.unidadeAtual || ''"
-        :perfil-usuario="perfilStore.perfilSelecionado"
-        :is-subprocesso-em-andamento="isSubprocessoEmAndamento"
-        @alterar-data-limite="abrirModalAlterarDataLimite"
+      v-if="unidadeComResponsavelDinamico"
+      :processo-descricao="processoAtual?.descricao || ''"
+      :unidade-sigla="unidadeComResponsavelDinamico.sigla"
+      :unidade-nome="unidadeComResponsavelDinamico.nome"
+      :situacao="situacaoUnidadeNoProcesso as string"
+      :titular-nome="titularDetalhes?.nome || ''"
+      :titular-ramal="titularDetalhes?.ramal || ''"
+      :titular-email="titularDetalhes?.email || ''"
+      :responsavel-nome="responsavelDetalhes?.nome || ''"
+      :responsavel-ramal="responsavelDetalhes?.ramal || ''"
+      :responsavel-email="responsavelDetalhes?.email || ''"
+      :unidade-atual="SubprocessoDetalhes?.unidadeAtual || ''"
+      :perfil-usuario="perfilStore.perfilSelecionado"
+      :is-subprocesso-em-andamento="isSubprocessoEmAndamento"
+      @alterar-data-limite="abrirModalAlterarDataLimite"
     />
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
     <SubprocessoCards
-        :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
-        :mapa="mapa"
-        :situacao="situacaoUnidadeNoProcesso as string"
-        @ir-para-atividades="irParaAtividadesConhecimentos"
-        @navegar-para-mapa="navegarParaMapa"
-        @ir-para-diagnostico-equipe="irParaDiagnosticoEquipe"
-        @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
+      :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
+      :mapa="mapa"
+      :situacao="situacaoUnidadeNoProcesso as string"
+      @ir-para-atividades="irParaAtividadesConhecimentos"
+      @navegar-para-mapa="navegarParaMapa"
+      @ir-para-diagnostico-equipe="irParaDiagnosticoEquipe"
+      @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
     />
 
 
@@ -36,14 +36,14 @@
     <div class="mt-4">
       <h4>Movimentações do Processo</h4>
       <div
-          v-if="movements.length === 0"
-          class="alert alert-info"
+        v-if="movements.length === 0"
+        class="alert alert-info"
       >
         Nenhuma movimentação registrada para este subprocesso.
       </div>
       <table
-          v-else
-          class="table table-striped"
+        v-else
+        class="table table-striped"
       >
         <thead>
           <tr>
@@ -54,10 +54,10 @@
           </tr>
         </thead>
         <tbody>
-        <tr
+          <tr
             v-for="movement in movements"
             :key="movement.id"
-        >
+          >
             <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
             <td>{{ movement.unidadeOrigem }}</td>
             <td>{{ movement.unidadeDestino }}</td>
@@ -69,12 +69,12 @@
   </div>
 
   <SubprocessoModal
-      :mostrar-modal="mostrarModalAlterarDataLimite"
-      :data-limite-atual="dataLimiteAtual"
-      :etapa-atual="etapaAtual"
-      :situacao-etapa-atual="SubprocessoDetalhes?.situacao || 'Não informado'"
-      @fechar-modal="fecharModalAlterarDataLimite"
-      @confirmar-alteracao="confirmarAlteracaoDataLimite"
+    :mostrar-modal="mostrarModalAlterarDataLimite"
+    :data-limite-atual="dataLimiteAtual"
+    :etapa-atual="etapaAtual"
+    :situacao-etapa-atual="SubprocessoDetalhes?.situacao || 'Não informado'"
+    @fechar-modal="fecharModalAlterarDataLimite"
+    @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
 </template>
 

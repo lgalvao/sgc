@@ -9,28 +9,28 @@
       </div>
       <div class="d-flex gap-2">
         <button
-            class="btn btn-outline-success"
-            @click="finalizarDiagnostico"
+          class="btn btn-outline-success"
+          @click="finalizarDiagnostico"
         >
-          <i class="bi bi-check-circle me-2"/>Finalizar Diagnóstico
+          <i class="bi bi-check-circle me-2" />Finalizar Diagnóstico
         </button>
       </div>
     </div>
 
     <div class="alert alert-info">
-      <i class="bi bi-info-circle me-2"/>
+      <i class="bi bi-info-circle me-2" />
       Nesta etapa, os servidores da unidade devem avaliar a importância e o domínio das competências da unidade.
     </div>
 
     <!-- Lista de competências para avaliação -->
     <div
-        v-if="competencias.length > 0"
-        class="row"
+      v-if="competencias.length > 0"
+      class="row"
     >
       <div
-          v-for="competencia in competencias"
-          :key="competencia.id"
-          class="col-md-6 mb-4"
+        v-for="competencia in competencias"
+        :key="competencia.id"
+        class="col-md-6 mb-4"
       >
         <div class="card h-100">
           <div class="card-header">
@@ -42,8 +42,8 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
               <select
-                  v-model="avaliacoes[competencia.id].importancia"
-                  class="form-select"
+                v-model="avaliacoes[competencia.id].importancia"
+                class="form-select"
               >
                 <option value="1">
                   1 - Muito baixa
@@ -66,8 +66,8 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
               <select
-                  v-model="avaliacoes[competencia.id].dominio"
-                  class="form-select"
+                v-model="avaliacoes[competencia.id].dominio"
+                class="form-select"
               >
                 <option value="1">
                   1 - Muito baixo
@@ -102,19 +102,19 @@
     </div>
 
     <div
-        v-else
-        class="alert alert-warning"
+      v-else
+      class="alert alert-warning"
     >
-      <i class="bi bi-exclamation-triangle me-2"/>
+      <i class="bi bi-exclamation-triangle me-2" />
       Nenhum mapa de competências disponível para diagnóstico.
     </div>
 
     <!-- Modal de confirmação -->
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalConfirmacao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -123,22 +123,22 @@
               Finalizar Diagnóstico
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn-close"
+              @click="fecharModalConfirmacao"
             />
           </div>
           <div class="modal-body">
             <p>Confirma a finalização do diagnóstico da equipe? Esta ação não poderá ser desfeita.</p>
             <div
-                v-if="avaliacoesPendentes.length > 0"
-                class="alert alert-warning"
+              v-if="avaliacoesPendentes.length > 0"
+              class="alert alert-warning"
             >
               <strong>Atenção:</strong> As seguintes competências ainda não foram avaliadas:
               <ul class="mb-0 mt-2">
                 <li
-                    v-for="comp in avaliacoesPendentes"
-                    :key="comp.id"
+                  v-for="comp in avaliacoesPendentes"
+                  :key="comp.id"
                 >
                   {{ comp.descricao }}
                 </li>
@@ -147,16 +147,16 @@
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalConfirmacao"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-success"
-                @click="confirmarFinalizacao"
+              type="button"
+              class="btn btn-success"
+              @click="confirmarFinalizacao"
             >
               Confirmar
             </button>
@@ -165,8 +165,8 @@
       </div>
     </div>
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalConfirmacao"
+      class="modal-backdrop fade show"
     />
   </div>
 </template>

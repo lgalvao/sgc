@@ -4,71 +4,71 @@
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
-            class="display-6 mb-0"
-            data-testid="titulo-processos"
+          class="display-6 mb-0"
+          data-testid="titulo-processos"
         >
           Processos
         </div>
         <router-link
-            v-if="perfil.perfilSelecionado === 'ADMIN'"
-            :to="{ name: 'CadProcesso' }"
-            class="btn btn-outline-primary"
-            data-testid="btn-criar-processo"
+          v-if="perfil.perfilSelecionado === 'ADMIN'"
+          :to="{ name: 'CadProcesso' }"
+          class="btn btn-outline-primary"
+          data-testid="btn-criar-processo"
         >
-          <i class="bi bi-plus-lg"/> Criar processo
+          <i class="bi bi-plus-lg" /> Criar processo
         </router-link>
       </div>
       <TabelaProcessos
-          :processos="processosOrdenadosComUnidades"
-          :criterio-ordenacao="criterio"
-          :direcao-ordenacao-asc="asc"
-          @ordenar="ordenarPor"
-          @selecionar-processo="abrirDetalhesProcesso"
+        :processos="processosOrdenadosComUnidades"
+        :criterio-ordenacao="criterio"
+        :direcao-ordenacao-asc="asc"
+        @ordenar="ordenarPor"
+        @selecionar-processo="abrirDetalhesProcesso"
       />
     </div>
 
     <div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div
-            class="mb-0 display-6"
-            data-testid="titulo-alertas"
+          class="mb-0 display-6"
+          data-testid="titulo-alertas"
         >
           Alertas
         </div>
       </div>
       <table
-          class="table"
-          data-testid="tabela-alertas"
+        class="table"
+        data-testid="tabela-alertas"
       >
         <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Descrição</th>
-          <th>Processo</th>
-          <th>Origem</th>
-        </tr>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Descrição</th>
+            <th>Processo</th>
+            <th>Origem</th>
+          </tr>
         </thead>
         <tbody>
-        <tr
+          <tr
             v-for="(alerta, index) in alertasFormatados"
             :key="index"
             :class="{ 'fw-bold': !alerta.lido }"
             style="cursor: pointer;"
             @click="marcarComoLido(alerta.id)"
-        >
-          <td>{{ alerta.dataFormatada }}</td>
-          <td>{{ alerta.descricao }}</td>
-          <td>{{ alerta.processo }}</td>
-          <td>{{ alerta.unidade }}</td>
-        </tr>
-        <tr v-if="!alertasFormatados || alertasFormatados.length === 0">
-          <td
+          >
+            <td>{{ alerta.dataFormatada }}</td>
+            <td>{{ alerta.descricao }}</td>
+            <td>{{ alerta.processo }}</td>
+            <td>{{ alerta.unidade }}</td>
+          </tr>
+          <tr v-if="!alertasFormatados || alertasFormatados.length === 0">
+            <td
               class="text-center text-muted"
               colspan="4"
-          >
-            Nenhum alerta no momento.
-          </td>
-        </tr>
+            >
+              Nenhum alerta no momento.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -10,16 +10,17 @@
       </div>
       <div class="d-flex gap-2">
         <button
-            v-if="podeVerImpacto"
-            class="btn btn-outline-secondary"
-            @click="abrirModalImpacto"
+          v-if="podeVerImpacto"
+          class="btn btn-outline-secondary"
+          data-testid="impactos-mapa-button"
+          @click="abrirModalImpacto"
         >
-          <i class="bi bi-arrow-right-circle me-2"/>Impacto no mapa
+          <i class="bi bi-arrow-right-circle me-2" />Impacto no mapa
         </button>
         <button
-            :disabled="competencias.length === 0"
-            class="btn btn-outline-success"
-            @click="finalizarEdicao"
+          :disabled="competencias.length === 0"
+          class="btn btn-outline-success"
+          @click="finalizarEdicao"
         >
           Disponibilizar
         </button>
@@ -29,77 +30,77 @@
     <div v-if="unidade">
       <div class="mb-4 mt-3">
         <button
-            class="btn btn-outline-primary mb-3"
-            data-testid="btn-abrir-criar-competencia"
-            @click="() => abrirModalCriarNovaCompetencia()"
+          class="btn btn-outline-primary mb-3"
+          data-testid="btn-abrir-criar-competencia"
+          @click="() => abrirModalCriarNovaCompetencia()"
         >
-          <i class="bi bi-plus-lg"/> Criar competência
+          <i class="bi bi-plus-lg" /> Criar competência
         </button>
 
         <div
-            v-for="comp in competencias"
-            :key="comp.id"
-            class="card mb-2 competencia-card"
-            data-testid="competencia-item"
+          v-for="comp in competencias"
+          :key="comp.id"
+          class="card mb-2 competencia-card"
+          data-testid="competencia-item"
         >
           <div class="card-body py-2">
             <div
-                class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
+              class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
             >
               <strong
-                  class="competencia-descricao"
-                  data-testid="competencia-descricao"
+                class="competencia-descricao"
+                data-testid="competencia-descricao"
               > {{ comp.descricao }}</strong>
               <div class="ms-auto d-inline-flex align-items-center gap-1 botoes-acao">
                 <button
-                    class="btn btn-sm btn-outline-primary botao-acao"
-                    data-bs-toggle="tooltip"
-                    data-testid="btn-editar-competencia"
-                    title="Editar"
-                    @click="iniciarEdicaoCompetencia(comp)"
+                  class="btn btn-sm btn-outline-primary botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-editar-competencia"
+                  title="Editar"
+                  @click="iniciarEdicaoCompetencia(comp)"
                 >
-                  <i class="bi bi-pencil"/>
+                  <i class="bi bi-pencil" />
                 </button>
                 <button
-                    class="btn btn-sm btn-outline-danger botao-acao"
-                    data-bs-toggle="tooltip"
-                    data-testid="btn-excluir-competencia"
-                    title="Excluir"
-                    @click="excluirCompetencia(comp.id)"
+                  class="btn btn-sm btn-outline-danger botao-acao"
+                  data-bs-toggle="tooltip"
+                  data-testid="btn-excluir-competencia"
+                  title="Excluir"
+                  @click="excluirCompetencia(comp.id)"
                 >
-                  <i class="bi bi-trash"/>
+                  <i class="bi bi-trash" />
                 </button>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
               <div
-                  v-for="atvId in comp.atividadesAssociadas"
-                  :key="atvId"
-                  class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada"
+                v-for="atvId in comp.atividadesAssociadas"
+                :key="atvId"
+                class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada"
               >
                 <div class="card-body d-flex align-items-center py-1 px-2">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
-                        v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
-                        :data-bs-html="true"
-                        :data-bs-title="getConhecimentosTooltip(atvId)"
-                        class="badge bg-secondary ms-2"
-                        data-bs-custom-class="conhecimentos-tooltip"
-                        data-bs-placement="top"
-                        data-bs-toggle="tooltip"
-                        data-testid="badge-conhecimentos"
+                      v-if="getAtividadeCompleta(atvId) && getAtividadeCompleta(atvId)!.conhecimentos.length > 0"
+                      :data-bs-html="true"
+                      :data-bs-title="getConhecimentosTooltip(atvId)"
+                      class="badge bg-secondary ms-2"
+                      data-bs-custom-class="conhecimentos-tooltip"
+                      data-bs-placement="top"
+                      data-bs-toggle="tooltip"
+                      data-testid="badge-conhecimentos"
                     >
                       {{ getAtividadeCompleta(atvId)?.conhecimentos.length }}
                     </span>
                   </span>
                   <button
-                      class="btn btn-sm btn-outline-secondary botao-acao-inline"
-                      data-bs-toggle="tooltip"
-                      title="Remover Atividade"
-                      @click="removerAtividadeAssociada(comp.id, atvId)"
+                    class="btn btn-sm btn-outline-secondary botao-acao-inline"
+                    data-bs-toggle="tooltip"
+                    title="Remover Atividade"
+                    @click="removerAtividadeAssociada(comp.id, atvId)"
                   >
-                    <i class="bi bi-trash"/>
+                    <i class="bi bi-trash" />
                   </button>
                 </div>
               </div>
@@ -114,28 +115,28 @@
 
     <!-- Modal de Criar Nova Competência -->
     <div
-        v-if="mostrarModalCriarNovaCompetencia"
-        aria-labelledby="criarCompetenciaModalLabel"
-        aria-modal="true"
-        class="modal fade show"
-        role="dialog"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalCriarNovaCompetencia"
+      aria-labelledby="criarCompetenciaModalLabel"
+      aria-modal="true"
+      class="modal fade show"
+      role="dialog"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5
-                id="criarCompetenciaModalLabel"
-                class="modal-title"
+              id="criarCompetenciaModalLabel"
+              class="modal-title"
             >
               {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}
             </h5>
             <button
-                aria-label="Close"
-                class="btn-close"
-                type="button"
-                @click="fecharModalCriarNovaCompetencia"
+              aria-label="Close"
+              class="btn-close"
+              type="button"
+              @click="fecharModalCriarNovaCompetencia"
             />
           </div>
           <div class="modal-body">
@@ -144,11 +145,11 @@
               <h5>Descrição</h5>
               <div class="mb-2">
                 <textarea
-                    v-model="novaCompetencia.descricao"
-                    class="form-control"
-                    data-testid="input-nova-competencia"
-                    placeholder="Descreva a competência"
-                    rows="3"
+                  v-model="novaCompetencia.descricao"
+                  class="form-control"
+                  data-testid="input-nova-competencia"
+                  placeholder="Descreva a competência"
+                  rows="3"
                 />
               </div>
             </div>
@@ -157,34 +158,34 @@
               <h5>Atividades</h5>
               <div class="d-flex flex-wrap gap-2">
                 <div
-                    v-for="atividade in atividades"
-                    :key="atividade.id"
-                    :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
-                    class="card atividade-card-item"
-                    :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
-                    @click="toggleAtividade(atividade.id)"
+                  v-for="atividade in atividades"
+                  :key="atividade.id"
+                  :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
+                  class="card atividade-card-item"
+                  :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
+                  @click="toggleAtividade(atividade.id)"
                 >
                   <div class="card-body d-flex align-items-center py-2">
                     <input
-                        :id="`atv-${atividade.id}`"
-                        v-model="atividadesSelecionadas"
-                        :value="atividade.id"
-                        class="form-check-input me-2"
-                        data-testid="atividade-checkbox"
-                        hidden
-                        type="checkbox"
+                      :id="`atv-${atividade.id}`"
+                      v-model="atividadesSelecionadas"
+                      :value="atividade.id"
+                      class="form-check-input me-2"
+                      data-testid="atividade-checkbox"
+                      hidden
+                      type="checkbox"
                     >
                     <label class="form-check-label mb-0 d-flex align-items-center">
                       {{ atividade.descricao }}
                       <span
-                          v-if="atividade.conhecimentos.length > 0"
-                          :data-bs-html="true"
-                          :data-bs-title="getConhecimentosModal(atividade)"
-                          class="badge bg-secondary ms-2"
-                          data-bs-custom-class="conhecimentos-tooltip"
-                          data-bs-placement="right"
-                          data-bs-toggle="tooltip"
-                          data-testid="badge-conhecimentos"
+                        v-if="atividade.conhecimentos.length > 0"
+                        :data-bs-html="true"
+                        :data-bs-title="getConhecimentosModal(atividade)"
+                        class="badge bg-secondary ms-2"
+                        data-bs-custom-class="conhecimentos-tooltip"
+                        data-bs-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-testid="badge-conhecimentos"
                       >
                         {{ atividade.conhecimentos.length }}
                       </span>
@@ -196,23 +197,23 @@
           </div>
           <div class="modal-footer">
             <button
-                class="btn btn-secondary"
-                type="button"
-                @click="fecharModalCriarNovaCompetencia"
+              class="btn btn-secondary"
+              type="button"
+              @click="fecharModalCriarNovaCompetencia"
             >
               Cancelar
             </button>
             <button
-                :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-                class="btn btn-primary"
-                data-bs-toggle="tooltip"
-                data-testid="btn-criar-competencia"
-                title="Criar Competência"
-                type="button"
-                @click="adicionarCompetenciaEFecharModal"
+              :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+              class="btn btn-primary"
+              data-bs-toggle="tooltip"
+              data-testid="btn-criar-competencia"
+              title="Criar Competência"
+              type="button"
+              @click="adicionarCompetenciaEFecharModal"
             >
               <i
-                  class="bi bi-save"
+                class="bi bi-save"
               /> Salvar
             </button>
           </div>
@@ -221,53 +222,53 @@
     </div>
 
     <div
-        v-if="mostrarModalCriarNovaCompetencia"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalCriarNovaCompetencia"
+      class="modal-backdrop fade show"
     />
 
     <!-- Modal de Disponibilizar -->
     <div
-        v-if="mostrarModalDisponibilizar"
-        aria-labelledby="disponibilizarModalLabel"
-        aria-modal="true"
-        class="modal fade show"
-        role="dialog"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalDisponibilizar"
+      aria-labelledby="disponibilizarModalLabel"
+      aria-modal="true"
+      class="modal fade show"
+      role="dialog"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
-                id="disponibilizarModalLabel"
-                class="modal-title"
+              id="disponibilizarModalLabel"
+              class="modal-title"
             >
               Disponibilizar Mapa
             </h5>
             <button
-                aria-label="Close"
-                class="btn-close"
-                type="button"
-                @click="fecharModalDisponibilizar"
+              aria-label="Close"
+              class="btn-close"
+              type="button"
+              @click="fecharModalDisponibilizar"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <label
-                  class="form-label"
-                  for="dataLimite"
+                class="form-label"
+                for="dataLimite"
               >Data limite para validação</label>
               <input
-                  id="dataLimite"
-                  v-model="dataLimiteValidacao"
-                  class="form-control"
-                  type="date"
+                id="dataLimite"
+                v-model="dataLimiteValidacao"
+                class="form-control"
+                type="date"
               >
             </div>
             <div
-                v-if="notificacaoDisponibilizacao"
-                class="alert alert-info mt-3"
-                data-testid="notificacao-disponibilizacao"
+              v-if="notificacaoDisponibilizacao"
+              class="alert alert-info mt-3"
+              data-testid="notificacao-disponibilizacao"
             >
               {{ notificacaoDisponibilizacao }}
             </div>
@@ -275,17 +276,17 @@
 
           <div class="modal-footer">
             <button
-                class="btn btn-secondary"
-                type="button"
-                @click="fecharModalDisponibilizar"
+              class="btn btn-secondary"
+              type="button"
+              @click="fecharModalDisponibilizar"
             >
               Cancelar
             </button>
             <button
-                :disabled="!dataLimiteValidacao"
-                class="btn btn-success"
-                type="button"
-                @click="disponibilizarMapa"
+              :disabled="!dataLimiteValidacao"
+              class="btn btn-success"
+              type="button"
+              @click="disponibilizarMapa"
             >
               Disponibilizar
             </button>
@@ -295,15 +296,15 @@
     </div>
 
     <div
-        v-if="mostrarModalDisponibilizar"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalDisponibilizar"
+      class="modal-backdrop fade show"
     />
 
     <ImpactoMapaModal
-        :id-processo="idProcesso"
-        :sigla-unidade="siglaUnidade"
-        :mostrar="mostrarModalImpacto"
-        @fechar="fecharModalImpacto"
+      :id-processo="idProcesso"
+      :sigla-unidade="siglaUnidade"
+      :mostrar="mostrarModalImpacto"
+      @fechar="fecharModalImpacto"
     />
   </div>
 </template>

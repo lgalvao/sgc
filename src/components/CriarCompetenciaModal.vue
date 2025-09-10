@@ -1,27 +1,27 @@
 <template>
   <div
-      v-if="mostrar"
-      aria-labelledby="criarCompetenciaModalLabel"
-      aria-modal="true"
-      class="modal fade show"
-      role="dialog"
-      style="display: block;"
-      tabindex="-1"
+    v-if="mostrar"
+    aria-labelledby="criarCompetenciaModalLabel"
+    aria-modal="true"
+    class="modal fade show"
+    role="dialog"
+    style="display: block;"
+    tabindex="-1"
   >
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5
-              id="criarCompetenciaModalLabel"
-              class="modal-title"
+            id="criarCompetenciaModalLabel"
+            class="modal-title"
           >
             {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}
           </h5>
           <button
-              aria-label="Close"
-              class="btn-close"
-              type="button"
-              @click="fechar"
+            aria-label="Close"
+            class="btn-close"
+            type="button"
+            @click="fechar"
           />
         </div>
         <div class="modal-body">
@@ -29,10 +29,10 @@
             <h5>Descrição</h5>
             <div class="mb-2">
               <textarea
-                  v-model="novaCompetencia.descricao"
-                  class="form-control"
-                  placeholder="Descreva a competência"
-                  rows="3"
+                v-model="novaCompetencia.descricao"
+                class="form-control"
+                placeholder="Descreva a competência"
+                rows="3"
               />
             </div>
           </div>
@@ -41,31 +41,31 @@
             <h5>Atividades</h5>
             <div class="d-flex flex-wrap gap-2">
               <div
-                  v-for="atividade in atividades"
-                  :key="atividade.id"
-                  :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
-                  class="card atividade-card-item"
-                  @click="toggleAtividade(atividade.id)"
+                v-for="atividade in atividades"
+                :key="atividade.id"
+                :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
+                class="card atividade-card-item"
+                @click="toggleAtividade(atividade.id)"
               >
                 <div class="card-body d-flex align-items-center py-2">
                   <input
-                      :id="`atv-${atividade.id}`"
-                      v-model="atividadesSelecionadas"
-                      :value="atividade.id"
-                      class="form-check-input me-2"
-                      hidden
-                      type="checkbox"
+                    :id="`atv-${atividade.id}`"
+                    v-model="atividadesSelecionadas"
+                    :value="atividade.id"
+                    class="form-check-input me-2"
+                    hidden
+                    type="checkbox"
                   >
                   <label class="form-check-label mb-0 d-flex align-items-center">
                     {{ atividade.descricao }}
                     <span
-                        v-if="atividade.conhecimentos.length > 0"
-                        :data-bs-html="true"
-                        :data-bs-title="getConhecimentosModal(atividade)"
-                        class="badge bg-secondary ms-2"
-                        data-bs-custom-class="conhecimentos-tooltip"
-                        data-bs-placement="right"
-                        data-bs-toggle="tooltip"
+                      v-if="atividade.conhecimentos.length > 0"
+                      :data-bs-html="true"
+                      :data-bs-title="getConhecimentosModal(atividade)"
+                      class="badge bg-secondary ms-2"
+                      data-bs-custom-class="conhecimentos-tooltip"
+                      data-bs-placement="right"
+                      data-bs-toggle="tooltip"
                     >
                       {{ atividade.conhecimentos.length }}
                     </span>
@@ -77,27 +77,27 @@
         </div>
         <div class="modal-footer">
           <button
-              class="btn btn-secondary"
-              type="button"
-              @click="fechar"
+            class="btn btn-secondary"
+            type="button"
+            @click="fechar"
           >
             Cancelar
           </button>
           <button
-              :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-              class="btn btn-primary"
-              type="button"
-              @click="salvar"
+            :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+            class="btn btn-primary"
+            type="button"
+            @click="salvar"
           >
-            <i class="bi bi-save"/> Salvar
+            <i class="bi bi-save" /> Salvar
           </button>
         </div>
       </div>
     </div>
   </div>
   <div
-      v-if="mostrar"
-      class="modal-backdrop fade show"
+    v-if="mostrar"
+    class="modal-backdrop fade show"
   />
 </template>
 

@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
-import {Movimentacao, Processo, ResultadoAnalise, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
+import {Movimentacao, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 import {useUnidadesStore} from './unidades'
-import {useAnalisesStore} from './analises'
+
 import {useAlertasStore} from './alertas'
 import {parseDate} from '@/utils/dateUtils'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
@@ -66,6 +66,7 @@ function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataL
         dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
         movimentacoes: [],
+        analises: [],
     };
 }
 
@@ -238,12 +239,10 @@ export const useProcessosStore = defineStore('processos', {
         async aceitarMapa(payload: {
             idProcesso: number,
             unidade: string,
-            observacao?: string,
             perfil: string
         }) {
-            const {idProcesso, unidade, observacao, perfil} = payload;
+            const {idProcesso, unidade, perfil} = payload;
             const unidadesStore = useUnidadesStore();
-            const analisesStore = useAnalisesStore();
             const alertasStore = useAlertasStore();
             const notificacoesStore = useNotificacoesStore();
 
@@ -259,14 +258,7 @@ export const useProcessosStore = defineStore('processos', {
                     throw new Error('Unidade superior não encontrada');
                 }
 
-                // Registrar análise de validação
-                analisesStore.registrarAnalise({
-                    idSubprocesso: subprocesso.id,
-                    dataHora: new Date(),
-                    unidade: unidade,
-                    resultado: ResultadoAnalise.ACEITE,
-                    observacao: observacao
-                });
+
 
                 if (perfil === 'ADMIN') {
                     // ADMIN: homologar diretamente
@@ -317,11 +309,9 @@ export const useProcessosStore = defineStore('processos', {
         },
         async rejeitarMapa(payload: {
             idProcesso: number,
-            unidade: string,
-            observacao?: string
+            unidade: string
         }) {
-            const {idProcesso, unidade, observacao} = payload;
-            const analisesStore = useAnalisesStore();
+            const {idProcesso, unidade} = payload;
 
             const subprocessoIndex = this.subprocessos.findIndex(
                 pu => pu.idProcesso === idProcesso && pu.unidade === unidade
@@ -335,14 +325,7 @@ export const useProcessosStore = defineStore('processos', {
                     throw new Error('Unidade anterior não encontrada');
                 }
 
-                // Registrar análise de validação
-                analisesStore.registrarAnalise({
-                    idSubprocesso: subprocesso.id,
-                    dataHora: new Date(),
-                    unidade: unidade,
-                    resultado: ResultadoAnalise.DEVOLUCAO,
-                    observacao: observacao
-                });
+
 
                 // Registrar movimentação
                 this.addMovement({

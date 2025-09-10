@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-        v-if="title"
-        class="d-flex justify-content-between align-items-center mb-3"
+      v-if="title"
+      class="d-flex justify-content-between align-items-center mb-3"
     >
       <h4 class="mb-0">
         {{ title }}
@@ -10,17 +10,17 @@
 
       <div>
         <button
-            class="btn btn-outline-primary btn-sm me-2"
-            data-testid="btn-expandir-todas"
-            @click="expandAll"
+          class="btn btn-outline-primary btn-sm me-2"
+          data-testid="btn-expandir-todas"
+          @click="expandAll"
         >
-          <i class="bi bi-arrows-expand"/>
+          <i class="bi bi-arrows-expand" />
         </button>
         <button
-            class="btn btn-outline-secondary btn-sm"
-            @click="collapseAll"
+          class="btn btn-outline-secondary btn-sm"
+          @click="collapseAll"
         >
-          <i class="bi bi-arrows-collapse"/>
+          <i class="bi bi-arrows-collapse" />
         </button>
       </div>
     </div>
@@ -29,24 +29,24 @@
       <table class="table table-striped table-hover m-0">
         <colgroup>
           <col
-              v-for="(column) in columns"
-              :key="column.key"
-              :style="{ width: column.width || (100 / columns.length) + '%' }"
+            v-for="(column) in columns"
+            :key="column.key"
+            :style="{ width: column.width || (100 / columns.length) + '%' }"
           >
         </colgroup>
 
         <thead v-if="!hideHeaders">
-        <tr>
-          <th
+          <tr>
+            <th
               v-for="column in columns"
               :key="column.key"
-          >
-            {{ column.label }}
-          </th>
-        </tr>
+            >
+              {{ column.label }}
+            </th>
+          </tr>
         </thead>
         <tbody>
-        <TreeRow
+          <TreeRow
             v-for="item in flattenedData"
             :key="item.id"
             :columns="columns"
@@ -54,7 +54,7 @@
             :level="item.level"
             @toggle="toggleExpand"
             @row-click="handleTreeRowClick"
-        />
+          />
         </tbody>
       </table>
     </div>
