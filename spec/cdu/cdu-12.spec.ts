@@ -1,12 +1,12 @@
 import {test, expect} from '@playwright/test';
 import {
     loginAsAdmin,
-    navigateToProcessDetails,
+    navigateToProcessDetails as _navigateToProcessDetails,
     expectTextVisible,
-    expectVisible,
-    waitForNotification
+    expectVisible as _expectVisible,
+    waitForNotification as _waitForNotification
 } from './test-helpers';
-import {TEXTS} from './test-constants';
+import {TEXTS as _TEXTS} from './test-constants';
 
 test.describe('CDU-12 - Verificar impactos no mapa de competências', () => {
 

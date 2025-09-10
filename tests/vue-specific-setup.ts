@@ -1,6 +1,6 @@
-import '../spec/global.d.ts';
 import {ErrorReporter} from './utils/error-reporter';
 import {Page, test as base} from '@playwright/test';
+import {parseDate} from '../src/utils/dateUtils'; // Importar parseDate
 
 // Definição de uma interface para a janela com propriedades customizadas
 interface CustomWindow extends Window {
@@ -18,6 +18,44 @@ declare const window: CustomWindow;
 export const vueTest = base.extend<{ page: Page }>({
     page: async ({page}, use) => {
         const errorReporter = new ErrorReporter();
+
+        // Interceptar e modificar subprocessos.json
+        await page.route('**/subprocessos.json', async route => {
+            const response = await page.request.fetch(route.request());
+            let json = await response.json();
+
+            // Processar cada subprocesso para converter datas
+            json = json.map((pu: any) => ({
+                ...pu,
+                dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) : null,
+                dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
+                dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
+                dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
+            }));
+
+            await route.fulfill({
+                response,
+                body: JSON.stringify(json),
+            });
+        });
+
+        // Interceptar e modificar processos.json
+        await page.route('**/processos.json', async route => {
+            const response = await page.request.fetch(route.request());
+            let json = await response.json();
+
+            // Processar cada processo para converter datas
+            json = json.map((p: any) => ({
+                ...p,
+                dataLimite: p.dataLimite ? parseDate(p.dataLimite) : null,
+                dataFinalizacao: p.dataFinalizacao ? parseDate(p.dataFinalizacao) : null,
+            }));
+
+            await route.fulfill({
+                response,
+                body: JSON.stringify(json),
+            });
+        });
 
         await page.addInitScript(() => {
             const originalConsoleError = console.error;

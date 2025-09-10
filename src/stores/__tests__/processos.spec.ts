@@ -36,7 +36,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "situacao": "Concluído",
             "unidadeAtual": "SESEL",
             "unidadeAnterior": null,
-            "movimentacoes": []
+            "movimentacoes": [],
+            "analises": []
         },
         {
             "id": 2,
@@ -49,7 +50,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "situacao": "Em andamento",
             "unidadeAtual": "COSIS",
             "unidadeAnterior": "SESEL",
-            "movimentacoes": []
+            "movimentacoes": [],
+            "analises": []
         },
         {
             "id": 3,
@@ -62,7 +64,8 @@ vi.mock('../../mocks/subprocessos.json', () => ({
             "situacao": "Em andamento",
             "unidadeAtual": "SEDESENV",
             "unidadeAnterior": null,
-            "movimentacoes": []
+            "movimentacoes": [],
+            "analises": []
         }
     ]
 }));
@@ -89,6 +92,7 @@ describe('useProcessosStore', () => {
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
         dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
         movimentacoes: [],
+        analises: [],
     });
 
     beforeEach(() => {
@@ -124,7 +128,8 @@ describe('useProcessosStore', () => {
                     "dataFimEtapa2": "2025-06-15",
                     "situacao": "Concluído",
                     "unidadeAtual": "SESEL",
-                    "unidadeAnterior": null
+                    "unidadeAnterior": null,
+                    "analises": []
                 },
                 {
                     "id": 2,
@@ -136,7 +141,8 @@ describe('useProcessosStore', () => {
                     "dataFimEtapa2": null,
                     "situacao": "Em andamento",
                     "unidadeAtual": "COSIS",
-                    "unidadeAnterior": "SESEL"
+                    "unidadeAnterior": "SESEL",
+                    "analises": []
                 },
                 {
                     "id": 3,
@@ -148,7 +154,8 @@ describe('useProcessosStore', () => {
                     "dataFimEtapa2": null,
                     "situacao": "Em andamento",
                     "unidadeAtual": "SEDESENV",
-                    "unidadeAnterior": null
+                    "unidadeAnterior": null,
+                    "analises": []
                 }
             ].map(parsesubprocessoDates)
         });
@@ -201,14 +208,16 @@ describe('useProcessosStore', () => {
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
                     dataFimEtapa1: null, dataFimEtapa2: null,
                     situacao: 'Em andamento', unidadeAtual: 'NOVA1', unidadeAnterior: null,
-                    movimentacoes: []
+                    movimentacoes: [],
+                    analises: []
                 },
                 {
                     id: 5, idProcesso: 3, unidade: 'NOVA2',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
                     dataFimEtapa1: null, dataFimEtapa2: null,
                     situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnterior: null,
-                    movimentacoes: []
+                    movimentacoes: [],
+                    analises: []
                 }
             ];
             const initialLength = processosStore.subprocessos.length;
@@ -227,7 +236,7 @@ describe('useProcessosStore', () => {
 
             processosStore.finalizarProcesso(2); // Processo with id 2 is 'Em andamento'
 
-            const processoFinalizado = processosStore.processos.find(p => p.id === 2);
+            const processoFinalizado = processosStore.processos.find((p: Processo) => p.id === 2);
             expect(processoFinalizado?.situacao).toBe(SituacaoProcesso.FINALIZADO);
             expect(processoFinalizado?.dataFinalizacao).toEqual(now);
 

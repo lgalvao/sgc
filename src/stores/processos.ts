@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import processosMock from '../mocks/processos.json'
 import subprocessosMock from '../mocks/subprocessos.json'
-import {Movimentacao, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
+import {Movimentacao, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 import {useUnidadesStore} from './unidades'
 
 import {useAlertasStore} from './alertas'
@@ -51,35 +51,30 @@ function parseProcessoDates(processo: Omit<Processo, 'dataLimite' | 'dataFinaliz
     };
 }
 
-function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'situacao'> & {
-    dataLimiteEtapa1?: string | null,
-    dataLimiteEtapa2?: string | null,
-    dataFimEtapa1?: string | null,
-    dataFimEtapa2?: string | null,
-    situacao: string
-}): Subprocesso {
+function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
     return {
-        ...pu,
-        situacao: pu.situacao as Subprocesso['situacao'],
-        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
-        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
-        dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
-        dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
-        movimentacoes: [],
-        analises: [],
+        id: pu.id || 0,
+        idProcesso: pu.idProcesso || 0,
+        unidade: pu.unidade || '',
+        situacao: pu.situacao || SITUACOES_SUBPROCESSO.NAO_INICIADO,
+        unidadeAtual: pu.unidadeAtual || '',
+        unidadeAnterior: pu.unidadeAnterior || null,
+        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1 as any) || new Date() : new Date(),
+        dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1 as any) : null,
+        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2 as any) : null,
+        dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2 as any) : null,
+        sugestoes: pu.sugestoes || undefined,
+        observacoes: pu.observacoes || undefined,
+        movimentacoes: pu.movimentacoes || [],
+        analises: pu.analises || [],
+        idMapaCopiado: pu.idMapaCopiado || undefined,
     };
 }
 
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        subprocessos: (subprocessosMock as (Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
-            dataLimiteEtapa1?: string | null;
-            dataLimiteEtapa2?: string | null;
-            dataFimEtapa1?: string | null;
-            dataFimEtapa2?: string | null;
-            movimentacoes: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string; }>;
-        })[]).map(parseSubprocessoDates) as Subprocesso[],
+        subprocessos: (subprocessosMock as Partial<Subprocesso>[]).map(parseSubprocessoDates) as Subprocesso[],
         movements: [] as Movimentacao[]
     }),
     getters: {
@@ -259,7 +254,6 @@ export const useProcessosStore = defineStore('processos', {
                 }
 
 
-
                 if (perfil === 'ADMIN') {
                     // ADMIN: homologar diretamente
                     this.subprocessos[subprocessoIndex] = {
@@ -324,7 +318,6 @@ export const useProcessosStore = defineStore('processos', {
                 if (!unidadeInferior) {
                     throw new Error('Unidade anterior não encontrada');
                 }
-
 
 
                 // Registrar movimentação

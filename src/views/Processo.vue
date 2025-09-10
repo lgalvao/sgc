@@ -225,6 +225,7 @@ import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
 import {Processo, Subprocesso, Unidade} from '@/types/tipos'
+import {ensureValidDate} from '@/utils/dateUtils'
 
 interface TreeTableItem {
   id: number | string;
@@ -326,10 +327,11 @@ const dadosFormatados = computed<TreeTableItem[]>(() => {
 })
 
 function formatarData(data: Date | null): string {
-  if (!data) return ''
-  const dia = String(data.getDate()).padStart(2, '0');
-  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexed
-  const ano = data.getFullYear();
+  const validDate = ensureValidDate(data);
+  if (!validDate) return '';
+  const dia = String(validDate.getDate()).padStart(2, '0');
+  const mes = String(validDate.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexed
+  const ano = validDate.getFullYear();
   return `${dia}/${mes}/${ano}`
 }
 
@@ -348,7 +350,8 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
       const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: Subprocesso) => pu.unidade === item.sigla);
       if (Subprocesso) {
         situacao = Subprocesso.situacao;
-        dataLimite = formatarData(Subprocesso.dataLimiteEtapa1);
+
+        dataLimite = formatarData(Subprocesso.dataLimiteEtapa1 || null);
         unidadeAtual = Subprocesso.unidadeAtual;
       }
     }

@@ -2,37 +2,32 @@ import {defineStore} from 'pinia'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Movimentacao, Subprocesso} from '@/types/tipos'
 import {parseDate} from '@/utils/dateUtils'
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 
-function parseSubprocessoDates(pu: Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2' | 'movimentacoes'> & {
-    dataLimiteEtapa1?: string | null,
-    dataLimiteEtapa2?: string | null,
-    dataFimEtapa1?: string | null,
-    dataFimEtapa2?: string | null,
-    movimentacoes?: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string }>
-}): Subprocesso {
+function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
     return {
-        ...pu,
-        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
-        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
-        dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
-        dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
-        movimentacoes: pu.movimentacoes ? pu.movimentacoes.map(mov => ({
-            ...mov,
-            dataHora: parseDate(mov.dataHora) || new Date()
-        })) : []
+        id: pu.id || 0,
+        idProcesso: pu.idProcesso || 0,
+        unidade: pu.unidade || '',
+        situacao: SITUACOES_SUBPROCESSO.MAPA_CRIADO,
+        unidadeAtual: pu.unidadeAtual || '',
+        unidadeAnterior: pu.unidadeAnterior || null,
+        dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1 as any) || new Date() : new Date(),
+        dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1 as any) : null,
+        dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2 as any) : null,
+        dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2 as any) : null,
+        sugestoes: pu.sugestoes || undefined,
+        observacoes: pu.observacoes || undefined,
+        movimentacoes: pu.movimentacoes || [],
+        analises: pu.analises || [],
+        idMapaCopiado: pu.idMapaCopiado || undefined,
     };
 }
 
-defineStore('subprocessos', {
+export const useSubprocessosStore = defineStore('subprocessos', {
     state: () => {
         return {
-            subprocessos: (subprocessosMock as (Omit<Subprocesso, 'dataLimiteEtapa1' | 'dataLimiteEtapa2' | 'dataFimEtapa1' | 'dataFimEtapa2'> & {
-                dataLimiteEtapa1?: string | null;
-                dataLimiteEtapa2?: string | null;
-                dataFimEtapa1?: string | null;
-                dataFimEtapa2?: string | null;
-                movimentacoes: Array<Omit<Movimentacao, 'dataHora'> & { dataHora: string; }>;
-            })[]).map(parseSubprocessoDates) as Subprocesso[],
+            subprocessos: (subprocessosMock as Partial<Subprocesso>[]).map(parseSubprocessoDates) as Subprocesso[],
         };
     },
     getters: {
@@ -41,17 +36,8 @@ defineStore('subprocessos', {
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
             const subprocesso = state.subprocessos.find(sp => sp.id === idSubprocesso);
-
             return subprocesso ? subprocesso.movimentacoes.sort((a: Movimentacao, b: Movimentacao) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
         },
-        getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
-            return state.subprocessos.filter(pu =>
-                pu.idProcesso === idProcesso &&
-                pu.unidadeAtual === siglaUnidadeUsuario &&
-                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
-            );
-        },
-
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             return state.subprocessos.filter(pu =>
                 pu.idProcesso === idProcesso &&

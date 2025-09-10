@@ -125,3 +125,11 @@ export function diffInDays(date1: Date, date2: Date): number {
   const diffTime = Math.abs(date2.getTime() - date1.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
+
+export function ensureValidDate(date: Date | null | undefined): Date | null {
+  if (!date) return null;
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    return date;
+  }
+  return null;
+}
