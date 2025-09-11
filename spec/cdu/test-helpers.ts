@@ -195,6 +195,7 @@ const LOGIN_DATA: Record<string, LoginData> = {
     ADMIN: { idServidor: '6', perfil: 'ADMIN', unidade: 'SEDOC' },
     GESTOR: { idServidor: '1', perfil: 'GESTOR', unidade: 'SESEL' },
     CHEFE: { idServidor: '14', perfil: 'CHEFE', unidade: 'STIC' },
+    CHEFE_SEDIA: { idServidor: '14', perfil: 'CHEFE', unidade: 'SEDIA' },
     SERVIDOR: { idServidor: '15', perfil: 'SERVIDOR', unidade: 'STIC' }
 };
 
@@ -218,5 +219,6 @@ async function loginAs(page: Page, role: keyof typeof LOGIN_DATA): Promise<void>
 export const loginAsAdmin = (page: Page) => loginAs(page, 'ADMIN');
 export const loginAsGestor = (page: Page) => loginAs(page, 'GESTOR');
 export const loginAsChefe = (page: Page) => loginAs(page, 'CHEFE');
+export const loginAsChefeSedia = (page: Page) => loginAs(page, 'CHEFE_SEDIA');
 export const loginAsServidor = (page: Page) => loginAs(page, 'SERVIDOR');
 

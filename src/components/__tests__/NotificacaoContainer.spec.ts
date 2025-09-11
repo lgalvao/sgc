@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import {createPinia, setActivePinia} from 'pinia';
 import NotificacaoContainer from '../NotificacaoContainer.vue';
 import {type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
-import {iconeTipo} from '@/utils/notificationIcons';
+import {iconeTipo} from '@/utils';
 
 describe('NotificacaoContainer.vue', () => {
     let notificacoesStore: ReturnType<typeof useNotificacoesStore>;

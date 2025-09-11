@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
-import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils/dateUtils';
+import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils';
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 interface Props {

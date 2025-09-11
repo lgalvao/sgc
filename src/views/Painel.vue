@@ -85,7 +85,7 @@ import {useRouter} from 'vue-router'
 import {Perfil, Processo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados'; // Importar o novo composable
-import {formatDateTimeBR} from '@/utils/dateUtils';
+import {formatDateTimeBR} from '@/utils';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()

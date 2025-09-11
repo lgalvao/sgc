@@ -168,7 +168,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
 import {Processo, SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
-import {generateUniqueId} from '@/utils/idGenerator'
+import {generateUniqueId} from '@/utils'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 

@@ -97,7 +97,7 @@
         "descricao": "Suporte técnico",
         "atividadesAssociadas": [
           6,
-          7
+          500
         ]
       }
     ],
@@ -148,9 +148,9 @@
         "id": 4,
         "descricao": "Desenvolvimento de sistemas",
         "atividadesAssociadas": [
-          1,
-          2,
-          3
+          400,
+          401,
+          402
         ]
       },
       {
@@ -166,7 +166,7 @@
         "descricao": "Suporte técnico",
         "atividadesAssociadas": [
           6,
-          7
+          500
         ]
       }
     ],
@@ -217,16 +217,16 @@
         "id": 7,
         "descricao": "Gestão de competências",
         "atividadesAssociadas": [
-          1,
-          2
+          503,
+          506
         ]
       },
       {
         "id": 8,
         "descricao": "Análise de dados",
         "atividadesAssociadas": [
-          3,
-          4
+          506,
+          503
         ]
       }
     ],
@@ -244,16 +244,16 @@
         "id": 9,
         "descricao": "Desenvolvimento de software",
         "atividadesAssociadas": [
-          1,
-          2
+          509,
+          512
         ]
       },
       {
         "id": 10,
         "descricao": "Testes e qualidade",
         "atividadesAssociadas": [
-          3,
-          4
+          512,
+          509
         ]
       }
     ],
@@ -271,16 +271,16 @@
         "id": 11,
         "descricao": "Gestão organizacional",
         "atividadesAssociadas": [
-          1,
-          2
+          515,
+          518
         ]
       },
       {
         "id": 12,
         "descricao": "Planejamento estratégico",
         "atividadesAssociadas": [
-          3,
-          4
+          518,
+          515
         ]
       }
     ],

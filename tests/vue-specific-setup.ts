@@ -1,6 +1,6 @@
 import {ErrorReporter} from './utils/error-reporter';
 import {Page, test as base} from '@playwright/test';
-import {parseDate} from '../src/utils/dateUtils'; // Importar parseDate
+import {parseDate} from '../src/utils'; // Importar parseDate
 
 // Definição de uma interface para a janela com propriedades customizadas
 interface CustomWindow extends Window {

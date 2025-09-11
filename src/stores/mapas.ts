@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import mapasData from '../mocks/mapas.json' assert {type: 'json'};
 import type {Mapa} from '@/types/tipos'
-import {parseDate} from '@/utils/dateUtils'
+import {parseDate} from '@/utils'
 
 function parseMapaDates(mapa: Omit<Mapa, 'dataCriacao' | 'dataDisponibilizacao' | 'dataFinalizacao'>
     & { dataCriacao: string, dataDisponibilizacao?: string | null, dataFinalizacao?: string | null }): Mapa {

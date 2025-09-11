@@ -5,9 +5,8 @@ import {Movimentacao, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} fro
 import {useUnidadesStore} from './unidades'
 
 import {useAlertasStore} from './alertas'
-import {parseDate} from '@/utils/dateUtils'
+import {generateUniqueId, parseDate} from '@/utils'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
-import {generateUniqueId} from '@/utils/idGenerator'
 import {useNotificacoesStore} from './notificacoes'
 
 function mapTipoProcesso(tipo: string): TipoProcesso {
@@ -413,6 +412,8 @@ export const useProcessosStore = defineStore('processos', {
                     unidadeAnterior: unidade,
                     situacao: SITUACOES_SUBPROCESSO.MAPA_COM_SUGESTOES,
                     sugestoes: sugestoes,
+                    dataFimEtapa2: new Date(), // Definir data/hora de conclusão da etapa 2
+                    analises: [], // Excluir histórico de análise
                     movimentacoes: subprocesso.movimentacoes || [],
                 };
 
@@ -462,6 +463,8 @@ export const useProcessosStore = defineStore('processos', {
                     unidadeAtual: unidadeSuperior,
                     unidadeAnterior: unidade,
                     situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+                    dataFimEtapa2: new Date(), // Definir data/hora de conclusão da etapa 2
+                    analises: [], // Excluir histórico de análise
                     movimentacoes: subprocesso.movimentacoes || [],
                 };
 

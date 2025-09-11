@@ -305,7 +305,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
-import {formatDateBR} from '@/utils/dateUtils'
+import {formatDateBR} from '@/utils'
 
 // Stores
 const processosStore = useProcessosStore()

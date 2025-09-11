@@ -615,5 +615,110 @@
         "descricao": "Estratégias de teste de regressão"
       }
     ]
+  },
+  {
+    "id": 500,
+    "descricao": "Suporte técnico especializado",
+    "idSubprocesso": 5,
+    "conhecimentos": [
+      {
+        "id": 501,
+        "descricao": "Atendimento de chamados técnicos"
+      },
+      {
+        "id": 502,
+        "descricao": "Resolução de problemas de hardware"
+      }
+    ]
+  },
+  {
+    "id": 503,
+    "descricao": "Gestão de competências organizacionais",
+    "idSubprocesso": 15,
+    "conhecimentos": [
+      {
+        "id": 504,
+        "descricao": "Mapeamento de competências"
+      },
+      {
+        "id": 505,
+        "descricao": "Avaliação de desempenho"
+      }
+    ]
+  },
+  {
+    "id": 506,
+    "descricao": "Análise de dados estratégicos",
+    "idSubprocesso": 15,
+    "conhecimentos": [
+      {
+        "id": 507,
+        "descricao": "Business Intelligence"
+      },
+      {
+        "id": 508,
+        "descricao": "Análise estatística"
+      }
+    ]
+  },
+  {
+    "id": 509,
+    "descricao": "Desenvolvimento de software avançado",
+    "idSubprocesso": 27,
+    "conhecimentos": [
+      {
+        "id": 510,
+        "descricao": "Arquitetura de software"
+      },
+      {
+        "id": 511,
+        "descricao": "Padrões de design"
+      }
+    ]
+  },
+  {
+    "id": 512,
+    "descricao": "Testes e qualidade de software",
+    "idSubprocesso": 27,
+    "conhecimentos": [
+      {
+        "id": 513,
+        "descricao": "Testes unitários e integração"
+      },
+      {
+        "id": 514,
+        "descricao": "Controle de qualidade"
+      }
+    ]
+  },
+  {
+    "id": 515,
+    "descricao": "Gestão organizacional estratégica",
+    "idSubprocesso": 28,
+    "conhecimentos": [
+      {
+        "id": 516,
+        "descricao": "Planejamento estratégico"
+      },
+      {
+        "id": 517,
+        "descricao": "Gestão de processos"
+      }
+    ]
+  },
+  {
+    "id": 518,
+    "descricao": "Planejamento estratégico avançado",
+    "idSubprocesso": 28,
+    "conhecimentos": [
+      {
+        "id": 519,
+        "descricao": "Análise de cenários"
+      },
+      {
+        "id": 520,
+        "descricao": "Gestão de riscos"
+      }
+    ]
   }
 ]

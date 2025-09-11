@@ -100,7 +100,7 @@
 
 <script lang="ts" setup>
 import {type EmailContent, type Notificacao, useNotificacoesStore} from '@/stores/notificacoes';
-import {iconeTipo} from '@/utils/notificationIcons'; // Importar a função iconeTipo
+import {iconeTipo} from '@/utils'; // Importar a função iconeTipo
 import {storeToRefs} from 'pinia';
 import {onMounted, onUnmounted, ref, watch} from 'vue';
 

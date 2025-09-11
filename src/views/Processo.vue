@@ -225,7 +225,7 @@ import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
 import {Processo, Subprocesso, Unidade} from '@/types/tipos'
-import {ensureValidDate} from '@/utils/dateUtils'
+import {ensureValidDate} from '@/utils'
 
 interface TreeTableItem {
   id: number | string;

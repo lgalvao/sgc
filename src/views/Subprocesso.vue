@@ -99,7 +99,7 @@ import {
   TipoResponsabilidade,
   Unidade
 } from "@/types/tipos";
-import {formatDateTimeBR, parseDate} from '@/utils/dateUtils';
+import {formatDateTimeBR, parseDate} from '@/utils';
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';

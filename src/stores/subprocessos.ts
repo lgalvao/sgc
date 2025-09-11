@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import subprocessosMock from '../mocks/subprocessos.json'
 import {Movimentacao, Subprocesso} from '@/types/tipos'
-import {parseDate} from '@/utils/dateUtils'
+import {parseDate} from '@/utils'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 
 function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {

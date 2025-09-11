@@ -2,8 +2,7 @@ import {defineStore} from 'pinia'
 import analisesMock from '../mocks/analises.json'
 import type {AnaliseValidacao} from '@/types/tipos'
 import {ResultadoAnalise} from '@/types/tipos'
-import {generateUniqueId} from '@/utils/idGenerator'
-import {parseDate} from '@/utils/dateUtils'
+import {generateUniqueId, parseDate} from '@/utils'
 
 function mapResultadoAnalise(resultado: string): ResultadoAnalise {
     switch (resultado) {

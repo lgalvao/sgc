@@ -24,6 +24,17 @@
           Validar
         </button>
 
+        <!-- Botão Histórico de análise para CHEFE (CDU-19) -->
+        <button
+          v-if="podeValidar && temHistoricoAnalise"
+          class="btn btn-outline-secondary"
+          title="Histórico de análise"
+          data-testid="historico-analise-btn"
+          @click="verHistorico"
+        >
+          Histórico de análise
+        </button>
+
         <!-- Botões para GESTOR/ADMIN (CDU-20 - Analisar validação) -->
         <button
           v-if="podeAnalisar"
@@ -39,7 +50,7 @@
           v-if="podeAnalisar"
           class="btn btn-outline-secondary"
           title="Histórico de análise"
-          data-testid="historico-analise-btn"
+          data-testid="historico-analise-btn-gestor"
           @click="verHistorico"
         >
           Histórico de análise
@@ -449,7 +460,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
-import {Atividade, Competencia, Conhecimento, Subprocesso, Unidade} from '@/types/tipos';
+import {Atividade, Competencia, Conhecimento, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -526,6 +537,10 @@ const podeVerSugestoes = computed(() => {
   return subprocesso.value?.situacao === 'Mapa com sugestões'
 })
 
+const temHistoricoAnalise = computed(() => {
+  return historicoAnalise.value.length > 0
+})
+
 const historicoAnalise = computed(() => {
   if (!idSubprocesso.value) return []
 
@@ -556,6 +571,10 @@ function fecharModalAceitar() {
 }
 
 function abrirModalSugestoes() {
+  // Pré-preencher com sugestões existentes se houver
+  if (subprocesso.value?.sugestoes) {
+    sugestoes.value = subprocesso.value.sugestoes
+  }
   mostrarModalSugestoes.value = true
 }
 
@@ -665,6 +684,17 @@ async function confirmarValidacao() {
 
 async function confirmarAceitacao() {
   try {
+    // Registrar análise de aceite (apenas para GESTOR, ADMIN não registra análise)
+    if (perfilSelecionado.value === 'GESTOR' && idSubprocesso.value) {
+      analisesStore.registrarAnalise({
+        idSubprocesso: idSubprocesso.value,
+        dataHora: new Date(),
+        unidade: unidade.value?.sigla || '',
+        resultado: ResultadoAnalise.ACEITE,
+        observacao: undefined // Modal AceitarMapaModal não tem campo de observação
+      })
+    }
+
     await processosStore.aceitarMapa({
       idProcesso: idProcesso.value,
       unidade: sigla.value,
@@ -698,6 +728,17 @@ async function confirmarAceitacao() {
 
 async function confirmarDevolucao() {
   try {
+    // Registrar análise de devolução
+    if (idSubprocesso.value) {
+      analisesStore.registrarAnalise({
+        idSubprocesso: idSubprocesso.value,
+        dataHora: new Date(),
+        unidade: perfilSelecionado.value === 'ADMIN' ? 'SEDOC' : (unidade.value?.sigla || ''),
+        resultado: ResultadoAnalise.DEVOLUCAO,
+        observacao: observacaoDevolucao.value || undefined
+      })
+    }
+
     await processosStore.rejeitarMapa({
       idProcesso: idProcesso.value,
       unidade: sigla.value

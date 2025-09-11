@@ -167,7 +167,7 @@
 import {computed, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {type EmailContent, type Notificacao, type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes'
-import {formatDateTimeBR} from '@/utils/dateUtils'
+import {formatDateTimeBR} from '@/utils'
 
 interface Props {
   mostrarModal: boolean

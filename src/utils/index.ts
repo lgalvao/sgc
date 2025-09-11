@@ -1,17 +1,39 @@
 /**
- * Utilitários para manipulação de datas no projeto SGC
+ * Utilitários centralizados do projeto SGC
  */
 
-/**
- * Converte uma string de data para objeto Date
- * @param dateString - String no formato ISO ou brasileiro
- * @returns Date object ou null se inválido
- */
+import {CLASSES_BADGE_SITUACAO} from '@/constants/situacoes';
+import {TipoNotificacao} from '@/stores/notificacoes';
+
+// ===== GERAÇÃO DE IDs =====
+let counter = 0;
+export function generateUniqueId(): number {
+  return Date.now() * 1000 + (counter++ % 1000);
+}
+
+// ===== CLASSES DE BADGE =====
+export function badgeClass(situacao: string): string {
+  return CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] || 'bg-secondary';
+}
+
+// ===== ÍCONES DE NOTIFICAÇÃO =====
+export const iconeTipo = (tipo: TipoNotificacao): string => {
+  switch (tipo) {
+    case 'success': return 'bi bi-check-circle-fill text-success';
+    case 'error': return 'bi bi-exclamation-triangle-fill text-danger';
+    case 'warning': return 'bi bi-exclamation-triangle-fill text-warning';
+    case 'info': return 'bi bi-info-circle-fill text-info';
+    case 'email': return 'bi bi-envelope-fill text-primary';
+    default: return 'bi bi-bell-fill';
+  }
+};
+
+// ===== UTILITÁRIOS DE DATA =====
 export function parseDate(dateString: string | null | undefined): Date | null {
   if (!dateString) return null;
 
   try {
-    // Tenta formato brasileiro DD/MM/YYYY primeiro
+    // Formato brasileiro DD/MM/YYYY
     const brMatch = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     if (brMatch) {
       const [, day, month, year] = brMatch;
@@ -19,7 +41,6 @@ export function parseDate(dateString: string | null | undefined): Date | null {
       const monthNum = parseInt(month) - 1;
       const yearNum = parseInt(year);
 
-      // Valida ranges básicos
       if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > 2100) {
         return null;
       }
@@ -27,8 +48,8 @@ export function parseDate(dateString: string | null | undefined): Date | null {
       return new Date(yearNum, monthNum, dayNum);
     }
 
-    // Tenta formato ISO
-    const date = new Date(dateString + 'T00:00:00.000Z'); // Força UTC para evitar timezone issues
+    // Formato ISO
+    const date = new Date(dateString + 'T00:00:00.000Z');
     if (!isNaN(date.getTime())) {
       return date;
     }
@@ -38,12 +59,6 @@ export function parseDate(dateString: string | null | undefined): Date | null {
   }
 }
 
-/**
- * Formata data para exibição em português brasileiro
- * @param date - Date object ou string
- * @param options - Opções de formatação
- * @returns String formatada ou 'Não informado' se null
- */
 export function formatDateBR(
   date: Date | string | null | undefined,
   options: Intl.DateTimeFormatOptions = {
@@ -64,11 +79,6 @@ export function formatDateBR(
   }
 }
 
-/**
- * Formata data para campos de input (YYYY-MM-DD)
- * @param date - Date object
- * @returns String no formato YYYY-MM-DD ou vazia se null
- */
 export function formatDateForInput(date: Date | null | undefined): string {
   if (!date || isNaN(date.getTime())) return '';
 
@@ -82,11 +92,6 @@ export function formatDateForInput(date: Date | null | undefined): string {
   }
 }
 
-/**
- * Formata data e hora para exibição
- * @param date - Date object ou string
- * @returns String formatada com data e hora
- */
 export function formatDateTimeBR(date: Date | string | null | undefined): string {
   return formatDateBR(date, {
     year: 'numeric',
@@ -97,11 +102,6 @@ export function formatDateTimeBR(date: Date | string | null | undefined): string
   });
 }
 
-/**
- * Verifica se uma data é válida e futura
- * @param date - Date object
- * @returns true se a data é hoje ou futura
- */
 export function isDateValidAndFuture(date: Date | null | undefined): boolean {
   if (!date) return false;
 
@@ -115,12 +115,6 @@ export function isDateValidAndFuture(date: Date | null | undefined): boolean {
   }
 }
 
-/**
- * Calcula diferença em dias entre duas datas
- * @param date1 - Primeira data
- * @param date2 - Segunda data
- * @returns Número de dias de diferença
- */
 export function diffInDays(date1: Date, date2: Date): number {
   const diffTime = Math.abs(date2.getTime() - date1.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
