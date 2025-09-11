@@ -299,7 +299,8 @@
         "descricao": "Desenvolvimento de sistemas",
         "atividadesAssociadas": [
           1,
-          2
+          2,
+          3
         ]
       }
     ],
@@ -317,7 +318,9 @@
         "id": 14,
         "descricao": "Gestão eleitoral",
         "atividadesAssociadas": [
-          6
+          6,
+          2,
+          3
         ]
       }
     ],
@@ -336,7 +339,8 @@
         "descricao": "Infraestrutura de TI",
         "atividadesAssociadas": [
           4,
-          5
+          5,
+          3
         ]
       }
     ],
@@ -355,7 +359,8 @@
         "descricao": "Desenvolvimento organizacional",
         "atividadesAssociadas": [
           1,
-          3
+          3,
+          2
         ]
       }
     ],
