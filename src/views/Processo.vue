@@ -437,7 +437,7 @@ async function executarFinalizacao() {
         // Notificar unidades operacionais/interoperacionais diretamente
         unidadesSubordinadas.forEach(siglaUnidade => {
           notificacoesStore.email(
-              EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao, siglaUnidade),
+              EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao),
               `Responsável pela ${siglaUnidade}`,
               EMAIL_TEMPLATES.CORPO_EMAIL_OPERACIONAL(processoAtual.descricao, siglaUnidade)
           );
@@ -445,7 +445,7 @@ async function executarFinalizacao() {
       } else {
         // Notificar unidades superiores com lista de subordinadas
         notificacoesStore.email(
-            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior),
+            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao),
             `Responsável pela ${unidadeSuperior}`,
             EMAIL_TEMPLATES.CORPO_EMAIL_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior, unidadesSubordinadas)
         );

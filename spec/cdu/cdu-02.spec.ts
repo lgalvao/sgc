@@ -4,7 +4,7 @@ import {loginAsAdmin, loginAsChefe, loginAsGestor, loginAsServidor} from '~/util
 import {SELECTORS, URLS} from './test-constants';
 import {
     clickAndVerifyProcessTableSort,
-    expectCommonPainelElements,
+    expectCommonDashboardElements,
     expectNotVisible,
     expectUrl,
     expectVisible,
@@ -13,58 +13,35 @@ import {
 
 test.describe('CDU-02: Visualizar Painel', () => {
   test('deve exibir tela Painel com seções Processos e Alertas para SERVIDOR', async ({ page }) => {
-    // 1. Usuário faz login como SERVIDOR
     await loginAsServidor(page);
-
-    // 2. Sistema exibe tela Painel
     await expectUrl(page, `**${URLS.PAINEL}`);
-      await expectCommonPainelElements(page);
-
-    // 5. SERVIDOR não vê botão Criar processo
+    await expectCommonDashboardElements(page);
     await expectNotVisible(page, SELECTORS.BTN_CRIAR_PROCESSO);
-
-    // 6. Seção Alertas
     await expectVisible(page, SELECTORS.TABELA_ALERTAS);
   });
 
   test('deve exibir tela Painel para GESTOR sem botão Criar processo', async ({ page }) => {
-    // 1. Usuário faz login como GESTOR
     await loginAsGestor(page);
-
-    // 2. Sistema exibe tela Painel
-      await expectUrl(page, `**${URLS.PAINEL}`);
-      await expectCommonPainelElements(page);
-
-    // 3. GESTOR não vê botão Criar processo
-      await expectNotVisible(page, SELECTORS.BTN_CRIAR_PROCESSO);
+    await expectUrl(page, `**${URLS.PAINEL}`);
+    await expectCommonDashboardElements(page);
+    await expectNotVisible(page, SELECTORS.BTN_CRIAR_PROCESSO);
   });
 
   test('deve exibir tela Painel para CHEFE', async ({ page }) => {
-    // 1. Usuário faz login como CHEFE
     await loginAsChefe(page);
-
-    // 2. Sistema exibe tela Painel diretamente
-      await expectUrl(page, `**${URLS.PAINEL}`);
-      await expectCommonPainelElements(page);
-
-    // 3. CHEFE não vê botão Criar processo
-      await expectNotVisible(page, SELECTORS.BTN_CRIAR_PROCESSO);
+    await expectUrl(page, `**${URLS.PAINEL}`);
+    await expectCommonDashboardElements(page);
+    await expectNotVisible(page, SELECTORS.BTN_CRIAR_PROCESSO);
   });
 
   test('deve permitir ordenação de processos por descrição', async ({ page }) => {
-    // 1. Login usando função que já funciona
     await loginAsAdmin(page);
-
-      // 2. Clicar no cabeçalho Descrição da tabela de processos e verificar visibilidade
-      await clickAndVerifyProcessTableSort(page, SELECTORS.COLUNA_DESCRICAO);
+    await clickAndVerifyProcessTableSort(page, SELECTORS.COLUNA_DESCRICAO);
   });
 
   test('deve permitir ordenação de processos por tipo', async ({ page }) => {
-    // 1. Login usando função que já funciona
     await loginAsAdmin(page);
-
-      // 2. Clicar no cabeçalho Tipo da tabela de processos e verificar visibilidade
-      await clickAndVerifyProcessTableSort(page, SELECTORS.COLUNA_TIPO);
+    await clickAndVerifyProcessTableSort(page, SELECTORS.COLUNA_TIPO);
   });
 
   test('deve permitir clicar em processo SERVIDOR e navegar para detalhes', async ({ page }) => {

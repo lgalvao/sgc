@@ -71,12 +71,13 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
 import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils/dateUtils';
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 interface Props {
    mostrarModal: boolean;
    dataLimiteAtual: Date | null;
    etapaAtual: number | null;
-   situacaoEtapaAtual: string;
+   situacaoEtapaAtual: typeof SITUACOES_SUBPROCESSO[keyof typeof SITUACOES_SUBPROCESSO] | 'Não informado';
 }
 
 const props = defineProps<Props>();

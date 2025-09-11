@@ -14,7 +14,7 @@
           <button
             type="button"
             class="btn-close"
-            @click="_emit('fechar')"
+            @click="emit('fechar')"
           />
         </div>
         <div class="modal-body">
@@ -52,7 +52,7 @@
           <button
             type="button"
             class="btn btn-secondary"
-            @click="_emit('fechar')"
+            @click="emit('fechar')"
           >
             Fechar
           </button>
@@ -67,26 +67,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import { useProcessosStore } from '@/stores/processos';
-import { AnaliseValidacao } from '@/types/tipos';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import {ref, watch} from 'vue';
+
+import {useAnalisesStore} from '@/stores/analises';
+import {AnaliseValidacao} from '@/types/tipos';
+import {format} from 'date-fns';
+import {ptBR} from 'date-fns/locale';
 
 const props = defineProps<{
   mostrar: boolean;
   idSubprocesso: number | undefined;
 }>();
 
-const _emit = defineEmits(['fechar']);
+const emit = defineEmits(['fechar']);
 
-const processosStore = useProcessosStore();
+
+const analisesStore = useAnalisesStore();
 const analises = ref<AnaliseValidacao[]>([]);
 
 watch(() => props.mostrar, (newVal) => {
   if (newVal && props.idSubprocesso) {
     // TODO: Implementar método na store para buscar análises
-    analises.value = processosStore.getAnalisesBySubprocessoId(props.idSubprocesso);
+    analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
   }
 }, { immediate: true });
 

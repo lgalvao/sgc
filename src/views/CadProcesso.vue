@@ -250,7 +250,8 @@ function salvarProcesso() {
      unidadeAtual: unidadeSigla,
      unidadeAnterior: null,
      situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
-     movimentacoes: []
+     movimentacoes: [],
+     analises: []
    }));
 
    const novo = {
@@ -315,7 +316,8 @@ function iniciarProcesso() {
        situacao: situacaoInicial,
        observacoes: '',
        sugestoes: '',
-       movimentacoes: []
+       movimentacoes: [],
+       analises: []
      };
    });
 

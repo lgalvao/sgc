@@ -4,6 +4,7 @@
     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
     "tipo": "ADMINISTRATIVA",
     "idServidorTitular": 7,
+    "id": 1,
     "filhas": [
       {
         "sigla": "SGP",
@@ -45,6 +46,7 @@
         "tipo": "INTEROPERACIONAL",
         "idServidorTitular": 5,
         "responsavel": null,
+        "id": 2,
         "filhas": [
           {
             "sigla": "COSIS",

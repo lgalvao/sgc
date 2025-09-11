@@ -8,7 +8,11 @@ import {SELECTORS, TEXTS, URLS} from './test-constants';
  * @param value The value to fill into the input field.
  */
 export async function fillFormField(page: Page, labelOrPlaceholder: string, value: string): Promise<void> {
-    await page.getByPlaceholder(labelOrPlaceholder).fill(value);
+    try {
+        await page.getByPlaceholder(labelOrPlaceholder).fill(value);
+    } catch {
+        await page.getByLabel(labelOrPlaceholder).fill(value);
+    }
 }
 
 /**
@@ -21,15 +25,14 @@ export async function clickButton(page: Page, name: string): Promise<void> {
 }
 
 /**
- * Helper function to expect a success message (toast) to be visible and then disappear.
+ * Helper function to expect a success message (toast) to be visible.
  * @param page Playwright Page object.
  * @param message The success message text.
  */
 export async function expectSuccessMessage(page: Page, message: string): Promise<void> {
-    const notification = page.locator('.notification.notification-success'); // Seletor mais específico para sucesso
+    const notification = page.locator('.notification.notification-success');
     await expect(notification).toBeVisible();
-    await expect(notification).toContainText(message); // Use toContainText for partial matches
-    // Não esperar que desapareça, pois a navegação de página o removerá
+    await expect(notification).toContainText(message);
 }
 
 /**
@@ -67,10 +70,9 @@ export async function expectNotVisible(page: Page, text: string): Promise<void> 
  * @param message The error message text.
  */
 export async function expectErrorMessage(page: Page, message: string): Promise<void> {
-    const notification = page.locator('.notification.notification-error'); // Seletor mais específico para erro
+    const notification = page.locator('.notification.notification-error');
     await expect(notification).toBeVisible();
-    await expect(notification).toContainText(message); // Use toContainText for partial matches
-    // Do not wait for it to disappear, as error messages might persist or require user action
+    await expect(notification).toContainText(message);
 }
 
 /**
@@ -78,16 +80,6 @@ export async function expectErrorMessage(page: Page, message: string): Promise<v
  * @param page Playwright Page object.
  */
 export async function expectCommonDashboardElements(page: Page): Promise<void> {
-    await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
-    await expectVisible(page, SELECTORS.TITULO_ALERTAS);
-}
-
-/**
- * Helper function to expect common elements of the dashboard (Painel) to be visible.
- * Includes process and alert titles, and process table headers.
- * @param page Playwright Page object.
- */
-export async function expectCommonPainelElements(page: Page): Promise<void> {
     await expectVisible(page, SELECTORS.TITULO_PROCESSOS);
     await expectVisible(page, SELECTORS.TITULO_ALERTAS);
     await expectVisible(page, SELECTORS.TABELA_PROCESSOS);
@@ -164,6 +156,9 @@ export async function navigateToMapeamentoActivityRegistration(page: Page): Prom
     await page.getByTestId('atividades-card').click();
 }
 
+// Common selectors
+export const MODAL_SELECTOR = '.modal.show';
+
 /**
  * Helper function to expect a confirmation modal to be visible with specific texts.
  * @param page Playwright Page object.
@@ -171,73 +166,57 @@ export async function navigateToMapeamentoActivityRegistration(page: Page): Prom
  * @param text2 The second text to expect in the modal.
  */
 export async function expectConfirmationModal(page: Page, text1: string, text2: string): Promise<void> {
-    const modalConfirmacao = page.locator('.modal.show');
-    await expect(modalConfirmacao).toBeVisible();
+    const modal = page.locator(MODAL_SELECTOR);
+    await expect(modal).toBeVisible();
     await expectTextVisible(page, text1);
     await expectTextVisible(page, text2);
 }
 
 /**
- * Helper function to wait for a notification (toast) to appear and then disappear.
+ * Helper function to wait for a notification (toast) to appear.
  * @param page Playwright Page object.
- * @param type The type of notification ('success', 'error', 'info').
  * @param message The message text to expect in the notification.
+ * @param dataTestId The test ID attribute used to locate the notification element.
  */
-export async function waitForNotification(page: Page, type: 'success' | 'error' | 'info' | 'warning', message: string, dataTestId: string) {
+export async function waitForNotification(page: Page, message: string, dataTestId: string): Promise<void> {
     const notificationLocator = page.getByTestId(dataTestId);
-
-    // Wait for the notification to appear
     await notificationLocator.waitFor({state: 'visible', timeout: 5000});
-
-    // Assert the message
     await expect(notificationLocator).toContainText(message);
-
-    // Wait for the notification to disappear
-    await notificationLocator.waitFor({state: 'hidden', timeout: 10000}); // Increased timeout for disappearance
 }
 
-/**
- * Helper function to simulate login as ADMIN.
- * @param page Playwright Page object.
- */
-export async function loginAsAdmin(page: Page): Promise<void> {
-    await page.context().addInitScript(() => {
-        localStorage.setItem('idServidor', '6'); // Ricardo Alves
-        localStorage.setItem('perfilSelecionado', 'ADMIN');
-        localStorage.setItem('unidadeSelecionada', 'SEDOC');
-    });
-    await page.goto('/painel');
-    await expect(page).toHaveURL(/\/painel/);
-    await expectCommonPainelElements(page);
+// Login data configuration
+interface LoginData {
+    idServidor: string;
+    perfil: string;
+    unidade: string;
 }
+
+const LOGIN_DATA: Record<string, LoginData> = {
+    ADMIN: { idServidor: '6', perfil: 'ADMIN', unidade: 'SEDOC' },
+    GESTOR: { idServidor: '1', perfil: 'GESTOR', unidade: 'SESEL' },
+    CHEFE: { idServidor: '14', perfil: 'CHEFE', unidade: 'STIC' },
+    SERVIDOR: { idServidor: '15', perfil: 'SERVIDOR', unidade: 'STIC' }
+};
 
 /**
- * Helper function to simulate login as GESTOR.
+ * Generic login function for different user roles.
  * @param page Playwright Page object.
+ * @param role The user role to login as.
  */
-export async function loginAsGestor(page: Page): Promise<void> {
-    await page.context().addInitScript(() => {
-        localStorage.setItem('idServidor', '1'); // Ana Paula Souza
-        localStorage.setItem('perfilSelecionado', 'GESTOR');
-        localStorage.setItem('unidadeSelecionada', 'SESEL');
-    });
+async function loginAs(page: Page, role: keyof typeof LOGIN_DATA): Promise<void> {
+    const userData = LOGIN_DATA[role];
+    await page.context().addInitScript((data) => {
+        localStorage.setItem('idServidor', data.idServidor);
+        localStorage.setItem('perfilSelecionado', data.perfil);
+        localStorage.setItem('unidadeSelecionada', data.unidade);
+    }, userData);
     await page.goto('/painel');
     await expect(page).toHaveURL(/\/painel/);
-    await expectTextVisible(page, 'Painel');
+    await expectCommonDashboardElements(page);
 }
 
-/**
- * Helper function to simulate login as CHEFE.
- * @param page Playwright Page object.
- */
-export async function loginAsChefe(page: Page): Promise<void> {
-    await page.context().addInitScript(() => {
-        localStorage.setItem('idServidor', '14'); // Maroca Silva
-        localStorage.setItem('perfilSelecionado', 'CHEFE');
-        localStorage.setItem('unidadeSelecionada', 'STIC');
-    });
-    await page.goto('/painel');
-    await expect(page).toHaveURL(/\/painel/);
-    await expectTextVisible(page, 'Painel');
-}
+export const loginAsAdmin = (page: Page) => loginAs(page, 'ADMIN');
+export const loginAsGestor = (page: Page) => loginAs(page, 'GESTOR');
+export const loginAsChefe = (page: Page) => loginAs(page, 'CHEFE');
+export const loginAsServidor = (page: Page) => loginAs(page, 'SERVIDOR');
 

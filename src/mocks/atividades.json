@@ -555,5 +555,65 @@
         "descricao": "Habilidade em prototipagem rápida"
       }
     ]
+  },
+  {
+    "id": 300,
+    "descricao": "Atividade de Teste para Subprocesso 30",
+    "idSubprocesso": 30,
+    "conhecimentos": [
+      {
+        "id": 301,
+        "descricao": "Conhecimento 1 para Subprocesso 30"
+      },
+      {
+        "id": 302,
+        "descricao": "Conhecimento 2 para Subprocesso 30"
+      }
+    ]
+  },
+  {
+    "id": 400,
+    "descricao": "Desenvolvimento de sistemas para revisão",
+    "idSubprocesso": 26,
+    "conhecimentos": [
+      {
+        "id": 401,
+        "descricao": "Programação em linguagens modernas"
+      },
+      {
+        "id": 402,
+        "descricao": "Conhecimento em frameworks web"
+      }
+    ]
+  },
+  {
+    "id": 401,
+    "descricao": "Análise de requisitos de sistema",
+    "idSubprocesso": 26,
+    "conhecimentos": [
+      {
+        "id": 403,
+        "descricao": "Técnicas de levantamento de requisitos"
+      },
+      {
+        "id": 404,
+        "descricao": "Modelagem de processos de negócio"
+      }
+    ]
+  },
+  {
+    "id": 402,
+    "descricao": "Testes de software automatizados",
+    "idSubprocesso": 26,
+    "conhecimentos": [
+      {
+        "id": 405,
+        "descricao": "Ferramentas de automação de testes"
+      },
+      {
+        "id": 406,
+        "descricao": "Estratégias de teste de regressão"
+      }
+    ]
   }
 ]

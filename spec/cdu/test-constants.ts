@@ -1,8 +1,4 @@
-// Test constants for CDU tests - repeated strings and selectors
-
-// Common selectors
 export const SELECTORS = {
-    // Page elements
     TITULO_PROCESSOS: 'titulo-processos',
     TITULO_ALERTAS: 'titulo-alertas',
     TABELA_PROCESSOS: 'tabela-processos',
@@ -27,15 +23,10 @@ export const SELECTORS = {
     UNIDADE_INFO: 'unidade-info',
 } as const;
 
-// Common text strings
 export const TEXTS = {
-    // Login page
     SISTEMA_GESTAO_COMPETENCIAS: 'Sistema de Gestão de Competências',
-    TITULO_ELEITORAL: 'Título eleitoral',
-    SENHA: 'Senha',
     ENTRAR: 'Entrar',
 
-    // Process management
     CRIAR_PROCESSO: 'Criar processo',
     SALVAR: 'Salvar',
     INICIAR_PROCESSO: 'Iniciar processo',
@@ -46,7 +37,6 @@ export const TEXTS = {
     DETALHES_PROCESSO: 'Detalhes do processo',
     DETALHES_SUBPROCESSO: 'Detalhes do subprocesso',
 
-    // Activities and knowledge
     CADASTRO_ATIVIDADES_CONHECIMENTOS: 'Atividades e conhecimentos',
     ADICIONAR_ATIVIDADE: 'Adicionar atividade',
     ADICIONAR_CONHECIMENTO: 'Adicionar conhecimento',
@@ -56,7 +46,6 @@ export const TEXTS = {
     CANCELAR: 'Cancelar',
     DISPONIBILIZAR: 'Disponibilizar',
 
-    // Map management
     MAPA_COMPETENCIAS: 'Mapa de competências',
     CRIAR_COMPETENCIA: 'Criar competência',
     EDICAO_COMPETENCIA: 'Edição de competência',
@@ -70,14 +59,12 @@ export const TEXTS = {
     ACEITE_REGISTRADO: 'Aceite registrado',
     HOMOLOGACAO_EFETIVADA: 'Homologação efetivada',
 
-    // Validation
     APRESENTAR_SUGESTOES: 'Apresentar sugestões',
     VALIDAR: 'Validar',
     VER_SUGESTOES: 'Ver sugestões',
     MAPA_VALIDADO: 'Mapa validado e submetido para análise à unidade superior',
     MAPA_SUGESTOES: 'Mapa submetido com sugestões para análise da unidade superior',
 
-    // Modal texts
     DISPONIBILIZACAO_CADASTRO: 'Disponibilização do cadastro',
     CONFIRMA_DISPONIBILIZACAO: 'Confirma a finalização e a disponibilização do cadastro?',
     CADASTRO_DISPONIBILIZADO: 'Cadastro de atividades disponibilizado',
@@ -113,11 +100,9 @@ export const TEXTS = {
     ACAO_TORNARA_VIGENTES: 'Essa ação tornará vigentes os mapas de competências homologados',
     ERRO_UNIDADES_NAO_HOMOLOGADAS: 'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado',
 
-    // Map visualization
     MAPA_COMPETENCIAS_TECNICAS: 'Mapa de competências técnicas',
 } as const;
 
-// Common URLs
 export const URLS = {
     PAINEL: '/painel',
     LOGIN: '/login',
@@ -127,7 +112,6 @@ export const URLS = {
     VISUALIZACAO_MAPA: '/vis-mapa',
 } as const;
 
-// Common form labels
 export const LABELS = {
     DESCRICAO: 'Descrição',
     TIPO: 'Tipo',

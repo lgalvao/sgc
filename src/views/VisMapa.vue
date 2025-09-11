@@ -663,12 +663,11 @@ async function confirmarValidacao() {
   }
 }
 
-async function confirmarAceitacao(observacao: string) {
+async function confirmarAceitacao() {
   try {
     await processosStore.aceitarMapa({
       idProcesso: idProcesso.value,
       unidade: sigla.value,
-      observacao: observacao || undefined,
       perfil: perfilSelecionado.value || ''
     })
 
@@ -701,8 +700,7 @@ async function confirmarDevolucao() {
   try {
     await processosStore.rejeitarMapa({
       idProcesso: idProcesso.value,
-      unidade: sigla.value,
-      observacao: observacaoDevolucao.value || undefined
+      unidade: sigla.value
     })
 
     fecharModalDevolucao()

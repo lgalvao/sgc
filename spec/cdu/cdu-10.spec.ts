@@ -8,7 +8,8 @@ import {
     expectErrorMessage,
     expectSuccessMessage,
     expectTextVisible,
-    fillFormField
+    fillFormField,
+    MODAL_SELECTOR
 } from './test-helpers';
 
 // Funções auxiliares para o teste
@@ -27,87 +28,57 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
 
     test.beforeEach(async ({page}) => {
         await loginAsChefe(page);
-        // Navegar para a página de cadastro de atividades de um processo de Revisão com situação 'Revisão do cadastro em andamento'
-        // Usaremos o processo 2, unidade STIC, que já configuramos no mock para essa situação
         await page.goto(`/processo/2/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
+        await page.reload();
         await expectTextVisible(page, TEXTS.CADASTRO_ATIVIDADES_CONHECIMENTOS);
     });
 
     test('deve permitir a disponibilização da revisão do cadastro com sucesso', async ({page}) => {
-        // Garante que há pelo menos uma atividade com conhecimento para evitar a validação de atividades sem conhecimento
         await adicionarAtividadeComConhecimento(page, `Atividade Sucesso ${Date.now()}`, `Conhecimento Sucesso ${Date.now()}`);
-
-        // Clicar no botão "Disponibilizar"
         await clickButton(page, TEXTS.DISPONIBILIZAR);
-
-        // Verificar que o modal de confirmação está visível
         await expectConfirmationModal(page, TEXTS.DISPONIBILIZACAO_CADASTRO, TEXTS.CONFIRMA_DISPONIBILIZACAO_REVISAO);
-        const modalConfirmacao = page.locator('.modal.show'); // Ainda precisamos da referência para fechar o modal
-
-        // Confirmar a disponibilização
+        
+        const modal = page.locator(MODAL_SELECTOR);
         await clickButton(page, TEXTS.CONFIRMAR);
-        await expect(modalConfirmacao).not.toBeVisible(); // Esperar o modal fechar
-
-        // Verificar a mensagem de sucesso
+        await expect(modal).not.toBeVisible();
         await expectSuccessMessage(page, 'Revisão do cadastro de atividades disponibilizada');
-
-        // Verificar redirecionamento para o painel
         await expect(page).toHaveURL(URLS.PAINEL);
     });
 
+    async function expectDisponibilizarError(page: Page, errorTitle: string, errorMessage: string) {
+        await clickButton(page, TEXTS.DISPONIBILIZAR);
+        const modal = page.locator(MODAL_SELECTOR);
+        await expect(modal).not.toBeVisible();
+        await expectErrorMessage(page, errorTitle);
+        await expectErrorMessage(page, errorMessage);
+    }
+
     test('não deve permitir a disponibilização se houver atividades sem conhecimento', async ({page}) => {
-        // Adicionar uma atividade SEM conhecimento
         const atividadeDesc = `Atividade Sem Conhecimento ${Date.now()}`;
         await fillFormField(page, 'Nova atividade', atividadeDesc);
         await page.getByTestId('btn-adicionar-atividade').click();
-        const atividadeCard = page.locator('.atividade-card', {hasText: atividadeDesc});
-        await expect(atividadeCard).toBeVisible();
+        await expect(page.locator('.atividade-card', {hasText: atividadeDesc})).toBeVisible();
 
-        // Clicar no botão "Disponibilizar"
-        await clickButton(page, TEXTS.DISPONIBILIZAR);
-
-        // Verificar que o modal de confirmação NÃO aparece
-        const modalConfirmacao = page.locator('.modal.show');
-        await expect(modalConfirmacao).not.toBeVisible();
-
-        // Verificar a mensagem de erro
-        await expectErrorMessage(page, 'Atividades sem Conhecimento');
-        await expectErrorMessage(page, 'As seguintes atividades não têm conhecimentos associados e precisam ser ajustadas antes da disponibilização:');
-        await expectErrorMessage(page, `- Atividade Sem Conhecimento`); // Verifica parte da descrição da atividade
+        await expectDisponibilizarError(page, 'Atividades sem Conhecimento', 'As seguintes atividades não têm conhecimentos associados e precisam ser ajustadas antes da disponibilização:');
+        await expectErrorMessage(page, `- Atividade Sem Conhecimento`);
     });
 
     test('não deve permitir a disponibilização se o subprocesso não estiver na situação correta', async ({page}) => {
-        // Navegar para um processo com situação diferente (ex: Processo 1, Unidade STIC - "Cadastro em andamento")
         await page.goto(`/processo/1/STIC/cadastro`);
         await page.waitForLoadState('networkidle');
         await expectTextVisible(page, TEXTS.CADASTRO_ATIVIDADES_CONHECIMENTOS);
 
-        // Clicar no botão "Disponibilizar"
-        await clickButton(page, TEXTS.DISPONIBILIZAR);
-
-        // Verificar que o modal de confirmação NÃO aparece
-        const modalConfirmacao = page.locator('.modal.show');
-        await expect(modalConfirmacao).not.toBeVisible();
-
-        // Verificar a mensagem de erro
-        await expectErrorMessage(page, 'Erro na Disponibilização');
-        await expectErrorMessage(page, 'A disponibilização só pode ser feita quando o subprocesso está na situação "Revisão do cadastro em andamento".');
+        await expectDisponibilizarError(page, 'Erro na Disponibilização', 'A disponibilização só pode ser feita quando o subprocesso está na situação "Revisão do cadastro em andamento".');
     });
 
-    // Teste para o botão "Histórico de análise" (já coberto pela CDU-09, mas podemos adicionar um básico aqui)
     test('deve exibir o botão Histórico de análise e abrir o modal', async ({page}) => {
-        // O mock do processo 2/STIC já tem análises, então o botão deve estar visível
-        const botaoHistoricoAnalise = page.getByText('Histórico de análise');
-        await expect(botaoHistoricoAnalise).toBeVisible();
-        await botaoHistoricoAnalise.click();
-
-        const modalHistorico = page.locator('.modal.show');
-        await expect(modalHistorico).toBeVisible();
+        await page.getByText('Histórico de análise').click();
+        const modal = page.locator(MODAL_SELECTOR);
+        await expect(modal).toBeVisible();
         await expect(page.getByTestId('modal-historico-analise-titulo')).toBeVisible();
-
         await page.getByRole('button', {name: 'Fechar'}).click();
-        await expect(modalHistorico).not.toBeVisible();
+        await expect(modal).not.toBeVisible();
     });
 
 });

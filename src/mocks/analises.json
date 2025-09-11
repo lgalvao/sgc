@@ -1,10 +1,18 @@
 [
   {
     "id": 1,
+    "idSubprocesso": 30,
+    "dataHora": "2025-07-10T10:00:00Z",
+    "unidade": "STIC",
+    "resultado": "Aprovado",
+    "observacao": "Observação de teste para histórico."
+  },
+  {
+    "id": 2,
     "idSubprocesso": 5,
     "dataHora": "2025-07-10T10:00:00Z",
     "unidade": "STIC",
     "resultado": "Aprovado",
-    "observacao": "Análise inicial aprovada."
+    "observacao": "Observação de teste para histórico."
   }
 ]

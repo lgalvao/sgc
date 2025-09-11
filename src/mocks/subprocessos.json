@@ -1,18 +1,6 @@
 [
-  {
-    "id": 1,
-    "idProcesso": 1,
-    "unidade": "STIC",
-    "dataLimiteEtapa1": "2025-06-30",
-    "dataLimiteEtapa2": null,
-    "dataFimEtapa1": null,
-    "dataFimEtapa2": null,
-    "situacao": "Cadastro em andamento",
-    "unidadeAtual": "STIC",
-    "unidadeAnterior": null,
-    "movimentacoes": [],
-    "analises": []
-  },
+
+
   {
     "id": 3,
     "idProcesso": 1,
@@ -68,8 +56,8 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Mapa homologado",
-    "unidadeAtual": "COINF",
+    "situacao": "Revisão do cadastro disponibilizada",
+    "unidadeAtual": "SEDOC",
     "unidadeAnterior": "STIC",
     "movimentacoes": [],
     "analises": []
@@ -194,9 +182,9 @@
     "dataLimiteEtapa2": null,
     "dataFimEtapa1": null,
     "dataFimEtapa2": null,
-    "situacao": "Revisão do cadastro homologada",
-    "unidadeAtual": "SESEL",
-    "unidadeAnterior": "STIC",
+    "situacao": "Revisão do cadastro disponibilizada",
+    "unidadeAtual": "SEDOC",
+    "unidadeAnterior": "SESEL",
     "movimentacoes": [],
     "analises": []
   },
@@ -336,6 +324,80 @@
     "dataFimEtapa2": null,
     "situacao": "Cadastro em andamento",
     "unidadeAtual": "SEDIA",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 30,
+    "idProcesso": 1,
+    "unidade": "STIC",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro disponibilizado",
+    "unidadeAtual": "STIC",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 31,
+    "idProcesso": 6,
+    "situacao": "Criado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 32,
+    "idProcesso": 7,
+    "situacao": "Criado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 33,
+    "idProcesso": 8,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Criado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 34,
+    "idProcesso": 9,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Criado",
+    "unidadeAtual": "UNIDADE_PADRAO",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 35,
+    "idProcesso": 10,
+    "unidade": "UNIDADE_PADRAO",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Criado",
+    "unidadeAtual": "UNIDADE_PADRAO",
     "unidadeAnterior": null,
     "movimentacoes": [],
     "analises": []

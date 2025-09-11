@@ -100,7 +100,7 @@ import {
   Unidade
 } from "@/types/tipos";
 import {formatDateTimeBR, parseDate} from '@/utils/dateUtils';
-import {SITUACOES_EM_ANDAMENTO, SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
+import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
@@ -207,7 +207,21 @@ const mapa = computed<Mapa | null>(() => {
 // Computed para verificar se o subprocesso está em andamento
 const isSubprocessoEmAndamento = computed(() => {
   if (!SubprocessoDetalhes.value) return false;
-  return SITUACOES_EM_ANDAMENTO.includes(SubprocessoDetalhes.value.situacao);
+  const situacao = SubprocessoDetalhes.value.situacao;
+  const situacoesFinalizadas = [
+    SITUACOES_SUBPROCESSO.FINALIZADO,
+    SITUACOES_SUBPROCESSO.VALIDADO,
+    SITUACOES_SUBPROCESSO.DEVOLVIDO,
+    SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+    SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
+    SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA,
+    SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO,
+    SITUACOES_SUBPROCESSO.CADASTRO_ACEITO,
+    SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_ACEITA,
+    SITUACOES_SUBPROCESSO.NAO_INICIADO // Adicionado para garantir que não iniciado não seja considerado em andamento
+  ] as const;
+
+  return !situacoesFinalizadas.includes(situacao as (typeof situacoesFinalizadas)[number]);
 });
 
 // Computed para identificar a etapa atual e sua data limite
@@ -265,8 +279,10 @@ function irParaAtividadesConhecimentos() {
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
   if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === sigla.value) {
+    console.log('Navigating to SubprocessoCadastro with params:', params); // ADD THIS
     router.push({name: 'SubprocessoCadastro', params}); // Abre CadAtividades.vue
   } else {
+    console.log('Navigating to SubprocessoVisCadastro with params:', params); // ADD THIS
     router.push({name: 'SubprocessoVisCadastro', params}); // Abre VisAtividades.vue
   }
 }

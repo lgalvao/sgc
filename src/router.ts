@@ -1,10 +1,10 @@
-import {createRouter, createWebHistory, RouteLocationNormalized} from 'vue-router';
+import {createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const routes = [
     {
         path: '/',
         redirect: '/login',
-    },
+    } as RouteRecordRaw,
     {
         path: '/login',
         name: 'Login',

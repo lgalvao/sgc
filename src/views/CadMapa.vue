@@ -243,7 +243,7 @@
               id="disponibilizarModalLabel"
               class="modal-title"
             >
-              Disponibilizar Mapa
+              Disponibilização do mapa de competências
             </h5>
             <button
               aria-label="Close"
@@ -264,6 +264,19 @@
                 class="form-control"
                 type="date"
               >
+            </div>
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="observacoes"
+              >Observações (opcional)</label>
+              <textarea
+                id="observacoes"
+                v-model="observacoesDisponibilizacao"
+                class="form-control"
+                rows="3"
+                placeholder="Digite observações sobre a disponibilização..."
+              />
             </div>
             <div
               v-if="notificacaoDisponibilizacao"
@@ -300,6 +313,60 @@
       class="modal-backdrop fade show"
     />
 
+    <!-- Modal de Exclusão de Competência -->
+    <div
+      v-if="mostrarModalExcluirCompetencia"
+      aria-labelledby="excluirCompetenciaModalLabel"
+      aria-modal="true"
+      class="modal fade show"
+      role="dialog"
+      style="display: block;"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              id="excluirCompetenciaModalLabel"
+              class="modal-title"
+            >
+              Exclusão de competência
+            </h5>
+            <button
+              aria-label="Close"
+              class="btn-close"
+              type="button"
+              @click="fecharModalExcluirCompetencia"
+            />
+          </div>
+          <div class="modal-body">
+            <p>Confirma a exclusão da competência "{{ competenciaParaExcluir?.descricao }}"?</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              @click="fecharModalExcluirCompetencia"
+            >
+              Cancelar
+            </button>
+            <button
+              class="btn btn-danger"
+              type="button"
+              @click="confirmarExclusaoCompetencia"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="mostrarModalExcluirCompetencia"
+      class="modal-backdrop fade show"
+    />
+
     <ImpactoMapaModal
       :id-processo="idProcesso"
       :sigla-unidade="siglaUnidade"
@@ -320,6 +387,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
+import {useAlertasStore} from '@/stores/alertas'
 import {Atividade, Competencia, Perfil, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
@@ -333,6 +401,7 @@ const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const unidadesStore = useUnidadesStore()
+const alertasStore = useAlertasStore()
 const {unidades} = storeToRefs(unidadesStore)
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
@@ -423,7 +492,10 @@ const competenciaSendoEditada = ref<Competencia | null>(null)
 
 const mostrarModalCriarNovaCompetencia = ref(false)
 const mostrarModalDisponibilizar = ref(false)
+const mostrarModalExcluirCompetencia = ref(false)
+const competenciaParaExcluir = ref<Competencia | null>(null)
 const dataLimiteValidacao = ref('')
+const observacoesDisponibilizacao = ref('')
 const notificacaoDisponibilizacao = ref('')
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
@@ -521,13 +593,21 @@ function adicionarOuAtualizarCompetencia() {
       unidade: siglaUnidade.value,
       idProcesso: idProcesso.value,
       competencias: competencias.value,
-      situacao: './utils/auth',
+      situacao: 'em_andamento',
       dataCriacao: new Date(),
       dataDisponibilizacao: null,
       dataFinalizacao: null,
     };
     mapas.value.push(novoMapa);
     mapasStore.adicionarMapa(novoMapa);
+  }
+  
+  // 10. Se a situação do subprocesso ainda for 'Cadastro homologado', alterar para 'Mapa criado'
+  if (subprocesso.value && subprocesso.value.situacao === 'Cadastro homologado') {
+    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === subprocesso.value!.id);
+    if (subprocessoIndex !== -1) {
+      processosStore.subprocessos[subprocessoIndex].situacao = 'Mapa criado';
+    }
   }
 
   novaCompetencia.value.descricao = '';
@@ -557,15 +637,32 @@ function finalizarEdicao() {
     mapas.value.push(novoMapa);
   }
   mostrarModalDisponibilizar.value = true;
-  dataLimiteValidacao.value = ''; // Limpa a data ao abrir o modal
-  notificacaoDisponibilizacao.value = ''; // Limpa a notificação
+  dataLimiteValidacao.value = '';
+  observacoesDisponibilizacao.value = '';
+  notificacaoDisponibilizacao.value = '';
 }
 
 function excluirCompetencia(id: number) {
-  competencias.value = competencias.value.filter(comp => comp.id !== id);
-  if (mapa.value) {
-    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+  const competencia = competencias.value.find(comp => comp.id === id);
+  if (competencia) {
+    competenciaParaExcluir.value = competencia;
+    mostrarModalExcluirCompetencia.value = true;
   }
+}
+
+function confirmarExclusaoCompetencia() {
+  if (competenciaParaExcluir.value) {
+    competencias.value = competencias.value.filter(comp => comp.id !== competenciaParaExcluir.value!.id);
+    if (mapa.value) {
+      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+    }
+    fecharModalExcluirCompetencia();
+  }
+}
+
+function fecharModalExcluirCompetencia() {
+  mostrarModalExcluirCompetencia.value = false;
+  competenciaParaExcluir.value = null;
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
@@ -611,13 +708,16 @@ function disponibilizarMapa() {
     return;
   }
 
-  // Alterar situação do subprocesso para 'Mapa disponibilizado'
+  // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
   const subprocesso = processosStore.subprocessos.find(
       pu => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
   );
   if (subprocesso) {
-    subprocesso.situacao = 'Mapa disponibilizado';
+    subprocesso.situacao = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
     subprocesso.dataLimiteEtapa2 = new Date(dataLimiteValidacao.value);
+    if (observacoesDisponibilizacao.value) {
+      subprocesso.observacoes = observacoesDisponibilizacao.value;
+    }
 
     // Registrar movimentação
     processosStore.addMovement({
@@ -649,6 +749,21 @@ function disponibilizarMapa() {
       `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
   );
 
+  // Criar alerta interno (CDU-17 item 18)
+  alertasStore.criarAlerta({
+    descricao: `Mapa de competências da unidade ${currentUnidade.sigla} disponibilizado para análise`,
+    idProcesso: idProcesso.value,
+    dataHora: new Date(),
+    unidadeOrigem: 'SEDOC',
+    unidadeDestino: currentUnidade.sigla
+  });
+
+  // Excluir sugestões e histórico de análise (CDU-17 item 19)
+  if (subprocesso) {
+    subprocesso.sugestoes = '';
+    subprocesso.analises = [];
+  }
+
   notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
 
   // Fechar modal e redirecionar para Painel
@@ -660,7 +775,8 @@ function disponibilizarMapa() {
 
 function fecharModalDisponibilizar() {
   mostrarModalDisponibilizar.value = false;
-  notificacaoDisponibilizacao.value = ''; // Limpa a notificação ao fechar
+  observacoesDisponibilizacao.value = '';
+  notificacaoDisponibilizacao.value = '';
 }
 
 onMounted(() => {

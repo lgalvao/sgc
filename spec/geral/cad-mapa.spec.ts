@@ -1,7 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
 import {loginAsAdmin} from "~/utils/auth";
-import {waitForNotification as _waitForNotification} from '../cdu/test-helpers';
 
 test.describe('Cadastro de Mapa de Competências', () => {
     test.beforeEach(async ({page}) => {
@@ -77,8 +76,11 @@ test.describe('Cadastro de Mapa de Competências', () => {
         await competenciaItem.hover();
         await competenciaItem.getByTestId('btn-excluir-competencia').click();
 
+        // Confirmar a exclusão no modal
+        await page.getByRole('button', {name: 'Confirmar'}).click();
+
         // Verificar se a competência não está mais visível
-        await expect(page.getByText(competenciaParaExcluir)).not.toBeVisible();
+        await expect(page.locator('.competencia-card').filter({hasText: competenciaParaExcluir})).not.toBeVisible();
     });
 
     test('deve disponibilizar o mapa com sucesso', async ({page}) => {
