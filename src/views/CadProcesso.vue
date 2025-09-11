@@ -145,7 +145,7 @@
         class="btn btn-success ms-2"
         data-testid="btn-iniciar-processo"
         type="button"
-        @click="iniciarProcesso"
+        @click="abrirModalConfirmacao"
       >
         Iniciar processo
       </button>
@@ -156,6 +156,50 @@
         Cancelar
       </router-link>
     </form>
+
+    <!-- Modal de confirmação CDU-05 -->
+    <div
+      v-if="mostrarModalConfirmacao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmação</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="fecharModalConfirmacao"
+            />
+          </div>
+          <div class="modal-body">
+            <p>Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalConfirmacao"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="confirmarIniciarProcesso"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="mostrarModalConfirmacao"
+      class="modal-backdrop fade show"
+    />
   </div>
 </template>
 
@@ -183,6 +227,7 @@ const mapasStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const alertasStore = useAlertasStore()
 const notificacoesStore = useNotificacoesStore()
+const mostrarModalConfirmacao = ref(false)
 
 function limparCampos() {
   descricao.value = ''
@@ -274,6 +319,37 @@ function salvarProcesso() {
    limparCampos();
 }
 
+function abrirModalConfirmacao() {
+   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
+     notificacoesStore.erro(
+       'Dados incompletos',
+       'Preencha todos os campos e selecione ao menos uma unidade.'
+     );
+     return
+   }
+
+   const unidadesFiltradas = validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
+
+   if (unidadesFiltradas.length === 0) {
+     notificacoesStore.erro(
+       'Unidades inválidas',
+       'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+     );
+     return
+   }
+
+   mostrarModalConfirmacao.value = true
+}
+
+function fecharModalConfirmacao() {
+  mostrarModalConfirmacao.value = false
+}
+
+function confirmarIniciarProcesso() {
+  mostrarModalConfirmacao.value = false
+  iniciarProcesso()
+}
+
 function iniciarProcesso() {
    if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
      notificacoesStore.erro(
@@ -317,7 +393,8 @@ function iniciarProcesso() {
        observacoes: '',
        sugestoes: '',
        movimentacoes: [],
-       analises: []
+       analises: [],
+       idMapaCopiado: undefined
      };
    });
 
@@ -333,7 +410,8 @@ function iniciarProcesso() {
    processosStore.adicionarProcesso(novo);
    processosStore.adicionarsubprocessos(novossubprocessosObjetos);
 
-   // Para processos de revisão, criar cópia dos mapas vigentes
+   // Passo 7: Armazenar árvore de unidades participantes
+   // Passo 10: Para processos de revisão, criar cópia dos mapas vigentes com atividades/conhecimentos
    if (tipo.value === TipoProcesso.REVISAO) {
      unidadesFiltradas.forEach(unidadeSigla => {
        const mapaVigente = mapasStore.getMapaVigentePorUnidade(unidadeSigla);
@@ -348,11 +426,27 @@ function iniciarProcesso() {
            situacao: 'em_andamento'
          };
          mapasStore.adicionarMapa(novoMapa);
+         
+         // Vincular mapa copiado ao subprocesso
+         const subprocesso = novossubprocessosObjetos.find(sp => sp.unidade === unidadeSigla);
+         if (subprocesso) {
+           subprocesso.idMapaCopiado = mapaVigente.id;
+         }
        }
      });
    }
 
-   // Registrar movimentações e enviar notificações conforme CDU-04/CDU-05
+   // Passo 11: Registrar movimentações para cada subprocesso
+   novossubprocessosObjetos.forEach(subprocesso => {
+     processosStore.addMovement({
+       idSubprocesso: subprocesso.id,
+       unidadeOrigem: 'SEDOC',
+       unidadeDestino: subprocesso.unidade,
+       descricao: 'Processo iniciado'
+     });
+   });
+
+   // Passo 12-13: Enviar notificações e criar alertas
    enviarNotificacoesIniciarProcesso(novo, unidadesFiltradas);
 
    notificacoesStore.sucesso(
