@@ -1,61 +1,61 @@
-import {expect, Page, test} from '@playwright/test';
-import {loginAsAdmin, loginAsGestor, MODAL_SELECTOR} from './test-helpers';
+import {expect, Page} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
+import {esperarUrl, loginComoAdmin, loginComoGestor} from './auxiliares-teste';
+import {devolverParaAjustes} from './auxiliares-acoes';
+import {irParaSubprocesso} from './auxiliares-navegacao';
+import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
 
-test.describe('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
-  const ANALYSIS_URL = '/processo/2/SESEL/vis-cadastro';
-  
-  async function navigateToAnalysis(page: Page, loginFn: (page: Page) => Promise<void>) {
-    await loginFn(page);
-    await page.goto(ANALYSIS_URL);
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-  }
-  
-  async function expectSuccessAndRedirect(page: Page, message: string) {
-    const notification = page.locator('.notification.notification-success');
-    await expect(notification).toBeVisible();
-    await expect(notification).toContainText(message);
-    await expect(page).toHaveURL(/\/painel/);
-  }
+async function navegarParaAnaliseRevisao(page: Page, loginFn: (page: Page) => Promise<void>) {
+  await loginFn(page);
+  await irParaSubprocesso(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, 'SESEL');
+  await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.REVISAO_STIC.id}/SESEL/vis-cadastro`);
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
+}
 
-  test('deve exibir botões corretos por perfil', async ({page}) => {
-    await navigateToAnalysis(page, loginAsGestor);
+async function esperarSucessoERedirecionamento(page: Page, mensagem: string) {
+  const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
+  await expect(notification).toBeVisible();
+  await expect(notification).toContainText(mensagem);
+  await esperarUrl(page, URLS.PAINEL);
+}
+
+test.describe('CDU-14: Analisar revisão de cadastro de atividades e conhecimentos', () => {
+  test('deve exibir botões corretos por perfil', async ({ page }) => {
+    await navegarParaAnaliseRevisao(page, loginComoGestor);
     await expect(page.getByText('Histórico de análise')).toBeVisible();
     await expect(page.getByText('Devolver para ajustes')).toBeVisible();
     await expect(page.getByText('Registrar aceite')).toBeVisible();
     
-    await navigateToAnalysis(page, loginAsAdmin);
+    await navegarParaAnaliseRevisao(page, loginComoAdmin);
     await expect(page.getByText('Homologar')).toBeVisible();
   });
 
-  test('deve permitir devolução e aceite', async ({page}) => {
-    await navigateToAnalysis(page, loginAsGestor);
+  test('deve permitir devolução e aceite', async ({ page }) => {
+    await navegarParaAnaliseRevisao(page, loginComoGestor);
     
     // Testar devolução
-    await page.getByText('Devolver para ajustes').click();
-    await expect(page.getByRole('heading', {name: 'Devolução da revisão do cadastro'})).toBeVisible();
-    await page.getByLabel('Observação (opcional)').fill('Ajustes necessários.');
-    await page.getByRole('button', {name: 'Confirmar'}).click();
-    await expectSuccessAndRedirect(page, 'devolvido para ajustes');
+    await devolverParaAjustes(page, 'Ajustes necessários.');
+    await esperarSucessoERedirecionamento(page, 'devolvido para ajustes');
     
     // Testar aceite
-    await navigateToAnalysis(page, loginAsGestor);
+    await navegarParaAnaliseRevisao(page, loginComoGestor);
     await page.getByText('Registrar aceite').click();
-    await expect(page.getByRole('heading', {name: 'Aceite da revisão do cadastro'})).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Aceite da revisão do cadastro' })).toBeVisible();
     await page.getByLabel('Observação (opcional)').fill('Aceite após análise.');
-    await page.getByRole('button', {name: 'Confirmar'}).click();
-    await expectSuccessAndRedirect(page, 'Aceite registrado');
+    await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
+    await esperarSucessoERedirecionamento(page, 'Aceite registrado');
   });
 
-  test('deve exibir histórico de análise', async ({page}) => {
-    await navigateToAnalysis(page, loginAsGestor);
+  test('deve exibir histórico de análise', async ({ page }) => {
+    await navegarParaAnaliseRevisao(page, loginComoGestor);
     await page.getByText('Histórico de análise').click();
     
-    const modal = page.locator(MODAL_SELECTOR);
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await expect(page.getByRole('heading', {name: 'Histórico de Análise'})).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Histórico de Análise' })).toBeVisible();
     
-    await page.getByRole('button', {name: 'Fechar'}).click();
+    await page.getByRole('button', { name: 'Fechar' }).click();
     await expect(modal).not.toBeVisible();
   });
 });

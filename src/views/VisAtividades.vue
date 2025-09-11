@@ -258,7 +258,7 @@ import {useRouter} from 'vue-router'
 import {Atividade, Perfil, Processo, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
-import {URL_SISTEMA} from '@/constants/index';
+import {URL_SISTEMA} from '@/constants';
 
 const props = defineProps<{
   idProcesso: number | string,
@@ -406,7 +406,7 @@ function confirmarValidacao() {
 
     notificacoesStore.sucesso('Homologação efetivada', 'O cadastro foi homologado com sucesso!');
     fecharModalValidar();
-    router.push(`/processo/${idProcesso.value}/subprocesso/${idSubprocesso.value}`);
+    router.push(`/processo/${idProcesso.value}/${siglaUnidade.value}`);
   } else {
     // 10. Aceitar (perfil GESTOR)
     // 10.5. Registrar análise de cadastro
@@ -572,7 +572,7 @@ function confirmarHomologacaoSemImpacto() {
   
   notificacoesStore.sucesso('Homologação efetivada', 'O mapa de competências vigente foi mantido!');
   fecharModalHomologacaoSemImpacto();
-  router.push(`/processo/${idProcesso.value}/subprocesso/${idSubprocesso.value}`);
+  router.push(`/processo/${idProcesso.value}/${siglaUnidade.value}`);
 }
 </script>
 

@@ -73,7 +73,8 @@ function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processos: processosMock.map(parseProcessoDates) as Processo[],
-        subprocessos: (subprocessosMock as Partial<Subprocesso>[]).map(parseSubprocessoDates) as Subprocesso[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        subprocessos: (subprocessosMock as any[]).map(parseSubprocessoDates) as Subprocesso[],
         movements: [] as Movimentacao[]
     }),
     getters: {

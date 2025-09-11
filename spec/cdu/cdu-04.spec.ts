@@ -1,30 +1,28 @@
-import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {loginAsAdmin} from '~/utils/auth';
-import {navigateToProcessCreation} from './test-helpers';
+import {esperarMensagemSucesso, esperarUrl, loginComoAdmin} from './auxiliares-teste';
+import {navegarParaCriacaoProcesso} from './auxiliares-teste';
+import {iniciarProcesso} from './auxiliares-acoes';
+import {TEXTOS, URLS, ROTULOS} from './constantes-teste';
 
 test.describe('CDU-04: Iniciar processo de mapeamento', () => {
-  test.beforeEach(async ({page}) => {
-    await loginAsAdmin(page);
+  test.beforeEach(async ({ page }) => {
+    await loginComoAdmin(page);
   });
 
   test('deve iniciar processo de mapeamento', async ({ page }) => {
-    await navigateToProcessCreation(page);
+    await navegarParaCriacaoProcesso(page);
     
-    await page.getByLabel('Descrição').fill('Processo de Mapeamento Teste');
-    await page.getByLabel('Tipo').selectOption('Mapeamento');
-    await page.getByLabel('Data limite').fill('2025-12-31');
+    await page.getByLabel(ROTULOS.DESCRICAO).fill('Processo de Mapeamento Teste');
+    await page.getByLabel(ROTULOS.TIPO).selectOption('Mapeamento');
+    await page.getByLabel(ROTULOS.DATA_LIMITE).fill('2025-12-31');
     
     await page.waitForSelector('input[type="checkbox"]');
     const firstCheckbox = page.locator('input[type="checkbox"]').first();
     await firstCheckbox.check();
     
-    await page.getByText('Iniciar processo').click();
-    await page.waitForSelector('.modal.show');
-    await page.getByText('Confirmar').click();
-    await page.waitForLoadState('networkidle');
+    await iniciarProcesso(page);
     
-    await expect(page).toHaveURL(/\/painel$/);
-    await expect(page.getByText('Processo iniciado')).toBeVisible();
+    await esperarUrl(page, URLS.PAINEL);
+    await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
   });
 });

@@ -1,91 +1,74 @@
-import {expect, Page, test} from '@playwright/test';
-import {loginAsAdmin} from './test-helpers';
+import {expect, Page} from '@playwright/test';
+import {vueTest as test} from '../../tests/vue-specific-setup';
+import {esperarElementoVisivel, loginComoAdmin} from './auxiliares-teste';
+import {criarCompetencia} from './auxiliares-acoes';
+import {irParaMapaCompetencias} from './auxiliares-navegacao';
+import {TEXTOS} from './constantes-teste';
 
-test.describe('CDU-15 - Manter mapa de competências', () => {
-  const MAPA_URL = '/processo/4/SESEL/mapa';
-  
-  async function navigateToMapa(page: Page) {
-    await loginAsAdmin(page);
-    await page.goto(MAPA_URL);
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-  }
-  
-  async function createCompetencia(page: Page, descricao: string, numAtividades = 1) {
-    await page.getByTestId('btn-abrir-criar-competencia').click();
-    await page.getByTestId('input-nova-competencia').fill(descricao);
-    
-    for (let i = 0; i < numAtividades; i++) {
-      await page.locator('[data-testid="atividade-nao-associada"] label').nth(i).click();
-    }
-    
-    await page.getByTestId('btn-criar-competencia').click();
-    await expect(page.getByText(descricao)).toBeVisible();
-  }
+async function navegarParaMapa(page: Page) {
+  await loginComoAdmin(page);
+  await irParaMapaCompetencias(page, 4, 'SESEL');
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+}
 
-  test('deve exibir tela de edição de mapa com elementos corretos', async ({page}) => {
-    await navigateToMapa(page);
+
+
+test.describe('CDU-15: Manter mapa de competências', () => {
+  test('deve exibir tela de edição de mapa com elementos corretos', async ({ page }) => {
+    await navegarParaMapa(page);
     
-    // Verificar elementos visuais da tela
-    await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
-    await expect(page.getByRole('button', {name: 'Disponibilizar'})).toBeVisible();
+    await esperarElementoVisivel(page, 'btn-abrir-criar-competencia');
+    await expect(page.getByRole('button', { name: TEXTOS.DISPONIBILIZAR })).toBeVisible();
   });
 
-  test('deve criar competência e alterar situação do subprocesso', async ({page}) => {
-    await navigateToMapa(page);
+  test('deve criar competência e alterar situação do subprocesso', async ({ page }) => {
+    await navegarParaMapa(page);
     
-    const competenciaDescricao = 'Competência Teste ' + Date.now();
-    await createCompetencia(page, competenciaDescricao);
+    const competenciaDescricao = `Competência Teste ${Date.now()}`;
+    await criarCompetencia(page, competenciaDescricao);
     
-    // Verificar se competência foi criada
-    const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaDescricao});
+    const competenciaCard = page.locator('.competencia-card').filter({ hasText: competenciaDescricao });
     await expect(competenciaCard).toBeVisible();
     
-    // Verificar botões de ação na competência
     await competenciaCard.hover();
-    await expect(competenciaCard.getByTestId('btn-editar-competencia')).toBeVisible();
-    await expect(competenciaCard.getByTestId('btn-excluir-competencia')).toBeVisible();
+    await esperarElementoVisivel(page, 'btn-editar-competencia');
+    await esperarElementoVisivel(page, 'btn-excluir-competencia');
   });
 
-  test('deve editar competência existente', async ({page}) => {
-    await navigateToMapa(page);
+  test('deve editar competência existente', async ({ page }) => {
+    await navegarParaMapa(page);
     
-    const competenciaOriginal = 'Competência Original ' + Date.now();
-    await createCompetencia(page, competenciaOriginal);
+    const competenciaOriginal = `Competência Original ${Date.now()}`;
+    await criarCompetencia(page, competenciaOriginal);
     
-    // Editar competência
-    const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaOriginal});
+    const competenciaCard = page.locator('.competencia-card').filter({ hasText: competenciaOriginal });
     await competenciaCard.hover();
     await competenciaCard.getByTestId('btn-editar-competencia').click();
     
-    const competenciaEditada = 'Competência Editada ' + Date.now();
+    const competenciaEditada = `Competência Editada ${Date.now()}`;
     await page.getByTestId('input-nova-competencia').fill(competenciaEditada);
     await page.getByTestId('btn-criar-competencia').click();
     
-    // Verificar se competência foi editada
     await expect(page.getByText(competenciaEditada)).toBeVisible();
     await expect(page.getByText(competenciaOriginal)).not.toBeVisible();
   });
 
-  test('deve excluir competência com confirmação', async ({page}) => {
-    await navigateToMapa(page);
+  test('deve excluir competência com confirmação', async ({ page }) => {
+    await navegarParaMapa(page);
     
-    const competenciaParaExcluir = 'Competência para Excluir ' + Date.now();
-    await createCompetencia(page, competenciaParaExcluir);
+    const competenciaParaExcluir = `Competência para Excluir ${Date.now()}`;
+    await criarCompetencia(page, competenciaParaExcluir);
     
-    // Excluir competência
-    const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaParaExcluir});
+    const competenciaCard = page.locator('.competencia-card').filter({ hasText: competenciaParaExcluir });
     await competenciaCard.hover();
     await competenciaCard.getByTestId('btn-excluir-competencia').click();
     
-    // Verificar modal de confirmação
-    await expect(page.getByRole('heading', {name: 'Exclusão de competência'})).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Exclusão de competência' })).toBeVisible();
     await expect(page.getByText(`Confirma a exclusão da competência "${competenciaParaExcluir}"?`)).toBeVisible();
     
-    // Confirmar exclusão
-    await page.getByRole('button', {name: 'Confirmar'}).click();
+    await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
     
-    // Verificar se competência foi removida
     await expect(competenciaCard).not.toBeVisible();
   });
 });

@@ -1,9 +1,12 @@
 [
-
-
   {
     "id": 3,
     "idProcesso": 1,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa2": null,
     "situacao": "Mapa validado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC",
@@ -42,6 +45,10 @@
     "id": 26,
     "idProcesso": 2,
     "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa2": null,
     "situacao": "Revisão do cadastro homologada",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": "STIC",
@@ -345,6 +352,11 @@
   {
     "id": 31,
     "idProcesso": 6,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-09-15",
+    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa2": null,
     "situacao": "Criado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": null,
@@ -354,6 +366,11 @@
   {
     "id": 32,
     "idProcesso": 7,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-10-30",
+    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa2": null,
     "situacao": "Criado",
     "unidadeAtual": "SESEL",
     "unidadeAnterior": null,

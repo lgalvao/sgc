@@ -472,10 +472,10 @@ const processoAtual = computed<Processo | null>(() => {
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 function adicionarAtividade() {
-  if (novaAtividade.value && idSubprocesso.value !== undefined) {
+  if (novaAtividade.value?.trim() && idSubprocesso.value !== undefined) {
     const novaAtividadeObj = {
       id: Date.now(),
-      descricao: novaAtividade.value,
+      descricao: novaAtividade.value.trim(),
       idSubprocesso: idSubprocesso.value,
       conhecimentos: [],
     };
@@ -485,24 +485,25 @@ function adicionarAtividade() {
       idAtividade: novaAtividadeObj.id,
       descricaoAtividade: novaAtividadeObj.descricao,
     });
-
-
+    verificarEAlterarSituacao();
     novaAtividade.value = '';
+    notificacoesStore.sucesso('Atividade adicionada', 'A atividade foi adicionada com sucesso.');
   }
 }
 
 function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
-  const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividadeRemovida.id, siglaUnidade.value, idProcesso.value);
-  atividadesStore.removerAtividade(atividadeRemovida.id);
-  revisaoStore.registrarMudanca({
-    tipo: TipoMudanca.AtividadeRemovida,
-    idAtividade: atividadeRemovida.id,
-    descricaoAtividade: atividadeRemovida.descricao,
-    competenciasImpactadasIds: idsImpactados,
-  });
-
-
+  if (confirm('Confirma a remoção desta atividade e todos os conhecimentos associados?')) {
+    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividadeRemovida.id, siglaUnidade.value, idProcesso.value);
+    atividadesStore.removerAtividade(atividadeRemovida.id);
+    revisaoStore.registrarMudanca({
+      tipo: TipoMudanca.AtividadeRemovida,
+      idAtividade: atividadeRemovida.id,
+      descricaoAtividade: atividadeRemovida.descricao,
+      competenciasImpactadasIds: idsImpactados,
+    });
+    verificarEAlterarSituacao();
+  }
 }
 
 function adicionarConhecimento(idx: number) {
@@ -510,24 +511,24 @@ function adicionarConhecimento(idx: number) {
   if (atividade.novoConhecimento?.trim()) {
     const novoConhecimentoObj = {
       id: Date.now(),
-      descricao: atividade.novoConhecimento
+      descricao: atividade.novoConhecimento.trim()
     };
     const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
     atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, idsImpactados);
-
-
-    // Limpar o campo
+    verificarEAlterarSituacao();
     atividade.novoConhecimento = '';
+    notificacoesStore.sucesso('Conhecimento adicionado', 'O conhecimento foi adicionado com sucesso.');
   }
 }
 
 function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
-  const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
-  atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, idsImpactados);
-
-
+  if (confirm('Confirma a remoção deste conhecimento?')) {
+    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
+    atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, idsImpactados);
+    verificarEAlterarSituacao();
+  }
 }
 
 const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
@@ -896,6 +897,16 @@ function abrirModalImpacto() {
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
   revisaoStore.setMudancasParaImpacto([]);
+}
+
+function verificarEAlterarSituacao() {
+  if (subprocesso.value?.situacao === 'Não iniciado' && idSubprocesso.value) {
+    const novaSituacao = isRevisao.value ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
+    const subprocessoIndex = processosStore.subprocessos.findIndex(sp => sp.id === idSubprocesso.value);
+    if (subprocessoIndex !== -1) {
+      processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+    }
+  }
 }
 </script>
 

@@ -206,8 +206,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
+import {onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'

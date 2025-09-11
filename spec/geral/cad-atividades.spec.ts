@@ -67,6 +67,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const btnRemoverAtividade = atividadeCard.getByTestId('btn-remover-atividade');
         await expect(btnRemoverAtividade).toBeVisible();
         await expect(btnRemoverAtividade).toBeEnabled();
+        page.on('dialog', dialog => dialog.accept());
         await btnRemoverAtividade.click({force: true});
         await expect(page.locator('.atividade-card', {hasText: atividadeParaRemover})).not.toBeAttached();
     });
@@ -124,6 +125,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         await expect(btnRemoverConhecimento).toBeVisible();
         await expect(btnRemoverConhecimento).toBeEnabled();
 
+        page.on('dialog', dialog => dialog.accept());
         await btnRemoverConhecimento.click();
         await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover})).not.toBeAttached();

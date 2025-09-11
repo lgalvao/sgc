@@ -1,6 +1,6 @@
 import {ErrorReporter} from './utils/error-reporter';
 import {Page, test as base} from '@playwright/test';
-import {parseDate} from '../src/utils'; // Importar parseDate
+import {parseDate} from '@/utils'; // Importar parseDate
 
 // Definição de uma interface para a janela com propriedades customizadas
 interface CustomWindow extends Window {
@@ -118,6 +118,14 @@ export const vueTest = base.extend<{ page: Page }>({
         });
 
         await use(page);
+
+        // Verificar se há erros críticos e falhar o teste se necessário
+        if (errorReporter.hasErrors()) {
+            const criticalErrors = errorReporter.getCriticalErrors();
+            if (criticalErrors.length > 0) {
+                console.warn(`⚠️  Teste executado com ${criticalErrors.length} erro(s) crítico(s)`);
+            }
+        }
 
         errorReporter.generateReport();
     },

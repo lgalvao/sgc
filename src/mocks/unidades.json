@@ -4,6 +4,7 @@
     "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
     "tipo": "ADMINISTRATIVA",
     "idServidorTitular": 7,
+    "responsavel": null,
     "id": 1,
     "filhas": [
       {
@@ -13,7 +14,7 @@
         "idServidorTitular": 2,
         "responsavel": {
           "idServidorResponsavel": 13,
-          "tipo": 1,
+          "tipo": "Atribuição temporária",
           "dataInicio": "2025-01-01",
           "dataFim": "2025-12-31"
         },
@@ -62,7 +63,7 @@
                 "idServidorTitular": 7,
                 "responsavel": {
                   "idServidorResponsavel": 8,
-                  "tipo": 0,
+                  "tipo": "Substituição",
                   "dataInicio": "2025-01-01",
                   "dataFim": "2025-12-31"
                 },
