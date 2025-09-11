@@ -140,6 +140,13 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
 
 function abrirDetalhesProcesso(processo: Processo) {
   const perfilUsuario = perfil.perfilSelecionado;
+  
+  // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
+  if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'Criado') {
+    router.push({name: 'CadProcesso', query: {idProcesso: processo.id}})
+    return;
+  }
+  
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
     router.push({name: 'Processo', params: {idProcesso: processo.id}})
   } else { // CHEFE ou SERVIDOR

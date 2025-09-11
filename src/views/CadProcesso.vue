@@ -204,8 +204,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
+import {ref, onMounted} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
@@ -221,6 +221,7 @@ const descricao = ref<string>('')
 const tipo = ref<TipoProcesso>(TipoProcesso.MAPEAMENTO)
 const dataLimite = ref<string>('')
 const router = useRouter()
+const route = useRoute()
 const processosStore = useProcessosStore()
 const unidadesStore = useUnidadesStore()
 const mapasStore = useMapasStore()
@@ -228,6 +229,25 @@ const servidoresStore = useServidoresStore()
 const alertasStore = useAlertasStore()
 const notificacoesStore = useNotificacoesStore()
 const mostrarModalConfirmacao = ref(false)
+const processoEditando = ref<Processo | null>(null)
+
+// Carregar processo se estiver editando
+onMounted(() => {
+  const idProcesso = route.query.idProcesso;
+  if (idProcesso) {
+    const processo = processosStore.processos.find(p => p.id === Number(idProcesso));
+    if (processo) {
+      processoEditando.value = processo;
+      descricao.value = processo.descricao;
+      tipo.value = processo.tipo;
+      dataLimite.value = processo.dataLimite.toISOString().split('T')[0];
+      
+      // Carregar unidades participantes
+      const subprocessos = processosStore.getUnidadesDoProcesso(processo.id);
+      unidadesSelecionadas.value = subprocessos.map(sp => sp.unidade);
+    }
+  }
+})
 
 function limparCampos() {
   descricao.value = ''

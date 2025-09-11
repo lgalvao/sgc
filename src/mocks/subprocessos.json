@@ -403,6 +403,20 @@
     "analises": []
   },
   {
+    "id": 101,
+    "idProcesso": 100,
+    "unidade": "STIC",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Não iniciado",
+    "unidadeAtual": "STIC",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
     "id": 99,
     "idProcesso": 99,
     "unidade": "STIC",

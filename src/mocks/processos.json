@@ -73,5 +73,13 @@
     "dataLimite": "2025-12-31",
     "dataFinalizacao": null,
     "situacao": "Em andamento"
+  },
+  {
+    "id": 100,
+    "descricao": "Processo teste revisão CDU-05",
+    "tipo": "Revisão",
+    "dataLimite": "2025-12-31",
+    "dataFinalizacao": null,
+    "situacao": "Criado"
   }
 ]
