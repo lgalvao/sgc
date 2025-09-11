@@ -81,5 +81,21 @@
     "dataLimite": "2025-12-31",
     "dataFinalizacao": null,
     "situacao": "Criado"
+  },
+  {
+    "id": 101,
+    "descricao": "Processo teste mapeamento para finalização",
+    "tipo": "Mapeamento",
+    "dataLimite": "2025-12-31",
+    "dataFinalizacao": null,
+    "situacao": "Em andamento"
+  },
+  {
+    "id": 102,
+    "descricao": "Processo teste revisão para finalização",
+    "tipo": "Revisão",
+    "dataLimite": "2025-12-31",
+    "dataFinalizacao": null,
+    "situacao": "Em andamento"
   }
 ]

@@ -20,6 +20,8 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
     await firstCheckbox.check();
     
     await page.getByText('Iniciar processo').click();
+    await page.waitForSelector('.modal.show');
+    await page.getByText('Confirmar').click();
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveURL(/\/painel$/);

@@ -55,7 +55,6 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
     
     if (await processoTeste.count() > 0) {
       await processoTeste.click();
-      const currentUrl = page.url();
       
       await page.click('button:has-text("Finalizar processo")');
       await expect(page.locator('.modal.show')).toBeVisible();
@@ -112,5 +111,79 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
     
     // Verificar que botão não existe
     await expect(page.locator('button:has-text("Finalizar processo")')).not.toBeVisible();
+  });
+
+  // Teste adicional para Passo 8: deve definir mapas como vigentes
+  test('Passo 8: deve definir mapas como vigentes após finalização', async ({ page }) => {
+    // Finalizar processo de mapeamento
+    await page.goto('/processo/101');
+    await page.waitForSelector('button:has-text("Finalizar processo")');
+    
+    await page.click('button:has-text("Finalizar processo")');
+    await page.waitForSelector('.modal.show');
+    await page.click('button:has-text("Confirmar")');
+    await page.waitForSelector('.notification-success', { timeout: 10000 });
+    
+    // Verificar que o processo foi finalizado (redirecionado para painel)
+    await expect(page).toHaveURL('/painel');
+    
+    // Verificar que o processo aparece como finalizado na tabela
+    const processoFinalizado = page.locator('table[data-testid="tabela-processos"] tbody tr').filter({ hasText: 'Processo teste mapeamento para finalização' });
+    await expect(processoFinalizado).toContainText('Finalizado');
+    
+    // Verificar que a notificação de sucesso menciona mapas vigentes
+    const notificacaoSucesso = await page.locator('.notification-success').textContent();
+    expect(notificacaoSucesso).toContain('mapas de competências estão agora vigentes');
+  });
+
+  // Teste mais específico para emails
+  test('Passo 9.1-9.2: deve enviar emails com conteúdo correto', async ({ page }) => {
+    await page.goto('/processo/101');
+    await page.waitForSelector('button:has-text("Finalizar processo")');
+    
+    await page.click('button:has-text("Finalizar processo")');
+    await page.waitForSelector('.modal.show');
+    await page.click('button:has-text("Confirmar")');
+    await page.waitForSelector('.notification-success', { timeout: 10000 });
+    
+    // Verificar notificações de email
+    const emailNotifications = await page.locator('.notification-email').count();
+    expect(emailNotifications).toBeGreaterThan(0);
+    
+    // Verificar que pelo menos um email foi enviado
+    const firstEmailNotification = await page.locator('.notification-email').first().textContent();
+    expect(firstEmailNotification).toContain('E-mail enviado');
+  });
+
+  // Teste para diferentes tipos de processo
+  test('deve funcionar para processos de mapeamento e revisão', async ({ page }) => {
+    // Testar com processo de mapeamento
+    await page.goto('/processo/101');
+    await page.waitForSelector('button:has-text("Finalizar processo")');
+    
+    await page.click('button:has-text("Finalizar processo")');
+    await page.waitForSelector('.modal.show');
+    
+    const modalTitle = await page.textContent('.modal-title');
+    expect(modalTitle).toContain('Finalização de processo');
+    
+    await page.click('button:has-text("Cancelar")');
+    await page.waitForSelector('.modal.show', { state: 'hidden' });
+    
+    // Testar com processo de revisão
+    await page.goto('/processo/102');
+    await page.waitForSelector('button:has-text("Finalizar processo")');
+    
+    await page.click('button:has-text("Finalizar processo")');
+    await page.waitForSelector('.modal.show');
+    
+    const modalTitleRevisao = await page.textContent('.modal-title');
+    expect(modalTitleRevisao).toContain('Finalização de processo');
+    
+    await page.click('button:has-text("Confirmar")');
+    await page.waitForSelector('.notification-success', { timeout: 10000 });
+    
+    const alertText = await page.textContent('.notification-success');
+    expect(alertText).toContain('Processo finalizado');
   });
 });

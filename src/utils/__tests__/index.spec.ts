@@ -43,7 +43,7 @@ describe('utils', () => {
     });
 
     it('should return default icon for unknown types', () => {
-      expect(iconeTipo('unknown' as any)).toBe('bi bi-bell-fill');
+      expect(iconeTipo('unknown' as 'success')).toBe('bi bi-bell-fill');
     });
   });
 

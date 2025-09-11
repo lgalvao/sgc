@@ -443,5 +443,61 @@
     "unidadeAnterior": null,
     "movimentacoes": [],
     "analises": []
+  },
+  {
+    "id": 102,
+    "idProcesso": 101,
+    "unidade": "STIC",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "STIC",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 103,
+    "idProcesso": 101,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 104,
+    "idProcesso": 102,
+    "unidade": "STIC",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "STIC",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 105,
+    "idProcesso": 102,
+    "unidade": "SEDESENV",
+    "dataLimiteEtapa1": "2025-12-31",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Mapa homologado",
+    "unidadeAtual": "SEDESENV",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
   }
 ]
