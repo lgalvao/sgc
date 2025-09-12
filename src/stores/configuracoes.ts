@@ -7,8 +7,8 @@ interface ConfiguracoesState {
 
 export const useConfiguracoesStore = defineStore('configuracoes', {
     state: (): ConfiguracoesState => ({
-        diasInativacaoProcesso: 10, // Valor padrão
-        diasAlertaNovo: 7, // Valor padrão
+        diasInativacaoProcesso: 10,
+        diasAlertaNovo: 7,
     }),
     actions: {
         loadConfiguracoes() {

@@ -2,6 +2,12 @@
 
 Este é um documento vivo que sumariza as lições aprendidas e as boas práticas observadas durante o processo de desenvolvimento, com foco em estratégias para modificação de código, depuração e resolução de problemas.
 
+## 0. Princípios
+
+*   **Seja Pragmático:** Não hesite em usar a abordagem "Ler, Modificar, Escrever" em vez de insistir em um `replace` que não funciona. O importante é progredir de forma segura.
+*   **Reconheça e Adapte-se:** Se uma estratégia não está funcionando, pare, analise o motivo e mude a abordagem.
+*   **Comunicação:** Se estiver em dúvida sobre o comportamento esperado ou a melhor forma de implementar algo, confirme o entendimento com o usuário.
+
 ## 1. Entendimento do Contexto Existente
 
 *   **Análise Profunda:** Antes de qualquer alteração, dedique tempo para entender a arquitetura existente, os padrões de código, as convenções de nomenclatura e o fluxo de dados. Isso inclui ler arquivos relacionados, testes e configurações.
@@ -9,8 +15,6 @@ Este é um documento vivo que sumariza as lições aprendidas e as boas prática
 *   **Rede de Segurança com Testes:** Se a funcionalidade a ser alterada já possui testes, execute-os para garantir que estão passando e que servirão como uma rede de segurança. Se não houver testes, considere criar testes de alto nível antes de refatorar.
 
 ## 2. Estratégias de Modificação de Código
-
-### A Estratégia Mais Segura: Ler, Modificar, Escrever
 
 Para modificações complexas, múltiplas ou quando a sensibilidade do `replace` é um problema, a abordagem mais robusta e recomendada é:
 
@@ -42,9 +46,3 @@ Após cada alteração significativa, execute os seguintes comandos nesta ordem 
 3.  **Verificação Contínua:** Execute o ciclo de validação da Seção 3 (`lint`, `typecheck`, `test`). Corrija os problemas antes de prosseguir.
 4.  **Repetição:** Volte ao passo 2 e continue fazendo pequenas alterações e verificações até que a refatoração esteja completa.
 5.  **Commit Atômico:** Agrupe as alterações em um commit lógico e bem descrito. Use `git status` e `git diff HEAD` para revisar tudo antes de comitar. Uma boa mensagem de commit explica o "porquê" da mudança, não apenas o "o quê".
-
-## 5. Princípios e Mentalidade
-
-*   **Seja Pragmático:** Não hesite em usar a abordagem "Ler, Modificar, Escrever" em vez de insistir em um `replace` que não funciona. O importante é progredir de forma segura.
-*   **Reconheça e Adapte-se:** Se uma estratégia não está funcionando, pare, analise o motivo e mude a abordagem.
-*   **Comunicação:** Se estiver em dúvida sobre o comportamento esperado ou a melhor forma de implementar algo, confirme o entendimento com o usuário.

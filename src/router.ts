@@ -22,7 +22,7 @@ const routes = [
         path: '/processo/cadastro',
         name: 'CadProcesso',
         component: () => import('./views/CadProcesso.vue'),
-        meta: {title: 'Novo Processo', breadcrumb: 'Novo Processo'},
+        meta: {title: 'Novo processo', breadcrumb: 'Novo ^processo'},
     },
     {
         path: '/processo/:idProcesso',

@@ -2,7 +2,7 @@ import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {useServidoresStore} from '@/stores/servidores';
 import {useUnidadesStore} from '@/stores/unidades';
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria';
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {Perfil, Unidade} from '@/types/tipos';
 
 // Função auxiliar para achatar a hierarquia de unidades

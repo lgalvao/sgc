@@ -102,7 +102,7 @@ import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicaoTemporaria'
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 import servidoresMock from '@/mocks/servidores.json'
 import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
 

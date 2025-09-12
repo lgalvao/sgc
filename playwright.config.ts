@@ -8,7 +8,7 @@ export default defineConfig({
     timeout: 7000,
     testDir: './spec',
     fullyParallel: true,
-    reporter: "line",
+    reporter: "dot",
 
     webServer: {
         command: 'npm run dev',
@@ -19,14 +19,14 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:5173/',
         trace: 'on-first-retry',
-        actionTimeout: 3000,
-        navigationTimeout: 3000,
+        actionTimeout: 2000,
+        navigationTimeout: 2000,
     },
     projects: [{
         name: 'chromium',
         use: {
             ...devices['Desktop Chrome'],
-            ...vueTest, // Mover vueTest para dentro de 'use'
+            ...vueTest
         },
     }],
 });
