@@ -14,6 +14,7 @@ export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: 
     await page.waitForSelector('[data-testid="atividades-card"]');
     await page.getByTestId('atividades-card').click();
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-cadastro`));
+    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
 

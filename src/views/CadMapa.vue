@@ -269,7 +269,7 @@
               <label
                 class="form-label"
                 for="observacoes"
-              >Observações (opcional)</label>
+              >Observações</label>
               <textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"

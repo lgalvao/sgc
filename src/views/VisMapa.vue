@@ -346,7 +346,7 @@
               <label
                 for="observacaoDevolucao"
                 class="form-label"
-              >Observação (opcional):</label>
+              >Observação:</label>
               <textarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"

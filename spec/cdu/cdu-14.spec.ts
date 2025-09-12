@@ -42,7 +42,7 @@ test.describe('CDU-14: Analisar revisão de cadastro de atividades e conheciment
     await navegarParaAnaliseRevisao(page, loginComoGestor);
     await page.getByText('Registrar aceite').click();
     await expect(page.getByRole('heading', { name: 'Aceite da revisão do cadastro' })).toBeVisible();
-    await page.getByLabel('Observação (opcional)').fill('Aceite após análise.');
+    await page.getByLabel('Observação').fill('Aceite após análise.');
     await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
     await esperarSucessoERedirecionamento(page, 'Aceite registrado');
   });

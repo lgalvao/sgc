@@ -6,99 +6,96 @@ import {devolverParaAjustes, homologarItem} from './auxiliares-acoes';
 import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
-  test('deve exibir modal de Histórico de análise', async ({ page }) => {
-    await loginComoGestor(page);
-    await navegarParaVisualizacaoAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    const idProcessoStic = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id;
+    const siglaStic = DADOS_TESTE.UNIDADES.STIC;
 
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
-    await page.getByRole('button', { name: 'Histórico de análise' }).click();
+    test('deve exibir modal de Histórico de análise', async ({page}) => {
+        await loginComoGestor(page);
+        await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
 
-    await expect(page.locator('div.modal.fade.show')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Histórico de Análise' })).toBeVisible();
-    await esperarTextoVisivel(page, 'Observação de teste para histórico.');
+        await page.getByRole('button', {name: 'Histórico de análise'}).click();
 
-    await page.getByRole('button', { name: 'Fechar' }).click();
-    await expect(page.getByRole('heading', { name: 'Histórico de Análise' })).not.toBeVisible();
-  });
+        await expect(page.locator('div.modal.fade.show')).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Histórico de Análise'})).toBeVisible();
+        await esperarTextoVisivel(page, 'Observação de teste para histórico.');
 
-  test('GESTOR deve conseguir devolver cadastro para ajustes', async ({ page }) => {
-    await loginComoGestor(page);
-    await navegarParaVisualizacaoAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+        await page.getByRole('button', {name: 'Fechar'}).click();
+        await expect(page.getByRole('heading', {name: 'Histórico de Análise'})).not.toBeVisible();
+    });
 
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
-    await devolverParaAjustes(page, 'Devolução para correção de detalhes.');
+    test('GESTOR deve conseguir devolver cadastro para ajustes', async ({page}) => {
+        await loginComoGestor(page);
 
-    const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
-    await expect(notification).toBeVisible({ timeout: 5000 });
-    await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
+        await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
 
-    await esperarUrl(page, URLS.PAINEL);
-  });
+        await devolverParaAjustes(page, 'Devolução para correção de detalhes.');
 
-  test('ADMIN deve conseguir devolver cadastro para ajustes', async ({ page }) => {
-    await loginComoAdmin(page);
-    await navegarParaVisualizacaoAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+        const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
+        await expect(notification).toBeVisible();
+        await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
 
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
-    await devolverParaAjustes(page);
+        await esperarUrl(page, URLS.PAINEL);
+    });
 
-    const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
-    await expect(notification).toBeVisible({ timeout: 5000 });
-    await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
+    test('ADMIN deve conseguir devolver cadastro para ajustes', async ({page}) => {
+        await loginComoAdmin(page);
+        await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
 
-    await esperarUrl(page, URLS.PAINEL);
-  });
+        await devolverParaAjustes(page);
 
-  test('GESTOR deve conseguir registrar aceite do cadastro', async ({ page }) => {
-    await loginComoGestor(page);
-    await navegarParaVisualizacaoAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+        const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
+        await expect(notification).toBeVisible();
+        await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
 
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
+        await esperarUrl(page, URLS.PAINEL);
+    });
 
-    const acceptButton = page.getByRole('button', { name: 'Registrar aceite' });
-    const validateButton = page.getByRole('button', { name: 'Validar' });
-    
-    if (await acceptButton.isVisible()) {
-      await acceptButton.click();
-    } else {
-      await validateButton.click();
-    }
+    test('GESTOR deve conseguir registrar aceite do cadastro', async ({page}) => {
+        await loginComoGestor(page);
+        await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
 
-    await expect(page.getByRole('heading', { name: 'Validação do cadastro' })).toBeVisible();
-    await esperarTextoVisivel(page, 'Confirma o aceite do cadastro de atividades?');
+        const acceptButton = page.getByRole('button', {name: 'Registrar aceite'});
+        const validateButton = page.getByRole('button', {name: 'Validar'});
 
-    await page.getByLabel('Observação (opcional)').fill('Aceite do cadastro de atividades.');
-    await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
+        if (await acceptButton.isVisible()) {
+            await acceptButton.click();
+        } else {
+            await validateButton.click();
+        }
 
-    const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
-    await expect(notification).toBeVisible({ timeout: 5000 });
-    await expect(notification).toContainText('A análise foi registrada com sucesso!');
+        await expect(page.getByRole('heading', {name: 'Validação do cadastro'})).toBeVisible();
+        await esperarTextoVisivel(page, 'Confirma o aceite do cadastro de atividades?');
 
-    await esperarUrl(page, URLS.PAINEL);
-  });
+        await page.getByLabel('Observação').fill('Aceite do cadastro de atividades.');
+        await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 
-  test('ADMIN deve conseguir homologar o cadastro', async ({ page }) => {
-    await loginComoAdmin(page);
-    await navegarParaVisualizacaoAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+        const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
+        await expect(notification).toBeVisible();
+        await expect(notification).toContainText('A análise foi registrada com sucesso!');
 
-    await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
+        await esperarUrl(page, URLS.PAINEL);
+    });
 
-    const homologateButton = page.getByRole('button', { name: 'Homologar' });
-    const validateButton = page.getByRole('button', { name: 'Validar' });
-    
-    if (await homologateButton.isVisible()) {
-      await homologarItem(page);
-    } else {
-      await validateButton.click();
-      await expect(page.getByRole('heading', { name: 'Homologação do cadastro de atividades e conhecimentos' })).toBeVisible();
-      await esperarTextoVisivel(page, 'Confirma a homologação do cadastro de atividades e conhecimentos?');
-      await page.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
-    }
+    test('ADMIN deve conseguir homologar o cadastro', async ({page}) => {
+        await loginComoAdmin(page);
+        await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
 
-    const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
-    await expect(notification).toBeVisible({ timeout: 5000 });
-    await expect(notification).toContainText('O cadastro foi homologado com sucesso!');
+        const homologateButton = page.getByRole('button', {name: 'Homologar'});
+        const validateButton = page.getByRole('button', {name: 'Validar'});
 
-    await expect(page).toHaveURL(new RegExp('/processo/1/STIC'));
-  });
+        if (await homologateButton.isVisible()) {
+            await homologarItem(page);
+        } else {
+            await validateButton.click();
+            await expect(page.getByRole('heading', {name: 'Homologação do cadastro de atividades e conhecimentos'})).toBeVisible();
+            await esperarTextoVisivel(page, 'Confirma a homologação do cadastro de atividades e conhecimentos?');
+            await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+        }
+
+        const notificacao = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
+        await expect(notificacao).toBeVisible();
+        await expect(notificacao).toContainText('O cadastro foi homologado com sucesso!');
+
+        await expect(page).toHaveURL(new RegExp('/processo/1/STIC'));
+    });
 });

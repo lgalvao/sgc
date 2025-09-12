@@ -112,7 +112,7 @@
               <label
                 class="form-label"
                 for="observacaoValidacao"
-              >Observação (opcional)</label>
+              >Observação</label>
               <textarea
                 id="observacaoValidacao"
                 v-model="observacaoValidacao"
@@ -208,7 +208,7 @@
               <label
                 class="form-label"
                 for="observacaoDevolucao"
-              >Observação (opcional)</label>
+              >Observação</label>
               <textarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"

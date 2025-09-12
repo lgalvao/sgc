@@ -53,7 +53,6 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
 
   test('não deve permitir disponibilização se subprocesso não estiver na situação correta', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-
     await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
     
     const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);

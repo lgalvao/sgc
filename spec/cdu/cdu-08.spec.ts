@@ -14,25 +14,23 @@ import {
 import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './constantes-teste';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginComoChefe(page);
-  });
+  test.beforeEach(async ({ page }) => await loginComoChefe(page));
 
-  test('Passos 1-4: deve navegar do Painel para cadastro de atividades', async ({ page }) => {
+  test('deve navegar do Painel para cadastro de atividades', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     await expect(page.getByRole('heading', { name: TEXTOS.CADASTRO_ATIVIDADES_CONHECIMENTOS })).toBeVisible();
     await esperarElementoVisivel(page, SELETORES.INPUT_NOVA_ATIVIDADE);
   });
 
-  test('Passo 5: deve exibir botão Impacto no mapa para processos de revisão', async ({ page }) => {
+  test('deve exibir botão Impacto no mapa para processos de revisão', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     const botaoImpacto = page.locator(`button:has-text("${TEXTOS.IMPACTO_NO_MAPA}")`);
     await expect(botaoImpacto).toBeVisible();
   });
 
-  test('Passos 6-9: deve adicionar atividade e conhecimento', async ({ page }) => {
+  test('deve adicionar atividade e conhecimento', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     // Passo 6-7: Adicionar atividade
@@ -45,7 +43,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     await adicionarConhecimento(cardAtividade, nomeConhecimento);
   });
 
-  test('Passos 11-11.2: deve editar e remover atividades', async ({ page }) => {
+  test('deve editar e remover atividades', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     // Adicionar atividade para teste
@@ -54,12 +52,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     
     const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeOriginal });
     
-    // Passo 11.1: Editar atividade
+    // Editar atividade
     const nomeEditado = gerarNomeUnico('Atividade Editada');
     await editarAtividade(page, cardAtividade, nomeEditado);
     await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeEditado })).toBeVisible();
     
-    // Passo 11.2: Remover atividade com confirmação
+    // Remover atividade com confirmação
     const cardEditado = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeEditado });
     await removerAtividade(page, cardEditado);
     await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeEditado })).not.toBeAttached();
@@ -76,19 +74,19 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const nomeConhecimentoOriginal = gerarNomeUnico('Conhecimento Original');
     await adicionarConhecimento(cardAtividade, nomeConhecimentoOriginal);
     
-    // Passo 12.1: Editar conhecimento
+    // Editar conhecimento
     const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, { hasText: nomeConhecimentoOriginal });
     const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
     await editarConhecimento(page, linhaConhecimento, nomeConhecimentoEditado);
     await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, { hasText: nomeConhecimentoEditado })).toBeVisible();
     
-    // Passo 12.2: Remover conhecimento com confirmação
+    // Remover conhecimento com confirmação
     const conhecimentoEditado = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, { hasText: nomeConhecimentoEditado });
     await removerConhecimento(page, conhecimentoEditado);
     await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, { hasText: nomeConhecimentoEditado })).not.toBeAttached();
   });
 
-  test('Passo 13: deve importar atividades de processos finalizados', async ({ page }) => {
+  test('deve importar atividades de processos finalizados', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     await page.click(`button:has-text("${TEXTOS.IMPORTAR_ATIVIDADES}")`);
@@ -97,7 +95,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     await expect(page.locator('.modal-body')).toBeVisible();
   });
 
-  test('Passo 14: deve alterar situação de "Não iniciado" para "em andamento"', async ({ page }) => {
+  test('deve alterar situação de "Não iniciado" para "em andamento"', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.SEMARE);
     
     const nomeAtividade = gerarNomeUnico('Primeira Atividade');
@@ -106,7 +104,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toBeVisible();
   });
 
-  test('Passo 15: deve disponibilizar cadastro após finalização', async ({ page }) => {
+  test('deve disponibilizar cadastro após finalização', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     // Adicionar atividade com conhecimento

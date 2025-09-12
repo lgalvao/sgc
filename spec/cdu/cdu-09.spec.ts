@@ -6,9 +6,7 @@ import {disponibilizarCadastro} from './auxiliares-acoes';
 import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginComoChefe(page);
-  });
+  test.beforeEach(async ({ page }) => await loginComoChefe(page));
 
   test('deve mostrar botão Histórico de análise e permitir disponibilização', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
@@ -41,11 +39,11 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', (
     const nomeConhecimento = `Conhecimento de teste para CDU-09 ${Date.now()}`;
     await adicionarConhecimento(cardAtividade, nomeConhecimento);
 
-    try {
-      await disponibilizarCadastro(page);
-      await esperarUrl(page, URLS.PAINEL);
-    } catch {
-      await expect(page.getByRole('button', { name: TEXTOS.DISPONIBILIZAR })).toBeVisible();
-    }
+    // Assegura que o botão está habilitado antes da ação
+    const botaoDisponibilizar = page.getByRole('button', { name: TEXTOS.DISPONIBILIZAR });
+    await expect(botaoDisponibilizar).toBeEnabled();
+
+    await disponibilizarCadastro(page);
+    await esperarUrl(page, URLS.PAINEL);
   });
 });

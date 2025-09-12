@@ -4,9 +4,7 @@ import {clicarPrimeiroProcesso} from './auxiliares-navegacao';
 import {SELETORES} from './constantes-teste';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
-    test.beforeEach(async ({page}) => {
-        await loginComoChefe(page);
-    });
+    test.beforeEach(async ({page}) => await loginComoChefe(page));
 
     test('deve mostrar detalhes do subprocesso para CHEFE', async ({page}) => {
         await clicarPrimeiroProcesso(page);
