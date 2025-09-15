@@ -169,23 +169,24 @@ export async function login(page: Page, idServidor: string): Promise<void> {
 /**
  * Login genérico para diferentes perfis
  */
-async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS): Promise<void> {
+async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS, idServidorOverride?: string): Promise<void> {
   const dadosUsuario = DADOS_TESTE.PERFIS[perfil];
+  const finalIdServidor = idServidorOverride || dadosUsuario.idServidor;
   await page.context().addInitScript((dados) => {
     localStorage.setItem('idServidor', dados.idServidor);
     localStorage.setItem('perfilSelecionado', dados.perfil);
     localStorage.setItem('unidadeSelecionada', dados.unidade);
-  }, dadosUsuario);
+  }, { ...dadosUsuario, idServidor: finalIdServidor });
   await page.goto(URLS.PAINEL);
   await expect(page).toHaveURL(/\/painel/);
   await verificarElementosPainel(page);
 }
 
-export const loginComoAdmin = (page: Page) => fazerLoginComo(page, 'ADMIN');
-export const loginComoGestor = (page: Page) => fazerLoginComo(page, 'GESTOR');
-export const loginComoChefe = (page: Page) => fazerLoginComo(page, 'CHEFE');
-export const loginComoChefeSedia = (page: Page) => fazerLoginComo(page, 'CHEFE_SEDIA');
-export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR');
+export const loginComoAdmin = (page: Page, idServidor?: string) => fazerLoginComo(page, 'ADMIN', idServidor);
+export const loginComoGestor = (page: Page, idServidor?: string) => fazerLoginComo(page, 'GESTOR', idServidor);
+export const loginComoChefe = (page: Page, idServidor?: string) => fazerLoginComo(page, 'CHEFE', idServidor);
+export const loginComoChefeSedia = (page: Page, idServidor?: string) => fazerLoginComo(page, 'CHEFE_SEDIA', idServidor);
+export const loginComoServidor = (page: Page, idServidor?: string) => fazerLoginComo(page, 'SERVIDOR', idServidor);
 
 /**
  * Espera por um elemento ser invisível
@@ -197,6 +198,10 @@ export async function esperarElementoInvisivel(page: Page, seletor: string): Pro
 /**
  * Espera por uma URL específica
  */
-export async function esperarUrl(page: Page, url: string): Promise<void> {
-  await expect(page).toHaveURL(new RegExp(url));
+export async function esperarUrl(page: Page, url: string | RegExp): Promise<void> {
+  if (typeof url === 'string') {
+    await expect(page).toHaveURL(new RegExp(url));
+  } else {
+    await expect(page).toHaveURL(url);
+  }
 }
