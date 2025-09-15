@@ -1,5 +1,5 @@
 import {expect, Locator, Page} from '@playwright/test';
-import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
+import {DADOS_TESTE, ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
 
 /**
  * Clica em um botão pelo nome
@@ -153,6 +153,17 @@ export async function removerConhecimento(page: Page, linhaConhecimento: Locator
  */
 export function gerarNomeUnico(prefixo: string): string {
   return `${prefixo} ${Date.now()}`;
+}
+
+/**
+ * Realiza o login pela UI, preenchendo título e senha.
+ * Não clica em "Entrar", permitindo interações adicionais na tela de login.
+ */
+export async function login(page: Page, idServidor: string): Promise<void> {
+  await page.goto(URLS.LOGIN);
+  // O login mockado usa o ID do servidor como "título" e uma senha padrão
+  await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
+  await page.getByLabel(ROTULOS.SENHA).fill('senha-padrao'); // A senha é ignorada pelo mock
 }
 
 /**

@@ -4,7 +4,7 @@ Leia Leia @README.md e @regras/regras-perfis.md e @regras/regras-endpoints.md. A
 @/reqs/cdu-12.md e verifique o que falta no projeto para concluir a implementação atender a essas especificações, e o
 que está diferente do especificado e precisa de ajustes.
 
-## Revisão dos teste e2e
+## Revisão dos testes e2e
 
 Reveja o teste @spec/cdu/cdu-21.spec.ts para que fique alinhado à especificação @reqs/cdu-21.md.
 

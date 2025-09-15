@@ -83,6 +83,8 @@ export const TEXTOS = {
   MAPA_COMPETENCIAS_TECNICAS: 'Mapa de competências técnicas',
   HOMOLOGAR: 'Homologar',
   VALIDAR: 'Validar',
+  ERRO_LOGIN_INVALIDO: 'Título ou senha inválidos.',
+  USUARIO_NAO_ENCONTRADO: 'Usuário não encontrado',
 } as const;
 
 export const URLS = {
@@ -106,6 +108,7 @@ export const ROTULOS = {
   OBSERVACAO: 'observação',
   TITULO_ELEITORAL: 'Título eleitoral',
   SENHA: 'Senha',
+  PERFIL_UNIDADE: 'Perfil - Unidade',
 } as const;
 
 export const DADOS_TESTE = {
@@ -141,3 +144,5 @@ export const SELETORES_CSS = {
   GRUPO_CONHECIMENTO: '.group-conhecimento',
   LINHA_TABELA: 'table tbody tr',
 } as const;
+
+export const ID_SERVIDOR_MULTIPERFIL = '8';

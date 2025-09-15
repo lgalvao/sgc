@@ -26,7 +26,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
     
     await expect(page.getByRole('heading', { name: 'Disponibilização do mapa de competências' })).toBeVisible();
     await expect(page.getByLabel('Data limite para validação')).toBeVisible();
-    await expect(page.getByLabel('Observações (opcional)')).toBeVisible();
+        await expect(page.getByLabel('Observações')).toBeVisible();
   });
 
   test('deve preencher observações no modal', async ({ page }) => {
@@ -68,7 +68,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
     await page.locator('#dataLimite').fill('2025-12-31');
     await expect(btnDisponibilizar).toBeEnabled();
     
-    await expect(page.getByLabel('Observações (opcional)')).toBeVisible();
+        await expect(page.getByLabel('Observações')).toBeVisible();
     await page.locator('#observacoes').fill('Teste de observações');
     await expect(page.locator('#observacoes')).toHaveValue('Teste de observações');
   });
