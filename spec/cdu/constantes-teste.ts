@@ -85,6 +85,14 @@ export const TEXTOS = {
   VALIDAR: 'Validar',
   ERRO_LOGIN_INVALIDO: 'Título ou senha inválidos.',
   USUARIO_NAO_ENCONTRADO: 'Usuário não encontrado',
+  ERRO_DESCRICAO_OBRIGATORIA: 'Preencha a descrição',
+  ERRO_UNIDADE_SEM_MAPA: 'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.',
+  PROCESSO_CRIADO: 'Processo criado.',
+  PROCESSO_ALTERADO: 'Processo alterado.',
+  CONFIRMACAO_REMOCAO_PROCESSO_INICIO: 'Remover o processo \'',
+  CONFIRMACAO_REMOCAO_PROCESSO_FIM: '\'? Esta ação não poderá ser desfeita.',
+  PROCESSO_REMOVIDO_INICIO: 'Processo ',
+  PROCESSO_REMOVIDO_FIM: ' removido',
 } as const;
 
 export const URLS = {

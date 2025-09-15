@@ -149,6 +149,14 @@
       >
         Iniciar processo
       </button>
+      <button
+        v-if="processoEditando"
+        class="btn btn-danger ms-2"
+        type="button"
+        @click="abrirModalRemocao"
+      >
+        Remover
+      </button>
       <router-link
         class="btn btn-secondary ms-2"
         to="/painel"
@@ -202,6 +210,52 @@
       v-if="mostrarModalConfirmacao"
       class="modal-backdrop fade show"
     />
+
+    <!-- Modal de confirmação de remoção -->
+    <div
+      v-if="mostrarModalRemocao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Confirmação
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="fecharModalRemocao"
+            />
+          </div>
+          <div class="modal-body">
+            <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalRemocao"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="confirmarRemocao"
+            >
+              Remover
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="mostrarModalRemocao"
+      class="modal-backdrop fade show"
+    />
   </div>
 </template>
 
@@ -217,6 +271,7 @@ import {Processo, SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
+import {TEXTOS} from '@/constants';
 
 const unidadesSelecionadas = ref<string[]>([])
 const descricao = ref<string>('')
@@ -231,6 +286,7 @@ const servidoresStore = useServidoresStore()
 const alertasStore = useAlertasStore()
 const notificacoesStore = useNotificacoesStore()
 const mostrarModalConfirmacao = ref(false)
+const mostrarModalRemocao = ref(false)
 const processoEditando = ref<Processo | null>(null)
 
 // Carregar processo se estiver editando
@@ -304,38 +360,55 @@ function salvarProcesso() {
      return
    }
 
-   const novoidProcesso = processosStore.processos.length + 1;
+   if (processoEditando.value) {
+     // Editando processo existente
+     processosStore.editarProcesso({
+       id: processoEditando.value.id,
+       descricao: descricao.value,
+       tipo: tipo.value,
+       dataLimite: new Date(dataLimite.value),
+       unidades: unidadesFiltradas
+     });
+     
+     notificacoesStore.sucesso(
+       'Processo alterado',
+       'O processo foi alterado com sucesso!'
+     );
+   } else {
+     // Criando novo processo
+     const novoidProcesso = processosStore.processos.length + 1;
 
-   const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
-     id: generateUniqueId(),
-     idProcesso: novoidProcesso,
-     unidade: unidadeSigla,
-     dataLimiteEtapa1: new Date(dataLimite.value),
-     dataLimiteEtapa2: new Date(dataLimite.value),
-     dataFimEtapa1: null,
-     dataFimEtapa2: null,
-     unidadeAtual: unidadeSigla,
-     unidadeAnterior: null,
-     situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
-     movimentacoes: [],
-     analises: []
-   }));
+     const novossubprocessosObjetos = unidadesFiltradas.map((unidadeSigla) => ({
+       id: generateUniqueId(),
+       idProcesso: novoidProcesso,
+       unidade: unidadeSigla,
+       dataLimiteEtapa1: new Date(dataLimite.value),
+       dataLimiteEtapa2: new Date(dataLimite.value),
+       dataFimEtapa1: null,
+       dataFimEtapa2: null,
+       unidadeAtual: unidadeSigla,
+       unidadeAnterior: null,
+       situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
+       movimentacoes: [],
+       analises: []
+     }));
 
-   const novo = {
-     id: novoidProcesso,
-     descricao: descricao.value,
-     tipo: tipo.value,
-     dataLimite: new Date(dataLimite.value),
-     situacao: SituacaoProcesso.CRIADO,
-     dataFinalizacao: null
-   };
-   processosStore.adicionarProcesso(novo);
-   processosStore.adicionarsubprocessos(novossubprocessosObjetos);
+     const novo = {
+       id: novoidProcesso,
+       descricao: descricao.value,
+       tipo: tipo.value,
+       dataLimite: new Date(dataLimite.value),
+       situacao: SituacaoProcesso.CRIADO,
+       dataFinalizacao: null
+     };
+     processosStore.adicionarProcesso(novo);
+     processosStore.adicionarsubprocessos(novossubprocessosObjetos);
 
-   notificacoesStore.sucesso(
-     'Processo salvo',
-     'O processo foi salvo com sucesso!'
-   );
+     notificacoesStore.sucesso(
+       'Processo salvo',
+       'O processo foi salvo com sucesso!'
+     );
+   }
 
    router.push('/painel');
    limparCampos();
@@ -370,6 +443,26 @@ function fecharModalConfirmacao() {
 function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false
   iniciarProcesso()
+}
+
+function abrirModalRemocao() {
+  mostrarModalRemocao.value = true
+}
+
+function fecharModalRemocao() {
+  mostrarModalRemocao.value = false
+}
+
+function confirmarRemocao() {
+  if (processoEditando.value) {
+    processosStore.removerProcesso(processoEditando.value.id)
+    notificacoesStore.sucesso(
+      'Processo removido',
+      `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`
+    )
+    router.push('/painel')
+  }
+  fecharModalRemocao()
 }
 
 function iniciarProcesso() {

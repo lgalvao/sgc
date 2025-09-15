@@ -110,6 +110,56 @@ export const useProcessosStore = defineStore('processos', {
                 this.subprocessos.push(pu);
             });
         },
+        removerProcesso(idProcesso: number) {
+            // Remove o processo
+            const processoIndex = this.processos.findIndex(p => p.id === idProcesso);
+            if (processoIndex !== -1) {
+                this.processos.splice(processoIndex, 1);
+            }
+            // Remove todos os subprocessos relacionados
+            this.subprocessos = this.subprocessos.filter(sp => sp.idProcesso !== idProcesso);
+            // Remove todas as movimentações relacionadas
+            const subprocessosIds = this.subprocessos.filter(sp => sp.idProcesso === idProcesso).map(sp => sp.id);
+            this.movements = this.movements.filter(m => !subprocessosIds.includes(m.idSubprocesso));
+        },
+        editarProcesso(dadosProcesso: {
+            id: number,
+            descricao: string,
+            tipo: TipoProcesso,
+            dataLimite: Date,
+            unidades: string[]
+        }) {
+            const processoIndex = this.processos.findIndex(p => p.id === dadosProcesso.id);
+            if (processoIndex !== -1) {
+                // Atualizar dados do processo
+                this.processos[processoIndex] = {
+                    ...this.processos[processoIndex],
+                    descricao: dadosProcesso.descricao,
+                    tipo: dadosProcesso.tipo,
+                    dataLimite: dadosProcesso.dataLimite
+                };
+                
+                // Atualizar subprocessos - remover os antigos e adicionar os novos
+                this.subprocessos = this.subprocessos.filter(sp => sp.idProcesso !== dadosProcesso.id);
+                
+                const novosSubprocessos = dadosProcesso.unidades.map((unidadeSigla) => ({
+                    id: generateUniqueId(),
+                    idProcesso: dadosProcesso.id,
+                    unidade: unidadeSigla,
+                    dataLimiteEtapa1: dadosProcesso.dataLimite,
+                    dataLimiteEtapa2: dadosProcesso.dataLimite,
+                    dataFimEtapa1: null,
+                    dataFimEtapa2: null,
+                    unidadeAtual: unidadeSigla,
+                    unidadeAnterior: null,
+                    situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
+                    movimentacoes: [],
+                    analises: []
+                }));
+                
+                this.subprocessos.push(...novosSubprocessos);
+            }
+        },
         finalizarProcesso(idProcesso: number) {
             const processo = this.processos.find(p => p.id === idProcesso);
             if (processo) {

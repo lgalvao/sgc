@@ -1,6 +1,13 @@
 // Constantes gerais da aplicação
 export const URL_SISTEMA = 'http://localhost:5173'; // URL do sistema SGC
 
+export const TEXTOS = {
+  CONFIRMACAO_REMOCAO_PROCESSO_INICIO: 'Remover o processo \'',
+  CONFIRMACAO_REMOCAO_PROCESSO_FIM: '\'? Esta ação não poderá ser desfeita.',
+  PROCESSO_REMOVIDO_INICIO: 'Processo ',
+  PROCESSO_REMOVIDO_FIM: ' removido'
+};
+
 export const EMAIL_TEMPLATES = {
     FINALIZACAO_PROCESSO_OPERACIONAL: (processoDescricao: string) =>
     `SGC: Conclusão do processo ${processoDescricao}`,
