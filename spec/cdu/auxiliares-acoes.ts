@@ -79,7 +79,7 @@ export async function iniciarProcesso(page: Page): Promise<void> {
   await page.getByText(TEXTOS.INICIAR_PROCESSO).click();
   await page.waitForSelector('.modal.show');
   await page.getByText(TEXTOS.CONFIRMAR).click();
-  await page.waitForLoadState('networkidle');
+  //await page.waitForLoadState('networkidle');
 }
 
 /**

@@ -6,7 +6,7 @@ import {login} from "./auxiliares-utils";
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve carregar a página de login corretamente', async ({page}) => {
         await page.goto('/');
-        await verificarUrl(page, `**${URLS.LOGIN}`);
+        await verificarUrl(page, `${URLS.LOGIN}`);
         await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
         await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();
         await expect(page.getByRole('button', {name: TEXTOS.ENTRAR})).toBeVisible();
@@ -23,10 +23,11 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve exibir estrutura da aplicação para SERVIDOR', async ({page}) => {
         await loginComoServidor(page);
         await verificarElementosPainel(page);
-
         const navBar = page.getByRole('navigation');
+
         await expect(navBar.getByRole('link', {name: 'Painel'})).toBeVisible();
         await expect(navBar.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
+
         await expect(page.getByText('SERVIDOR - STIC')).toBeVisible();
         await expect(page.locator('a[title="Configurações do sistema"]')).not.toBeVisible();
         await expect(page.locator('a[title="Sair"]')).toBeVisible();
@@ -42,11 +43,10 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
 
     test('deve fazer logout e retornar para a tela de login', async ({page}) => {
         await loginComoServidor(page);
-        await verificarUrl(page, `**${URLS.PAINEL}`);
-
+        await verificarUrl(page, `${URLS.PAINEL}`);
         await page.locator('a[title="Sair"]').click();
 
-        await verificarUrl(page, `**${URLS.LOGIN}`);
+        await verificarUrl(page, `${URLS.LOGIN}`);
         await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
     });
 });

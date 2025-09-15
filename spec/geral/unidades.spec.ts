@@ -8,7 +8,7 @@ test.describe('Detalhes da Unidade', () => {
 
         // Navegar para a página da unidade STIC
         await page.goto(`/unidade/STIC`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir os detalhes da unidade e a tabela de subunidades', async ({page}) => {

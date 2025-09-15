@@ -16,7 +16,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve exibir botões Apresentar sugestões e Validar para CHEFE', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await esperarTextoVisivel(page, 'Mapa de competências técnicas');
 
@@ -26,7 +26,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve exibir botão Histórico de análise quando houver análises', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         const historicoBtn = page.getByTestId('historico-analise-btn');
         const isVisible = await historicoBtn.isVisible();
@@ -42,7 +42,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve permitir apresentar sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await page.getByTestId('apresentar-sugestoes-btn').click();
 
@@ -58,7 +58,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve permitir validar mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await validarMapa(page);
 
@@ -67,7 +67,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar apresentação de sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await page.getByTestId('apresentar-sugestoes-btn').click();
         await esperarElementoVisivel(page, 'modal-apresentar-sugestoes');
@@ -79,7 +79,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar validação de mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await page.getByTestId('validar-btn').click();
         await esperarElementoVisivel(page, 'modal-validar');

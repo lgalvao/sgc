@@ -6,7 +6,7 @@ test.describe('Configurações', () => {
     test.beforeEach(async ({page}) => {
         await login(page);
         await page.goto(`/configuracoes`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir o título e os campos de configuração com valores padrão', async ({page}) => {
@@ -40,7 +40,7 @@ test.describe('Configurações', () => {
 
         // Recarregar a página para verificar persistência
         await page.reload();
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         // Verificar se os novos valores persistem
         await expect(diasInativacaoProcessoInput).toHaveValue('45');

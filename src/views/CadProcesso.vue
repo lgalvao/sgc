@@ -525,8 +525,6 @@ function iniciarProcesso() {
    processosStore.adicionarProcesso(novo);
    processosStore.adicionarsubprocessos(novossubprocessosObjetos);
 
-   // Passo 7: Armazenar árvore de unidades participantes
-   // Passo 10: Para processos de revisão, criar cópia dos mapas vigentes com atividades/conhecimentos
    if (tipo.value === TipoProcesso.REVISAO) {
      unidadesFiltradas.forEach(unidadeSigla => {
        const mapaVigente = mapasStore.getMapaVigentePorUnidade(unidadeSigla);
@@ -551,7 +549,6 @@ function iniciarProcesso() {
      });
    }
 
-   // Passo 11: Registrar movimentações para cada subprocesso
    novossubprocessosObjetos.forEach(subprocesso => {
      processosStore.addMovement({
        idSubprocesso: subprocesso.id,
@@ -561,7 +558,6 @@ function iniciarProcesso() {
      });
    });
 
-   // Passo 12-13: Enviar notificações e criar alertas
    enviarNotificacoesIniciarProcesso(novo, unidadesFiltradas);
 
    notificacoesStore.sucesso(

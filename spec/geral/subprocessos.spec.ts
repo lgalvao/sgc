@@ -6,7 +6,7 @@ test.describe('Detalhes da Unidade no Processo', () => {
     test.beforeEach(async ({page}) => {
         await login(page);
         await page.goto('/processo/4/SESEL');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir os detalhes da unidade e os cards de funcionalidade', async ({page}) => {

@@ -8,7 +8,7 @@ import {DADOS_TESTE, TEXTOS} from './constantes-teste';
 async function navegarParaMapaRevisao(page: Page) {
   await loginComoAdmin(page);
   await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, 'SESEL');
-  await page.waitForLoadState('networkidle');
+  //await page.waitForLoadState('networkidle');
   await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 }
 

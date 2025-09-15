@@ -1,6 +1,11 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarElementoInvisivel, esperarElementoVisivel, loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
+import {
+    esperarElementoInvisivel,
+    esperarElementoVisivel,
+    loginComoAdmin,
+    loginComoGestor
+} from './auxiliares-verificacoes';
 import {irParaVisualizacaoMapa} from './auxiliares-navegacao';
 import {SELETORES_CSS} from './constantes-teste';
 
@@ -12,7 +17,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve exibir botões para GESTOR analisar mapa validado', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await esperarElementoVisivel(page, 'historico-analise-btn-gestor');
             await esperarElementoVisivel(page, 'devolver-ajustes-btn');
@@ -22,7 +26,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve permitir devolver para ajustes', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await page.getByTestId('devolver-ajustes-btn').click();
 
@@ -39,7 +42,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve permitir registrar aceite', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await page.getByTestId('registrar-aceite-btn').click();
 
@@ -53,7 +55,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve cancelar devolução', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await page.getByTestId('devolver-ajustes-btn').click();
             await esperarElementoVisivel(page, 'modal-devolucao');
@@ -71,7 +72,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve exibir botão Homologar para ADMIN', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await esperarElementoVisivel(page, 'registrar-aceite-btn');
             await expect(page.getByTestId('registrar-aceite-btn')).toHaveText('Homologar');
@@ -79,7 +79,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve permitir homologar mapa', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await page.getByTestId('registrar-aceite-btn').click();
 
@@ -99,7 +98,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve exibir botão Ver sugestões quando situação for "Mapa com sugestões"', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             const verSugestoesBtn = page.getByTestId('ver-sugestoes-btn');
             const isVisible = await verSugestoesBtn.isVisible();
@@ -121,7 +119,6 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve exibir histórico de análise', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            await page.waitForLoadState('networkidle');
 
             await page.getByTestId('historico-analise-btn-gestor').click();
 

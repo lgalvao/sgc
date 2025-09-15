@@ -8,7 +8,7 @@ test.describe('Detalhes do Processo - Unidades', () => {
 
         // Navegar para a página de detalhes do processo (ID 1)
         await page.goto(`/processo/1`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir os detalhes do processo e a tabela de unidades participantes', async ({page}) => {

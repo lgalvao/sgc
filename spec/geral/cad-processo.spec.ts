@@ -8,7 +8,7 @@ test.describe('Cadastro de Processo', () => {
 
         // Navegar para a página de cadastro de processo
         await page.goto(`/processo/cadastro`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir o formulário de cadastro de processo', async ({page}) => {

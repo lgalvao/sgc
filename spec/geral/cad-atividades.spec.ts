@@ -21,7 +21,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
 
         // Navegar para a página de cadastro de atividades (novo padrão: /processo/:idProcesso/:siglaUnidade/cadastro)
         await page.goto(`/processo/1/STIC/cadastro`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir o título da página e os campos de entrada', async ({page}) => {
@@ -104,7 +104,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
         const conhecimentoEditado = `Conhecimento Editado ${Date.now()}`;
         await page.getByTestId('input-editar-conhecimento').fill(conhecimentoEditado);
         await page.getByTestId('btn-salvar-edicao-conhecimento').click();
-        await page.waitForLoadState('networkidle'); // Adicionado para sincronização
+        //await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(page.locator('.group-conhecimento', {hasText: conhecimentoEditado})).toBeVisible();
     });
 
@@ -127,7 +127,7 @@ test.describe('Cadastro de Atividades e Conhecimentos', () => {
 
         page.on('dialog', dialog => dialog.accept());
         await btnRemoverConhecimento.click();
-        await page.waitForLoadState('networkidle'); // Adicionado para sincronização
+        //await page.waitForLoadState('networkidle'); // Adicionado para sincronização
         await expect(atividadeCard.locator('.group-conhecimento', {hasText: conhecimentoParaRemover})).not.toBeAttached();
     });
 });

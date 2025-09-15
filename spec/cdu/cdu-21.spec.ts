@@ -8,7 +8,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         await loginComoAdmin(page);
     });
 
-    test('Passo 1-3: deve navegar do Painel para processo Em andamento e exibir botão Finalizar', async ({page}) => {
+    test('deve navegar do Painel para processo Em andamento e exibir botão Finalizar', async ({page}) => {
         await expect(page.getByTestId(SELETORES.TITULO_PROCESSOS)).toContainText('Processos');
         const processoEmAndamento = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: TEXTOS.EM_ANDAMENTO}).first();
         await processoEmAndamento.click();
@@ -18,7 +18,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         await expect(page.locator(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`)).toBeVisible();
     });
 
-    test('Passo 4-5: deve impedir finalização quando há unidades não homologadas', async ({page}) => {
+    test('deve impedir finalização quando há unidades não homologadas', async ({page}) => {
         const processoEmAndamento = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: TEXTOS.EM_ANDAMENTO}).first();
         await processoEmAndamento.click();
 
@@ -27,7 +27,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         await expect(page.locator('.notification')).toContainText('Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado');
     });
 
-    test('Passo 6: deve exibir modal de confirmação com título e mensagem corretos', async ({page}) => {
+    test('deve exibir modal de confirmação com título e mensagem corretos', async ({page}) => {
         const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
 
         if (await processoTeste.count() > 0) {
@@ -43,8 +43,9 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         }
     });
 
-    test('Passo 6.1: deve cancelar finalização e permanecer na mesma tela', async ({page}) => {
-        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
+    test('deve cancelar finalização e permanecer na mesma tela', async ({page}) => {
+        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+            .filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
 
         if (await processoTeste.count() > 0) {
             await processoTeste.click();
@@ -59,22 +60,24 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
     });
 
     test('Passo 7-10: deve finalizar processo com sucesso', async ({page}) => {
-        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
+        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+            .filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
 
         if (await processoTeste.count() > 0) {
             await processoTeste.click();
-
             await finalizarProcesso(page);
 
             await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toContainText(TEXTOS.PROCESSO_FINALIZADO);
             await expect(page).toHaveURL('/painel');
 
-            await expect(page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome})).toContainText(TEXTOS.FINALIZADO);
+            await expect(page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+                .filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome})).toContainText(TEXTOS.FINALIZADO);
         }
     });
 
     test('Passo 9.1-9.2: deve enviar notificações por email', async ({page}) => {
-        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
+        const processoTeste = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+            .filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_FINALIZACAO.nome});
 
         if (await processoTeste.count() > 0) {
             await processoTeste.click();
@@ -90,7 +93,8 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         await page.goto('/login');
         await loginComoGestor(page);
 
-        const processoEmAndamento = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: TEXTOS.EM_ANDAMENTO}).first();
+        const processoEmAndamento = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+            .filter({hasText: TEXTOS.EM_ANDAMENTO}).first();
         await processoEmAndamento.click();
 
         await expect(page.locator(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`)).not.toBeVisible();
@@ -107,7 +111,8 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
 
         await expect(page).toHaveURL('/painel');
 
-        const processoFinalizado = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_MAPEAMENTO.nome});
+        const processoFinalizado = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
+            .filter({hasText: DADOS_TESTE.PROCESSOS.TESTE_MAPEAMENTO.nome});
         await expect(processoFinalizado).toContainText(TEXTOS.FINALIZADO);
 
         const notificacaoSucesso = await page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO).textContent();

@@ -8,7 +8,7 @@ import {TEXTOS} from './constantes-teste';
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, 4, 'SESEL');
-    await page.waitForLoadState('networkidle');
+    //await page.waitForLoadState('networkidle');
     await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 }
 

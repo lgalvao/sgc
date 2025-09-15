@@ -8,7 +8,7 @@ test.describe('Cadastro de Atribuição Temporária', () => {
 
         // Navegar para a página de cadastro de atribuição (unidade STIC)
         await page.goto(`/unidade/STIC/atribuicao`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir o título da página e os campos do formulário', async ({page}) => {

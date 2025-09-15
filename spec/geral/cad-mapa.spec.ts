@@ -10,7 +10,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
         // Navega diretamente para o novo endpoint padronizado
         await page.goto('/processo/4/SESEL/mapa');
         await page.waitForLoadState('domcontentloaded');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve criar uma nova competência com sucesso', async ({page}) => {

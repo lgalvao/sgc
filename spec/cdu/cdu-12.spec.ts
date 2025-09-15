@@ -8,7 +8,7 @@ test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
         await loginComoAdmin(page);
 
         await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, 'SESEL');
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await page.getByTestId('impactos-mapa-button').waitFor({state: 'visible'});
         await page.getByTestId('impactos-mapa-button').click();

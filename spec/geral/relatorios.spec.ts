@@ -8,7 +8,7 @@ test.describe('Relatórios', () => {
 
         // Navegar para a página de relatórios
         await page.goto(`/relatorios`);
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
     });
 
     test('deve exibir o título e os cards de relatórios', async ({page}) => {

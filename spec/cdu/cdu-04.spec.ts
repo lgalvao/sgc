@@ -29,7 +29,7 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
         await expect(page.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
         await expect(page.getByText(TEXTOS.NOTIFICACAO_EMAIL)).toBeVisible();
         await page.getByText(TEXTOS.CONFIRMAR).click();
-        await page.waitForLoadState('networkidle');
+        //await page.waitForLoadState('networkidle');
 
         await esperarUrl(page, URLS.PAINEL);
         await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);

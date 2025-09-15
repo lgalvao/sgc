@@ -9,7 +9,7 @@ async function navegarParaAnaliseRevisao(page: Page, loginFn: (page: Page) => Pr
   await loginFn(page);
   await irParaSubprocesso(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, 'SESEL');
   await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.REVISAO_STIC.id}/SESEL/vis-cadastro`);
-  await page.waitForLoadState('networkidle');
+  //await page.waitForLoadState('networkidle');
   await expect(page.getByRole('heading', { name: 'Atividades e conhecimentos' })).toBeVisible();
 }
 

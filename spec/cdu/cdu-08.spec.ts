@@ -10,7 +10,7 @@ import {
     removerAtividade,
     removerConhecimento
 } from './auxiliares-verificacoes';
-import { gerarNomeUnico } from './auxiliares-utils';
+import {gerarNomeUnico} from './auxiliares-utils';
 import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './constantes-teste';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
@@ -63,7 +63,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeEditado })).not.toBeAttached();
   });
 
-  test('Passos 12-12.2: deve editar e remover conhecimentos', async ({ page }) => {
+  test('deve editar e remover conhecimentos', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
     
     // Adicionar atividade e conhecimento para teste
