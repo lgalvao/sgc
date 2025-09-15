@@ -5,7 +5,7 @@ import {
     esperarTextoVisivel,
     loginComoAdmin,
     navegarParaCriacaoProcesso
-} from './auxiliares-teste';
+} from './auxiliares-verificacoes';
 import {ROTULOS, SELETORES, TEXTOS, URLS} from './constantes-teste';
 
 test.describe('CDU-03: Manter processo', () => {

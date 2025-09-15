@@ -1,7 +1,7 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
 import {TEXTOS} from './constantes-teste';
-import {loginComoAdmin, navegarParaDetalhesProcesso, verificarUrl} from './auxiliares-teste';
+import {loginComoAdmin, navegarParaDetalhesProcesso, verificarUrl} from './auxiliares-verificacoes';
 
 test.describe('CDU-06: Detalhar processo', () => {
     test.beforeEach(async ({page}) => await loginComoAdmin(page));

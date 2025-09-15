@@ -33,7 +33,7 @@ export async function homologarItem(page: Page): Promise<void> {
  * Devolve para ajustes
  */
 export async function devolverParaAjustes(page: Page, observacao?: string): Promise<void> {
-  await page.click('button:has-text("Devolver")');
+  await page.click(`button:has-text("${TEXTOS.DEVOLVER}")`);
   await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
   
   if (observacao) {
@@ -86,5 +86,5 @@ export async function iniciarProcesso(page: Page): Promise<void> {
  * Cancela um modal
  */
 export async function cancelarModal(page: Page): Promise<void> {
-  await page.click('button:has-text("' + TEXTOS.CANCELAR + '")');
+  await page.click(`button:has-text("${TEXTOS.CANCELAR}")`);
 }

@@ -1,5 +1,5 @@
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarElementoInvisivel, esperarTextoVisivel, loginComoAdmin} from './auxiliares-teste';
+import {esperarElementoInvisivel, esperarTextoVisivel, loginComoAdmin} from './auxiliares-verificacoes';
 import {irParaMapaCompetencias} from './auxiliares-navegacao';
 import {DADOS_TESTE} from './constantes-teste';
 

@@ -5,12 +5,12 @@ import {
     editarAtividade,
     editarConhecimento,
     esperarElementoVisivel,
-    gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
     removerAtividade,
     removerConhecimento
-} from './auxiliares-teste';
+} from './auxiliares-verificacoes';
+import { gerarNomeUnico } from './auxiliares-utils';
 import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './constantes-teste';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {

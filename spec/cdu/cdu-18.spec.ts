@@ -7,7 +7,7 @@ import {
     loginComoChefe,
     loginComoServidor,
     verificarUrl
-} from './auxiliares-teste';
+} from './auxiliares-verificacoes';
 import {irParaProcessoPorTexto} from './auxiliares-navegacao';
 import {SELETORES, TEXTOS} from './constantes-teste';
 

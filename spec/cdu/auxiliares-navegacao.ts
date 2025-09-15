@@ -57,10 +57,3 @@ export async function irParaVisualizacaoMapa(page: Page, idProcesso: number, uni
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-mapa`));
 }
 
-/**
- * Navega para cadastro de atividades
- */
-export async function navegarParaCadastroAtividades(page: Page, idProcesso: number, unidade: string): Promise<void> {
-    await page.goto(`/processo/${idProcesso}/${unidade}/cadastro`);
-    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/cadastro`));
-}

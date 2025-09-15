@@ -1,6 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarElementoVisivel, loginComoAdmin} from './auxiliares-teste';
+import {esperarElementoVisivel, loginComoAdmin} from './auxiliares-verificacoes';
 import {criarCompetencia} from './auxiliares-acoes';
 import {irParaMapaCompetencias} from './auxiliares-navegacao';
 import {TEXTOS} from './constantes-teste';

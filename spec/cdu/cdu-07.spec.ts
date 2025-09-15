@@ -1,5 +1,5 @@
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarElementoVisivel, loginComoChefe, verificarUrl} from './auxiliares-teste';
+import {esperarElementoVisivel, loginComoChefe, verificarUrl} from './auxiliares-verificacoes';
 import {clicarPrimeiroProcesso} from './auxiliares-navegacao';
 import {SELETORES} from './constantes-teste';
 

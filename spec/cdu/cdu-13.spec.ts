@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarTextoVisivel, esperarUrl, loginComoAdmin, loginComoGestor} from './auxiliares-teste';
+import {esperarTextoVisivel, esperarUrl, loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
 import {navegarParaVisualizacaoAtividades} from './auxiliares-navegacao';
 import {devolverParaAjustes, homologarItem} from './auxiliares-acoes';
 import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';

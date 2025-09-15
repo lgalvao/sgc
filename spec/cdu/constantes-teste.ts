@@ -60,6 +60,7 @@ export const TEXTOS = {
   REMOVER: 'Remover',
   CONFIRMAR: 'Confirmar',
   CANCELAR: 'Cancelar',
+  DEVOLVER: 'Devolver',
   DISPONIBILIZAR: 'Disponibilizar',
   MAPA_COMPETENCIAS: 'Mapa de competências',
   CRIAR_COMPETENCIA: 'Criar competência',

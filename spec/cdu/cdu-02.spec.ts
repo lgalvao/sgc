@@ -8,7 +8,7 @@ import {
     loginComoChefe,
     loginComoGestor,
     loginComoServidor
-} from './auxiliares-teste';
+} from './auxiliares-verificacoes';
 import {clicarPrimeiroProcesso} from './auxiliares-navegacao';
 import {SELETORES, TEXTOS, URLS} from './constantes-teste';
 

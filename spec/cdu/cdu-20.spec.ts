@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarElementoInvisivel, esperarElementoVisivel, loginComoAdmin, loginComoGestor} from './auxiliares-teste';
+import {esperarElementoInvisivel, esperarElementoVisivel, loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
 import {irParaVisualizacaoMapa} from './auxiliares-navegacao';
 import {SELETORES_CSS} from './constantes-teste';
 
