@@ -9,7 +9,7 @@ import {generateUniqueId, parseDate} from '@/utils'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 import {useNotificacoesStore} from './notificacoes'
 
-function mapTipoProcesso(tipo: string): TipoProcesso {
+export function mapTipoProcesso(tipo: string): TipoProcesso {
     switch (tipo) {
         case 'Mapeamento':
             return TipoProcesso.MAPEAMENTO;
@@ -22,7 +22,7 @@ function mapTipoProcesso(tipo: string): TipoProcesso {
     }
 }
 
-function mapSituacaoProcesso(situacao: string): SituacaoProcesso {
+export function mapSituacaoProcesso(situacao: string): SituacaoProcesso {
     switch (situacao) {
         case 'Criado':
             return SituacaoProcesso.CRIADO;

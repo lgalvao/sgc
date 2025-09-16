@@ -2,7 +2,7 @@
   "compilerOptions": {
     // Type Checking
     "strict": true,
-    "strictNullChecks": false, // Adicionado
+    "strictNullChecks": false,
     "noImplicitAny": false,
     "noEmit": true,
     "skipLibCheck": true,
@@ -30,6 +30,7 @@
       "vite/client",
       "@playwright/test"
     ],
+
     // Project
     "baseUrl": ".",
     "paths": {

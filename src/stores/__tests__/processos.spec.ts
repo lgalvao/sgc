@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {useProcessosStore} from '../processos';
+import {mapSituacaoProcesso, mapTipoProcesso, useProcessosStore} from '../processos'; // Importar as funções diretamente
 import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 
 // Mock the JSON imports
@@ -74,17 +74,35 @@ describe('useProcessosStore', () => {
     let processosStore: ReturnType<typeof useProcessosStore>;
 
     // Helper to parse dates in mock data for comparison
-    const parseProcessoDates = (processo: { id: number, descricao: string, tipo: string, dataLimite: string, dataFinalizacao?: string | null, situacao: string }): Processo => ({
+    const parseProcessoDates = (processo: {
+        id: number,
+        descricao: string,
+        tipo: string,
+        dataLimite: string,
+        dataFinalizacao?: string | null,
+        situacao: string
+    }): Processo => ({
         ...processo,
         tipo: processo.tipo === 'Mapeamento' ? TipoProcesso.MAPEAMENTO :
-              processo.tipo === 'Revisão' ? TipoProcesso.REVISAO : TipoProcesso.DIAGNOSTICO,
+            processo.tipo === 'Revisão' ? TipoProcesso.REVISAO : TipoProcesso.DIAGNOSTICO,
         situacao: processo.situacao === 'Finalizado' ? SituacaoProcesso.FINALIZADO :
-                  processo.situacao === 'Em andamento' ? SituacaoProcesso.EM_ANDAMENTO : SituacaoProcesso.CRIADO,
+            processo.situacao === 'Em andamento' ? SituacaoProcesso.EM_ANDAMENTO : SituacaoProcesso.CRIADO,
         dataLimite: new Date(processo.dataLimite),
         dataFinalizacao: processo.dataFinalizacao ? new Date(processo.dataFinalizacao) : null,
     });
 
-    const parsesubprocessoDates = (pu: { id: number, idProcesso: number, unidade: string, dataLimiteEtapa1?: string | null, dataLimiteEtapa2?: string | null, dataFimEtapa1?: string | null, dataFimEtapa2?: string | null, situacao: string, unidadeAtual: string, unidadeAnterior: string | null }): Subprocesso => ({
+    const parsesubprocessoDates = (pu: {
+        id: number,
+        idProcesso: number,
+        unidade: string,
+        dataLimiteEtapa1?: string | null,
+        dataLimiteEtapa2?: string | null,
+        dataFimEtapa1?: string | null,
+        dataFimEtapa2?: string | null,
+        situacao: string,
+        unidadeAtual: string,
+        unidadeAnterior: string | null
+    }): Subprocesso => ({
         ...pu,
         situacao: pu.situacao as Subprocesso['situacao'],
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : new Date(),
@@ -169,6 +187,41 @@ describe('useProcessosStore', () => {
         expect(processosStore.subprocessos[0].dataLimiteEtapa1).not.toBeNull();
     });
 
+    // Novos testes para as funções de mapeamento
+    describe('Funções de Mapeamento', () => {
+        it('mapTipoProcesso should return correct TipoProcesso for Mapeamento', () => {
+            expect(mapTipoProcesso('Mapeamento')).toBe(TipoProcesso.MAPEAMENTO);
+        });
+
+        it('mapTipoProcesso should return correct TipoProcesso for Revisão', () => {
+            expect(mapTipoProcesso('Revisão')).toBe(TipoProcesso.REVISAO);
+        });
+
+        it('mapTipoProcesso should return correct TipoProcesso for Diagnóstico', () => {
+            expect(mapTipoProcesso('Diagnóstico')).toBe(TipoProcesso.DIAGNOSTICO);
+        });
+
+        it('mapTipoProcesso should return default TipoProcesso for unknown type', () => {
+            expect(mapTipoProcesso('Unknown')).toBe(TipoProcesso.MAPEAMENTO);
+        });
+
+        it('mapSituacaoProcesso should return correct SituacaoProcesso for Criado', () => {
+            expect(mapSituacaoProcesso('Criado')).toBe(SituacaoProcesso.CRIADO);
+        });
+
+        it('mapSituacaoProcesso should return correct SituacaoProcesso for Em andamento', () => {
+            expect(mapSituacaoProcesso('Em andamento')).toBe(SituacaoProcesso.EM_ANDAMENTO);
+        });
+
+        it('mapSituacaoProcesso should return correct SituacaoProcesso for Finalizado', () => {
+            expect(mapSituacaoProcesso('Finalizado')).toBe(SituacaoProcesso.FINALIZADO);
+        });
+
+        it('mapSituacaoProcesso should return default SituacaoProcesso for unknown situation', () => {
+            expect(mapSituacaoProcesso('Unknown')).toBe(SituacaoProcesso.CRIADO);
+        });
+    });
+
     describe('getters', () => {
         it('getUnidadesDoProcesso should filter subprocessos by idProcesso', () => {
             const unidades = processosStore.getUnidadesDoProcesso(1);
@@ -180,6 +233,53 @@ describe('useProcessosStore', () => {
         it('getUnidadesDoProcesso should return empty array if no matching idProcesso', () => {
             const unidades = processosStore.getUnidadesDoProcesso(999);
             expect(unidades.length).toBe(0);
+        });
+
+        // Novos testes para getSubprocessosElegiveisAceiteBloco
+        it('getSubprocessosElegiveisAceiteBloco should filter by idProcesso and unidadeAtual', () => {
+            const elegiveis = processosStore.getSubprocessosElegiveisAceiteBloco(1, 'SESEL');
+            expect(elegiveis.length).toBe(0); // Nenhum mock está com essa situação
+        });
+
+        it('getSubprocessosElegiveisAceiteBloco should return empty array if no matching subprocessos', () => {
+            const elegiveis = processosStore.getSubprocessosElegiveisAceiteBloco(999, 'NONEXISTENT');
+            expect(elegiveis.length).toBe(0);
+        });
+
+        // Novos testes para getSubprocessosElegiveisHomologacaoBloco
+        it('getSubprocessosElegiveisHomologacaoBloco should filter by idProcesso', () => {
+            const elegiveis = processosStore.getSubprocessosElegiveisHomologacaoBloco(1);
+            expect(elegiveis.length).toBe(0); // Nenhum mock está com essa situação
+        });
+
+        it('getSubprocessosElegiveisHomologacaoBloco should return empty array if no matching subprocessos', () => {
+            const elegiveis = processosStore.getSubprocessosElegiveisHomologacaoBloco(999);
+            expect(elegiveis.length).toBe(0);
+        });
+
+        // Novos testes para getMovementsForSubprocesso
+        it('getMovementsForSubprocesso should return movements for existing subprocesso', () => {
+            // Adicionar uma movimentação de teste
+            processosStore.addMovement({
+                idSubprocesso: 1,
+                unidadeOrigem: 'A',
+                unidadeDestino: 'B',
+                descricao: 'Teste'
+            });
+            const movements = processosStore.getMovementsForSubprocesso(1);
+            expect(movements.length).toBe(1);
+            expect(movements[0].descricao).toBe('Teste');
+        });
+
+        it('getMovementsForSubprocesso should return empty array for non-existent subprocesso', () => {
+            const movements = processosStore.getMovementsForSubprocesso(999);
+            expect(movements.length).toBe(0);
+        });
+
+        it('getMovementsForSubprocesso should return empty array if no movements exist for subprocesso', () => {
+            // Garantir que não há movimentações para o subprocesso 2
+            const movements = processosStore.getMovementsForSubprocesso(2);
+            expect(movements.length).toBe(0);
         });
     });
 

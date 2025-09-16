@@ -13,7 +13,7 @@ import {clicarPrimeiroProcesso} from './auxiliares-navegacao';
 import {SELETORES, TEXTOS, URLS} from './constantes-teste';
 
 // Helper function to login and wait for dashboard
-async function loginAguardarPainel(page, loginFn: Function, userId?: string) {
+async function loginAguardarPainel(page, loginFn: (page: Page, userId?: string) => Promise<void>, userId?: string) {
     if (userId) {
         await loginFn(page, userId);
     } else {

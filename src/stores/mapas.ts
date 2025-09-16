@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import mapasData from '../mocks/mapas.json' assert {type: 'json'};
+import mapasData from '../mocks/mapas.json';
 import type {Mapa} from '@/types/tipos'
 import {parseDate} from '@/utils'
 

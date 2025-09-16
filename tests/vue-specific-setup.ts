@@ -1,6 +1,8 @@
 import {ErrorReporter} from './utils/error-reporter';
-import {Page, test as base} from '@playwright/test';
-import {parseDate} from '@/utils'; // Importar parseDate
+import {Page, test} from '@playwright/test'; // Importar test diretamente
+import {parseDate} from '@/utils';
+import {existsSync, mkdirSync, writeFileSync} from 'fs'; // Importar fs
+import {join} from 'path'; // Importar path
 
 // Definição de uma interface para a janela com propriedades customizadas
 interface CustomWindow extends Window {
@@ -11,12 +13,14 @@ interface CustomWindow extends Window {
     postMessage(message: any, targetOrigin: string, transfer?: Transferable[]): void;
 
     postMessage(message: any, options?: WindowPostMessageOptions): void;
+
+    __coverage__?: any; // Adicionar a propriedade __coverage__
 }
 
 declare const window: CustomWindow;
 
-export const vueTest = base.extend<{ page: Page }>({
-    page: async ({page}, use) => {
+export const vueTest = test.extend<{ page: Page }>({
+    page: async ({ page }, use, testInfo) => { // Manter esta linha
         const errorReporter = new ErrorReporter();
 
         // Interceptar e modificar subprocessos.json
@@ -61,10 +65,10 @@ export const vueTest = base.extend<{ page: Page }>({
             const originalConsoleError = console.error;
             console.error = function (...args: any[]) {
                 if (args.some(arg => typeof arg === 'string' && (arg.includes('[Vue') || arg.includes('vue') || arg.includes('component')))) {
-                    window.postMessage({type: 'VUE_ERROR', message: `[VUE] ${args.join(' ')}`}, '*');
+                    window.postMessage({ type: 'VUE_ERROR', message: `[VUE] ${args.join(' ')}` }, '*');
                     originalConsoleError.apply(console, ['🔥 VUE:', ...args]);
                 } else {
-                    window.postMessage({type: 'CONSOLE_ERROR', message: args.join(' ')}, '*');
+                    window.postMessage({ type: 'CONSOLE_ERROR', message: args.join(' ') }, '*');
                     originalConsoleError.apply(console, args);
                 }
             };
@@ -118,6 +122,20 @@ export const vueTest = base.extend<{ page: Page }>({
         });
 
         await use(page);
+
+        // Coletar cobertura após cada teste
+        if (process.env.COLLECT_COVERAGE) { // Adicionar uma flag para ativar a coleta
+            const coverage = await page.evaluate(() => (window as any).__coverage__);
+            if (coverage) {
+                const coveragePath = join(process.cwd(), '.nyc_output');
+                if (!existsSync(coveragePath)) {
+                    mkdirSync(coveragePath, { recursive: true });
+                }
+                const testTitle = test.info().title.replace(/[^a-zA-Z0-9]/g, '_'); // Nome do arquivo baseado no título do teste
+                writeFileSync(join(coveragePath, `coverage-${testTitle}-${Date.now()}.json`), JSON.stringify(coverage));
+//                console.log(`Cobertura salva para o teste: ${test.info().title}`);
+            }
+        }
 
         // Verificar se há erros críticos e falhar o teste se necessário
         if (errorReporter.hasErrors()) {
