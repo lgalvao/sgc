@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {useAnalisesStore} from '../analises';
+import {mapResultadoAnalise, parseAnaliseDates, useAnalisesStore} from '../analises';
 import {ResultadoAnalise} from '@/types/tipos';
 
 describe('useAnalisesStore', () => {
@@ -60,6 +60,44 @@ describe('useAnalisesStore', () => {
             
             expect(analisesStore.analises.length).toBe(initialLength - 1);
             expect(analisesStore.getAnalisesPorSubprocesso(999)).toEqual([]);
+        });
+    });
+
+    describe('Auxiliary Functions', () => {
+        it('mapResultadoAnalise should return DEVOLUCAO for "Devolução"', () => {
+            const resultado = mapResultadoAnalise('Devolução');
+            expect(resultado).toBe(ResultadoAnalise.DEVOLUCAO);
+        });
+
+        it('mapResultadoAnalise should return ACEITE for unknown result', () => {
+            const resultado = mapResultadoAnalise('UNKNOWN');
+            expect(resultado).toBe(ResultadoAnalise.ACEITE);
+        });
+
+        it('parseAnaliseDates should parse dataHora and map resultado', () => {
+            const mockAnalise = {
+                dataHora: '2025-01-01T10:00:00Z',
+                resultado: 'Aceite',
+                idSubprocesso: 1,
+                unidade: 'TEST',
+                observacao: 'Obs'
+            };
+            const parsedAnalise = parseAnaliseDates(mockAnalise);
+            expect(parsedAnalise.dataHora).toEqual(new Date('2025-01-01T10:00:00Z'));
+            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
+        });
+
+        it('parseAnaliseDates should handle null dataHora and unknown resultado', () => {
+            const mockAnalise = {
+                dataHora: null, // Testando null dataHora
+                resultado: 'UNKNOWN', // Testando resultado desconhecido
+                idSubprocesso: 1,
+                unidade: 'TEST',
+                observacao: 'Obs'
+            };
+            const parsedAnalise = parseAnaliseDates(mockAnalise);
+            expect(parsedAnalise.dataHora).toBeInstanceOf(Date); // Deve ser uma nova data se null
+            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
         });
     });
 });

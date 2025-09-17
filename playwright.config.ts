@@ -2,18 +2,17 @@
 
 import {defineConfig, devices} from '@playwright/test';
 import {vueTest} from './tests/vue-specific-setup';
-import path from 'path'; // Importar path
-import {fileURLToPath} from 'url'; // Importar fileURLToPath
+import path from 'path';
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 12000,
+    timeout: 30000,
     testDir: './spec',
-    workers: 15,
-    fullyParallel: true,
+    workers: 7,
     reporter: "dot",
     webServer: {
         command: 'npm run dev',
@@ -34,5 +33,5 @@ export default defineConfig({
             ...vueTest,
         },
     }],
-    globalTeardown: path.resolve(__dirname, './tests/global-teardown.ts'), // Usar path.resolve
+
 });

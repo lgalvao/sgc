@@ -2,6 +2,30 @@ import {defineStore} from 'pinia'
 import unidadesMock from '../mocks/unidades.json' with {type: 'json'};
 import type {Unidade} from '@/types/tipos'
 
+// Função auxiliar para getUnidadesSubordinadas
+function findAndCollectSubordinates(unidade: Unidade, unidadesEncontradas: string[]) {
+    unidadesEncontradas.push(unidade.sigla);
+    if (unidade.filhas) {
+        unidade.filhas.forEach(child => findAndCollectSubordinates(child, unidadesEncontradas));
+    }
+}
+
+// Função auxiliar para getUnidadeSuperior
+function findSuperiorUnit(unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null {
+    for (const unidade of unidades) {
+        if (unidade.sigla === targetSigla) {
+            return parentSigla;
+        }
+        if (unidade.filhas) {
+            const superior = findSuperiorUnit(unidade.filhas, targetSigla, unidade.sigla);
+            if (superior !== null) {
+                return superior;
+            }
+        }
+    }
+    return null;
+}
+
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
         unidades: unidadesMock as unknown as Unidade[]
@@ -19,38 +43,44 @@ export const useUnidadesStore = defineStore('unidades', {
         },
         getUnidadesSubordinadas(siglaUnidade: string): string[] {
             const unidadesEncontradas: string[] = [];
-
-            const findAndCollect = (unidade: Unidade) => {
-                unidadesEncontradas.push(unidade.sigla);
-                if (unidade.filhas) {
-                    unidade.filhas.forEach(findAndCollect);
-                }
-            };
+            const stack: Unidade[] = [];
 
             const unidadeRaiz = this.pesquisarUnidade(siglaUnidade);
             if (unidadeRaiz) {
-                findAndCollect(unidadeRaiz);
-            }
-
-            return unidadesEncontradas;
-        },
-        getUnidadeSuperior(siglaUnidade: string): string | null {
-            const findSuperior = (unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null => {
-                for (const unidade of unidades) {
-                    if (unidade.sigla === targetSigla) {
-                        return parentSigla;
-                    }
-                    if (unidade.filhas) {
-                        const superior = findSuperior(unidade.filhas, targetSigla, unidade.sigla);
-                        if (superior !== null) {
-                            return superior;
+                stack.push(unidadeRaiz);
+                while (stack.length > 0) {
+                    const currentUnidade = stack.pop()!;
+                    unidadesEncontradas.push(currentUnidade.sigla);
+                    if (currentUnidade.filhas) {
+                        for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
+                            stack.push(currentUnidade.filhas[i]);
                         }
                     }
                 }
-                return null;
-            };
+            }
+            return unidadesEncontradas;
+        },
+        getUnidadeSuperior(siglaUnidade: string): string | null {
+            const stack: { unit: Unidade, parentSigla: string | null }[] = [];
 
-            return findSuperior(this.unidades, siglaUnidade);
+            for (const unidade of this.unidades) {
+                stack.push({ unit: unidade, parentSigla: null });
+            }
+
+            while (stack.length > 0) {
+                const { unit: currentUnidade, parentSigla: currentParentSigla } = stack.pop()!;
+
+                if (currentUnidade.sigla === siglaUnidade) {
+                    return currentParentSigla;
+                }
+
+                if (currentUnidade.filhas) {
+                    for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
+                        stack.push({ unit: currentUnidade.filhas[i], parentSigla: currentUnidade.sigla });
+                    }
+                }
+            }
+            return null;
         },
         getUnidadeImediataSuperior(siglaUnidade: string): string | null {
             return this.getUnidadeSuperior(siglaUnidade);

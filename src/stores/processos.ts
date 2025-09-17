@@ -111,6 +111,10 @@ export const useProcessosStore = defineStore('processos', {
             });
         },
         removerProcesso(idProcesso: number) {
+            // Coletar os IDs dos subprocessos relacionados ANTES de removê-los
+            const subprocessosDoProcesso = this.subprocessos.filter(sp => sp.idProcesso === idProcesso);
+            const subprocessosIds = subprocessosDoProcesso.map(sp => sp.id);
+
             // Remove o processo
             const processoIndex = this.processos.findIndex(p => p.id === idProcesso);
             if (processoIndex !== -1) {
@@ -119,7 +123,6 @@ export const useProcessosStore = defineStore('processos', {
             // Remove todos os subprocessos relacionados
             this.subprocessos = this.subprocessos.filter(sp => sp.idProcesso !== idProcesso);
             // Remove todas as movimentações relacionadas
-            const subprocessosIds = this.subprocessos.filter(sp => sp.idProcesso === idProcesso).map(sp => sp.id);
             this.movements = this.movements.filter(m => !subprocessosIds.includes(m.idSubprocesso));
         },
         editarProcesso(dadosProcesso: {
@@ -186,15 +189,12 @@ export const useProcessosStore = defineStore('processos', {
 
                     if (tipoAcao === 'aceitar') {
                         // Registrar movimentação
-                        const subprocessoAceite = this.subprocessos.find(pu => pu.idProcesso === idProcesso && pu.unidade === siglaUnidade);
-                        if (subprocessoAceite) {
-                            this.addMovement({
-                                idSubprocesso: subprocessoAceite.id,
-                                unidadeOrigem: unidadeUsuario,
-                                unidadeDestino: 'Unidade superior hierárquica',
-                                descricao: 'Cadastro de atividades e conhecimentos validado em bloco'
-                            });
-                        }
+                        this.addMovement({
+                            idSubprocesso: subprocesso.id, // Usar subprocesso diretamente
+                            unidadeOrigem: unidadeUsuario,
+                            unidadeDestino: 'Unidade superior hierárquica',
+                            descricao: 'Cadastro de atividades e conhecimentos validado em bloco'
+                        });
 
                         // Atualizar situação do subprocesso
                         this.subprocessos[subprocessoIndex] = {
@@ -205,15 +205,12 @@ export const useProcessosStore = defineStore('processos', {
                     } else {
                         // Para ADMIN - homologar
                         // Registrar movimentação
-                        const subprocessoHomologar = this.subprocessos.find(pu => pu.idProcesso === idProcesso && pu.unidade === siglaUnidade);
-                        if (subprocessoHomologar) {
-                            this.addMovement({
-                                idSubprocesso: subprocessoHomologar.id,
-                                unidadeOrigem: 'SEDOC',
-                                unidadeDestino: 'SEDOC',
-                                descricao: 'Cadastro de atividades e conhecimentos homologado em bloco'
-                            });
-                        }
+                        this.addMovement({
+                            idSubprocesso: subprocesso.id, // Usar subprocesso diretamente
+                            unidadeOrigem: 'SEDOC',
+                            unidadeDestino: 'SEDOC',
+                            descricao: 'Cadastro de atividades e conhecimentos homologado em bloco'
+                        });
 
                         // Atualizar situação do subprocesso
                         const novaSituacao = subprocesso.situacao.includes('Revisão')
@@ -297,12 +294,6 @@ export const useProcessosStore = defineStore('processos', {
 
             if (subprocessoIndex !== -1) {
                 const subprocesso = this.subprocessos[subprocessoIndex];
-                const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(unidade);
-
-                if (!unidadeSuperior) {
-                    throw new Error('Unidade superior não encontrada');
-                }
-
 
                 if (perfil === 'ADMIN') {
                     // ADMIN: homologar diretamente
@@ -313,6 +304,10 @@ export const useProcessosStore = defineStore('processos', {
                     };
                 } else {
                     // GESTOR: enviar para superior
+                    const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(unidade); // <-- Movido para cá
+                    if (!unidadeSuperior) {
+                        throw new Error('Unidade superior não encontrada');
+                    }
                     this.addMovement({
                         idSubprocesso: subprocesso.id,
                         unidadeOrigem: unidade,

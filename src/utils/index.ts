@@ -29,34 +29,44 @@ export const iconeTipo = (tipo: TipoNotificacao): string => {
 };
 
 // ===== UTILITÁRIOS DE DATA =====
+// Removendo import { parse, isValid } from 'date-fns';
+
 export function parseDate(dateString: string | null | undefined): Date | null {
-  if (!dateString) return null;
-
-  try {
-    // Formato brasileiro DD/MM/YYYY
-    const brMatch = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (brMatch) {
-      const [, day, month, year] = brMatch;
-      const dayNum = parseInt(day);
-      const monthNum = parseInt(month) - 1;
-      const yearNum = parseInt(year);
-
-      if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > 2100) {
+    if (!dateString) {
         return null;
-      }
-
-      return new Date(yearNum, monthNum, dayNum);
     }
 
-    // Formato ISO
-    const date = new Date(dateString + 'T00:00:00.000Z');
+    // Tentar parsear como ISO 8601 primeiro
+    let date = new Date(dateString);
     if (!isNaN(date.getTime())) {
-      return date;
+        return date;
     }
-    return null;
-  } catch {
-    return null;
-  }
+
+    // Tentar parsear como DD/MM/YYYY manualmente
+    const parts = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (parts) {
+        const day = parseInt(parts[1], 10);
+        const month = parseInt(parts[2], 10); // Mês (1-12)
+        const year = parseInt(parts[3], 10);
+
+        // Validação básica de dia, mês e ano
+        if (year < 1000 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) {
+            return null;
+        }
+
+        date = new Date(year, month - 1, day); // <-- Mudar para 'date'
+
+        // Verificar se a data criada é válida e se os componentes correspondem
+        // Isso é crucial para pegar datas como 31/02 ou meses inválidos
+        if (!isNaN(date.getTime()) && // Mudar parsedDate para date
+            date.getFullYear() === year && // Mudar parsedDate para date
+            date.getMonth() === (month - 1) && // Mudar parsedDate para date
+            date.getDate() === day) { // Mudar parsedDate para date
+            return date; // Mudar parsedDate para date
+        } // <-- Adicionado o fechamento do if (parts)
+    } // <-- Adicionado o fechamento do if (!isNaN(date.getTime()))
+
+    return null; // Retornar null se não conseguir parsear
 }
 
 export function formatDateBR(

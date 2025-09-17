@@ -1,11 +1,11 @@
 # Sobre o projeto
 
-Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, desenvolvido em Vue 3 e Vite, com TypeScript, Vue Router, Bootstrap 5 e Pinia. O objetivo do sistema será gerir os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE, centralizando todos os dados no front-end via mocks em JSON. O sistema está em desenvolvimento ativo, com muitas funcionalidades já implementadas e outras em andamento.
+Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, **desenvolvido** em Vue 3 e Vite, com TypeScript, Vue Router, Bootstrap 5 e Pinia. O objetivo do sistema será gerir os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE, centralizando todos os dados no front-end via mocks em JSON. O sistema está em desenvolvimento ativo, com muitas funcionalidades já implementadas e outras em andamento.
 
 ## Antes de qualquer coisa
 
-- Este é um protótipo. Não vamos nos preocupar com desempenho ou reuso; o foco é no funcionamento da UX/UI do sistema.
-- Não antecipe otimizações e abstrações; faça só o necessário para o momento.
+- Este é um **protótipo**. Não vamos nos preocupar com desempenho ou reuso; o foco é no funcionamento da UX/UI do sistema.
+- **Não*** antecipe otimizações e abstrações; faça só o necessário para o momento.
 - O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
 - O código, comentários e dados devem estar sempre em **português do Brasil**.
 
@@ -14,28 +14,35 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 O projeto utiliza Vitest para testes unitários e Playwright para testes de integração (e2e). ESLint é usado para garantir a consistência do código.
 
 ### Localização dos Testes
+
 - **Testes Unitários (Vitest)**: Ficam localizados em diretórios `__tests__/` adjacentes aos arquivos que estão testando (ex: `src/components/__tests__/Navbar.spec.ts`).
 - **Testes E2E (Playwright)**: Todos os testes de ponta a ponta ficam no diretório `/spec`, organizados por funcionalidade (ex: `spec/cdu/cdu-01.spec.ts`).
 
 ### Comandos
+
 - **Executar testes unitários**:
+  
   ```bash
   npm run test:unit
   ```
 - **Executar testes end-to-end**:
+  
   ```bash
   npm run test:e2e
   ```
 - **Verificar o estilo do código (Lint)**:
+  
   ```bash
   npm run lint
   ```
 - **Verificar os tipos do TypeScript**:
+  
   ```bash
   npm run typecheck
   ```
 
 ## Estrutura de Diretórios:
+
 - `/src/components/`: Componentes Vue reutilizáveis
 - `/src/views/`: Páginas/rotas da aplicação
 - `/src/stores/`: Gerenciamento de estado com Pinia
@@ -46,6 +53,7 @@ O projeto utiliza Vitest para testes unitários e Playwright para testes de inte
 - `/src/types/`: Definições de tipos TypeScript
 
 ## Visão geral de design
+
 - **Dados Centralizados**: Todos os dados (processos, unidades, atividades, etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local.
 - **Perfis de Usuário**: O perfil (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) é determinado dinamicamente com base na lotação do servidor logado, através do composable `usePerfil`. O `idServidor` logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
 - **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, com um seletor para pares "perfil - unidade" quando houver múltiplas opções.
@@ -53,7 +61,9 @@ O projeto utiliza Vitest para testes unitários e Playwright para testes de inte
 ## Arquitetura e Componentes
 
 ### Stores (`/src/stores/`)
+
 Cada domínio possui um store dedicado:
+
 - `processos.ts`: Gerencia o estado dos processos.
 - `subprocessos.ts`: Gerencia os dados e a lógica de negócio dos subprocessos.
 - `mapas.ts`: Gerencia os mapas de competência.
@@ -68,6 +78,7 @@ Cada domínio possui um store dedicado:
 - `configuracoes.ts`: Gerencia as configurações globais do sistema.
 
 ### Componentes (`/src/components/`)
+
 - `AceitarMapaModal.vue`: Modal para GESTORES/CHEFES aceitarem um mapa ou para o ADMIN homologá-lo.
 - `AcoesEmBlocoModal.vue`: Modal para aceitar ou homologar cadastros de atividades em lote.
 - `BarraNavegacao.vue`: Agrupa o botão "Voltar" e breadcrumbs dinâmicos.
@@ -87,6 +98,7 @@ Cada domínio possui um store dedicado:
 - `UnidadeTreeItem.vue`: Componente recursivo para renderizar uma árvore de unidades com checkboxes.
 
 ### Views (`/src/views/`)
+
 - `Login.vue`: Tela de login simulado.
 - `Painel.vue`: Painel inicial com processos e alertas.
 - `Processo.vue`: Detalhes de um processo e sua árvore de unidades.

@@ -4,7 +4,7 @@ import type {AnaliseValidacao} from '@/types/tipos'
 import {ResultadoAnalise} from '@/types/tipos'
 import {generateUniqueId, parseDate} from '@/utils'
 
-function mapResultadoAnalise(resultado: string): ResultadoAnalise {
+export function mapResultadoAnalise(resultado: string): ResultadoAnalise {
     switch (resultado) {
         case 'Devolução':
             return ResultadoAnalise.DEVOLUCAO;
@@ -15,7 +15,7 @@ function mapResultadoAnalise(resultado: string): ResultadoAnalise {
     }
 }
 
-function parseAnaliseDates(analise: Omit<AnaliseValidacao, 'dataHora' | 'resultado'> & {
+export function parseAnaliseDates(analise: Omit<AnaliseValidacao, 'dataHora' | 'resultado'> & {
     dataHora: string,
     resultado: string
 }): AnaliseValidacao {

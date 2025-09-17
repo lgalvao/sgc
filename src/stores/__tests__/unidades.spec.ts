@@ -38,5 +38,82 @@ describe('useUnidadesStore', () => {
             const unidade = unidadesStore.pesquisarUnidade('NONEXISTENT');
             expect(unidade).toBeNull();
         });
+
+        it('getUnidadesSubordinadas should return direct and indirect subordinate units for a root unit (e.g., "SEDOC")', () => {
+            const subordinadas = unidadesStore.getUnidadesSubordinadas('SEDOC');
+            expect(subordinadas).toContain('SGP');
+            expect(subordinadas).toContain('COEDE');
+            expect(subordinadas).toContain('SEMARE');
+            expect(subordinadas).toContain('STIC');
+            expect(subordinadas).toContain('COSIS');
+            expect(subordinadas).toContain('SEDESENV');
+            expect(subordinadas).toContain('SEDIA');
+            expect(subordinadas).toContain('SESEL');
+            expect(subordinadas).toContain('COSINF');
+            expect(subordinadas).toContain('SENIC');
+            expect(subordinadas).toContain('COJUR');
+            expect(subordinadas).toContain('SEJUR');
+            expect(subordinadas).toContain('SEPRO');
+            expect(subordinadas.length).toBe(14); // Total de unidades no mock
+        });
+
+        it('getUnidadesSubordinadas should return subordinate units for an intermediate unit (e.g., "STIC")', () => {
+            const subordinadas = unidadesStore.getUnidadesSubordinadas('STIC');
+            expect(subordinadas).toContain('COSIS');
+            expect(subordinadas).toContain('SEDESENV');
+            expect(subordinadas).toContain('SEDIA');
+            expect(subordinadas).toContain('SESEL');
+            expect(subordinadas).toContain('COSINF');
+            expect(subordinadas).toContain('SENIC');
+            expect(subordinadas).toContain('COJUR');
+            expect(subordinadas).toContain('SEJUR');
+            expect(subordinadas).toContain('SEPRO');
+            expect(subordinadas.length).toBe(10);
+        });
+
+        it('getUnidadesSubordinadas should return an empty array for an operational unit (e.g., "SEMARE")', () => {
+            const subordinadas = unidadesStore.getUnidadesSubordinadas('SEMARE');
+            expect(subordinadas).toEqual(['SEMARE']); // A própria unidade é incluída
+        });
+
+        it('getUnidadesSubordinadas should return an empty array for a non-existent unit', () => {
+            const subordinadas = unidadesStore.getUnidadesSubordinadas('NONEXISTENT');
+            expect(subordinadas).toEqual([]);
+        });
+
+        it('getUnidadeSuperior should return the superior unit sigla for a child unit (e.g., "SEMARE" -> "COEDE")', () => {
+            const superior = unidadesStore.getUnidadeSuperior('SEMARE');
+            expect(superior).toBe('COEDE');
+        });
+
+        it('getUnidadeSuperior should return the superior unit sigla for an intermediate unit (e.g., "COEDE" -> "SGP")', () => {
+            const superior = unidadesStore.getUnidadeSuperior('COEDE');
+            expect(superior).toBe('SGP');
+        });
+
+        it('getUnidadeSuperior should return null for a root unit (e.g., "SEDOC")', () => {
+            const superior = unidadesStore.getUnidadeSuperior('SEDOC');
+            expect(superior).toBeNull();
+        });
+
+        it('getUnidadeSuperior should return null for a non-existent unit', () => {
+            const superior = unidadesStore.getUnidadeSuperior('NONEXISTENT');
+            expect(superior).toBeNull();
+        });
+
+        it('getUnidadeImediataSuperior should return the immediate superior unit sigla (e.g., "SEDESENV" -> "COSIS")', () => {
+            const superior = unidadesStore.getUnidadeImediataSuperior('SEDESENV');
+            expect(superior).toBe('COSIS');
+        });
+
+        it('getUnidadeImediataSuperior should return null for a root unit (e.g., "SEDOC")', () => {
+            const superior = unidadesStore.getUnidadeImediataSuperior('SEDOC');
+            expect(superior).toBeNull();
+        });
+
+        it('getUnidadeImediataSuperior should return null for a non-existent unit', () => {
+            const superior = unidadesStore.getUnidadeImediataSuperior('NONEXISTENT');
+            expect(superior).toBeNull();
+        });
     });
 });

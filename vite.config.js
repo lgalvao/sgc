@@ -1,21 +1,15 @@
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import istanbul from 'vite-plugin-istanbul'; // Importar o plugin
+import istanbul from 'vite-plugin-istanbul'; // Import istanbul plugin
 
 export default defineConfig({
     plugins: [
         vue(),
-        istanbul({
-            include: 'src/*',
-            exclude: [
-                'node_modules',
-                'src/**/*.spec.ts',
-                'src/**/*.test.ts',
-                'src/mocks/**/*.json'
-            ],
-            extension: ['.js', '.ts', '.vue'],
-            forceBuildInstrument: true,
+        istanbul({ // Add istanbul plugin
+            include: 'src/**/*.{js,ts,vue}', // Instrument all js, ts, and vue files in src
+            exclude: ['node_modules', 'tests'], // Exclude node_modules and tests
+            extension: ['.js', '.ts', '.vue'], // Specify extensions to look for
         }),
     ],
     resolve: {alias: {'@': path.resolve(__dirname, './src')},},
@@ -32,9 +26,6 @@ export default defineConfig({
                 'node_modules/',
                 'spec/**',
                 'tests/**',
-                'src/constants/*.ts',
-                'src/views/*.vue',
-                'src/types/*.ts',
                 'src/**/*.spec.ts',
                 'src/**/*.test.ts',
                 'src/mocks/**/*.json',
@@ -46,5 +37,8 @@ export default defineConfig({
     define: {
         __VUE_PROD_DEVTOOLS__: false,
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
-    }
+    },
+    build: {
+        sourcemap: true, // Explicitly enable sourcemaps to hide the message
+    },
 });

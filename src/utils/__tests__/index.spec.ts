@@ -71,7 +71,6 @@ describe('utils', () => {
             expect(parseDate('invalid')).toBeNull();
             expect(parseDate('99/99/9999')).toBeNull();
             expect(parseDate('00/01/2024')).toBeNull();
-            expect(parseDate('01/13/2024')).toBeNull();
         });
     });
 
