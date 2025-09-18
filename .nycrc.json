@@ -1,0 +1,31 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "include": [
+    "src/**/*.{js,ts,vue}"
+  ],
+  "extension": [
+    ".js",
+    ".ts",
+    ".vue"
+  ],
+  "reporter": [
+    "html",
+    "text"
+  ],
+  "report-dir": "coverage",
+  "temp-dir": ".nyc_output",
+  "all": true,
+  "exclude": [
+    "node_modules/**",
+    "tests/**",
+    "spec/**",
+    "playwright.config.ts",
+    "vite.config.js",
+    "vitest.setup.js",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/mocks/**/*.json",
+    "src/main.ts",
+    "src/router.ts"
+  ]
+}
