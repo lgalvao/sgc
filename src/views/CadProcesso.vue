@@ -658,26 +658,46 @@ function isChecked(sigla: string): boolean {
 }
 
 function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
+  const selfSelected = isChecked(unidade.sigla)
+
   if (isFolha(unidade)) {
-    return isChecked(unidade.sigla)
+    return selfSelected
   }
 
   const subunidades = getTodasSubunidades(unidade)
   const selecionadas = subunidades.filter(sigla => isChecked(sigla)).length
 
-  if (selecionadas === 0) return false
+  if (selecionadas === 0) {
+    // Permitir que a raiz interoperacional apareça selecionada mesmo sem filhas marcadas (regra 2.3.2.5)
+    return selfSelected
+  }
   if (selecionadas === subunidades.length) return true
+  // Caso parcialmente selecionada (algumas filhas) ou a própria raiz esteja selecionada com parte das filhas
   return 'indeterminate'
 }
 
 function toggleUnidade(unidade: Unidade) {
+  const unidadeEhInteroperacional = unidade.tipo === 'INTEROPERACIONAL'
+
+  if (unidadeEhInteroperacional) {
+    // Regra 2.3.2.5: a raiz interoperacional pode ser selecionada sem propagar para as subordinadas
+    if (isChecked(unidade.sigla)) {
+      // Desmarca apenas a própria unidade
+      unidadesSelecionadas.value = unidadesSelecionadas.value.filter(sigla => sigla !== unidade.sigla)
+    } else {
+      // Marca apenas a própria unidade
+      unidadesSelecionadas.value.push(unidade.sigla)
+    }
+    return
+  }
+
   const todasSubunidades = [unidade.sigla, ...getTodasSubunidades(unidade)]
   const todasEstaoSelecionadas = todasSubunidades.every(sigla => isChecked(sigla))
 
   if (todasEstaoSelecionadas) {
     // Desseleciona a unidade e todas as subunidades
     unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
-        sigla => !todasSubunidades.includes(sigla)
+      sigla => !todasSubunidades.includes(sigla)
     )
   } else {
     // Seleciona a unidade e todas as subunidades

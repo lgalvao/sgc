@@ -91,6 +91,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
 
     test('Pré-condição: não deve exibir botão para perfil não-ADMIN', async ({page}) => {
         await page.goto('/login');
+        await page.waitForLoadState('networkidle');
         await loginComoGestor(page);
 
         const processoEmAndamento = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
@@ -102,12 +103,13 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
 
     test('Passo 8: deve definir mapas como vigentes após finalização', async ({page}) => {
         await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.TESTE_MAPEAMENTO.id}`);
+        await page.waitForLoadState('networkidle');
         await page.waitForSelector(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
 
         await page.click(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
         await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
         await page.click(`button:has-text("${TEXTOS.CONFIRMAR}")`);
-        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO, {timeout: 10000});
+        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO);
 
         await expect(page).toHaveURL('/painel');
 
@@ -121,12 +123,13 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
 
     test('Passo 9.1-9.2: deve enviar emails com conteúdo correto', async ({page}) => {
         await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.TESTE_MAPEAMENTO.id}`);
+        await page.waitForLoadState('networkidle');
         await page.waitForSelector(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
 
         await page.click(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
         await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
         await page.click(`button:has-text("${TEXTOS.CONFIRMAR}")`);
-        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO, {timeout: 10000});
+        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO);
 
         const emailNotifications = await page.locator(SELETORES_CSS.NOTIFICACAO_EMAIL).count();
         expect(emailNotifications).toBeGreaterThan(0);
@@ -138,6 +141,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
     test('deve funcionar para processos de mapeamento e revisão', async ({page}) => {
         // Testar com processo de mapeamento
         await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.TESTE_MAPEAMENTO.id}`);
+        await page.waitForLoadState('networkidle');
         await page.waitForSelector(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
 
         await page.click(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
@@ -151,6 +155,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
 
         // Testar com processo de revisão
         await page.goto(`/processo/${DADOS_TESTE.PROCESSOS.TESTE_REVISAO.id}`);
+        await page.waitForLoadState('networkidle');
         await page.waitForSelector(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
 
         await page.click(`button:has-text("${TEXTOS.FINALIZAR_PROCESSO}")`);
@@ -160,7 +165,7 @@ test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => 
         expect(modalTitleRevisao).toContain(TEXTOS.FINALIZACAO_PROCESSO);
 
         await page.click(`button:has-text("${TEXTOS.CONFIRMAR}")`);
-        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO, {timeout: 10000});
+        await page.waitForSelector(SELETORES_CSS.NOTIFICACAO_SUCESSO);
 
         const alertText = await page.textContent(SELETORES_CSS.NOTIFICACAO_SUCESSO);
         expect(alertText).toContain(TEXTOS.PROCESSO_FINALIZADO);

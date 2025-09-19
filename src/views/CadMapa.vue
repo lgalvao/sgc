@@ -429,6 +429,9 @@ const podeVerImpacto = computed(() => {
 const mostrarModalImpacto = ref(false);
 
 function abrirModalImpacto() {
+  // Segue o comportamento esperado pelos testes:
+  // - Sem mudanças: não abre o modal e exibe notificação "Nenhum impacto..."
+  // - Com mudanças: abre o modal de impactos
   if (revisaoStore.mudancasRegistradas.length === 0) {
     notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
     return;

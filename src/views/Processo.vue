@@ -375,9 +375,21 @@ function abrirDetalhesUnidade(item: any) {
     const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
     if (Subprocesso && Subprocesso.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
-      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
+      // ADMIN e GESTOR podem navegar para detalhes de qualquer unidade
+      // CHEFE e SERVIDOR só podem navegar para sua própria unidade
+      const perfilUsuario = perfilStore.perfilSelecionado;
+      if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
+        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
+      } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
+        // Para CHEFE e SERVIDOR, só navega se for sua própria unidade
+        if (perfilStore.unidadeSelecionada === Subprocesso.unidade) {
+          router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
+        }
+      }
     } else if (Array.isArray(item.children) && item.children.length > 0) {
+      // Item tem filhos, não navega
     } else {
+      // Não encontrou subprocesso para o item
     }
   }
 }

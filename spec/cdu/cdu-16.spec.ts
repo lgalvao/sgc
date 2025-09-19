@@ -30,9 +30,9 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
     await page.getByTestId('impactos-mapa-button').click();
     
     try {
-      await expect(page.getByRole('heading', { name: /impacto/i })).toBeVisible({ timeout: 2000 });
+      await expect(page.getByRole('heading', { name: /impacto/i })).toBeVisible();
     } catch {
-      await expect(page.locator('.notification')).toBeVisible({ timeout: 2000 });
+      await expect(page.locator('.notification')).toBeVisible();
     }
   });
 

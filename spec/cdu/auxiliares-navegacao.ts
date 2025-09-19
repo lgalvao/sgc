@@ -6,6 +6,7 @@ import {SELETORES_CSS} from './constantes-teste';
  */
 export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}`);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 
     await page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: unidade}).first().click();
@@ -38,6 +39,7 @@ export async function irParaProcessoPorTexto(page: Page, textoProcesso: string):
  */
 export async function irParaSubprocesso(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}`);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}`));
 }
 
@@ -46,6 +48,7 @@ export async function irParaSubprocesso(page: Page, idProcesso: number, unidade:
  */
 export async function irParaMapaCompetencias(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/mapa`);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/mapa`));
 }
 
@@ -54,6 +57,7 @@ export async function irParaMapaCompetencias(page: Page, idProcesso: number, uni
  */
 export async function irParaVisualizacaoMapa(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/vis-mapa`);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-mapa`));
 }
 

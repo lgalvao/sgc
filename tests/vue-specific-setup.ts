@@ -133,7 +133,6 @@ export const vueTest = test.extend<{ page: Page }>({
                 }
                 const testTitle = test.info().title.replace(/[^a-zA-Z0-9]/g, '_'); // Nome do arquivo baseado no título do teste
                 writeFileSync(join(coveragePath, `coverage-${testTitle}-${Date.now()}.json`), JSON.stringify(coverage));
-//                console.log(`Cobertura salva para o teste: ${test.info().title}`);
             }
         }
 

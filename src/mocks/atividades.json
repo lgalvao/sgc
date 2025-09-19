@@ -121,21 +121,6 @@
     ]
   },
   {
-    "id": 8,
-    "descricao": "Atividade de Teste para STIC",
-    "idSubprocesso": 1,
-    "conhecimentos": [
-      {
-        "id": 49,
-        "descricao": "Conhecimento em ferramentas de teste de software (ex: Selenium, JUnit)"
-      },
-      {
-        "id": 50,
-        "descricao": "Habilidade em escrita de planos de teste"
-      }
-    ]
-  },
-  {
     "id": 9,
     "descricao": "Elaboração de documentação técnica",
     "idSubprocesso": 3,
@@ -568,6 +553,17 @@
       {
         "id": 302,
         "descricao": "Conhecimento 2 para Subprocesso 30"
+      }
+    ]
+  },
+  {
+    "id": 1000,
+    "descricao": "Atividade para Teste de Remoção",
+    "idSubprocesso": 30,
+    "conhecimentos": [
+      {
+        "id": 1001,
+        "descricao": "Conhecimento para Teste de Remoção"
       }
     ]
   },

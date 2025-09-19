@@ -82,6 +82,7 @@ export async function navegarParaDetalhesProcesso(page: Page, textoProcesso: str
  */
 export async function navegarParaCadastroAtividades(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/cadastro`);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/processo\/\d+\/[^/]+\/cadastro/);
     await esperarTextoVisivel(page, TEXTOS.CADASTRO_ATIVIDADES_CONHECIMENTOS);
 }
@@ -158,6 +159,7 @@ async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFI
         localStorage.setItem('unidadeSelecionada', dados.unidade);
     }, {...dadosUsuario, idServidor: finalIdServidor});
     await page.goto(URLS.PAINEL);
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/painel/);
     await verificarElementosPainel(page);
 }

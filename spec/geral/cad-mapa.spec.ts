@@ -111,7 +111,7 @@ test.describe('Cadastro de Mapa de Competências', () => {
 
         // Verificar a notificação de sucesso
         const notificacaoDisponibilizacaoLocator = page.getByTestId('notificacao-disponibilizacao');
-        await notificacaoDisponibilizacaoLocator.waitFor({state: 'visible', timeout: 5000});
+        await notificacaoDisponibilizacaoLocator.waitFor({state: 'visible'});
         await expect(notificacaoDisponibilizacaoLocator).toContainText('Mapa de competências da unidade SESEL foi disponibilizado para validação até 31/12/2025.');
         // Não esperamos que ela desapareça automaticamente, pois é uma notificação local no modal.
     });

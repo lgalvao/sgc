@@ -129,17 +129,29 @@ test.describe('CDU-03: Manter processo', () => {
   test('deve permitir selecionar unidade interoperacional sem selecionar subordinadas', async ({ page }) => {
     await navegarParaCriacaoProcesso(page);
 
-    // Aguardar checkboxes carregarem e selecionar um
-    await page.waitForSelector('input[type="checkbox"]');
-    const firstCheckbox = page.locator('input[type="checkbox"]').first();
-    await firstCheckbox.click();
+    // Garantir que os checkboxes foram renderizados
+    await page.waitForSelector('#chk-STIC');
 
-    // Verificar se está selecionado
-    await expect(firstCheckbox).toBeChecked();
+    const chkStic = page.locator('#chk-STIC');
+    // Filho conhecido da STIC nos mocks é COSIS (se presente no cenário atual)
+    const chkCosis = page.locator('#chk-COSIS');
 
-    // Verificar que checkboxes foram selecionados (comportamento de árvore)
-    const checkedCount = await page.locator('input[type="checkbox"]:checked').count();
-    expect(checkedCount).toBeGreaterThan(0);
+    // Selecionar a unidade interoperacional raiz (STIC)
+    await chkStic.click();
+
+    // A raiz deve estar marcada...
+    await expect(chkStic).toBeChecked();
+    // ...mas as subordinadas NÃO devem ser marcadas automaticamente (regra 2.3.2.5)
+    if (await chkCosis.count() > 0) {
+      await expect(chkCosis).not.toBeChecked();
+    }
+
+    // Desmarcar STIC não deve afetar filhos marcando/desmarcando-os
+    await chkStic.click();
+    await expect(chkStic).not.toBeChecked();
+    if (await chkCosis.count() > 0) {
+      await expect(chkCosis).not.toBeChecked();
+    }
   });
 
   test('deve criar processo com sucesso e redirecionar para o Painel', async ({ page }) => {
@@ -157,9 +169,6 @@ test.describe('CDU-03: Manter processo', () => {
 
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 
-    // Aguardar um tempo para o processo ser salvo
-    await page.waitForTimeout(2000);
-    
     // Verificar se está no painel ou se houve redirecionamento
     const currentUrl = page.url();
     expect(currentUrl).toContain('/painel');
@@ -176,7 +185,7 @@ test.describe('CDU-03: Manter processo', () => {
     const firstCheckbox = page.locator('input[type="checkbox"]').first();
     await firstCheckbox.click();
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByText(descricaoOriginal)).toBeVisible();
 
@@ -192,7 +201,7 @@ test.describe('CDU-03: Manter processo', () => {
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 
     // Aguardar redirecionamento para o Painel
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
 
     // Verificar se a descrição editada aparece na listagem e a original não
@@ -211,7 +220,7 @@ test.describe('CDU-03: Manter processo', () => {
     const firstCheckbox = page.locator('input[type="checkbox"]').first();
     await firstCheckbox.click();
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByText(descricaoProcessoRemover)).toBeVisible();
 
@@ -249,7 +258,7 @@ test.describe('CDU-03: Manter processo', () => {
     const firstCheckbox = page.locator('input[type="checkbox"]').first();
     await firstCheckbox.click();
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByText(descricaoProcessoCancelarRemocao)).toBeVisible();
 
@@ -283,7 +292,7 @@ test.describe('CDU-03: Manter processo', () => {
     const firstCheckbox = page.locator('input[type="checkbox"]').first();
     await firstCheckbox.click();
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.getByText(descricaoProcessoIniciar)).toBeVisible();
 
@@ -326,7 +335,7 @@ test.describe('CDU-03: Manter processo', () => {
     await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 
     // Aguardar redirecionamento para o Painel
-    await page.waitForURL(URLS.PAINEL, { timeout: 10000 });
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(URLS.PAINEL);
 
     // Verificar se o processo aparece na listagem (sem verificar a data em si)

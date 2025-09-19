@@ -133,6 +133,7 @@
               <button
                 class="btn btn-outline-primary btn-sm"
                 @click="exportarMapasVigentes"
+                data-testid="export-csv-mapas"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -190,6 +191,7 @@
               <button
                 class="btn btn-outline-primary btn-sm"
                 @click="exportarDiagnosticosGaps"
+                data-testid="export-csv-diagnosticos"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -261,6 +263,7 @@
               <button
                 class="btn btn-outline-primary btn-sm"
                 @click="exportarAndamentoGeral"
+                data-testid="export-csv-andamento"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -454,18 +457,39 @@ const calcularPercentualConcluido = (idProcesso: number) => {
 }
 
 const abrirModalMapasVigentes = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalMapasVigentes')) // eslint-disable-line @typescript-eslint/no-explicit-any
-  modal.show()
+  try {
+    const element = document.getElementById('modalMapasVigentes')
+    if (element && (window as any).bootstrap?.Modal) {
+      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+      modal.show()
+    }
+  } catch (error) {
+    console.error('Erro ao abrir modal de mapas vigentes:', error)
+  }
 }
 
 const abrirModalDiagnosticosGaps = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDiagnosticosGaps')) // eslint-disable-line @typescript-eslint/no-explicit-any
-  modal.show()
+  try {
+    const element = document.getElementById('modalDiagnosticosGaps')
+    if (element && (window as any).bootstrap?.Modal) {
+      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+      modal.show()
+    }
+  } catch (error) {
+    console.error('Erro ao abrir modal de diagnósticos de gaps:', error)
+  }
 }
 
 const abrirModalAndamentoGeral = () => {
-  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalAndamentoGeral')) // eslint-disable-line @typescript-eslint/no-explicit-any
-  modal.show()
+  try {
+    const element = document.getElementById('modalAndamentoGeral')
+    if (element && (window as any).bootstrap?.Modal) {
+      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+      modal.show()
+    }
+  } catch (error) {
+    console.error('Erro ao abrir modal de andamento geral:', error)
+  }
 }
 
 const exportarMapasVigentes = () => {

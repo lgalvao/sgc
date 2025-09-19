@@ -6,6 +6,7 @@ import {login} from "./auxiliares-utils";
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve carregar a página de login corretamente', async ({page}) => {
         await page.goto('/');
+        await page.waitForLoadState('networkidle');
         await verificarUrl(page, `${URLS.LOGIN}`);
         await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
         await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();

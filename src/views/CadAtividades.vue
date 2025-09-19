@@ -383,7 +383,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
 import {Modal} from 'bootstrap' // Importar Modal do Bootstrap
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
@@ -491,7 +491,7 @@ function adicionarAtividade() {
   }
 }
 
-function removerAtividade(idx: number) {
+async function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
   if (confirm('Confirma a remoção desta atividade e todos os conhecimentos associados?')) {
     const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividadeRemovida.id, siglaUnidade.value, idProcesso.value);
@@ -502,7 +502,9 @@ function removerAtividade(idx: number) {
       descricaoAtividade: atividadeRemovida.descricao,
       competenciasImpactadasIds: idsImpactados,
     });
-    verificarEAlterarSituacao();
+    await verificarEAlterarSituacao();
+    await nextTick();
+    await nextTick();
   }
 }
 
@@ -521,13 +523,15 @@ function adicionarConhecimento(idx: number) {
   }
 }
 
-function removerConhecimento(idx: number, cidx: number) {
+async function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm('Confirma a remoção deste conhecimento?')) {
     const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
     atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, idsImpactados);
-    verificarEAlterarSituacao();
+    await verificarEAlterarSituacao();
+    await nextTick();
+    await nextTick();
   }
 }
 
@@ -899,12 +903,13 @@ function fecharModalImpacto() {
   revisaoStore.setMudancasParaImpacto([]);
 }
 
-function verificarEAlterarSituacao() {
+async function verificarEAlterarSituacao() {
   if (subprocesso.value?.situacao === 'Não iniciado' && idSubprocesso.value) {
     const novaSituacao = isRevisao.value ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
     const subprocessoIndex = processosStore.subprocessos.findIndex(sp => sp.id === idSubprocesso.value);
     if (subprocessoIndex !== -1) {
       processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
+      await nextTick();
     }
   }
 }
@@ -926,15 +931,9 @@ function verificarEAlterarSituacao() {
 
 .botoes-acao-atividade,
 .botoes-acao {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.group-atividade:hover .botoes-acao-atividade,
-.group-conhecimento:hover .botoes-acao {
   opacity: 1;
   pointer-events: auto;
+  transition: opacity 0.2s;
 }
 
 .botao-acao {
