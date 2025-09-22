@@ -173,26 +173,22 @@ describe('SubprocessoHeader.vue', () => {
       const wrapperAdmin = mountComponent({
         perfilUsuario: Perfil.ADMIN
       });
-      interface SubprocessoHeaderInstance extends InstanceType<typeof SubprocessoHeader> {
-        mostrarBotaoAlterarData: boolean;
-      }
-
       // Test ADMIN user
-      const vmAdmin = wrapperAdmin.vm as SubprocessoHeaderInstance;
+      const vmAdmin = wrapperAdmin.vm;
       expect(vmAdmin.mostrarBotaoAlterarData).toBe(true);
 
       // Test non-ADMIN user
       const wrapperGestor = mountComponent({
         perfilUsuario: Perfil.GESTOR
       });
-      const vmGestor = wrapperGestor.vm as SubprocessoHeaderInstance;
+      const vmGestor = wrapperGestor.vm;
       expect(vmGestor.mostrarBotaoAlterarData).toBe(false);
 
       // Test null perfil
       const wrapperNull = mountComponent({
         perfilUsuario: null
       });
-      const vmNull = wrapperNull.vm as SubprocessoHeaderInstance;
+      const vmNull = wrapperNull.vm;
       expect(vmNull.mostrarBotaoAlterarData).toBe(false);
     });
   });

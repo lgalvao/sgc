@@ -104,6 +104,73 @@ export const useAtividadesStore = defineStore('atividades', {
         },
         setAtividadesSnapshot(snapshot: Atividade[]) {
             this.atividadesSnapshot = snapshot;
+        },
+        importarAtividades(idSubprocessoDestino: number, selecionadas: Atividade[]) {
+            // Normalização de strings
+            const normalize = (s: string) => s?.trim().toLowerCase() || '';
+            const ignoradas: { descricao: string; motivo: string }[] = [];
+    
+            // Atividades já existentes no destino
+            const existentes = this.getAtividadesPorSubprocesso(idSubprocessoDestino) || [];
+            const existentesSet = new Set(existentes.map(a => normalize(a.descricao)));
+    
+            // Evitar duplicatas na própria seleção
+            const vistos = new Set<string>();
+    
+            const novasAtividades: Atividade[] = [];
+    
+            for (const ativ of selecionadas) {
+                const descNorm = normalize(ativ.descricao);
+                if (!descNorm) {
+                    ignoradas.push({ descricao: ativ.descricao || '(sem descrição)', motivo: 'Descrição vazia' });
+                    continue;
+                }
+                if (vistos.has(descNorm)) {
+                    ignoradas.push({ descricao: ativ.descricao, motivo: 'Duplicada na seleção' });
+                    continue;
+                }
+                vistos.add(descNorm);
+    
+                if (existentesSet.has(descNorm)) {
+                    ignoradas.push({ descricao: ativ.descricao, motivo: 'Já existe no cadastro' });
+                    continue;
+                }
+    
+                // Deduplicar conhecimentos desta atividade
+                const conhecimentosVistos = new Set<string>();
+                const conhecimentosDedup: Conhecimento[] = [];
+                for (const c of ativ.conhecimentos || []) {
+                    const cNorm = normalize(c.descricao);
+                    if (!cNorm || conhecimentosVistos.has(cNorm)) continue;
+                    conhecimentosVistos.add(cNorm);
+                    conhecimentosDedup.push({ id: 0, descricao: c.descricao.trim() });
+                }
+    
+                const novaAtividade: Atividade = {
+                    id: 0,
+                    descricao: ativ.descricao.trim(),
+                    idSubprocesso: idSubprocessoDestino,
+                    conhecimentos: conhecimentosDedup
+                };
+    
+                novasAtividades.push(novaAtividade);
+            }
+    
+            // Atribuir IDs e inserir
+            const novasComIds = novasAtividades.map(a => {
+                const novoId = this.nextId++;
+                const conhecimentosComIds = a.conhecimentos.map(c => ({ ...c, id: this.nextId++ }));
+                return { ...a, id: novoId, conhecimentos: conhecimentosComIds };
+            });
+    
+            if (novasComIds.length) {
+                this.atividades.push(...novasComIds);
+            }
+    
+            return {
+                importadas: novasComIds.length,
+                ignoradas
+            };
         }
     }
 });

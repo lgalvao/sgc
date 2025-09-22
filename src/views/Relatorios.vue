@@ -132,8 +132,8 @@
             <div class="mb-3">
               <button
                 class="btn btn-outline-primary btn-sm"
-                @click="exportarMapasVigentes"
                 data-testid="export-csv-mapas"
+                @click="exportarMapasVigentes"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -190,8 +190,8 @@
             <div class="mb-3">
               <button
                 class="btn btn-outline-primary btn-sm"
-                @click="exportarDiagnosticosGaps"
                 data-testid="export-csv-diagnosticos"
+                @click="exportarDiagnosticosGaps"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -262,8 +262,8 @@
             <div class="mb-3">
               <button
                 class="btn btn-outline-primary btn-sm"
-                @click="exportarAndamentoGeral"
                 data-testid="export-csv-andamento"
+                @click="exportarAndamentoGeral"
               >
                 <i class="bi bi-download" /> Exportar CSV
               </button>
@@ -459,8 +459,9 @@ const calcularPercentualConcluido = (idProcesso: number) => {
 const abrirModalMapasVigentes = () => {
   try {
     const element = document.getElementById('modalMapasVigentes')
-    if (element && (window as any).bootstrap?.Modal) {
-      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const bootstrapWindow = window as BootstrapWindow;
+    if (element && bootstrapWindow.bootstrap?.Modal) {
+      const modal = new bootstrapWindow.bootstrap.Modal(element)
       modal.show()
     }
   } catch (error) {
@@ -471,8 +472,9 @@ const abrirModalMapasVigentes = () => {
 const abrirModalDiagnosticosGaps = () => {
   try {
     const element = document.getElementById('modalDiagnosticosGaps')
-    if (element && (window as any).bootstrap?.Modal) {
-      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const bootstrapWindow = window as BootstrapWindow;
+    if (element && bootstrapWindow.bootstrap?.Modal) {
+      const modal = new bootstrapWindow.bootstrap.Modal(element)
       modal.show()
     }
   } catch (error) {
@@ -483,8 +485,9 @@ const abrirModalDiagnosticosGaps = () => {
 const abrirModalAndamentoGeral = () => {
   try {
     const element = document.getElementById('modalAndamentoGeral')
-    if (element && (window as any).bootstrap?.Modal) {
-      const modal = new (window as any).bootstrap.Modal(element) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const bootstrapWindow = window as BootstrapWindow;
+    if (element && bootstrapWindow.bootstrap?.Modal) {
+      const modal = new bootstrapWindow.bootstrap.Modal(element)
       modal.show()
     }
   } catch (error) {
@@ -535,7 +538,7 @@ const exportarAndamentoGeral = () => {
   downloadCSV(csv, 'andamento-geral.csv')
 }
 
-const gerarCSV = (dados: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+const gerarCSV = (dados: CSVData[]) => {
   if (dados.length === 0) return ''
 
   const headers = Object.keys(dados[0])

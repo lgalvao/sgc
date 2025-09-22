@@ -626,14 +626,24 @@ function cancelarEdicaoAtividade() {
 function handleImportAtividades(atividadesImportadas: Atividade[]) {
   if (idSubprocesso.value === undefined) return;
 
-  const novasAtividades = atividadesImportadas.map(atividade => ({
-    ...atividade,
-    idSubprocesso: idSubprocesso.value as number,
-  }));
+  const resultado = atividadesStore.importarAtividades(idSubprocesso.value as number, atividadesImportadas);
 
-  atividadesStore.adicionarMultiplasAtividades(novasAtividades);
+  if (resultado.importadas > 0) {
+    notificacoesStore.sucesso('Importação concluída', `${resultado.importadas} atividade(s) importada(s).`);
+  }
 
+  if (resultado.ignoradas && resultado.ignoradas.length > 0) {
+    const detalhes = resultado.ignoradas
+      .slice(0, 10)
+      .map(i => `- ${i.descricao} (${i.motivo})`)
+      .join('\n');
+    notificacoesStore.aviso(
+      'Itens ignorados na importação',
+      `${resultado.ignoradas.length} item(ns) ignorado(s):\n${detalhes}${resultado.ignoradas.length > 10 ? '\n...' : ''}`
+    );
+  }
 
+  mostrarModalImportar.value = false;
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -770,10 +780,11 @@ function disponibilizarCadastro() {
       pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
 
-  if (!subprocesso || subprocesso.situacao !== 'Revisão do cadastro em andamento') {
+  const situacaoEsperada = isRevisao.value ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
+  if (!subprocesso || subprocesso.situacao !== situacaoEsperada) {
     notificacoesStore.erro(
         'Erro na Disponibilização',
-        'A disponibilização só pode ser feita quando o subprocesso está na situação "Revisão do cadastro em andamento".'
+        `A disponibilização só pode ser feita quando o subprocesso está na situação "${situacaoEsperada}".`
     );
     return;
   }
@@ -880,7 +891,10 @@ async function confirmarDisponibilizacao() {
   }
 
   // Adicionar mensagem de sucesso
-  notificacoesStore.sucesso('Sucesso', 'Revisão do cadastro de atividades disponibilizada');
+  notificacoesStore.sucesso(
+        'Disponibilização concluída',
+        isRevisao ? 'Revisão do cadastro de atividades disponibilizada' : 'Cadastro de atividades e conhecimentos disponibilizado'
+      );
 
   fecharModalConfirmacao();
   await router.push('/painel');

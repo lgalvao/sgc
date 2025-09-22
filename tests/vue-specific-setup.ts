@@ -20,7 +20,7 @@ interface CustomWindow extends Window {
 declare const window: CustomWindow;
 
 export const vueTest = test.extend<{ page: Page }>({
-    page: async ({ page }, use, testInfo) => { // Manter esta linha
+    page: async ({ page }, use, _testInfo) => { // Manter esta linha
         const errorReporter = new ErrorReporter();
 
         // Interceptar e modificar subprocessos.json

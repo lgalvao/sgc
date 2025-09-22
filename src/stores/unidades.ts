@@ -3,21 +3,21 @@ import unidadesMock from '../mocks/unidades.json' with {type: 'json'};
 import type {Unidade} from '@/types/tipos'
 
 // Função auxiliar para getUnidadesSubordinadas
-function findAndCollectSubordinates(unidade: Unidade, unidadesEncontradas: string[]) {
+function _findAndCollectSubordinates(unidade: Unidade, unidadesEncontradas: string[]) {
     unidadesEncontradas.push(unidade.sigla);
     if (unidade.filhas) {
-        unidade.filhas.forEach(child => findAndCollectSubordinates(child, unidadesEncontradas));
+        unidade.filhas.forEach(child => _findAndCollectSubordinates(child, unidadesEncontradas));
     }
 }
 
 // Função auxiliar para getUnidadeSuperior
-function findSuperiorUnit(unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null {
+function _findSuperiorUnit(unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null {
     for (const unidade of unidades) {
         if (unidade.sigla === targetSigla) {
             return parentSigla;
         }
         if (unidade.filhas) {
-            const superior = findSuperiorUnit(unidade.filhas, targetSigla, unidade.sigla);
+            const superior = _findSuperiorUnit(unidade.filhas, targetSigla, unidade.sigla);
             if (superior !== null) {
                 return superior;
             }

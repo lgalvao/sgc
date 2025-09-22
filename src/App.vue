@@ -4,6 +4,12 @@ import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
 import BarraNavegacao from './components/BarraNavegacao.vue';
 import NotificacaoContainer from './components/NotificacaoContainer.vue';
+import pkg from '../package.json';
+
+interface PackageJson {
+  version: string;
+  [key: string]: unknown;
+}
 
 const route = useRoute()
 
@@ -25,6 +31,7 @@ function refreshHideFlag() {
 }
 
 watch(() => route.fullPath, () => refreshHideFlag(), {immediate: true})
+const version = (pkg as PackageJson).version
 
 const shouldShowNavBarExtras = computed(() => {
   if (route.path === '/login') return false
@@ -45,4 +52,10 @@ const shouldShowNavBarExtras = computed(() => {
   </div>
   <router-view />
   <NotificacaoContainer />
+  <footer class="bg-light text-muted border-top mt-4">
+    <div class="container py-3 small d-flex justify-content-between align-items-center">
+      <span>Versão {{ version }}</span>
+      <span>Desenvolvido por SESEL/COSIS/TRE-PE</span>
+    </div>
+  </footer>
 </template>

@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {mapSituacaoProcesso, mapTipoProcesso, useProcessosStore} from '../processos'; // Importar as funções diretamente
 import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
@@ -479,7 +479,7 @@ describe('useProcessosStore', () => {
                     id: 7, idProcesso: 4, unidade: 'NOVA2',
                     dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(),
                     dataFimEtapa1: null, dataFimEtapa2: null,
-                    situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnidadeAnterior: null,
+                    situacao: 'Em andamento', unidadeAtual: 'NOVA2', unidadeAnterior: null,
                     movimentacoes: [],
                     analises: []
                 }
@@ -618,7 +618,7 @@ describe('useProcessosStore', () => {
             it('should process "aceitar" action for GESTOR, add movement and keep situation', async () => {
                 const subprocessoId = 4; // UNIDADE_GESTOR, situacao: "Cadastro disponibilizado"
                 const initialMovementsLength = processosStore.movements.length;
-                const mockUnidadesStore = mockUnidadesStoreInstance; // Usar a instância global do mock
+                const _mockUnidadesStore = mockUnidadesStoreInstance; // Usar a instância global do mock
 
                 await processosStore.processarCadastroBloco({
                     idProcesso: 3,
@@ -638,7 +638,7 @@ describe('useProcessosStore', () => {
             it('should process "homologar" action for ADMIN, add movement and update situation', async () => {
                 const subprocessoId = 5; // UNIDADE_ADMIN, situacao: "Revisão do cadastro disponibilizada"
                 const initialMovementsLength = processosStore.movements.length;
-                const mockNotificacoesStore = useNotificacoesStore(); // Get the mocked store instance
+                const _mockNotificacoesStore = useNotificacoesStore(); // Get the mocked store instance
 
                 await processosStore.processarCadastroBloco({
                     idProcesso: 3,
@@ -818,7 +818,7 @@ Mais informações no Sistema de Gestão de Competências.`
 
                 const subprocessoAtualizado = processosStore.subprocessos.find(sp => sp.id === subprocessoId);
                 expect(subprocessoAtualizado?.situacao).toBe('Mapa homologado');
-                expect(processosStore.movements.length).toBe(initialMovementsLength); // Nenhuma movimentação para ADMIN
+                expect(processosStore.movements.length).toBe(initialMovementsLength + 1); // Movimentação registrada para ADMIN
                 expect(mockUnidadesStore.getUnidadeImediataSuperior).not.toHaveBeenCalled();
                 expect(mockAlertasStore.criarAlerta).not.toHaveBeenCalled();
                 expect(mockNotificacoesStore.email).not.toHaveBeenCalled();
@@ -858,7 +858,7 @@ Mais informações no Sistema de Gestão de Competências.`
 
             it('should reject if superior unit not found for GESTOR', async () => {
                 const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as vi.Mock).mockImplementationOnce(() => null); // Mockar a implementação para garantir que null seja retornado
+                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null); // Mockar a implementação para garantir que null seja retornado
 
                 await expect(processosStore.aceitarMapa({
                     idProcesso: 3,
@@ -976,7 +976,7 @@ Mais informações no Sistema de Gestão de Competências.`
 
             it('should reject if superior unit not found', async () => {
                 const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as vi.Mock).mockImplementationOnce(() => null);
+                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
 
                 await expect(processosStore.apresentarSugestoes({
                     idProcesso: 3,
@@ -1019,7 +1019,7 @@ Mais informações no Sistema de Gestão de Competências.`
 
             it('should reject if superior unit not found', async () => {
                 const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as vi.Mock).mockImplementationOnce(() => null);
+                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
 
                 await expect(processosStore.validarMapa({
                     idProcesso: 3,
@@ -1063,10 +1063,10 @@ Mais informações no Sistema de Gestão de Competências.`
             processosStore.getMovementsForSubprocesso(1);
 
             // Teste de actions
-            const novoProcesso = { id: 100, descricao: 'Teste', tipo: TipoProcesso.MAPEAMENTO, dataLimite: new Date(), situacao: SituacaoProcesso.CRIADO };
+            const novoProcesso = { id: 100, descricao: 'Teste', tipo: TipoProcesso.MAPEAMENTO, dataLimite: new Date(), situacao: SituacaoProcesso.CRIADO, dataFinalizacao: null };
             processosStore.adicionarProcesso(novoProcesso);
 
-            const novosSubprocessos = [{ id: 101, idProcesso: 100, unidade: 'TESTE', dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(), situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO, movimentacoes: [], analises: [] }];
+            const novosSubprocessos = [{ id: 101, idProcesso: 100, unidade: 'TESTE', dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(), situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO, unidadeAtual: 'TESTE', unidadeAnterior: null, dataFimEtapa1: null, dataFimEtapa2: null, movimentacoes: [], analises: [] }];
             processosStore.adicionarsubprocessos(novosSubprocessos);
 
             processosStore.removerProcesso(100); // Remover o processo adicionado

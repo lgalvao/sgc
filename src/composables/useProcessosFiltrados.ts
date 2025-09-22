@@ -26,7 +26,10 @@ export function useProcessosFiltrados(filterBySituacaoFinalizado: Ref<boolean> =
     if (perfilUsuario === Perfil.ADMIN) {
       return processosBase;
     }
-
+    
+    // Excluir processos "Criado" para perfis não-ADMIN (CDU-02)
+    processosBase = processosBase.filter(p => p.situacao !== SituacaoProcesso.CRIADO);
+    
     // Para GESTOR, CHEFE, SERVIDOR, filtra pela unidade
     if (unidadeUsuario) {
       let unidadesParaFiltrar: string[] = [];

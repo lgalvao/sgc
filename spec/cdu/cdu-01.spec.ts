@@ -18,7 +18,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
         await page.getByRole('button', {name: TEXTOS.ENTRAR}).click();
 
         const notificacao = page.locator('.notification-container');
-        await expect(notificacao.getByText(TEXTOS.USUARIO_NAO_ENCONTRADO)).toBeVisible();
+        await expect(notificacao.getByText(TEXTOS.ERRO_LOGIN_INVALIDO)).toBeVisible();
     });
 
     test('deve exibir estrutura da aplicação para SERVIDOR', async ({page}) => {

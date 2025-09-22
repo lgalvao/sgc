@@ -19,6 +19,12 @@ export enum SituacaoProcesso {
     FINALIZADO = 'Finalizado',
 }
 
+export interface UnidadeSnapshot {
+    sigla: string;
+    tipo: string;
+    filhas: UnidadeSnapshot[];
+}
+
 export interface Processo {
     id: number;
     descricao: string;
@@ -26,6 +32,7 @@ export interface Processo {
     dataLimite: Date;
     situacao: SituacaoProcesso;
     dataFinalizacao: Date | null;
+    unidadesSnapshot?: UnidadeSnapshot[]; // Cópia da árvore/unidades participantes no momento da iniciação
 }
 
 export interface Subprocesso {

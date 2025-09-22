@@ -76,6 +76,7 @@ describe('useAnalisesStore', () => {
 
         it('parseAnaliseDates should parse dataHora and map resultado', () => {
             const mockAnalise = {
+                id: 1,
                 dataHora: '2025-01-01T10:00:00Z',
                 resultado: 'Aceite',
                 idSubprocesso: 1,
@@ -89,6 +90,7 @@ describe('useAnalisesStore', () => {
 
         it('parseAnaliseDates should handle null dataHora and unknown resultado', () => {
             const mockAnalise = {
+                id: 2,
                 dataHora: null, // Testando null dataHora
                 resultado: 'UNKNOWN', // Testando resultado desconhecido
                 idSubprocesso: 1,

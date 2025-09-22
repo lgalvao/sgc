@@ -1,4 +1,4 @@
-import {expect} from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
 import {
     esperarElementoInvisivel,

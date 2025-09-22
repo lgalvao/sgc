@@ -207,7 +207,7 @@ test.describe('Relatórios', () => {
             const exportarButton = page.getByTestId('export-csv-mapas');
             
             if (await exportarButton.isVisible()) {
-                const tableRows = page.locator('#modalMapasVigentes table tbody tr');
+                const _tableRows = page.locator('#modalMapasVigentes table tbody tr');
     
                 await exportarButton.click();
     
@@ -230,7 +230,7 @@ test.describe('Relatórios', () => {
             const exportarButton = page.getByTestId('export-csv-diagnosticos');
             
             if (await exportarButton.isVisible()) {
-                const tableRows = page.locator('#modalDiagnosticosGaps table tbody tr');
+                const _tableRows = page.locator('#modalDiagnosticosGaps table tbody tr');
     
                 await exportarButton.click();
     
@@ -252,7 +252,7 @@ test.describe('Relatórios', () => {
             const exportarButton = page.getByTestId('export-csv-andamento');
             
             if (await exportarButton.isVisible()) {
-                const tableRows = page.locator('#modalAndamentoGeral table tbody tr');
+                const _tableRows = page.locator('#modalAndamentoGeral table tbody tr');
     
                 await exportarButton.click();
     
@@ -337,9 +337,9 @@ test.describe('Relatórios', () => {
         
         const modal = page.locator('#modalAndamentoGeral');
         if (await modal.isVisible()) {
-            const exportarButton = page.getByTestId('export-csv-andamento');
+            const _exportarButton = page.getByTestId('export-csv-andamento');
 
-            const tableRows = page.locator('#modalAndamentoGeral table tbody tr');
+            const _tableRows = page.locator('#modalAndamentoGeral table tbody tr');
 
             // Verificar que o modal abre corretamente mesmo com filtros aplicados
             await expect(page.getByText('Andamento Geral dos Processos')).toBeVisible();

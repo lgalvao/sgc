@@ -38,7 +38,7 @@ const mockMapa: Mapa = {
     { id: 10, descricao: 'Atividade Existente 1' } as Atividade,
     { id: 11, descricao: 'Atividade Existente 2' } as Atividade,
   ],
-} as Mapa;
+} as unknown as Mapa;
 
 const mockAtividadeAdicionada: Atividade = {
   id: 20,
@@ -88,7 +88,7 @@ vi.mock('@/stores/mapas', () => ({
 vi.mock('@/stores/revisao', async (importOriginal) => {
   const mod = await importOriginal();
   return {
-    ...mod,
+    ...(mod as object),
     useRevisaoStore: () => mockRevisaoStore,
   };
 });

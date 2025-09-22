@@ -50,7 +50,7 @@ test.describe('Configurações', () => {
     test('deve validar campos obrigatórios e valores mínimos', async ({page}) => {
         const diasInativacaoProcessoInput = page.getByLabel('Dias para inativação de processos');
         const diasAlertaNovoInput = page.getByLabel('Dias para indicação de alerta como novo');
-        const salvarButton = page.getByRole('button', {name: 'Salvar'});
+        const _salvarButton = page.getByRole('button', {name: 'Salvar'});
 
         // Verificar que os campos têm atributo min="1"
         await expect(diasInativacaoProcessoInput).toHaveAttribute('min', '1');

@@ -149,8 +149,8 @@ const handleLogin = () => {
       }
     } else {
       notificacoesStore.erro(
-        'Usuário não encontrado',
-        'Verifique se o título eleitoral está correto.'
+        'Título ou senha inválidos',
+        'Título ou senha inválidos.'
       );
     }
   } else {

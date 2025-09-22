@@ -38,9 +38,9 @@
         <thead v-if="!hideHeaders">
           <tr>
             <th
-              role="columnheader"
               v-for="column in columns"
               :key="column.key"
+              role="columnheader"
             >
               {{ column.label }}
             </th>

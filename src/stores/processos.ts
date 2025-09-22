@@ -296,10 +296,18 @@ export const useProcessosStore = defineStore('processos', {
                 const subprocesso = this.subprocessos[subprocessoIndex];
 
                 if (perfil === 'ADMIN') {
-                    // ADMIN: homologar diretamente
+                    // ADMIN: homologar diretamente (consolidar efeitos)
+                    this.addMovement({
+                        idSubprocesso: subprocesso.id,
+                        unidadeOrigem: 'SEDOC',
+                        unidadeDestino: 'SEDOC',
+                        descricao: 'Mapa de competências homologado'
+                    });
                     this.subprocessos[subprocessoIndex] = {
                         ...subprocesso,
                         situacao: SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
+                        dataFimEtapa2: subprocesso.dataFimEtapa2 || new Date(),
+                        analises: [], // Limpar histórico de análise
                         movimentacoes: subprocesso.movimentacoes || [],
                     };
                 } else {
@@ -315,12 +323,14 @@ export const useProcessosStore = defineStore('processos', {
                         descricao: 'Mapa de competências validado'
                     });
 
-                    // Atualizar subprocesso
+                    // Atualizar subprocesso (consolidar efeitos)
                     this.subprocessos[subprocessoIndex] = {
                         ...subprocesso,
                         unidadeAtual: unidadeSuperior,
                         unidadeAnterior: unidade,
                         situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
+                        dataFimEtapa2: new Date(),
+                        analises: [],
                         movimentacoes: subprocesso.movimentacoes || [],
                     };
 
@@ -415,7 +425,7 @@ export const useProcessosStore = defineStore('processos', {
                     unidadeDestino: unidadeInferior,
                     dataHora: new Date(),
                     idProcesso: idProcesso,
-                    descricao: `Cadastro de atividades e conhecimentos da unidade ${subprocesso.unidade} devolvido para ajustes`
+                    descricao: `Validação do mapa de competências da unidade ${subprocesso.unidade} devolvida para ajustes`
                 });
 
                 return Promise.resolve();
@@ -509,9 +519,9 @@ export const useProcessosStore = defineStore('processos', {
                     unidadeAtual: unidadeSuperior,
                     unidadeAnterior: unidade,
                     situacao: SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
-                    dataFimEtapa2: new Date(), // Definir data/hora de conclusão da etapa 2
-                    analises: [], // Excluir histórico de análise
-                    movimentacoes: subprocesso.movimentacoes || [],
+                        dataFimEtapa2: new Date(),
+                        analises: [],
+                        movimentacoes: subprocesso.movimentacoes || [],
                 };
 
                 // Simular envio de e-mail

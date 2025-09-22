@@ -42,15 +42,25 @@
       >
         <thead>
           <tr>
-            <th>Data/Hora</th>
+            <th
+              style="cursor: pointer;"
+              @click="ordenarAlertasPor('data')"
+            >
+              Data/Hora
+            </th>
             <th>Descrição</th>
-            <th>Processo</th>
+            <th
+              style="cursor: pointer;"
+              @click="ordenarAlertasPor('processo')"
+            >
+              Processo
+            </th>
             <th>Origem</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(alerta, index) in alertasFormatados"
+            v-for="(alerta, index) in alertasOrdenados"
             :key="index"
             :class="{ 'fw-bold': !alerta.lido }"
             style="cursor: pointer;"
@@ -61,7 +71,7 @@
             <td>{{ alerta.processo }}</td>
             <td>{{ alerta.unidade }}</td>
           </tr>
-          <tr v-if="!alertasFormatados || alertasFormatados.length === 0">
+          <tr v-if="!alertasOrdenados || alertasOrdenados.length === 0">
             <td
               class="text-center text-muted"
               colspan="4"
@@ -104,8 +114,8 @@ const { processosFiltrados } = useProcessosFiltrados();
 
 const processosOrdenados = computed<Processo[]>(() => {
   return [...processosFiltrados.value].sort((a, b) => {
-    let valA: string | number | Date | null = a[criterio.value as keyof Processo]
-    let valB: string | number | Date | null = b[criterio.value as keyof Processo]
+    let valA: unknown = a[criterio.value as keyof Processo]
+    let valB: unknown = b[criterio.value as keyof Processo]
 
     if (criterio.value === 'unidades') {
       valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidade).join(', ')
@@ -161,10 +171,10 @@ function abrirDetalhesProcesso(processo: Processo) {
 
 const alertasFormatados = computed(() => {
   const alertasDoServidor = alertasStore.getAlertasDoServidor();
-
+ 
   return alertasDoServidor.map(alerta => {
     const processo = processos.value.find(p => p.id === alerta.idProcesso);
-
+ 
     return {
       id: alerta.id,
       data: alerta.dataHora,
@@ -176,6 +186,36 @@ const alertasFormatados = computed(() => {
     };
   });
 });
+
+// Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
+const alertaCriterio = ref<'data' | 'processo'>('data');
+const alertaAsc = ref(false); // false = desc (padrão por data/hora)
+
+const alertasOrdenados = computed(() => {
+  const lista = [...alertasFormatados.value];
+  return lista.sort((a, b) => {
+    if (alertaCriterio.value === 'data') {
+      const da = a.data.getTime();
+      const db = b.data.getTime();
+      return alertaAsc.value ? da - db : db - da;
+    } else {
+      const pa = (a.processo || '').toLowerCase();
+      const pb = (b.processo || '').toLowerCase();
+      if (pa < pb) return alertaAsc.value ? -1 : 1;
+      if (pa > pb) return alertaAsc.value ? 1 : -1;
+      return 0;
+    }
+  });
+});
+
+function ordenarAlertasPor(campo: 'data' | 'processo') {
+  if (alertaCriterio.value === campo) {
+    alertaAsc.value = !alertaAsc.value;
+  } else {
+    alertaCriterio.value = campo;
+    alertaAsc.value = true; // primeira ordenação do campo em asc
+  }
+}
 
 // Removida função formatarDataHora - usando utilitário centralizado
 

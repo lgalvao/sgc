@@ -267,7 +267,7 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
-import {Processo, SituacaoProcesso, TipoProcesso, Unidade} from '@/types/tipos'
+import {Processo, SituacaoProcesso, TipoProcesso, Unidade, UnidadeSnapshot} from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
@@ -519,13 +519,30 @@ function iniciarProcesso() {
      tipo: tipo.value,
      dataLimite: new Date(dataLimite.value),
      situacao: SituacaoProcesso.EM_ANDAMENTO,
-     dataFinalizacao: null
+     dataFinalizacao: null,
+     unidadesSnapshot: buildUnidadesSnapshot(unidadesFiltradas)
    };
 
    processosStore.adicionarProcesso(novo);
    processosStore.adicionarsubprocessos(novossubprocessosObjetos);
 
-   if (tipo.value === TipoProcesso.REVISAO) {
+   if (tipo.value === TipoProcesso.MAPEAMENTO) {
+     // CDU-04 (item 10): criar mapa vazio para cada unidade participante
+     unidadesFiltradas.forEach(unidadeSigla => {
+       const novoMapa = {
+         id: generateUniqueId(),
+         unidade: unidadeSigla,
+         idProcesso: novoidProcesso,
+         competencias: [],
+         situacao: 'em_andamento',
+         dataCriacao: new Date(),
+         dataDisponibilizacao: null,
+         dataFinalizacao: null
+       };
+       mapasStore.adicionarMapa(novoMapa);
+     });
+   } else if (tipo.value === TipoProcesso.REVISAO) {
+     // CDU-05 (item 10): copiar mapa vigente para o novo processo de revisão
      unidadesFiltradas.forEach(unidadeSigla => {
        const mapaVigente = mapasStore.getMapaVigentePorUnidade(unidadeSigla);
        if (mapaVigente) {
@@ -540,7 +557,7 @@ function iniciarProcesso() {
          };
          mapasStore.adicionarMapa(novoMapa);
          
-         // Vincular mapa copiado ao subprocesso
+         // Vincular referência do mapa copiado ao subprocesso
          const subprocesso = novossubprocessosObjetos.find(sp => sp.unidade === unidadeSigla);
          if (subprocesso) {
            subprocesso.idMapaCopiado = mapaVigente.id;
@@ -549,14 +566,7 @@ function iniciarProcesso() {
      });
    }
 
-   novossubprocessosObjetos.forEach(subprocesso => {
-     processosStore.addMovement({
-       idSubprocesso: subprocesso.id,
-       unidadeOrigem: 'SEDOC',
-       unidadeDestino: subprocesso.unidade,
-       descricao: 'Processo iniciado'
-     });
-   });
+   // Movimentações iniciais serão registradas por enviarNotificacoesIniciarProcesso()
 
    enviarNotificacoesIniciarProcesso(novo, unidadesFiltradas);
 
@@ -707,6 +717,29 @@ function toggleUnidade(unidade: Unidade) {
       }
     })
   }
+}
+
+function buildUnidadesSnapshot(unidadesSelecionadas: string[]): UnidadeSnapshot[] {
+  // Get the root units that are selected or have selected descendants
+  const roots = unidadesStore.unidades.filter(u =>
+    unidadesSelecionadas.includes(u.sigla) ||
+    getTodasSubunidades(u).some(s => unidadesSelecionadas.includes(s))
+  );
+
+  return roots.map(u => buildSnapshotRec(u, unidadesSelecionadas));
+}
+
+function buildSnapshotRec(unidade: Unidade, selected: string[]): UnidadeSnapshot {
+  const filhas = unidade.filhas?.filter(f =>
+    selected.includes(f.sigla) ||
+    getTodasSubunidades(f).some(s => selected.includes(s))
+  ).map(f => buildSnapshotRec(f, selected)) || [];
+
+  return {
+    sigla: unidade.sigla,
+    tipo: unidade.tipo,
+    filhas
+  };
 }
 
 
