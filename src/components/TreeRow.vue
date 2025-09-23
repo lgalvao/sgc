@@ -7,7 +7,7 @@
     <td
       v-for="(column, index) in columns"
       :key="column.key"
-      :style="index === 0 ? { paddingLeft: (level * 20) + 'px' } : {}"
+      :style="index === 0 ? { paddingLeft: (level * 1.25) + 'rem' } : {}"
     >
       <span
         v-if="index === 0 && item.children && item.children.length > 0"
@@ -61,7 +61,7 @@ const handleRowClick = () => {
 <style scoped>
 .toggle-icon {
   cursor: pointer;
-  margin-right: 5px;
+  margin-right: 0.3125rem;
 }
 
 </style>

@@ -206,13 +206,13 @@ const fecharEmailModal = () => {
 }
 
 .notification-content {
-  padding: 15px;
+  padding: 1rem;
 }
 
 .notification-header {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .notification-header strong {
@@ -221,7 +221,7 @@ const fecharEmailModal = () => {
 
 .notification-body {
   font-size: 13px;
-  color: #666;
+  color: var(--bs-secondary);
   line-height: 1.4;
 }
 

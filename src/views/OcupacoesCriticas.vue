@@ -342,6 +342,6 @@ function confirmarFinalizacao() {
 }
 
 .border {
-  border-color: #dee2e6 !important;
+  border-color: var(--bs-border-color) !important;
 }
 </style>

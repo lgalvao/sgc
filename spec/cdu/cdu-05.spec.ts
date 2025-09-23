@@ -40,7 +40,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
     await page.click(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`);
     
     await expect(page.locator('.modal.show')).toBeVisible();
-    await expect(page.locator('h5:has-text("Confirmação")')).toBeVisible();
+    await expect(page.locator('h5:has-text("Iniciar processo")')).toBeVisible();
     await expect(page.locator('text=' + TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
     await expect(page.locator('text=' + TEXTOS.NOTIFICACAO_EMAIL)).toBeVisible();
   });

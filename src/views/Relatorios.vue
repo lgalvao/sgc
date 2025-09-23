@@ -554,7 +554,7 @@ const downloadCSV = (csv: string, nomeArquivo: string) => {
 
 <style scoped>
 .card:hover {
-  background-color: #f8f9fa;
-  border-color: #0d6efd;
+  background-color: var(--bs-light);
+  border-color: var(--bs-primary);
 }
 </style>

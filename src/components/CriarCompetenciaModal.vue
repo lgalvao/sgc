@@ -180,20 +180,20 @@ function salvar() {
 <style scoped>
 .atividade-card-item {
   cursor: pointer;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.375rem;
   transition: all 0.2s ease-in-out;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 
 .atividade-card-item:hover {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
 .atividade-card-item.checked {
-  background-color: #e9f5ff;
-  border-color: #007bff;
+  background-color: var(--bs-primary-bg-subtle);
+  border-color: var(--bs-primary);
 }
 
 .atividade-card-item .form-check-label {
@@ -203,7 +203,7 @@ function salvar() {
 
 .atividade-card-item.checked .form-check-label {
   font-weight: bold;
-  color: #007bff;
+  color: var(--bs-primary);
 }
 
 .atividade-card-item .card-body {

@@ -487,7 +487,7 @@ function adicionarAtividade() {
     });
     verificarEAlterarSituacao();
     novaAtividade.value = '';
-    notificacoesStore.sucesso('Atividade adicionada', 'A atividade foi adicionada com sucesso.');
+    // Notificação removida conforme plano UX
   }
 }
 
@@ -519,7 +519,7 @@ function adicionarConhecimento(idx: number) {
     atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, idsImpactados);
     verificarEAlterarSituacao();
     atividade.novoConhecimento = '';
-    notificacoesStore.sucesso('Conhecimento adicionado', 'O conhecimento foi adicionado com sucesso.');
+    // Notificação removida conforme plano UX
   }
 }
 
@@ -945,9 +945,15 @@ async function verificarEAlterarSituacao() {
 
 .botoes-acao-atividade,
 .botoes-acao {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.atividade-hover-row:hover .botoes-acao-atividade,
+.conhecimento-hover-row:hover .botoes-acao {
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 0.2s;
 }
 
 .botao-acao {
@@ -966,8 +972,8 @@ async function verificarEAlterarSituacao() {
 
 .botao-acao:focus,
 .botao-acao:hover {
-  background: #f0f4fa;
-  box-shadow: 0 0 0 2px #e3f0ff;
+  background: var(--bs-primary-bg-subtle);
+  box-shadow: 0 0 0 2px var(--bs-primary);
 }
 
 .fade-group {
@@ -989,8 +995,8 @@ async function verificarEAlterarSituacao() {
 }
 
 .atividade-titulo-card {
-  background: #f8fafc;
-  border-bottom: 1px solid #e3e8ee;
+  background: var(--bs-light);
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 0.5rem 0.75rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;

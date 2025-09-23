@@ -154,7 +154,7 @@
       tabindex="-1"
       data-testid="modal-apresentar-sugestoes"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -216,7 +216,7 @@
       tabindex="-1"
       data-testid="modal-sugestoes"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -269,7 +269,7 @@
       tabindex="-1"
       data-testid="modal-validar"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -321,7 +321,7 @@
       tabindex="-1"
       data-testid="modal-devolucao"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -387,7 +387,7 @@
       tabindex="-1"
       data-testid="modal-historico"
     >
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -769,8 +769,8 @@ async function confirmarDevolucao() {
 }
 
 .competencia-titulo-card {
-  background: #f8fafc;
-  border-bottom: 1px solid #e3e8ee;
+  background: var(--bs-light);
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 0.5rem 0.75rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
@@ -789,7 +789,7 @@ async function confirmarDevolucao() {
 }
 
 .atividade-associada-descricao {
-  color: #495057;
+  color: var(--bs-body-color);
   font-weight: bold;
 }
 

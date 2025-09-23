@@ -52,10 +52,12 @@ const shouldShowNavBarExtras = computed(() => {
   </div>
   <router-view />
   <NotificacaoContainer />
-  <footer class="bg-light text-muted border-top mt-4">
+  <footer
+  v-if="route.path !== '/login'"
+  class="bg-light text-muted border-top mt-4">
     <div class="container py-3 small d-flex justify-content-between align-items-center">
       <span>Versão {{ version }}</span>
-      <span>Desenvolvido por SESEL/COSIS/TRE-PE</span>
+      <span>© SESEL/COSIS/TRE-PE</span>
     </div>
   </footer>
 </template>

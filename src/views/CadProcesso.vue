@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h2>Cadastro de processo</h2>
 
-    <form class="mt-4 col-md-6 col-sm-8 col-12 p-0">
+    <form class="mt-4 col-md-6 col-sm-8 col-12">
       <div class="mb-3">
         <label
           class="form-label"
@@ -46,7 +46,7 @@
               :key="unidade.sigla"
             >
               <div
-                :style="{ marginLeft: '0px' }"
+                :style="{ marginLeft: '0' }"
                 class="form-check"
               >
                 <!--suppress HtmlUnknownAttribute -->
@@ -176,7 +176,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              Confirmação
+              Iniciar processo
             </h5>
             <button
               type="button"
@@ -222,7 +222,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              Confirmação
+              Iniciar processo
             </h5>
             <button
               type="button"
@@ -747,30 +747,20 @@ function buildSnapshotRec(unidade: Unidade, selected: string[]): UnidadeSnapshot
 
 <style scoped>
 input[type="checkbox"]:indeterminate {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10h8'/%3e%3c/svg%3e");
 }
 
-.form-check {
-  margin-bottom: 0.25rem;
-  padding-left: 1.5em;
-}
+
 
 .ms-4 {
-  border-left: 1px dashed #dee2e6;
+  border-left: 1px dashed var(--bs-border-color);
   padding-left: 1rem;
   margin-left: 0.5rem;
 }
 
-.form-check-label {
-  cursor: pointer;
-  user-select: none;
-  padding: 0.25rem 0;
-  display: inline-block;
-}
 
-.form-check-input {
-  margin-top: 0.25rem;
-}
+
+
 </style>

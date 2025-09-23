@@ -24,7 +24,9 @@
               class="form-label"
               for="titulo"
               data-testid="label-titulo"
-            >Título eleitoral</label>
+            >
+               <i class="bi bi-person-circle me-2" />
+               Título eleitoral</label>
             <input
               id="titulo"
               v-model="titulo"
@@ -41,7 +43,9 @@
               class="form-label"
               for="senha"
               data-testid="label-senha"
-            >Senha</label>
+            >
+               <i class="bi bi-key me-2" />
+               Senha</label>
             <input
               id="senha"
               v-model="senha"
@@ -85,6 +89,7 @@
             type="submit"
             data-testid="botao-entrar"
           >
+            <i class="bi bi-box-arrow-in-right me-2" />
             Entrar
           </button>
         </form>
@@ -172,7 +177,7 @@ const finalizarLogin = (idServidor: number, perfil: Perfil, unidadeSigla: string
 .login-bg {
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(120deg, #e3f0ff 0%, #c9e7ff 50%, #f6faff 100%);
+  background: linear-gradient(120deg, var(--bs-primary-bg-subtle) 0%, var(--bs-info-bg-subtle) 50%, var(--bs-light) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,25 +194,18 @@ const finalizarLogin = (idServidor: number, perfil: Perfil, unidadeSigla: string
 .login-card {
   width: 100%;
   max-width: 400px;
-  border-radius: 22px;
   border: none;
-  background: #fff;
-  box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.13);
+  background: var(--bs-body-bg);
 }
 
 .login-btn {
-  font-size: 1.15rem;
-  padding: 0.75rem 0;
-  border-radius: 8px;
   transition: background 0.2s;
   font-weight: 500;
 }
 
 .login-btn:hover {
-  background: #1769e0;
+  background: var(--bs-primary);
 }
 
-.card {
-  box-shadow: 0 6px 32px 0 rgba(0, 0, 0, 0.10);
-}
+
 </style>

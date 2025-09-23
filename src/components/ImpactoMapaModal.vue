@@ -43,7 +43,7 @@
                     <div class="d-flex w-100 justify-content-start align-items-start">
                       <i
                         class="bi fs-5 me-3 bi-plus-circle-fill text-success"
-                        style="margin-top: 2px;"
+                        style="margin-top: 0.125rem;"
                       />
                       <div class="flex-grow-1">
                         <p class="mb-1">

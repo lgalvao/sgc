@@ -1,87 +1,65 @@
 <template>
-  <!-- Modal para aceitar mapa com observações -->
-  <div
-    v-if="mostrarModal"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
+  <BaseModal
+    :mostrar="mostrarModal"
+    :titulo="tituloModal"
+    :tipo="perfil === 'ADMIN' ? 'success' : 'primary'"
+    :icone="perfil === 'ADMIN' ? 'bi bi-check-circle' : 'bi bi-check-circle'"
+    @fechar="$emit('fecharModal')"
   >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5
-            class="modal-title"
-            data-testid="modal-aceite-title"
-          >
-            <i class="bi bi-check-circle text-success me-2" />
-            {{ tituloModal }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-testid="modal-aceite-close"
-            @click="$emit('fecharModal')"
-          />
-        </div>
+    <template #conteudo>
+      <div data-testid="modal-aceite-body">
+        <p v-if="perfil === 'ADMIN'">
+          {{ corpoModal }}
+        </p>
         <div
-          class="modal-body"
-          data-testid="modal-aceite-body"
+          v-else
+          class="mb-3"
         >
-          <p v-if="perfil === 'ADMIN'">
-            {{ corpoModal }}
-          </p>
-          <div
-            v-else
-            class="mb-3"
-          >
-            <label
-              for="observacao-textarea"
-              class="form-label"
-            >{{ corpoModal }}</label>
-            <textarea
-              id="observacao-textarea"
-              v-model="observacao"
-              class="form-control"
-              rows="4"
-              placeholder="Digite suas observações sobre o mapa..."
-              data-testid="observacao-aceite-textarea"
-            />
-            <div class="form-text">
-              As observações serão registradas junto com a validação do mapa.
-            </div>
+          <label
+            for="observacao-textarea"
+            class="form-label"
+          >{{ corpoModal }}</label>
+          <textarea
+            id="observacao-textarea"
+            v-model="observacao"
+            class="form-control"
+            rows="4"
+            placeholder="Digite suas observações sobre o mapa..."
+            data-testid="observacao-aceite-textarea"
+          />
+          <div class="form-text">
+            As observações serão registradas junto com a validação do mapa.
           </div>
         </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-testid="modal-aceite-cancelar"
-            @click="$emit('fecharModal')"
-          >
-            <i class="bi bi-x-circle me-1" />
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="btn btn-success"
-            data-testid="modal-aceite-confirmar"
-            @click="$emit('confirmarAceitacao', observacao)"
-          >
-            <i class="bi bi-check-circle me-1" />
-            Aceitar
-          </button>
-        </div>
       </div>
-    </div>
-  </div>
-  <div
-    v-if="mostrarModal"
-    class="modal-backdrop fade show"
-  />
+    </template>
+
+    <template #acoes>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-testid="modal-aceite-cancelar"
+        @click="$emit('fecharModal')"
+      >
+        <i class="bi bi-x-circle me-1" />
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        data-testid="modal-aceite-confirmar"
+        @click="$emit('confirmarAceitacao', observacao)"
+      >
+        <i class="bi bi-check-circle me-1" />
+        Aceitar
+      </button>
+    </template>
+  </BaseModal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
+import BaseModal from './BaseModal.vue';
 
 interface Props {
   mostrarModal: boolean;
@@ -113,36 +91,19 @@ computed(() => {
 </script>
 
 <style scoped>
-.modal-content {
-  border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  border: none;
-  border-radius: 0.5rem 0.5rem 0 0;
-}
-
-.modal-title {
-  font-weight: 600;
-}
-
 .form-control:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  border-color: var(--bs-success);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
   border: none;
   transition: transform 0.2s ease;
 }
 
 .btn-success:hover {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #218838 0%, #1aa085 100%);
+  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
 }
 </style>

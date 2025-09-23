@@ -59,18 +59,18 @@ defineProps({
 <style scoped>
 .form-check {
   margin-bottom: 0.25rem;
-  padding-left: 1.5em;
+  padding-left: 1.5rem;
 }
 
 .ms-4 {
-  border-left: 1px dashed #dee2e6;
+  border-left: 1px dashed var(--bs-border-color);
   padding-left: 1rem;
   margin-left: 0.5rem;
 }
 
 input[type="checkbox"]:indeterminate {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10h8'/%3e%3c/svg%3e");
 }
 </style>

@@ -578,7 +578,7 @@ function confirmarHomologacaoSemImpacto() {
 
 <style>
 .unidade-nome {
-  color: #222;
+  color: var(--bs-body-color);
   opacity: 0.85;
   padding-right: 1rem;
 }
@@ -594,8 +594,8 @@ function confirmarHomologacaoSemImpacto() {
 }
 
 .atividade-titulo-card {
-  background: #f8fafc;
-  border-bottom: 1px solid #e3e8ee;
+  background: var(--bs-light);
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 0.5rem 0.75rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
@@ -617,15 +617,15 @@ function confirmarHomologacaoSemImpacto() {
 }
 
 .unidade-sigla {
-  background: #f8fafc;
-  color: #333;
+  background: var(--bs-light);
+  color: var(--bs-dark);
   font-weight: bold;
   border-radius: 0.5rem;
   letter-spacing: 1px;
 }
 
 .unidade-nome {
-  color: #222;
+  color: var(--bs-body-color);
   opacity: 0.85;
   padding-right: 1rem;
 }

@@ -97,11 +97,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
   test('deve alterar situação de "Não iniciado" para "em andamento"', async ({ page }) => {
     await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.SEMARE);
-    
+
     const nomeAtividade = gerarNomeUnico('Primeira Atividade');
     await adicionarAtividade(page, nomeAtividade);
-    
-    await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toBeVisible();
+
+    // Verificar se a atividade foi adicionada com sucesso
+    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade })).toBeVisible();
   });
 
   test('deve disponibilizar cadastro após finalização', async ({ page }) => {

@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <div v-if="processo">
       <span
-        class="badge text-bg-secondary mb-2"
+        class="badge bg-secondary mb-2"
         style="border-radius: 0"
       >Detalhes do processo</span>
       <h2

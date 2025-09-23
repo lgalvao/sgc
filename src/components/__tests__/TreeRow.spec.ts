@@ -26,7 +26,7 @@ describe('TreeRow.vue', () => {
         });
 
         const firstTd = wrapper.find('td');
-        expect(firstTd.attributes().style).toContain('padding-left: 40px;');
+        expect(firstTd.attributes().style).toContain('padding-left: 2.5rem;');
     });
 
     it('deve exibir o toggle-icon se houver children', () => {

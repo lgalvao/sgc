@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <div class="fs-5 w-100 mb-3">
+    <div class="fs-5 mb-3">
       {{ unidade?.sigla }} - {{ unidade?.nome }}
     </div>
 
@@ -43,7 +43,7 @@
           class="card mb-2 competencia-card"
           data-testid="competencia-item"
         >
-          <div class="card-body py-2">
+          <div class="card-body">
             <div
               class="card-title fs-5 d-flex align-items-center competencia-edicao-row position-relative competencia-hover-row competencia-titulo-card"
             >
@@ -78,7 +78,7 @@
                 :key="atvId"
                 class="card atividade-associada-card-item d-flex align-items-center group-atividade-associada"
               >
-                <div class="card-body d-flex align-items-center py-1 px-2">
+                <div class="card-body d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ descricaoAtividade(atvId) }}
                     <span
@@ -165,7 +165,7 @@
                   :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
                   @click="toggleAtividade(atividade.id)"
                 >
-                  <div class="card-body d-flex align-items-center py-2">
+                  <div class="card-body d-flex align-items-center">
                     <input
                       :id="`atv-${atividade.id}`"
                       v-model="atividadesSelecionadas"
@@ -831,8 +831,8 @@ onMounted(() => {
 
 .botao-acao:focus,
 .botao-acao:hover {
-  background: #f0f4fa;
-  box-shadow: 0 0 0 2px #e3f0ff;
+  background: var(--bs-primary-bg-subtle);
+  box-shadow: 0 0 0 2px var(--bs-primary);
 }
 
 .competencia-descricao {
@@ -851,8 +851,8 @@ onMounted(() => {
 }
 
 .competencia-titulo-card {
-  background: #f8fafc;
-  border-bottom: 1px solid #e3e8ee;
+  background: var(--bs-light);
+  border-bottom: 1px solid var(--bs-border-color);
   padding: 0.5rem 0.75rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
@@ -869,20 +869,20 @@ onMounted(() => {
 
 .atividade-card-item {
   cursor: pointer;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.375rem;
   transition: all 0.2s ease-in-out;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 
 .atividade-card-item:hover {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem var(--bs-primary);
 }
 
 .atividade-card-item.checked {
-  background-color: #e9f5ff;
-  border-color: #007bff;
+  background-color: var(--bs-primary-bg-subtle);
+  border-color: var(--bs-primary);
 }
 
 .atividade-card-item .form-check-label {
@@ -892,7 +892,7 @@ onMounted(() => {
 
 .atividade-card-item.checked .form-check-label {
   font-weight: bold;
-  color: #007bff;
+  color: var(--bs-primary);
 }
 
 .atividade-card-item .card-body {
@@ -900,14 +900,14 @@ onMounted(() => {
 }
 
 .atividade-associada-card-item {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.375rem;
-  background-color: #f8f9fa;
+  background-color: var(--bs-secondary-bg);
 }
 
 .atividade-associada-descricao {
   font-size: 0.85rem;
-  color: #495057;
+  color: var(--bs-body-color);
 }
 
 .botao-acao-inline {

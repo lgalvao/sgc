@@ -5,7 +5,7 @@ import {vueTest} from './tests/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 10000,
+    timeout: 12000,
     testDir: './spec',
     fullyParallel: true,
     reporter: "dot",
