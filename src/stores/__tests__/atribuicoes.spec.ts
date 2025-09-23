@@ -76,4 +76,49 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(result.length).toBe(0);
         });
     });
+
+    describe('getters', () => {
+        it('getAtribuicoesPorUnidade should filter atribuicoes by unidade', () => {
+            const atribuicao1: AtribuicaoTemporaria = {
+                unidade: 'COSIS',
+                idServidor: 1,
+                dataInicio: new Date('2025-01-01'),
+                dataTermino: new Date('2025-01-31'),
+                justificativa: 'J1'
+            };
+            const atribuicao2: AtribuicaoTemporaria = {
+                unidade: 'SESEL',
+                idServidor: 2,
+                dataInicio: new Date('2025-02-01'),
+                dataTermino: new Date('2025-02-28'),
+                justificativa: 'J2'
+            };
+            const atribuicao3: AtribuicaoTemporaria = {
+                unidade: 'COSIS',
+                idServidor: 3,
+                dataInicio: new Date('2025-03-01'),
+                dataTermino: new Date('2025-03-31'),
+                justificativa: 'J3'
+            };
+
+            atribuicaoTemporariaStore.$patch({
+                atribuicoes: [atribuicao1, atribuicao2, atribuicao3]
+            });
+
+            const result = atribuicaoTemporariaStore.getAtribuicoesPorUnidade('COSIS');
+            expect(result.length).toBe(2);
+            expect(result[0]).toEqual(atribuicao1);
+            expect(result[1]).toEqual(atribuicao3);
+        });
+
+        it('getAtribuicoesPorUnidade should return an empty array if no matching unidade', () => {
+            const atribuicao1: AtribuicaoTemporaria = {
+                unidade: 'COSIS', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
+            };
+            atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
+
+            const result = atribuicaoTemporariaStore.getAtribuicoesPorUnidade('NONEXISTENT');
+            expect(result.length).toBe(0);
+        });
+    });
 });

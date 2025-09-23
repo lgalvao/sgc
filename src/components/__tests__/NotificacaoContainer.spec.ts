@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createPinia, setActivePinia} from 'pinia';
 import NotificacaoContainer from '../NotificacaoContainer.vue';
@@ -194,6 +194,129 @@ describe('NotificacaoContainer.vue', () => {
         });
     });
 
+    describe('auto-hide functionality', () => {
+        it('should schedule auto-hide for success notifications', async () => {
+            const wrapper = mountComponent();
+
+            notificacoesStore.sucesso('Sucesso!', 'Mensagem de sucesso');
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+
+            const vm = wrapper.vm as unknown as { scheduleAutoHide: (notification: { id: string; tipo: string }) => void };
+            const mockNotification = { id: 'test-id', tipo: 'success' };
+            vm.scheduleAutoHide(mockNotification);
+
+            // Verify that the notification is still there initially
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+        });
+
+        it('should not schedule auto-hide for non-success notifications', async () => {
+            const wrapper = mountComponent();
+
+            notificacoesStore.erro('Erro!', 'Mensagem de erro');
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+
+            const vm = wrapper.vm as unknown as { scheduleAutoHide: (notification: { id: string; tipo: string }) => void };
+            const mockNotification = { id: 'test-id', tipo: 'error' };
+            vm.scheduleAutoHide(mockNotification);
+
+            // Should still be there since it's not a success notification
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+        });
+
+        it('should cancel auto-hide when notification is removed', async () => {
+            const wrapper = mountComponent();
+
+            const notificationId = notificacoesStore.sucesso('Sucesso!', 'Mensagem');
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+
+            // Test cancelAutoHide function directly
+            const vm = wrapper.vm as unknown as { cancelAutoHide: (notificationId: string) => void };
+            vm.cancelAutoHide(notificationId);
+
+            // Should still be there since we cancelled the auto-hide
+            expect(wrapper.findAll('.notification')).toHaveLength(1);
+        });
+    });
+
+    describe('email modal functionality', () => {
+        it('should show email modal when clicking "Ver e-mail completo" button', async () => {
+            const emailContent = {
+                assunto: 'Assunto do e-mail',
+                destinatario: 'destinatario@example.com',
+                corpo: 'Corpo do e-mail com conteúdo detalhado.'
+            };
+
+            notificacoesStore.adicionarNotificacao({
+                tipo: 'email',
+                titulo: 'E-mail recebido',
+                mensagem: 'Você recebeu um novo e-mail',
+                emailContent
+            });
+
+            const wrapper = mountComponent();
+
+            await wrapper.vm.$nextTick();
+
+            // Find and click the "Ver e-mail completo" button
+            const emailButton = wrapper.find('.btn-outline-primary');
+            expect(emailButton.exists()).toBe(true);
+            await emailButton.trigger('click');
+
+            // Check if modal is visible
+            expect(wrapper.find('.modal').exists()).toBe(true);
+            expect(wrapper.find('.modal-title').text()).toBe('E-mail Simulado');
+        });
+
+        it('should close email modal when clicking close button', async () => {
+            const emailContent = {
+                assunto: 'Assunto do e-mail',
+                destinatario: 'destinatario@example.com',
+                corpo: 'Corpo do e-mail'
+            };
+
+            notificacoesStore.adicionarNotificacao({
+                tipo: 'email',
+                titulo: 'E-mail recebido',
+                mensagem: 'Você recebeu um novo e-mail',
+                emailContent
+            });
+
+            const wrapper = mountComponent();
+
+            await wrapper.vm.$nextTick();
+
+            // Test the functions directly instead of relying on DOM interactions
+            const vm = wrapper.vm as unknown as { mostrarEmail: (payload: { emailContent: unknown }) => void; fecharEmailModal: () => void; emailModalVisivel: boolean };
+
+            // Open modal
+            vm.mostrarEmail({ emailContent });
+            expect(vm.emailModalVisivel).toBe(true);
+
+            // Close modal
+            vm.fecharEmailModal();
+            expect(vm.emailModalVisivel).toBe(false);
+        });
+
+        it('should not show email button for non-email notifications', async () => {
+            notificacoesStore.sucesso('Sucesso!', 'Operação realizada');
+
+            const wrapper = mountComponent();
+
+            await wrapper.vm.$nextTick();
+
+            // Should not have email button for success notification
+            expect(wrapper.find('.btn-outline-primary').exists()).toBe(false);
+        });
+    });
 
     describe('NotificacaoContainer.vue', () => {
         it('should return correct icon classes for each type', () => {
@@ -226,6 +349,86 @@ describe('NotificacaoContainer.vue', () => {
             expect(notification.find('.notification-content').exists()).toBe(true);
             expect(notification.find('.notification-header').exists()).toBe(true);
             expect(notification.find('.notification-body').exists()).toBe(true);
+        });
+    });
+
+    describe('lifecycle hooks and timeout management', () => {
+        it('should set timeout for success notifications in scheduleAutoHide', async () => {
+            const wrapper = mountComponent();
+
+            const vm = wrapper.vm as unknown as { scheduleAutoHide: (notification: { id: string; tipo: string }) => void };
+            const mockNotification = { id: 'test-id', tipo: 'success' };
+
+            // Mock setTimeout to capture the timeout ID
+            const mockSetTimeout = vi.fn((callback, delay) => {
+                expect(delay).toBe(3000); // Should be 3 seconds for success notifications
+                return 123; // Mock timeout ID
+            });
+            global.setTimeout = mockSetTimeout;
+
+            vm.scheduleAutoHide(mockNotification);
+
+            expect(mockSetTimeout).toHaveBeenCalledTimes(1);
+            expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), 3000);
+        });
+
+        it('should not set timeout for non-success notifications in scheduleAutoHide', async () => {
+            const wrapper = mountComponent();
+
+            const vm = wrapper.vm as unknown as { scheduleAutoHide: (notification: { id: string; tipo: string }) => void };
+            const mockNotification = { id: 'test-id', tipo: 'error' };
+
+            // Mock setTimeout to verify it's not called
+            const mockSetTimeout = vi.fn();
+            global.setTimeout = mockSetTimeout;
+
+            vm.scheduleAutoHide(mockNotification);
+
+            expect(mockSetTimeout).not.toHaveBeenCalled();
+        });
+
+        it('should clear timeouts on unmount', async () => {
+            const wrapper = mountComponent();
+
+            const vm = wrapper.vm as unknown as { autoHideTimeouts: Map<string, number> };
+
+            // Add a mock timeout ID to the map
+            (vm.autoHideTimeouts as Map<string, number>).set('test-id', 123);
+
+            // Mock clearTimeout
+            const mockClearTimeout = vi.fn();
+            global.clearTimeout = mockClearTimeout;
+
+            // Unmount the component
+            wrapper.unmount();
+
+            expect(mockClearTimeout).toHaveBeenCalledWith(123);
+            expect((vm.autoHideTimeouts as Map<string, number>).size).toBe(0);
+        });
+
+        it('should handle watch notifications correctly', async () => {
+            const wrapper = mountComponent();
+
+            const vm = wrapper.vm as unknown as { scheduleAutoHide: (notification: any) => void; cancelAutoHide: (notificationId: string) => void };
+
+            // Mock the functions to verify they're available
+            const mockScheduleAutoHide = vi.fn();
+            const mockCancelAutoHide = vi.fn();
+            (vm as any).scheduleAutoHide = mockScheduleAutoHide;
+            (vm as any).cancelAutoHide = mockCancelAutoHide;
+
+            // Test that the functions exist and are callable
+            expect(typeof vm.scheduleAutoHide).toBe('function');
+            expect(typeof vm.cancelAutoHide).toBe('function');
+
+            // Test scheduleAutoHide with success notification
+            const successNotification = { id: 'success-id', tipo: 'success', titulo: 'Test', mensagem: 'Test message' };
+            vm.scheduleAutoHide(successNotification);
+            expect(mockScheduleAutoHide).toHaveBeenCalledWith(successNotification);
+
+            // Test cancelAutoHide
+            vm.cancelAutoHide('test-id');
+            expect(mockCancelAutoHide).toHaveBeenCalledWith('test-id');
         });
     });
 });

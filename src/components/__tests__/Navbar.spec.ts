@@ -135,4 +135,50 @@ describe('Navbar.vue', () => {
             expect(wrapper.find('select').exists()).toBe(false);
         });
     });
+
+    describe('Navegação', () => {
+        beforeEach(() => {
+            // Setup mock data for navigation tests
+            mockServidorLogadoRef.value = {id: 1, nome: 'Teste User'};
+            mockPerfilSelecionadoRef.value = 'USER';
+            mockUnidadeSelecionadaRef.value = 'ABC';
+        });
+
+        it('deve definir sessionStorage e navegar corretamente ao usar navigateFromNavbar', async () => {
+            const wrapper = await mountComponent();
+
+            // Mock sessionStorage
+            const sessionStorageSpy = vi.spyOn(sessionStorage, 'setItem');
+
+            const vm = wrapper.vm as unknown as { navigateFromNavbar: (route: string) => void };
+            vm.navigateFromNavbar('/test-route');
+
+            // Verifica se sessionStorage foi definido corretamente
+            expect(sessionStorageSpy).toHaveBeenCalledWith('cameFromNavbar', '1');
+
+            // Verifica se o router.push foi chamado com a rota correta
+            expect(pushSpy).toHaveBeenCalledWith('/test-route');
+
+            // Limpa o spy
+            sessionStorageSpy.mockRestore();
+        });
+
+        it('deve navegar para diferentes rotas usando navigateFromNavbar', async () => {
+            const wrapper = await mountComponent();
+
+            const vm = wrapper.vm as unknown as { navigateFromNavbar: (route: string) => void };
+
+            // Testa navegação para painel
+            vm.navigateFromNavbar('/painel');
+            expect(pushSpy).toHaveBeenCalledWith('/painel');
+
+            // Testa navegação para relatórios
+            vm.navigateFromNavbar('/relatorios');
+            expect(pushSpy).toHaveBeenCalledWith('/relatorios');
+
+            // Testa navegação para histórico
+            vm.navigateFromNavbar('/historico');
+            expect(pushSpy).toHaveBeenCalledWith('/historico');
+        });
+    });
 });

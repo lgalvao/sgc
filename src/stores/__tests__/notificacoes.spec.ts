@@ -168,6 +168,26 @@ describe('useNotificacoesStore', () => {
 
             expect(notificacoesStore.notificacoes[0].duracao).toBe(3000);
         });
+
+        it('email should add email notification with email content', () => {
+            const assunto = 'Relatório Mensal';
+            const destinatario = 'usuario@example.com';
+            const corpo = 'Corpo do email de teste';
+
+            notificacoesStore.email(assunto, destinatario, corpo);
+
+            expect(notificacoesStore.notificacoes).toHaveLength(1);
+            const notificacao = notificacoesStore.notificacoes[0];
+            expect(notificacao.tipo).toBe('email');
+            expect(notificacao.titulo).toBe(`E-mail enviado: ${assunto}`);
+            expect(notificacao.mensagem).toBe(`Para: ${destinatario}`);
+            expect(notificacao.duracao).toBe(10000); // 10 seconds for emails
+            expect(notificacao.emailContent).toEqual({
+                assunto,
+                destinatario,
+                corpo
+            });
+        });
     });
 
     describe('auto-removal', () => {

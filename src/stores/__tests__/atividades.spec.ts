@@ -244,5 +244,99 @@ describe('useAtividadesStore', () => {
             expect(atividadesStore.atividades[initialLength + 1].conhecimentos[0].id).toBe(initialNextId + 3);
             expect(atividadesStore.nextId).toBe(initialNextId + 4);
         });
+
+        it('setAtividadesSnapshot should set the activities snapshot', () => {
+            const snapshotAtividades: Atividade[] = [
+                {id: 100, descricao: 'Snapshot Atividade 1', idSubprocesso: 1, conhecimentos: []},
+                {id: 101, descricao: 'Snapshot Atividade 2', idSubprocesso: 2, conhecimentos: []},
+            ];
+
+            atividadesStore.setAtividadesSnapshot(snapshotAtividades);
+
+            expect(atividadesStore.atividadesSnapshot).toEqual(snapshotAtividades);
+        });
+
+        it('importarAtividades should import activities with deduplication', () => {
+            // Mock the revisao store
+            const mockRevisaoStore = {
+                registrarMudanca: vi.fn()
+            };
+            vi.doMock('../revisao', () => ({
+                useRevisaoStore: vi.fn(() => mockRevisaoStore)
+            }));
+
+            const idSubprocessoDestino = 5;
+            const atividadesParaImportar: Atividade[] = [
+                {
+                    id: 0,
+                    descricao: 'Nova Atividade 1',
+                    idSubprocesso: 1,
+                    conhecimentos: [
+                        {id: 0, descricao: 'Conhecimento 1'},
+                        {id: 0, descricao: 'Conhecimento 2'},
+                        {id: 0, descricao: 'Conhecimento 1'} // Duplicado
+                    ]
+                },
+                {
+                    id: 0,
+                    descricao: 'Nova Atividade 2',
+                    idSubprocesso: 1,
+                    conhecimentos: [
+                        {id: 0, descricao: 'Conhecimento 3'}
+                    ]
+                },
+                {
+                    id: 0,
+                    descricao: '   ', // Descrição vazia
+                    idSubprocesso: 1,
+                    conhecimentos: []
+                },
+                {
+                    id: 0,
+                    descricao: 'Nova Atividade 1', // Duplicada na seleção
+                    idSubprocesso: 1,
+                    conhecimentos: []
+                }
+            ];
+
+            const initialLength = atividadesStore.atividades.length;
+            const initialNextId = atividadesStore.nextId;
+
+            const resultado = atividadesStore.importarAtividades(idSubprocessoDestino, atividadesParaImportar);
+
+            // Deve importar apenas atividades válidas e não duplicadas
+            expect(resultado.importadas).toBe(2); // 2 atividades válidas
+            expect(resultado.ignoradas.length).toBe(2); // 2 atividades ignoradas (vazia e duplicada)
+            expect(atividadesStore.atividades.length).toBe(initialLength + 2);
+
+            // Verificar se as atividades foram adicionadas com IDs corretos
+            const atividadesAdicionadas = atividadesStore.atividades.slice(-2);
+            expect(atividadesAdicionadas[0].id).toBe(initialNextId);
+            expect(atividadesAdicionadas[1].id).toBe(initialNextId + 3); // +3 porque: +1 para atividade1, +2 para seus 2 conhecimentos
+            expect(atividadesAdicionadas[0].idSubprocesso).toBe(idSubprocessoDestino);
+            expect(atividadesAdicionadas[1].idSubprocesso).toBe(idSubprocessoDestino);
+
+            // Verificar deduplicação de conhecimentos
+            expect(atividadesAdicionadas[0].conhecimentos.length).toBe(2); // 2 conhecimentos únicos
+            expect(atividadesAdicionadas[0].conhecimentos[0].id).toBe(initialNextId + 1);
+            expect(atividadesAdicionadas[0].conhecimentos[1].id).toBe(initialNextId + 2);
+
+            // Verificar se o nextId foi atualizado corretamente
+            expect(atividadesStore.nextId).toBe(initialNextId + 5); // 2 atividades + 3 conhecimentos (2 para primeira atividade, 1 para segunda)
+        });
+
+        it('importarAtividades should handle empty activities list', () => {
+            const mockRevisaoStore = {
+                registrarMudanca: vi.fn()
+            };
+            vi.doMock('../revisao', () => ({
+                useRevisaoStore: vi.fn(() => mockRevisaoStore)
+            }));
+
+            const resultado = atividadesStore.importarAtividades(1, []);
+
+            expect(resultado.importadas).toBe(0);
+            expect(resultado.ignoradas.length).toBe(0);
+        });
     });
 });

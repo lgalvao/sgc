@@ -2,30 +2,6 @@ import {defineStore} from 'pinia'
 import unidadesMock from '../mocks/unidades.json' with {type: 'json'};
 import type {Unidade} from '@/types/tipos'
 
-// Função auxiliar para getUnidadesSubordinadas
-function _findAndCollectSubordinates(unidade: Unidade, unidadesEncontradas: string[]) {
-    unidadesEncontradas.push(unidade.sigla);
-    if (unidade.filhas) {
-        unidade.filhas.forEach(child => _findAndCollectSubordinates(child, unidadesEncontradas));
-    }
-}
-
-// Função auxiliar para getUnidadeSuperior
-function _findSuperiorUnit(unidades: Unidade[], targetSigla: string, parentSigla: string | null = null): string | null {
-    for (const unidade of unidades) {
-        if (unidade.sigla === targetSigla) {
-            return parentSigla;
-        }
-        if (unidade.filhas) {
-            const superior = _findSuperiorUnit(unidade.filhas, targetSigla, unidade.sigla);
-            if (superior !== null) {
-                return superior;
-            }
-        }
-    }
-    return null;
-}
-
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
         unidades: unidadesMock as unknown as Unidade[]
@@ -64,11 +40,11 @@ export const useUnidadesStore = defineStore('unidades', {
             const stack: { unit: Unidade, parentSigla: string | null }[] = [];
 
             for (const unidade of this.unidades) {
-                stack.push({ unit: unidade, parentSigla: null });
+                stack.push({unit: unidade, parentSigla: null});
             }
 
             while (stack.length > 0) {
-                const { unit: currentUnidade, parentSigla: currentParentSigla } = stack.pop()!;
+                const {unit: currentUnidade, parentSigla: currentParentSigla} = stack.pop()!;
 
                 if (currentUnidade.sigla === siglaUnidade) {
                     return currentParentSigla;
@@ -76,7 +52,7 @@ export const useUnidadesStore = defineStore('unidades', {
 
                 if (currentUnidade.filhas) {
                     for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
-                        stack.push({ unit: currentUnidade.filhas[i], parentSigla: currentUnidade.sigla });
+                        stack.push({unit: currentUnidade.filhas[i], parentSigla: currentUnidade.sigla});
                     }
                 }
             }

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import {beforeEach, describe, expect, it, Mock, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {mapSituacaoProcesso, mapTipoProcesso, useProcessosStore} from '../processos'; // Importar as funções diretamente
 import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
@@ -591,7 +591,7 @@ describe('useProcessosStore', () => {
             expect(processosStore.subprocessos.filter(sp => sp.idProcesso === processoId).length).toBe(novasUnidades.length);
             expect(processosStore.subprocessos.some(sp => sp.idProcesso === processoId && sp.unidade === 'UNIDADE_A')).toBe(true);
             expect(processosStore.subprocessos.some(sp => sp.idProcesso === processoId && sp.unidade === 'UNIDADE_B')).toBe(true);
-            
+
             // Verificar se o total de subprocessos foi ajustado corretamente
             // Havia 2 subprocessos para o processo 1, agora há 2 novos. O total deve ser o mesmo.
             expect(processosStore.subprocessos.length).toBe(initialSubprocessosLength);
@@ -618,7 +618,6 @@ describe('useProcessosStore', () => {
             it('should process "aceitar" action for GESTOR, add movement and keep situation', async () => {
                 const subprocessoId = 4; // UNIDADE_GESTOR, situacao: "Cadastro disponibilizado"
                 const initialMovementsLength = processosStore.movements.length;
-                const _mockUnidadesStore = mockUnidadesStoreInstance; // Usar a instância global do mock
 
                 await processosStore.processarCadastroBloco({
                     idProcesso: 3,
@@ -628,9 +627,8 @@ describe('useProcessosStore', () => {
                 });
 
                 expect(processosStore.movements.length).toBe(initialMovementsLength + 1);
-                // expect(mockUnidadesStore.getUnidadeImediataSuperior).toHaveBeenCalledWith('UNIDADE_GESTOR'); // Removido
                 expect(processosStore.movements[initialMovementsLength].descricao).toBe('Cadastro de atividades e conhecimentos validado em bloco');
-                
+
                 const subprocessoAtualizado = processosStore.subprocessos.find(sp => sp.id === subprocessoId);
                 expect(subprocessoAtualizado?.situacao).toBe('Cadastro disponibilizado'); // Situação deve ser mantida
             });
@@ -638,7 +636,6 @@ describe('useProcessosStore', () => {
             it('should process "homologar" action for ADMIN, add movement and update situation', async () => {
                 const subprocessoId = 5; // UNIDADE_ADMIN, situacao: "Revisão do cadastro disponibilizada"
                 const initialMovementsLength = processosStore.movements.length;
-                const _mockNotificacoesStore = useNotificacoesStore(); // Get the mocked store instance
 
                 await processosStore.processarCadastroBloco({
                     idProcesso: 3,
@@ -649,14 +646,14 @@ describe('useProcessosStore', () => {
 
                 expect(processosStore.movements.length).toBe(initialMovementsLength + 1);
                 expect(processosStore.movements[initialMovementsLength].descricao).toBe('Cadastro de atividades e conhecimentos homologado em bloco');
-                
+
                 const subprocessoAtualizado = processosStore.subprocessos.find(sp => sp.id === subprocessoId);
                 expect(subprocessoAtualizado?.situacao).toBe('Revisão do cadastro homologada'); // Situação deve ser atualizada
             });
 
             it('should handle multiple units in a block process', async () => {
                 const initialMovementsLength = processosStore.movements.length;
-                
+
                 // Adicionar um subprocesso com situação "Cadastro disponibilizado" para o processo 3
                 processosStore.subprocessos.push(parsesubprocessoDates({
                     "id": 8, // Alterado de 6 para 8
@@ -683,7 +680,7 @@ describe('useProcessosStore', () => {
 
             it('should not process if subprocesso not found', async () => {
                 const initialMovementsLength = processosStore.movements.length;
-                
+
                 await processosStore.processarCadastroBloco({
                     idProcesso: 3,
                     unidades: ['UNIDADE_INEXISTENTE'],
@@ -720,6 +717,36 @@ describe('useProcessosStore', () => {
 
                 expect(processosStore.movements.length).toBe(initialMovementsLength); // Nenhuma movimentação adicionada
                 expect(processosStore.subprocessos.length).toBe(initialSubprocessosLength); // Nenhum subprocesso atualizado
+            });
+
+            it('should update situation to "Cadastro homologado" when homologating subprocesso without "Revisão" in situation', async () => {
+                // Adicionar um subprocesso com situação "Cadastro disponibilizado" (sem "Revisão")
+                processosStore.subprocessos.push(parsesubprocessoDates({
+                    "id": 8,
+                    "idProcesso": 3,
+                    "unidade": "UNIDADE_SEM_REVISAO",
+                    "dataLimiteEtapa1": "2025-08-01",
+                    "dataLimiteEtapa2": "2025-08-10",
+                    "situacao": "Cadastro disponibilizado", // Sem "Revisão"
+                    "unidadeAtual": "UNIDADE_SEM_REVISAO",
+                    "unidadeAnterior": null
+                }));
+
+                const subprocessoId = 8;
+                const initialMovementsLength = processosStore.movements.length;
+
+                await processosStore.processarCadastroBloco({
+                    idProcesso: 3,
+                    unidades: ['UNIDADE_SEM_REVISAO'],
+                    tipoAcao: 'homologar',
+                    unidadeUsuario: 'ADMIN'
+                });
+
+                expect(processosStore.movements.length).toBe(initialMovementsLength + 1);
+                expect(processosStore.movements[initialMovementsLength].descricao).toBe('Cadastro de atividades e conhecimentos homologado em bloco');
+
+                const subprocessoAtualizado = processosStore.subprocessos.find(sp => sp.id === subprocessoId);
+                expect(subprocessoAtualizado?.situacao).toBe('Cadastro homologado'); // Deve ser "Cadastro homologado" (sem "Revisão")
             });
         });
 
@@ -857,8 +884,8 @@ Mais informações no Sistema de Gestão de Competências.`
             });
 
             it('should reject if superior unit not found for GESTOR', async () => {
-                const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null); // Mockar a implementação para garantir que null seja retornado
+                // Mockar a implementação para garantir que null seja retornado
+                (mockUnidadesStoreInstance.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
 
                 await expect(processosStore.aceitarMapa({
                     idProcesso: 3,
@@ -975,8 +1002,7 @@ Mais informações no Sistema de Gestão de Competências.`
             });
 
             it('should reject if superior unit not found', async () => {
-                const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
+                (mockUnidadesStoreInstance.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
 
                 await expect(processosStore.apresentarSugestoes({
                     idProcesso: 3,
@@ -1018,8 +1044,7 @@ Mais informações no Sistema de Gestão de Competências.`
             });
 
             it('should reject if superior unit not found', async () => {
-                const mockUnidadesStore = mockUnidadesStoreInstance;
-                (mockUnidadesStore.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
+                (mockUnidadesStoreInstance.getUnidadeImediataSuperior as Mock).mockImplementationOnce(() => null);
 
                 await expect(processosStore.validarMapa({
                     idProcesso: 3,
@@ -1063,33 +1088,83 @@ Mais informações no Sistema de Gestão de Competências.`
             processosStore.getMovementsForSubprocesso(1);
 
             // Teste de actions
-            const novoProcesso = { id: 100, descricao: 'Teste', tipo: TipoProcesso.MAPEAMENTO, dataLimite: new Date(), situacao: SituacaoProcesso.CRIADO, dataFinalizacao: null };
+            const novoProcesso = {
+                id: 100,
+                descricao: 'Teste',
+                tipo: TipoProcesso.MAPEAMENTO,
+                dataLimite: new Date(),
+                situacao: SituacaoProcesso.CRIADO,
+                dataFinalizacao: null
+            };
             processosStore.adicionarProcesso(novoProcesso);
 
-            const novosSubprocessos = [{ id: 101, idProcesso: 100, unidade: 'TESTE', dataLimiteEtapa1: new Date(), dataLimiteEtapa2: new Date(), situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO, unidadeAtual: 'TESTE', unidadeAnterior: null, dataFimEtapa1: null, dataFimEtapa2: null, movimentacoes: [], analises: [] }];
+            const novosSubprocessos = [{
+                id: 101,
+                idProcesso: 100,
+                unidade: 'TESTE',
+                dataLimiteEtapa1: new Date(),
+                dataLimiteEtapa2: new Date(),
+                situacao: SITUACOES_SUBPROCESSO.NAO_INICIADO,
+                unidadeAtual: 'TESTE',
+                unidadeAnterior: null,
+                dataFimEtapa1: null,
+                dataFimEtapa2: null,
+                movimentacoes: [],
+                analises: []
+            }];
             processosStore.adicionarsubprocessos(novosSubprocessos);
 
             processosStore.removerProcesso(100); // Remover o processo adicionado
 
-            processosStore.editarProcesso({ id: 1, descricao: 'Editado', tipo: TipoProcesso.REVISAO, dataLimite: new Date(), unidades: ['SESEL'] });
+            processosStore.editarProcesso({
+                id: 1,
+                descricao: 'Editado',
+                tipo: TipoProcesso.REVISAO,
+                dataLimite: new Date(),
+                unidades: ['SESEL']
+            });
 
             processosStore.finalizarProcesso(1);
 
-            await processosStore.processarCadastroBloco({ idProcesso: 3, unidades: ['UNIDADE_GESTOR'], tipoAcao: 'aceitar', unidadeUsuario: 'UNIDADE_GESTOR' });
-            await processosStore.processarCadastroBloco({ idProcesso: 3, unidades: ['UNIDADE_ADMIN'], tipoAcao: 'homologar', unidadeUsuario: 'ADMIN' });
+            await processosStore.processarCadastroBloco({
+                idProcesso: 3,
+                unidades: ['UNIDADE_GESTOR'],
+                tipoAcao: 'aceitar',
+                unidadeUsuario: 'UNIDADE_GESTOR'
+            });
+            await processosStore.processarCadastroBloco({
+                idProcesso: 3,
+                unidades: ['UNIDADE_ADMIN'],
+                tipoAcao: 'homologar',
+                unidadeUsuario: 'ADMIN'
+            });
 
-            await processosStore.alterarDataLimiteSubprocesso({ idProcesso: 1, unidade: 'SESEL', etapa: 1, novaDataLimite: new Date() });
+            await processosStore.alterarDataLimiteSubprocesso({
+                idProcesso: 1,
+                unidade: 'SESEL',
+                etapa: 1,
+                novaDataLimite: new Date()
+            });
 
-            await processosStore.aceitarMapa({ idProcesso: 3, unidade: 'UNIDADE_GESTOR', perfil: 'GESTOR' });
-            await processosStore.aceitarMapa({ idProcesso: 3, unidade: 'UNIDADE_ADMIN', perfil: 'ADMIN' });
+            await processosStore.aceitarMapa({idProcesso: 3, unidade: 'UNIDADE_GESTOR', perfil: 'GESTOR'});
+            await processosStore.aceitarMapa({idProcesso: 3, unidade: 'UNIDADE_ADMIN', perfil: 'ADMIN'});
 
-            await processosStore.rejeitarMapa({ idProcesso: 3, unidade: 'UNIDADE_COM_ANTERIOR' });
+            await processosStore.rejeitarMapa({idProcesso: 3, unidade: 'UNIDADE_COM_ANTERIOR'});
 
-            await processosStore.apresentarSugestoes({ idProcesso: 3, unidade: 'UNIDADE_GESTOR', sugestoes: 'Sugestoes de teste' });
+            await processosStore.apresentarSugestoes({
+                idProcesso: 3,
+                unidade: 'UNIDADE_GESTOR',
+                sugestoes: 'Sugestoes de teste'
+            });
 
-            await processosStore.validarMapa({ idProcesso: 3, unidade: 'UNIDADE_GESTOR' });
+            await processosStore.validarMapa({idProcesso: 3, unidade: 'UNIDADE_GESTOR'});
 
-            processosStore.addMovement({ idSubprocesso: 1, unidadeOrigem: 'A', unidadeDestino: 'B', descricao: 'Movimento de teste' });
+            processosStore.addMovement({
+                idSubprocesso: 1,
+                unidadeOrigem: 'A',
+                unidadeDestino: 'B',
+                descricao: 'Movimento de teste'
+            });
         });
     });
 });

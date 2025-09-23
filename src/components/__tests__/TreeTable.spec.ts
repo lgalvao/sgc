@@ -156,4 +156,93 @@ describe('TreeTable.vue', () => {
         const treeRow = wrapper.findComponent(TreeRow);
         expect(treeRow.props().item.expanded).toBe(false);
     });
+
+    it('deve encontrar item existente usando findItemById', async () => {
+        const dataWithNestedChildren = [
+            {
+                id: 1, nome: 'Item 1', expanded: false, children: [
+                    {id: 11, nome: 'SubItem 1.1', expanded: false, children: [
+                        {id: 111, nome: 'SubSubItem 1.1.1', expanded: false}
+                    ]},
+                    {id: 12, nome: 'SubItem 1.2', expanded: false},
+                ]
+            },
+            {id: 2, nome: 'Item 2', expanded: false},
+        ];
+        const wrapper = mount(TreeTable, {
+            props: {data: dataWithNestedChildren, columns: mockColumns},
+            global: {stubs: {TreeRow: mockTreeRow}},
+        });
+
+        // Testar encontrar item de nível superior
+        const vm = wrapper.vm as any;
+        const foundItem = vm.findItemById(dataWithNestedChildren, 1);
+        expect(foundItem).toBeTruthy();
+        expect(foundItem?.nome).toBe('Item 1');
+
+        // Testar encontrar item aninhado
+        const foundNestedItem = vm.findItemById(dataWithNestedChildren, 111);
+        expect(foundNestedItem).toBeTruthy();
+        expect(foundNestedItem?.nome).toBe('SubSubItem 1.1.1');
+    });
+
+    it('deve retornar null quando item não encontrado usando findItemById', async () => {
+        const mockData = [
+            {id: 1, nome: 'Item 1'},
+            {id: 2, nome: 'Item 2'},
+        ];
+        const wrapper = mount(TreeTable, {
+            props: {data: mockData, columns: mockColumns},
+            global: {stubs: {TreeRow: mockTreeRow}},
+        });
+
+        const vm = wrapper.vm as any;
+        const notFoundItem = vm.findItemById(mockData, 999);
+        expect(notFoundItem).toBeNull();
+    });
+
+    it('deve alternar expansão de item usando toggleExpand', async () => {
+        const dataWithChildren = [
+            {
+                id: 1, nome: 'Item 1', expanded: false, children: [
+                    {id: 11, nome: 'SubItem 1.1'},
+                ]
+            },
+        ];
+        const wrapper = mount(TreeTable, {
+            props: {data: dataWithChildren, columns: mockColumns},
+            global: {stubs: {TreeRow: mockTreeRow}},
+        });
+
+        const vm = wrapper.vm as any;
+
+        // Verificar estado inicial do internalData
+        expect(vm.internalData[0].expanded).toBe(false);
+
+        // Alternar para expandido
+        vm.toggleExpand(1);
+        expect(vm.internalData[0].expanded).toBe(true);
+
+        // Alternar para colapsado
+        vm.toggleExpand(1);
+        expect(vm.internalData[0].expanded).toBe(false);
+    });
+
+    it('não deve fazer nada ao tentar alternar item inexistente usando toggleExpand', async () => {
+        const mockData = [
+            {id: 1, nome: 'Item 1', expanded: false},
+        ];
+        const wrapper = mount(TreeTable, {
+            props: {data: mockData, columns: mockColumns},
+            global: {stubs: {TreeRow: mockTreeRow}},
+        });
+
+        const vm = wrapper.vm as any;
+
+        // Tentar alternar item inexistente
+        vm.toggleExpand(999);
+
+        // Verificar que não quebrou e manteve estado
+        expect(mockData[0].expanded).toBe(false);
+    });
 });

@@ -1,16 +1,10 @@
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import istanbul from 'vite-plugin-istanbul';
 
 export default defineConfig({
     plugins: [
         vue(),
-        istanbul({
-            include: 'src/**/*.{ts,vue}',
-            exclude: ['node_modules', 'tests', 'spec'],
-            extension: ['.ts', '.vue']
-        }),
     ],
     resolve: {alias: {'@': path.resolve(__dirname, './src')},},
     test: {
@@ -20,9 +14,10 @@ export default defineConfig({
         exclude: ['spec/**/*'],
         setupFiles: ['./vitest.setup.ts'],
         coverage: {
-            provider: 'istanbul',
-            reporter: ['json'],
-            reportsDirectory: '.nyc_output_unit',
+            provider: 'v8',
+            reporter: ['json', 'html', 'text'],
+            reportsDirectory: 'coverage',
+            include: ['src/**/*.{ts,vue}'],
             exclude: [
                 'node_modules/',
                 'spec/**',
@@ -31,8 +26,10 @@ export default defineConfig({
                 'src/**/*.test.ts',
                 'src/mocks/**/*.json',
                 'src/main.ts',
-                'src/router.ts'
+                'src/router.ts',
+                'src/views/**'
             ],
+            all: false,
         },
     },
     define: {

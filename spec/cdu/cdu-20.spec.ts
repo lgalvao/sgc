@@ -32,25 +32,16 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
             await esperarElementoVisivel(page, 'modal-devolucao');
             await expect(page.getByTestId('modal-devolucao-title')).toHaveText('Devolução');
             await expect(page.getByTestId('modal-devolucao-body')).toContainText('Confirma a devolução da validação do mapa para ajustes?');
-
             await page.getByTestId('observacao-devolucao-textarea').fill('Necessário revisar competências');
-
             await page.getByTestId('modal-devolucao-confirmar').click();
-
-            await page.waitForTimeout(1000);
         });
 
         test('deve permitir registrar aceite', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-
             await page.getByTestId('registrar-aceite-btn').click();
-
             const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
             await expect(modal).toBeVisible();
-
             await page.getByTestId('modal-aceite-confirmar').click();
-
-            await page.waitForTimeout(1000);
         });
 
         test('deve cancelar devolução', async ({page}) => {

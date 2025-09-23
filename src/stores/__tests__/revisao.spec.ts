@@ -1,6 +1,15 @@
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {TipoMudanca, useRevisaoStore} from '../revisao';
+
+// Mock the mapas store before importing the revisao store
+const mockMapasStore = {
+    getMapaByUnidadeId: vi.fn()
+};
+
+vi.mock('../mapas', () => ({
+    useMapasStore: vi.fn(() => mockMapasStore),
+}));
 
 describe('useRevisaoStore', () => {
     let revisaoStore: ReturnType<typeof useRevisaoStore>;
@@ -98,6 +107,83 @@ describe('useRevisaoStore', () => {
 
             expect(revisaoStore.mudancasRegistradas).toEqual([]);
             // mudancasParaImpacto is not cleared by limparMudancas
+        });
+    });
+
+    describe('obterIdsCompetenciasImpactadas', () => {
+        it('should return IDs of competencies that have the activity associated', () => {
+            // Configure the mock behavior
+            mockMapasStore.getMapaByUnidadeId.mockImplementation((unidadeId: string, idProcesso: number) => {
+                if (unidadeId === 'SESEL' && idProcesso === 1) {
+                    return {
+                        id: 1,
+                        unidade: 'SESEL',
+                        idProcesso: 1,
+                        situacao: 'em_andamento',
+                        competencias: [
+                            { id: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
+                            { id: 2, descricao: 'Competência 2', atividadesAssociadas: [30] },
+                            { id: 3, descricao: 'Competência 3', atividadesAssociadas: [10, 40] }
+                        ],
+                        dataCriacao: new Date(),
+                        dataDisponibilizacao: null,
+                        dataFinalizacao: null
+                    };
+                }
+                return undefined;
+            });
+
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+
+            expect(idsImpactados).toEqual([1, 3]); // Competências 1 e 3 têm a atividade 10 associada
+        });
+
+        it('should return empty array when no map is found for the unit and process', () => {
+            // Configure the mock to return undefined
+            mockMapasStore.getMapaByUnidadeId.mockReturnValue(undefined);
+
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'NONEXISTENT', 999);
+
+            expect(idsImpactados).toEqual([]);
+        });
+
+        it('should return empty array when map exists but no competencies have the activity associated', () => {
+            // Configure the mock to return a map with competencies that don't have the activity
+            mockMapasStore.getMapaByUnidadeId.mockReturnValue({
+                id: 1,
+                unidade: 'SESEL',
+                idProcesso: 1,
+                situacao: 'em_andamento',
+                competencias: [
+                    { id: 1, descricao: 'Competência 1', atividadesAssociadas: [20, 30] },
+                    { id: 2, descricao: 'Competência 2', atividadesAssociadas: [40] }
+                ],
+                dataCriacao: new Date(),
+                dataDisponibilizacao: null,
+                dataFinalizacao: null
+            });
+
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+
+            expect(idsImpactados).toEqual([]); // Nenhuma competência tem a atividade 10 associada
+        });
+
+        it('should return empty array when map exists but has no competencies', () => {
+            // Configure the mock to return a map with no competencies
+            mockMapasStore.getMapaByUnidadeId.mockReturnValue({
+                id: 1,
+                unidade: 'SESEL',
+                idProcesso: 1,
+                situacao: 'em_andamento',
+                competencias: [],
+                dataCriacao: new Date(),
+                dataDisponibilizacao: null,
+                dataFinalizacao: null
+            });
+
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+
+            expect(idsImpactados).toEqual([]);
         });
     });
 

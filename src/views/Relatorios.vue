@@ -114,6 +114,8 @@
     <div
       id="modalMapasVigentes"
       class="modal fade"
+      :class="{ show: mostrarModalMapasVigentes }"
+      :style="{ display: mostrarModalMapasVigentes ? 'block' : 'none' }"
       tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
@@ -125,7 +127,7 @@
             <button
               type="button"
               class="btn-close"
-              data-bs-dismiss="modal"
+              @click="mostrarModalMapasVigentes = false"
             />
           </div>
           <div class="modal-body">
@@ -172,6 +174,8 @@
     <div
       id="modalDiagnosticosGaps"
       class="modal fade"
+      :class="{ show: mostrarModalDiagnosticosGaps }"
+      :style="{ display: mostrarModalDiagnosticosGaps ? 'block' : 'none' }"
       tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
@@ -183,7 +187,7 @@
             <button
               type="button"
               class="btn-close"
-              data-bs-dismiss="modal"
+              @click="mostrarModalDiagnosticosGaps = false"
             />
           </div>
           <div class="modal-body">
@@ -244,6 +248,8 @@
     <div
       id="modalAndamentoGeral"
       class="modal fade"
+      :class="{ show: mostrarModalAndamentoGeral }"
+      :style="{ display: mostrarModalAndamentoGeral ? 'block' : 'none' }"
       tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
@@ -255,7 +261,7 @@
             <button
               type="button"
               class="btn-close"
-              data-bs-dismiss="modal"
+              @click="mostrarModalAndamentoGeral = false"
             />
           </div>
           <div class="modal-body">
@@ -310,6 +316,9 @@ import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 import {formatDateBR} from '@/utils'
 
+// Definição de tipo para os dados do CSV
+type CSVData = Record<string, string | number | undefined>;
+
 // Stores
 const processosStore = useProcessosStore()
 const mapasStore = useMapasStore()
@@ -319,6 +328,11 @@ const mapasStore = useMapasStore()
 const filtroTipo = ref('')
 const filtroDataInicio = ref('')
 const filtroDataFim = ref('')
+
+// Refs para controle dos modais
+const mostrarModalMapasVigentes = ref(false)
+const mostrarModalDiagnosticosGaps = ref(false)
+const mostrarModalAndamentoGeral = ref(false)
 
 // Dados computados
 const processosFiltrados = computed(() => {
@@ -457,43 +471,16 @@ const calcularPercentualConcluido = (idProcesso: number) => {
 }
 
 const abrirModalMapasVigentes = () => {
-  try {
-    const element = document.getElementById('modalMapasVigentes')
-    const bootstrapWindow = window as BootstrapWindow;
-    if (element && bootstrapWindow.bootstrap?.Modal) {
-      const modal = new bootstrapWindow.bootstrap.Modal(element)
-      modal.show()
-    }
-  } catch (error) {
-    console.error('Erro ao abrir modal de mapas vigentes:', error)
-  }
+  mostrarModalMapasVigentes.value = true;
 }
-
 const abrirModalDiagnosticosGaps = () => {
-  try {
-    const element = document.getElementById('modalDiagnosticosGaps')
-    const bootstrapWindow = window as BootstrapWindow;
-    if (element && bootstrapWindow.bootstrap?.Modal) {
-      const modal = new bootstrapWindow.bootstrap.Modal(element)
-      modal.show()
-    }
-  } catch (error) {
-    console.error('Erro ao abrir modal de diagnósticos de gaps:', error)
-  }
+  mostrarModalDiagnosticosGaps.value = true;
+}
+const abrirModalAndamentoGeral = () => {
+  mostrarModalAndamentoGeral.value = true;
 }
 
-const abrirModalAndamentoGeral = () => {
-  try {
-    const element = document.getElementById('modalAndamentoGeral')
-    const bootstrapWindow = window as BootstrapWindow;
-    if (element && bootstrapWindow.bootstrap?.Modal) {
-      const modal = new bootstrapWindow.bootstrap.Modal(element)
-      modal.show()
-    }
-  } catch (error) {
-    console.error('Erro ao abrir modal de andamento geral:', error)
-  }
-}
+
 
 const exportarMapasVigentes = () => {
   const dados = mapasVigentes.value.map(mapa => ({

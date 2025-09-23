@@ -63,13 +63,13 @@ A nova estrutura centralizará tudo relacionado aos testes E2E em um único dire
     **Mude esta linha:**
     ```typescript
     // Linha a ser alterada (o valor pode ser './spec' ou 'spec/')
-    testDir: './spec',
+    testDir: './spec'
     ```
 
     **Para esta:**
     ```typescript
     // Novo valor
-    testDir: './e2e',
+    testDir: './e2e'
     ```
 
 6.  **Verificação Final:** Rode a suíte de testes E2E para garantir que a nova configuração está funcionando corretamente.

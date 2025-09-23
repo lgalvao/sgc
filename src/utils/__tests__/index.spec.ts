@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {
     badgeClass,
     diffInDays,
+    ensureValidDate,
     formatDateBR,
     formatDateForInput,
     formatDateTimeBR,
@@ -163,6 +164,38 @@ describe('utils', () => {
             const date1 = new Date(2024, 0, 1);
             const date2 = new Date(2024, 0, 1);
             expect(diffInDays(date1, date2)).toBe(0);
+        });
+    });
+
+    describe('ensureValidDate', () => {
+        it('should return null for null or undefined', () => {
+            expect(ensureValidDate(null)).toBeNull();
+            expect(ensureValidDate(undefined)).toBeNull();
+        });
+
+        it('should return valid Date object for valid Date', () => {
+            const validDate = new Date(2024, 2, 15);
+            const result = ensureValidDate(validDate);
+            expect(result).toBe(validDate);
+        });
+
+        it('should return null for invalid Date object', () => {
+            const invalidDate = new Date('invalid');
+            expect(ensureValidDate(invalidDate)).toBeNull();
+        });
+
+        it('should return null for Date with NaN time', () => {
+            const nanDate = new Date(NaN);
+            expect(ensureValidDate(nanDate)).toBeNull();
+        });
+
+        it('should handle Date objects with valid time but invalid components', () => {
+            // Create a date that would be invalid (like February 30th)
+            // JavaScript automatically corrects this to March 1st, so this test validates the corrected behavior
+            const edgeCaseDate = new Date(2024, 1, 30); // February 30th becomes March 1st
+            expect(ensureValidDate(edgeCaseDate)).toBeInstanceOf(Date);
+            expect(ensureValidDate(edgeCaseDate)?.getMonth()).toBe(2); // March
+            expect(ensureValidDate(edgeCaseDate)?.getDate()).toBe(1); // 1st
         });
     });
 });

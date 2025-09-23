@@ -61,6 +61,39 @@ describe('SubprocessoCards.vue', () => {
     });
   });
 
+  describe('handleMapaClick function', () => {
+    it('should emit navegarParaMapa when handleMapaClick is called', async () => {
+      const wrapper = mountComponent({
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        mapa: null,
+        situacao: 'Mapa em andamento'
+      });
+
+        await wrapper.find('[data-testid="mapa-card"]').trigger('click');
+
+      expect(wrapper.emitted()).toHaveProperty('navegarParaMapa');
+      expect(wrapper.emitted('navegarParaMapa')).toHaveLength(1);
+    });
+
+    it('should handle mapa click for different process types', async () => {
+      const testCases = [
+        { tipoProcesso: TipoProcesso.MAPEAMENTO, expectedEmits: 1 },
+        { tipoProcesso: TipoProcesso.REVISAO, expectedEmits: 1 }
+      ];
+
+      for (const { tipoProcesso, expectedEmits } of testCases) {
+        const wrapper = mountComponent({
+          tipoProcesso,
+          mapa: { id: 1, unidade: 'TEST', situacao: 'em_andamento', idProcesso: 1, competencias: [], dataCriacao: new Date(), dataDisponibilizacao: null, dataFinalizacao: null },
+          situacao: 'Mapa em andamento'
+        });
+
+        await wrapper.find('[data-testid="mapa-card"]').trigger('click');
+        expect(wrapper.emitted('navegarParaMapa')).toHaveLength(expectedEmits);
+      }
+    });
+  });
+
   describe('mapa card states', () => {
     it('should disable mapa card when mapa is null', () => {
       const wrapper = mountComponent({
@@ -132,6 +165,26 @@ describe('SubprocessoCards.vue', () => {
 
       expect(wrapper.text()).toContain('Disponibilizado');
       expect(wrapper.find('.badge.bg-success').exists()).toBe(true);
+    });
+
+    it('should show custom situacao badge when situacao has a custom value', () => {
+      const wrapper = mountComponent({
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
+        situacao: 'Custom Status'
+      });
+
+      expect(wrapper.text()).toContain('Custom Status');
+      expect(wrapper.find('.badge.bg-secondary').exists()).toBe(true);
     });
   });
 
@@ -274,6 +327,48 @@ describe('SubprocessoCards.vue', () => {
       const mapaCard = wrapper.findAll('.card')[1];
       // Empty object is truthy, so card should not be disabled
       expect(mapaCard.classes()).not.toContain('disabled-card');
+    });
+
+    it('should handle undefined situacao prop', () => {
+      const wrapper = mountComponent({
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          }
+        // situacao is undefined
+      });
+
+      // Should show default "Disponibilizado" badge when situacao is undefined
+      expect(wrapper.text()).toContain('Disponibilizado');
+      expect(wrapper.find('.badge.bg-secondary').exists()).toBe(true);
+    });
+
+    it('should handle empty string situacao', () => {
+      const wrapper = mountComponent({
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+          mapa: {
+              id: 1,
+              unidade: 'UNID_TESTE',
+              situacao: 'em_andamento',
+              idProcesso: 1,
+              competencias: [],
+              dataCriacao: new Date(),
+              dataDisponibilizacao: null,
+              dataFinalizacao: null,
+          },
+        situacao: '' // Empty string
+      });
+
+      // Should show default "Disponibilizado" badge when situacao is empty string
+      expect(wrapper.text()).toContain('Disponibilizado');
+      expect(wrapper.find('.badge.bg-secondary').exists()).toBe(true);
     });
   });
 });

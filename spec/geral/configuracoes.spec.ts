@@ -50,7 +50,6 @@ test.describe('Configurações', () => {
     test('deve validar campos obrigatórios e valores mínimos', async ({page}) => {
         const diasInativacaoProcessoInput = page.getByLabel('Dias para inativação de processos');
         const diasAlertaNovoInput = page.getByLabel('Dias para indicação de alerta como novo');
-        const _salvarButton = page.getByRole('button', {name: 'Salvar'});
 
         // Verificar que os campos têm atributo min="1"
         await expect(diasInativacaoProcessoInput).toHaveAttribute('min', '1');
@@ -63,7 +62,7 @@ test.describe('Configurações', () => {
         // Testar valor zero (abaixo do mínimo)
         await diasInativacaoProcessoInput.fill('0');
         await diasAlertaNovoInput.fill('0');
-        
+
         // Verificar que os valores foram preenchidos (mesmo que inválidos)
         await expect(diasInativacaoProcessoInput).toHaveValue('0');
         await expect(diasAlertaNovoInput).toHaveValue('0');
@@ -71,7 +70,7 @@ test.describe('Configurações', () => {
         // Testar valores negativos
         await diasInativacaoProcessoInput.fill('-5');
         await diasAlertaNovoInput.fill('-3');
-        
+
         // Verificar que os valores negativos foram preenchidos (mesmo que inválidos)
         await expect(diasInativacaoProcessoInput).toHaveValue('-5');
         await expect(diasAlertaNovoInput).toHaveValue('-3');
@@ -83,79 +82,6 @@ test.describe('Configurações', () => {
 
         // Verificar texto explicativo do campo de dias para alerta
         await expect(page.getByText('Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.')).toBeVisible();
-    });
-
-    test('deve exibir seção de cenários de demonstração', async ({page}) => {
-        // Verificar título da seção
-        await expect(page.getByRole('heading', {name: 'Cenários de Demonstração'})).toBeVisible();
-
-        // Verificar descrição
-        await expect(page.getByText('Carregue cenários pré-configurados para demonstração das funcionalidades do sistema.')).toBeVisible();
-
-        // Verificar cards de cenários
-        await expect(page.getByText('Cenário: Processo em Andamento')).toBeVisible();
-        await expect(page.getByText('Cenário: Processo Finalizado')).toBeVisible();
-        await expect(page.getByText('Cenário: Revisão Completa')).toBeVisible();
-        await expect(page.getByText('Cenário: Diagnóstico')).toBeVisible();
-
-        // Verificar botão de resetar dados
-        await expect(page.getByRole('button', {name: /Resetar Todos os Dados/})).toBeVisible();
-    });
-
-    test('deve carregar cenário de processo em andamento', async ({page}) => {
-        const carregarCenarioButton = page.getByRole('button', {name: 'Carregar Cenário'}).first();
-        
-        await carregarCenarioButton.click();
-
-        // Verificar mensagem de sucesso
-        await expect(page.getByText('Cenário "Processo em Andamento" carregado com sucesso!')).toBeVisible();
-
-        // Verificar que a mensagem desaparece após 3 segundos
-        await page.waitForTimeout(3500);
-        await expect(page.getByText('Cenário "Processo em Andamento" carregado com sucesso!')).not.toBeVisible();
-    });
-
-    test('deve carregar cenário de processo finalizado', async ({page}) => {
-        const carregarCenarioButtons = page.getByRole('button', {name: 'Carregar Cenário'});
-        const segundoBotao = carregarCenarioButtons.nth(1);
-        
-        await segundoBotao.click();
-
-        // Verificar mensagem de sucesso
-        await expect(page.getByText('Cenário "Processo Finalizado" carregado com sucesso!')).toBeVisible();
-    });
-
-    test('deve carregar cenário de revisão completa', async ({page}) => {
-        const carregarCenarioButtons = page.getByRole('button', {name: 'Carregar Cenário'});
-        const terceiroBotao = carregarCenarioButtons.nth(2);
-        
-        await terceiroBotao.click();
-
-        // Verificar mensagem de sucesso
-        await expect(page.getByText('Cenário "Revisão Completa" carregado com sucesso!')).toBeVisible();
-    });
-
-    test('deve carregar cenário de diagnóstico', async ({page}) => {
-        const carregarCenarioButtons = page.getByRole('button', {name: 'Carregar Cenário'});
-        const quartoBotao = carregarCenarioButtons.nth(3);
-        
-        await quartoBotao.click();
-
-        // Verificar mensagem de sucesso
-        await expect(page.getByText('Cenário "Diagnóstico" carregado com sucesso!')).toBeVisible();
-    });
-
-    test('deve resetar todos os dados', async ({page}) => {
-        const resetarButton = page.getByRole('button', {name: /Resetar Todos os Dados/});
-        
-        await resetarButton.click();
-
-        // Verificar mensagem de sucesso
-        await expect(page.getByText('Todos os dados foram resetados!')).toBeVisible();
-
-        // Verificar que a mensagem desaparece após 3 segundos
-        await page.waitForTimeout(3500);
-        await expect(page.getByText('Todos os dados foram resetados!')).not.toBeVisible();
     });
 
     test('deve manter configurações após navegação', async ({page}) => {

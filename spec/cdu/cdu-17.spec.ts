@@ -83,10 +83,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
         const btnDisponibilizar = page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
         await expect(btnDisponibilizar).toBeEnabled();
-
         await btnDisponibilizar.click();
-
-        await page.waitForTimeout(2000);
     });
 
     test('deve cancelar disponibilização', async ({page}) => {

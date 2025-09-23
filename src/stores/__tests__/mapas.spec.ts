@@ -150,5 +150,62 @@ describe('useMapasStore', () => {
             mapasStore.editarMapa(999, novosDados);
             expect(mapasStore.mapas).toEqual(initialMapas);
         });
+
+        it('definirMapaComoVigente should set the specified map as vigente and demote existing vigente maps', () => {
+            // Add a map that is already vigente
+            const mapaVigente: Mapa = {
+                id: 3,
+                unidade: 'SESEL',
+                idProcesso: 3,
+                situacao: 'vigente',
+                competencias: [],
+                dataCriacao: new Date('2025-01-01'),
+                dataDisponibilizacao: new Date('2025-01-02'),
+                dataFinalizacao: new Date('2025-01-03')
+            };
+            mapasStore.adicionarMapa(mapaVigente);
+
+            // Verify initial state
+            const mapaVigenteInicial = mapasStore.getMapaByUnidadeId('SESEL', 3);
+            expect(mapaVigenteInicial?.situacao).toBe('vigente');
+
+            // Call definirMapaComoVigente
+            mapasStore.definirMapaComoVigente('SESEL', 1);
+
+            // Check that the previous vigente map was demoted to disponibilizado
+            const mapaDemoted = mapasStore.getMapaByUnidadeId('SESEL', 3);
+            expect(mapaDemoted?.situacao).toBe('disponibilizado');
+
+            // Check that the new map is now vigente
+            const mapaNovoVigente = mapasStore.getMapaByUnidadeId('SESEL', 1);
+            expect(mapaNovoVigente?.situacao).toBe('vigente');
+            expect(mapaNovoVigente?.dataFinalizacao).toBeInstanceOf(Date);
+        });
+
+        it('definirMapaComoVigente should handle case when no previous vigente map exists', () => {
+            // SESEL has an 'em_andamento' map, not 'vigente'
+            const mapaEmAndamento = mapasStore.getMapaByUnidadeId('SESEL', 1);
+            expect(mapaEmAndamento?.situacao).toBe('em_andamento');
+
+            // Call definirMapaComoVigente
+            mapasStore.definirMapaComoVigente('SESEL', 1);
+
+            // Check that the map is now vigente
+            const mapaAgoraVigente = mapasStore.getMapaByUnidadeId('SESEL', 1);
+            expect(mapaAgoraVigente?.situacao).toBe('vigente');
+            expect(mapaAgoraVigente?.dataFinalizacao).toBeInstanceOf(Date);
+        });
+
+        it('definirMapaComoVigente should not change state if map not found', () => {
+            const initialMapas = [...mapasStore.mapas];
+            const initialSituacao = mapasStore.getMapaByUnidadeId('SESEL', 1)?.situacao;
+
+            mapasStore.definirMapaComoVigente('NONEXISTENT', 999);
+
+            // State should remain unchanged
+            expect(mapasStore.mapas).toEqual(initialMapas);
+            const mapaInalterado = mapasStore.getMapaByUnidadeId('SESEL', 1);
+            expect(mapaInalterado?.situacao).toBe(initialSituacao);
+        });
     });
 });

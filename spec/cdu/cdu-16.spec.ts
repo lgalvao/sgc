@@ -115,7 +115,5 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
     await page.locator('#dataLimite').fill('2025-12-31');
     await page.locator('#observacoes').fill('Mapa ajustado conforme revisão');
     await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', { name: TEXTOS.DISPONIBILIZAR }).click();
-    
-    await page.waitForTimeout(2000);
   });
 });

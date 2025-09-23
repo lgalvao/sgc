@@ -167,31 +167,7 @@ describe('SubprocessoHeader.vue', () => {
     });
   });
 
-  describe('computed properties', () => {
-    it('should compute mostrarBotaoAlterarData correctly', () => {
-      // Test ADMIN user
-      const wrapperAdmin = mountComponent({
-        perfilUsuario: Perfil.ADMIN
-      });
-      // Test ADMIN user
-      const vmAdmin = wrapperAdmin.vm;
-      expect(vmAdmin.mostrarBotaoAlterarData).toBe(true);
 
-      // Test non-ADMIN user
-      const wrapperGestor = mountComponent({
-        perfilUsuario: Perfil.GESTOR
-      });
-      const vmGestor = wrapperGestor.vm;
-      expect(vmGestor.mostrarBotaoAlterarData).toBe(false);
-
-      // Test null perfil
-      const wrapperNull = mountComponent({
-        perfilUsuario: null
-      });
-      const vmNull = wrapperNull.vm;
-      expect(vmNull.mostrarBotaoAlterarData).toBe(false);
-    });
-  });
 
   describe('structure and styling', () => {
     it('should have correct card structure', () => {

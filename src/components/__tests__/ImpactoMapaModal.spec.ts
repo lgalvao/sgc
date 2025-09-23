@@ -268,4 +268,120 @@ describe('ImpactoMapaModal.vue', () => {
     await wrapper.find('.btn-close').trigger('click');
     expect(wrapper.emitted('fechar')).toHaveLength(1);
   });
+
+  it('exibe atividades alteradas corretamente', async () => {
+    mockRevisaoStore.mudancasParaImpacto = [
+      {
+        id: 5,
+        tipo: TipoMudanca.AtividadeAlterada,
+        descricaoAtividade: 'Atividade Alterada',
+        idAtividade: 10,
+        valorAntigo: 'Valor Anterior',
+        valorNovo: 'Valor Novo',
+        competenciasImpactadasIds: [],
+      },
+    ];
+
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 100,
+        siglaUnidade: 'UNID1',
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.html()).toContain('Atividade alterada: <strong>Atividade Alterada</strong>');
+    expect(wrapper.html()).toContain('De "Valor Anterior" para "Valor Novo"');
+  });
+
+  it('exibe conhecimentos alterados corretamente', async () => {
+    mockRevisaoStore.mudancasParaImpacto = [
+      {
+        id: 6,
+        tipo: TipoMudanca.ConhecimentoAlterado,
+        descricaoConhecimento: 'Conhecimento Alterado',
+        idAtividade: 10,
+        valorAntigo: 'Valor Anterior',
+        valorNovo: 'Valor Novo',
+        competenciasImpactadasIds: [],
+      },
+    ];
+
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 100,
+        siglaUnidade: 'UNID1',
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.html()).toContain('Conhecimento alterado: <strong>Conhecimento Alterado</strong>');
+    expect(wrapper.html()).toContain('De "Valor Anterior" para "Valor Novo"');
+  });
+
+  it('exibe competências impactadas por IDs explícitos', async () => {
+    mockRevisaoStore.mudancasParaImpacto = [
+      {
+        id: 7,
+        tipo: TipoMudanca.AtividadeRemovida,
+        descricaoAtividade: 'Atividade Removida',
+        idAtividade: 10,
+        competenciasImpactadasIds: [1], // Explicitamente marca competência 1 como impactada
+      },
+    ];
+
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 100,
+        siglaUnidade: 'UNID1',
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.html()).toContain('Competencia 1');
+    expect(wrapper.html()).toContain('Atividade removida: <strong>Atividade Removida</strong>');
+  });
+
+  it('retorna mapa vazio quando não há mapa para a unidade/processo', async () => {
+    mockMapasStore.getMapaByUnidadeId.mockReturnValue(null);
+
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 100,
+        siglaUnidade: 'UNID1',
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    // Verificar que não há competências impactadas quando não há mapa
+    expect(wrapper.find('[data-testid="msg-nenhuma-competencia"]').exists()).toBe(true);
+  });
+
+  it('processa competências impactadas por atividades associadas', async () => {
+    mockRevisaoStore.mudancasParaImpacto = [
+      {
+        id: 8,
+        tipo: TipoMudanca.ConhecimentoAdicionado,
+        descricaoConhecimento: 'Novo Conhecimento',
+        idAtividade: 10, // Atividade 10 está associada à Competencia 1
+        competenciasImpactadasIds: [],
+      },
+    ];
+
+    const wrapper = mount(ImpactoMapaModal, {
+      props: {
+        mostrar: true,
+        idProcesso: 100,
+        siglaUnidade: 'UNID1',
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.html()).toContain('Competencia 1');
+    expect(wrapper.html()).toContain('Conhecimento adicionado: <strong>Novo Conhecimento</strong>');
+  });
 });

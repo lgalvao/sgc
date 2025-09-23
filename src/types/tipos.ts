@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 export enum Perfil {

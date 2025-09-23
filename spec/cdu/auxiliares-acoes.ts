@@ -83,8 +83,19 @@ export async function iniciarProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Cancela um modal
+ * Cancela um modal clicando no botão "Cancelar", "Fechar", ou em um botão de fechar genérico.
  */
 export async function cancelarModal(page: Page): Promise<void> {
-  await page.click(`button:has-text("${TEXTOS.CANCELAR}")`);
+  const modalVisivel = page.locator('.modal.show');
+  const botaoCancelar = modalVisivel.getByRole('button', { name: TEXTOS.CANCELAR });
+  const botaoFechar = modalVisivel.getByRole('button', { name: 'Fechar' });
+  const botaoDismiss = modalVisivel.locator('[data-bs-dismiss="modal"]');
+
+  if (await botaoCancelar.count() > 0) {
+    await botaoCancelar.last().click();
+  } else if (await botaoFechar.count() > 0) {
+    await botaoFechar.last().click();
+  } else {
+    await botaoDismiss.last().click();
+  }
 }

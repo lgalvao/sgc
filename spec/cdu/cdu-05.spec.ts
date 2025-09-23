@@ -1,7 +1,12 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {esperarMensagemErro, esperarMensagemSucesso, esperarUrl, loginComoAdmin} from './auxiliares-verificacoes';
-import {navegarParaCriacaoProcesso} from './auxiliares-verificacoes';
+import {
+    esperarMensagemErro,
+    esperarMensagemSucesso,
+    esperarUrl,
+    loginComoAdmin,
+    navegarParaCriacaoProcesso
+} from './auxiliares-verificacoes';
 import {cancelarModal, iniciarProcesso} from './auxiliares-acoes';
 import {SELETORES, TEXTOS, URLS} from './constantes-teste';
 

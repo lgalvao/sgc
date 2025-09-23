@@ -22,7 +22,7 @@ test.describe('Relatórios', () => {
         // Verificar filtro de tipo de processo
         await expect(page.getByLabel('Tipo de Processo')).toBeVisible();
         await expect(page.getByRole('combobox', {name: 'Tipo de Processo'})).toBeVisible();
-        
+
         // Verificar opções do filtro
         const tipoSelect = page.getByRole('combobox', {name: 'Tipo de Processo'});
         await expect(tipoSelect).toContainText('Todos');
@@ -43,7 +43,7 @@ test.describe('Relatórios', () => {
 
     test('deve aplicar filtros de tipo de processo', async ({page}) => {
         const tipoSelect = page.getByRole('combobox', {name: 'Tipo de Processo'});
-        
+
         // Selecionar tipo "Mapeamento"
         await tipoSelect.selectOption({label: 'Mapeamento'});
         await expect(tipoSelect).toHaveValue('Mapeamento');
@@ -83,10 +83,10 @@ test.describe('Relatórios', () => {
     test('deve exibir contadores nos cards de relatórios', async ({page}) => {
         // Verificar contador de mapas vigentes (pode ser 0 com mocks atuais)
         await expect(page.getByText(/mapas encontrados/)).toBeVisible();
-        
+
         // Verificar contador de diagnósticos de gaps (hardcoded 4)
         await expect(page.getByText(/diagnósticos encontrados/)).toBeVisible();
-        
+
         // Verificar contador de processos (13 com mocks)
         await expect(page.getByText(/processos encontrados/)).toBeVisible();
     });
@@ -95,97 +95,87 @@ test.describe('Relatórios', () => {
         const mapasVigentesCard = page.getByRole('heading', {name: 'Mapas Vigentes'}).locator('..');
         await mapasVigentesCard.click();
 
-        // Aguardar um pouco para o modal carregar
-        await page.waitForTimeout(1000);
-        
-        // Verificar se o modal está visível
         const modal = page.locator('#modalMapasVigentes');
-        if (await modal.isVisible()) {
-            // Verificar modal
-            await expect(page.getByText('Mapas Vigentes')).toBeVisible();
-            
-            // Verificar botão de exportar
-            await expect(page.getByTestId('export-csv-mapas')).toBeVisible();
-            
-            // Verificar tabela
-            await expect(page.getByRole('table')).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Unidade'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Processo'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Competências'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Data Criação'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
-        }
+        await modal.waitFor({ state: 'visible' });
+
+        // Verificar modal
+        await expect(modal.getByRole('heading', { name: 'Mapas Vigentes' })).toBeVisible();
+
+        // Verificar botão de exportar
+        await expect(page.getByTestId('export-csv-mapas')).toBeVisible();
+
+        // Verificar tabela
+        await modal.getByRole('table').waitFor({ state: 'visible' });
+        await modal.locator('thead').waitFor({ state: 'visible' });
+        await expect(modal.getByText('Unidade')).toBeVisible();
+        await expect(modal.locator('th:has-text("Processo")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Competências")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Data Criação")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Situação")')).toBeVisible();
     });
 
     test('deve abrir modal de diagnósticos de gaps', async ({page}) => {
         const diagnosticosCard = page.getByRole('heading', {name: 'Diagnósticos de Gaps'}).locator('..');
         await diagnosticosCard.click();
 
-        // Aguardar um pouco para o modal carregar
-        await page.waitForTimeout(1000);
-        
-        // Verificar se o modal está visível
         const modal = page.locator('#modalDiagnosticosGaps');
-        if (await modal.isVisible()) {
-            // Verificar modal
-            await expect(page.getByText('Diagnósticos de Gaps')).toBeVisible();
-            
-            // Verificar botão de exportar
-            await expect(page.getByTestId('export-csv-diagnosticos')).toBeVisible();
-            
-            // Verificar tabela
-            await expect(page.getByRole('table')).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Processo'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Unidade'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Gaps Identificados'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Importância Média'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Dominio Médio'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Competências Críticas'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Status'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Data Diagnóstico'})).toBeVisible();
-        }
+        await modal.waitFor({ state: 'visible' });
+
+        // Verificar modal
+        await expect(modal.getByRole('heading', { name: 'Diagnósticos de Gaps' })).toBeVisible();
+
+        // Verificar botão de exportar
+        await modal.getByRole('table').waitFor({ state: 'visible' });
+        await modal.locator('thead').waitFor({ state: 'visible' });
+        await expect(modal.getByRole('table')).toBeVisible();
+        await expect(modal.locator('th:has-text("Processo")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Unidade")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Gaps Identificados")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Importância Média")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Dominio Médio")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Competências Críticas")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Status")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Data Diagnóstico")')).toBeVisible();
     });
 
     test('deve abrir modal de andamento geral', async ({page}) => {
         const andamentoCard = page.getByRole('heading', {name: 'Andamento Geral'}).locator('..');
         await andamentoCard.click();
 
-        // Aguardar um pouco para o modal carregar
-        await page.waitForTimeout(1000);
-        
-        // Verificar se o modal está visível
         const modal = page.locator('#modalAndamentoGeral');
-        if (await modal.isVisible()) {
-            // Verificar modal
-            await expect(page.getByText('Andamento Geral dos Processos')).toBeVisible();
-            
-            // Verificar botão de exportar
-            await expect(page.getByTestId('export-csv-andamento')).toBeVisible();
-            
-            // Verificar tabela
-            await expect(page.getByRole('table')).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Descrição'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Tipo'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Data Limite'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: 'Unidades Participantes'})).toBeVisible();
-            await expect(page.getByRole('columnheader', {name: '% Concluído'})).toBeVisible();
-        }
+        await modal.waitFor({ state: 'visible' });
+
+        // Verificar modal
+        await expect(page.getByText('Andamento Geral dos Processos')).toBeVisible();
+
+        // Verificar botão de exportar
+        await expect(page.getByTestId('export-csv-andamento')).toBeVisible();
+
+        // Verificar tabela
+        await modal.getByRole('table').waitFor({ state: 'visible' });
+        await modal.locator('thead').waitFor({ state: 'visible' });
+        await expect(modal.getByRole('table')).toBeVisible();
+        await expect(modal.locator('th:has-text("Descrição")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Tipo")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Situação")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Data Limite")')).toBeVisible();
+        await expect(modal.locator('th:has-text("Unidades Participantes")')).toBeVisible();
+        await expect(modal.locator('th:has-text("% Concluído")')).toBeVisible();
     });
 
     test('deve fechar modais de relatórios', async ({page}) => {
         // Abrir modal de mapas vigentes
         const mapasVigentesCard = page.getByRole('heading', {name: 'Mapas Vigentes'}).locator('..');
         await mapasVigentesCard.click();
-        
+
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         // Verificar se o modal está visível
         const modal = page.locator('#modalMapasVigentes');
         if (await modal.isVisible()) {
             await expect(modal).toBeVisible();
-            
+
             // Fechar modal pelo botão X
             const fecharButton = page.locator('#modalMapasVigentes .btn-close');
             if (await fecharButton.isVisible()) {
@@ -201,18 +191,13 @@ test.describe('Relatórios', () => {
         await mapasVigentesCard.click();
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalMapasVigentes');
         if (await modal.isVisible()) {
             const exportarButton = page.getByTestId('export-csv-mapas');
-            
+
             if (await exportarButton.isVisible()) {
-                const _tableRows = page.locator('#modalMapasVigentes table tbody tr');
-    
                 await exportarButton.click();
-    
-                // Verificar que o download foi iniciado (não podemos verificar o arquivo diretamente)
-                // Mas podemos verificar que o botão foi clicado sem erro
                 await expect(exportarButton).toBeEnabled();
             }
         }
@@ -224,17 +209,13 @@ test.describe('Relatórios', () => {
         await diagnosticosCard.click();
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalDiagnosticosGaps');
         if (await modal.isVisible()) {
             const exportarButton = page.getByTestId('export-csv-diagnosticos');
-            
+
             if (await exportarButton.isVisible()) {
-                const _tableRows = page.locator('#modalDiagnosticosGaps table tbody tr');
-    
                 await exportarButton.click();
-    
-                // Verificar que o botão foi clicado sem erro
                 await expect(exportarButton).toBeEnabled();
             }
         }
@@ -246,17 +227,13 @@ test.describe('Relatórios', () => {
         await andamentoCard.click();
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalAndamentoGeral');
         if (await modal.isVisible()) {
             const exportarButton = page.getByTestId('export-csv-andamento');
-            
+
             if (await exportarButton.isVisible()) {
-                const _tableRows = page.locator('#modalAndamentoGeral table tbody tr');
-    
                 await exportarButton.click();
-    
-                // Verificar que o botão foi clicado sem erro
                 await expect(exportarButton).toBeEnabled();
             }
         }
@@ -268,7 +245,7 @@ test.describe('Relatórios', () => {
         await diagnosticosCard.click();
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalDiagnosticosGaps');
         if (await modal.isVisible()) {
             const table = page.locator('#modalDiagnosticosGaps table');
@@ -281,10 +258,9 @@ test.describe('Relatórios', () => {
             // Verificar se há dados na tabela (hardcoded 4)
             const tabela = page.getByRole('table');
             await expect(tabela).toBeVisible();
-            
+
             // Verificar se há linhas de dados
-            const linhas = tableRows;
-            const countLinhas = await linhas.count();
+            const countLinhas = await tableRows.count();
             expect(countLinhas).toBeGreaterThan(0); // Deve ter 4 linhas
         }
     });
@@ -296,16 +272,16 @@ test.describe('Relatórios', () => {
 
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalDiagnosticosGaps');
         if (await modal.isVisible()) {
             // Verificar se há badges de status (um por linha, 4 linhas)
             const badges = modal.locator('.badge');
             const countBadges = await badges.count();
-            
+
             if (countBadges > 0) {
                 expect(countBadges).toBe(4); // Uma badge por diagnóstico
-                
+
                 // Verificar classes dos badges
                 const primeiroBadge = badges.first();
                 const classes = await primeiroBadge.getAttribute('class');
@@ -334,14 +310,9 @@ test.describe('Relatórios', () => {
         await andamentoCard.click();
         // Aguardar um pouco para o modal carregar
         await page.waitForTimeout(1000);
-        
+
         const modal = page.locator('#modalAndamentoGeral');
         if (await modal.isVisible()) {
-            const _exportarButton = page.getByTestId('export-csv-andamento');
-
-            const _tableRows = page.locator('#modalAndamentoGeral table tbody tr');
-
-            // Verificar que o modal abre corretamente mesmo com filtros aplicados
             await expect(page.getByText('Andamento Geral dos Processos')).toBeVisible();
         }
     });
