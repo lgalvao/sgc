@@ -156,4 +156,79 @@ describe('TabelaProcessos.vue', () => {
     });
     expect(wrapperUndefined.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false);
   });
+
+  it('deve exibir indicadores de ordenação para diferentes critérios', () => {
+    // Teste para critério 'tipo'
+    const wrapperTipo = mount(TabelaProcessos, {
+      props: {
+        processos: [],
+        criterioOrdenacao: 'tipo',
+        direcaoOrdenacaoAsc: true,
+      },
+    });
+    expect(wrapperTipo.find('[data-testid="coluna-tipo"] span').text()).toBe('↑');
+
+    // Teste para critério 'unidades'
+    const wrapperUnidades = mount(TabelaProcessos, {
+      props: {
+        processos: [],
+        criterioOrdenacao: 'unidades',
+        direcaoOrdenacaoAsc: false,
+      },
+    });
+    expect(wrapperUnidades.find('[data-testid="coluna-unidades"] span').text()).toBe('↓');
+
+    // Teste para critério 'situacao'
+    const wrapperSituacao = mount(TabelaProcessos, {
+      props: {
+        processos: [],
+        criterioOrdenacao: 'situacao',
+        direcaoOrdenacaoAsc: true,
+      },
+    });
+    expect(wrapperSituacao.find('[data-testid="coluna-situacao"] span').text()).toBe('↑');
+  });
+
+  it('deve exibir indicadores de ordenação para dataFinalizacao quando showDataFinalizacao é true', () => {
+    const wrapper = mount(TabelaProcessos, {
+      props: {
+        processos: [],
+        criterioOrdenacao: 'dataFinalizacao',
+        direcaoOrdenacaoAsc: true,
+        showDataFinalizacao: true,
+      },
+    });
+
+    expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="coluna-data-finalizacao"] span').text()).toBe('↑');
+  });
+
+  it('deve exibir data de finalização formatada quando showDataFinalizacao é true', () => {
+    const wrapper = mount(TabelaProcessos, {
+      props: {
+        processos: mockProcessos,
+        criterioOrdenacao: 'descricao',
+        direcaoOrdenacaoAsc: true,
+        showDataFinalizacao: true,
+      },
+    });
+
+    const rows = wrapper.findAll('tbody tr');
+    // O segundo processo tem dataFinalizacaoFormatada
+    expect(rows[1].text()).toContain('26/08/2024');
+  });
+
+  it('deve emitir ordenar com dataFinalizacao quando showDataFinalizacao é true', async () => {
+    const wrapper = mount(TabelaProcessos, {
+      props: {
+        processos: [],
+        criterioOrdenacao: 'descricao',
+        direcaoOrdenacaoAsc: true,
+        showDataFinalizacao: true,
+      },
+    });
+
+    await wrapper.find('[data-testid="coluna-data-finalizacao"]').trigger('click');
+    expect(wrapper.emitted().ordenar).toEqual([['dataFinalizacao']]);
+  });
 });

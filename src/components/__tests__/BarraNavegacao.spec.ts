@@ -329,5 +329,52 @@ describe('BarraNavegacao.vue', () => {
             expect(breadcrumbItems[1].text()).toBe('Relatórios');
             expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
         });
+
+        it('não deve mostrar breadcrumbs quando a rota é painel', async () => {
+            await router.push('/painel');
+            const wrapper = await mountComponent();
+            // Breadcrumbs should not be rendered for painel route
+            expect(wrapper.find('[data-testid="breadcrumbs"]').exists()).toBe(false);
+        });
+
+
+        it('deve lidar com função breadcrumb que retorna string', async () => {
+            const customRoute = {
+                path: '/custom',
+                name: 'Custom',
+                component: {template: '<div>Custom</div>'},
+                meta: {breadcrumb: (route: RouteLocationNormalized) => 'Custom Page'}
+            };
+
+            router.addRoute(customRoute);
+            await router.push('/custom');
+            const wrapper = await mountComponent();
+
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(2);
+            expect(breadcrumbItems[1].text()).toBe('Custom Page');
+
+            router.removeRoute('Custom');
+        });
+
+        it('deve evitar duplicação de breadcrumbs quando currentPageLabel é igual ao último crumb', async () => {
+            // Criar uma rota onde o breadcrumb da meta seria igual ao último crumb
+            const duplicateRoute = {
+                path: '/processo/123',
+                name: 'Processo',
+                component: {template: '<div>Processo</div>'},
+                meta: {breadcrumb: 'Processo'} // Isso seria duplicado com o crumb de processo
+            };
+
+            router.addRoute(duplicateRoute);
+            await router.push('/processo/123');
+            const wrapper = await mountComponent();
+
+            // Verificar que não há duplicação
+            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
+            expect(breadcrumbItems.length).toBe(2); // Home + Processo (não duplicado)
+
+            router.removeRoute('Processo');
+        });
     });
 });

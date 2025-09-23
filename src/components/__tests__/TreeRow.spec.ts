@@ -85,5 +85,27 @@ describe('TreeRow.vue', () => {
         expect(wrapper.emitted()['row-click']).toBeUndefined();
     });
 
-    
+    it('deve exibir o ícone chevron-down quando item está expandido', () => {
+        const item = {id: 1, nome: 'Item 1', children: [{id: 2, nome: 'Child 1'}], expanded: true};
+        const columns = [{key: 'nome', label: 'Nome'}];
+        const wrapper = mount(TreeRow, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find('.toggle-icon').exists()).toBe(true);
+        expect(wrapper.find('.bi-chevron-down').exists()).toBe(true);
+        expect(wrapper.find('.bi-chevron-right').exists()).toBe(false);
+    });
+
+    it('deve exibir o ícone chevron-right quando item não está expandido', () => {
+        const item = {id: 1, nome: 'Item 1', children: [{id: 2, nome: 'Child 1'}], expanded: false};
+        const columns = [{key: 'nome', label: 'Nome'}];
+        const wrapper = mount(TreeRow, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find('.toggle-icon').exists()).toBe(true);
+        expect(wrapper.find('.bi-chevron-right').exists()).toBe(true);
+        expect(wrapper.find('.bi-chevron-down').exists()).toBe(false);
+    });
 });

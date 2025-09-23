@@ -195,11 +195,13 @@ describe('useProcessosStore', () => {
         dataFimEtapa1?: string | null,
         dataFimEtapa2?: string | null,
         situacao: string,
-        unidadeAtual: string,
-        unidadeAnterior: string | null
+        unidadeAtual?: string,
+        unidadeAnterior?: string | null
     }): Subprocesso => ({
         ...pu,
         situacao: pu.situacao as Subprocesso['situacao'],
+        unidadeAtual: pu.unidadeAtual || '',
+        unidadeAnterior: pu.unidadeAnterior || null,
         dataLimiteEtapa1: pu.dataLimiteEtapa1 ? new Date(pu.dataLimiteEtapa1) : new Date(),
         dataLimiteEtapa2: pu.dataLimiteEtapa2 ? new Date(pu.dataLimiteEtapa2) : null,
         dataFimEtapa1: pu.dataFimEtapa1 ? new Date(pu.dataFimEtapa1) : null,
@@ -347,6 +349,112 @@ describe('useProcessosStore', () => {
         expect(processosStore.subprocessos[0].dataLimiteEtapa1).not.toBeNull();
     });
 
+    it('should handle observacoes field in parseSubprocessoDates', () => {
+        // Criar um subprocesso com observacoes
+        const subprocessoComObservacoes = parsesubprocessoDates({
+            "id": 10,
+            "idProcesso": 1,
+            "unidade": "TESTE_OBS",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_OBS",
+            "unidadeAnterior": null,
+            "observacoes": "Teste de observações"
+        });
+
+        expect(subprocessoComObservacoes.observacoes).toBe("Teste de observações");
+
+        // Criar um subprocesso sem observacoes
+        const subprocessoSemObservacoes = parsesubprocessoDates({
+            "id": 11,
+            "idProcesso": 1,
+            "unidade": "TESTE_SEM_OBS",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_SEM_OBS",
+            "unidadeAnterior": null
+        });
+
+        expect(subprocessoSemObservacoes.observacoes).toBeUndefined();
+    });
+
+    it('should handle idMapaCopiado field in parseSubprocessoDates', () => {
+        // Criar um subprocesso com idMapaCopiado
+        const subprocessoComIdMapa = parsesubprocessoDates({
+            "id": 12,
+            "idProcesso": 1,
+            "unidade": "TESTE_MAPA",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_MAPA",
+            "unidadeAnterior": null,
+            "idMapaCopiado": 123
+        });
+
+        expect(subprocessoComIdMapa.idMapaCopiado).toBe(123);
+
+        // Criar um subprocesso sem idMapaCopiado
+        const subprocessoSemIdMapa = parsesubprocessoDates({
+            "id": 13,
+            "idProcesso": 1,
+            "unidade": "TESTE_SEM_MAPA",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_SEM_MAPA",
+            "unidadeAnterior": null
+        });
+
+        expect(subprocessoSemIdMapa.idMapaCopiado).toBeUndefined();
+    });
+
+    it('should handle unidadeAtual field in parseSubprocessoDates', () => {
+        // Criar um subprocesso com unidadeAtual
+        const subprocessoComUnidadeAtual = parsesubprocessoDates({
+            "id": 14,
+            "idProcesso": 1,
+            "unidade": "TESTE_UNIDADE",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_UNIDADE_ATUAL",
+            "unidadeAnterior": null
+        });
+
+        expect(subprocessoComUnidadeAtual.unidadeAtual).toBe("TESTE_UNIDADE_ATUAL");
+
+        // Criar um subprocesso sem unidadeAtual
+        const subprocessoSemUnidadeAtual = parsesubprocessoDates({
+            "id": 15,
+            "idProcesso": 1,
+            "unidade": "TESTE_SEM_UNIDADE",
+            "situacao": "Em andamento",
+            "unidadeAnterior": null
+        });
+
+        expect(subprocessoSemUnidadeAtual.unidadeAtual).toBe("");
+    });
+
+    it('should handle idMapaCopiado field in parseSubprocessoDates', () => {
+        // Criar um subprocesso com idMapaCopiado
+        const subprocessoComIdMapa = parsesubprocessoDates({
+            "id": 16,
+            "idProcesso": 1,
+            "unidade": "TESTE_MAPA",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_MAPA",
+            "unidadeAnterior": null,
+            "idMapaCopiado": 456
+        });
+
+        expect(subprocessoComIdMapa.idMapaCopiado).toBe(456);
+
+        // Criar um subprocesso sem idMapaCopiado - para cobrir a linha 70-71
+        const subprocessoSemIdMapa = parsesubprocessoDates({
+            "id": 17,
+            "idProcesso": 1,
+            "unidade": "TESTE_SEM_MAPA_FINAL",
+            "situacao": "Em andamento",
+            "unidadeAtual": "TESTE_SEM_MAPA_FINAL",
+            "unidadeAnterior": null
+        });
+
+        expect(subprocessoSemIdMapa.idMapaCopiado).toBeUndefined();
+    });
+
     // Novos testes para as funções de mapeamento
     describe('Funções de Mapeamento', () => {
         it('mapTipoProcesso should return correct TipoProcesso for Mapeamento', () => {
@@ -409,6 +517,24 @@ describe('useProcessosStore', () => {
             expect(elegiveis.length).toBe(0);
         });
 
+        it('getSubprocessosElegiveisAceiteBloco should filter by situacao "Revisão do cadastro disponibilizada"', () => {
+            // Criar um subprocesso com situação "Revisão do cadastro disponibilizada"
+            processosStore.subprocessos.push(parsesubprocessoDates({
+                "id": 8,
+                "idProcesso": 3,
+                "unidade": "UNIDADE_REVISAO",
+                "dataLimiteEtapa1": "2025-08-01",
+                "dataLimiteEtapa2": "2025-08-10",
+                "situacao": "Revisão do cadastro disponibilizada",
+                "unidadeAtual": "UNIDADE_REVISAO",
+                "unidadeAnterior": null
+            }));
+
+            const elegiveis = processosStore.getSubprocessosElegiveisAceiteBloco(3, 'UNIDADE_REVISAO');
+            expect(elegiveis.length).toBe(1);
+            expect(elegiveis[0].situacao).toBe('Revisão do cadastro disponibilizada');
+        });
+
         it('getSubprocessosElegiveisHomologacaoBloco should filter by idProcesso and specific situations', () => {
             const elegiveis = processosStore.getSubprocessosElegiveisHomologacaoBloco(3);
             expect(elegiveis.length).toBe(2);
@@ -444,6 +570,33 @@ describe('useProcessosStore', () => {
             // Garantir que não há movimentações para o subprocesso 2
             const movements = processosStore.getMovementsForSubprocesso(2);
             expect(movements.length).toBe(0);
+        });
+
+        it('getMovementsForSubprocesso should sort movements by dataHora in descending order', () => {
+            // Adicionar múltiplas movimentações com datas diferentes
+            const now = new Date();
+            const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+            processosStore.addMovement({
+                idSubprocesso: 1,
+                unidadeOrigem: 'A',
+                unidadeDestino: 'B',
+                descricao: 'Movement 1',
+                dataHora: tomorrow
+            });
+
+            processosStore.addMovement({
+                idSubprocesso: 1,
+                unidadeOrigem: 'C',
+                unidadeDestino: 'D',
+                descricao: 'Movement 2',
+                dataHora: yesterday
+            });
+
+            const movements = processosStore.getMovementsForSubprocesso(1);
+            expect(movements.length).toBe(2);
+            expect(movements[0].dataHora.getTime()).toBeGreaterThan(movements[1].dataHora.getTime());
         });
     });
 

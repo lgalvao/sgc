@@ -73,6 +73,22 @@ describe('Configuracoes Store', () => {
         expect(store.diasAlertaNovo).toBe(initialValue);
     });
 
+    it('should set diasInativacaoProcesso when value is greater than or equal to 1', () => {
+        const store = useConfiguracoesStore();
+        store.setDiasInativacaoProcesso(30);
+        expect(store.diasInativacaoProcesso).toBe(30);
+        store.setDiasInativacaoProcesso(1);
+        expect(store.diasInativacaoProcesso).toBe(1);
+    });
+
+    it('should set diasAlertaNovo when value is greater than or equal to 1', () => {
+        const store = useConfiguracoesStore();
+        store.setDiasAlertaNovo(20);
+        expect(store.diasAlertaNovo).toBe(20);
+        store.setDiasAlertaNovo(1);
+        expect(store.diasAlertaNovo).toBe(1);
+    });
+
     it('should handle localStorage errors gracefully during load', () => {
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
         });

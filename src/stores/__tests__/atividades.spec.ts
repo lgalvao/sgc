@@ -217,6 +217,32 @@ describe('useAtividadesStore', () => {
             fetchSpy.mockRestore(); // Restore the original implementation
         });
 
+        it('fetchAtividadesPorSubprocesso should handle case when no activities found for subprocesso', async () => {
+            // Create a fresh store instance for this test
+            setActivePinia(createPinia());
+            const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
+                useAtividadesStore: typeof useAtividadesStore
+            };
+            const testAtividadesStore = useAtividadesStoreActual();
+
+            // Manually set the initial state for this test
+            testAtividadesStore.atividades = []; // Clear the array first
+            const initialAtividades = getMockAtividadesData();
+            testAtividadesStore.atividades = initialAtividades.map((a: Atividade) => ({
+                ...a,
+                conhecimentos: a.conhecimentos.map((c: Conhecimento) => ({...c}))
+            }));
+            testAtividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
+
+            const initialLength = testAtividadesStore.atividades.length;
+
+            // Fetch activities for a subprocesso that doesn't exist in mock data
+            await testAtividadesStore.fetchAtividadesPorSubprocesso(999);
+
+            // Should not add any activities since none match the subprocesso
+            expect(testAtividadesStore.atividades.length).toBe(initialLength);
+        });
+
         it('adicionarMultiplasAtividades should add multiple activities and assign unique IDs', () => {
             const novasAtividades: Atividade[] = [
                 {

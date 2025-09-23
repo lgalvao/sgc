@@ -546,11 +546,11 @@ describe('ImportarAtividadesModal.vue', () => {
       expect(options).toHaveLength(1); // Apenas a opção disabled
     });
 
-    it('deve lidar com processo sem unidades', async () => {
+    it('deve chamar selecionarProcesso(null) quando processoSelecionadoId é null', async () => {
       mockProcessosStore.processos = [
         {
           id: 1,
-          descricao: 'Processo sem Unidades',
+          descricao: 'Processo Teste',
           tipo: TipoProcesso.MAPEAMENTO,
           situacao: SituacaoProcesso.FINALIZADO,
           dataLimite: new Date(),
@@ -558,7 +558,36 @@ describe('ImportarAtividadesModal.vue', () => {
         },
       ];
 
-      mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue([]);
+      const wrapper = mountComponent();
+
+      await wrapper.vm.$nextTick();
+
+      // Simular que processoSelecionadoId se torna null
+      const vm = wrapper.vm as any;
+      await vm.selecionarProcesso(null);
+
+      // Verificar que o estado foi resetado
+      expect(vm.processoSelecionado).toBeNull();
+      expect(vm.unidadesParticipantes).toEqual([]);
+      expect(vm.unidadeSelecionada).toBeNull();
+      expect(vm.unidadeSelecionadaId).toBeNull();
+    });
+
+    it('deve chamar selecionarUnidade(null) quando unidadeSelecionadaId é null', async () => {
+      mockProcessosStore.processos = [
+        {
+          id: 1,
+          descricao: 'Processo Teste',
+          tipo: TipoProcesso.MAPEAMENTO,
+          situacao: SituacaoProcesso.FINALIZADO,
+          dataLimite: new Date(),
+          dataFinalizacao: new Date(),
+        },
+      ];
+
+      mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue([
+        { id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado' } as Subprocesso,
+      ]);
 
       const wrapper = mountComponent();
 
@@ -570,9 +599,56 @@ describe('ImportarAtividadesModal.vue', () => {
 
       await wrapper.vm.$nextTick();
 
-      // Verificar que não há opções de unidade
-      const options = wrapper.findAll('select#unidade-select option');
-      expect(options).toHaveLength(1); // Apenas a opção disabled
+      // Simular que unidadeSelecionadaId se torna null
+      const vm = wrapper.vm as any;
+      await vm.selecionarUnidade(null);
+
+      // Verificar que atividades foram limpas
+      expect(vm.atividadesParaImportar).toEqual([]);
+      expect(vm.unidadeSelecionada).toBeNull();
+    });
+
+    it('deve manter botão importar desabilitado quando nenhuma atividade selecionada', async () => {
+      mockProcessosStore.processos = [
+        {
+          id: 1,
+          descricao: 'Processo Teste',
+          tipo: TipoProcesso.MAPEAMENTO,
+          situacao: SituacaoProcesso.FINALIZADO,
+          dataLimite: new Date(),
+          dataFinalizacao: new Date(),
+        },
+      ];
+
+      mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue([
+        { id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado' } as Subprocesso,
+      ]);
+
+      mockAtividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue([
+        { id: 1, descricao: 'Atividade 1', idSubprocesso: 1, conhecimentos: [] } as Atividade,
+      ]);
+
+      const wrapper = mountComponent();
+
+      await wrapper.vm.$nextTick();
+
+      // Selecionar processo e unidade
+      const processoSelect = wrapper.find('select#processo-select');
+      await processoSelect.setValue(1);
+
+      await wrapper.vm.$nextTick();
+
+      const unidadeSelect = wrapper.find('select#unidade-select');
+      await unidadeSelect.setValue(1);
+
+      await wrapper.vm.$nextTick();
+
+      // Verificar que botão importar está desabilitado
+      const importarButton = wrapper.find('.btn-outline-primary');
+      expect(importarButton.attributes('disabled')).toBeDefined();
+
+      // Verificar que não emitiu evento de importar
+      expect(wrapper.emitted().importar).toBeFalsy();
     });
   });
 });

@@ -198,4 +198,34 @@ describe('utils', () => {
             expect(ensureValidDate(edgeCaseDate)?.getDate()).toBe(1); // 1st
         });
     });
+     describe('error handling in formatDateBR', () => {
+         it('should return "Data inválida" for invalid date strings', () => {
+             // Test with an invalid date string that will cause parseDate to fail
+             const result = formatDateBR('invalid-date-string');
+             expect(result).toBe('Data inválida');
+         });
+     });
 });
+     
+
+     describe('error handling in formatDateForInput', () => {
+         it('should return empty string when date operations throw an error', () => {
+             // Create a date that will cause getFullYear() to throw
+             const invalidDate = new Date('invalid');
+
+             // This should trigger the catch block and return ''
+             const result = formatDateForInput(invalidDate);
+             expect(result).toBe('');
+         });
+     });
+
+     describe('error handling in isDateValidAndFuture', () => {
+         it('should return false when date operations throw an error', () => {
+             // Create a date that will cause setHours() to throw
+             const invalidDate = new Date('invalid');
+
+             // This should trigger the catch block and return false
+             const result = isDateValidAndFuture(invalidDate);
+             expect(result).toBe(false);
+         });
+     });
