@@ -200,22 +200,25 @@ test.describe('Detalhes do Processo - Unidades', () => {
     });
 
     test('deve cancelar finalização de processo', async ({page}) => {
+        // Este cenário exige todas as unidades operacionais/interoperacionais homologadas.
+        // Usar processo 99 (mock) que atende a pré-condição para exibir o modal.
+        await page.goto('/processo/99');
+
         const finalizarButton = page.getByRole('button', {name: 'Finalizar processo'});
-        
-        if (await finalizarButton.count() > 0) {
-            await finalizarButton.click();
-            
-            // Wait for modal
-            await expect(page.locator('.modal')).toBeVisible();
-            
-            // Clicar em cancelar - usa texto "Cancelar" não data-testid
-            const cancelarButton = page.getByRole('button', {name: 'Cancelar'});
-            if (await cancelarButton.count() > 0) {
-                await cancelarButton.click();
-                
-                // Verificar que o modal foi fechado
-                await expect(page.getByText('Finalização de processo')).not.toBeVisible();
-            }
+        await expect(finalizarButton).toBeVisible();
+
+        await finalizarButton.click();
+
+        // Wait for modal - usar seletor mais específico para evitar conflitos com outros modais
+        await expect(page.locator('.modal.show')).toBeVisible();
+
+        // Clicar em cancelar - usa texto "Cancelar" não data-testid
+        const cancelarButton = page.getByRole('button', {name: 'Cancelar'});
+        if (await cancelarButton.count() > 0) {
+            await cancelarButton.click();
+
+            // Verificar que o modal foi fechado
+            await expect(page.getByText('Finalização de processo')).not.toBeVisible();
         }
     });
 
