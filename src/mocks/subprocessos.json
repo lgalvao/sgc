@@ -516,5 +516,33 @@
     "unidadeAnterior": null,
     "movimentacoes": [],
     "analises": []
+  },
+  {
+    "id": 200,
+    "idProcesso": 1,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-06-30",
+    "dataFimEtapa1": null,
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa2": null,
+    "situacao": "Cadastro disponibilizado",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
+  },
+  {
+    "id": 201,
+    "idProcesso": 2,
+    "unidade": "SESEL",
+    "dataLimiteEtapa1": "2025-07-15",
+    "dataLimiteEtapa2": null,
+    "dataFimEtapa1": null,
+    "dataFimEtapa2": null,
+    "situacao": "Revisão do cadastro disponibilizada",
+    "unidadeAtual": "SESEL",
+    "unidadeAnterior": null,
+    "movimentacoes": [],
+    "analises": []
   }
 ]

@@ -319,8 +319,7 @@ const podeVerImpacto = computed(() => {
 
   const perfil = perfilStore.perfilSelecionado;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada' || 
-                          subprocesso.value.situacao === 'Cadastro disponibilizado';
+  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada';
   const localizacaoCorreta = subprocesso.value.unidadeAtual === perfilStore.unidadeSelecionada;
 
   return podeVer && situacaoCorreta && localizacaoCorreta;

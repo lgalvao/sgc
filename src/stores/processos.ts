@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
-import processosMock from '../mocks/processos.json'
-import subprocessosMock from '../mocks/subprocessos.json'
+import processosMock from '../mocks/processos.json' assert {type: 'json'}
+import subprocessosMock from '../mocks/subprocessos.json' assert {type: 'json'}
 import {Movimentacao, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 import {useUnidadesStore} from './unidades'
 
