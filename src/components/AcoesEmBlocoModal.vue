@@ -5,7 +5,7 @@
     style="display: block;"
     tabindex="-1"
   >
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
@@ -23,7 +23,7 @@
             <i class="bi bi-info-circle" />
             Selecione as unidades que terão seus cadastros {{ tipoAcao === 'aceitar' ? 'aceitos' : 'homologados' }}:
           </div>
-          
+
           <div class="table-responsive">
             <table class="table table-bordered">
               <thead class="table-light">
@@ -63,8 +63,8 @@
           >
             <i class="bi bi-x-circle" /> Cancelar
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn"
             :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
             @click="confirmar"

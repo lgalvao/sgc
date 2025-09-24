@@ -9,15 +9,15 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.ts --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck",
-    "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vitest",
-    "test:unit:run": "vitest run",
     "test:e2e": "playwright test",
     "coverage": "npm run coverage:unit && npm run coverage:e2e",
     "coverage:unit": "vitest run --coverage",
     "coverage:unit:watch": "vitest --coverage",
     "coverage:e2e": "cross-env COLLECT_COVERAGE=true playwright test",
     "coverage:clean": "rimraf coverage .nyc_output .nyc_output_unit .nyc_output_e2e",
+    "screenshots:clean": "node scripts/clean-screenshots.js",
+    "screenshots:clean-and-test": "npm run screenshots:clean && npm run test:e2e",
     "coverage:report": "npm run coverage:unit && echo 'Coverage report generated in coverage/ directory'"
   },
   "dependencies": {
