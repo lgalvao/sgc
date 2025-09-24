@@ -6,14 +6,14 @@ no projeto.
 ### 0. Como/quando executar os testes
 
 * Use `npx playwright test` para rodar todos os testes.
-* Para rodar um teste específico, use `npx playwright test spec/nome-do-teste.spec.ts`.
+* Para rodar um teste específico, use `npx playwright test e2e/nome-do-teste.spec.ts`.
 * Não rode todo os testes frequentemente. Foque em testes específicos durante o desenvolvimento.
 * Use `npx playwright test --last-failed` quando estiver corrigindo problemas identificados nos testes.
 * **Estratégias de Depuração**: Em caso de falhas inesperadas, especialmente em testes de UI, utilize `page.pause()` dentro do teste para pausar a execução e inspecionar o estado da página no navegador Playwright. Isso é útil para entender por que um elemento não está visível ou uma interação não está ocorrendo como esperado.
 
 ### 1. Estrutura e Configuração
 
-* **Localização**: Todos os testes E2E estão no diretório `spec/`.
+* **Localização**: Todos os testes E2E estão no diretório `e2e/`.
 * **Estrutura de Arquivos**: Cada arquivo `.spec.ts` deve testar uma funcionalidade específica (ex: `login.spec.ts`,
   `cad-atividades.spec.ts`).
 * **Servidor**: O servidor de desenvolvimento já está rodando em segundo plano. Não tente executá-lo novamente.
@@ -52,7 +52,7 @@ no projeto.
 
 * **Isolamento de Testes e Setup**: Garanta que cada teste ou grupo de testes seja executado em um ambiente limpo e previsível. Utilize blocos `test.beforeEach` para configurar o estado inicial da aplicação (ex: login, navegação para uma página específica) e garantir que os pré-requisitos do teste sejam atendidos.
 * **Funções Auxiliares Robustas**: Crie funções auxiliares para ações repetitivas, mas evite que elas tentem lidar com múltiplas variações de UI ou usem lógicas de fallback genéricas. Funções auxiliares devem ser focadas, usar seletores específicos e falhar diretamente se as pré-condições não forem atendidas. Isso reduz a duplicação, facilita a manutenção e torna os testes mais legíveis e confiáveis.
-* **Autenticação e Perfis**: Use as funções de login em `spec/utils/auth.ts` antes de cada suíte ou grupo de testes. Crie funções de login específicas (ex: `loginAsAdmin`, `loginAsGestor`) para simular diferentes perfis de usuário, garantindo que os testes sejam executados com as permissões corretas. Utilize IDs de servidores válidos que existam nos mocks.
+* **Autenticação e Perfis**: Use as funções de login em `e2e/support/utils/auth.ts` antes de cada suíte ou grupo de testes. Crie funções de login específicas (ex: `loginAsAdmin`, `loginAsGestor`) para simular diferentes perfis de usuário, garantindo que os testes sejam executados com as permissões corretas. Utilize IDs de servidores válidos que existam nos mocks.
 * **Modais e Confirmações**:
     * Sempre aguarde a abertura do modal antes de interagir.
     * Use seletores específicos para os botões dentro do modal.

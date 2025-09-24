@@ -16,7 +16,7 @@ O projeto utiliza Vitest para testes unitários e Playwright para testes de inte
 ### Localização dos Testes
 
 - **Testes Unitários (Vitest)**: Ficam localizados em diretórios `__tests__/` adjacentes aos arquivos que estão testando (ex: `src/components/__tests__/Navbar.spec.ts`).
-- **Testes E2E (Playwright)**: Todos os testes de ponta a ponta ficam no diretório `/spec`, organizados por funcionalidade (ex: `spec/cdu/cdu-01.spec.ts`).
+- **Testes E2E (Playwright)**: Todos os testes de ponta a ponta ficam no diretório `/e2e`, organizados por funcionalidade (ex: `e2e/cdu/cdu-01.spec.ts`).
 
 ### Comandos
 
