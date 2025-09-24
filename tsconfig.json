@@ -38,7 +38,7 @@
         "src/*"
       ],
       "~/*": [
-        "spec/*"
+        "e2e/*"
       ]
     },
     "forceConsistentCasingInFileNames": true

@@ -1,12 +1,12 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {defineConfig, devices} from '@playwright/test';
-import {vueTest} from './tests/vue-specific-setup';
+import {vueTest} from './e2e/support/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
     timeout: 12000,
-    testDir: './spec',
+    testDir: './e2e',
     fullyParallel: true,
     reporter: "dot",
     webServer: {
@@ -15,7 +15,7 @@ export default defineConfig({
         reuseExistingServer: true,
         timeout: 120 * 1000,
     },
-    globalSetup: './tests/global-setup.ts',
+    globalSetup: './e2e/support/global-setup.ts',
     use: {
         baseURL: 'http://localhost:5173/',
         trace: 'on-first-retry',
