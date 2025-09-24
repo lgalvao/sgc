@@ -102,7 +102,7 @@
 import {type EmailContent, type Notificacao, useNotificacoesStore} from '@/stores/notificacoes';
 import {iconeTipo} from '@/utils'; // Importar a função iconeTipo
 import {storeToRefs} from 'pinia';
-import {onMounted, onUnmounted, ref, watch} from 'vue';
+import {ref} from 'vue';
 
 const notificacoesStore = useNotificacoesStore();
 const {notificacoes} = storeToRefs(notificacoesStore);
@@ -112,60 +112,6 @@ const {removerNotificacao} = notificacoesStore;
 // Estado para modal de email
 const emailModalVisivel = ref(false);
 const emailAtual = ref<EmailContent | null>(null);
-
-// Auto-hide para notificações de sucesso após 3 segundos
-let autoHideTimeouts: Map<string, number> = new Map();
-
-const scheduleAutoHide = (notificacao: Notificacao) => {
-  // Só auto-hide para notificações de sucesso
-  if (notificacao.tipo === 'success') {
-    const timeoutId = window.setTimeout(() => {
-      removerNotificacao(notificacao.id);
-      autoHideTimeouts.delete(notificacao.id);
-    }, 3000); // 3 segundos
-
-    autoHideTimeouts.set(notificacao.id, timeoutId);
-  }
-};
-
-const cancelAutoHide = (notificacaoId: string) => {
-  const timeoutId = autoHideTimeouts.get(notificacaoId);
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-    autoHideTimeouts.delete(notificacaoId);
-  }
-};
-
-// Configurar auto-hide para notificações existentes
-onMounted(() => {
-  notificacoes.value.forEach(scheduleAutoHide);
-});
-
-// Limpar timeouts quando o componente for desmontado
-onUnmounted(() => {
-  autoHideTimeouts.forEach((timeoutId) => {
-    clearTimeout(timeoutId);
-  });
-  autoHideTimeouts.clear();
-});
-
-watch(notificacoes, (novasNotificacoes, notificacoesAntigas) => {
-  // Verificar notificações adicionadas
-  novasNotificacoes.forEach(notificacao => {
-    const existsInOld = notificacoesAntigas.some(old => old.id === notificacao.id);
-    if (!existsInOld) {
-      scheduleAutoHide(notificacao);
-    }
-  });
-
-  // Verificar notificações removidas
-  notificacoesAntigas.forEach(notificacao => {
-    const existsInNew = novasNotificacoes.some(newNot => newNot.id === notificacao.id);
-    if (!existsInNew) {
-      cancelAutoHide(notificacao.id);
-    }
-  });
-});
 
 const mostrarEmail = (notificacao: Notificacao) => {
   if (notificacao.emailContent) {

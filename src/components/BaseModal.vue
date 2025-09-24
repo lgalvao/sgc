@@ -6,7 +6,10 @@
     tabindex="-1"
     :class="{ 'modal-lg': tamanho === 'large', 'modal-xl': tamanho === 'extra-large' }"
   >
-    <div class="modal-dialog" :class="{ 'modal-dialog-centered': centralizado }">
+    <div
+      class="modal-dialog"
+      :class="{ 'modal-dialog-centered': centralizado }"
+    >
       <div class="modal-content">
         <div
           class="modal-header"
@@ -20,7 +23,10 @@
           }"
         >
           <h5 class="modal-title">
-            <i v-if="icone" :class="icone" />
+            <i
+              v-if="icone"
+              :class="icone"
+            />
             {{ titulo }}
           </h5>
           <button
@@ -33,7 +39,10 @@
         <div class="modal-body">
           <slot name="conteudo" />
         </div>
-        <div v-if="$slots.acoes" class="modal-footer">
+        <div
+          v-if="$slots.acoes"
+          class="modal-footer"
+        >
           <slot name="acoes" />
         </div>
       </div>
@@ -55,7 +64,7 @@ interface Props {
   icone?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   tipo: 'primary',
   tamanho: 'default',
   centralizado: true,

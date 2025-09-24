@@ -7,7 +7,7 @@ no projeto.
 
 * Use `npx playwright test` para rodar todos os testes.
 * Para rodar um teste específico, use `npx playwright test spec/nome-do-teste.spec.ts`.
-* Não rodar todo os testes frequentemente. Foque em testes específicos durante o desenvolvimento.
+* Não rode todo os testes frequentemente. Foque em testes específicos durante o desenvolvimento.
 * Use `npx playwright test --last-failed` quando estiver corrigindo problemas identificados nos testes.
 
 ### 1. Estrutura e Configuração

@@ -27,12 +27,11 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
       ...notificacao,
         id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
       timestamp: new Date(),
-      duracao: notificacao.duracao ?? 5000
+      duracao: notificacao.duracao ?? (notificacao.tipo === 'success' ? 3000 : 0),
     };
 
     notificacoes.value.push(novaNotificacao);
 
-    // Auto-remover após a duração especificada
     if (novaNotificacao.duracao && novaNotificacao.duracao > 0) {
       setTimeout(() => {
         removerNotificacao(novaNotificacao.id);

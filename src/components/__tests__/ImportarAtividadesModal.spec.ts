@@ -292,6 +292,7 @@ describe('ImportarAtividadesModal.vue', () => {
       expect(wrapper.findAll('.form-check-input[type="checkbox"]')).toHaveLength(2);
 
       // Simular que unidadeSelecionada se torna null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const vm = wrapper.vm as any;
       await vm.selecionarUnidade(null);
 
@@ -563,6 +564,7 @@ describe('ImportarAtividadesModal.vue', () => {
       await wrapper.vm.$nextTick();
 
       // Simular que processoSelecionadoId se torna null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const vm = wrapper.vm as any;
       await vm.selecionarProcesso(null);
 
@@ -600,6 +602,7 @@ describe('ImportarAtividadesModal.vue', () => {
       await wrapper.vm.$nextTick();
 
       // Simular que unidadeSelecionadaId se torna null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const vm = wrapper.vm as any;
       await vm.selecionarUnidade(null);
 

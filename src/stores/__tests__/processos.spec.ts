@@ -196,7 +196,9 @@ describe('useProcessosStore', () => {
         dataFimEtapa2?: string | null,
         situacao: string,
         unidadeAtual?: string,
-        unidadeAnterior?: string | null
+        unidadeAnterior?: string | null,
+        observacoes?: string,
+        idMapaCopiado?: number
     }): Subprocesso => ({
         ...pu,
         situacao: pu.situacao as Subprocesso['situacao'],
@@ -208,6 +210,8 @@ describe('useProcessosStore', () => {
         dataFimEtapa2: pu.dataFimEtapa2 ? new Date(pu.dataFimEtapa2) : null,
         movimentacoes: [],
         analises: [],
+        observacoes: pu.observacoes,
+        idMapaCopiado: pu.idMapaCopiado,
     });
 
     beforeEach(() => {
@@ -578,21 +582,25 @@ describe('useProcessosStore', () => {
             const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
             const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
+            vi.useFakeTimers();
+
+            vi.setSystemTime(tomorrow);
             processosStore.addMovement({
                 idSubprocesso: 1,
                 unidadeOrigem: 'A',
                 unidadeDestino: 'B',
                 descricao: 'Movement 1',
-                dataHora: tomorrow
             });
 
+            vi.setSystemTime(yesterday);
             processosStore.addMovement({
                 idSubprocesso: 1,
                 unidadeOrigem: 'C',
                 unidadeDestino: 'D',
                 descricao: 'Movement 2',
-                dataHora: yesterday
             });
+
+            vi.useRealTimers();
 
             const movements = processosStore.getMovementsForSubprocesso(1);
             expect(movements.length).toBe(2);

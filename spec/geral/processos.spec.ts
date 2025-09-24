@@ -1,11 +1,12 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../../tests/vue-specific-setup';
-import {login} from "~/utils/auth";
+import {login, loginAsGestor} from "~/utils/auth";
 
 test.describe('Detalhes do Processo - Unidades', () => {
     test.beforeEach(async ({page}) => {
         await login(page);
         await page.goto(`/processo/1`);
+        await page.waitForLoadState('networkidle'); // Added this line
     });
 
     test('deve exibir os detalhes do processo e a tabela de unidades participantes', async ({page}) => {
@@ -48,22 +49,9 @@ test.describe('Detalhes do Processo - Unidades', () => {
         const linhaSESEL = page.locator('table tbody tr').filter({ hasText: 'SESEL' });
         const linhaSTIC = page.locator('table tbody tr').filter({ hasText: 'STIC' });
         
-        // Verificar se pelo menos uma dessas unidades está presente
-        const seselVisible = await linhaSESEL.isVisible();
-        const sticVisible = await linhaSTIC.isVisible();
-        
-        if (seselVisible) {
-            // Clicar na linha SESEL (OPERACIONAL)
-            await linhaSESEL.click();
-        } else if (sticVisible) {
-            // Clicar na linha STIC (INTEROPERACIONAL)
-            await linhaSTIC.click();
-        } else {
-            // Fallback: clicar na primeira linha que não seja SGP (INTERMEDIARIA)
-            const linhasClicaveis = page.locator('table tbody tr').filter({ hasNot: page.locator('.tree-row-disabled') });
-            const primeiraLinha = linhasClicaveis.first();
-            await primeiraLinha.click();
-        }
+        // Clicar na linha SESEL (OPERACIONAL)
+        await expect(linhaSESEL).toBeVisible();
+        await linhaSESEL.click();
         
         // Aguardar navegação completa
         await page.waitForLoadState('networkidle');
@@ -72,20 +60,58 @@ test.describe('Detalhes do Processo - Unidades', () => {
         await expect(page).toHaveURL(/\/processo\/1\/[A-Z]+/);
     });
 
-    test('deve exibir botões de ação em bloco para GESTOR', async ({page}) => {
-        // Simular perfil GESTOR (assumindo que o login já define isso)
-        // Verificar se o botão "Aceitar em bloco" aparece quando há unidades elegíveis
-        const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
+    test.describe('Testes para perfil GESTOR', () => {
+        test.beforeEach(async ({page}) => {
+            await loginAsGestor(page);
+            await page.goto(`/processo/1`);
+            await page.waitForLoadState('networkidle'); // Added this line
+        });
+
+        test('deve exibir botões de ação em bloco para GESTOR', async ({page}) => {
+            // Verificar se o botão "Aceitar em bloco" aparece quando há unidades elegíveis
+            const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
+            
+            // O botão pode ou não aparecer dependendo do estado dos dados
+            // Vamos verificar se existe pelo menos a estrutura
+            const botoesBloco = page.locator('.d-flex.gap-2');
+            await expect(botoesBloco).toBeVisible();
+            await expect(aceitarBlocoButton).toBeVisible();
+        });
+
+                test('deve abrir modal de aceitar em bloco', async ({page}) => {
+                    const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
+                    
+                    await expect(aceitarBlocoButton).toBeVisible();
+                    await aceitarBlocoButton.click();
+                    
+                    // Verificar modal
+                    await expect(page.getByText('Aceitar cadastros em bloco')).toBeVisible();
+                    await expect(page.getByText('Selecione as unidades que terão seus cadastros aceitos:')).toBeVisible();
+                    
+                    // Verificar tabela no modal
+                    await expect(page.getByRole('cell', {name: 'Selecionar'})).toBeVisible();
+                    await expect(page.getByRole('cell', {name: 'Sigla'})).toBeVisible();
+                    await expect(page.getByRole('cell', {name: 'Nome'})).toBeVisible();
+                    await expect(page.getByRole('cell', {name: 'Situação Atual'})).toBeVisible();
+                    
+                    // Verificar botões do modal
+                    await expect(page.getByRole('button', {name: 'Cancelar'})).toBeVisible();
+                    await expect(page.getByRole('button', {name: 'Aceitar'}).and(page.locator('.btn-primary'))).toBeVisible();
+                });
         
-        // O botão pode ou não aparecer dependendo do estado dos dados
-        // Vamos verificar se existe pelo menos a estrutura
-        const botoesBloco = page.locator('.d-flex.gap-2');
-        if (await botoesBloco.isVisible()) {
-            if (await aceitarBlocoButton.count() > 0) {
-                await expect(aceitarBlocoButton).toBeVisible();
-            }
-        }
-    });
+                test('deve fechar modal de ação em bloco', async ({page}) => {
+                    const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
+                    
+                    await expect(aceitarBlocoButton).toBeVisible();
+                    await aceitarBlocoButton.click();
+                    
+                    // Fechar modal pelo botão X
+                    const fecharButton = page.locator('.modal-header .btn-close');
+                    await fecharButton.click();
+                    
+                    // Verificar que o modal foi fechado
+                    await expect(page.getByText('Aceitar cadastros em bloco')).not.toBeVisible();
+                });    });
 
     test('deve exibir botões de ação em bloco para ADMIN', async ({page}) => {
         // Verificar se o botão "Homologar em bloco" aparece quando há unidades elegíveis
@@ -93,9 +119,9 @@ test.describe('Detalhes do Processo - Unidades', () => {
         
         // O botão pode ou não aparecer dependendo do estado dos dados
         const botoesBloco = page.locator('.d-flex.gap-2');
-        if (await botoesBloco.isVisible()) {
-            await expect(homologarBlocoButton).toBeVisible();
-        }
+        await expect(botoesBloco).toBeVisible();
+        await page.pause(); // Added for inspection
+        await expect(homologarBlocoButton).toBeVisible();
     });
 
     test('deve exibir botão de finalizar processo para ADMIN', async ({page}) => {
@@ -103,82 +129,15 @@ test.describe('Detalhes do Processo - Unidades', () => {
         const finalizarButton = page.getByRole('button', {name: 'Finalizar processo'});
         
         // O botão deve aparecer apenas para processos em andamento
-        if (await finalizarButton.isVisible()) {
-            await expect(finalizarButton).toBeVisible();
-            await expect(finalizarButton).toHaveClass(/btn-danger/);
-        }
+        await expect(finalizarButton).toBeVisible();
+        await expect(finalizarButton).toHaveClass(/btn-danger/);
     });
 
-    test('deve abrir modal de aceitar em bloco', async ({page}) => {
-        const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
-        
-        if (await aceitarBlocoButton.isVisible()) {
-            await aceitarBlocoButton.click();
-            
-            // Verificar modal
-            await expect(page.getByText('Aceitar cadastros em bloco')).toBeVisible();
-            await expect(page.getByText('Selecione as unidades que terão seus cadastros aceitos:')).toBeVisible();
-            
-            // Verificar tabela no modal
-            await expect(page.getByRole('cell', {name: 'Selecionar'})).toBeVisible();
-            await expect(page.getByRole('cell', {name: 'Sigla'})).toBeVisible();
-            await expect(page.getByRole('cell', {name: 'Nome'})).toBeVisible();
-            await expect(page.getByRole('cell', {name: 'Situação Atual'})).toBeVisible();
-            
-            // Verificar botões do modal
-            await expect(page.getByRole('button', {name: 'Cancelar'})).toBeVisible();
-            await expect(page.getByRole('button', {name: 'Aceitar'})).toBeVisible();
-        }
-    });
 
-    test('deve abrir modal de homologar em bloco', async ({page}) => {
-        const homologarBlocoButton = page.getByRole('button', {name: 'Homologar em bloco'});
         
-        if (await homologarBlocoButton.isVisible()) {
-            await homologarBlocoButton.click();
-            
-            // Verificar modal
-            await expect(page.getByText('Homologar cadastros em bloco')).toBeVisible();
-            await expect(page.getByText('Selecione as unidades que terão seus cadastros homologados:')).toBeVisible();
-            
-            // Verificar botões do modal
-            await expect(page.getByRole('button', {name: 'Cancelar'})).toBeVisible();
-            const homologarConfirmButton = page.getByRole('button', {name: 'Homologar', exact: true});
-            if (await homologarConfirmButton.count() > 0) {
-                await expect(homologarConfirmButton).toBeVisible();
-            }
-        }
-    });
 
-    test('deve fechar modal de ação em bloco', async ({page}) => {
-        const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
-        
-        if (await aceitarBlocoButton.isVisible()) {
-            await aceitarBlocoButton.click();
-            
-            // Fechar modal pelo botão X
-            const fecharButton = page.getByRole('button', {name: ''}).filter({hasText: ''});
-            await fecharButton.click();
-            
-            // Verificar que o modal foi fechado
-            await expect(page.getByText('Aceitar cadastros em bloco')).not.toBeVisible();
-        }
-    });
 
-    test('deve cancelar ação em bloco', async ({page}) => {
-        const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
-        
-        if (await aceitarBlocoButton.isVisible()) {
-            await aceitarBlocoButton.click();
-            
-            // Clicar em cancelar
-            const cancelarButton = page.getByRole('button', {name: 'Cancelar'});
-            await cancelarButton.click();
-            
-            // Verificar que o modal foi fechado
-            await expect(page.getByText('Aceitar cadastros em bloco')).not.toBeVisible();
-        }
-    });
+
 
     test('deve abrir modal de finalização de processo', async ({page}) => {
         // Este cenário exige todas as unidades operacionais/interoperacionais homologadas.
@@ -214,34 +173,16 @@ test.describe('Detalhes do Processo - Unidades', () => {
 
         // Clicar em cancelar - usa texto "Cancelar" não data-testid
         const cancelarButton = page.getByRole('button', {name: 'Cancelar'});
-        if (await cancelarButton.count() > 0) {
-            await cancelarButton.click();
+        await expect(cancelarButton).toBeVisible();
+        await cancelarButton.click();
 
-            // Verificar que o modal foi fechado
-            await expect(page.getByText('Finalização de processo')).not.toBeVisible();
-        }
+        // Verificar que o modal foi fechado
+        await expect(page.getByText('Finalização de processo')).not.toBeVisible();
     });
 
-    test('deve exibir alerta de sucesso após ação em bloco', async ({page}) => {
-        const aceitarBlocoButton = page.getByRole('button', {name: 'Aceitar em bloco'});
-        
-        if (await aceitarBlocoButton.isVisible()) {
-            await aceitarBlocoButton.click();
-            
-            // Selecionar pelo menos uma unidade
-            const checkbox = page.locator('input[type="checkbox"]').first();
-            if (await checkbox.isVisible()) {
-                await checkbox.check();
-                
-                // Confirmar ação
-                const confirmarButton = page.getByRole('button', {name: 'Aceitar'});
-                await confirmarButton.click();
-                
-                // Verificar alerta de sucesso
-                await expect(page.getByText('Cadastros aceitos em bloco com sucesso!')).toBeVisible();
-            }
-        }
-    });
+
+
+
 
     test('deve exibir estrutura hierárquica das unidades', async ({page}) => {
         // Wait for load

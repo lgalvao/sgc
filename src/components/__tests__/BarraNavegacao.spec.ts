@@ -343,7 +343,7 @@ describe('BarraNavegacao.vue', () => {
                 path: '/custom',
                 name: 'Custom',
                 component: {template: '<div>Custom</div>'},
-                meta: {breadcrumb: (route: RouteLocationNormalized) => 'Custom Page'}
+                meta: {breadcrumb: (_route: RouteLocationNormalized) => 'Custom Page'}
             };
 
             router.addRoute(customRoute);

@@ -25,8 +25,8 @@
               for="titulo"
               data-testid="label-titulo"
             >
-               <i class="bi bi-person-circle me-2" />
-               Título eleitoral</label>
+              <i class="bi bi-person-circle me-2" />
+              Título eleitoral</label>
             <input
               id="titulo"
               v-model="titulo"
@@ -44,8 +44,8 @@
               for="senha"
               data-testid="label-senha"
             >
-               <i class="bi bi-key me-2" />
-               Senha</label>
+              <i class="bi bi-key me-2" />
+              Senha</label>
             <input
               id="senha"
               v-model="senha"
