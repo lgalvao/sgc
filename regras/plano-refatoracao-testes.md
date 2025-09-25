@@ -34,16 +34,16 @@ Esta é a camada mais importante para a semântica. Ela traduz comandos técnico
     2.  **Crie Funções para Verificações de Estado:** Encapsule as asserções (`expect`) em funções que descrevem o estado esperado do sistema.
     3.  **Nomenclatura e Idioma:**
         *   **Idioma:** Todas as variáveis, funções e identificadores devem ser escritos em **português**.
-        *   **Padrão:** Use verbos imperativos e termos claros do domínio do SGC.
-        *   **Ações:** `clicarNoProcesso`, `preencherFormularioDoMapa`, `submeterParaAnalise`.
-        *   **Verificações:** `verificarVisibilidadeDoProcesso`, `esperarPaginaDeDetalhesDoProcesso`, `assegurarQueBotaoEstaDesabilitado`.
+        *   **Padrão de Nomenclatura:** Use nomes diretos e concisos, evitando preposições e artigos (ex: `de`, `para`, `no`). Use sufixos para adicionar clareza quando necessário.
+        *   **Ações:** `clicarProcesso`, `preencherFormularioMapa`, `ordenarTabelaPorColuna`.
+        *   **Verificações:** `verificarVisibilidadeProcesso`, `verificarNavegacaoPaginaDetalhes`, `assegurarBotaoDesabilitado`.
 *   **Exemplo de Função de Ação:**
     ```typescript
     // Em 'auxiliares-navegacao.ts' ou 'auxiliares-acoes.ts'
     import { Page } from '@playwright/test';
     import { SELETORES } from './constantes-teste';
 
-    export async function clicarNoProcesso(page: Page, nomeProcesso: string | RegExp) {
+    export async function clicarProcesso(page: Page, nomeProcesso: string | RegExp) {
       await page.getByTestId(SELETORES.TABELA_PROCESSOS).getByRole('row', { name: nomeProcesso }).click();
     }
     ```
@@ -53,7 +53,7 @@ Esta é a camada mais importante para a semântica. Ela traduz comandos técnico
     import { expect, Page } from '@playwright/test';
     import { SELETORES } from './constantes-teste';
 
-    export async function verificarNavegacaoParaPaginaDeDetalhesDoProcesso(page: Page) {
+    export async function verificarNavegacaoPaginaDetalhesProcesso(page: Page) {
       await expect(page).toHaveURL(/.*\/processo\/\d+$/);
       await expect(page.locator(SELETORES.PROCESSO_INFO)).toBeVisible();
     }
