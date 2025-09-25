@@ -1,3 +1,4 @@
+
 import {expect, Locator, Page} from '@playwright/test';
 import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
 
@@ -173,7 +174,6 @@ async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFI
     await page.goto(URLS.PAINEL);
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/painel/);
-    await verificarElementosPainel(page);
 }
 
 export const loginComoAdmin = (page: Page, idServidor?: string) => fazerLoginComo(page, 'ADMIN', idServidor);
@@ -198,4 +198,63 @@ export async function esperarUrl(page: Page, url: string | RegExp): Promise<void
     } else {
         await expect(page).toHaveURL(url);
     }
+}
+
+// ==================================================================
+// FUNÇÕES SEMÂNTICAS EM PORTUGUÊS
+// ==================================================================
+
+/**
+ * Verifica os elementos básicos do painel de processos.
+ */
+export async function verificarElementosBasicosDoPainel(page: Page) {
+    await esperarElementoVisivel(page, SELETORES.TITULO_PROCESSOS);
+    await esperarElementoVisivel(page, SELETORES.TABELA_PROCESSOS);
+}
+
+/**
+ * Garante que o botão "Criar processo" não está visível.
+ */
+export async function verificarAusenciaDoBotaoCriarProcesso(page: Page) {
+    await esperarElementoInvisivel(page, SELETORES.BTN_CRIAR_PROCESSO);
+}
+
+/**
+ * Verifica a visibilidade de um processo específico na tabela de processos.
+ * @param page A instância da página.
+ * @param nomeProcesso O nome do processo a ser verificado (string ou RegExp).
+ * @param visivel `true` se o processo deve estar visível, `false` caso contrário.
+ */
+export async function verificarVisibilidadeDoProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean) {
+    const processo = page.getByRole('row', { name: nomeProcesso });
+    if (visivel) {
+        await expect(processo).toBeVisible();
+    } else {
+        await expect(processo).toBeHidden();
+    }
+}
+
+/**
+ * Verifica se a navegação para a página de um subprocesso foi bem-sucedida.
+ */
+export async function verificarNavegacaoParaPaginaDeSubprocesso(page: Page) {
+    await esperarUrl(page, /.*\/processo\/\d+\/\w+$/);
+    await esperarElementoVisivel(page, SELETORES.SUBPROCESSO_HEADER);
+    await esperarElementoVisivel(page, SELETORES.PROCESSO_INFO);
+}
+
+/**
+ * Verifica se a navegação para a página de cadastro/edição de processo foi bem-sucedida.
+ */
+export async function verificarNavegacaoParaPaginaDeCadastroDeProcesso(page: Page) {
+    await esperarUrl(page, /.*\/processo\/cadastro\?idProcesso=\d+/);
+    await expect(page.getByRole('heading', { name: 'Cadastro de Processo' })).toBeVisible();
+}
+
+/**
+ * Verifica se a navegação para a página de detalhes de um processo foi bem-sucedida.
+ */
+export async function verificarNavegacaoParaPaginaDeDetalhesDoProcesso(page: Page) {
+    await esperarUrl(page, /.*\/processo\/\d+$/);
+    await esperarElementoVisivel(page, SELETORES.PROCESSO_INFO);
 }

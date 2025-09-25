@@ -8,6 +8,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
         await verificarUrl(page, `${URLS.LOGIN}`);
+
         await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
         await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();
         await expect(page.getByRole('button', {name: TEXTOS.ENTRAR})).toBeVisible();

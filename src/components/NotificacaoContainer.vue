@@ -182,7 +182,6 @@ const fecharEmailModal = () => {
   }
 }
 
-/* Responsividade */
 @media (max-width: 480px) {
   .notification-container {
     left: 10px;

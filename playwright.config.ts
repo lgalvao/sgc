@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {defineConfig, devices} from '@playwright/test';
-import {vueTest} from './e2e/support/vue-specific-setup';
+import {vueTest} from '~/support/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,

@@ -14,13 +14,13 @@ interface CustomWindow extends Window {
 
     postMessage(message: any, options?: WindowPostMessageOptions): void;
 
-    __coverage__?: any; // Adicionar a propriedade __coverage__
+    __coverage__?: any;
 }
 
 declare const window: CustomWindow;
 
 export const vueTest = test.extend<{ page: Page }>({
-    page: async ({ page }, use, _testInfo) => { // Manter esta linha
+    page: async ({page}, use, _testInfo) => {
         const errorReporter = new ErrorReporter();
 
         // Interceptar e modificar subprocessos.json
@@ -65,10 +65,10 @@ export const vueTest = test.extend<{ page: Page }>({
             const originalConsoleError = console.error;
             console.error = function (...args: any[]) {
                 if (args.some(arg => typeof arg === 'string' && (arg.includes('[Vue') || arg.includes('vue') || arg.includes('component')))) {
-                    window.postMessage({ type: 'VUE_ERROR', message: `[VUE] ${args.join(' ')}` }, '*');
+                    window.postMessage({type: 'VUE_ERROR', message: `[VUE] ${args.join(' ')}`}, '*');
                     originalConsoleError.apply(console, ['🔥 VUE:', ...args]);
                 } else {
-                    window.postMessage({ type: 'CONSOLE_ERROR', message: args.join(' ') }, '*');
+                    window.postMessage({type: 'CONSOLE_ERROR', message: args.join(' ')}, '*');
                     originalConsoleError.apply(console, args);
                 }
             };
@@ -129,7 +129,7 @@ export const vueTest = test.extend<{ page: Page }>({
             if (coverage) {
                 const coveragePath = join(process.cwd(), '.nyc_output');
                 if (!existsSync(coveragePath)) {
-                    mkdirSync(coveragePath, { recursive: true });
+                    mkdirSync(coveragePath, {recursive: true});
                 }
                 const testTitle = test.info().title.replace(/[^a-zA-Z0-9]/g, '_'); // Nome do arquivo baseado no título do teste
                 writeFileSync(join(coveragePath, `coverage-${testTitle}-${Date.now()}.json`), JSON.stringify(coverage));

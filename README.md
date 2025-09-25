@@ -5,7 +5,7 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 ## Antes de qualquer coisa
 
 - Este é um **protótipo**. Não vamos nos preocupar com desempenho ou reuso; o foco é no funcionamento da UX/UI do sistema.
-- **Não*** antecipe otimizações e abstrações; faça só o necessário para o momento.
+- **Não** antecipe otimizações e abstrações; faça só o necessário para o momento.
 - O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
 - O código, comentários e dados devem estar sempre em **português do Brasil**.
 

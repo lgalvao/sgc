@@ -17,6 +17,7 @@ export async function login(page: Page, idServidor: string): Promise<void> {
   
   await page.goto(URLS.LOGIN);
   await page.waitForLoadState('networkidle');
+
   // O login mockado usa o ID do servidor como "título" e uma senha padrão
   await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
   await page.getByLabel(ROTULOS.SENHA).fill('senha-padrao'); // A senha é ignorada pelo mock
