@@ -1,9 +1,9 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarTextoVisivel, esperarUrl, loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
-import {navegarParaVisualizacaoAtividades} from './auxiliares-navegacao';
-import {devolverParaAjustes, homologarItem} from './auxiliares-acoes';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
+import {esperarTextoVisivel, esperarUrl, loginComoAdmin, loginComoGestor} from './helpers';
+import {navegarParaVisualizacaoAtividades} from './helpers';
+import {devolverParaAjustes, homologarItem} from './helpers';
+import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
     const idProcessoStic = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id;

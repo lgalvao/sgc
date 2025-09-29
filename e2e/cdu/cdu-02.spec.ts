@@ -6,20 +6,17 @@ import {
     loginComoGestor,
     loginComoServidor,
     verificarAusenciaBotaoCriarProcesso,
-    verificarElementosBasicosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
     verificarNavegacaoPaginaDetalhesProcesso,
     verificarNavegacaoPaginaSubprocesso,
     verificarVisibilidadeProcesso,
-} from './auxiliares-verificacoes';
-import {
     clicarPrimeiroProcesso,
     clicarProcesso,
     clicarUnidade,
     expandirTodasAsUnidades,
-    ordenarTabelaProcessosPorColuna,
-} from './auxiliares-navegacao';
-import {SELETORES, TEXTOS} from './constantes-teste';
+    ordenarTabelaProcessosPorColuna, verificarElementosPainel,
+} from './helpers';
+import {SELETORES, TEXTOS} from './helpers';
 
 const obterValoresColuna = async (page: Page, indiceColuna: number) => {
     return page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).evaluateAll(linhas =>
@@ -37,14 +34,14 @@ test.describe('CDU-02: Visualizar Painel', () => {
         for (const perfil of perfisSemAcessoCriacao) {
             test(`não deve exibir o botão "Criar processo" para ${perfil.nome}`, async ({page}) => {
                 await perfil.funcaoLogin(page);
-                await verificarElementosBasicosPainel(page);
+                await verificarElementosPainel(page);
                 await verificarAusenciaBotaoCriarProcesso(page);
             });
         }
 
         test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({page}) => {
             await loginComoServidor(page);
-            await verificarElementosBasicosPainel(page);
+            await verificarElementosPainel(page);
             await verificarAusenciaBotaoCriarProcesso(page);
             await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
         });

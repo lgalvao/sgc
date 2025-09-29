@@ -5,9 +5,9 @@ import {
     esperarElementoVisivel,
     esperarTextoVisivel,
     loginComoChefeSedia,
-} from './auxiliares-verificacoes';
-import {validarMapa} from './auxiliares-acoes';
-import {irParaVisualizacaoMapa} from './auxiliares-navegacao';
+} from './helpers';
+import {validarMapa} from './helpers';
+import {irParaVisualizacaoMapa} from './helpers';
 
 test.describe('CDU-19: Validar mapa de competências', () => {
     test.beforeEach(async ({page}) => {

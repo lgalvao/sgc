@@ -1,6 +1,5 @@
 import {test} from '@playwright/test';
-import {SELETORES, URLS} from "~/cdu/constantes-teste";
-import {loginComoAdmin, loginComoChefe, loginComoGestor, loginComoServidor} from "../cdu/auxiliares-verificacoes";
+import {loginComoAdmin, loginComoChefe, loginComoGestor, loginComoServidor, SELETORES, URLS} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Painel', () => {
     test('03 - Painel - ADMIN', async ({page}) => {

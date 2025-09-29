@@ -7,9 +7,9 @@ import {
     loginComoChefe,
     loginComoServidor,
     verificarUrl
-} from './auxiliares-verificacoes';
-import {irParaProcessoPorTexto} from './auxiliares-navegacao';
-import {SELETORES, TEXTOS} from './constantes-teste';
+} from './helpers';
+import {irParaProcessoPorTexto} from './helpers';
+import {SELETORES, TEXTOS} from './helpers';
 
 test.describe('CDU-18: Visualizar mapa de competências', () => {
   test('ADMIN/GESTOR: navegar pelo processo até visualização do mapa', async ({ page }) => {

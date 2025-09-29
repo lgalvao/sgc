@@ -6,9 +6,9 @@ import {
     esperarTextoVisivel,
     loginComoAdmin,
     navegarParaCadastroAtividades
-} from './auxiliares-verificacoes';
-import {irParaMapaCompetencias} from './auxiliares-navegacao';
-import {DADOS_TESTE, SELETORES_CSS} from './constantes-teste';
+} from './helpers';
+import {irParaMapaCompetencias} from './helpers';
+import {DADOS_TESTE, SELETORES_CSS} from './helpers';
 
 test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
   test('deve exibir mensagem de "Nenhum impacto" quando não houver divergências', async ({page}) => {

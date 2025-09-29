@@ -1,9 +1,9 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarElementoVisivel, esperarTextoVisivel, loginComoAdmin} from './auxiliares-verificacoes';
-import {criarCompetencia} from './auxiliares-acoes';
-import {irParaMapaCompetencias} from './auxiliares-navegacao';
-import {DADOS_TESTE, TEXTOS} from './constantes-teste';
+import {esperarElementoVisivel, esperarTextoVisivel, loginComoAdmin} from './helpers';
+import {criarCompetencia} from './helpers';
+import {irParaMapaCompetencias} from './helpers';
+import {DADOS_TESTE, TEXTOS} from './helpers';
 
 async function navegarParaMapaRevisao(page: Page) {
   await loginComoAdmin(page);

@@ -1,14 +1,14 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {DADOS_TESTE} from './constantes-teste';
+import {DADOS_TESTE} from './helpers';
 import {
     loginComoAdmin,
     loginComoChefe,
     loginComoGestor,
     loginComoServidor,
     navegarParaCadastroAtividades,
-} from './auxiliares-verificacoes';
-import {navegarParaVisualizacaoAtividades} from './auxiliares-navegacao';
+} from './helpers';
+import {navegarParaVisualizacaoAtividades} from './helpers';
 
 async function verificarListagemAtividadesEConhecimentos(page) {
   // Renderização básica da lista

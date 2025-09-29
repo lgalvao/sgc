@@ -1,5 +1,5 @@
 import {test} from '@playwright/test';
-import {TEXTOS, URLS} from "~/cdu/constantes-teste";
+import {TEXTOS, URLS} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Autenticação', () => {
     test('01 - Login Page', async ({page}) => {

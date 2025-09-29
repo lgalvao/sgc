@@ -1,0 +1,1 @@
+export { gerarNomeUnico } from './utils';

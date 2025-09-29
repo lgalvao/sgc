@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
-import {loginComoAdmin, loginComoServidor, verificarElementosPainel, verificarUrl,} from './auxiliares-verificacoes';
-import {ROTULOS, TEXTOS, URLS} from './constantes-teste';
-import {login} from "./auxiliares-utils";
+import {loginComoAdmin, loginComoServidor, verificarElementosPainel, verificarUrl,} from './helpers';
+import {ROTULOS, TEXTOS, URLS} from './helpers';
+import {login} from "./helpers";
 
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve carregar a página de login corretamente', async ({page}) => {

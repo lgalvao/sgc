@@ -1,15 +1,16 @@
 import {expect, test} from '@playwright/test';
-import {DADOS_TESTE, SELETORES, TEXTOS} from "../cdu/constantes-teste";
+import {DADOS_TESTE, SELETORES, TEXTOS} from "../cdu/helpers";
 import {
+    cancelarModal,
+    gerarNomeUnico,
+    irParaSubprocesso,
     loginComoAdmin,
     loginComoChefe,
     loginComoGestor,
     loginComoServidor,
-    navegarParaCadastroAtividades
-} from "~/cdu/auxiliares-verificacoes";
-import {cancelarModal} from "~/cdu/auxiliares-acoes";
-import {irParaSubprocesso, navegarParaVisualizacaoAtividades} from "~/cdu/auxiliares-navegacao";
-import {gerarNomeUnico} from "~/cdu/auxiliares-utils";
+    navegarParaCadastroAtividades,
+    navegarParaVisualizacaoAtividades
+} from "~/cdu/helpers";
 
 test.describe('Captura de Telas - Atividades', () => {
     test('19 - Detalhes de Subprocesso (CHEFE)', async ({page}) => {

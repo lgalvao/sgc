@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
-import {loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
-import {cancelarModal, finalizarProcesso} from './auxiliares-acoes';
-import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './constantes-teste';
+import {loginComoAdmin, loginComoGestor} from './helpers';
+import {cancelarModal, finalizarProcesso} from './helpers';
+import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './helpers';
 
 test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
     test.beforeEach(async ({page}) => {

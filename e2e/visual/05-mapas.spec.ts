@@ -1,14 +1,17 @@
 import {expect, test} from '@playwright/test';
-import {DADOS_TESTE, TEXTOS} from "../cdu/constantes-teste";
 import {
+    cancelarModal,
+    criarCompetencia,
+    DADOS_TESTE,
+    irParaMapaCompetencias,
+    irParaVisualizacaoMapa,
     loginComoAdmin,
     loginComoChefe,
     loginComoChefeSedia,
     loginComoGestor,
-    navegarParaCadastroAtividades
-} from "~/cdu/auxiliares-verificacoes";
-import {cancelarModal, criarCompetencia} from "~/cdu/auxiliares-acoes";
-import {irParaMapaCompetencias, irParaVisualizacaoMapa} from "~/cdu/auxiliares-navegacao";
+    navegarParaCadastroAtividades,
+    TEXTOS
+} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Mapas', () => {
     test('30 - Mapa de Competências - Edição (ADMIN)', async ({page}) => {
@@ -38,12 +41,12 @@ test.describe('Captura de Telas - Mapas', () => {
 
         await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.SESEL);
         await page.waitForLoadState('networkidle');
-            const impactosButton = page.getByTestId('impactos-mapa-button');
-            await impactosButton.waitFor({ state: 'visible' });
-            await impactosButton.click();
-            await expect(page.getByTestId('impacto-mapa-modal')).toBeVisible();
-            await page.screenshot({path: 'screenshots/32-modal-impactos-mapa.png', fullPage: true});
-            await cancelarModal(page);
+        const impactosButton = page.getByTestId('impactos-mapa-button');
+        await impactosButton.waitFor({state: 'visible'});
+        await impactosButton.click();
+        await expect(page.getByTestId('impacto-mapa-modal')).toBeVisible();
+        await page.screenshot({path: 'screenshots/32-modal-impactos-mapa.png', fullPage: true});
+        await cancelarModal(page);
     });
 
     test('33 - Modal Exclusão de Competência (ADMIN)', async ({page}) => {
@@ -102,11 +105,11 @@ test.describe('Captura de Telas - Mapas', () => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
         await page.waitForLoadState('networkidle');
         const validarButton = page.getByTestId('validar-btn');
-        await validarButton.waitFor({ state: 'visible' });
+        await validarButton.waitFor({state: 'visible'});
         await validarButton.click();
         await expect(page.getByTestId('modal-validar')).toBeVisible();
-            await page.screenshot({path: 'screenshots/38-modal-validacao-mapa.png', fullPage: true});
-            await cancelarModal(page);
+        await page.screenshot({path: 'screenshots/38-modal-validacao-mapa.png', fullPage: true});
+        await cancelarModal(page);
 
 
     });
@@ -116,11 +119,11 @@ test.describe('Captura de Telas - Mapas', () => {
         await irParaVisualizacaoMapa(page, 1, 'SEDESENV'); // Processo 1, SEDESENV para devolução
         await page.waitForLoadState('networkidle');
         const devolverButton = page.getByTestId('devolver-ajustes-btn');
-        await devolverButton.waitFor({ state: 'visible' });
+        await devolverButton.waitFor({state: 'visible'});
         await devolverButton.click();
         await expect(page.getByTestId('modal-devolucao')).toBeVisible();
-            await page.screenshot({path: 'screenshots/39-modal-devolucao-mapa.png', fullPage: true});
-            await cancelarModal(page);
+        await page.screenshot({path: 'screenshots/39-modal-devolucao-mapa.png', fullPage: true});
+        await cancelarModal(page);
     });
 
     test('40 - Modal Aceite (Visualização Mapa - GESTOR)', async ({page}) => {
@@ -165,11 +168,11 @@ test.describe('Captura de Telas - Mapas', () => {
     test('43 - Modal Histórico de Análise (Visualização Mapa - GESTOR)', async ({page}) => {
         await loginComoGestor(page);
         await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-            const historicoButton = page.getByTestId('historico-analise-btn-gestor');
-            await historicoButton.click();
-            await expect(page.locator('.modal.show', { hasText: 'Histórico de Análise' })).toBeVisible();
-            await page.screenshot({path: 'screenshots/43-modal-historico-analise-mapa.png', fullPage: true});
-            await cancelarModal(page);
+        const historicoButton = page.getByTestId('historico-analise-btn-gestor');
+        await historicoButton.click();
+        await expect(page.locator('.modal.show', {hasText: 'Histórico de Análise'})).toBeVisible();
+        await page.screenshot({path: 'screenshots/43-modal-historico-analise-mapa.png', fullPage: true});
+        await cancelarModal(page);
 
     });
 });

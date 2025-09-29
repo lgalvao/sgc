@@ -11,7 +11,7 @@
 
     // Modules
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,

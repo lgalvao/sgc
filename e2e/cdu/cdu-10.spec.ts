@@ -10,9 +10,9 @@ import {
     esperarUrl,
     loginComoChefe,
     navegarParaCadastroAtividades
-} from './auxiliares-verificacoes';
-import {disponibilizarCadastro} from './auxiliares-acoes';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
+} from './helpers';
+import {disponibilizarCadastro} from './helpers';
+import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
 
 async function adicionarAtividadeComConhecimento(page: Page, atividadeDesc: string, conhecimentoDesc: string) {
     await adicionarAtividade(page, atividadeDesc);

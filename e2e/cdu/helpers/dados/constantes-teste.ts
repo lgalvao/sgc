@@ -153,4 +153,6 @@ export const SELETORES_CSS = {
     CARD_ATIVIDADE: '.atividade-card',
     GRUPO_CONHECIMENTO: '.group-conhecimento',
     LINHA_TABELA: 'table tbody tr',
+    CHECKBOX: 'input[type="checkbox"]',
+    CHECKBOX_MARCADO: 'input[type="checkbox"]:checked',
 } as const;

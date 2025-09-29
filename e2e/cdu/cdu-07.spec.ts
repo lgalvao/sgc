@@ -1,7 +1,7 @@
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarElementoVisivel, loginComoChefe, verificarUrl} from './auxiliares-verificacoes';
-import {clicarPrimeiroProcesso} from './auxiliares-navegacao';
-import {SELETORES} from './constantes-teste';
+import {esperarElementoVisivel, loginComoChefe, verificarUrl} from './helpers';
+import {clicarPrimeiroProcesso} from './helpers';
+import {SELETORES} from './helpers';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
     test.beforeEach(async ({page}) => await loginComoChefe(page));

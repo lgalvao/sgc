@@ -5,9 +5,9 @@ import {
     esperarElementoVisivel,
     loginComoAdmin,
     loginComoGestor
-} from './auxiliares-verificacoes';
-import {irParaVisualizacaoMapa} from './auxiliares-navegacao';
-import {SELETORES_CSS} from './constantes-teste';
+} from './helpers';
+import {irParaVisualizacaoMapa} from './helpers';
+import {SELETORES_CSS} from './helpers';
 
 test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     test.describe('GESTOR', () => {

@@ -1,9 +1,9 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarUrl, loginComoAdmin, loginComoGestor} from './auxiliares-verificacoes';
-import {devolverParaAjustes} from './auxiliares-acoes';
-import {irParaSubprocesso} from './auxiliares-navegacao';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './constantes-teste';
+import {esperarUrl, loginComoAdmin, loginComoGestor} from './helpers';
+import {devolverParaAjustes} from './helpers';
+import {irParaSubprocesso} from './helpers';
+import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
 
 async function navegarParaAnaliseRevisao(page: Page, loginFn: (page: Page) => Promise<void>) {
   await loginFn(page);

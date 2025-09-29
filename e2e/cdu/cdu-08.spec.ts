@@ -8,9 +8,9 @@ import {
     loginComoChefe,
     navegarParaCadastroAtividades,
     removerAtividade
-} from './auxiliares-verificacoes';
-import {gerarNomeUnico} from './auxiliares-utils';
-import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './constantes-teste';
+} from './helpers';
+import {gerarNomeUnico} from './helpers';
+import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     test.beforeEach(async ({page}) => {

@@ -1,5 +1,5 @@
 import {test} from '@playwright/test';
-import {loginComoAdmin} from "~/cdu/auxiliares-verificacoes";
+import {loginComoAdmin} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Admin', () => {
     test('44 - Página de Configurações (ADMIN)', async ({page}) => {
