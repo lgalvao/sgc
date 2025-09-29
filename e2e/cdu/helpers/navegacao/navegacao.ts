@@ -25,8 +25,7 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
  * Navega para criação de processo
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
-    await page.getByText(TEXTOS.CRIAR_PROCESSO).click();
-    await verificarUrl(page, `**${URLS.PROCESSO_CADASTRO}`);
+    await page.goto(URLS.PROCESSO_CADASTRO);
 }
 
 /**

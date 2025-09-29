@@ -94,6 +94,7 @@ export const TEXTOS = {
     CONFIRMACAO_REMOCAO_PROCESSO_FIM: '\'? Esta ação não poderá ser desfeita.',
     PROCESSO_REMOVIDO_INICIO: 'Processo ',
     PROCESSO_REMOVIDO_FIM: ' removido',
+    TITULO_PROCESSOS_LABEL: 'Processos',
 } as const;
 
 export const URLS = {
@@ -155,4 +156,10 @@ export const SELETORES_CSS = {
     LINHA_TABELA: 'table tbody tr',
     CHECKBOX: 'input[type="checkbox"]',
     CHECKBOX_MARCADO: 'input[type="checkbox"]:checked',
+    TITULO_CADASTRO_PROCESSO: 'h2:has-text("Cadastro de processo")',
+    TITULO_MODAL_INICIAR_PROCESSO: 'h5:has-text("Iniciar processo")',
+    CAMPO_DESCRICAO: '#descricao',
+    CAMPO_TIPO: '#tipo',
+    CAMPO_DATA_LIMITE: '#dataLimite',
+    CHECKBOX_STIC: '#chk-STIC',
 } as const;

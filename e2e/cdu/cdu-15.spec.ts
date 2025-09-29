@@ -1,21 +1,16 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarElementoVisivel, loginComoAdmin} from './helpers';
-import {criarCompetencia} from './helpers';
-import {irParaMapaCompetencias} from './helpers';
-import {TEXTOS} from './helpers';
+import {criarCompetencia, esperarElementoVisivel, irParaMapaCompetencias, loginComoAdmin, TEXTOS} from './helpers';
 
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, 4, 'SESEL');
-    //await page.waitForLoadState('networkidle');
     await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 }
 
 test.describe('CDU-15: Manter mapa de competências', () => {
     test('deve exibir tela de edição de mapa com elementos corretos', async ({page}) => {
         await navegarParaMapa(page);
-
         await esperarElementoVisivel(page, 'btn-abrir-criar-competencia');
         await expect(page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR})).toBeVisible();
     });
@@ -25,7 +20,6 @@ test.describe('CDU-15: Manter mapa de competências', () => {
 
         const competenciaDescricao = `Competência Teste ${Date.now()}`;
         await criarCompetencia(page, competenciaDescricao);
-
         const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaDescricao});
         await expect(competenciaCard).toBeVisible();
 

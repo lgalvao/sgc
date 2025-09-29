@@ -52,7 +52,73 @@ no projeto.
 
 * **Isolamento de Testes e Setup**: Garanta que cada teste ou grupo de testes seja executado em um ambiente limpo e previsível. Utilize blocos `test.beforeEach` para configurar o estado inicial da aplicação (ex: login, navegação para uma página específica) e garantir que os pré-requisitos do teste sejam atendidos.
 * **Funções Auxiliares Robustas**: Crie funções auxiliares para ações repetitivas, mas evite que elas tentem lidar com múltiplas variações de UI ou usem lógicas de fallback genéricas. Funções auxiliares devem ser focadas, usar seletores específicos e falhar diretamente se as pré-condições não forem atendidas. Isso reduz a duplicação, facilita a manutenção e torna os testes mais legíveis e confiáveis.
-* **Autenticação e Perfis**: Use as funções de login em `e2e/support/utils/auth.ts` antes de cada suíte ou grupo de testes. Crie funções de login específicas (ex: `loginAsAdmin`, `loginAsGestor`) para simular diferentes perfis de usuário, garantindo que os testes sejam executados com as permissões corretas. Utilize IDs de servidores válidos que existam nos mocks.
+
+#### 5.1 Estrutura Modular de Helpers
+
+A estrutura de helpers foi refatorada para seguir o princípio da responsabilidade única:
+
+```
+📁 e2e/cdu/helpers/
+├── 📁 acoes/         # Ações por domínio
+│   ├── acoes-atividades.ts    # Adicionar, editar, remover atividades/conhecimentos
+│   ├── acoes-mapa.ts          # Ações relacionadas a mapas de competências
+│   ├── acoes-modais.ts        # Interações com modais e confirmações
+│   ├── acoes-processo.ts      # Criação, edição, remoção de processos
+│   └── index.ts               # Re-exporta todas as ações
+├── 📁 verificacoes/  # Verificações por domínio
+│   ├── verificacoes-basicas.ts    # Esperas, URLs, elementos visíveis
+│   ├── verificacoes-processo.ts   # Verificações específicas de processo
+│   ├── verificacoes-ui.ts         # Verificações de interface
+│   └── index.ts                   # Re-exporta todas as verificações
+├── 📁 navegacao/     # Navegação, login e rotas
+│   ├── navegacao.ts           # Funções de navegação e login
+│   └── index.ts               # Re-exporta navegação
+├── 📁 dados/         # Constantes e dados de teste
+│   ├── constantes-teste.ts    # Seletores, textos, URLs, dados mock
+│   └── index.ts               # Re-exporta constantes
+├── 📁 utils/         # Utilitários gerais
+│   ├── utils.ts               # Funções utilitárias (gerar nomes únicos)
+│   └── index.ts               # Re-exporta utilitários
+└── index.ts          # Ponto de entrada único
+```
+
+#### 5.2 Como Usar os Helpers
+
+**Importação centralizada:**
+```typescript
+import {
+    loginComoAdmin,
+    navegarParaCadastroAtividades,
+    adicionarAtividade,
+    verificarElementosPainel,
+    SELETORES,
+    TEXTOS
+} from './helpers';
+```
+
+**Exemplo de uso em teste:**
+```typescript
+test.describe('CDU-08: Manter atividades', () => {
+    test.beforeEach(async ({page}) => {
+        await loginComoAdmin(page);
+    });
+
+    test('deve adicionar atividade', async ({page}) => {
+        await navegarParaCadastroAtividades(page, processoId, unidade);
+        await adicionarAtividade(page, 'Nova Atividade');
+        await verificarElementosPainel(page);
+    });
+});
+```
+
+#### 5.3 Princípios de Organização
+
+* **Responsabilidade Única**: Cada módulo tem uma responsabilidade específica
+* **Re-exportação Limpa**: Use `index.ts` para re-exportar funções relacionadas
+* **Importação Centralizada**: Importe do `helpers/index.ts` para acesso a tudo
+* **Nomenclatura Clara**: Use prefixos como `verificar`, `navegar`, `adicionar`
+
+* **Autenticação e Perfis**: Use as funções de login em `e2e/cdu/helpers/navegacao` antes de cada suíte ou grupo de testes. As funções disponíveis incluem `loginComoAdmin()`, `loginComoGestor()`, `loginComoChefe()`, `loginComoServidor()`. Utilize IDs de servidores válidos que existam nos mocks.
 * **Modais e Confirmações**:
     * Sempre aguarde a abertura do modal antes de interagir.
     * Use seletores específicos para os botões dentro do modal.

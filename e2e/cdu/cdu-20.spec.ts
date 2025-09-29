@@ -3,17 +3,15 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {
     esperarElementoInvisivel,
     esperarElementoVisivel,
+    irParaVisualizacaoMapa,
     loginComoAdmin,
-    loginComoGestor
+    loginComoGestor,
+    SELETORES_CSS
 } from './helpers';
-import {irParaVisualizacaoMapa} from './helpers';
-import {SELETORES_CSS} from './helpers';
 
 test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     test.describe('GESTOR', () => {
-        test.beforeEach(async ({page}) => {
-            await loginComoGestor(page);
-        });
+        test.beforeEach(async ({page}) => await loginComoGestor(page));
 
         test('deve exibir botões para GESTOR analisar mapa validado', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
@@ -57,9 +55,7 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     });
 
     test.describe('ADMIN', () => {
-        test.beforeEach(async ({page}) => {
-            await loginComoAdmin(page);
-        });
+        test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
         test('deve exibir botão Homologar para ADMIN', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
@@ -70,14 +66,12 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
 
         test('deve permitir homologar mapa', async ({page}) => {
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
-
             await page.getByTestId('registrar-aceite-btn').click();
 
             const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
             await expect(modal).toBeVisible();
 
             await page.getByTestId('modal-aceite-confirmar').click();
-
             await page.waitForTimeout(1000);
         });
     });

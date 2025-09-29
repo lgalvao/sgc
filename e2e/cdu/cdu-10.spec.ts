@@ -4,15 +4,16 @@ import {
     adicionarAtividade,
     adicionarConhecimento,
     clicarBotao,
+    DADOS_TESTE,
+    disponibilizarCadastro,
     esperarElementoVisivel,
-    esperarMensagemErro,
-    esperarMensagemSucesso,
-    esperarUrl,
     loginComoChefe,
-    navegarParaCadastroAtividades
+    navegarParaCadastroAtividades,
+    SELETORES_CSS,
+    TEXTOS,
+    URLS
 } from './helpers';
-import {disponibilizarCadastro} from './helpers';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
+import {esperarMensagemErro, esperarMensagemSucesso, esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
 
 async function adicionarAtividadeComConhecimento(page: Page, atividadeDesc: string, conhecimentoDesc: string) {
     await adicionarAtividade(page, atividadeDesc);
@@ -29,11 +30,8 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
     test('deve permitir disponibilização da revisão com sucesso', async ({page}) => {
         const nomeAtividade = `Atividade Sucesso ${Date.now()}`;
         const nomeConhecimento = `Conhecimento Sucesso ${Date.now()}`;
-
         await adicionarAtividadeComConhecimento(page, nomeAtividade, nomeConhecimento);
-
         await disponibilizarCadastro(page);
-
         await esperarMensagemSucesso(page, 'Revisão do cadastro de atividades disponibilizada');
         await esperarUrl(page, URLS.PAINEL);
     });
@@ -41,9 +39,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
     test('não deve permitir disponibilização se houver atividades sem conhecimento', async ({page}) => {
         const nomeAtividade = `Atividade Sem Conhecimento ${Date.now()}`;
         await adicionarAtividade(page, nomeAtividade);
-
         await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
-
         const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
         await expect(modal).not.toBeVisible();
 

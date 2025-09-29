@@ -2,15 +2,18 @@ import {expect, test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    DADOS_TESTE,
     editarAtividade,
     editarConhecimento,
     esperarElementoVisivel,
+    gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
-    removerAtividade
+    removerAtividade,
+    SELETORES,
+    SELETORES_CSS,
+    TEXTOS
 } from './helpers';
-import {gerarNomeUnico} from './helpers';
-import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     test.beforeEach(async ({page}) => {
@@ -79,17 +82,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
         await editarConhecimento(page, linhaConhecimento, nomeConhecimentoEditado);
 
-        // Verificar que a edição funcionou - usar metodo mais flexível
-        // Como estamos contornando um bug de automação via DOM manipulation,
-        // vamos verificar que o texto foi alterado no DOM diretamente
         const textoAposEdicao = await page.evaluate(() => {
             const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
             return Array.from(spans).map(span => span.textContent).join(', ');
         });
         expect(textoAposEdicao).toContain(nomeConhecimentoEditado);
 
-        // Remover conhecimento com confirmação - usar seletor mais específico
-        // Primeiro, encontrar o grupo que contém o conhecimento editado
         const grupoConhecimentoEditado = await page.evaluate((nomeEditado) => {
             const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
             for (const span of spans) {
@@ -100,7 +98,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         expect(grupoConhecimentoEditado).toBe(true);
 
-        // Para simular a remoção, vamos usar JavaScript diretamente
         await page.evaluate((nomeEditado) => {
             const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
             for (const span of spans) {

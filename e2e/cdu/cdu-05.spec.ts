@@ -1,90 +1,77 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
-    cancelarModal,
-    esperarMensagemErro,
-    esperarMensagemSucesso,
-    esperarUrl,
+    cancelarNoModal,
+    clicarBotaoIniciarProcesso,
+    clicarProcessoNaTabela,
     iniciarProcesso,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
+    preencherFormularioProcesso,
     SELETORES,
     TEXTOS,
-    URLS
+    URLS,
+    verificarBotaoIniciarProcessoVisivel,
+    verificarMensagemErro,
+    verificarMensagemSucesso,
+    verificarModalConfirmacaoIniciarProcessoInvisivel,
+    verificarModalConfirmacaoIniciarProcessoVisivel,
+    verificarPaginaCadastroProcesso,
+    verificarTituloProcessos,
+    verificarUrlPainel,
+    verificarValorCampoDescricao
 } from './helpers';
 
+
 test.describe('CDU-05: Iniciar processo de revisão', () => {
-    test.beforeEach(async ({page}) => {
-        await loginComoAdmin(page);
-    });
+    test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
     test('deve navegar para processo Criado e exibir botão Iniciar', async ({page}) => {
-        // Passo 1: No Painel, clicar em processo Criado
-        await expect(page.locator('[data-testid="titulo-processos"]')).toContainText('Processos');
-        const processoCriado = page.locator('table[data-testid="tabela-processos"] tbody tr').filter({hasText: 'Processo teste revisão CDU-05'});
-        await processoCriado.click();
+        await verificarTituloProcessos(page);
+        await clicarProcessoNaTabela(page, 'Processo teste revisão CDU-05');
 
-        // Passo 2: Verificar tela Cadastro de processo com campos preenchidos
-        await expect(page.locator('h2:has-text("Cadastro de processo")')).toBeVisible();
-        await expect(page.locator('#descricao')).toHaveValue('Processo teste revisão CDU-05');
-
-        // Passo 3: Verificar botão Iniciar processo
-        await expect(page.locator('[data-testid="btn-iniciar-processo"]')).toBeVisible();
+        await verificarPaginaCadastroProcesso(page);
+        await verificarValorCampoDescricao(page, 'Processo teste revisão CDU-05');
+        await verificarBotaoIniciarProcessoVisivel(page);
     });
 
     test('deve exibir modal de confirmação para processo válido', async ({page}) => {
-        await navegarParaCriacaoProcesso(page);
+        const descricaoProcessoExistente = "Processo teste revisão CDU-05"; // Usar processo existente nos mocks
+        await page.goto(URLS.PAINEL);
+        await expect(page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`).getByText(descricaoProcessoExistente)).toBeVisible();
 
-        await page.fill('#descricao', 'Teste CDU-05');
-        await page.selectOption('#tipo', 'Revisão');
-        await page.fill('#dataLimite', '2025-12-31');
-        await page.check('#chk-STIC');
+        await clicarProcessoNaTabela(page, descricaoProcessoExistente);
+        // Verifica se a URL é a da página de detalhes do processo
+        await expect(page).toHaveURL(new RegExp(`/processo/cadastro\\?idProcesso=100`));
+        await clicarBotaoIniciarProcesso(page);
 
-        await page.click(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`);
-
-        await expect(page.locator('.modal.show')).toBeVisible();
-        await expect(page.locator('h5:has-text("Iniciar processo")')).toBeVisible();
-        await expect(page.locator('text=' + TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
-        await expect(page.locator('text=' + TEXTOS.NOTIFICACAO_EMAIL)).toBeVisible();
+        await verificarModalConfirmacaoIniciarProcessoVisivel(page);
     });
 
     test('deve cancelar iniciação e permanecer na mesma tela', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
+        await preencherFormularioProcesso(page, 'Teste CDU-05 Cancelar', 'Revisão', '2025-12-31', true);
+        await clicarBotaoIniciarProcesso(page);
+        await cancelarNoModal(page);
 
-        await page.fill('#descricao', 'Teste CDU-05 Cancelar');
-        await page.selectOption('#tipo', 'Revisão');
-        await page.fill('#dataLimite', '2025-12-31');
-        await page.check('#chk-STIC');
-
-        await page.click(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`);
-        await expect(page.locator('.modal.show')).toBeVisible();
-
-        await cancelarModal(page);
-
-        await expect(page.locator('.modal.show')).not.toBeVisible();
-        await expect(page.url()).toContain('/processo/cadastro');
+        await verificarModalConfirmacaoIniciarProcessoInvisivel(page);
+        await verificarPaginaCadastroProcesso(page); // verificarUrlCadastroProcesso foi substituída por verificarPaginaCadastroProcesso
     });
 
     test('deve iniciar processo com sucesso', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
-
-        await page.fill('#descricao', 'Teste CDU-05 Sucesso');
-        await page.selectOption('#tipo', 'Revisão');
-        await page.fill('#dataLimite', '2025-12-31');
-        await page.check('#chk-STIC');
-
+        await preencherFormularioProcesso(page, 'Teste CDU-05 Sucesso', 'Revisão', '2025-12-31', true);
         await iniciarProcesso(page);
 
-        await esperarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
-        await esperarUrl(page, URLS.PAINEL);
+        await verificarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
+        await verificarUrlPainel(page, URLS.PAINEL);
     });
 
     test('deve validar dados antes de mostrar modal', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
+        await clicarBotaoIniciarProcesso(page);
 
-        await page.click(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`);
-
-        await esperarMensagemErro(page, TEXTOS.DADOS_INCOMPLETOS);
-        await expect(page.locator('.modal.show')).not.toBeVisible();
+        await verificarMensagemErro(page, TEXTOS.DADOS_INCOMPLETOS);
+        await verificarModalConfirmacaoIniciarProcessoInvisivel(page);
     });
 });

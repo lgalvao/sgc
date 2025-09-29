@@ -3,12 +3,15 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {
     adicionarAtividade,
     adicionarConhecimento,
-    esperarUrl,
+    DADOS_TESTE,
+    disponibilizarCadastro,
     loginComoChefe,
-    navegarParaCadastroAtividades
+    navegarParaCadastroAtividades,
+    SELETORES_CSS,
+    TEXTOS,
+    URLS,
+    verificarUrlPainel
 } from './helpers';
-import {disponibilizarCadastro} from './helpers';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', () => {
     test.beforeEach(async ({page}) => await loginComoChefe(page));
@@ -49,6 +52,6 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', (
         await expect(botaoDisponibilizar).toBeEnabled();
 
         await disponibilizarCadastro(page);
-        await esperarUrl(page, URLS.PAINEL);
+        await verificarUrlPainel(page, URLS.PAINEL);
     });
 });

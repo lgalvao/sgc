@@ -4,22 +4,17 @@ import {
     esperarElementoInvisivel,
     esperarElementoVisivel,
     esperarTextoVisivel,
+    irParaVisualizacaoMapa,
     loginComoChefeSedia,
+    validarMapa,
 } from './helpers';
-import {validarMapa} from './helpers';
-import {irParaVisualizacaoMapa} from './helpers';
 
 test.describe('CDU-19: Validar mapa de competências', () => {
-    test.beforeEach(async ({page}) => {
-        await loginComoChefeSedia(page);
-    });
+    test.beforeEach(async ({page}) => await loginComoChefeSedia(page));
 
     test('deve exibir botões Apresentar sugestões e Validar para CHEFE', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
-
         await esperarTextoVisivel(page, 'Mapa de competências técnicas');
-
         await esperarElementoVisivel(page, 'apresentar-sugestoes-btn');
         await esperarElementoVisivel(page, 'validar-btn');
     });

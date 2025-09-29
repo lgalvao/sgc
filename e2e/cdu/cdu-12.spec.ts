@@ -2,20 +2,19 @@ import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
     adicionarConhecimento,
+    DADOS_TESTE,
     esperarElementoInvisivel,
     esperarTextoVisivel,
+    irParaMapaCompetencias,
     loginComoAdmin,
-    navegarParaCadastroAtividades
+    navegarParaCadastroAtividades,
+    SELETORES_CSS
 } from './helpers';
-import {irParaMapaCompetencias} from './helpers';
-import {DADOS_TESTE, SELETORES_CSS} from './helpers';
 
 test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
   test('deve exibir mensagem de "Nenhum impacto" quando não houver divergências', async ({page}) => {
     await loginComoAdmin(page);
-
     await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, 'SESEL');
-    //await page.waitForLoadState('networkidle');
 
     await page.getByTestId('impactos-mapa-button').waitFor({state: 'visible'});
     await page.getByTestId('impactos-mapa-button').click();

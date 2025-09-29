@@ -1,8 +1,21 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
+    abrirDialogoRemocaoProcesso,
     aguardarProcessoNoPainel,
+    cancelarNoModal,
+    clicarIniciarProcesso,
+    clicarPrimeiroProcessoTabela,
+    confirmarNoModal,
+    confirmarRemocaoNoModal,
+    criarProcessoCompleto,
+    criarProcessoSemUnidades,
+    editarDescricaoProcesso,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
+    navegarParaProcessoNaTabela,
+    preencherFormularioProcesso,
+    selecionarPrimeiraUnidade,
+    tentarSalvarProcessoVazio,
     verificarCamposObrigatoriosFormulario,
     verificarComportamentoCheckboxInteroperacional,
     verificarComportamentoMarcacaoCheckbox,
@@ -17,21 +30,6 @@ import {
     verificarProcessoIniciadoComSucesso,
     verificarProcessoRemovidoComSucesso,
     verificarSelecaoArvoreCheckboxes
-} from './helpers';
-import {
-    abrirDialogoRemocaoProcesso,
-    cancelarNoModal,
-    clicarIniciarProcesso,
-    clicarPrimeiroProcessoTabela,
-    confirmarNoModal,
-    confirmarRemocaoNoModal,
-    criarProcessoCompleto,
-    criarProcessoSemUnidades,
-    editarDescricaoProcesso,
-    navegarParaProcessoNaTabela,
-    preencherFormularioProcesso,
-    selecionarPrimeiraUnidade,
-    tentarSalvarProcessoVazio
 } from './helpers';
 
 test.describe('CDU-03: Manter processo', () => {

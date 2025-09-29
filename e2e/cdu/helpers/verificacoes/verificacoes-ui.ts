@@ -1,6 +1,6 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS} from '../dados';
-import {esperarElementoVisivel} from './verificacoes-basicas';
+import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from './verificacoes-basicas';
 
 /**
  * VERIFICAÇÕES DE INTERFACE DE USUÁRIO
@@ -89,4 +89,20 @@ export async function verificarComportamentoCheckboxInteroperacional(page: Page)
     if (cosisExists) {
         await expect(chkCosis).not.toBeChecked();
     }
+}
+
+/**
+ * Verifica o título da seção de processos no painel.
+ */
+export async function verificarTituloProcessos(page: Page): Promise<void> {
+    await expect(page.locator(`[data-testid="${SELETORES.TITULO_PROCESSOS}"]`)).toContainText(TEXTOS.TITULO_PROCESSOS_LABEL);
+}
+
+/**
+ * Verifica a visibilidade dos elementos da página de detalhes do processo.
+ */
+export async function verificarElementosDetalhesProcessoVisiveis(page: Page): Promise<void> {
+    await esperarTextoVisivel(page, TEXTOS.SITUACAO_LABEL);
+    await esperarTextoVisivel(page, TEXTOS.UNIDADES_PARTICIPANTES);
+    await esperarBotaoVisivel(page, TEXTOS.FINALIZAR_PROCESSO);
 }

@@ -22,7 +22,10 @@ export {
     removerProcessoComConfirmacao,
     cancelarRemocaoProcesso,
     confirmarInicializacaoProcesso,
-    removerProcessoConfirmandoNoModal
+    removerProcessoConfirmandoNoModal,
+    clicarUnidadeNaTabelaDetalhes,
+    clicarBotaoIniciarProcesso,
+    clicarProcessoNaTabela
 } from './acoes-processo';
 
 // Ações de modais

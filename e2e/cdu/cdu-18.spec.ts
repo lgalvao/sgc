@@ -3,13 +3,14 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {
     esperarElementoVisivel,
     esperarTextoVisivel,
+    irParaProcessoPorTexto,
     loginComoAdmin,
     loginComoChefe,
     loginComoServidor,
+    SELETORES,
+    TEXTOS,
     verificarUrl
 } from './helpers';
-import {irParaProcessoPorTexto} from './helpers';
-import {SELETORES, TEXTOS} from './helpers';
 
 test.describe('CDU-18: Visualizar mapa de competências', () => {
   test('ADMIN/GESTOR: navegar pelo processo até visualização do mapa', async ({ page }) => {

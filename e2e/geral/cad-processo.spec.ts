@@ -5,7 +5,6 @@ import {login} from "../utils/auth";
 test.describe('Cadastro de Processo', () => {
     test.beforeEach(async ({page}) => {
         await login(page);
-        // Navegar para a página de cadastro de processo
         await page.goto(`/processo/cadastro`);
     });
 

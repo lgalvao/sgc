@@ -1,25 +1,23 @@
-import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {TEXTOS} from './helpers';
-import {loginComoAdmin, navegarParaDetalhesProcesso, verificarUrl} from './helpers';
+import {
+    clicarUnidadeNaTabelaDetalhes,
+    loginComoAdmin,
+    navegarParaDetalhesProcesso,
+    verificarElementosDetalhesProcessoVisiveis,
+    verificarNavegacaoPaginaSubprocesso
+} from './helpers';
 
 test.describe('CDU-06: Detalhar processo', () => {
     test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
     test('deve mostrar detalhes do processo para ADMIN', async ({page}) => {
         await navegarParaDetalhesProcesso(page, 'STIC/COINF');
-
-        await expect(page.getByText(TEXTOS.SITUACAO_LABEL)).toBeVisible();
-        await expect(page.getByText(TEXTOS.UNIDADES_PARTICIPANTES)).toBeVisible();
-        await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).toBeVisible();
+        await verificarElementosDetalhesProcessoVisiveis(page);
     });
 
     test('deve permitir clicar em unidade', async ({page}) => {
         await navegarParaDetalhesProcesso(page, 'STIC/COINF');
-
-        const unidadeRow = page.locator('[data-testid^="tree-table-row-"]').filter({hasText: 'STIC'}).first();
-        await unidadeRow.click();
-
-        await verificarUrl(page, '/processo/\\d+/[^/]+');
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
+        await verificarNavegacaoPaginaSubprocesso(page);
     });
 });

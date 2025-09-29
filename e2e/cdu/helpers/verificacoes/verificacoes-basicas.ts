@@ -76,3 +76,10 @@ export async function verificarModalVisivel(page: Page): Promise<void> {
 export async function verificarModalFechado(page: Page): Promise<void> {
     await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).not.toBeVisible();
 }
+
+/**
+ * Espera um botão ficar visível na página
+ */
+export async function esperarBotaoVisivel(page: Page, nomeBotao: string): Promise<void> {
+    await expect(page.getByRole('button', {name: nomeBotao})).toBeVisible();
+}

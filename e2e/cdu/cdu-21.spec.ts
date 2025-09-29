@@ -1,12 +1,17 @@
 import {expect, test} from '@playwright/test';
-import {loginComoAdmin, loginComoGestor} from './helpers';
-import {cancelarModal, finalizarProcesso} from './helpers';
-import {DADOS_TESTE, SELETORES, SELETORES_CSS, TEXTOS} from './helpers';
+import {
+    cancelarModal,
+    DADOS_TESTE,
+    finalizarProcesso,
+    loginComoAdmin,
+    loginComoGestor,
+    SELETORES,
+    SELETORES_CSS,
+    TEXTOS
+} from './helpers';
 
 test.describe('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
-    test.beforeEach(async ({page}) => {
-        await loginComoAdmin(page);
-    });
+    test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
     test('deve navegar do Painel para processo Em andamento e exibir botão Finalizar', async ({page}) => {
         await expect(page.getByTestId(SELETORES.TITULO_PROCESSOS)).toContainText('Processos');

@@ -5,13 +5,13 @@
 
 // Verificações básicas
 export {
-    esperarMensagemSucesso,
-    esperarMensagemErro,
+    esperarMensagemSucesso as verificarMensagemSucesso,
+    esperarMensagemErro as verificarMensagemErro,
     esperarTextoVisivel,
     esperarElementoVisivel,
     esperarElementoInvisivel,
     verificarUrl,
-    esperarUrl,
+    esperarUrl as verificarUrlPainel,
     verificarModalVisivel,
     verificarModalFechado
 } from './verificacoes-basicas';
@@ -31,7 +31,11 @@ export {
     verificarPermanenciaFormularioEdicao,
     verificarConfirmacaoInicializacao,
     verificarModalConfirmacaoInicializacao,
-    verificarProcessoInicializadoComSucesso
+    verificarProcessoInicializadoComSucesso,
+    verificarValorCampoDescricao,
+    verificarBotaoIniciarProcessoVisivel,
+    verificarModalConfirmacaoIniciarProcessoVisivel,
+    verificarModalConfirmacaoIniciarProcessoInvisivel
 } from './verificacoes-processo';
 
 // Verificações de UI
@@ -41,5 +45,7 @@ export {
     verificarVisibilidadeProcesso,
     verificarSelecaoArvoreCheckboxes,
     verificarComportamentoMarcacaoCheckbox,
-    verificarComportamentoCheckboxInteroperacional
+    verificarComportamentoCheckboxInteroperacional,
+    verificarTituloProcessos,
+    verificarElementosDetalhesProcessoVisiveis
 } from './verificacoes-ui';

@@ -1,22 +1,24 @@
 import {expect, Page, test} from '@playwright/test';
 import {
+    clicarPrimeiroProcesso,
+    clicarProcesso,
+    clicarUnidade,
     esperarElementoVisivel,
+    expandirTodasAsUnidades,
     loginComoAdmin,
     loginComoChefe,
     loginComoGestor,
     loginComoServidor,
+    ordenarTabelaProcessosPorColuna,
+    SELETORES,
+    TEXTOS,
     verificarAusenciaBotaoCriarProcesso,
+    verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
     verificarNavegacaoPaginaDetalhesProcesso,
     verificarNavegacaoPaginaSubprocesso,
     verificarVisibilidadeProcesso,
-    clicarPrimeiroProcesso,
-    clicarProcesso,
-    clicarUnidade,
-    expandirTodasAsUnidades,
-    ordenarTabelaProcessosPorColuna, verificarElementosPainel,
 } from './helpers';
-import {SELETORES, TEXTOS} from './helpers';
 
 const obterValoresColuna = async (page: Page, indiceColuna: number) => {
     return page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).evaluateAll(linhas =>

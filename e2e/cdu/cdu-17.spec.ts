@@ -1,14 +1,10 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {loginComoAdmin} from './helpers';
-import {criarCompetencia} from './helpers';
-import {irParaMapaCompetencias} from './helpers';
-import {TEXTOS} from './helpers';
+import {criarCompetencia, irParaMapaCompetencias, loginComoAdmin, TEXTOS} from './helpers';
 
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, 4, 'SESEL');
-    //await page.waitForLoadState('networkidle');
     await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 }
 
@@ -19,9 +15,7 @@ async function criarCompetenciaSimples(page: Page, nome: string) {
 test.describe('CDU-17: Disponibilizar mapa de competências', () => {
     test('deve exibir modal com título e campos corretos', async ({page}) => {
         await navegarParaMapa(page);
-
         await criarCompetenciaSimples(page, 'Competência Teste');
-
         await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
 
         await expect(page.getByRole('heading', {name: 'Disponibilização do mapa de competências'})).toBeVisible();
@@ -31,11 +25,8 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve preencher observações no modal', async ({page}) => {
         await navegarParaMapa(page);
-
         await criarCompetenciaSimples(page, 'Competência Teste');
-
         await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
-
         await page.locator('#observacoes').fill('Observações de teste para CDU-17');
         await expect(page.locator('#observacoes')).toHaveValue('Observações de teste para CDU-17');
     });
@@ -88,7 +79,6 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve cancelar disponibilização', async ({page}) => {
         await navegarParaMapa(page);
-
         await criarCompetenciaSimples(page, 'Competência Teste');
 
         await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();

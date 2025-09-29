@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES_CSS, TEXTOS} from '../dados/constantes-teste';
+import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados/constantes-teste';
 
 /**
  * AÇÕES ESPECÍFICAS PARA PROCESSOS
@@ -9,12 +9,15 @@ import {SELETORES_CSS, TEXTOS} from '../dados/constantes-teste';
 /**
  * Preencher formulário básico de processo
  */
-export async function preencherFormularioProcesso(page: Page, descricao: string, tipo: string, dataLimite?: string): Promise<void> {
-    await page.getByLabel('Descrição').fill(descricao);
-    await page.getByLabel('Tipo').selectOption(tipo);
+export async function preencherFormularioProcesso(page: Page, descricao: string, tipo: string, dataLimite?: string, sticChecked: boolean = false): Promise<void> {
+    await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, descricao);
+    await page.selectOption(SELETORES_CSS.CAMPO_TIPO, tipo);
     
     if (dataLimite) {
-        await page.getByLabel('Data limite').fill(dataLimite);
+        await page.fill(SELETORES_CSS.CAMPO_DATA_LIMITE, dataLimite);
+    }
+    if (sticChecked) {
+        await page.check(SELETORES_CSS.CHECKBOX_STIC);
     }
 }
 
@@ -132,13 +135,28 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
 }
 
 /**
+ * Clica no botão de iniciar processo
+ */
+export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
+    await page.getByRole('button', { name: TEXTOS.INICIAR_PROCESSO }).click();
+}
+
+/**
+ * Clica em um processo específico na tabela do painel
+ */
+export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): Promise<void> {
+    await page.waitForSelector(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`); // Espera a tabela carregar
+    const processo = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: nomeProcesso});
+    await processo.click();
+}
+
+/**
  * Inicia um processo com confirmação
  */
 export async function iniciarProcesso(page: Page): Promise<void> {
   await page.getByText(TEXTOS.INICIAR_PROCESSO).click();
-  await page.waitForSelector('.modal.show');
+  await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
   await page.getByText(TEXTOS.CONFIRMAR).click();
-  //await page.waitForLoadState('networkidle');
 }
 
 /**
@@ -171,4 +189,12 @@ export async function confirmarInicializacaoProcesso(page: Page): Promise<void> 
 export async function removerProcessoConfirmandoNoModal(page: Page): Promise<void> {
   await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
   await page.locator('.modal.show .btn-danger').click();
+}
+
+/**
+ * Clica em uma unidade específica na tabela de detalhes do processo.
+ */
+export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: string): Promise<void> {
+    const unidadeRow = page.locator(SELETORES.LINHA_TABELA_ARVORE).filter({hasText: nomeUnidade}).first();
+    await unidadeRow.click();
 }

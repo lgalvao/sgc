@@ -1,9 +1,18 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {esperarTextoVisivel, esperarUrl, loginComoAdmin, loginComoGestor} from './helpers';
-import {navegarParaVisualizacaoAtividades} from './helpers';
-import {devolverParaAjustes, homologarItem} from './helpers';
-import {DADOS_TESTE, SELETORES_CSS, TEXTOS, URLS} from './helpers';
+import {
+    DADOS_TESTE,
+    devolverParaAjustes,
+    esperarTextoVisivel,
+    homologarItem,
+    loginComoAdmin,
+    loginComoGestor,
+    navegarParaVisualizacaoAtividades,
+    SELETORES_CSS,
+    TEXTOS,
+    URLS,
+    verificarUrlPainel
+} from './helpers';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
     const idProcessoStic = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id;
@@ -12,7 +21,6 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
     test('deve exibir modal de Histórico de análise', async ({page}) => {
         await loginComoGestor(page);
         await navegarParaVisualizacaoAtividades(page, idProcessoStic, siglaStic);
-
         await page.getByRole('button', {name: 'Histórico de análise'}).click();
 
         await expect(page.locator('div.modal.fade.show')).toBeVisible();
@@ -34,7 +42,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await expect(notification).toBeVisible();
         await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
 
-        await esperarUrl(page, URLS.PAINEL);
+        await verificarUrlPainel(page, URLS.PAINEL);
     });
 
     test('ADMIN deve conseguir devolver cadastro para ajustes', async ({page}) => {
@@ -47,7 +55,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await expect(notification).toBeVisible();
         await expect(notification).toContainText('O cadastro foi devolvido para ajustes!');
 
-        await esperarUrl(page, URLS.PAINEL);
+        await verificarUrlPainel(page, URLS.PAINEL);
     });
 
     test('GESTOR deve conseguir registrar aceite do cadastro', async ({page}) => {
@@ -73,7 +81,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await expect(notification).toBeVisible();
         await expect(notification).toContainText('A análise foi registrada com sucesso!');
 
-        await esperarUrl(page, URLS.PAINEL);
+        await verificarUrlPainel(page, URLS.PAINEL);
     });
 
     test('ADMIN deve conseguir homologar o cadastro', async ({page}) => {
