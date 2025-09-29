@@ -150,57 +150,27 @@
             :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
-            <template v-if="editandoConhecimento.idxAtividade === idx && editandoConhecimento.idxConhecimento === cidx">
-              <input
-                v-model="conhecimentoEditado"
-                class="form-control form-control-sm me-2 conhecimento-edicao-input"
-                data-testid="input-editar-conhecimento"
-                style="max-width: 300px;"
-              >
+            <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
+            <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
               <button
-                class="btn btn-sm btn-outline-success me-1 botao-acao"
+                class="btn btn-sm btn-outline-primary botao-acao"
                 data-bs-toggle="tooltip"
-                data-testid="btn-salvar-edicao-conhecimento"
-                title="Salvar"
-                @click="salvarEdicaoConhecimento(idx, cidx)"
+                data-testid="btn-editar-conhecimento"
+                title="Editar"
+                @click="abrirModalEdicaoConhecimento(conhecimento)"
               >
-                <i class="bi bi-save" />
+                <i class="bi bi-pencil" />
               </button>
               <button
-                class="btn btn-sm btn-outline-secondary botao-acao"
+                class="btn btn-sm btn-outline-danger botao-acao"
                 data-bs-toggle="tooltip"
-                data-testid="btn-cancelar-edicao-conhecimento"
-                title="Cancelar"
-                @click="cancelarEdicaoConhecimento"
+                data-testid="btn-remover-conhecimento"
+                title="Remover"
+                @click="removerConhecimento(idx, cidx)"
               >
-                <i class="bi bi-x" />
+                <i class="bi bi-trash" />
               </button>
-            </template>
-            <template v-else>
-              <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
-              <div class="d-inline-flex align-items-center gap-1 ms-3 botoes-acao fade-group">
-                <button
-                  class="btn btn-sm btn-outline-primary botao-acao"
-                  data-bs-toggle="tooltip"
-                  data-testid="btn-editar-conhecimento"
-                  title="Editar"
-                  @click="iniciarEdicaoConhecimento(idx, cidx, conhecimento.descricao)"
-                >
-                  <i
-                    class="bi bi-pencil"
-                  />
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-danger botao-acao"
-                  data-bs-toggle="tooltip"
-                  data-testid="btn-remover-conhecimento"
-                  title="Remover"
-                  @click="removerConhecimento(idx, cidx)"
-                >
-                  <i class="bi bi-trash" />
-                </button>
-              </div>
-            </template>
+            </div>
           </div>
           <form
             class="row g-2 align-items-center"
@@ -379,6 +349,14 @@
       v-if="mostrarModalHistorico"
       class="modal-backdrop fade show"
     />
+
+    <!-- Modal de Edição de Conhecimento -->
+    <EditarConhecimentoModal
+      :mostrar="mostrarModalEdicaoConhecimento"
+      :conhecimento="conhecimentoSendoEditado"
+      @fechar="fecharModalEdicaoConhecimento"
+      @salvar="salvarEdicaoConhecimento"
+    />
   </div>
 </template>
 
@@ -398,6 +376,7 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import ImportarAtividadesModal from '@/components/ImportarAtividadesModal.vue'
+import EditarConhecimentoModal from '@/components/EditarConhecimentoModal.vue'
 
 interface AtividadeComEdicao extends Atividade {
   novoConhecimento?: string;
@@ -535,50 +514,72 @@ async function removerConhecimento(idx: number, cidx: number) {
   }
 }
 
-const editandoConhecimento = ref<{ idxAtividade: number | null, idxConhecimento: number | null }>({
-  idxAtividade: null,
-  idxConhecimento: null
-})
-const conhecimentoEditado = ref('')
+// ✅ NOVA IMPLEMENTAÇÃO: Modal para edição de conhecimento
+const mostrarModalEdicaoConhecimento = ref(false)
+const conhecimentoSendoEditado = ref<{ id: number; descricao: string } | null>(null)
 
-function iniciarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number, valorAtual: string) {
-  editandoConhecimento.value = {idxAtividade, idxConhecimento}
-  conhecimentoEditado.value = valorAtual
+function abrirModalEdicaoConhecimento(conhecimento: { id: number; descricao: string }) {
+  conhecimentoSendoEditado.value = conhecimento
+  mostrarModalEdicaoConhecimento.value = true
 }
 
-function salvarEdicaoConhecimento(idxAtividade: number, idxConhecimento: number) {
-  if (conhecimentoEditado.value) {
-    const newAtividades = [...atividades.value];
-    const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos];
-    const conhecimentoOriginal = newConhecimentos[idxConhecimento];
-    const valorAntigo = conhecimentoOriginal ? conhecimentoOriginal.descricao : '';
+function fecharModalEdicaoConhecimento() {
+  mostrarModalEdicaoConhecimento.value = false
+  conhecimentoSendoEditado.value = null
+}
 
-    // Get impacted competencies before updating the store
-    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(newAtividades[idxAtividade].id, siglaUnidade.value, idProcesso.value);
+function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
+  // Encontrar a atividade que contém o conhecimento
+  let atividadeEncontrada: any = null
+  let idxAtividade = -1
+  
+  for (let i = 0; i < atividades.value.length; i++) {
+    const atividade = atividades.value[i]
+    const conhecimentoIndex = atividade.conhecimentos.findIndex(c => c.id === conhecimentoId)
+    if (conhecimentoIndex >= 0) {
+      atividadeEncontrada = atividade
+      idxAtividade = i
+      break
+    }
+  }
+  
+  if (atividadeEncontrada && idxAtividade >= 0) {
+    const conhecimentoIndex = atividadeEncontrada.conhecimentos.findIndex(c => c.id === conhecimentoId)
+    const valorAntigo = atividadeEncontrada.conhecimentos[conhecimentoIndex].descricao
+    
+    // Atualizar o conhecimento
+    const newAtividades = [...atividades.value]
+    const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos]
+    newConhecimentos[conhecimentoIndex] = {
+      ...newConhecimentos[conhecimentoIndex], 
+      descricao: novaDescricao
+    }
+    newAtividades[idxAtividade] = {
+      ...newAtividades[idxAtividade], 
+      conhecimentos: newConhecimentos
+    }
+    atividades.value = newAtividades
 
-    newConhecimentos[idxConhecimento] = {...newConhecimentos[idxConhecimento], descricao: conhecimentoEditado.value};
-    newAtividades[idxAtividade] = {...newAtividades[idxAtividade], conhecimentos: newConhecimentos};
-    atividades.value = newAtividades;
-
+    // Registrar mudança
+    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(
+      atividadeEncontrada.id, 
+      siglaUnidade.value, 
+      idProcesso.value
+    )
+    
     revisaoStore.registrarMudanca({
       tipo: TipoMudanca.ConhecimentoAlterado,
-      idAtividade: newAtividades[idxAtividade].id,
-      idConhecimento: newConhecimentos[idxConhecimento].id,
-      descricaoAtividade: newAtividades[idxAtividade].descricao,
-      descricaoConhecimento: conhecimentoEditado.value,
+      idAtividade: atividadeEncontrada.id,
+      idConhecimento: conhecimentoId,
+      descricaoAtividade: atividadeEncontrada.descricao,
+      descricaoConhecimento: novaDescricao,
       valorAntigo: valorAntigo,
-      valorNovo: conhecimentoEditado.value,
+      valorNovo: novaDescricao,
       competenciasImpactadasIds: idsImpactados,
-    });
-
-
+    })
   }
-  cancelarEdicaoConhecimento()
-}
-
-function cancelarEdicaoConhecimento() {
-  editandoConhecimento.value = {idxAtividade: null, idxConhecimento: null}
-  conhecimentoEditado.value = ''
+  
+  fecharModalEdicaoConhecimento()
 }
 
 const editandoAtividade = ref<number | null>(null)

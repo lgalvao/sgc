@@ -127,26 +127,25 @@ export async function removerAtividade(page: Page, cardAtividade: Locator): Prom
 }
 
 /**
- * Edita um conhecimento
+ * Edita um conhecimento usando o modal (novo padrão)
  */
 export async function editarConhecimento(page: Page, linhaConhecimento: Locator, novoNome: string): Promise<void> {
-    await linhaConhecimento.hover();
-    await page.waitForTimeout(100); // Consider replacing with a more specific wait if possible
-
-    // Clicar no botão de editar
+    // Clicar no botão editar
     const btnEditar = linhaConhecimento.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO);
-    await expect(btnEditar).toBeVisible();
-    await btnEditar.click({ force: true });
+    await linhaConhecimento.hover();
+    await btnEditar.click();
 
-    // Preencher o input de edição
-    const inputEdicao = page.getByTestId(SELETORES.INPUT_EDITAR_CONHECIMENTO);
-    await expect(inputEdicao).toBeVisible();
-    await inputEdicao.fill(novoNome);
-
-    // Salvar a edição
-    const btnSalvar = page.getByTestId(SELETORES.BTN_SALVAR_EDICAO_CONHECIMENTO);
-    await expect(btnSalvar).toBeVisible();
-    await btnSalvar.click();
+    // Aguardar o modal aparecer
+    await page.getByTestId('input-conhecimento-modal').waitFor({ state: 'visible' });
+    
+    // Preencher o novo nome
+    await page.getByTestId('input-conhecimento-modal').fill(novoNome);
+    
+    // Salvar
+    await page.getByTestId('btn-salvar-conhecimento-modal').click();
+    
+    // Aguardar o modal fechar
+    await page.getByTestId('input-conhecimento-modal').waitFor({ state: 'hidden' });
 }
 
 /**

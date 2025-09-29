@@ -127,6 +127,7 @@ export const DADOS_TESTE = {
         TESTE_FINALIZACAO: {id: 99, nome: 'Processo teste para finalização'},
         TESTE_MAPEAMENTO: {id: 101, nome: 'Processo teste mapeamento para finalização'},
         TESTE_REVISAO: {id: 102, nome: 'Processo teste revisão para finalização'},
+
     },
     UNIDADES: {
         STIC: 'STIC',
