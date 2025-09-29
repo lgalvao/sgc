@@ -1,5 +1,5 @@
 import {test} from '@playwright/test';
-import {loginComoAdmin} from "~/cdu/auxiliares-verificacoes";
+import {loginComoAdmin} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Unidades', () => {
     test('50 - Detalhes da Unidade (STIC - ADMIN)', async ({page}) => {

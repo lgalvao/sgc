@@ -11,7 +11,10 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 id="editarConhecimentoModalLabel" class="modal-title">
+          <h5
+            id="editarConhecimentoModalLabel"
+            class="modal-title"
+          >
             Editar Conhecimento
           </h5>
           <button
@@ -23,7 +26,10 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="descricaoConhecimento" class="form-label">Descrição do Conhecimento</label>
+            <label
+              for="descricaoConhecimento"
+              class="form-label"
+            >Descrição do Conhecimento</label>
             <textarea
               id="descricaoConhecimento"
               v-model="descricaoEditada"
@@ -63,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import {ref, watch} from 'vue'
 
 interface Props {
   mostrar: boolean

@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {loginAsAdmin} from "~/utils/auth";
+import {loginAsAdmin} from "../utils/auth";
 
 test.describe('Cadastro de Mapa de Competências', () => {
     test.beforeEach(async ({page}) => {

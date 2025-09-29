@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {login} from "~/utils/auth";
+import {login} from "../utils/auth";
 
 test.describe('Relatórios', () => {
     test.beforeEach(async ({page}) => {
@@ -96,17 +96,17 @@ test.describe('Relatórios', () => {
         await mapasVigentesCard.click();
 
         const modal = page.locator('#modalMapasVigentes');
-        await modal.waitFor({ state: 'visible' });
+        await modal.waitFor({state: 'visible'});
 
         // Verificar modal
-        await expect(modal.getByRole('heading', { name: 'Mapas Vigentes' })).toBeVisible();
+        await expect(modal.getByRole('heading', {name: 'Mapas Vigentes'})).toBeVisible();
 
         // Verificar botão de exportar
         await expect(page.getByTestId('export-csv-mapas')).toBeVisible();
 
         // Verificar tabela
-        await modal.getByRole('table').waitFor({ state: 'visible' });
-        await modal.locator('thead').waitFor({ state: 'visible' });
+        await modal.getByRole('table').waitFor({state: 'visible'});
+        await modal.locator('thead').waitFor({state: 'visible'});
         await expect(modal.getByText('Unidade')).toBeVisible();
         await expect(modal.locator('th:has-text("Processo")')).toBeVisible();
         await expect(modal.locator('th:has-text("Competências")')).toBeVisible();
@@ -119,14 +119,14 @@ test.describe('Relatórios', () => {
         await diagnosticosCard.click();
 
         const modal = page.locator('#modalDiagnosticosGaps');
-        await modal.waitFor({ state: 'visible' });
+        await modal.waitFor({state: 'visible'});
 
         // Verificar modal
-        await expect(modal.getByRole('heading', { name: 'Diagnósticos de Gaps' })).toBeVisible();
+        await expect(modal.getByRole('heading', {name: 'Diagnósticos de Gaps'})).toBeVisible();
 
         // Verificar botão de exportar
-        await modal.getByRole('table').waitFor({ state: 'visible' });
-        await modal.locator('thead').waitFor({ state: 'visible' });
+        await modal.getByRole('table').waitFor({state: 'visible'});
+        await modal.locator('thead').waitFor({state: 'visible'});
         await expect(modal.getByRole('table')).toBeVisible();
         await expect(modal.locator('th:has-text("Processo")')).toBeVisible();
         await expect(modal.locator('th:has-text("Unidade")')).toBeVisible();
@@ -143,7 +143,7 @@ test.describe('Relatórios', () => {
         await andamentoCard.click();
 
         const modal = page.locator('#modalAndamentoGeral');
-        await modal.waitFor({ state: 'visible' });
+        await modal.waitFor({state: 'visible'});
 
         // Verificar modal
         await expect(page.getByText('Andamento Geral dos Processos')).toBeVisible();
@@ -152,8 +152,8 @@ test.describe('Relatórios', () => {
         await expect(page.getByTestId('export-csv-andamento')).toBeVisible();
 
         // Verificar tabela
-        await modal.getByRole('table').waitFor({ state: 'visible' });
-        await modal.locator('thead').waitFor({ state: 'visible' });
+        await modal.getByRole('table').waitFor({state: 'visible'});
+        await modal.locator('thead').waitFor({state: 'visible'});
         await expect(modal.getByRole('table')).toBeVisible();
         await expect(modal.locator('th:has-text("Descrição")')).toBeVisible();
         await expect(modal.locator('th:has-text("Tipo")')).toBeVisible();

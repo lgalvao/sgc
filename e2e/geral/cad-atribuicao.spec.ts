@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {login} from "~/utils/auth";
+import {login} from "../utils/auth";
 
 test.describe('Cadastro de Atribuição Temporária', () => {
     test.beforeEach(async ({page}) => {
