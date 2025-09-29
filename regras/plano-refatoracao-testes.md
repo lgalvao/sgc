@@ -35,9 +35,16 @@ Esta é a camada mais baixa e desacopla os testes das implementações específi
 
 #### Camada 2: Ações e Verificações (A "Linguagem de Domínio")
 
-Esta é a camada mais importante para a semântica. Ela traduz comandos técnicos do Playwright em ações de negócio claras.
+Esta é a camada mais importante para a semântica. Ela traduz comandos técnicos do Playwright em ações de negócio claras, organizadas de forma modular.
 
-*   **Arquivos:** `e2e/cdu/auxiliares-acoes.ts`, `e2e/cdu/auxiliares-verificacoes.ts`, `e2e/cdu/auxiliares-navegacao.ts`
+*   **Estrutura de Arquivos:** As funções auxiliares (helpers) estão organizadas por domínio dentro do diretório `e2e/cdu/helpers/`:
+    *   `helpers/acoes/`: Funções que executam ações do usuário (ex: `adicionarAtividade`, `confirmarNoModal`).
+    *   `helpers/verificacoes/`: Funções que contêm asserções `expect` (ex: `verificarProcessoCriado`, `verificarUrlPainel`).
+    *   `helpers/navegacao/`: Funções para `page.goto()` e fluxos de navegação (ex: `navegarParaCadastroAtividades`).
+    *   `helpers/dados/`: Onde as constantes da Camada 1 residem.
+    *   `helpers/utils/`: Funções utilitárias genéricas.
+    *   Cada subdiretório possui um `index.ts` para re-exportar suas funções, e um `helpers/index.ts` centraliza todas as importações.
+
 *   **Diretrizes:**
     1.  **Crie Funções para Ações de Negócio:** Encapsule qualquer ação que um usuário realiza em uma função com um nome de negócio. Essas funções usam as constantes da Camada 1.
     2.  **Crie Funções para Verificações de Estado:** Encapsule as asserções (`expect`) em funções que descrevem o estado esperado do sistema.

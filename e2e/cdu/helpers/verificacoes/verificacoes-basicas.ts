@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES_CSS} from '../dados';
+import {SELETORES_CSS, TEXTOS, URLS} from '../dados';
 
 /**
  * VERIFICAÇÕES BÁSICAS E PRIMITIVAS
@@ -64,6 +64,13 @@ export async function esperarUrl(page: Page, url: string | RegExp): Promise<void
 }
 
 /**
+ * Verifica se a URL atual é a do Painel.
+ */
+export async function verificarUrlDoPainel(page: Page): Promise<void> {
+    await expect(page).toHaveURL(URLS.PAINEL);
+}
+
+/**
  * Verifica se modal está visível
  */
 export async function verificarModalVisivel(page: Page): Promise<void> {
@@ -82,4 +89,12 @@ export async function verificarModalFechado(page: Page): Promise<void> {
  */
 export async function esperarBotaoVisivel(page: Page, nomeBotao: string): Promise<void> {
     await expect(page.getByRole('button', {name: nomeBotao})).toBeVisible();
+}
+
+/**
+ * Espera uma notificação de erro de login inválido.
+ */
+export async function esperarNotificacaoLoginInvalido(page: Page): Promise<void> {
+    const notificacao = page.locator('.notification-container');
+    await expect(notificacao.getByText(TEXTOS.ERRO_LOGIN_INVALIDO)).toBeVisible();
 }

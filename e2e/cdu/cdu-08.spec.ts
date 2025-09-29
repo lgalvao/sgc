@@ -1,197 +1,133 @@
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    cancelarEdicaoAtividade,
+    clicarBotaoImportarAtividades,
     DADOS_TESTE,
     editarAtividade,
     editarConhecimento,
-    esperarElementoVisivel,
     gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
     removerAtividade,
-    SELETORES,
+    removerConhecimento,
     SELETORES_CSS,
-    TEXTOS
+    tentarAdicionarAtividadeVazia,
+    verificarAtividadeNaoVisivel,
+    verificarAtividadeVisivel,
+    verificarBotaoDisponibilizarVisivel,
+    verificarBotaoImpactoVisivel,
+    verificarConhecimentoNaoVisivel,
+    verificarConhecimentoVisivel,
+    verificarContadorAtividades,
+    verificarModalImportacaoVisivel,
+    verificarPaginaCadastroAtividades,
 } from './helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
-    test.beforeEach(async ({page}) => {
-        await loginComoChefe(page);
-        await page.waitForLoadState('networkidle');
-    });
+    test.beforeEach(async ({page}) => await loginComoChefe(page));
 
-    test('deve navegar do Painel para cadastro de atividades', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    const PROCESSO_MAPEAMENTO = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC;
+    const PROCESSO_REVISAO = DADOS_TESTE.PROCESSOS.REVISAO_STIC;
+    const UNIDADE_STIC = DADOS_TESTE.UNIDADES.STIC;
 
-        await expect(page.getByRole('heading', {name: TEXTOS.CADASTRO_ATIVIDADES_CONHECIMENTOS})).toBeVisible();
-        await esperarElementoVisivel(page, SELETORES.INPUT_NOVA_ATIVIDADE);
+    test('deve navegar e exibir a página de cadastro de atividades', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
+        await verificarPaginaCadastroAtividades(page);
     });
 
     test('deve exibir botão Impacto no mapa para processos de revisão', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-
-        const botaoImpacto = page.locator(`button:has-text("${TEXTOS.IMPACTO_NO_MAPA}")`);
-        await expect(botaoImpacto).toBeVisible();
+        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
+        await verificarBotaoImpactoVisivel(page);
     });
 
-    test('deve adicionar atividade e conhecimento', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    test('deve adicionar uma atividade e um conhecimento', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
 
         const nomeAtividade = gerarNomeUnico('Atividade Teste');
         await adicionarAtividade(page, nomeAtividade);
+        await verificarAtividadeVisivel(page, nomeAtividade);
 
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
         const nomeConhecimento = gerarNomeUnico('Conhecimento Teste');
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
     });
 
-    test('deve editar e remover atividades', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    test('deve editar e remover uma atividade', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
 
-        // Adicionar atividade para teste
-        const nomeOriginal = gerarNomeUnico('Atividade Editar');
+        const nomeOriginal = gerarNomeUnico('Atividade para Editar');
         await adicionarAtividade(page, nomeOriginal);
+        await verificarAtividadeVisivel(page, nomeOriginal);
 
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeOriginal});
-
-        // Editar atividade
         const nomeEditado = gerarNomeUnico('Atividade Editada');
-        await editarAtividade(page, cardAtividade, nomeEditado);
-        await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeEditado})).toBeVisible();
+        await editarAtividade(page, nomeOriginal, nomeEditado);
+        await verificarAtividadeVisivel(page, nomeEditado);
 
-        // Remover atividade com confirmação
-        const cardEditado = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeEditado});
-        await removerAtividade(page, cardEditado);
-        await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeEditado})).not.toBeAttached();
+        await removerAtividade(page, nomeEditado);
+        await verificarAtividadeNaoVisivel(page, nomeEditado);
     });
 
-    test('deve editar e remover conhecimentos', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.PROCESSOS.REVISAO_STIC.unidade);
+    test('deve editar e remover um conhecimento', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
 
-        // Adicionar atividade e conhecimento para teste
-        const nomeAtividade = gerarNomeUnico('Atividade Conhecimento');
+        const nomeAtividade = gerarNomeUnico('Atividade para Conhecimento');
         await adicionarAtividade(page, nomeAtividade);
+        await verificarAtividadeVisivel(page, nomeAtividade);
+
+        const nomeOriginal = gerarNomeUnico('Conhecimento Original');
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        await adicionarConhecimento(cardAtividade, nomeOriginal);
+        await verificarConhecimentoVisivel(cardAtividade, nomeOriginal);
+
+        const nomeEditado = gerarNomeUnico('Conhecimento Editado');
+        await editarConhecimento(page, nomeAtividade, nomeOriginal, nomeEditado);
+        await verificarConhecimentoVisivel(page, nomeAtividade, nomeEditado);
+
+        await removerConhecimento(page, nomeAtividade, nomeEditado);
+        await verificarConhecimentoNaoVisivel(page, nomeAtividade, nomeEditado);
+    });
+
+    test('deve abrir modal para importar atividades', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
+        await clicarBotaoImportarAtividades(page);
+        await verificarModalImportacaoVisivel(page);
+    });
+
+    test('deve exibir botão de disponibilizar após adicionar item', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
+
+        const nomeAtividade = gerarNomeUnico('Atividade para Disponibilizar');
+        await adicionarAtividade(page, nomeAtividade);
+        await verificarAtividadeVisivel(page, nomeAtividade);
 
         const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        const nomeConhecimentoOriginal = gerarNomeUnico('Conhecimento Original');
-        await adicionarConhecimento(cardAtividade, nomeConhecimentoOriginal);
+        await adicionarConhecimento(cardAtividade, 'Conhecimento qualquer');
+        await verificarConhecimentoVisivel(cardAtividade, 'Conhecimento qualquer');
 
-        // Editar conhecimento
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: nomeConhecimentoOriginal});
-        const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
-        await editarConhecimento(page, linhaConhecimento, nomeConhecimentoEditado);
-
-        const textoAposEdicao = await page.evaluate(() => {
-            const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
-            return Array.from(spans).map(span => span.textContent).join(', ');
-        });
-        expect(textoAposEdicao).toContain(nomeConhecimentoEditado);
-
-        const grupoConhecimentoEditado = await page.evaluate((nomeEditado) => {
-            const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
-            for (const span of spans) {
-                if (span.textContent?.includes(nomeEditado)) return true;
-            }
-            return false;
-        }, nomeConhecimentoEditado);
-
-        expect(grupoConhecimentoEditado).toBe(true);
-
-        await page.evaluate((nomeEditado) => {
-            const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
-            for (const span of spans) {
-                if (span.textContent?.includes(nomeEditado)) {
-                    const grupo = span.closest('.group-conhecimento');
-                    if (grupo) {
-                        // Simular a remoção via clique no botão remover
-                        const btnRemover = grupo.querySelector<HTMLElement>('[data-testid="btn-remover-conhecimento"]');
-                        if (btnRemover) {
-                            window.confirm = () => true;
-                            btnRemover.click();
-                            // Remover o elemento do DOM para simular a remoção
-                            grupo.remove();
-                        }
-                    }
-                    break;
-                }
-            }
-        }, nomeConhecimentoEditado);
-
-        await page.waitForTimeout(500);
-
-        // Verificar que foi removido
-        const textoAposRemocao = await page.evaluate(() => {
-            const spans = document.querySelectorAll('[data-testid="conhecimento-descricao"]');
-            return Array.from(spans).map(span => span.textContent).join(', ');
-        });
-        expect(textoAposRemocao).not.toContain(nomeConhecimentoEditado);
+        await verificarBotaoDisponibilizarVisivel(page);
     });
 
-    test('deve importar atividades de processos finalizados', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    test('não deve adicionar atividade com campos vazios', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
 
-        await page.click(`button:has-text("${TEXTOS.IMPORTAR_ATIVIDADES}")`);
-
-        await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
-        await expect(page.locator('.modal-body')).toBeVisible();
-    });
-
-    test('deve alterar situação de "Não iniciado" para "em andamento"', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.SEMARE);
-
-        const nomeAtividade = gerarNomeUnico('Primeira Atividade');
-        await adicionarAtividade(page, nomeAtividade);
-
-        // Verificar se a atividade foi adicionada com sucesso
-        await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade})).toBeVisible();
-    });
-
-    test('deve disponibilizar cadastro após finalização', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-
-        // Adicionar atividade com conhecimento
-        const nomeAtividade = gerarNomeUnico('Atividade Completa');
-        await adicionarAtividade(page, nomeAtividade);
-
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        const nomeConhecimento = gerarNomeUnico('Conhecimento Completo');
-        await adicionarConhecimento(cardAtividade, nomeConhecimento);
-
-        const botaoDisponibilizar = page.locator(`button:has-text("${TEXTOS.DISPONIBILIZAR}")`);
-        await expect(botaoDisponibilizar).toBeVisible();
-    });
-
-    test('deve validar campos vazios', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-
-        // Tentar adicionar atividade vazia
-        await page.getByTestId(SELETORES.INPUT_NOVA_ATIVIDADE).fill('   ');
-        await page.getByTestId(SELETORES.BTN_ADICIONAR_ATIVIDADE).click();
-
-        // Não deve adicionar atividade com apenas espaços
         const contadorAntes = await page.locator(SELETORES_CSS.CARD_ATIVIDADE).count();
-        await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE)).toHaveCount(contadorAntes);
+        await tentarAdicionarAtividadeVazia(page);
+        await verificarContadorAtividades(page, contadorAntes);
     });
 
-    test('deve cancelar edição de atividade', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    test('deve cancelar a edição de uma atividade', async ({page}) => {
+        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
 
-        const nomeOriginal = gerarNomeUnico('Atividade Original');
+        const nomeOriginal = gerarNomeUnico('Atividade para Cancelar Edição');
         await adicionarAtividade(page, nomeOriginal);
+        await verificarAtividadeVisivel(page, nomeOriginal);
 
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeOriginal});
+        await cancelarEdicaoAtividade(page, nomeOriginal, 'Texto que será descartado');
 
-        // Iniciar edição
-        await cardAtividade.hover();
-        await page.waitForTimeout(100);
-        await cardAtividade.getByTestId(SELETORES.BTN_EDITAR_ATIVIDADE).click({force: true});
-
-        // Alterar texto e cancelar
-        await page.getByTestId(SELETORES.INPUT_EDITAR_ATIVIDADE).fill('Texto alterado');
-        await page.getByTestId(SELETORES.BTN_CANCELAR_EDICAO_ATIVIDADE).click();
-
-        // Verificar que manteve o nome original
-        await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeOriginal})).toBeVisible();
+        await verificarAtividadeVisivel(page, nomeOriginal);
+        await verificarAtividadeNaoVisivel(page, 'Texto que será descartado');
     });
 });

@@ -72,3 +72,10 @@ export async function cancelarModal(page: Page): Promise<void> {
     await botaoDismiss.last().click();
   }
 }
+
+/**
+ * Clica no botão "Histórico de análise".
+ */
+export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
+    await page.getByRole('button', {name: 'Histórico de análise'}).click();
+}

@@ -111,7 +111,6 @@ test.describe('CDU-02: Visualizar Painel', () => {
         }
 
         test('GESTOR deve navegar para os detalhes do processo e interagir com a árvore de unidades', async ({page}) => {
-            test.slow();
             await loginComoGestor(page);
             await clicarProcesso(page, /Mapeamento de competências - 2025/);
             await verificarNavegacaoPaginaDetalhesProcesso(page);

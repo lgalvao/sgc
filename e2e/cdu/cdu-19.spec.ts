@@ -21,7 +21,6 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve exibir botão Histórico de análise quando houver análises', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
 
         const historicoBtn = page.getByTestId('historico-analise-btn');
         const isVisible = await historicoBtn.isVisible();
@@ -37,17 +36,11 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve permitir apresentar sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
-
         await page.getByTestId('apresentar-sugestoes-btn').click();
-
         await esperarElementoVisivel(page, 'modal-apresentar-sugestoes');
         await expect(page.getByTestId('modal-apresentar-sugestoes-title')).toHaveText('Apresentar Sugestões');
-
         await page.getByTestId('sugestoes-textarea').fill('Sugestão de teste para o mapa');
-
         await page.getByTestId('modal-apresentar-sugestoes-confirmar').click();
-
         await expect(page).toHaveURL(/\/processo\/5\/SEDIA$/);
     });
 

@@ -1,57 +1,54 @@
-import {expect} from '@playwright/test';
-import {vueTest as test} from '../support/vue-specific-setup';
+import {test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    cancelarModal,
+    clicarBotaoHistoricoAnalise,
     DADOS_TESTE,
     disponibilizarCadastro,
+    gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
     SELETORES_CSS,
-    TEXTOS,
-    URLS,
-    verificarUrlPainel
+    verificarAtividadeVisivel,
+    verificarBotaoDisponibilizarHabilitado,
+    verificarBotaoHistoricoAnaliseVisivel,
+    verificarConhecimentoVisivel,
+    verificarModalFechado,
+    verificarModalHistoricoAnaliseAberto,
+    verificarUrlDoPainel
 } from './helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', () => {
-    test.beforeEach(async ({page}) => await loginComoChefe(page));
+    const PROCESSO_REVISAO = DADOS_TESTE.PROCESSOS.REVISAO_STIC;
+    const UNIDADE_STIC = DADOS_TESTE.UNIDADES.STIC;
 
-    test('deve mostrar botão Histórico de análise e permitir disponibilização', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
+    test.beforeEach(async ({page}) => {
+        await loginComoChefe(page);
+        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
+    });
 
-        const botaoHistorico = page.getByText('Histórico de análise');
-        await expect(botaoHistorico).toBeVisible();
+    test('deve exibir e interagir com o modal de histórico de análise', async ({page}) => {
+        await verificarBotaoHistoricoAnaliseVisivel(page);
+        await clicarBotaoHistoricoAnalise(page);
+        await verificarModalHistoricoAnaliseAberto(page);
+        await cancelarModal(page);
+        await verificarModalFechado(page);
+    });
 
-        await botaoHistorico.click();
-
-        const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
-        await expect(modal).toBeVisible();
-        await expect(page.getByTestId('modal-historico-analise-titulo')).toBeVisible();
-
-        const tabela = modal.locator('table');
-        await expect(tabela).toBeVisible();
-
-        const tabelaAnalises = modal.getByTestId('historico-analise-tabela');
-        await expect(tabelaAnalises.getByText('Data/Hora')).toBeVisible();
-        await expect(tabelaAnalises.getByText('Unidade')).toBeVisible();
-        await expect(tabelaAnalises.getByText('Resultado')).toBeVisible();
-        await expect(tabelaAnalises.getByText('Observações')).toBeVisible();
-
-        await page.getByRole('button', {name: 'Fechar'}).click();
-        await expect(modal).not.toBeVisible();
-
-        const nomeAtividade = `Atividade de teste para CDU-09 ${Date.now()}`;
+    test('deve permitir a disponibilização do cadastro após preenchimento', async ({page}) => {
+        const nomeAtividade = gerarNomeUnico('Atividade para CDU-09');
         await adicionarAtividade(page, nomeAtividade);
+        await verificarAtividadeVisivel(page, nomeAtividade);
 
         const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        const nomeConhecimento = `Conhecimento de teste para CDU-09 ${Date.now()}`;
+        const nomeConhecimento = gerarNomeUnico('Conhecimento para CDU-09');
         await adicionarConhecimento(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
 
-        // Assegura que o botão está habilitado antes da ação
-        const botaoDisponibilizar = page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-        await expect(botaoDisponibilizar).toBeEnabled();
-
+        await verificarBotaoDisponibilizarHabilitado(page);
         await disponibilizarCadastro(page);
-        await verificarUrlPainel(page, URLS.PAINEL);
+
+        await verificarUrlDoPainel(page);
     });
 });

@@ -25,5 +25,8 @@ export {
     loginComoChefe,
     loginComoChefeSedia,
     loginComoServidor,
-    login
+    login,
+    navegarParaHome,
+    clicarBotaoEntrar,
+    clicarBotaoSair
 } from './navegacao';

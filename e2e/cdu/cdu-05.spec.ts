@@ -17,8 +17,7 @@ import {
     verificarModalConfirmacaoIniciarProcessoInvisivel,
     verificarModalConfirmacaoIniciarProcessoVisivel,
     verificarPaginaCadastroProcesso,
-    verificarTituloProcessos,
-    verificarUrlPainel,
+    verificarTituloProcessos, verificarUrlDoPainel,
     verificarValorCampoDescricao
 } from './helpers';
 
@@ -41,6 +40,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await expect(page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`).getByText(descricaoProcessoExistente)).toBeVisible();
 
         await clicarProcessoNaTabela(page, descricaoProcessoExistente);
+
         // Verifica se a URL é a da página de detalhes do processo
         await expect(page).toHaveURL(new RegExp(`/processo/cadastro\\?idProcesso=100`));
         await clicarBotaoIniciarProcesso(page);
@@ -64,7 +64,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await iniciarProcesso(page);
 
         await verificarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
-        await verificarUrlPainel(page, URLS.PAINEL);
+        await verificarUrlDoPainel(page);
     });
 
     test('deve validar dados antes de mostrar modal', async ({page}) => {

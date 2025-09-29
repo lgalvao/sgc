@@ -206,3 +206,25 @@ export async function login(page: Page, idServidor: string): Promise<void> {
     await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
     await page.getByLabel(ROTULOS.SENHA).fill('senha-padrao'); // A senha é ignorada pelo mock
 }
+
+/**
+ * Navega para a página inicial (raiz do site).
+ */
+export async function navegarParaHome(page: Page): Promise<void> {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+}
+
+/**
+ * Clica no botão "Entrar" na tela de login.
+ */
+export async function clicarBotaoEntrar(page: Page): Promise<void> {
+    await page.getByRole('button', { name: TEXTOS.ENTRAR }).click();
+}
+
+/**
+ * Clica no botão/link "Sair" para fazer logout.
+ */
+export async function clicarBotaoSair(page: Page): Promise<void> {
+    await page.locator('a[title="Sair"]').click();
+}

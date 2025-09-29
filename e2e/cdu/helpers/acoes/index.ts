@@ -16,7 +16,8 @@ export {
     criarProcessoMapeamentoCompleto,
     finalizarProcesso,
     disponibilizarCadastro,
-    homologarItem,
+    aceitarCadastro,
+    homologarCadastro,
     devolverParaAjustes,
     iniciarProcesso,
     removerProcessoComConfirmacao,
@@ -37,7 +38,8 @@ export {
     clicarIniciarProcesso,
     abrirModalInicializacaoProcesso,
     confirmarInicializacaoNoModal,
-    cancelarModal
+    cancelarModal,
+    clicarBotaoHistoricoAnalise
 } from './acoes-modais';
 
 // Ações de atividades
@@ -48,10 +50,17 @@ export {
     removerAtividade,
     editarConhecimento,
     removerConhecimento,
-    criarCompetencia
+    criarCompetencia,
+    clicarBotaoImportarAtividades,
+    clicarBotaoDisponibilizar,
+    tentarAdicionarAtividadeVazia,
+    cancelarEdicaoAtividade,
+    adicionarConhecimentoPrimeiraAtividade
 } from './acoes-atividades';
 
 // Ações de mapa
 export {
-    validarMapa
+    validarMapa,
+    clicarBotaoImpactosMapa,
+    fecharModalImpactos
 } from './acoes-mapa';

@@ -1,11 +1,33 @@
-import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
-import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from './verificacoes-basicas';
+import {expect, Locator, Page} from '@playwright/test';
+import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel, verificarModalVisivel} from './verificacoes-basicas';
 
 /**
  * VERIFICAÇÕES DE INTERFACE DE USUÁRIO
  * Funções para verificações específicas de elementos da UI e comportamentos visuais
  */
+
+/**
+ * Verifica se um conhecimento em uma atividade específica está visível.
+ * Pode receber o nome da atividade ou o locator do card da atividade.
+ */
+export async function verificarConhecimentoVisivel(pageOrCard: Page | Locator, nomeAtividadeOuConhecimento: string, nomeConhecimento?: string): Promise<void> {
+    let cardAtividade: Locator;
+    let conhecimento: string;
+
+    if (typeof nomeConhecimento === 'string') {
+        // Assinatura: (page, nomeAtividade, nomeConhecimento)
+        const page = pageOrCard as Page;
+        cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividadeOuConhecimento});
+        conhecimento = nomeConhecimento;
+    } else {
+        // Assinatura: (cardLocator, nomeConhecimento)
+        cardAtividade = pageOrCard as Locator;
+        conhecimento = nomeAtividadeOuConhecimento;
+    }
+
+    await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: conhecimento})).toBeVisible();
+}
 
 /**
  * Verifica elementos comuns do painel após login
@@ -105,4 +127,185 @@ export async function verificarElementosDetalhesProcessoVisiveis(page: Page): Pr
     await esperarTextoVisivel(page, TEXTOS.SITUACAO_LABEL);
     await esperarTextoVisivel(page, TEXTOS.UNIDADES_PARTICIPANTES);
     await esperarBotaoVisivel(page, TEXTOS.FINALIZAR_PROCESSO);
+}
+
+/**
+ * Verifica se os campos da tela de login estão visíveis.
+ */
+export async function verificarCamposLogin(page: Page): Promise<void> {
+    await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
+    await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();
+    await expect(page.getByRole('button', { name: TEXTOS.ENTRAR })).toBeVisible();
+}
+
+/**
+ * Verifica a estrutura da barra de navegação para o perfil SERVIDOR.
+ */
+export async function verificarEstruturaServidor(page: Page): Promise<void> {
+    const navBar = page.getByRole('navigation');
+    await expect(navBar.getByRole('link', { name: 'Painel' })).toBeVisible();
+    await expect(navBar.getByRole('link', { name: 'Minha unidade' })).toBeVisible();
+    await expect(page.getByText('SERVIDOR - STIC')).toBeVisible();
+    await expect(page.locator('a[title="Configurações do sistema"]')).not.toBeVisible();
+    await expect(page.locator('a[title="Sair"]')).toBeVisible();
+}
+
+/**
+ * Verifica a estrutura da barra de navegação para o perfil ADMIN.
+ */
+export async function verificarEstruturaAdmin(page: Page): Promise<void> {
+    await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
+    await expect(page.locator('a[title="Configurações do sistema"]')).toBeVisible();
+}
+
+/**
+ * Verifica se a página de cadastro de atividades está visível.
+ */
+export async function verificarPaginaCadastroAtividades(page: Page): Promise<void> {
+    await expect(page.getByRole('heading', {name: TEXTOS.CADASTRO_ATIVIDADES_CONHECIMENTOS})).toBeVisible();
+    await esperarElementoVisivel(page, SELETORES.INPUT_NOVA_ATIVIDADE);
+}
+
+/**
+ * Verifica se o botão "Impacto no mapa" está visível.
+ */
+export async function verificarBotaoImpactoVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: TEXTOS.IMPACTO_NO_MAPA})).toBeVisible();
+}
+
+/**
+ * Verifica se o modal de importação de atividades está visível.
+ */
+export async function verificarModalImportacaoVisivel(page: Page): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator('.modal-body')).toBeVisible();
+}
+
+/**
+ * Verifica se o botão "Disponibilizar" está visível.
+ */
+export async function verificarBotaoDisponibilizarVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR})).toBeVisible();
+}
+
+/**
+ * Verifica se uma atividade com um nome específico está visível.
+ */
+export async function verificarAtividadeVisivel(page: Page, nomeAtividade: string): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade})).toBeVisible();
+}
+
+/**
+ * Verifica se uma atividade com um nome específico NÃO está visível/anexada.
+ */
+export async function verificarAtividadeNaoVisivel(page: Page, nomeAtividade: string): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade})).not.toBeAttached();
+}
+
+/**
+ * Verifica se um conhecimento em uma atividade específica NÃO está visível.
+ */
+export async function verificarConhecimentoNaoVisivel(page: Page, nomeAtividade: string, nomeConhecimento: string): Promise<void> {
+    const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+    await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento})).not.toBeVisible();
+}
+
+/**
+ * Verifica a quantidade de cards de atividade na página.
+ */
+export async function verificarContadorAtividades(page: Page, numeroEsperado: number): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE)).toHaveCount(numeroEsperado);
+}
+
+/**
+ * Verifica se o botão "Histórico de análise" está visível.
+ */
+export async function verificarBotaoHistoricoAnaliseVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: 'Histórico de análise'})).toBeVisible();
+}
+
+/**
+ * Verifica se o modal de histórico de análise está aberto com os elementos corretos.
+ */
+export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<void> {
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', {name: 'Histórico de Análise'})).toBeVisible();
+
+    const tabela = modal.locator('table');
+    await expect(tabela).toBeVisible();
+
+    // Verifica se a linha de cabeçalho contém todos os textos esperados
+    const headerRow = tabela.locator('thead tr');
+    await expect(headerRow).toContainText('Data/Hora');
+    await expect(headerRow).toContainText('Unidade');
+    await expect(headerRow).toContainText('Resultado');
+    await expect(headerRow).toContainText('Observações');
+
+    // Verifica o conteúdo de uma observação específica, conforme o teste original
+    await expect(modal.getByText('Observação de teste para histórico.')).toBeVisible();
+}
+
+/**
+ * Verifica se o botão "Disponibilizar" está habilitado.
+ */
+export async function verificarBotaoDisponibilizarHabilitado(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR})).toBeEnabled();
+}
+
+/**
+ * Verifica se a mensagem "Nenhum impacto no mapa da unidade" está visível.
+ */
+export async function verificarMensagemNenhumImpacto(page: Page): Promise<void> {
+    await esperarTextoVisivel(page, 'Nenhum impacto no mapa da unidade.');
+}
+
+/**
+ * Verifica se o modal de impactos no mapa está visível e com o conteúdo esperado.
+ */
+export async function verificarModalImpactosAberto(page: Page): Promise<void> {
+    const modal = page.getByTestId('impacto-mapa-modal');
+    await expect(modal).toBeVisible();
+    await expect(page.getByTestId('titulo-competencias-impactadas')).toBeVisible();
+    await expect(page.getByTestId('msg-nenhuma-competencia')).not.toBeVisible();
+}
+
+/**
+ * Verifica se o modal de impactos no mapa está fechado.
+ */
+export async function verificarModalImpactosFechado(page: Page): Promise<void> {
+    const modal = page.getByTestId('impacto-mapa-modal');
+    await expect(modal).not.toBeVisible();
+}
+
+/**
+ * Verifica se a listagem de atividades e conhecimentos está sendo exibida.
+ */
+export async function verificarListagemAtividadesEConhecimentos(page: Page): Promise<void> {
+    await expect(page.getByTestId('atividade-descricao').first()).toBeVisible();
+    await expect(page.getByTestId('conhecimento-descricao').first()).toBeVisible();
+}
+
+/**
+ * Verifica se a página está em modo "somente leitura", sem controles de edição.
+ */
+export async function verificarModoSomenteLeitura(page: Page): Promise<void> {
+    await expect(page.getByTestId(SELETORES.BTN_EDITAR_ATIVIDADE)).toHaveCount(0);
+    await expect(page.getByTestId(SELETORES.BTN_REMOVER_ATIVIDADE)).toHaveCount(0);
+    await expect(page.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO)).toHaveCount(0);
+    await expect(page.getByTestId(SELETORES.BTN_REMOVER_CONHECIMENTO)).toHaveCount(0);
+    await expect(page.getByTestId(SELETORES.BTN_ADICIONAR_CONHECIMENTO)).toHaveCount(0);
+    await expect(page.getByTestId(SELETORES.BTN_ADICIONAR_ATIVIDADE)).toHaveCount(0);
+}
+
+/**
+ * Verifica se o cabeçalho da unidade é exibido corretamente na página de visualização.
+ */
+export async function verificarCabecalhoUnidade(page: Page, siglaEsperada: string): Promise<void> {
+    const sigla = page.locator('.unidade-cabecalho .unidade-sigla');
+    const nome = page.locator('.unidade-cabecalho .unidade-nome');
+    await expect(sigla).toBeVisible();
+    await expect(sigla).toContainText(siglaEsperada);
+    await expect(nome).toBeVisible();
+    await expect(nome).toHaveText(/\S+/);
 }

@@ -8,9 +8,9 @@ import {
     loginComoGestor,
     SELETORES_CSS,
     TEXTOS,
-    URLS,
-    verificarUrlPainel
+    URLS, verificarUrlDoPainel,
 } from './helpers';
+import Painel from "../../src/views/Painel.vue";
 
 async function navegarParaAnaliseRevisao(page: Page, loginFn: (page: Page) => Promise<void>) {
     await loginFn(page);
@@ -24,7 +24,7 @@ async function esperarSucessoERedirecionamento(page: Page, mensagem: string) {
     const notification = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO);
     await expect(notification).toBeVisible();
     await expect(notification).toContainText(mensagem);
-    await verificarUrlPainel(page, URLS.PAINEL);
+    await verificarUrlDoPainel(page);
 }
 
 test.describe('CDU-14: Analisar revisão de cadastro de atividades e conhecimentos', () => {

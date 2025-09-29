@@ -11,9 +11,10 @@ export {
     esperarElementoVisivel,
     esperarElementoInvisivel,
     verificarUrl,
-    esperarUrl as verificarUrlPainel,
+    verificarUrlDoPainel, // Corrigido: removido alias e adicionada função específica
     verificarModalVisivel,
-    verificarModalFechado
+    verificarModalFechado,
+    esperarNotificacaoLoginInvalido
 } from './verificacoes-basicas';
 
 // Verificações de processo
@@ -47,5 +48,26 @@ export {
     verificarComportamentoMarcacaoCheckbox,
     verificarComportamentoCheckboxInteroperacional,
     verificarTituloProcessos,
-    verificarElementosDetalhesProcessoVisiveis
+    verificarElementosDetalhesProcessoVisiveis,
+    verificarCamposLogin,
+    verificarEstruturaAdmin,
+    verificarEstruturaServidor,
+    verificarPaginaCadastroAtividades,
+    verificarBotaoImpactoVisivel,
+    verificarModalImportacaoVisivel,
+    verificarBotaoDisponibilizarVisivel,
+    verificarAtividadeVisivel,
+    verificarAtividadeNaoVisivel,
+    verificarConhecimentoVisivel,
+    verificarConhecimentoNaoVisivel,
+    verificarContadorAtividades,
+    verificarBotaoHistoricoAnaliseVisivel,
+    verificarModalHistoricoAnaliseAberto,
+    verificarBotaoDisponibilizarHabilitado,
+    verificarMensagemNenhumImpacto,
+    verificarModalImpactosAberto,
+    verificarModalImpactosFechado,
+    verificarListagemAtividadesEConhecimentos,
+    verificarModoSomenteLeitura,
+    verificarCabecalhoUnidade
 } from './verificacoes-ui';

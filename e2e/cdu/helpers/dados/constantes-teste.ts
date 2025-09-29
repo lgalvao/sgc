@@ -95,6 +95,9 @@ export const TEXTOS = {
     PROCESSO_REMOVIDO_INICIO: 'Processo ',
     PROCESSO_REMOVIDO_FIM: ' removido',
     TITULO_PROCESSOS_LABEL: 'Processos',
+    CADASTRO_DEVOLVIDO_AJUSTES: 'O cadastro foi devolvido para ajustes!',
+    ANALISE_REGISTRADA_SUCESSO: 'A análise foi registrada com sucesso!',
+    CADASTRO_HOMOLOGADO_SUCESSO: 'O cadastro foi homologado com sucesso!',
 } as const;
 
 export const URLS = {

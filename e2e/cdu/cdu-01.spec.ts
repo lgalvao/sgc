@@ -1,61 +1,51 @@
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 import {
+    clicarBotaoEntrar,
+    clicarBotaoSair,
+    esperarNotificacaoLoginInvalido,
     login,
     loginComoAdmin,
     loginComoServidor,
-    ROTULOS,
-    TEXTOS,
+    navegarParaHome,
     URLS,
+    verificarCamposLogin,
     verificarElementosPainel,
+    verificarEstruturaAdmin,
+    verificarEstruturaServidor,
     verificarUrl,
 } from './helpers';
 
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve carregar a página de login corretamente', async ({page}) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
+        await navegarParaHome(page);
         await verificarUrl(page, `${URLS.LOGIN}`);
-
-        await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
-        await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();
-        await expect(page.getByRole('button', {name: TEXTOS.ENTRAR})).toBeVisible();
+        await verificarCamposLogin(page);
     });
 
     test('deve exibir erro para usuário não encontrado', async ({page}) => {
         await login(page, '0000000000'); // ID de usuário que não existe
-        await page.getByRole('button', {name: TEXTOS.ENTRAR}).click();
-
-        const notificacao = page.locator('.notification-container');
-        await expect(notificacao.getByText(TEXTOS.ERRO_LOGIN_INVALIDO)).toBeVisible();
+        await clicarBotaoEntrar(page);
+        await esperarNotificacaoLoginInvalido(page);
     });
 
     test('deve exibir estrutura da aplicação para SERVIDOR', async ({page}) => {
         await loginComoServidor(page);
         await verificarElementosPainel(page);
-        const navBar = page.getByRole('navigation');
-
-        await expect(navBar.getByRole('link', {name: 'Painel'})).toBeVisible();
-        await expect(navBar.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
-
-        await expect(page.getByText('SERVIDOR - STIC')).toBeVisible();
-        await expect(page.locator('a[title="Configurações do sistema"]')).not.toBeVisible();
-        await expect(page.locator('a[title="Sair"]')).toBeVisible();
+        await verificarEstruturaServidor(page);
     });
 
     test('deve exibir estrutura da aplicação para ADMIN com acesso às configurações', async ({page}) => {
         await loginComoAdmin(page);
         await verificarElementosPainel(page);
-
-        await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
-        await expect(page.locator('a[title="Configurações do sistema"]')).toBeVisible();
+        await verificarEstruturaAdmin(page);
     });
 
     test('deve fazer logout e retornar para a tela de login', async ({page}) => {
         await loginComoServidor(page);
         await verificarUrl(page, `${URLS.PAINEL}`);
-        await page.locator('a[title="Sair"]').click();
+        await clicarBotaoSair(page);
 
         await verificarUrl(page, `${URLS.LOGIN}`);
-        await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
+        await verificarCamposLogin(page);
     });
 });

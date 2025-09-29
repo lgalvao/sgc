@@ -109,29 +109,64 @@ export async function disponibilizarCadastro(page: Page): Promise<void> {
 }
 
 /**
- * Homologa um cadastro/mapa
+ * Devolve um cadastro para ajustes, preenchendo a observação se fornecida.
  */
-export async function homologarItem(page: Page): Promise<void> {
-  await page.click(`button:has-text("${TEXTOS.HOMOLOGAR}")`);
-  await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
-  const confirmarBtn = page.locator(`button:has-text("${TEXTOS.CONFIRMAR}")`).last();
-  await confirmarBtn.click();
+export async function devolverParaAjustes(page: Page, observacao?: string): Promise<void> {
+  await page.getByRole('button', {name: TEXTOS.DEVOLVER}).click();
+  const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+  await expect(modal).toBeVisible();
+  
+  if (observacao) {
+    await modal.getByLabel('Observação').fill(observacao);
+  }
+  
+  await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
- * Devolve para ajustes
+ * Aceita um cadastro, preenchendo a observação se fornecida.
  */
-export async function devolverParaAjustes(page: Page, observacao?: string): Promise<void> {
-  await page.click(`button:has-text("${TEXTOS.DEVOLVER}")`);
-  await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
-  
-  if (observacao) {
-    const textarea = page.locator('textarea').first();
-    await textarea.waitFor({ state: 'visible' });
-    await textarea.fill(observacao);
-  }
-  
-  await page.click(`button:has-text("${TEXTOS.CONFIRMAR}")`);
+export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
+    const acceptButton = page.getByRole('button', {name: 'Registrar aceite'});
+    const validateButton = page.getByRole('button', {name: TEXTOS.VALIDAR});
+
+    if (await acceptButton.isVisible()) {
+        await acceptButton.click();
+    } else {
+        await validateButton.click();
+    }
+
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+
+    if (observacao) {
+        await modal.getByLabel('Observação').fill(observacao);
+    }
+
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+}
+
+/**
+ * Homologa um cadastro, preenchendo a observação se fornecida.
+ */
+export async function homologarCadastro(page: Page, observacao?: string): Promise<void> {
+    const homologateButton = page.getByRole('button', {name: TEXTOS.HOMOLOGAR});
+    const validateButton = page.getByRole('button', {name: TEXTOS.VALIDAR});
+
+    if (await homologateButton.isVisible()) {
+        await homologateButton.click();
+    } else {
+        await validateButton.click();
+    }
+
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+
+    if (observacao) {
+        await modal.getByLabel('Observação').fill(observacao);
+    }
+
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
