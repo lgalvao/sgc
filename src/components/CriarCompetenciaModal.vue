@@ -33,6 +33,7 @@
                 class="form-control"
                 placeholder="Descreva a competência"
                 rows="3"
+                data-testid="input-descricao-competencia"
               />
             </div>
           </div>
@@ -79,6 +80,7 @@
           <button
             class="btn btn-secondary"
             type="button"
+            data-testid="btn-modal-cancelar"
             @click="fechar"
           >
             Cancelar
@@ -87,6 +89,7 @@
             :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
             class="btn btn-primary"
             type="button"
+            data-testid="btn-modal-confirmar"
             @click="salvar"
           >
             <i class="bi bi-save" /> Salvar

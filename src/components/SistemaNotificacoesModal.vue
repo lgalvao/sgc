@@ -15,6 +15,7 @@
           <button
             type="button"
             class="btn-close"
+            data-testid="btn-modal-fechar"
             @click="fecharModal"
           />
         </div>
@@ -24,6 +25,7 @@
               <h6>Notificações do Sistema</h6>
               <button
                 class="btn btn-sm btn-outline-danger"
+                data-testid="btn-limpar-notificacoes"
                 @click="limparTodas"
               >
                 <i class="bi bi-trash me-1" />
@@ -80,6 +82,7 @@
                 >
                   <button
                     class="btn btn-sm btn-outline-primary"
+                    data-testid="btn-ver-email"
                     @click="mostrarEmail(notificacao)"
                   >
                     <i class="bi bi-envelope me-1" />
@@ -94,6 +97,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            data-testid="btn-modal-fechar"
             @click="fecharModal"
           >
             Fechar
@@ -125,6 +129,7 @@
           <button
             type="button"
             class="btn-close"
+            data-testid="btn-modal-fechar"
             @click="fecharEmailModal"
           />
         </div>
@@ -148,6 +153,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            data-testid="btn-modal-fechar"
             @click="fecharEmailModal"
           >
             Fechar

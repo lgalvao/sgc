@@ -1,183 +1,136 @@
-# Correções de Testes - Lições Aprendidas e Diretrizes
+# Correções de Testes - Lições Aprendidas e Diretrizes (versão Pós-Refatoração)
 
 ## 📋 Resumo Executivo
+Este guia atualiza e amplia as diretrizes de correção de testes após a refatoração dos testes E2E em camadas (constantes → helpers de domínio → specs semânticos). Inclui aprendizados obtidos ao corrigir várias quebras pós-refatoração, exemplos práticos e recomendações operacionais para evitar regressões e acelerar correções futuras.
 
-Este documento consolida as lições aprendidas durante a correção do teste CDU-08 "deve editar e remover conhecimentos" e estabelece diretrizes para futuras correções de testes automatizados.
+## 🔧 Contexto da Refatoração
+A refatoração seguida pelo time adotou uma arquitetura em 3 camadas para os E2E:
+- Camada 1 — Constantes (seletores, textos, URLs): `e2e/cdu/helpers/dados/constantes-teste.ts`
+- Camada 2 — Linguagem de domínio (ações, verificações, navegação): `e2e/cdu/helpers/...`
+- Camada 3 — Especificações semânticas (`e2e/cdu/*.spec.ts`)
 
-## 🎯 Caso de Estudo: CDU-08 - Bug de Automação Vue.js
+Princípio chave: testes chamam apenas helpers semânticos da Camada 2; strings de UI e test-ids ficam na Camada 1.
 
-### Problema Original
-- **Teste**: `deve editar e remover conhecimentos`
-- **Falha**: `TimeoutError` esperando `input-editar-conhecimento` ficar visível
-- **Causa Raiz**: Evento de clique do Playwright não disparava a reatividade do Vue.js
+---
 
-### Tentativas Iniciais (Infrutíferas)
-1. ❌ Aumentar timeouts
-2. ❌ Usar `force: true` nos cliques
-3. ❌ Usar `dispatchEvent`
-4. ❌ Adicionar `page.pause()` para debug manual
-5. ❌ Modificar dados de teste e mocks
+## 🧠 Aprendizados Gerais (baseados na correção real)
+1. Centralizar TEXTOS/SELETORES evita duplicação e facilita correção: quando um texto de UI muda, ajustar a constante corrige todos os testes que dependem dela.
+2. Reexportar novos helpers nos `index.ts` é crítico — esquecer reexport quebra imports nos specs. Sempre atualize os índices junto com o novo helper.
+3. Verificações devem ser semânticas e tolerantes:
+   - Prefira verificar presença semântica (heading, tabela, estado) em vez de strings exatas.
+   - Use regex/`i` case-insensitive e `.first()` para evitar "strict mode violation" quando o DOM contém múltiplas instâncias.
+4. Notificações temporárias causam flakes: defina comportamento previsível em ambiente de teste (duracao configurável) ou verifique o conteúdo do elemento que persiste (ex.: modal, lista de alertas).
+5. Test-data (mocks) é fonte comum de falsos negativos: garanta que mocks contenham cenários esperados (histórico, unidades, idProcesso).
+6. Workarounds (DOM manipulation, JS injection) aceitos como último recurso — documente e marque TODO para remoção.
 
-### Solução Final (Efetiva)
-✅ **Workaround com DOM Manipulation**: Criação de interface de edição simulada quando a reatividade Vue falha
+---
 
-## 🧠 Lições Aprendidas
+## ✅ Boas Práticas Pós-Refatoração
 
-### 1. Diagnóstico Sistemático
-- **SEMPRE** investigue a causa raiz antes de implementar correções
-- Use testes de debug para isolar o problema específico
-- Se precisar do page.pause(), será necessário usar --headed mode
-- Verifique se o problema é de dados, timing, seletor ou bug de automação
+1. Sempre atualizar:
+   - [`e2e/cdu/helpers/dados/constantes-teste.ts`](e2e/cdu/helpers/dados/constantes-teste.ts:1) ao mudar rótulos/ids.
+   - `index.ts` de cada pasta (ações/verificações/navegação) ao adicionar helpers.
 
-## 📖 Diretrizes Gerais para Correções
+2. Helpers de verificação:
+   - Encapsulem `expect` para evitar `expect` nos specs.
+   - Exponham estados (ex.: `verificarCadastroDevolvidoComSucesso(page)`), não detalhes de DOM.
+   - Implementem tolerância a variações de UI (plural, capitalização, pequenas reformulações).
 
-### 🔍 Fase 1: Diagnóstico
-#### 1.1 Análise Inicial
-```bash
-# Execute o teste isolado primeiro
-npx playwright test caminho/do/teste.spec.ts -g "nome do teste específico" --headed
+3. Helpers de ação:
+   - Sempre receber `page: Page` como primeiro argumento.
+   - Tratar alternativas (botões com nomes diferentes) internamente.
+   - Registrar logs/contexto para facilitar debugging.
 
-# Verifique se outros testes na mesma suite funcionam
-npx playwright test caminho/do/teste.spec.ts
+4. Seletores e TestIds:
+   - Preferir `[data-testid="xxx"]`.
+   - Se o componente expõe `data-testid="btn-editar-competencia"`, mantenha a constante `EDITAR_COMPETENCIA: 'btn-editar-competencia'`.
+   - Se possível, adicione fallback robusto: `page.locator('[data-testid="x"], button:has-text("Y")').first()`.
+   - Se um test precisar de um identificador mais claro e ele não existir no código, crie um novo `data-testid` no componente em Camada 1 (faça essa mudança no código da aplicação, não no teste) e exporte a constante correspondente em `constantes-teste.ts`. Test-ids claros reduzem fragilidade e simplificam correções.
+
+5. Notificações:
+   - Em ambiente de teste, permita configurar duração (ex.: via variável de ambiente) para evitar flakes.
+   - Verifique o local persistente da informação (ex.: título de notificação ou modal) em vez de seletor CSS transitório.
+
+6. Timeouts e Esperas — recomendação prática:
+   - Não use "aumentar timeouts" como primeira linha de defesa. Em protótipos e durante a maioria das execuções de teste, as ações são instantâneas; usar longos timeouts mascara problemas reais.
+   - Só faz sentido recorrer a timeouts maiores quando o próprio código da aplicação implementa delays reais (por exemplo notificações que desaparecem, animações declaradas com delays, processos assíncronos controlados por timers).
+   - Prefira estratégias de espera determinísticas (waitForLoadState, waitForFunction, esperar elemento visível) e configurar durações controladas para componentes que realmente dependem de timeout.
+
+---
+
+## 📌 Recomendações Operacionais (Checklists atualizados)
+
+### Antes de editar um spec semântico (Camada 3)
+- [ ] Confirmar que as strings necessárias existem em `TEXTOS`.
+- [ ] Listar helpers que precisam ser criados/ajustados na Camada 2.
+- [ ] Reexportar novas funções nos `index.ts` correspondentes.
+
+### Ao corrigir um teste quebrado
+1. Reproduzir localmente com `--headed`.
+2. Ler e analisar o arquivo `error-context.md` gerado pelo Playwright para entender o contexto visual exato onde o teste quebrou. Esses snapshots mostram o DOM/estado no momento da falha e são essenciais para diagnóstico rápido.
+3. Coletar snapshots, console logs e network.
+4. Verificar se o erro é:
+   - Dados/mocks → atualize `src/mocks/*` ou `e2e` mocks.
+   - Seletores → atualizar `SELETORES/SELETORES_CSS`.
+   - Texto → atualizar `TEXTOS`.
+   - Tempo/interação → adicionar waits nas Camada 2 (não nos specs).
+   - Falha de importação → checar `index.ts` reexports.
+5. Modificar helpers (Camada 2) e reexecutar `npx playwright test --last-failed`.
+
+### Para workarounds (somente se necessário)
+- Documente a razão no helper com link para issue.
+- Marque com TODO e crie issue para remover após correção upstream.
+
+---
+
+## Exemplos práticos (trechos úteis)
+
+- Verificação tolerante de modal:
+```ts
+// verificarModalHistoricoAnaliseAberto (helper de verificações)
+const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+await expect(modal).toBeVisible();
+await expect(modal.getByRole('heading', { name: /Histórico de Análises?/i }).first()).toBeVisible();
+if ((await modal.getByText(/nenhuma análise registrada/i).count()) > 0) return;
+await expect(modal.getByText(/data\/hora/i).first()).toBeVisible();
 ```
 
-#### 1.2 Coleta de Evidências
-- [ ] HTML snapshot da página no momento da falha
-- [ ] Console logs do browser
-- [ ] Screenshots do estado atual
-- [ ] Network requests (se relevante)
-
-### 🔧 Fase 2: Estratégias de Correção
-
-#### 2.1 Ordem de Prioridade para Tentativas
-
-**Nível 1: Correções Simples**
-1. Ajustar seletores CSS/TestId
-2. Aumentar timeouts específicos (não globais)
-3. Adicionar `waitFor` apropriados
-4. Corrigir dados de teste
-
-**Nível 2: Problemas de Timing**
-1. Usar `page.waitForLoadState('networkidle')`
-2. Aguardar elementos específicos ficarem visíveis. Mas sem timeouts.
-
-**Nível 3: Problemas de Interação**
-1. Forçar cliques com `{ force: true }` (só em casos extremos)
-2. Usar `scrollIntoViewIfNeeded()`
-3. Simular hover antes de cliques
-4. Usar `dispatchEvent` para eventos customizados
-
-**Nível 4: Bugs de Framework (Vue/React/Angular)**
-1. Manipulação DOM direta
-2. Injeção de JavaScript
-3. Workarounds híbridos
-
-### 📝 Fase 3: Documentação e Manutenção
-
-#### 3.1 Documentação Obrigatória
-- [ ] Comentários explicando o workaround
-- [ ] Referência ao bug original
-- [ ] Condições sob as quais o workaround é ativado
-- [ ] TODO para remoção quando bug for corrigido
-
-## 🛠️ Ferramentas e Técnicas Úteis
-
-### Debug e Investigação
-```typescript
-// 1. Teste de debug isolado
-test('debug - investigar problema', async ({ page }) => {
-    // Reproduzir cenário problemático
-    // Adicionar logs extensivos
-    // Fazer screenshots em cada etapa
-    // Pause para investigação manual
-    await page.pause();
-});
-
-// 2. Verificação de estado
-const estado = await page.evaluate(() => {
-    return {
-        elementos: document.querySelectorAll('[data-testid="meu-elemento"]').length,
-        classes: document.querySelector('.minha-classe')?.className,
-        // Outros estados relevantes
-    };
-});
-
-// 3. Interceptação de eventos
-await page.evaluate(() => {
-    const elemento = document.querySelector('[data-testid="botao"]');
-    elemento?.addEventListener('click', (e) => {
-        console.log('Clique interceptado:', e);
-        window.debugInfo = e;
-    });
-});
+- Esperar notificação por texto (fallback genérico):
+```ts
+// esperarMensagemSucesso
+const notificacao = page.locator('.notification', { hasText: mensagem });
+await expect(notificacao).toBeVisible();
 ```
 
-### Seletores Robustos
-```typescript
-// ✅ Bom: Específico e estável
-page.getByTestId('btn-editar-conhecimento')
-
-// ✅ Bom: Fallback com múltiplas opções
-page.locator('[data-testid="btn-editar"], [aria-label="Editar"], button:has-text("Editar")').first()
-
-// ❌ Evitar: Muito genérico
-page.locator('button')
-
-// ❌ Evitar: Dependente de posição
-page.locator('button').nth(3)
+- Ações robustas com fallback de botões:
+```ts
+// confirmar ação no modal
+if ((await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).count()) > 0) {
+  await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
+} else {
+  await modal.getByRole('button', { name: /aceitar|confirmar/i }).first().click();
+}
 ```
 
-### Waiting Strategies
-```typescript
-// Para elementos aparecerem
-await elemento.waitFor({ state: 'visible'});
+---
 
-// Para requisições terminarem
-await page.waitForLoadState('networkidle');
+## ✔️ Checklist Final de Aceitação (após correção)
+- [ ] Teste reproduzido localmente em modo headed.
+- [ ] Evidências coletadas (snapshot, logs, network).
+- [ ] Correção aplicada na Camada correta (dados/constantes/helpers).
+- [ ] `index.ts` atualizado quando helper novo criado.
+- [ ] Tests rodando: `npx playwright test --last-failed` passa.
+- [ ] Workarounds documentados com TODO e issue criada.
 
-// Para elementos específicos (mais robusto)
-await page.waitForFunction(() => {
-    return document.querySelectorAll('[data-testid="meu-elemento"]').length > 0;
-});
-```
+---
 
-## 🚨 Sinais de Alerta
+## 🎯 Princípios Reforçados
+- Centralize textos e seletores.
+- Mantenha helpers semânticos pequenos e resilientes.
+- Prefira mudanças nas Camadas 1/2 em vez de tocar specs diretamente.
+- Documente tudo: WHY > WHAT.
 
-### Quando NÃO Fazer Workarounds
-- ❌ Teste falhando por dados inadequados
-- ❌ Seletores incorretos ou muito genéricos
-- ❌ Timing issues que podem ser resolvidos com waits apropriados
-- ❌ Bugs reais na aplicação que devem ser corrigidos
-
-## 📋 Checklist para Correções
-
-### Antes de Implementar Correção
-- [ ] Reproduzi o problema localmente?
-- [ ] Testei manualmente o mesmo fluxo?
-- [ ] Verifiquei se outros testes similares funcionam?
-- [ ] Identifiquei a causa raiz específica?
-- [ ] Tentei soluções mais simples primeiro?
-
-### Durante a Implementação
-- [ ] Documentei o workaround adequadamente?
-- [ ] Adicionei logs para facilitar debug futuro?
-- [ ] Mantive a funcionalidade original intacta?
-- [ ] Testei tanto o caminho normal quanto o workaround?
-
-### Após a Correção
-- [ ] Todos os testes da suite passam?
-- [ ] Não quebrei outros testes?
-- [ ] Documentei a solução em local apropriado?
-- [ ] Criei issue para acompanhamento do bug upstream?
-
-## 🎯 Princípios Fundamentais
-
-1. **Cirurgia Mínima**: Faça a menor mudança possível para resolver o problema
-2. **Documentação Clara**: Sempre explique WHY, não apenas WHAT
-5. **Monitoramento**: Revise periodicamente se workarounds ainda são necessários
-
-## 📚 Recursos Adicionais
-
+## 📚 Recursos
 - [Playwright Best Practices](https://playwright.dev/docs/best-practices)
 - [Vue.js Testing Cookbook](https://vue-test-utils.vuejs.org/guides/)
 - [Debugging Playwright Tests](https://playwright.dev/docs/debug)

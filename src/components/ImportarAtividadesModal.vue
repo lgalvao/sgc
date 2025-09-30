@@ -27,6 +27,7 @@
               id="processo-select"
               v-model="processoSelecionadoId"
               class="form-select"
+              data-testid="select-processo"
             >
               <option
                 disabled
@@ -60,6 +61,7 @@
               v-model="unidadeSelecionadaId"
               :disabled="!processoSelecionado"
               class="form-select"
+              data-testid="select-unidade"
             >
               <option
                 disabled
@@ -116,6 +118,7 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
+            data-testid="btn-modal-cancelar"
             @click="fechar"
           >
             Cancelar
@@ -124,6 +127,7 @@
             :disabled="!atividadesSelecionadas.length"
             class="btn btn-outline-primary"
             type="button"
+            data-testid="btn-importar"
             @click="importar"
           >
             Importar

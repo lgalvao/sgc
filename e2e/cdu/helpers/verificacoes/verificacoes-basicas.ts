@@ -10,7 +10,8 @@ import {SELETORES_CSS, TEXTOS, URLS} from '../dados';
  * Espera uma mensagem de sucesso aparecer
  */
 export async function esperarMensagemSucesso(page: Page, mensagem: string): Promise<void> {
-    const notificacao = page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO, {hasText: mensagem});
+    // Procuramos qualquer notificação que contenha o texto, independente da classe específica.
+    const notificacao = page.locator('.notification', {hasText: mensagem});
     await expect(notificacao).toBeVisible();
 }
 

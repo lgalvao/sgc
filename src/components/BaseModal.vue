@@ -33,6 +33,7 @@
             type="button"
             class="btn-close"
             :class="{ 'btn-close-white': tipo !== 'warning' }"
+            data-testid="btn-modal-fechar"
             @click="$emit('fechar')"
           />
         </div>

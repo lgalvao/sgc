@@ -17,7 +17,7 @@
             @click="emit('fechar')"
           />
         </div>
-        <div class="modal-body">
+        <div class="modal-body" data-testid="modal-historico-body">
           <div
             v-if="analises.length === 0"
             class="alert alert-info"
@@ -52,6 +52,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            data-testid="btn-modal-fechar"
             @click="emit('fechar')"
           >
             Fechar

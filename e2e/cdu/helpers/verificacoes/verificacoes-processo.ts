@@ -1,6 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
-import {esperarMensagemSucesso, esperarUrl} from './verificacoes-basicas';
+import {esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel} from './verificacoes-basicas';
 
 /**
  * VERIFICAÇÕES ESPECÍFICAS DE PROCESSOS
@@ -66,9 +66,100 @@ export async function verificarDialogoConfirmacaoRemocao(page: Page, descricaoPr
  * Verifica se processo foi removido com sucesso
  */
 export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
-    await expect(page.getByText(`${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricaoProcesso}${TEXTOS.PROCESSO_REMOVIDO_FIM}`)).toBeVisible();
+    // Verificar notificação de sucesso de forma mais robusta usando selector de notificação
+    const mensagemEsperada = `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricaoProcesso}${TEXTOS.PROCESSO_REMOVIDO_FIM}`;
+    await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toContainText(mensagemEsperada);
     await expect(page).toHaveURL(URLS.PAINEL);
     await expect(page.locator('[data-testid="tabela-processos"] tbody').getByText(descricaoProcesso)).not.toBeVisible();
+}
+
+/**
+ * Verifica a visibilidade do botão de finalização de processo.
+ */
+export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).toBeVisible();
+}
+
+/**
+ * Verifica a ausência do botão de finalização de processo.
+ */
+export async function verificarBotaoFinalizarProcessoInvisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).not.toBeVisible();
+}
+
+/**
+ * Verifica se o modal de finalização está visível com textos corretos.
+ */
+export async function verificarModalFinalizacaoProcesso(page: Page): Promise<void> {
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', {name: TEXTOS.FINALIZACAO_PROCESSO})).toBeVisible();
+    await expect(modal.getByText(TEXTOS.CONFIRMA_FINALIZACAO)).toBeVisible();
+    await expect(modal.getByText(TEXTOS.CONFIRMACAO_VIGENCIA_MAPAS)).toBeVisible();
+    await expect(modal.getByRole('button', {name: TEXTOS.CONFIRMAR})).toBeVisible();
+    await expect(modal.getByRole('button', {name: TEXTOS.CANCELAR})).toBeVisible();
+}
+
+/**
+ * Garante que o modal de finalização foi fechado.
+ */
+export async function verificarModalFinalizacaoFechado(page: Page): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).not.toBeVisible();
+}
+
+/**
+ * Verifica a notificação de bloqueio de finalização.
+ */
+export async function verificarFinalizacaoBloqueada(page: Page): Promise<void> {
+    await expect(page.locator('.notification')).toContainText(TEXTOS.FINALIZACAO_BLOQUEADA);
+}
+
+/**
+ * Confirma que o processo foi finalizado com sucesso no painel.
+ */
+export async function verificarProcessoFinalizadoNoPainel(page: Page, nomeProcesso: string): Promise<void> {
+    const linhaProcesso = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: nomeProcesso});
+    await expect(linhaProcesso).toContainText(TEXTOS.FINALIZADO);
+}
+
+/**
+ * Verifica se a notificação de sucesso contém o texto esperado após finalização.
+ */
+export async function verificarMensagemFinalizacaoSucesso(page: Page): Promise<void> {
+    await esperarMensagemSucesso(page, TEXTOS.PROCESSO_FINALIZADO);
+}
+
+/**
+ * Verifica se a notificação informa que os mapas estão vigentes.
+ */
+export async function verificarMapasVigentesNotificacao(page: Page): Promise<void> {
+    await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toContainText(TEXTOS.MAPAS_VIGENTES);
+}
+
+/**
+ * Garante que a notificação de envio de email está visível.
+ */
+export async function verificarEmailFinalizacaoEnviado(page: Page): Promise<void> {
+    const notificacaoEmail = page.locator(SELETORES_CSS.NOTIFICACAO_EMAIL).first();
+    await expect(notificacaoEmail).toBeVisible();
+    await expect(notificacaoEmail).toContainText(TEXTOS.EMAIL_ENVIADO);
+}
+
+
+/**
+ * Verifica se o cadastro foi devolvido para ajustes com sucesso.
+ */
+export async function verificarCadastroDevolvidoComSucesso(page: Page): Promise<void> {
+    await esperarMensagemSucesso(page, TEXTOS.CADASTRO_DEVOLVIDO_AJUSTES);
+    await verificarUrlDoPainel(page);
+}
+
+/**
+ * Verifica se o aceite foi registrado com sucesso.
+ */
+export async function verificarAceiteRegistradoComSucesso(page: Page): Promise<void> {
+    await esperarMensagemSucesso(page, TEXTOS.ACEITE_REGISTRADO);
+    await verificarUrlDoPainel(page);
 }
 
 /**

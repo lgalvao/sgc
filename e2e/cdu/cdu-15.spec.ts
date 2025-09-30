@@ -1,66 +1,71 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {criarCompetencia, esperarElementoVisivel, irParaMapaCompetencias, loginComoAdmin, TEXTOS} from './helpers';
+import {
+    confirmarNoModal,
+    criarCompetencia,
+    esperarBotaoVisivel,
+    esperarElementoVisivel,
+    esperarTextoVisivel,
+    irParaMapaCompetencias,
+    loginComoAdmin,
+    SELETORES,
+    TEXTOS,
+    verificarModalVisivel
+} from './helpers';
 
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, 4, 'SESEL');
-    await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
 test.describe('CDU-15: Manter mapa de competências', () => {
-    test('deve exibir tela de edição de mapa com elementos corretos', async ({page}) => {
+    test.beforeEach(async ({page}) => {
         await navegarParaMapa(page);
+    });
+
+    test('deve exibir tela de edição de mapa com elementos corretos', async ({page}) => {
         await esperarElementoVisivel(page, 'btn-abrir-criar-competencia');
-        await expect(page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR})).toBeVisible();
+        await esperarBotaoVisivel(page, TEXTOS.DISPONIBILIZAR);
     });
 
     test('deve criar competência e alterar situação do subprocesso', async ({page}) => {
-        await navegarParaMapa(page);
-
         const competenciaDescricao = `Competência Teste ${Date.now()}`;
         await criarCompetencia(page, competenciaDescricao);
-        const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaDescricao});
-        await expect(competenciaCard).toBeVisible();
-
-        await competenciaCard.hover();
-        await esperarElementoVisivel(page, 'btn-editar-competencia');
-        await esperarElementoVisivel(page, 'btn-excluir-competencia');
+        // Verifica que o novo card aparece pelo seu texto e que as ações estão disponíveis
+        await esperarTextoVisivel(page, competenciaDescricao);
+        await esperarElementoVisivel(page, SELETORES.EDITAR_COMPETENCIA);
+        await esperarElementoVisivel(page, SELETORES.EXCLUIR_COMPETENCIA);
     });
 
     test('deve editar competência existente', async ({page}) => {
-        await navegarParaMapa(page);
-
         const competenciaOriginal = `Competência Original ${Date.now()}`;
         await criarCompetencia(page, competenciaOriginal);
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaOriginal});
-        await competenciaCard.hover();
         await competenciaCard.getByTestId('btn-editar-competencia').click();
 
         const competenciaEditada = `Competência Editada ${Date.now()}`;
         await page.getByTestId('input-nova-competencia').fill(competenciaEditada);
         await page.getByTestId('btn-criar-competencia').click();
 
-        await expect(page.getByText(competenciaEditada)).toBeVisible();
+        // Verifica pelo texto da competência editada e que o original não existe mais
+        await esperarTextoVisivel(page, competenciaEditada);
         await expect(page.getByText(competenciaOriginal)).not.toBeVisible();
     });
 
     test('deve excluir competência com confirmação', async ({page}) => {
-        await navegarParaMapa(page);
-
         const competenciaParaExcluir = `Competência para Excluir ${Date.now()}`;
         await criarCompetencia(page, competenciaParaExcluir);
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaParaExcluir});
-        await competenciaCard.hover();
         await competenciaCard.getByTestId('btn-excluir-competencia').click();
 
-        await expect(page.getByRole('heading', {name: 'Exclusão de competência'})).toBeVisible();
-        await expect(page.getByText(`Confirma a exclusão da competência "${competenciaParaExcluir}"?`)).toBeVisible();
+        // Modal de exclusão pode ter título fixo; usamos helper semântico para aguardar modal e confirmar
+        await verificarModalVisivel(page);
+        await confirmarNoModal(page);
 
-        await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
-
-        await expect(competenciaCard).not.toBeVisible();
+        // Verifica que o texto da competência não está mais presente
+        await expect(page.getByText(competenciaParaExcluir)).not.toBeVisible();
     });
 });

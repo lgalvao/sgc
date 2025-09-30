@@ -7,14 +7,6 @@ import {DADOS_TESTE, ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../d
  */
 
 /**
- * Verifica URL com regex (função local para evitar dependência circular)
- */
-async function verificarUrl(page: Page, url: string): Promise<void> {
-    const regexUrl = new RegExp(url.replace(/\*\*/g, '.*'));
-    await expect(page).toHaveURL(regexUrl);
-}
-
-/**
  * Espera um texto ficar visível na página (função local para evitar dependência circular)
  */
 async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
@@ -65,6 +57,41 @@ export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: 
 }
 
 /**
+ * Navega diretamente para a tela de análise da revisão de cadastro de atividades e conhecimentos.
+ */
+export async function acessarAnaliseRevisaoCadastro(page: Page, idProcesso: number, unidade: string): Promise<void> {
+    await irParaSubprocesso(page, idProcesso, unidade);
+    await page.goto(`/processo/${idProcesso}/${unidade}/vis-cadastro`);
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-cadastro`));
+    await expect(page.getByRole('heading', {name: TEXTOS.CADASTRO_ATIVIDADES_CONHECIMENTOS})).toBeVisible();
+}
+
+/**
+ * Realiza o login como gestor e acessa a análise de revisão do cadastro.
+ */
+export async function acessarAnaliseRevisaoComoGestor(page: Page): Promise<void> {
+    await loginComoGestor(page);
+    await acessarAnaliseRevisaoCadastro(
+        page,
+        DADOS_TESTE.PROCESSOS.REVISAO_STIC.id,
+        DADOS_TESTE.UNIDADES.SESEL
+    );
+}
+
+/**
+ * Realiza o login como administrador e acessa a análise de revisão do cadastro.
+ */
+export async function acessarAnaliseRevisaoComoAdmin(page: Page): Promise<void> {
+    await loginComoAdmin(page);
+    await acessarAnaliseRevisaoCadastro(
+        page,
+        DADOS_TESTE.PROCESSOS.REVISAO_STIC.id,
+        DADOS_TESTE.UNIDADES.SESEL
+    );
+}
+
+/**
  * Navega para mapa de competências
  */
 export async function irParaMapaCompetencias(page: Page, idProcesso: number, unidade: string): Promise<void> {
@@ -98,6 +125,15 @@ export async function irParaProcessoPorTexto(page: Page, textoProcesso: string):
     const linhaProcesso = page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: textoProcesso}).first();
     await linhaProcesso.click();
     await expect(page).toHaveURL(/\/processo\/\d+/);
+}
+
+/**
+ * Navega diretamente para um processo pelo ID.
+ */
+export async function navegarParaProcessoPorId(page: Page, idProcesso: number): Promise<void> {
+    await page.goto(`/processo/${idProcesso}`);
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 }
 
 // ==================================================================
@@ -219,7 +255,7 @@ export async function navegarParaHome(page: Page): Promise<void> {
  * Clica no botão "Entrar" na tela de login.
  */
 export async function clicarBotaoEntrar(page: Page): Promise<void> {
-    await page.getByRole('button', { name: TEXTOS.ENTRAR }).click();
+    await page.getByRole('button', {name: TEXTOS.ENTRAR}).click();
 }
 
 /**

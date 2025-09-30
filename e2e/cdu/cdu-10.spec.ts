@@ -7,6 +7,7 @@ import {
     DADOS_TESTE,
     disponibilizarCadastro,
     esperarElementoVisivel,
+    gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
     SELETORES_CSS,
@@ -28,16 +29,19 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
     });
 
     test('deve permitir disponibilização da revisão com sucesso', async ({page}) => {
-        const nomeAtividade = `Atividade Sucesso ${Date.now()}`;
-        const nomeConhecimento = `Conhecimento Sucesso ${Date.now()}`;
+        const nomeAtividade = gerarNomeUnico("Atividade Sucesso");
+        const nomeConhecimento = gerarNomeUnico("Conhecimento Sucesso");
+
         await adicionarAtividadeComConhecimento(page, nomeAtividade, nomeConhecimento);
         await disponibilizarCadastro(page);
+
         await esperarMensagemSucesso(page, 'Revisão do cadastro de atividades disponibilizada');
         await esperarUrl(page, URLS.PAINEL);
     });
 
     test('não deve permitir disponibilização se houver atividades sem conhecimento', async ({page}) => {
-        const nomeAtividade = `Atividade Sem Conhecimento ${Date.now()}`;
+        const nomeAtividade = gerarNomeUnico("Atividade Sem Conhecimento");
+
         await adicionarAtividade(page, nomeAtividade);
         await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
         const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);

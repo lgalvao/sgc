@@ -93,7 +93,6 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
         await page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
 
         await page.waitForTimeout(2000);
-
         const modalDisponibilizar = page.locator('[aria-labelledby="disponibilizarModalLabel"]');
 
         try {

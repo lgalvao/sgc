@@ -15,6 +15,7 @@
           <button
             type="button"
             class="btn-close"
+            data-testid="btn-modal-fechar"
             @click="fechar"
           />
         </div>
@@ -42,6 +43,7 @@
                   <td>
                     <input
                       :id="'chk-' + unidade.sigla"
+                      :data-testid="'chk-unidade-' + unidade.sigla"
                       v-model="unidade.selecionada"
                       type="checkbox"
                       class="form-check-input"
@@ -59,6 +61,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            data-testid="btn-modal-cancelar"
             @click="fechar"
           >
             <i class="bi bi-x-circle" /> Cancelar
@@ -67,6 +70,7 @@
             type="button"
             class="btn"
             :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
+            data-testid="btn-modal-confirmar"
             @click="confirmar"
           >
             <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

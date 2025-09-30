@@ -27,6 +27,7 @@
               type="date"
               class="form-control"
               :min="dataLimiteMinima"
+              data-testid="input-nova-data-limite"
             >
             <div class="form-text">
               Data limite atual: {{ dataLimiteAtualFormatada }}
@@ -44,6 +45,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            data-testid="btn-modal-cancelar"
             @click="$emit('fecharModal')"
           >
             <i class="bi bi-x-circle me-1" />
@@ -53,6 +55,7 @@
             type="button"
             class="btn btn-primary"
             :disabled="!novaDataLimite || !isDataValida"
+            data-testid="btn-modal-confirmar"
             @click="$emit('confirmarAlteracao', novaDataLimite)"
           >
             <i class="bi bi-check-circle me-1" />

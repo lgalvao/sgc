@@ -46,17 +46,12 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve permitir validar mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
-
         await validarMapa(page);
-
         await expect(page).toHaveURL(/\/processo\/5\/SEDIA$/);
     });
 
     test('deve cancelar apresentação de sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
-
         await page.getByTestId('apresentar-sugestoes-btn').click();
         await esperarElementoVisivel(page, 'modal-apresentar-sugestoes');
 
@@ -67,8 +62,6 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar validação de mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, 5, 'SEDIA');
-        //await page.waitForLoadState('networkidle');
-
         await page.getByTestId('validar-btn').click();
         await esperarElementoVisivel(page, 'modal-validar');
 

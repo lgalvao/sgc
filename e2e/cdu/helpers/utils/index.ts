@@ -1,1 +1,1 @@
-export { gerarNomeUnico } from './utils';
+export { gerarNomeUnico, localizarPorTestIdOuRole, clicarPorTestIdOuRole } from './utils';

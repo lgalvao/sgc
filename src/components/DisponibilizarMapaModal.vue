@@ -17,6 +17,7 @@
           v-model="dataLimiteValidacao"
           class="form-control"
           type="date"
+          data-testid="input-data-limite"
         >
       </div>
       <div
@@ -31,6 +32,7 @@
       <button
         class="btn btn-secondary"
         type="button"
+        data-testid="btn-modal-cancelar"
         @click="fechar"
       >
         Cancelar
@@ -39,6 +41,7 @@
         :disabled="!dataLimiteValidacao"
         class="btn btn-success"
         type="button"
+        data-testid="btn-disponibilizar"
         @click="disponibilizar"
       >
         Disponibilizar

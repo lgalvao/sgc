@@ -7,19 +7,16 @@ import {
     loginComoAdmin,
     loginComoServidor,
     navegarParaHome,
-    URLS,
-    verificarCamposLogin,
     verificarElementosPainel,
     verificarEstruturaAdmin,
     verificarEstruturaServidor,
-    verificarUrl,
+    verificarPaginaLogin,
 } from './helpers';
 
 test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     test('deve carregar a página de login corretamente', async ({page}) => {
         await navegarParaHome(page);
-        await verificarUrl(page, `${URLS.LOGIN}`);
-        await verificarCamposLogin(page);
+        await verificarPaginaLogin(page);
     });
 
     test('deve exibir erro para usuário não encontrado', async ({page}) => {
@@ -42,10 +39,9 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
 
     test('deve fazer logout e retornar para a tela de login', async ({page}) => {
         await loginComoServidor(page);
-        await verificarUrl(page, `${URLS.PAINEL}`);
+        await verificarElementosPainel(page);
         await clicarBotaoSair(page);
 
-        await verificarUrl(page, `${URLS.LOGIN}`);
-        await verificarCamposLogin(page);
+        await verificarPaginaLogin(page);
     });
 });

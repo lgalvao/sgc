@@ -1,4 +1,4 @@
-# Resumo dos Testes End-to-End (CDU)
+# Resumo dos Testes e2e em CDU
 
 ## Visão Geral
 

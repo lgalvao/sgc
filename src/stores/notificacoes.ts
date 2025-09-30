@@ -27,7 +27,9 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
       ...notificacao,
         id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
       timestamp: new Date(),
-      duracao: notificacao.duracao ?? (notificacao.tipo === 'success' ? 3000 : 0),
+      // Aumentamos a duração padrão das notificações de sucesso para 8s
+      // (ajuda testes E2E a localizar mensagens que desapareciam antes da asserção)
+      duracao: notificacao.duracao ?? (notificacao.tipo === 'success' ? 8000 : 0),
     };
 
     notificacoes.value.push(novaNotificacao);

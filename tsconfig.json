@@ -49,7 +49,6 @@
     "src/**/*.vue",
     "spec/**/*.ts",
     "spec/**/*.d.ts",
-    "vite.config.js",
     "vitest.setup.ts",
     "playwright.config.ts"
   ],

@@ -1,4 +1,5 @@
 export const SELETORES = {
+    // Títulos e tabelas
     TITULO_PROCESSOS: 'titulo-processos',
     TITULO_ALERTAS: 'titulo-alertas',
     TABELA_PROCESSOS: 'tabela-processos',
@@ -7,8 +8,34 @@ export const SELETORES = {
     COLUNA_TIPO: 'coluna-tipo',
     COLUNA_UNIDADES: 'coluna-unidades',
     COLUNA_SITUACAO: 'coluna-situacao',
+
+    // Botões globais / ações de processo
     BTN_CRIAR_PROCESSO: 'btn-criar-processo',
     BTN_INICIAR_PROCESSO: 'btn-iniciar-processo',
+    BTN_SALVAR: 'btn-salvar',
+    BTN_CANCELAR: 'btn-cancelar',
+    BTN_CONFIRMAR: 'btn-confirmar',
+    BTN_FECHAR: 'btn-fechar',
+    // Test-ids específicos para modais e ações críticas
+    BTN_MODAL_FECHAR: 'btn-modal-fechar',
+    BTN_DISPONIBILIZAR: 'btn-disponibilizar',
+    BTN_REGISTRAR_ACEITE: 'btn-registrar-aceite',
+    BTN_DEVOLVER: 'btn-devolver',
+    BTN_HOMOLOGAR: 'btn-homologar',
+    BTN_VALIDAR: 'btn-validar',
+    BTN_ENTRAR: 'btn-entrar',
+    BTN_CRIAR: 'btn-criar',
+    BTN_EDITAR: 'btn-editar',
+    BTN_EXCLUIR: 'btn-excluir',
+    BTN_ACEITAR: 'btn-aceitar',
+    BTN_VER_SUGESTOES: 'btn-ver-sugestoes',
+    BTN_HISTORICO_ANALISE: 'btn-historico-analise',
+    // Ações adicionais usadas em modais/fluxos
+    BTN_IMPORTAR: 'btn-importar',
+    BTN_LIMPAR_NOTIFICACOES: 'btn-limpar-notificacoes',
+    BTN_VER_EMAIL: 'btn-ver-email',
+
+    // Cabeçalhos e componentes
     SUBPROCESSO_HEADER: 'subprocesso-header',
     PROCESSO_INFO: 'processo-info',
     UNIDADE_CARD: 'unidade-card',
@@ -16,12 +43,18 @@ export const SELETORES = {
     TREE_TABLE_ROW: '[data-testid^="tree-table-row-"]',
     MAPA_CARD: 'mapa-card',
     BLOCO_COMPETENCIA: 'competencia-block',
+
+    // Atividades / conhecimentos
     ITEM_ATIVIDADE: 'atividade-item',
     ITEM_CONHECIMENTO: 'conhecimento-item',
-    EDITAR_COMPETENCIA: 'editar-competencia',
-    EXCLUIR_COMPETENCIA: 'excluir-competencia',
     BADGE_CONHECIMENTOS: 'badge-conhecimentos',
     ATIVIDADE_NAO_ASSOCIADA: 'atividade-nao-associada',
+
+    // Competências (actions)
+    EDITAR_COMPETENCIA: 'btn-editar-competencia',
+    EXCLUIR_COMPETENCIA: 'btn-excluir-competencia',
+
+    // Inputs e botões de criação/edição
     INFO_UNIDADE: 'unidade-info',
     INPUT_NOVA_ATIVIDADE: 'input-nova-atividade',
     BTN_ADICIONAR_ATIVIDADE: 'btn-adicionar-atividade',
@@ -37,6 +70,22 @@ export const SELETORES = {
     BTN_CANCELAR_EDICAO_ATIVIDADE: 'btn-cancelar-edicao-atividade',
     BTN_SALVAR_EDICAO_CONHECIMENTO: 'btn-salvar-edicao-conhecimento',
     BTN_CANCELAR_EDICAO_CONHECIMENTO: 'btn-cancelar-edicao-conhecimento',
+
+    // Modais e observações (sugestões para novos test-ids a serem adicionados na UI)
+    MODAL_APRESENTAR_SUGESTOES: 'modal-apresentar-sugestoes',
+    MODAL_VALIDAR: 'modal-validar',
+    MODAL_DEVOLUCAO: 'modal-devolucao',
+    MODAL_HISTORICO: 'modal-historico',
+    INPUT_OBSERVACAO_DEVOLUCAO: 'input-observacao-devolucao',
+    INPUT_OBSERVACAO_VALIDACAO: 'input-observacao-validacao',
+    // Inputs e selects utilizados em modais importantes
+    INPUT_DATA_LIMITE: 'input-data-limite',
+    INPUT_NOVA_DATA_LIMITE: 'input-nova-data-limite',
+    INPUT_DESCRICAO_COMPETENCIA: 'input-descricao-competencia',
+    SELECT_PROCESSO: 'select-processo',
+    SELECT_UNIDADE: 'select-unidade',
+    BTN_MODAL_CONFIRMAR: 'btn-modal-confirmar',
+    BTN_MODAL_CANCELAR: 'btn-modal-cancelar',
 } as const;
 
 export const TEXTOS = {
@@ -51,6 +100,7 @@ export const TEXTOS = {
     DADOS_INCOMPLETOS: 'Dados incompletos',
     FINALIZAR_PROCESSO: 'Finalizar processo',
     PROCESSO_FINALIZADO: 'Processo finalizado',
+    FINALIZACAO_BLOQUEADA: 'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado',
     DETALHES_PROCESSO: 'Detalhes do processo',
     DETALHES_SUBPROCESSO: 'Detalhes do subprocesso',
     CADASTRO_ATIVIDADES_CONHECIMENTOS: 'Atividades e conhecimentos',
@@ -60,14 +110,20 @@ export const TEXTOS = {
     REMOVER: 'Remover',
     CONFIRMAR: 'Confirmar',
     CANCELAR: 'Cancelar',
+    FECHAR: 'Fechar',
     DEVOLVER: 'Devolver',
     DISPONIBILIZAR: 'Disponibilizar',
+    DEVOLVER_PARA_AJUSTES: 'Devolver para ajustes',
+    REGISTRAR_ACEITE: 'Registrar aceite',
+    HISTORICO_ANALISE: 'Histórico de análise',
+    ACEITE_REVISAO_TITULO: 'Aceite da revisão do cadastro',
     MAPA_COMPETENCIAS: 'Mapa de competências',
     CRIAR_COMPETENCIA: 'Criar competência',
     IMPACTO_NO_MAPA: 'Impacto no mapa',
     IMPORTAR_ATIVIDADES: 'Importar atividades',
     FINALIZACAO_PROCESSO: 'Finalização de processo',
     CONFIRMA_FINALIZACAO: 'Confirma a finalização do processo',
+    CONFIRMACAO_VIGENCIA_MAPAS: 'Essa ação tornará vigentes os mapas de competências homologados',
     MAPAS_VIGENTES: 'mapas de competências estão agora vigentes',
     EMAIL_ENVIADO: 'E-mail enviado',
     UNIDADES_PARTICIPANTES: 'Unidades participantes',
@@ -97,6 +153,7 @@ export const TEXTOS = {
     TITULO_PROCESSOS_LABEL: 'Processos',
     CADASTRO_DEVOLVIDO_AJUSTES: 'O cadastro foi devolvido para ajustes!',
     ANALISE_REGISTRADA_SUCESSO: 'A análise foi registrada com sucesso!',
+    ACEITE_REGISTRADO: 'Aceite registrado',
     CADASTRO_HOMOLOGADO_SUCESSO: 'O cadastro foi homologado com sucesso!',
 } as const;
 

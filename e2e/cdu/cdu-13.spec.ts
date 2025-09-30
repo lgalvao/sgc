@@ -27,6 +27,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
         await clicarBotaoHistoricoAnalise(page);
         await verificarModalHistoricoAnaliseAberto(page);
+
         await cancelarModal(page);
         await verificarModalFechado(page);
     });
