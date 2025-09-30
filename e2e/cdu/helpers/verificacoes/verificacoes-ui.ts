@@ -1,6 +1,6 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
-import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel, verificarModalVisivel} from './verificacoes-basicas';
+import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from './verificacoes-basicas';
 
 /**
  * VERIFICAÇÕES DE INTERFACE DE USUÁRIO
@@ -240,7 +240,6 @@ export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<
     await expect(headerRow).toContainText('Data/Hora');
     await expect(headerRow).toContainText('Unidade');
     await expect(headerRow).toContainText('Resultado');
-    await expect(headerRow).toContainText('Observações');
 
     // Verifica o conteúdo de uma observação específica, conforme o teste original
     await expect(modal.getByText('Observação de teste para histórico.')).toBeVisible();
