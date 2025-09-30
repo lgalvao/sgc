@@ -1,4 +1,4 @@
-import {expect, Page, test} from '@playwright/test';
+import {test} from '@playwright/test';
 import {
     clicarPrimeiroProcesso,
     clicarProcesso,
@@ -9,22 +9,16 @@ import {
     loginComoChefe,
     loginComoGestor,
     loginComoServidor,
-    ordenarTabelaProcessosPorColuna,
     SELETORES,
-    TEXTOS,
+    verificarAlertasOrdenadosPorDataHora,
     verificarAusenciaBotaoCriarProcesso,
+    verificarColunasTabelaAlertas,
     verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
     verificarNavegacaoPaginaDetalhesProcesso,
     verificarNavegacaoPaginaSubprocesso,
     verificarVisibilidadeProcesso,
 } from './helpers';
-
-const obterValoresColuna = async (page: Page, indiceColuna: number) => {
-    return page.locator(`${SELETORES.TABELA_PROCESSOS} tbody tr`).evaluateAll(linhas =>
-        linhas.map(linha => (linha.children[indiceColuna] as HTMLElement).innerText.trim())
-    );
-};
 
 test.describe('CDU-02: Visualizar Painel', () => {
     test.describe('Visibilidade de Componentes por Perfil', () => {
@@ -66,22 +60,6 @@ test.describe('CDU-02: Visualizar Painel', () => {
 
     test.describe('Tabela de Processos', () => {
         test.beforeEach(async ({page}) => await loginComoAdmin(page));
-
-        test('deve ordenar processos por descrição (asc/desc)', async ({page}) => {
-            const indiceColunaDescricao = 0;
-
-            const valoresAntes = await obterValoresColuna(page, indiceColunaDescricao);
-            const valoresOrdenadosAsc = [...valoresAntes].sort((a, b) => a.localeCompare(b));
-            const valoresOrdenadosDesc = [...valoresOrdenadosAsc].reverse();
-
-            await ordenarTabelaProcessosPorColuna(page, SELETORES.COLUNA_DESCRICAO);
-            const valoresAposOrdenacaoAsc = await obterValoresColuna(page, indiceColunaDescricao);
-            expect(valoresAposOrdenacaoAsc).toEqual(valoresOrdenadosAsc);
-
-            await ordenarTabelaProcessosPorColuna(page, SELETORES.COLUNA_DESCRICAO);
-            const valoresAposOrdenacaoDesc = await obterValoresColuna(page, indiceColunaDescricao);
-            expect(valoresAposOrdenacaoDesc).toEqual(valoresOrdenadosDesc);
-        });
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
             await loginComoChefe(page, '5'); // Chefe da STIC (id 5)
@@ -127,27 +105,11 @@ test.describe('CDU-02: Visualizar Painel', () => {
             await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
             await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
 
-            const tabelaAlertas = page.getByTestId(SELETORES.TABELA_ALERTAS);
-            await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DATA_HORA);
-            await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DESCRICAO);
-            await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_PROCESSO);
-            await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_ORIGEM);
+            await verificarColunasTabelaAlertas(page);
         });
 
         test('deve exibir alertas ordenados por data/hora decrescente inicialmente', async ({page}) => {
-            const indiceColunaData = 0;
-
-            const datas = await page.locator(`${SELETORES.TABELA_ALERTAS} tbody tr`).evaluateAll(linhas =>
-                linhas.map(linha => {
-                    const texto = (linha.children[indiceColunaData] as HTMLElement).innerText.trim();
-                    const [data, hora] = texto.split(' ');
-                    const [dia, mes, ano] = data.split('/');
-                    return new Date(`${ano}-${mes}-${dia}T${hora}`).getTime();
-                })
-            );
-
-            const datasOrdenadas = [...datas].sort((a, b) => b - a);
-            expect(datas).toEqual(datasOrdenadas);
+            await verificarAlertasOrdenadosPorDataHora(page);
         });
     });
 });

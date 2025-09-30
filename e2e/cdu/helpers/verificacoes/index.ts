@@ -61,6 +61,8 @@ export {
     verificarConhecimentoVisivel,
     verificarConhecimentoNaoVisivel,
     verificarContadorAtividades,
+    verificarColunasTabelaAlertas,
+    verificarAlertasOrdenadosPorDataHora,
     verificarBotaoHistoricoAnaliseVisivel,
     verificarModalHistoricoAnaliseAberto,
     verificarBotaoDisponibilizarHabilitado,

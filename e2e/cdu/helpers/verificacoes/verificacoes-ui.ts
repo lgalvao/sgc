@@ -135,7 +135,7 @@ export async function verificarElementosDetalhesProcessoVisiveis(page: Page): Pr
 export async function verificarCamposLogin(page: Page): Promise<void> {
     await expect(page.getByLabel(ROTULOS.TITULO_ELEITORAL)).toBeVisible();
     await expect(page.getByLabel(ROTULOS.SENHA)).toBeVisible();
-    await expect(page.getByRole('button', { name: TEXTOS.ENTRAR })).toBeVisible();
+    await expect(page.getByRole('button', {name: TEXTOS.ENTRAR})).toBeVisible();
 }
 
 /**
@@ -143,8 +143,8 @@ export async function verificarCamposLogin(page: Page): Promise<void> {
  */
 export async function verificarEstruturaServidor(page: Page): Promise<void> {
     const navBar = page.getByRole('navigation');
-    await expect(navBar.getByRole('link', { name: 'Painel' })).toBeVisible();
-    await expect(navBar.getByRole('link', { name: 'Minha unidade' })).toBeVisible();
+    await expect(navBar.getByRole('link', {name: 'Painel'})).toBeVisible();
+    await expect(navBar.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
     await expect(page.getByText('SERVIDOR - STIC')).toBeVisible();
     await expect(page.locator('a[title="Configurações do sistema"]')).not.toBeVisible();
     await expect(page.locator('a[title="Sair"]')).toBeVisible();
@@ -222,6 +222,34 @@ export async function verificarContadorAtividades(page: Page, numeroEsperado: nu
  */
 export async function verificarBotaoHistoricoAnaliseVisivel(page: Page): Promise<void> {
     await expect(page.getByRole('button', {name: 'Histórico de análise'})).toBeVisible();
+}
+
+/**
+ * Verifica se a tabela de alertas está exibindo as colunas corretas
+ */
+export async function verificarColunasTabelaAlertas(page: Page): Promise<void> {
+    const tabelaAlertas = page.getByTestId(SELETORES.TABELA_ALERTAS);
+    await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DATA_HORA);
+    await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DESCRICAO);
+    await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_PROCESSO);
+    await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_ORIGEM);
+}
+
+/**
+ * Verifica se os alertas estão ordenados por data/hora de forma decrescente
+ */
+export async function verificarAlertasOrdenadosPorDataHora(page: Page): Promise<void> {
+    const linhasAlertas = page.locator(`[data-testid="${SELETORES.TABELA_ALERTAS}"] tbody tr`);
+    const valoresDatas = await linhasAlertas.evaluateAll(linhas =>
+        linhas.map(linha => {
+            const textoData = (linha.children[0] as HTMLElement).innerText.trim();
+            const [data, hora] = textoData.split(' ');
+            const [dia, mes, ano] = data.split('/');
+            return new Date(`${ano}-${mes}-${dia}T${hora}`).getTime();
+        })
+    );
+    const valoresOrdenados = [...valoresDatas].sort((a, b) => b - a);
+    expect(valoresDatas).toEqual(valoresOrdenados);
 }
 
 /**
