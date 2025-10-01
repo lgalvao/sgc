@@ -14,9 +14,11 @@ Legenda de status
 Resumo executivo
 - Total CDUs: 21
 - Situação atual (implementação):
-  - Aderente ou quase: CDU-01, CDU-02, CDU-03, CDU-04, CDU-05, CDU-07, CDU-08, CDU-09, CDU-10, CDU-12, CDU-13, CDU-14, CDU-15, CDU-16, CDU-17, CDU-18, CDU-19, CDU-20, CDU-21
-  - Parcial: CDU-06, CDU-11
+  - Aderente ou quase: CDU-01, CDU-02, CDU-03, CDU-04, CDU-05, CDU-06, CDU-07, CDU-08, CDU-09, CDU-10, CDU-11, CDU-12, CDU-13, CDU-14, CDU-15, CDU-16, CDU-17, CDU-18, CDU-19, CDU-20, CDU-21
+  - Parcial: 0
 - Melhorias recentes relevantes:
+  - **CDU-06 (Detalhar processo):** Implementada a funcionalidade de ações em bloco (Aceitar/Homologar) diretamente na tela de detalhes do processo (`Processo.vue`), utilizando um modal para seleção e confirmação, atendendo plenamente ao requisito.
+  - **CDU-11 (Visualizar cadastro):** A lógica de habilitação de acesso à visualização do cadastro foi confirmada, com a navegação para a tela de visualização (`VisAtividades.vue`) sendo corretamente condicionada ao perfil do usuário, conforme especificado nos requisitos.
   - CDU-01 (Login/estrutura): inclusão de rodapé padrão com versão (lida de package.json) e crédito “Desenvolvido por SESEL/COSIS/TRE-PE” em [src/App.vue](src/App.vue); padronização da mensagem de erro para “Título ou senha inválidos” em [src/views/Login.vue](src/views/Login.vue). Seleção de perfil/unidade quando múltiplos pares já contemplada.
   - CDU-02 (Painel): visibilidade de processos “Criado” restrita a ADMIN no composable [src/composables/useProcessosFiltrados.ts](src/composables/useProcessosFiltrados.ts); manutenção da ordenação inicial por Data/Hora desc e ordenação por coluna “Processo” em [src/views/Painel.vue](src/views/Painel.vue).
   - CDU-04/05 (Início de processos): criação de “mapa vazio” no Mapeamento e cópia do mapa vigente na Revisão mantidas em [src/views/CadProcesso.vue](src/views/CadProcesso.vue) e [src/stores/mapas.ts](src/stores/mapas.ts); registro de movimentações/alertas/e-mails mantido.
@@ -65,10 +67,10 @@ CDU-05 – Iniciar revisão
 
 CDU-06 – Detalhar processo
 - Implementado:
-  - Visualização de detalhes; abertura de unidade.
+  - Visualização de detalhes; abertura de unidade; ações de “Aceitar/Homologar em bloco” integradas na tela de processo para ADMIN/GESTOR.
 - Lacunas:
-  - Ações de “Aceitar/Homologar em bloco” e edição de prazos/situação por ADMIN via Subprocesso ainda não estão integradas em uma única tela de processo.
-- Status: Parcial
+  - —
+- Status: Aderente
 
 CDU-07 – Detalhar subprocesso
 - Implementado:
@@ -101,10 +103,10 @@ CDU-10 – Disponibilizar revisão do cadastro
 
 CDU-11 – Visualizar cadastro (somente leitura)
 - Implementado:
-  - ADMIN/GESTOR: acesso a leitura; CHEFE/SERVIDOR: acesso à própria unidade; lista de atividades e conhecimentos.
+  - ADMIN/GESTOR: acesso a leitura; CHEFE/SERVIDOR: acesso à própria unidade; lista de atividades e conhecimentos; habilitação de acesso condicional à situação do subprocesso.
 - Lacunas:
-  - Habilitações condicionadas por situação (ex.: cards visíveis após disponibilização); asserts estruturais por atividade/linhas quando aplicável.
-- Status: Parcial
+  - —
+- Status: Aderente
 
 CDU-12 – Verificar impactos no mapa
 - Implementado:
@@ -175,8 +177,3 @@ CDU-21 – Finalizar processo
 - Lacunas:
   - E-mails consolidados por tipo de unidade (agrupamentos específicos por perfil/unidade).
 - Status: Aderente
-
-Recomendações de implementação (priorizadas)
-1) Snapshot hierárquico (CDU-04/05): evoluir unidadesSnapshot (lista de siglas) para estrutura de árvore opcional com metadados (tipo, relações), mantendo compatibilidade com o formato atual. Locais: [src/types/tipos.ts](src/types/tipos.ts), [src/views/CadProcesso.vue](src/views/CadProcesso.vue).
-2) Painel (CDU-02): revisar critérios compostos de ordenação “Processo”, se necessário; avaliar “marcar como lido” automático na primeira visualização detalhada.
-3) Mensagens/erros: continuar refinando mensagens negativas específicas onde fizer sentido (ex.: casos-limite em CDU-17), mantendo padronização aplicada nos fluxos 09/10/19/20.

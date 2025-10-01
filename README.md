@@ -57,7 +57,7 @@ Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no c�
 - `/src/views/`: Páginas/rotas da aplicação
 - `/src/stores/`: Gerenciamento de estado com Pinia
 - `/src/mocks/`: Dados simulados em JSON
-- `/src/composables/`: Lógica reutilizável, como o `usePerfil.ts`
+- `/src/composables/`: Lógica reutilizável
 - `/src/constants/`: Constantes e enums centralizados
 - `/src/utils/`: Utilitários auxiliares para funcionalidades comuns
 - `/src/types/`: Definições de tipos TypeScript
