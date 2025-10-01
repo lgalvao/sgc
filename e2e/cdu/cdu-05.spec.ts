@@ -7,7 +7,6 @@ import {
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     preencherFormularioProcesso,
-    SELETORES,
     TEXTOS,
     URLS,
     verificarBotaoIniciarProcessoVisivel,
@@ -39,13 +38,13 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         const descricaoProcessoExistente = "Processo teste revisão CDU-05"; // Usar processo existente nos mocks
         await page.goto(URLS.PAINEL);
         await verificarVisibilidadeProcesso(page, descricaoProcessoExistente, true);
- 
+
         await clicarProcessoNaTabela(page, descricaoProcessoExistente);
- 
+
         // Verifica se a navegação levou à página de cadastro do processo
         await verificarPaginaCadastroProcesso(page);
         await clicarBotaoIniciarProcesso(page);
- 
+
         await verificarModalConfirmacaoIniciarProcessoVisivel(page);
     });
 

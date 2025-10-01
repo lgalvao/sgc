@@ -13,7 +13,7 @@ export async function localizarElemento(seletores: Locator[]): Promise<Locator> 
             if ((await seletor.count()) > 0) {
                 return seletor;
             }
-        } catch (error) {
+        } catch {
             // Ignora erros de timeout ou outros que podem ocorrer se o seletor for inválido
             // e continua para o próximo da lista.
         }
@@ -36,7 +36,7 @@ export async function preencherCampo(seletores: Locator[], valor: string): Promi
  * @param seletores - Array de locators para tentar encontrar o elemento clicável.
  * @param options - Opções para o clique, como `force`.
  */
-export async function clicarElemento(seletores: Locator[], options?: {force?: boolean}): Promise<void> {
+export async function clicarElemento(seletores: Locator[], options?: { force?: boolean }): Promise<void> {
     const elemento = await localizarElemento(seletores);
     await elemento.click(options);
 }

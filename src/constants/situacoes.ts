@@ -32,6 +32,8 @@ export const SITUACOES_SUBPROCESSO = {
 
 // Situações de mapa
 export const SITUACOES_MAPA = {
+  VIGENTE: 'vigente',
+  DISPONIBILIZADO: 'disponibilizado',
   EM_ANDAMENTO: 'em_andamento',
   DISPONIVEL_VALIDACAO: 'disponivel_validacao'
 } as const;
@@ -42,6 +44,8 @@ export const LABELS_SITUACAO = {
   [SITUACOES_SUBPROCESSO.MAPA_VALIDADO]: 'Mapa validado',
   [SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO]: 'Mapa homologado',
   [SITUACOES_SUBPROCESSO.MAPA_CRIADO]: 'Mapa criado',
+  [SITUACOES_MAPA.VIGENTE]: 'Vigente',
+  [SITUACOES_MAPA.DISPONIBILIZADO]: 'Disponibilizado',
   [SITUACOES_MAPA.EM_ANDAMENTO]: 'Em andamento',
   [SITUACOES_MAPA.DISPONIVEL_VALIDACAO]: 'Disponibilizado',
   NAO_DISPONIBILIZADO: 'Não disponibilizado'
@@ -65,5 +69,9 @@ export const CLASSES_BADGE_SITUACAO = {
     [SITUACOES_SUBPROCESSO.CADASTRO_ACEITO]: 'bg-success',
     [SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_ACEITA]: 'bg-success',
     [SITUACOES_SUBPROCESSO.MAPA_AJUSTADO]: 'bg-info',
-  [SITUACOES_SUBPROCESSO.MAPA_CRIADO]: 'bg-info'
+  [SITUACOES_SUBPROCESSO.MAPA_CRIADO]: 'bg-info',
+  // Mapas (estados do mapa)
+  [SITUACOES_MAPA.VIGENTE]: 'bg-success',
+  [SITUACOES_MAPA.DISPONIBILIZADO]: 'bg-warning text-dark',
+  [SITUACOES_MAPA.EM_ANDAMENTO]: 'bg-warning text-dark'
 } as const;

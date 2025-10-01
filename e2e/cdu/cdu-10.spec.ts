@@ -6,7 +6,6 @@ import {
     clicarBotao,
     DADOS_TESTE,
     disponibilizarCadastro,
-    esperarElementoVisivel,
     gerarNomeUnico,
     loginComoChefe,
     navegarParaCadastroAtividades,
@@ -63,9 +62,9 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
 
     test('deve exibir botão Histórico de análise e abrir modal', async ({page}) => {
         await page.getByText('Histórico de análise').click();
- 
+
         await verificarModalHistoricoAnaliseAberto(page);
- 
+
         await page.getByRole('button', {name: 'Fechar'}).click();
         await verificarModalFechado(page);
     });

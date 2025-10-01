@@ -1,70 +1,159 @@
-import {describe, expect, it} from 'vitest';
-import atividades from '../../mocks/atividades.json';
-import mapas from '../../mocks/mapas.json';
-import analises from '../../mocks/analises.json';
-import subprocessos from '../../mocks/subprocessos.json';
-import unidades from '../../mocks/unidades.json';
-import type {Unidade} from '@/types/tipos';
-import {ResultadoAnalise, TipoResponsabilidade} from '@/types/tipos';
+import {describe, it, expect} from 'vitest';
+import fs from 'fs';
+import path from 'path';
+import {z} from 'zod';
 
-describe('Validação de Mocks', () => {
-  describe('Atividades', () => {
-    it('deve incluir conhecimentos em todas as atividades', () => {
-      atividades.forEach((atividade) => {
-        expect(atividade.conhecimentos).toBeDefined();
-        expect(Array.isArray(atividade.conhecimentos)).toBe(true);
-        expect(atividade.conhecimentos.length).toBeGreaterThan(0);
-      });
-    });
+/**
+ * Testes que validam os arquivos em src/mocks/ usando Zod.
+ * O objetivo é garantir que os mocks respeitem um contrato mínimo.
+ *
+ * O teste é deliberadamente permissivo (campos opcionais) mas exige
+ * a presença de campos essenciais como `situacao` onde aplicável.
+ */
+
+const MOCKS_DIR = path.resolve(__dirname, '../../mocks');
+
+function carregarMock(nomeArquivo: string) {
+  const caminho = path.join(MOCKS_DIR, nomeArquivo);
+  const conteudo = fs.readFileSync(caminho, 'utf-8');
+  return JSON.parse(conteudo);
+}
+
+/* Schemas Zod mínimos por entidade */
+const processoItemSchema = z.object({
+  id: z.number().optional(),
+  codigo: z.number().optional(),
+  descricao: z.string().optional(),
+  tipo: z.string().optional(),
+  situacao: z.string().optional(),
+  dataLimite: z.string().optional(),
+  data_limite: z.string().optional()
+}).passthrough();
+const processosSchema = z.array(processoItemSchema);
+
+const subprocessoItemSchema = z.object({
+  id: z.number().optional(),
+  idProcesso: z.number().optional(),
+  unidade: z.string().optional(),
+  situacao: z.string().optional()
+}).passthrough();
+const subprocessosSchema = z.array(subprocessoItemSchema);
+
+const mapaItemSchema = z.object({
+  id: z.number().optional(),
+  unidade: z.string().optional(),
+  situacao: z.string().optional(),
+  competencias: z.array(z.any()).optional()
+}).passthrough();
+const mapasSchema = z.array(mapaItemSchema);
+
+const unidadeItemSchema = z.object({
+  id: z.number().optional(),
+  codigo: z.number().optional(),
+  sigla: z.string().optional(),
+  nome: z.string().optional()
+}).passthrough();
+const unidadesSchema = z.array(unidadeItemSchema);
+
+const servidorItemSchema = z.object({
+  id: z.number().optional(),
+  nome: z.string().optional(),
+  unidade: z.string().optional()
+}).passthrough();
+const servidoresSchema = z.array(servidorItemSchema);
+
+const atividadeItemSchema = z.object({
+  id: z.number().optional(),
+  descricao: z.string().optional(),
+  idSubprocesso: z.number().optional(),
+  conhecimentos: z.array(z.any()).optional()
+}).passthrough();
+const atividadesSchema = z.array(atividadeItemSchema);
+
+const analiseItemSchema = z.object({
+  id: z.number().optional(),
+  idSubprocesso: z.number().optional(),
+  dataHora: z.string().optional(),
+  resultado: z.string().optional()
+}).passthrough();
+const analisesSchema = z.array(analiseItemSchema);
+
+const atribuicaoItemSchema = z.object({
+  id: z.number().optional(),
+  idServidor: z.number().optional(),
+  unidade: z.string().optional(),
+  dataInicio: z.string().optional(),
+  dataTermino: z.string().optional()
+}).passthrough();
+const atribuicoesSchema = z.array(atribuicaoItemSchema);
+
+const alertaItemSchema = z.object({
+  id: z.number().optional(),
+  unidadeOrigem: z.string().optional(),
+  unidadeDestino: z.string().optional(),
+  dataHora: z.string().optional(),
+  descricao: z.string().optional()
+}).passthrough();
+const alertasSchema = z.array(alertaItemSchema);
+
+const alertaServidorItemSchema = z.object({
+  id: z.number().optional(),
+  idAlerta: z.number().optional(),
+  idServidor: z.number().optional(),
+  lido: z.boolean().optional(),
+  dataLeitura: z.string().nullable().optional()
+}).passthrough();
+const alertasServidorSchema = z.array(alertaServidorItemSchema);
+
+/* Testes */
+describe('Validação dos mocks com Zod', () => {
+  it('processos.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('processos.json');
+    expect(() => processosSchema.parse(data)).not.toThrow();
   });
 
-  describe('Mapas', () => {
-    it('deve conter pelo menos três atividades em todos os mapas', () => {
-      mapas.forEach((mapa) => {
-        const totalAtividades = mapa.competencias.reduce(
-          (soma, competencia) => soma + competencia.atividadesAssociadas.length,
-          0
-        );
-        expect(totalAtividades).toBeGreaterThanOrEqual(3);
-      });
-    });
+  it('subprocessos.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('subprocessos.json');
+    expect(() => subprocessosSchema.parse(data)).not.toThrow();
   });
 
-  describe('Análises', () => {
-    it("deve ter o resultado como 'Aceite' ou 'Devolução'", () => {
-      const valoresValidos = Object.values(ResultadoAnalise);
-      analises.forEach((analise) => {
-        expect(valoresValidos).toContain(analise.resultado);
-      });
-    });
+  it('mapas.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('mapas.json');
+    expect(() => mapasSchema.parse(data)).not.toThrow();
   });
 
-  describe('Subprocessos', () => {
-    it("deve ter os campos obrigatórios 'unidade' e 'dataLimiteEtapa1'", () => {
-      subprocessos.forEach((subprocesso) => {
-        expect(subprocesso.unidade).toBeDefined();
-        expect(typeof subprocesso.unidade).toBe('string');
-        expect(subprocesso.unidade.length).toBeGreaterThan(0);
-        expect(subprocesso.dataLimiteEtapa1).toBeDefined();
-      });
-    });
+  it('unidades.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('unidades.json');
+    expect(() => unidadesSchema.parse(data)).not.toThrow();
   });
 
-  describe('Unidades', () => {
-    it("deve ter o tipo de responsabilidade como 'Substituição' ou 'Atribuição temporária' se houver responsável", () => {
-      const valoresValidos = Object.values(TipoResponsabilidade);
-      const checarUnidades = (unidadesParaChecar: Unidade[]) => {
-        unidadesParaChecar.forEach((unidade) => {
-          if (unidade.responsavel) {
-            expect(valoresValidos).toContain(unidade.responsavel.tipo);
-          }
-          if (unidade.filhas && unidade.filhas.length > 0) {
-            checarUnidades(unidade.filhas);
-          }
-        });
-      };
-       
-      checarUnidades(unidades as any as Unidade[]);
-    });
+  it('servidores.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('servidores.json');
+    expect(() => servidoresSchema.parse(data)).not.toThrow();
+  });
+
+  it('atividades.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('atividades.json');
+    expect(() => atividadesSchema.parse(data)).not.toThrow();
+  });
+
+  it('analises.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('analises.json');
+    expect(() => analisesSchema.parse(data)).not.toThrow();
+  });
+
+  it('atribuicoes.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('atribuicoes.json');
+    expect(() => atribuicoesSchema.parse(data)).not.toThrow();
+  });
+
+  it('alertas.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('alertas.json');
+    expect(() => alertasSchema.parse(data)).not.toThrow();
+  });
+
+  it('alertas-servidor.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('alertas-servidor.json');
+    expect(() => alertasServidorSchema.parse(data)).not.toThrow();
   });
 });

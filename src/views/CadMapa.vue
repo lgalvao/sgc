@@ -261,8 +261,8 @@
               >Data limite para validação</label>
               <input
                 id="dataLimite"
-                data-testid="input-data-limite"
                 v-model="dataLimiteValidacao"
+                data-testid="input-data-limite"
                 class="form-control"
                 type="date"
               >
@@ -274,8 +274,8 @@
               >Observações</label>
               <textarea
                 id="observacoes"
-                data-testid="input-observacoes"
                 v-model="observacoesDisponibilizacao"
+                data-testid="input-observacoes"
                 class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."

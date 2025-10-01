@@ -42,7 +42,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             return state.subprocessos.filter(pu =>
                 pu.idProcesso === idProcesso &&
-                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
+                (pu.situacao === SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO || pu.situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_DISPONIBILIZADA)
             );
         }
     },

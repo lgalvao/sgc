@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import mapasData from '../mocks/mapas.json';
 import type {Mapa} from '@/types/tipos'
 import {parseDate} from '@/utils'
+import {SITUACOES_MAPA} from '@/constants/situacoes'
 
 function parseMapaDates(mapa: Omit<Mapa, 'dataCriacao' | 'dataDisponibilizacao' | 'dataFinalizacao'>
     & { dataCriacao: string, dataDisponibilizacao?: string | null, dataFinalizacao?: string | null }): Mapa {
@@ -25,7 +26,7 @@ export const useMapasStore = defineStore('mapas', {
             // Considerar mapas 'vigente', 'em_andamento' e 'disponibilizado' como elegíveis para revisão
             return state.mapas.find(m =>
                 m.unidade === unidadeId &&
-                (m.situacao === 'vigente' || m.situacao === 'em_andamento' || m.situacao === 'disponibilizado')
+                (m.situacao === SITUACOES_MAPA.VIGENTE || m.situacao === SITUACOES_MAPA.EM_ANDAMENTO || m.situacao === SITUACOES_MAPA.DISPONIBILIZADO)
             )
         }
     },
@@ -41,13 +42,13 @@ export const useMapasStore = defineStore('mapas', {
         definirMapaComoVigente(unidadeId: string, idProcesso: number) {
             // Primeiro, desmarcar qualquer mapa vigente anterior para esta unidade
             this.mapas.forEach(mapa => {
-                if (mapa.unidade === unidadeId && mapa.situacao === 'vigente') mapa.situacao = 'disponibilizado';
+                if (mapa.unidade === unidadeId && mapa.situacao === SITUACOES_MAPA.VIGENTE) mapa.situacao = SITUACOES_MAPA.DISPONIBILIZADO;
             });
 
             // Definir o mapa do processo como vigente
             const mapaIndex = this.mapas.findIndex(m => m.unidade === unidadeId && m.idProcesso === idProcesso);
             if (mapaIndex !== -1) {
-                this.mapas[mapaIndex].situacao = 'vigente';
+                this.mapas[mapaIndex].situacao = SITUACOES_MAPA.VIGENTE;
                 this.mapas[mapaIndex].dataFinalizacao = new Date();
             }
         }

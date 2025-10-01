@@ -1,0 +1,838 @@
+{
+  "geradoEm": "2025-10-01T17:41:51.598Z",
+  "aplicou": false,
+  "arquivos": {
+    "alertas-servidor.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "idAlerta": 1,
+          "idServidor": 1,
+          "lido": false,
+          "dataLeitura": null
+        },
+        {
+          "id": 2,
+          "idAlerta": 2,
+          "idServidor": 1,
+          "lido": true,
+          "dataLeitura": "2025-07-03T15:00:00"
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "idAlerta": 1,
+          "idServidor": 1,
+          "lido": false,
+          "dataLeitura": null
+        },
+        {
+          "id": 2,
+          "idAlerta": 2,
+          "idServidor": 1,
+          "lido": true,
+          "dataLeitura": "2025-07-03T15:00:00"
+        }
+      ]
+    },
+    "alertas.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "unidadeOrigem": "COSIS",
+          "unidadeDestino": "SESEL",
+          "dataHora": "2025-07-02T10:00:00",
+          "idProcesso": 1,
+          "descricao": "Cadastro devolvido para ajustes"
+        },
+        {
+          "id": 2,
+          "unidadeOrigem": "SEDOC",
+          "unidadeDestino": "SEDESENV",
+          "dataHora": "2025-07-03T14:30:00",
+          "idProcesso": 1,
+          "descricao": "Prazo próximo para validação do mapa de competências"
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "unidadeOrigem": "COSIS",
+          "unidadeDestino": "SESEL",
+          "dataHora": "2025-07-02T10:00:00",
+          "idProcesso": 1,
+          "descricao": "Cadastro devolvido para ajustes"
+        },
+        {
+          "id": 2,
+          "unidadeOrigem": "SEDOC",
+          "unidadeDestino": "SEDESENV",
+          "dataHora": "2025-07-03T14:30:00",
+          "idProcesso": 1,
+          "descricao": "Prazo próximo para validação do mapa de competências"
+        }
+      ]
+    },
+    "analises.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "idSubprocesso": 30,
+          "dataHora": "2025-07-10T10:00:00Z",
+          "unidade": "STIC",
+          "resultado": "Aceite",
+          "observacao": "Observação de teste para histórico."
+        },
+        {
+          "id": 2,
+          "idSubprocesso": 5,
+          "dataHora": "2025-07-10T10:00:00Z",
+          "unidade": "STIC",
+          "resultado": "Aceite",
+          "observacao": "Observação de teste para histórico."
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "idSubprocesso": 30,
+          "dataHora": "2025-07-10T10:00:00Z",
+          "unidade": "STIC",
+          "resultado": "Aceite",
+          "observacao": "Observação de teste para histórico."
+        },
+        {
+          "id": 2,
+          "idSubprocesso": 5,
+          "dataHora": "2025-07-10T10:00:00Z",
+          "unidade": "STIC",
+          "resultado": "Aceite",
+          "observacao": "Observação de teste para histórico."
+        }
+      ]
+    },
+    "atividades.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "descricao": "Manutenção de sistemas administrativos criados pela unidade",
+          "idSubprocesso": 3,
+          "conhecimentos": [
+            {
+              "id": 1,
+              "descricao": "Criação de testes de integração em Cypress"
+            },
+            {
+              "id": 2,
+              "descricao": "Criação de testes em Playwright"
+            },
+            {
+              "id": 3,
+              "descricao": "Programação em Java"
+            },
+            {
+              "id": 4,
+              "descricao": "Programação em JavaScript/Vue"
+            },
+            {
+              "id": 5,
+              "descricao": "Correções de vulnerabilidades"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "descricao": "Especificação de sistemas administrativos",
+          "idSubprocesso": 3,
+          "conhecimentos": [
+            {
+              "id": 6,
+              "descricao": "Modelagem de dados"
+            },
+            {
+              "id": 7,
+              "descricao": "Especificação de requisitos e casos de uso"
+            },
+            {
+              "id": 8,
+              "descricao": "Especificação de testes de aceitação"
+            }
+          ]
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "descricao": "Manutenção de sistemas administrativos criados pela unidade",
+          "idSubprocesso": 3,
+          "conhecimentos": [
+            {
+              "id": 1,
+              "descricao": "Criação de testes de integração em Cypress"
+            },
+            {
+              "id": 2,
+              "descricao": "Criação de testes em Playwright"
+            },
+            {
+              "id": 3,
+              "descricao": "Programação em Java"
+            },
+            {
+              "id": 4,
+              "descricao": "Programação em JavaScript/Vue"
+            },
+            {
+              "id": 5,
+              "descricao": "Correções de vulnerabilidades"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "descricao": "Especificação de sistemas administrativos",
+          "idSubprocesso": 3,
+          "conhecimentos": [
+            {
+              "id": 6,
+              "descricao": "Modelagem de dados"
+            },
+            {
+              "id": 7,
+              "descricao": "Especificação de requisitos e casos de uso"
+            },
+            {
+              "id": 8,
+              "descricao": "Especificação de testes de aceitação"
+            }
+          ]
+        }
+      ]
+    },
+    "atribuicoes.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "unidade": "SENIC",
+          "idServidor": 8,
+          "dataInicio": "2025-08-01",
+          "dataTermino": "2025-10-31",
+          "justificativa": "Apoio temporário."
+        },
+        {
+          "unidade": "SEMARE",
+          "idServidor": 13,
+          "dataInicio": "2025-08-01",
+          "dataTermino": "2025-09-30",
+          "justificativa": "Quase todos de férias."
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "unidade": "SENIC",
+          "idServidor": 8,
+          "dataInicio": "2025-08-01",
+          "dataTermino": "2025-10-31",
+          "justificativa": "Apoio temporário."
+        },
+        {
+          "unidade": "SEMARE",
+          "idServidor": 13,
+          "dataInicio": "2025-08-01",
+          "dataTermino": "2025-09-30",
+          "justificativa": "Quase todos de férias."
+        }
+      ]
+    },
+    "mapas.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "unidade": "SESEL",
+          "idProcesso": 1,
+          "situacao": "disponibilizado",
+          "competencias": [
+            {
+              "id": 1,
+              "descricao": "Acompanhamento de processos eleitorais",
+              "atividadesAssociadas": [
+                6
+              ]
+            },
+            {
+              "id": 2,
+              "descricao": "Implantação de sistemas",
+              "atividadesAssociadas": [
+                1
+              ]
+            },
+            {
+              "id": 3,
+              "descricao": "Testes de sistemas eleitorais",
+              "atividadesAssociadas": [
+                4,
+                5
+              ]
+            }
+          ],
+          "dataCriacao": "2025-06-01",
+          "dataDisponibilizacao": "2025-07-15",
+          "dataFinalizacao": null
+        },
+        {
+          "id": 2,
+          "unidade": "SESEL",
+          "idProcesso": 4,
+          "situacao": "em_andamento",
+          "competencias": [
+            {
+              "id": 1,
+              "descricao": "Acompanhamento de processos eleitorais",
+              "atividadesAssociadas": [
+                6,
+                201
+              ]
+            },
+            {
+              "id": 2,
+              "descricao": "Implantação de sistemas",
+              "atividadesAssociadas": [
+                1,
+                200,
+                202
+              ]
+            },
+            {
+              "id": 3,
+              "descricao": "Testes de sistemas eleitorais",
+              "atividadesAssociadas": [
+                4,
+                5,
+                218
+              ]
+            }
+          ],
+          "dataCriacao": "2024-05-01",
+          "dataDisponibilizacao": null,
+          "dataFinalizacao": null
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "unidade": "SESEL",
+          "idProcesso": 1,
+          "situacao": "disponibilizado",
+          "competencias": [
+            {
+              "id": 1,
+              "descricao": "Acompanhamento de processos eleitorais",
+              "atividadesAssociadas": [
+                6
+              ]
+            },
+            {
+              "id": 2,
+              "descricao": "Implantação de sistemas",
+              "atividadesAssociadas": [
+                1
+              ]
+            },
+            {
+              "id": 3,
+              "descricao": "Testes de sistemas eleitorais",
+              "atividadesAssociadas": [
+                4,
+                5
+              ]
+            }
+          ],
+          "dataCriacao": "2025-06-01",
+          "dataDisponibilizacao": "2025-07-15",
+          "dataFinalizacao": null
+        },
+        {
+          "id": 2,
+          "unidade": "SESEL",
+          "idProcesso": 4,
+          "situacao": "em_andamento",
+          "competencias": [
+            {
+              "id": 1,
+              "descricao": "Acompanhamento de processos eleitorais",
+              "atividadesAssociadas": [
+                6,
+                201
+              ]
+            },
+            {
+              "id": 2,
+              "descricao": "Implantação de sistemas",
+              "atividadesAssociadas": [
+                1,
+                200,
+                202
+              ]
+            },
+            {
+              "id": 3,
+              "descricao": "Testes de sistemas eleitorais",
+              "atividadesAssociadas": [
+                4,
+                5,
+                218
+              ]
+            }
+          ],
+          "dataCriacao": "2024-05-01",
+          "dataDisponibilizacao": null,
+          "dataFinalizacao": null
+        }
+      ]
+    },
+    "processos.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "descricao": "Mapeamento de competências - 2025",
+          "tipo": "Mapeamento",
+          "dataLimite": "2025-06-30",
+          "dataFinalizacao": null,
+          "situacao": "Em andamento"
+        },
+        {
+          "id": 2,
+          "descricao": "Revisão de mapeamento STIC/COINF - 2025",
+          "tipo": "Revisão",
+          "dataLimite": "2025-07-15",
+          "situacao": "Em andamento"
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "descricao": "Mapeamento de competências - 2025",
+          "tipo": "Mapeamento",
+          "dataLimite": "2025-06-30",
+          "dataFinalizacao": null,
+          "situacao": "Em andamento"
+        },
+        {
+          "id": 2,
+          "descricao": "Revisão de mapeamento STIC/COINF - 2025",
+          "tipo": "Revisão",
+          "dataLimite": "2025-07-15",
+          "situacao": "Em andamento"
+        }
+      ]
+    },
+    "servidores.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 1,
+          "nome": "Ana Paula Souza",
+          "unidade": "SESEL",
+          "email": "ana.souza@tre-pe.jus.br",
+          "ramal": "1234"
+        },
+        {
+          "id": 2,
+          "nome": "Carlos Henrique Lima",
+          "unidade": "SGP",
+          "email": "carlos.lima@tre-pe.jus.br",
+          "ramal": "2345"
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 1,
+          "nome": "Ana Paula Souza",
+          "unidade": "SESEL",
+          "email": "ana.souza@tre-pe.jus.br",
+          "ramal": "1234"
+        },
+        {
+          "id": 2,
+          "nome": "Carlos Henrique Lima",
+          "unidade": "SGP",
+          "email": "carlos.lima@tre-pe.jus.br",
+          "ramal": "2345"
+        }
+      ]
+    },
+    "subprocessos.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "id": 3,
+          "idProcesso": 1,
+          "unidade": "SESEL",
+          "dataLimiteEtapa1": "2025-06-30",
+          "dataFimEtapa1": null,
+          "dataLimiteEtapa2": null,
+          "dataFimEtapa2": null,
+          "situacao": "Mapa validado",
+          "unidadeAtual": "SESEL",
+          "unidadeAnterior": "STIC",
+          "movimentacoes": [],
+          "analises": []
+        },
+        {
+          "id": 4,
+          "idProcesso": 1,
+          "unidade": "SEDESENV",
+          "dataLimiteEtapa1": "2025-06-30",
+          "dataLimiteEtapa2": "2025-07-30",
+          "dataFimEtapa1": "2025-06-30",
+          "dataFimEtapa2": null,
+          "situacao": "Mapa validado",
+          "unidadeAtual": "SEDESENV",
+          "unidadeAnterior": "SESEL",
+          "movimentacoes": [],
+          "analises": []
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "id": 3,
+          "idProcesso": 1,
+          "unidade": "SESEL",
+          "dataLimiteEtapa1": "2025-06-30",
+          "dataFimEtapa1": null,
+          "dataLimiteEtapa2": null,
+          "dataFimEtapa2": null,
+          "situacao": "Mapa validado",
+          "unidadeAtual": "SESEL",
+          "unidadeAnterior": "STIC",
+          "movimentacoes": [],
+          "analises": []
+        },
+        {
+          "id": 4,
+          "idProcesso": 1,
+          "unidade": "SEDESENV",
+          "dataLimiteEtapa1": "2025-06-30",
+          "dataLimiteEtapa2": "2025-07-30",
+          "dataFimEtapa1": "2025-06-30",
+          "dataFimEtapa2": null,
+          "situacao": "Mapa validado",
+          "unidadeAtual": "SEDESENV",
+          "unidadeAnterior": "SESEL",
+          "movimentacoes": [],
+          "analises": []
+        }
+      ]
+    },
+    "unidades.json": {
+      "mudou": false,
+      "tipo": "array",
+      "exemplosAntes": [
+        {
+          "sigla": "SEDOC",
+          "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
+          "tipo": "ADMINISTRATIVA",
+          "idServidorTitular": 7,
+          "responsavel": null,
+          "id": 1,
+          "filhas": [
+            {
+              "sigla": "SGP",
+              "nome": "Secretaria de Gestao de Pessoas",
+              "tipo": "INTERMEDIARIA",
+              "idServidorTitular": 2,
+              "responsavel": {
+                "idServidorResponsavel": 13,
+                "tipo": "Atribuição temporária",
+                "dataInicio": "2025-01-01",
+                "dataFim": "2025-12-31"
+              },
+              "filhas": [
+                {
+                  "sigla": "COEDE",
+                  "nome": "Coordenadoria de Educação Especial",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 3,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEMARE",
+                      "nome": "Seção Magistrados e Requisitados",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 4,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 5
+                    }
+                  ],
+                  "id": 4
+                }
+              ],
+              "id": 3
+            },
+            {
+              "sigla": "STIC",
+              "nome": "Secretaria de Informática e Comunicações",
+              "tipo": "INTEROPERACIONAL",
+              "idServidorTitular": 5,
+              "responsavel": null,
+              "id": 2,
+              "filhas": [
+                {
+                  "sigla": "COSIS",
+                  "nome": "Coordenadoria de Sistemas",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 6,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEDESENV",
+                      "nome": "Seção de Desenvolvimento de Sistemas",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 7,
+                      "responsavel": {
+                        "idServidorResponsavel": 8,
+                        "tipo": "Substituição",
+                        "dataInicio": "2025-01-01",
+                        "dataFim": "2025-12-31"
+                      },
+                      "filhas": [],
+                      "id": 8
+                    },
+                    {
+                      "sigla": "SEDIA",
+                      "nome": "Seção de Dados e Inteligência Artificial",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 9,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 9
+                    },
+                    {
+                      "sigla": "SESEL",
+                      "nome": "Seção de Sistemas Eleitorais",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 10,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 10
+                    }
+                  ],
+                  "id": 6
+                },
+                {
+                  "sigla": "COSINF",
+                  "nome": "Coordenadoria de Suporte e Infraestrutura",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 12,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SENIC",
+                      "nome": "Seção de Infraestrutura",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 13,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 11
+                    }
+                  ],
+                  "id": 7
+                },
+                {
+                  "sigla": "COJUR",
+                  "nome": "Coordenadoria Jurídica",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 15,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEJUR",
+                      "nome": "Seção Jurídica",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 16,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 12
+                    },
+                    {
+                      "sigla": "SEPRO",
+                      "nome": "Seção de Processos",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 17,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 13
+                    }
+                  ],
+                  "id": 14
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exemplosDepois": [
+        {
+          "sigla": "SEDOC",
+          "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
+          "tipo": "ADMINISTRATIVA",
+          "idServidorTitular": 7,
+          "responsavel": null,
+          "id": 1,
+          "filhas": [
+            {
+              "sigla": "SGP",
+              "nome": "Secretaria de Gestao de Pessoas",
+              "tipo": "INTERMEDIARIA",
+              "idServidorTitular": 2,
+              "responsavel": {
+                "idServidorResponsavel": 13,
+                "tipo": "Atribuição temporária",
+                "dataInicio": "2025-01-01",
+                "dataFim": "2025-12-31"
+              },
+              "filhas": [
+                {
+                  "sigla": "COEDE",
+                  "nome": "Coordenadoria de Educação Especial",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 3,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEMARE",
+                      "nome": "Seção Magistrados e Requisitados",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 4,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 5
+                    }
+                  ],
+                  "id": 4
+                }
+              ],
+              "id": 3
+            },
+            {
+              "sigla": "STIC",
+              "nome": "Secretaria de Informática e Comunicações",
+              "tipo": "INTEROPERACIONAL",
+              "idServidorTitular": 5,
+              "responsavel": null,
+              "id": 2,
+              "filhas": [
+                {
+                  "sigla": "COSIS",
+                  "nome": "Coordenadoria de Sistemas",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 6,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEDESENV",
+                      "nome": "Seção de Desenvolvimento de Sistemas",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 7,
+                      "responsavel": {
+                        "idServidorResponsavel": 8,
+                        "tipo": "Substituição",
+                        "dataInicio": "2025-01-01",
+                        "dataFim": "2025-12-31"
+                      },
+                      "filhas": [],
+                      "id": 8
+                    },
+                    {
+                      "sigla": "SEDIA",
+                      "nome": "Seção de Dados e Inteligência Artificial",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 9,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 9
+                    },
+                    {
+                      "sigla": "SESEL",
+                      "nome": "Seção de Sistemas Eleitorais",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 10,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 10
+                    }
+                  ],
+                  "id": 6
+                },
+                {
+                  "sigla": "COSINF",
+                  "nome": "Coordenadoria de Suporte e Infraestrutura",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 12,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SENIC",
+                      "nome": "Seção de Infraestrutura",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 13,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 11
+                    }
+                  ],
+                  "id": 7
+                },
+                {
+                  "sigla": "COJUR",
+                  "nome": "Coordenadoria Jurídica",
+                  "tipo": "INTERMEDIARIA",
+                  "idServidorTitular": 15,
+                  "responsavel": null,
+                  "filhas": [
+                    {
+                      "sigla": "SEJUR",
+                      "nome": "Seção Jurídica",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 16,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 12
+                    },
+                    {
+                      "sigla": "SEPRO",
+                      "nome": "Seção de Processos",
+                      "tipo": "OPERACIONAL",
+                      "idServidorTitular": 17,
+                      "responsavel": null,
+                      "filhas": [],
+                      "id": 13
+                    }
+                  ],
+                  "id": 14
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

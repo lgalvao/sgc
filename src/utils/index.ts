@@ -1,5 +1,5 @@
 /**
- * Utilitários centralizados do projeto SGC
+ * Utilitários centralizados do projeto SGC (Português BR)
  */
 
 import {CLASSES_BADGE_SITUACAO} from '@/constants/situacoes';
@@ -29,48 +29,77 @@ export const iconeTipo = (tipo: TipoNotificacao): string => {
 };
 
 // ===== UTILITÁRIOS DE DATA =====
-// Removendo import { parse, isValid } from 'date-fns';
+export function parseDate(dateInput: string | number | Date | null | undefined): Date | null {
+  if (dateInput === null || dateInput === undefined || dateInput === '') return null;
 
-export function parseDate(dateString: string | null | undefined): Date | null {
-    if (!dateString) {
-        return null;
+  // Se já for Date
+  if (dateInput instanceof Date) {
+    return isNaN(dateInput.getTime()) ? null : dateInput;
+  }
+
+  // Se for número (timestamp)
+  if (typeof dateInput === 'number') {
+    const d = new Date(dateInput);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Se for string
+  if (typeof dateInput === 'string') {
+    const s = dateInput.trim();
+    if (!s) return null;
+
+    // Detecta ISO com tempo (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
+    // Para strings somente-data (YYYY-MM-DD) devemos construir a Date em horário local
+    // para evitar deslocamento de fuso horário que causa `getMonth()` diferente do esperado.
+    const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;
+    if (isoDateWithOptionalTimeRe.test(s)) {
+      // Se for somente data (sem 'T'), construir em horário local
+      if (!s.includes('T')) {
+        const parts = s.split('-');
+        const year = Number(parts[0]);
+        const month = Number(parts[1]);
+        const day = Number(parts[2]);
+        const d = new Date(year, month - 1, day);
+        if (!isNaN(d.getTime())) return d;
+      } else {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) return d;
+      }
     }
 
-    // Tentar parsear como ISO 8601 primeiro
-    let date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-        return date;
+    // Detecta timestamp numérico em string
+    const numericRe = /^\d{10,}$/;
+    if (numericRe.test(s)) {
+      const n = Number(s);
+      const d = new Date(n);
+      if (!isNaN(d.getTime())) return d;
     }
 
-    // Tentar parsear como DD/MM/YYYY manualmente
-    const parts = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (parts) {
-        const day = parseInt(parts[1], 10);
-        const month = parseInt(parts[2], 10); // Mês (1-12)
-        const year = parseInt(parts[3], 10);
-
-        // Validação básica de dia, mês e ano
-        if (year < 1000 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) {
-            return null;
+    // Detecta DD/MM/YYYY
+    const ddmmyyyy = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const m = ddmmyyyy.exec(s);
+    if (m) {
+      const day = parseInt(m[1], 10);
+      const month = parseInt(m[2], 10);
+      const year = parseInt(m[3], 10);
+      if (year >= 1000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        const d = new Date(year, month -1, day);
+        // Verifica componentes para evitar 31/02 etc.
+        if (!isNaN(d.getTime()) && d.getUTCFullYear() === year && d.getUTCMonth() === month -1 && d.getUTCDate() === day) {
+          return d;
         }
+      }
+    }
 
-        date = new Date(year, month - 1, day); // <-- Mudar para 'date'
+    // Falha ao parsear
+    return null;
+  }
 
-        // Verificar se a data criada é válida e se os componentes correspondem
-        // Isso é crucial para pegar datas como 31/02 ou meses inválidos
-        if (!isNaN(date.getTime()) && // Mudar parsedDate para date
-            date.getFullYear() === year && // Mudar parsedDate para date
-            date.getMonth() === (month - 1) && // Mudar parsedDate para date
-            date.getDate() === day) { // Mudar parsedDate para date
-            return date; // Mudar parsedDate para date
-        } // <-- Adicionado o fechamento do if (parts)
-    } // <-- Adicionado o fechamento do if (!isNaN(date.getTime()))
-
-    return null; // Retornar null se não conseguir parsear
+  return null;
 }
 
 export function formatDateBR(
-  date: Date | string | null | undefined,
+  date: Date | string | number | null | undefined,
   options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
@@ -78,11 +107,9 @@ export function formatDateBR(
   }
 ): string {
   if (!date) return 'Não informado';
-
+  const dateObj = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
+  if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
   try {
-    const dateObj = typeof date === 'string' ? parseDate(date) : date;
-    if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
-
     return dateObj.toLocaleDateString('pt-BR', options);
   } catch {
     return 'Data inválida';
@@ -91,7 +118,6 @@ export function formatDateBR(
 
 export function formatDateForInput(date: Date | null | undefined): string {
   if (!date || isNaN(date.getTime())) return '';
-
   try {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -102,8 +128,11 @@ export function formatDateForInput(date: Date | null | undefined): string {
   }
 }
 
-export function formatDateTimeBR(date: Date | string | null | undefined): string {
-  return formatDateBR(date, {
+export function formatDateTimeBR(date: Date | string | number | null | undefined): string {
+  if (!date) return 'Não informado';
+  const dateObj = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
+  if (!dateObj || isNaN(dateObj.getTime())) return 'Data inválida';
+  return formatDateBR(dateObj, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -114,12 +143,13 @@ export function formatDateTimeBR(date: Date | string | null | undefined): string
 
 export function isDateValidAndFuture(date: Date | null | undefined): boolean {
   if (!date) return false;
-
   try {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    date.setHours(0, 0, 0, 0);
-    return date >= today;
+    today.setHours(0,0,0,0);
+    const d = typeof date === 'string' || typeof date === 'number' ? parseDate(date as any) : date;
+    if (!d) return false;
+    d.setHours(0,0,0,0);
+    return d >= today;
   } catch {
     return false;
   }

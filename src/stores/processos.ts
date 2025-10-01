@@ -86,7 +86,7 @@ export const useProcessosStore = defineStore('processos', {
             return state.subprocessos.filter(pu =>
                 pu.idProcesso === idProcesso &&
                 pu.unidadeAtual === siglaUnidadeUsuario &&
-                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
+                (pu.situacao === SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO || pu.situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_DISPONIBILIZADA)
             );
         },
 
@@ -94,7 +94,7 @@ export const useProcessosStore = defineStore('processos', {
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             return state.subprocessos.filter(pu =>
                 pu.idProcesso === idProcesso &&
-                (pu.situacao === 'Cadastro disponibilizado' || pu.situacao === 'Revisão do cadastro disponibilizada')
+                (pu.situacao === SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO || pu.situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_DISPONIBILIZADA)
             );
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
@@ -214,8 +214,8 @@ export const useProcessosStore = defineStore('processos', {
 
                         // Atualizar situação do subprocesso
                         const novaSituacao = subprocesso.situacao.includes('Revisão')
-                            ? 'Revisão do cadastro homologada'
-                            : 'Cadastro homologado';
+                            ? SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA
+                            : SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO;
 
                         this.subprocessos[subprocessoIndex] = {
                             ...subprocesso,
