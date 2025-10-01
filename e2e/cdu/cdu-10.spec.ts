@@ -1,4 +1,4 @@
-import {expect, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
     adicionarAtividade,
@@ -12,7 +12,9 @@ import {
     navegarParaCadastroAtividades,
     SELETORES_CSS,
     TEXTOS,
-    URLS
+    URLS,
+    verificarModalFechado,
+    verificarModalHistoricoAnaliseAberto
 } from './helpers';
 import {esperarMensagemErro, esperarMensagemSucesso, esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
 
@@ -44,8 +46,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
 
         await adicionarAtividade(page, nomeAtividade);
         await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
-        const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
-        await expect(modal).not.toBeVisible();
+        await verificarModalFechado(page);
 
         await esperarMensagemErro(page, 'Atividades sem Conhecimento');
         await esperarMensagemErro(page, 'As seguintes atividades não têm conhecimentos associados');
@@ -54,9 +55,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
     test('não deve permitir disponibilização se subprocesso não estiver na situação correta', async ({page}) => {
         await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
         await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
-
-        const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
-        await expect(modal).not.toBeVisible();
+        await verificarModalFechado(page);
 
         await esperarMensagemErro(page, 'Erro na Disponibilização');
         await esperarMensagemErro(page, 'A disponibilização só pode ser feita quando o subprocesso está na situação');
@@ -64,12 +63,10 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhe
 
     test('deve exibir botão Histórico de análise e abrir modal', async ({page}) => {
         await page.getByText('Histórico de análise').click();
-
-        const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
-        await expect(modal).toBeVisible();
-        await esperarElementoVisivel(page, 'modal-historico-analise-titulo');
-
+ 
+        await verificarModalHistoricoAnaliseAberto(page);
+ 
         await page.getByRole('button', {name: 'Fechar'}).click();
-        await expect(modal).not.toBeVisible();
+        await verificarModalFechado(page);
     });
 });

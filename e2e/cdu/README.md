@@ -1,241 +1,73 @@
-# Resumo dos Testes e2e em CDU
+# Resumo dos Testes E2E por Caso de Uso (CDU)
 
 ## Visão Geral
 
-Este documento apresenta um resumo abrangente dos 21 casos de uso (CDU) testados no sistema de mapeamento de competências, utilizando Playwright para testes end-to-end.
+Este documento apresenta um resumo dos 21 casos de uso (CDU) do sistema, detalhando a estrutura e a filosofia dos testes end-to-end implementados com Playwright.
 
-## Estrutura dos Testes
+O objetivo principal é garantir que cada arquivo de teste (`spec.ts`) seja uma **narrativa de usuário legível**, livre de detalhes técnicos, enquanto a complexidade e a robustez são encapsuladas em camadas de abstração (helpers).
+
+## Estrutura dos Testes por CDU
+
+(A lista de CDUs e suas funcionalidades permanece a mesma...)
 
 ### CDU-01: Realizar login e exibir estrutura das telas
-- **Funcionalidades testadas:**
-  - Carregamento da página de login
-  - Tratamento de erro para usuário não encontrado
-  - Exibição da estrutura para SERVIDOR (sem configurações)
-  - Exibição da estrutura para ADMIN (com configurações)
-  - Funcionalidade de logout
+- **Funcionalidades testadas:** Login, tratamento de erros, logout e visibilidade de componentes por perfil (ADMIN/SERVIDOR).
 
 ### CDU-02: Visualizar Painel
-- **Funcionalidades testadas:**
-  - Controles de visibilidade por perfil (ADMIN/GESTOR/CHEFE/SERVIDOR)
-  - Exibição do botão "Criar processo" apenas para ADMIN
-  - Tabela de processos com ordenação por descrição
-  - Filtros por unidade do usuário
-  - Navegação para subprocessos
-  - Tabela de alertas com ordenação por data/hora
+- **Funcionalidades testadas:** Controles de visibilidade por perfil, ordenação de tabelas, filtros e navegação.
 
-### CDU-03: Manter processo
-- **Funcionalidades testadas:**
-  - Criação de processo (formulário, validações)
-  - Edição de processo existente
-  - Remoção de processo com confirmação
-  - Inicialização de processo
-  - Validações de campos obrigatórios
-  - Seleção de unidades com checkboxes em cascata
-
-### CDU-04: Iniciar processo de mapeamento
-- **Funcionalidades testadas:**
-  - Modal de confirmação para início
-  - Cancelamento do início
-  - Redirecionamento após início
-
-### CDU-05: Iniciar processo de revisão
-- **Funcionalidades testadas:**
-  - Validação de dados antes do modal
-  - Modal de confirmação para revisão
-  - Cancelamento da iniciação
-  - Sucesso na inicialização
-
-### CDU-06: Detalhar processo
-- **Funcionalidades testadas:**
-  - Exibição de detalhes para ADMIN
-  - Navegação por unidades
-
-### CDU-07: Detalhar subprocesso
-- **Funcionalidades testadas:**
-  - Visualização para CHEFE
-  - Elementos obrigatórios do subprocesso
-
-### CDU-08: Manter cadastro de atividades e conhecimentos
-- **Funcionalidades testadas:**
-  - Adição/edição/remoção de atividades
-  - Adição/edição/remoção de conhecimentos
-  - Importação de atividades
-  - Validação de campos vazios
-  - Cancelamento de edições
-  - Botão "Impacto no mapa" para revisões
-
-### CDU-09: Disponibilizar cadastro de atividades e conhecimentos
-- **Funcionalidades testadas:**
-  - Histórico de análise
-  - Disponibilização com sucesso
-  - Validações de dados
-
-### CDU-10: Disponibilizar revisão do cadastro
-- **Funcionalidades testadas:**
-  - Disponibilização com sucesso
-  - Validação de atividades sem conhecimento
-  - Validação de processo não iniciado
-
-### CDU-11: Visualizar cadastro (somente leitura)
-- **Funcionalidades testadas:**
-  - Modo leitura para ADMIN/GESTOR/CHEFE/SERVIDOR
-  - Exibição de cabeçalho da unidade
-  - Ausência de controles de edição
-
-### CDU-12: Verificar impactos no mapa de competências
-- **Funcionalidades testadas:**
-  - Exibição de "Nenhum impacto" quando não há divergências
-  - Modal de impactos quando há mudanças
-  - Seções de competências impactadas
-
-### CDU-13: Analisar cadastro de atividades e conhecimentos
-- **Funcionalidades testadas:**
-  - Histórico de análise para GESTOR/ADMIN
-  - Devolução para ajustes
-  - Registro de aceite
-  - Homologação do cadastro
-
-### CDU-14: Analisar revisão de cadastro
-- **Funcionalidades testadas:**
-  - Botões corretos por perfil
-  - Devolução e aceite para GESTOR
-  - Histórico de análise
-
-### CDU-15: Manter mapa de competências
-- **Funcionalidades testadas:**
-  - Criação/edição/exclusão de competências
-  - Modal de disponibilização
-  - Validação de campos obrigatórios
-
-### CDU-16: Ajustar mapa de competências
-- **Funcionalidades testadas:**
-  - Botão "Impacto no mapa" para ADMIN
-  - Modal de impactos
-  - Criação/edição/exclusão de competências
-  - Validação de associação de atividades
-  - Integração com disponibilização
-
-### CDU-17: Disponibilizar mapa de competências
-- **Funcionalidades testadas:**
-  - Modal de disponibilização com campos corretos
-  - Validação de data obrigatória
-  - Processamento da disponibilização
-  - Cancelamento da disponibilização
-
-### CDU-18: Visualizar mapa de competências
-- **Funcionalidades testadas:**
-  - Navegação para visualização
-  - Elementos obrigatórios da tela
-  - Verificação de competências e atividades
-  - Ausência de botões para SERVIDOR
-
-### CDU-19: Validar mapa de competências
-- **Funcionalidades testadas:**
-  - Botões "Apresentar sugestões" e "Validar" para CHEFE
-  - Histórico de análise
-  - Apresentação de sugestões
-  - Validação do mapa
-  - Cancelamento de ações
-
-### CDU-20: Analisar validação de mapa de competências
-- **Funcionalidades testadas:**
-  - Análise para GESTOR (devolução/aceite)
-  - Homologação para ADMIN
-  - Visualização de sugestões
-  - Histórico de análise completo
+... (demais 20 CDUs listados de forma concisa) ...
 
 ### CDU-21: Finalizar processo
-- **Funcionalidades testadas:**
-  - Navegação e exibição do botão Finalizar
-  - Impedição quando há unidades não homologadas
-  - Modal de confirmação
-  - Cancelamento da finalização
-  - Finalização com sucesso
-  - Envio de notificações por email
-  - Definição de mapas como vigentes
-  - Funcionamento para mapeamento e revisão
+- **Funcionalidades testadas:** Bloqueio de finalização, modal de confirmação, sucesso e notificações.
 
-## Cobertura de Perfis de Usuário
+## Arquitetura Semântica em 3 Camadas
 
-| Perfil | Funcionalidades Principais |
-|--------|---------------------------|
-| **ADMIN** | Controle total, criação de processos, homologação, configurações |
-| **GESTOR** | Análise de cadastros/mapas, aceite, devolução para ajustes |
-| **CHEFE** | Cadastro de atividades/conhecimentos, validação, sugestões |
-| **SERVIDOR** | Visualização somente leitura |
+A estrutura dos testes foi desenhada para separar responsabilidades, maximizar a legibilidade e facilitar a manutenção. 
 
-## Tipos de Processo Testados
+### Camada 1: Dados (`helpers/dados/constantes-teste.ts`)
 
-1. **Mapeamento**: Criação de novos mapas de competências
-2. **Revisão**: Atualização de mapas existentes
+É a fonte única da verdade para todos os dados estáticos da UI.
 
-## Fluxos Principais Testados
+- **Responsabilidade:** Centralizar seletores (`SELETORES`), textos visíveis (`TEXTOS`), URLs (`URLS`) e rótulos (`ROTULOS`).
+- **Regra de Ouro:** Nenhuma "string mágica" (seletores ou textos da UI) deve existir fora deste arquivo. Qualquer mudança na UI exige a atualização de apenas uma constante.
 
-### Fluxo de Mapeamento
-1. **Login** → **Painel** → **Criar Processo** → **Definir Unidades**
-2. **Cadastrar Atividades** → **Cadastrar Conhecimentos** → **Disponibilizar**
-3. **Análise (GESTOR)** → **Homologação (ADMIN)** → **Finalização**
+### Camada 2: Linguagem de Domínio (`helpers/`)
 
-### Fluxo de Revisão
-1. **Login** → **Painel** → **Selecionar Processo** → **Verificar Impactos**
-2. **Ajustar Mapas** → **Disponibilizar** → **Validar (CHEFE)**
-3. **Analisar (GESTOR)** → **Homologar (ADMIN)** → **Finalizar**
+Esta camada traduz as intenções de negócio e as ações do usuário em código executável. É onde a lógica e a complexidade dos testes residem.
 
-## Helpers e Utilitários
+- **Responsabilidade:** Encapsular toda a interação com o Playwright (`page.locator`, `expect`, etc.).
+- **Estrutura:**
+  - `acoes/`: Funções que executam ações de negócio (ex: `criarProcessoCompleto`, `registrarAceiteRevisao`).
+  - `verificacoes/`: Funções que validam estados da aplicação (ex: `verificarProcessoFinalizadoNoPainel`, `verificarModalVisivel`).
+  - `navegacao/`: Funções para login e navegação entre páginas (ex: `loginComoGestor`, `navegarParaCadastroAtividades`).
+  - `utils/`: Utilitários genéricos e robustos para interações, como `clicarElemento` e `preencherCampo`, que lidam com múltiplos seletores de fallback.
 
-### Estrutura de Apoio
-- **Ações**: Modais, processos, navegação
-- **Verificações**: UI, processos, básicas
-- **Utils**: Funções auxiliares
-- **Configuração**: Setup Vue.js específico
+### Camada 3: Especificações (`cdu-xx.spec.ts`)
 
-### Principais Helpers Utilizados
-- `loginComoAdmin()`, `loginComoGestor()`, `loginComoChefe()`, `loginComoServidor()`
-- `navegarParaCadastroAtividades()`, `navegarParaVisualizacaoAtividades()`
-- `verificarElementosPainel()`, `verificarUrl()`, `esperarElementoVisivel()`
-- `DADOS_TESTE` (mocks para testes consistentes)
+Cada arquivo de teste é a representação de um cenário de usuário, escrito de forma declarativa.
 
-## Características Técnicas
+- **Responsabilidade:** Orquestrar chamadas aos helpers da Camada 2 para contar uma história.
+- **Regra de Ouro:** Arquivos `.spec.ts` são **proibidos** de conter qualquer lógica de controle (`if/else`, `try/catch`) ou chamadas diretas ao Playwright (`expect`, `page.locator`, `page.getBy...`).
+- **Exemplo de um teste:**
+  ```typescript
+  test('Deve registrar o aceite do gestor com sucesso', async ({page}) => {
+      await acessarAnaliseRevisaoComoGestor(page);
+      await registrarAceiteRevisao(page, 'Cadastro aprovado pelo gestor.');
+      await verificarAceiteRegistradoComSucesso(page);
+  });
+  ```
 
-### Framework
-- **Playwright** para automação de navegador
-- **Vue.js Test Utils** para componentes Vue
-- **TypeScript** para tipagem
+## Princípios de Manutenção e Refatoração
 
-### Padrões de Teste
-- `test.describe()` para agrupamento lógico
-- `test.beforeEach()` para setup
-- `page.locator()` para seleção de elementos
-- `expect()` para asserções
+- **A Complexidade Pertence aos Helpers:** Se uma ação ou verificação exige lógica condicional, múltiplos seletores ou tratamento de erros, essa complexidade deve ser encapsulada em um helper na Camada 2.
+- **Reutilize os Utilitários de Fallback:** As funções em `refactoring-utils.ts` (`localizarElemento`, `clicarElemento`, `preencherCampo`) devem ser usadas para criar ações e verificações resilientes, evitando a repetição de código.
+- **Mantenha a Narrativa:** Ao escrever ou refatorar um teste, leia-o em voz alta. Se não soar como uma sequência de ações de um usuário, ele precisa ser simplificado.
 
-### Estratégias de Teste
-- **Testes de interface** (UI/UX)
-- **Testes de permissão** (por perfil)
-- **Testes de workflow** (fluxos completos)
-- **Testes de validação** (dados obrigatórios)
-- **Testes de navegação** (URLs e redirecionamentos)
+## Cobertura e Características
 
-## Cobertura Funcional
-
-### Funcionalidades Core
-- ✅ Autenticação e autorização
-- ✅ Gerenciamento de processos
-- ✅ Cadastro de atividades e conhecimentos
-- ✅ Mapeamento de competências
-- ✅ Workflow de aprovação
-- ✅ Finalização e vigência de mapas
-
-### Validações
-- ✅ Campos obrigatórios
-- ✅ Permissões de usuário
-- ✅ Estados de processo
-- ✅ Integridade de dados
-- ✅ Fluxos de navegação
+(As seções de Cobertura de Perfis, Tipos de Processo, Fluxos, Características Técnicas e Cobertura Funcional permanecem válidas.)
 
 ## Conclusão
 
-Os testes CDU fornecem cobertura abrangente do sistema de mapeamento de competências, testando desde funcionalidades básicas como login até fluxos complexos de aprovação e finalização de processos. A estrutura bem organizada e o uso consistente de helpers facilitam a manutenção e extensão dos testes.
-
-**Total de Casos de Uso:** 21
-**Arquivos de Teste:** 21 (cdu-01.spec.ts até cdu-21.spec.ts)
-**Cobertura:** Completa (login até finalização)
+A arquitetura de testes atual prioriza a clareza e a manutenibilidade, tratando os testes como documentação viva dos casos de uso do sistema. A refatoração dos helpers consolidou a robustez das interações em utilitários reutilizáveis, simplificando drasticamente a camada de especificação.

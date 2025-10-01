@@ -1,5 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {clicarElemento, preencherCampo} from '../utils';
 
 /**
  * AÇÕES ESPECÍFICAS PARA PROCESSOS
@@ -9,7 +10,13 @@ import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
 /**
  * Preencher formulário básico de processo
  */
-export async function preencherFormularioProcesso(page: Page, descricao: string, tipo: string, dataLimite?: string, sticChecked: boolean = false): Promise<void> {
+export async function preencherFormularioProcesso(
+    page: Page,
+    descricao: string,
+    tipo: string,
+    dataLimite?: string,
+    sticChecked: boolean = false
+): Promise<void> {
     await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, descricao);
     await page.selectOption(SELETORES_CSS.CAMPO_TIPO, tipo);
 
@@ -53,7 +60,12 @@ export async function selecionarPrimeiroProcessoPorSituacao(page: Page, situacao
 /**
  * Criar processo completo com dados básicos
  */
-export async function criarProcessoCompleto(page: Page, descricao: string, tipo: string, dataLimite?: string): Promise<void> {
+export async function criarProcessoCompleto(
+    page: Page,
+    descricao: string,
+    tipo: string,
+    dataLimite?: string
+): Promise<void> {
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarPrimeiraUnidade(page);
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
@@ -151,7 +163,7 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        await modal.getByLabel('Observação').fill(observacao);
+        await preencherCampo([modal.getByLabel('Observação')], observacao);
     }
 
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
@@ -161,20 +173,13 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
  * Aceita um cadastro, preenchendo a observação se fornecida.
  */
 export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
-    const acceptButton = page.getByRole('button', {name: 'Registrar aceite'});
-    const validateButton = page.getByRole('button', {name: TEXTOS.VALIDAR});
-
-    if (await acceptButton.isVisible()) {
-        await acceptButton.click();
-    } else {
-        await validateButton.click();
-    }
+    await clicarElemento([page.getByRole('button', {name: 'Registrar aceite'}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
 
     const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        await modal.getByLabel('Observação').fill(observacao);
+        await preencherCampo([modal.getByLabel('Observação')], observacao);
     }
 
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
@@ -196,55 +201,33 @@ export async function registrarAceiteRevisao(page: Page, observacao?: string): P
         await expect(modal.getByRole('heading', {name: /aceit(ar|e)?/i}).first()).toBeVisible();
     }
 
-    // Campo de observação pode variar no label (Observação/Observações); usamos regex para localizar.
     if (observacao) {
-        if ((await modal.getByLabel(/observa/i).count()) > 0) {
-            await modal.getByLabel(/observa/i).fill(observacao);
-        } else {
-            // fallback: tentar encontrar um textbox com placeholder/text próximo
-            const textbox = modal.locator('textarea, input').filter({hasText: observacao}).first();
-            if ((await textbox.count()) > 0) {
-                await textbox.fill(observacao);
-            }
-        }
+        await preencherCampo([modal.getByLabel(/observa/i), modal.locator('textarea, input').first()], observacao);
     }
 
-    // Clicar no botão de confirmação: preferir texto "Confirmar", mas aceitar "Aceitar" como alternativa.
-    if ((await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).count()) > 0) {
-        await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
-    } else {
-        await modal.getByRole('button', {name: /aceitar|confirmar/i}).first().click();
-    }
+    await clicarElemento([
+        modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
+        modal.getByRole('button', {name: /aceitar|confirmar/i}),
+    ]);
 }
 
 /**
  * Homologa um cadastro, preenchendo a observação se fornecida.
  */
 export async function homologarCadastro(page: Page, observacao?: string): Promise<void> {
-    const homologateButton = page.getByRole('button', {name: TEXTOS.HOMOLOGAR});
-    const validateButton = page.getByRole('button', {name: TEXTOS.VALIDAR});
-
-    if (await homologateButton.count() > 0 && await homologateButton.isVisible()) {
-        await homologateButton.click();
-    } else {
-        await validateButton.click();
-    }
+    await clicarElemento([page.getByRole('button', {name: TEXTOS.HOMOLOGAR}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
 
     const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
-        if ((await modal.getByLabel(/observa/i).count()) > 0) {
-            await modal.getByLabel(/observa/i).fill(observacao);
-        }
+        await preencherCampo([modal.getByLabel(/observa/i)], observacao);
     }
 
-    // Tentar confirmar com botão "Confirmar" ou alternativa "Aceitar"
-    if ((await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).count()) > 0) {
-        await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
-    } else {
-        await modal.getByRole('button', {name: /aceitar|confirmar/i}).first().click();
-    }
+    await clicarElemento([
+        modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
+        modal.getByRole('button', {name: /aceitar|confirmar/i}),
+    ]);
 }
 
 /**

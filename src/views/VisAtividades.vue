@@ -25,6 +25,7 @@
         </button>
         <button
           class="btn btn-secondary"
+          data-testid="btn-devolver"
           title="Devolver para ajustes"
           @click="devolverCadastro"
         >
@@ -32,6 +33,7 @@
         </button>
         <button
           class="btn btn-success"
+          data-testid="btn-acao-principal-analise"
           title="Validar"
           @click="validarCadastro"
         >
@@ -132,6 +134,7 @@
             <button
               type="button"
               class="btn btn-success"
+              data-testid="btn-modal-confirmar-aceite"
               @click="confirmarValidacao"
             >
               Confirmar
@@ -228,6 +231,7 @@
             <button
               type="button"
               class="btn btn-danger"
+              data-testid="btn-modal-confirmar-devolucao"
               @click="confirmarDevolucao"
             >
               Confirmar

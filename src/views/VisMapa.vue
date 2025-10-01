@@ -67,8 +67,8 @@
         <button
           v-if="podeAnalisar"
           class="btn btn-outline-success"
+          data-testid="btn-registrar-aceite-homologar"
           title="Aceitar"
-          data-testid="registrar-aceite-btn"
           @click="abrirModalAceitar"
         >
           {{ perfilSelecionado === 'ADMIN' ? 'Homologar' : 'Registrar aceite' }}

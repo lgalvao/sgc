@@ -35,6 +35,7 @@
         <button
           v-if="isChefe"
           class="btn btn-outline-success"
+          data-testid="btn-disponibilizar"
           data-bs-toggle="tooltip"
           title="Disponibilizar"
           @click="disponibilizarCadastro"

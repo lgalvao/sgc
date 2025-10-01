@@ -39,6 +39,7 @@
         <button
           v-if="perfilStore.perfilSelecionado === 'ADMIN'"
           class="btn btn-outline-success"
+          data-testid="btn-abrir-modal-homologar-bloco"
           @click="abrirModalHomologarBloco"
         >
           <i class="bi bi-check-all me-1" />

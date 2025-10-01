@@ -1,5 +1,6 @@
 import {Locator, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {clicarElemento, preencherCampo} from '../utils';
 
 // ==================================================================
 // FUNÇÕES DE LOCALIZAÇÃO (INTERNAS)
@@ -124,33 +125,11 @@ export async function clicarBotaoImportarAtividades(page: Page): Promise<void> {
  * Clica no botão para disponibilizar o cadastro (prioriza botão da página por test-id, fallback para role).
  */
 export async function clicarBotaoDisponibilizar(page: Page): Promise<void> {
-    // 1) Preferir botão da página por test-id (btn-disponibilizar-page)
-    try {
-        const pageBtn = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE);
-        if ((await pageBtn.count()) > 0) {
-            await pageBtn.first().click();
-            return;
-        }
-    } catch {
-        // ignore
-    }
-
-    // 2) Fallback: botão textual na página (pode haver ambiguidade — preferimos test-id)
-    try {
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).first().click();
-        return;
-    } catch {
-        // continue para próximo fallback
-    }
-
-    // 3) Último recurso: tentar botão por test-id global (btn-disponibilizar)
-    const globalBtn = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR);
-    if ((await globalBtn.count()) > 0) {
-        await globalBtn.first().click();
-        return;
-    }
-
-    throw new Error('Botão de disponibilizar não encontrado na página.');
+    await clicarElemento([
+        page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE),
+        page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}),
+        page.getByTestId(SELETORES.BTN_DISPONIBILIZAR),
+    ]);
 }
 
 /**
@@ -186,19 +165,10 @@ export async function excluirCompetencia(page: Page, descricao: string): Promise
     const competenciaCard = page.locator('.competencia-card').filter({hasText: descricao});
     await competenciaCard.getByTestId(SELETORES.EXCLUIR_COMPETENCIA).click();
 
-    // Tentar confirmar pelo test-id do modal, se presente
-    try {
-        const confirmar = page.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR);
-        if ((await confirmar.count()) > 0) {
-            await confirmar.first().click();
-            return;
-        }
-    } catch {
-        // ignora e tenta fallback
-    }
-
-    // Fallback por role/text (botão "Confirmar")
-    await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await clicarElemento([
+        page.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
+        page.getByRole('button', {name: TEXTOS.CONFIRMAR}),
+    ]);
 }
 /**
  * Disponibiliza o mapa preenchendo data limite e observações no modal de disponibilização.
@@ -211,38 +181,18 @@ export async function disponibilizarMapaComData(page: Page, dataLimite: string, 
     const modal = page.locator('.modal.show');
     await modal.waitFor({state: 'visible'});
 
-    // Tentar preencher campo de data com múltiplos fallbacks
-    if ((await modal.locator('#dataLimite').count()) > 0) {
-        await modal.locator('#dataLimite').fill(dataLimite);
-    } else if ((await modal.getByLabel(/data/i).count()) > 0) {
-        await modal.getByLabel(/data/i).fill(dataLimite);
-    } else if ((await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).count()) > 0) {
-        await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).fill(dataLimite);
-    }
+    await preencherDataModal(page, dataLimite);
 
     if (observacoes) {
-        // Preferir test-id do input de observações
-        if ((await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).count()) > 0) {
-            await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).fill(observacoes);
-        } else if ((await modal.locator('#observacoes').count()) > 0) {
-            await modal.locator('#observacoes').fill(observacoes);
-        } else if ((await modal.getByLabel(/observa/i).count()) > 0) {
-            await modal.getByLabel(/observa/i).fill(observacoes);
-        } else {
-            const textbox = modal.locator('textarea, input').first();
-            await textbox.fill(observacoes);
-        }
+        await preencherObservacoesModal(page, observacoes);
     }
 
     // Confirmar disponibilização (pode usar texto "Disponibilizar" ou "Confirmar")
-    // Preferir botão dentro do modal por test-id
-    if ((await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).count()) > 0) {
-        await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first().click();
-    } else if ((await modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).count()) > 0) {
-        await modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).first().click();
-    } else {
-        await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).first().click();
-    }
+    await clicarElemento([
+        modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR),
+        modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}),
+        modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
+    ]);
 
     // Esperar fechamento do modal como tentativa de estabilidade (não falhar se permanecer aberto)
     await modal.waitFor({state: 'hidden', timeout: 5000}).catch(() => {});
@@ -262,17 +212,15 @@ export async function abrirModalDisponibilizacao(page: Page): Promise<void> {
  */
 export async function preencherDataModal(page: Page, dataLimite: string): Promise<void> {
     const modal = page.locator('.modal.show');
-    // Preferir test-id do input
-    if ((await modal.getByTestId(SELETORES.INPUT_DATA_LIMITE).count()) > 0) {
-        await modal.getByTestId(SELETORES.INPUT_DATA_LIMITE).fill(dataLimite);
-    } else if ((await modal.locator('#dataLimite').count()) > 0) {
-        await modal.locator('#dataLimite').fill(dataLimite);
-    } else if ((await modal.getByLabel(/data/i).count()) > 0) {
-        await modal.getByLabel(/data/i).fill(dataLimite);
-    } else {
-        // fallback para seletor global definido nas constantes
-        await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).fill(dataLimite);
-    }
+    await preencherCampo(
+        [
+            modal.getByTestId(SELETORES.INPUT_DATA_LIMITE),
+            modal.locator('#dataLimite'),
+            modal.getByLabel(/data/i),
+            page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE),
+        ],
+        dataLimite
+    );
 }
 
 /**
@@ -280,15 +228,13 @@ export async function preencherDataModal(page: Page, dataLimite: string): Promis
  */
 export async function preencherObservacoesModal(page: Page, observacoes: string): Promise<void> {
     const modal = page.locator('.modal.show');
-    if ((await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).count()) > 0) {
-        await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).fill(observacoes);
-    } else if ((await modal.locator('#observacoes').count()) > 0) {
-        await modal.locator('#observacoes').fill(observacoes);
-    } else if ((await modal.getByLabel(/observa/i).count()) > 0) {
-        await modal.getByLabel(/observa/i).fill(observacoes);
-    } else {
-        // fallback: tentar por input/textarea dentro do modal
-        const textbox = modal.locator('textarea, input').first();
-        await textbox.fill(observacoes);
-    }
+    await preencherCampo(
+        [
+            modal.getByTestId(SELETORES.INPUT_OBSERVACOES),
+            modal.locator('#observacoes'),
+            modal.getByLabel(/observa/i),
+            modal.locator('textarea, input').first(),
+        ],
+        observacoes
+    );
 }

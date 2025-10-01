@@ -1,4 +1,3 @@
-import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
     cancelarNoModal,
@@ -17,8 +16,10 @@ import {
     verificarModalConfirmacaoIniciarProcessoInvisivel,
     verificarModalConfirmacaoIniciarProcessoVisivel,
     verificarPaginaCadastroProcesso,
-    verificarTituloProcessos, verificarUrlDoPainel,
-    verificarValorCampoDescricao
+    verificarTituloProcessos,
+    verificarUrlDoPainel,
+    verificarValorCampoDescricao,
+    verificarVisibilidadeProcesso
 } from './helpers';
 
 
@@ -37,14 +38,14 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
     test('deve exibir modal de confirmação para processo válido', async ({page}) => {
         const descricaoProcessoExistente = "Processo teste revisão CDU-05"; // Usar processo existente nos mocks
         await page.goto(URLS.PAINEL);
-        await expect(page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`).getByText(descricaoProcessoExistente)).toBeVisible();
-
+        await verificarVisibilidadeProcesso(page, descricaoProcessoExistente, true);
+ 
         await clicarProcessoNaTabela(page, descricaoProcessoExistente);
-
-        // Verifica se a URL é a da página de detalhes do processo
-        await expect(page).toHaveURL(new RegExp(`/processo/cadastro\\?idProcesso=100`));
+ 
+        // Verifica se a navegação levou à página de cadastro do processo
+        await verificarPaginaCadastroProcesso(page);
         await clicarBotaoIniciarProcesso(page);
-
+ 
         await verificarModalConfirmacaoIniciarProcessoVisivel(page);
     });
 

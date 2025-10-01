@@ -70,7 +70,7 @@
             type="button"
             class="btn"
             :class="tipoAcao === 'aceitar' ? 'btn-primary' : 'btn-success'"
-            data-testid="btn-modal-confirmar"
+            data-testid="btn-confirmar-acao-bloco"
             @click="confirmar"
           >
             <i :class="tipoAcao === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />

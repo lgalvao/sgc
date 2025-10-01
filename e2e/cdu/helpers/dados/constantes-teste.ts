@@ -88,6 +88,13 @@ export const SELETORES = {
     SELECT_UNIDADE: 'select-unidade',
     BTN_MODAL_CONFIRMAR: 'btn-modal-confirmar',
     BTN_MODAL_CANCELAR: 'btn-modal-cancelar',
+    // Novas chaves para o Grupo 2
+    BTN_ACAO_PRINCIPAL_ANALISE: 'btn-acao-principal-analise',
+    BTN_MODAL_CONFIRMAR_ACEITE: 'btn-modal-confirmar-aceite',
+    BTN_MODAL_CONFIRMAR_DEVOLUCAO: 'btn-modal-confirmar-devolucao',
+    BTN_REGISTRAR_ACEITE_HOMOLOGAR: 'btn-registrar-aceite-homologar',
+    BTN_ABRIR_MODAL_HOMOLOGAR_BLOCO: 'btn-abrir-modal-homologar-bloco',
+    BTN_CONFIRMAR_ACAO_BLOCO: 'btn-confirmar-acao-bloco',
 } as const;
 
 export const TEXTOS = {
