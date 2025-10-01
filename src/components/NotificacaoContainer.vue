@@ -9,7 +9,7 @@
         v-for="notificacao in notificacoes"
         :key="notificacao.id"
         :class="['notification', `notification-${notificacao.tipo}`]"
-        :data-testid="`notificacao-${notificacao.id}`"
+        :data-testid="notificacao.testId ? notificacao.testId : `notificacao-${notificacao.id}`"
       >
         <div class="notification-content">
           <div class="notification-header">

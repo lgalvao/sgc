@@ -41,9 +41,7 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
 
     test('deve permitir criação de competências', async ({page}) => {
         await navegarParaMapaRevisao(page);
-
         await criarCompetenciaLocal(page, 'Competência CDU-16');
-
         await esperarTextoVisivel(page, 'Competência CDU-16');
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: 'Competência CDU-16'});
@@ -70,7 +68,6 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
 
     test('deve permitir exclusão de competências', async ({page}) => {
         await navegarParaMapaRevisao(page);
-
         await criarCompetenciaLocal(page, 'Competência para Excluir');
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: 'Competência para Excluir'});
@@ -85,7 +82,6 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
 
     test('deve validar associação de todas as atividades', async ({page}) => {
         await navegarParaMapaRevisao(page);
-
         await criarCompetenciaLocal(page, 'Competência Parcial');
 
         await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();

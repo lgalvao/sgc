@@ -237,7 +237,7 @@ interface TreeTableItem {
   children: TreeTableItem[];
   clickable?: boolean;
 
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  [key: string]: any;  
 }
 
 const route = useRoute()
@@ -369,7 +369,7 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function abrirDetalhesUnidade(item: any) {
   if (item) {
     const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);

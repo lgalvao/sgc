@@ -14,5 +14,13 @@
     "unidade": "STIC",
     "resultado": "Aceite",
     "observacao": "Observação de teste para histórico."
+  },
+  {
+    "id": 3,
+    "idSubprocesso": 15,
+    "dataHora": "2025-07-10T10:00:00Z",
+    "unidade": "SEDIA",
+    "resultado": "Aceite",
+    "observacao": "Entrada de mock adicionada para teste CDU-19."
   }
 ]

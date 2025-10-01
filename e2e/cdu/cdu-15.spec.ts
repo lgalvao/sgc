@@ -6,6 +6,7 @@ import {
     esperarBotaoVisivel,
     esperarElementoVisivel,
     esperarTextoVisivel,
+    gerarNomeUnico,
     irParaMapaCompetencias,
     loginComoAdmin,
     SELETORES,
@@ -32,6 +33,7 @@ test.describe('CDU-15: Manter mapa de competências', () => {
     test('deve criar competência e alterar situação do subprocesso', async ({page}) => {
         const competenciaDescricao = `Competência Teste ${Date.now()}`;
         await criarCompetencia(page, competenciaDescricao);
+
         // Verifica que o novo card aparece pelo seu texto e que as ações estão disponíveis
         await esperarTextoVisivel(page, competenciaDescricao);
         await esperarElementoVisivel(page, SELETORES.EDITAR_COMPETENCIA);
@@ -39,13 +41,13 @@ test.describe('CDU-15: Manter mapa de competências', () => {
     });
 
     test('deve editar competência existente', async ({page}) => {
-        const competenciaOriginal = `Competência Original ${Date.now()}`;
+        const competenciaOriginal = gerarNomeUnico("Competência Original");
         await criarCompetencia(page, competenciaOriginal);
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaOriginal});
         await competenciaCard.getByTestId('btn-editar-competencia').click();
 
-        const competenciaEditada = `Competência Editada ${Date.now()}`;
+        const competenciaEditada = gerarNomeUnico("Competência Editada");
         await page.getByTestId('input-nova-competencia').fill(competenciaEditada);
         await page.getByTestId('btn-criar-competencia').click();
 
@@ -55,7 +57,7 @@ test.describe('CDU-15: Manter mapa de competências', () => {
     });
 
     test('deve excluir competência com confirmação', async ({page}) => {
-        const competenciaParaExcluir = `Competência para Excluir ${Date.now()}`;
+        const competenciaParaExcluir = gerarNomeUnico("Competência para Excluir");
         await criarCompetencia(page, competenciaParaExcluir);
 
         const competenciaCard = page.locator('.competencia-card').filter({hasText: competenciaParaExcluir});

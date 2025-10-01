@@ -34,7 +34,7 @@ interface TreeItem {
   clickable?: boolean;
   level?: number;
 
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  [key: string]: any;  
 }
 
 const props = defineProps<{

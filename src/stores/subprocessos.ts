@@ -27,7 +27,7 @@ function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
 export const useSubprocessosStore = defineStore('subprocessos', {
     state: () => {
         return {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             subprocessos: (subprocessosMock as any[]).map(parseSubprocessoDates) as Subprocesso[],
         };
     },

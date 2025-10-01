@@ -41,7 +41,6 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
         await loginComoServidor(page);
         await verificarElementosPainel(page);
         await clicarBotaoSair(page);
-
         await verificarPaginaLogin(page);
     });
 });

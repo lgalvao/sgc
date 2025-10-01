@@ -70,7 +70,7 @@ export class ErrorReporter {
         Object.entries(this.errors).forEach(([type, errors]) => {
             if (errors.length > 0) {
                 console.error(`\n📋 ${type.toUpperCase()} (${errors.length}):`);
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 
                 errors.forEach((error: any, i: number) => {
                     let message = 'Erro desconhecido';
                     if ('message' in error && error.message) {

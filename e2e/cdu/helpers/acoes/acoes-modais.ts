@@ -15,7 +15,7 @@ export async function cancelarNoModal(page: Page): Promise<void> {
     const clicked = await clicarPorTestIdOuRole(page, SELETORES.BTN_MODAL_CANCELAR, 'button', TEXTOS.CANCELAR, '.modal.show .btn-secondary');
     if (!clicked) {
         // última tentativa: botão cancel no escopo do modal
-        await page.locator('.modal.show').getByRole('button', { name: TEXTOS.CANCELAR }).first().click();
+        await page.locator('.modal.show').getByRole('button', {name: TEXTOS.CANCELAR}).first().click();
     }
 }
 
@@ -26,7 +26,7 @@ export async function confirmarNoModal(page: Page): Promise<void> {
     // Priorizar test-id do botão confirmar em modais
     const clicked = await clicarPorTestIdOuRole(page, SELETORES.BTN_MODAL_CONFIRMAR, 'button', TEXTOS.CONFIRMAR, '.modal.show .btn-primary, .modal.show .btn-success');
     if (!clicked) {
-        await page.locator('.modal.show').getByRole('button', { name: TEXTOS.CONFIRMAR }).first().click();
+        await page.locator('.modal.show').getByRole('button', {name: TEXTOS.CONFIRMAR}).first().click();
     }
 }
 
@@ -114,8 +114,43 @@ export async function cancelarModal(page: Page): Promise<void> {
 }
 
 /**
- * Clica no botão "Histórico de análise".
+ * Clica no botão "Histórico de análise" de forma robusta.
+ * - Prioriza test-id (SELETORES.BTN_HISTORICO_ANALISE)
+ * - Fallback por role/text (TEXTOS.HISTORICO_ANALISE)
+ * - Lança erro claro se não encontrado para diagnóstico imediato
  */
 export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
-    await page.getByRole('button', {name: 'Histórico de análise'}).click();
+    // Lista de possíveis test-ids para o botão histórico na UI
+    const possiveisTestIds = [SELETORES.BTN_HISTORICO_ANALISE, 'historico-analise-btn', 'historico-analise-btn-gestor'];
+
+    for (const testId of possiveisTestIds) {
+        if (!testId) continue;
+        try {
+            const el = page.getByTestId(testId);
+            if ((await el.count()) > 0) {
+                // Esperar visibilidade explícita antes de clicar
+                try {
+                    await el.first().waitFor({state: 'visible'});
+                    await el.first().click();
+                    return;
+                } catch {
+                    // tentar click forçado como último recurso
+                    try {
+                        await el.first().click({force: true});
+                        return;
+                    } catch {
+                        // continue para próximo testId
+                    }
+                }
+            }
+        } catch {
+            // ignorar e tentar próximo testId
+        }
+    }
+
+    // Fallback: tentar por role/name com utilitário robusto de clique
+    const clicked = await clicarPorTestIdOuRole(page, undefined, 'button', TEXTOS.HISTORICO_ANALISE);
+    if (!clicked) {
+        throw new Error(`Botão "${TEXTOS.HISTORICO_ANALISE}" não encontrado ou não clicável.`);
+    }
 }

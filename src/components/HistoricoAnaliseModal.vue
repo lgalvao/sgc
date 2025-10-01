@@ -17,7 +17,10 @@
             @click="emit('fechar')"
           />
         </div>
-        <div class="modal-body" data-testid="modal-historico-body">
+        <div
+          class="modal-body"
+          data-testid="modal-historico-body"
+        >
           <div
             v-if="analises.length === 0"
             class="alert alert-info"

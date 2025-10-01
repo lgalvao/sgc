@@ -175,7 +175,7 @@ describe('TreeTable.vue', () => {
         });
 
         // Testar encontrar item de nível superior
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const vm = wrapper.vm as any;
         const foundItem = vm.findItemById(dataWithNestedChildren, 1);
         expect(foundItem).toBeTruthy();
@@ -197,7 +197,7 @@ describe('TreeTable.vue', () => {
             global: {stubs: {TreeRow: mockTreeRow}},
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const vm = wrapper.vm as any;
         const notFoundItem = vm.findItemById(mockData, 999);
         expect(notFoundItem).toBeNull();
@@ -216,7 +216,7 @@ describe('TreeTable.vue', () => {
             global: {stubs: {TreeRow: mockTreeRow}},
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const vm = wrapper.vm as any;
 
         // Verificar estado inicial do internalData
@@ -240,7 +240,7 @@ describe('TreeTable.vue', () => {
             global: {stubs: {TreeRow: mockTreeRow}},
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const vm = wrapper.vm as any;
 
         // Tentar alternar item inexistente

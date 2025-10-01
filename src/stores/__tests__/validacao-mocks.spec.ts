@@ -63,7 +63,7 @@ describe('Validação de Mocks', () => {
           }
         });
       };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       checarUnidades(unidades as any as Unidade[]);
     });
   });

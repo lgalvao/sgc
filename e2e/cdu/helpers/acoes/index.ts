@@ -63,9 +63,10 @@ export {
     adicionarConhecimentoPrimeiraAtividade
 } from './acoes-atividades';
 
-// Ações de mapa
-export {
-    validarMapa,
-    clicarBotaoImpactosMapa,
-    fecharModalImpactos
-} from './acoes-mapa';
+ // Ações de mapa
+ export {
+     validarMapa,
+     apresentarSugestoes,
+     clicarBotaoImpactosMapa,
+     fecharModalImpactos
+ } from './acoes-mapa';

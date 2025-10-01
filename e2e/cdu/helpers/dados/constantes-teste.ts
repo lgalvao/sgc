@@ -29,7 +29,7 @@ export const SELETORES = {
     BTN_EXCLUIR: 'btn-excluir',
     BTN_ACEITAR: 'btn-aceitar',
     BTN_VER_SUGESTOES: 'btn-ver-sugestoes',
-    BTN_HISTORICO_ANALISE: 'btn-historico-analise',
+    BTN_HISTORICO_ANALISE: 'historico-analise-btn',
     // Ações adicionais usadas em modais/fluxos
     BTN_IMPORTAR: 'btn-importar',
     BTN_LIMPAR_NOTIFICACOES: 'btn-limpar-notificacoes',

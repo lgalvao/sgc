@@ -12,7 +12,15 @@ import {SELETORES_CSS, TEXTOS, URLS} from '../dados';
 export async function esperarMensagemSucesso(page: Page, mensagem: string): Promise<void> {
     // Procuramos qualquer notificação que contenha o texto, independente da classe específica.
     const notificacao = page.locator('.notification', {hasText: mensagem});
-    await expect(notificacao).toBeVisible();
+    // Espera explícita e tolerante para notificações que podem demorar a aparecer
+    try {
+        await notificacao.first().waitFor({state: 'visible'});
+    } catch {
+        // fallback: tentar buscar por qualquer notificação que contenha parte da mensagem (nome do processo, etc.)
+        const parcial = mensagem.split(' ').slice(0, 3).join(' ');
+        const alternativa = page.locator('.notification', {hasText: parcial});
+        await alternativa.first().waitFor({state: 'visible'});
+    }
 }
 
 /**

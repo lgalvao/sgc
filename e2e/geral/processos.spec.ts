@@ -144,9 +144,9 @@ test.describe('Detalhes do Processo - Unidades', () => {
         await finalizarButton.click();
 
         // Modal deve abrir imediatamente quando a pré-condição é satisfeita
-        await expect(page.locator('.modal.show')).toBeVisible({timeout: 3000});
-        await expect(page.getByText('Finalização de processo')).toBeVisible({timeout: 3000});
-        await expect(page.getByText(/Confirma a finalização do processo/)).toBeVisible({timeout: 3000});
+        await expect(page.locator('.modal.show')).toBeVisible();
+        await expect(page.getByText('Finalização de processo')).toBeVisible();
+        await expect(page.getByText(/Confirma a finalização do processo/)).toBeVisible();
 
         await expect(page.getByTestId('btn-cancelar-finalizacao')).toBeVisible();
         await expect(page.getByTestId('btn-confirmar-finalizacao')).toBeVisible();

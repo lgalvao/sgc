@@ -43,8 +43,8 @@
                   <td>
                     <input
                       :id="'chk-' + unidade.sigla"
-                      :data-testid="'chk-unidade-' + unidade.sigla"
                       v-model="unidade.selecionada"
+                      :data-testid="'chk-unidade-' + unidade.sigla"
                       type="checkbox"
                       class="form-check-input"
                     >

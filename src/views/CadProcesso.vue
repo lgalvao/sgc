@@ -456,10 +456,20 @@ function fecharModalRemocao() {
 function confirmarRemocao() {
   if (processoEditando.value) {
     processosStore.removerProcesso(processoEditando.value.id)
-    notificacoesStore.sucesso(
-      'Processo removido',
-      `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`
-    )
+    // Marcar no localStorage para testes E2E (marcador rápido e estável)
+    try {
+      localStorage.setItem('lastRemovedProcess', descricao.value);
+    } catch {
+      // ignore localStorage errors in some environments
+    }
+    // Adicionar notificação com test-id explícito para facilitar verificação E2E
+    notificacoesStore.adicionarNotificacao({
+      tipo: 'success',
+      titulo: 'Processo removido',
+      mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
+      // testId estável que os testes podem esperar
+      testId: 'notificacao-remocao'
+    });
     router.push('/painel')
   }
   fecharModalRemocao()
