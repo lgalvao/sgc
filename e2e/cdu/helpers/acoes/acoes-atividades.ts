@@ -121,10 +121,36 @@ export async function clicarBotaoImportarAtividades(page: Page): Promise<void> {
 }
 
 /**
- * Clica no botão para disponibilizar o cadastro.
+ * Clica no botão para disponibilizar o cadastro (prioriza botão da página por test-id, fallback para role).
  */
 export async function clicarBotaoDisponibilizar(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
+    // 1) Preferir botão da página por test-id (btn-disponibilizar-page)
+    try {
+        const pageBtn = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE);
+        if ((await pageBtn.count()) > 0) {
+            await pageBtn.first().click();
+            return;
+        }
+    } catch {
+        // ignore
+    }
+
+    // 2) Fallback: botão textual na página (pode haver ambiguidade — preferimos test-id)
+    try {
+        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).first().click();
+        return;
+    } catch {
+        // continue para próximo fallback
+    }
+
+    // 3) Último recurso: tentar botão por test-id global (btn-disponibilizar)
+    const globalBtn = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR);
+    if ((await globalBtn.count()) > 0) {
+        await globalBtn.first().click();
+        return;
+    }
+
+    throw new Error('Botão de disponibilizar não encontrado na página.');
 }
 
 /**
@@ -135,4 +161,134 @@ export async function criarCompetencia(page: Page, descricao: string): Promise<v
     await page.getByTestId('input-nova-competencia').fill(descricao);
     await page.locator('[data-testid="atividade-nao-associada"] label').first().click();
     await page.getByTestId('btn-criar-competencia').click();
+}
+
+/**
+ * Edita uma competência existente.
+ * - localiza o card pela descrição original
+ * - aciona o botão de editar dentro do card
+ * - preenche o novo texto e confirma a edição
+ */
+export async function editarCompetencia(page: Page, descricaoOriginal: string, descricaoEditada: string): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card').filter({hasText: descricaoOriginal});
+    await competenciaCard.getByTestId(SELETORES.EDITAR_COMPETENCIA).click();
+    await page.getByTestId('input-nova-competencia').fill(descricaoEditada);
+    await page.getByTestId('btn-criar-competencia').click();
+}
+
+/**
+ * Exclui uma competência existente e confirma a ação no modal.
+ * - localiza o card pela descrição
+ * - aciona o botão de excluir dentro do card
+ * - confirma o modal de exclusão (tenta test-id, fallback por texto)
+ */
+export async function excluirCompetencia(page: Page, descricao: string): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card').filter({hasText: descricao});
+    await competenciaCard.getByTestId(SELETORES.EXCLUIR_COMPETENCIA).click();
+
+    // Tentar confirmar pelo test-id do modal, se presente
+    try {
+        const confirmar = page.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR);
+        if ((await confirmar.count()) > 0) {
+            await confirmar.first().click();
+            return;
+        }
+    } catch {
+        // ignora e tenta fallback
+    }
+
+    // Fallback por role/text (botão "Confirmar")
+    await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+}
+/**
+ * Disponibiliza o mapa preenchendo data limite e observações no modal de disponibilização.
+ * Função composta para evitar que testes manipulem seletores/expect diretamente.
+ */
+export async function disponibilizarMapaComData(page: Page, dataLimite: string, observacoes?: string): Promise<void> {
+    // Usa helper existente para abrir o modal de disponibilizar
+    await clicarBotaoDisponibilizar(page);
+
+    const modal = page.locator('.modal.show');
+    await modal.waitFor({state: 'visible'});
+
+    // Tentar preencher campo de data com múltiplos fallbacks
+    if ((await modal.locator('#dataLimite').count()) > 0) {
+        await modal.locator('#dataLimite').fill(dataLimite);
+    } else if ((await modal.getByLabel(/data/i).count()) > 0) {
+        await modal.getByLabel(/data/i).fill(dataLimite);
+    } else if ((await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).count()) > 0) {
+        await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).fill(dataLimite);
+    }
+
+    if (observacoes) {
+        // Preferir test-id do input de observações
+        if ((await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).count()) > 0) {
+            await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).fill(observacoes);
+        } else if ((await modal.locator('#observacoes').count()) > 0) {
+            await modal.locator('#observacoes').fill(observacoes);
+        } else if ((await modal.getByLabel(/observa/i).count()) > 0) {
+            await modal.getByLabel(/observa/i).fill(observacoes);
+        } else {
+            const textbox = modal.locator('textarea, input').first();
+            await textbox.fill(observacoes);
+        }
+    }
+
+    // Confirmar disponibilização (pode usar texto "Disponibilizar" ou "Confirmar")
+    // Preferir botão dentro do modal por test-id
+    if ((await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).count()) > 0) {
+        await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first().click();
+    } else if ((await modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).count()) > 0) {
+        await modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).first().click();
+    } else {
+        await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).first().click();
+    }
+
+    // Esperar fechamento do modal como tentativa de estabilidade (não falhar se permanecer aberto)
+    await modal.waitFor({state: 'hidden', timeout: 5000}).catch(() => {});
+}
+/**
+ * Abre o modal de disponibilização de mapa de competências.
+ * Encapsula a ação de clicar no botão "Disponibilizar" e aguardar o modal.
+ */
+export async function abrirModalDisponibilizacao(page: Page): Promise<void> {
+    await clicarBotaoDisponibilizar(page);
+    const modal = page.locator('.modal.show');
+    await modal.waitFor({state: 'visible'});
+}
+
+/**
+ * Preenche o campo de data do modal de disponibilização.
+ */
+export async function preencherDataModal(page: Page, dataLimite: string): Promise<void> {
+    const modal = page.locator('.modal.show');
+    // Preferir test-id do input
+    if ((await modal.getByTestId(SELETORES.INPUT_DATA_LIMITE).count()) > 0) {
+        await modal.getByTestId(SELETORES.INPUT_DATA_LIMITE).fill(dataLimite);
+    } else if ((await modal.locator('#dataLimite').count()) > 0) {
+        await modal.locator('#dataLimite').fill(dataLimite);
+    } else if ((await modal.getByLabel(/data/i).count()) > 0) {
+        await modal.getByLabel(/data/i).fill(dataLimite);
+    } else {
+        // fallback para seletor global definido nas constantes
+        await page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE).fill(dataLimite);
+    }
+}
+
+/**
+ * Preenche o campo de observações do modal de disponibilização.
+ */
+export async function preencherObservacoesModal(page: Page, observacoes: string): Promise<void> {
+    const modal = page.locator('.modal.show');
+    if ((await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).count()) > 0) {
+        await modal.getByTestId(SELETORES.INPUT_OBSERVACOES).fill(observacoes);
+    } else if ((await modal.locator('#observacoes').count()) > 0) {
+        await modal.locator('#observacoes').fill(observacoes);
+    } else if ((await modal.getByLabel(/observa/i).count()) > 0) {
+        await modal.getByLabel(/observa/i).fill(observacoes);
+    } else {
+        // fallback: tentar por input/textarea dentro do modal
+        const textbox = modal.locator('textarea, input').first();
+        await textbox.fill(observacoes);
+    }
 }

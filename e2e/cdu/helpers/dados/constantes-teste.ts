@@ -19,6 +19,7 @@ export const SELETORES = {
     // Test-ids específicos para modais e ações críticas
     BTN_MODAL_FECHAR: 'btn-modal-fechar',
     BTN_DISPONIBILIZAR: 'btn-disponibilizar',
+    BTN_DISPONIBILIZAR_PAGE: 'btn-disponibilizar-page',
     BTN_REGISTRAR_ACEITE: 'btn-registrar-aceite',
     BTN_DEVOLVER: 'btn-devolver',
     BTN_HOMOLOGAR: 'btn-homologar',
@@ -80,6 +81,7 @@ export const SELETORES = {
     INPUT_OBSERVACAO_VALIDACAO: 'input-observacao-validacao',
     // Inputs e selects utilizados em modais importantes
     INPUT_DATA_LIMITE: 'input-data-limite',
+    INPUT_OBSERVACOES: 'input-observacoes',
     INPUT_NOVA_DATA_LIMITE: 'input-nova-data-limite',
     INPUT_DESCRICAO_COMPETENCIA: 'input-descricao-competencia',
     SELECT_PROCESSO: 'select-processo',
@@ -155,6 +157,10 @@ export const TEXTOS = {
     ANALISE_REGISTRADA_SUCESSO: 'A análise foi registrada com sucesso!',
     ACEITE_REGISTRADO: 'Aceite registrado',
     CADASTRO_HOMOLOGADO_SUCESSO: 'O cadastro foi homologado com sucesso!',
+    // Novos textos para modal de disponibilização
+    DISPONIBILACAO_TITULO: 'Disponibilização do mapa de competências',
+    LABEL_DATA_LIMITE: 'Data limite para validação',
+    LABEL_OBSERVACOES: 'Observações'
 } as const;
 
 export const URLS = {

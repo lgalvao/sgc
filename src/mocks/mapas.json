@@ -73,7 +73,7 @@
     "id": 3,
     "unidade": "STIC",
     "idProcesso": 2,
-    "situacao": "disponibilizado",
+    "situacao": "em_andamento",
     "competencias": [
       {
         "id": 4,
@@ -102,7 +102,7 @@
       }
     ],
     "dataCriacao": "2025-06-01",
-    "dataDisponibilizacao": "2025-07-15",
+    "dataDisponibilizacao": null,
     "dataFinalizacao": null
   },
   {

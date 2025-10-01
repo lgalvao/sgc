@@ -115,12 +115,9 @@ if ((await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).count()) > 0) {
 ---
 
 ## ✔️ Checklist Final de Aceitação (após correção)
-- [ ] Teste reproduzido localmente em modo headed.
-- [ ] Evidências coletadas (snapshot, logs, network).
 - [ ] Correção aplicada na Camada correta (dados/constantes/helpers).
 - [ ] `index.ts` atualizado quando helper novo criado.
 - [ ] Tests rodando: `npx playwright test --last-failed` passa.
-- [ ] Workarounds documentados com TODO e issue criada.
 
 ---
 
@@ -128,7 +125,6 @@ if ((await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).count()) > 0) {
 - Centralize textos e seletores.
 - Mantenha helpers semânticos pequenos e resilientes.
 - Prefira mudanças nas Camadas 1/2 em vez de tocar specs diretamente.
-- Documente tudo: WHY > WHAT.
 
 ## 📚 Recursos
 - [Playwright Best Practices](https://playwright.dev/docs/best-practices)

@@ -99,3 +99,40 @@
 - `cancelarModal` cobre múltiplos botões de fechamento; reutilize-o em vez de criar interações diretas com o modal.
 - Fluxos de finalização exigem helpers dedicados para modal, bloqueios e notificações (ex.: `verificarModalFinalizacaoProcesso`, `verificarProcessoFinalizadoNoPainel`); centralize novos textos (`FINALIZACAO_BLOQUEADA`, `CONFIRMACAO_VIGENCIA_MAPAS`) em `TEXTOS`.
 - Exemplo: CDU-21 (Finalização de processo) — Exemplo de refatoração completa: o arquivo `spec` foi convertido em narrativa semântica, todas as interações e verificações estão em helpers reexportados, e as strings de UI necessárias foram centralizadas em `TEXTOS`. Use este caso como padrão para futuras refatorações de fluxos de finalização.
+### Revisão do guia (atualização)
+
+Observação: esta seção contém decisões e regras adicionais introduzidas após revisão prática do processo de refatoração. Ela corrige ambiguidades observadas no texto anterior e adiciona convenções para reduzir flutuações entre implementações de helpers e specs.
+
+- Eliminamos ambiguidades sobre onde tratar falhas transitórias:
+  - Especificações (arquivos `spec`) devem expressar apenas narrativas de usuário (pré-condição → ação → verificação).
+  - Toda lógica de tentativa/fallback e tratamento explícito de incertezas (ex.: tentar vários seletores, clicks forçados, timeouts alternativos) deve viver exclusivamente nos helpers da Camada 2.
+
+- Regra nova: try/catch é proibido nos `spec` (arquivos de teste).
+  - Justificativa: try/catch introduz branches e lógica de controle que poluem a narrativa do teste e dificultam leitura e manutenção.
+  - Implementação prática: qualquer cenário que hoje usa `try/catch` nos specs deve ser substituído por um helper na Camada 2 que encapsula o comportamento tolerante. Ex.: em vez de
+    - tentar fechar modal e depois verificar notificação no spec com try/catch,
+    - crie `verificarDisponibilizacaoConcluida(page)` na Camada 2 que encapsula os forks e expõe uma única chamada sem lógica no spec.
+  - Exceções: nenhuma — se a situação exigir tratamento especial, implemente um helper específico (ex.: `verificarModalImpactosAbertoComFallback`) e reexporte nos índices.
+
+- Convenção sobre verificações tolerantes:
+  - Preferir helpers que retornam void e lançam erros com mensagens claras quando o estado esperado não for alcançado.
+  - Helpers podem usar try/catch internamente para implementar fallbacks, mas devem encapsular essa complexidade e não expô-la ao spec.
+  - Nomes sugeridos: `verificarXComSucesso`, `verificarXComFallback`, `aguardarXOuNotificacao`.
+
+- Atualização rápida do checklist (adicionar itens):
+  - [ ] Não há `try/catch` nem condicionais (`if`) nos arquivos `spec`.
+  - [ ] Todos os cenários que precisavam de tratamento condicional foram movidos para helpers e reexportados.
+  - [ ] Todos os textos e seletores adicionais usados pelos novos helpers foram centralizados em `TEXTOS` e `SELETORES` antes de criar a verificação.
+
+- Boas práticas para migrar try/catch de specs para helpers:
+  1. Identifique o bloco `try/catch` no `spec`.
+  2. Extrair a lógica de fallback para uma função na Camada 2 com assinatura `async function nome(page: Page, ...): Promise<void>`.
+  3. Reexportar a função no `e2e/cdu/helpers/index.ts`.
+  4. Substituir o bloco no spec por uma única chamada sem lógica condicional.
+  5. Executar testes e, se necessário, ajustar mensagens/textos em `TEXTOS` e `SELETORES`.
+
+- Nota sobre manutenção e revisão:
+  - Ao revisar PRs, verifique explicitamente que não há `try/catch` nos specs e que os novos helpers foram reexportados nos `index.ts` correspondentes.
+  - Prefira nomes semânticos e em português para funções de helpers (ex.: `disponibilizarMapaComData`, `verificarDisponibilizacaoConcluida`).
+
+Fim da revisão.

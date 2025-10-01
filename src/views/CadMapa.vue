@@ -20,6 +20,7 @@
         <button
           :disabled="competencias.length === 0"
           class="btn btn-outline-success"
+          data-testid="btn-disponibilizar-page"
           @click="finalizarEdicao"
         >
           Disponibilizar
@@ -260,6 +261,7 @@
               >Data limite para validação</label>
               <input
                 id="dataLimite"
+                data-testid="input-data-limite"
                 v-model="dataLimiteValidacao"
                 class="form-control"
                 type="date"
@@ -272,6 +274,7 @@
               >Observações</label>
               <textarea
                 id="observacoes"
+                data-testid="input-observacoes"
                 v-model="observacoesDisponibilizacao"
                 class="form-control"
                 rows="3"
@@ -291,6 +294,7 @@
             <button
               class="btn btn-secondary"
               type="button"
+              data-testid="btn-modal-cancelar"
               @click="fecharModalDisponibilizar"
             >
               Cancelar
@@ -299,6 +303,7 @@
               :disabled="!dataLimiteValidacao"
               class="btn btn-success"
               type="button"
+              data-testid="btn-disponibilizar"
               @click="disponibilizarMapa"
             >
               Disponibilizar

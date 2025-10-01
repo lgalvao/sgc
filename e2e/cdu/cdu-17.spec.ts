@@ -1,90 +1,92 @@
-import {expect, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {criarCompetencia, irParaMapaCompetencias, loginComoAdmin, TEXTOS} from './helpers';
+import {
+    abrirModalDisponibilizacao,
+    criarCompetencia,
+    esperarTextoVisivel,
+    irParaMapaCompetencias,
+    loginComoAdmin,
+    preencherDataModal,
+    preencherObservacoesModal,
+    TEXTOS,
+    verificarBotaoDisponibilizarHabilitado,
+    verificarCampoObservacoesValor,
+    verificarModalDisponibilizacaoVisivel,
+    verificarModalFechado,
+    SELETORES
+} from './helpers';
 
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, 4, 'SESEL');
-    await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
-}
-
-async function criarCompetenciaSimples(page: Page, nome: string) {
-    await criarCompetencia(page, nome);
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
 test.describe('CDU-17: Disponibilizar mapa de competências', () => {
     test('deve exibir modal com título e campos corretos', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetenciaSimples(page, 'Competência Teste');
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
+        await criarCompetencia(page, 'Competência Teste');
 
-        await expect(page.getByRole('heading', {name: 'Disponibilização do mapa de competências'})).toBeVisible();
-        await expect(page.getByLabel('Data limite para validação')).toBeVisible();
-        await expect(page.getByLabel('Observações')).toBeVisible();
+        await abrirModalDisponibilizacao(page);
+        await verificarModalDisponibilizacaoVisivel(page);
     });
 
     test('deve preencher observações no modal', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetenciaSimples(page, 'Competência Teste');
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
-        await page.locator('#observacoes').fill('Observações de teste para CDU-17');
-        await expect(page.locator('#observacoes')).toHaveValue('Observações de teste para CDU-17');
+        await criarCompetencia(page, 'Competência Teste');
+
+        await abrirModalDisponibilizacao(page);
+        await preencherObservacoesModal(page, 'Observações de teste para CDU-17');
+        await verificarCampoObservacoesValor(page, 'Observações de teste para CDU-17');
     });
 
     test('deve validar data obrigatória', async ({page}) => {
         await navegarParaMapa(page);
+        await criarCompetencia(page, 'Competência Teste');
 
-        await criarCompetenciaSimples(page, 'Competência Teste');
+        await abrirModalDisponibilizacao(page);
+        await verificarBotaoDisponibilizarHabilitado(page, false);
 
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
-
-        const btnDisponibilizar = page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-        await expect(btnDisponibilizar).toBeDisabled();
-
-        await page.locator('#dataLimite').fill('2025-12-31');
-        await expect(btnDisponibilizar).toBeEnabled();
+        await preencherDataModal(page, '2025-12-31');
+        await verificarBotaoDisponibilizarHabilitado(page, true);
     });
 
     test('deve validar campos obrigatórios do modal', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetenciaSimples(page, 'Competência para Validação');
+        await criarCompetencia(page, 'Competência para Validação');
 
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
+        await abrirModalDisponibilizacao(page);
+        await verificarModalDisponibilizacaoVisivel(page);
 
-        await expect(page.getByRole('heading', {name: 'Disponibilização do mapa de competências'})).toBeVisible();
+        await verificarBotaoDisponibilizarHabilitado(page, false);
+        await preencherDataModal(page, '2025-12-31');
+        await verificarBotaoDisponibilizarHabilitado(page, true);
 
-        const btnDisponibilizar = page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-        await expect(btnDisponibilizar).toBeDisabled();
-
-        await page.locator('#dataLimite').fill('2025-12-31');
-        await expect(btnDisponibilizar).toBeEnabled();
-
-        await expect(page.getByLabel('Observações')).toBeVisible();
-        await page.locator('#observacoes').fill('Teste de observações');
-        await expect(page.locator('#observacoes')).toHaveValue('Teste de observações');
+        await preencherObservacoesModal(page, 'Teste de observações');
+        await verificarCampoObservacoesValor(page, 'Teste de observações');
     });
 
     test('deve processar disponibilização', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetenciaSimples(page, 'Competência para Disponibilizar');
+        await criarCompetencia(page, 'Competência para Disponibilizar');
 
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
-        await page.locator('#dataLimite').fill('2025-12-31');
-        await page.locator('#observacoes').fill('Observações de teste CDU-17');
+        await abrirModalDisponibilizacao(page);
+        await preencherDataModal(page, '2025-12-31');
+        await preencherObservacoesModal(page, 'Observações de teste CDU-17');
 
-        const btnDisponibilizar = page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-        await expect(btnDisponibilizar).toBeEnabled();
-        await btnDisponibilizar.click();
+        // confirmar disponibilização (usar test-id dentro do modal para evitar ambiguidade)
+        await verificarBotaoDisponibilizarHabilitado(page, true);
+        await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first().click();
     });
 
     test('deve cancelar disponibilização', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetenciaSimples(page, 'Competência Teste');
+        await criarCompetencia(page, 'Competência Teste');
 
-        await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
+        await abrirModalDisponibilizacao(page);
         await page.getByRole('button', {name: TEXTOS.CANCELAR}).click();
 
-        await expect(page.getByRole('heading', {name: 'Disponibilização do mapa de competências'})).not.toBeVisible();
-        await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+        await verificarModalFechado(page);
+        await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
     });
 });

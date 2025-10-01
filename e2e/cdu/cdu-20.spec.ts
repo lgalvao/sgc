@@ -61,9 +61,8 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     });
 
     test.describe('Ver sugestões', () => {
-        test.beforeEach(async ({page}) => await loginComoGestor(page));
-
         test('deve exibir botão Ver sugestões quando situação for "Mapa com sugestões"', async ({page}) => {
+            await loginComoGestor(page);
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
             await clicarBotaoHistoricoAnalise(page);
             await verificarModalHistoricoAnaliseAberto(page);
@@ -71,9 +70,8 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     });
 
     test.describe('Histórico de análise', () => {
-        test.beforeEach(async ({page}) => await loginComoGestor(page));
-
         test('deve exibir histórico de análise', async ({page}) => {
+            await loginComoGestor(page);
             await irParaVisualizacaoMapa(page, 1, 'SEDESENV');
             await clicarBotaoHistoricoAnalise(page);
             await verificarModalHistoricoAnaliseAberto(page);

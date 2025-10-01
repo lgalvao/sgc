@@ -15,7 +15,11 @@ export {
     verificarUrlDoPainel, // Corrigido: removido alias e adicionada função específica
     verificarModalVisivel,
     verificarModalFechado,
-    esperarNotificacaoLoginInvalido
+    esperarNotificacaoLoginInvalido,
+    verificarDisponibilizacaoConcluida,
+    verificarModalDisponibilizacaoVisivel,
+    verificarCampoObservacoesValor,
+    verificarBotaoDisponibilizarHabilitado
 } from './verificacoes-basicas';
 
 // Verificações de processo
@@ -84,10 +88,11 @@ export {
     verificarModalHistoricoAnaliseAberto,
     verificarAcoesAnaliseGestor,
     verificarAcaoHomologarVisivel,
-    verificarBotaoDisponibilizarHabilitado,
     verificarMensagemNenhumImpacto,
     verificarModalImpactosAberto,
     verificarModalImpactosFechado,
+    verificarCompetenciaVisivel,
+    verificarCompetenciaNaoVisivel,
     verificarListagemAtividadesEConhecimentos,
     verificarModoSomenteLeitura,
     verificarCabecalhoUnidade

@@ -331,12 +331,6 @@ export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<
     await expect(modal.getByText(/observa/i).first()).toBeVisible();
 }
 
-/**
- * Verifica se o botão "Disponibilizar" está habilitado.
- */
-export async function verificarBotaoDisponibilizarHabilitado(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR})).toBeEnabled();
-}
 
 /**
  * Verifica se a mensagem "Nenhum impacto no mapa da unidade" está visível.
@@ -361,6 +355,22 @@ export async function verificarModalImpactosAberto(page: Page): Promise<void> {
 export async function verificarModalImpactosFechado(page: Page): Promise<void> {
     const modal = page.getByTestId('impacto-mapa-modal');
     await expect(modal).not.toBeVisible();
+}
+
+/**
+ * Verifica se uma competência com a descrição fornecida está visível no mapa.
+ */
+export async function verificarCompetenciaVisivel(page: Page, descricao: string): Promise<void> {
+    const competencia = page.locator('.competencia-card', {hasText: descricao}).first();
+    await expect(competencia).toBeVisible();
+}
+
+/**
+ * Verifica que uma competência com a descrição fornecida NÃO está visível/no DOM.
+ */
+export async function verificarCompetenciaNaoVisivel(page: Page, descricao: string): Promise<void> {
+    const competencia = page.locator('.competencia-card', {hasText: descricao}).first();
+    await expect(competencia).not.toBeVisible();
 }
 
 /**
