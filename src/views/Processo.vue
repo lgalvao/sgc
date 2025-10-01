@@ -31,6 +31,7 @@
         <button
           v-if="perfilStore.perfilSelecionado === 'GESTOR'"
           class="btn btn-outline-primary"
+          data-testid="btn-aceitar-em-bloco"
           @click="abrirModalAceitarBloco"
         >
           <i class="bi bi-check-circle me-1" />
@@ -50,6 +51,7 @@
     <button
       v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === 'Em andamento'"
       class="btn btn-danger mt-3"
+      data-testid="btn-finalizar-processo"
       @click="finalizarProcesso"
     >
       Finalizar processo

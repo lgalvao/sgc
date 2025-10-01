@@ -34,9 +34,21 @@
     - Componente: VisAtividades.vue
     - Visualização de atividades e conhecimentos para a unidade dentro do processo
 
+- /processo/:idProcesso/:siglaUnidade/diagnostico-equipe
+    - Componente: DiagnosticoEquipe.vue
+    - Tela para o diagnóstico de competências da equipe.
+
+- /processo/:idProcesso/:siglaUnidade/ocupacoes-criticas
+    - Componente: OcupacoesCriticas.vue
+    - Tela para identificar ocupações críticas.
+
 - /unidade/:siglaUnidade
     - Componente: Unidade.vue
     - Detalhes da unidade fora do processo (responsável, mapa vigente e unidades subordinadas, se houver); para ADMIN, dá acesso ao cad. de atribuição temporária
+
+- /unidade/:siglaUnidade/mapa
+    - Componente: CadMapa.vue
+    - Edição/criação do mapa de competências no contexto da unidade.
 
 - /unidade/:siglaUnidade/atribuicao
     - Componente: CadAtribuicao.vue

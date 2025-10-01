@@ -8,8 +8,6 @@ O objetivo principal é garantir que cada arquivo de teste (`spec.ts`) seja uma 
 
 ## Estrutura dos Testes por CDU
 
-(A lista de CDUs e suas funcionalidades permanece a mesma...)
-
 ### CDU-01: Realizar login e exibir estrutura das telas
 - **Funcionalidades testadas:** Login, tratamento de erros, logout e visibilidade de componentes por perfil (ADMIN/SERVIDOR).
 
@@ -64,10 +62,6 @@ Cada arquivo de teste é a representação de um cenário de usuário, escrito d
 - **Reutilize os Utilitários de Fallback:** As funções em `refactoring-utils.ts` (`localizarElemento`, `clicarElemento`, `preencherCampo`) devem ser usadas para criar ações e verificações resilientes, evitando a repetição de código.
 - **Mantenha a Narrativa:** Ao escrever ou refatorar um teste, leia-o em voz alta. Se não soar como uma sequência de ações de um usuário, ele precisa ser simplificado.
 
-## Cobertura e Características
-
-(As seções de Cobertura de Perfis, Tipos de Processo, Fluxos, Características Técnicas e Cobertura Funcional permanecem válidas.)
-
 ## Conclusão
 
-A arquitetura de testes atual prioriza a clareza e a manutenibilidade, tratando os testes como documentação viva dos casos de uso do sistema. A refatoração dos helpers consolidou a robustez das interações em utilitários reutilizáveis, simplificando drasticamente a camada de especificação.
+A arquitetura de testes atual prioriza a clareza e a manutenibilidade, tratando os testes como documentação viva dos casos de uso do sistema. 

@@ -79,6 +79,7 @@ export const SELETORES = {
     MODAL_HISTORICO: 'modal-historico',
     INPUT_OBSERVACAO_DEVOLUCAO: 'input-observacao-devolucao',
     INPUT_OBSERVACAO_VALIDACAO: 'input-observacao-validacao',
+    INPUT_OBSERVACAO_ACEITE: 'input-observacao-aceite',
     // Inputs e selects utilizados em modais importantes
     INPUT_DATA_LIMITE: 'input-data-limite',
     INPUT_OBSERVACOES: 'input-observacoes',
@@ -95,6 +96,9 @@ export const SELETORES = {
     BTN_REGISTRAR_ACEITE_HOMOLOGAR: 'btn-registrar-aceite-homologar',
     BTN_ABRIR_MODAL_HOMOLOGAR_BLOCO: 'btn-abrir-modal-homologar-bloco',
     BTN_CONFIRMAR_ACAO_BLOCO: 'btn-confirmar-acao-bloco',
+    // Novas chaves para o Grupo 5
+    BTN_ACEITAR_EM_BLOCO: 'btn-aceitar-em-bloco',
+    BTN_FINALIZAR_PROCESSO: 'btn-finalizar-processo',
 } as const;
 
 export const TEXTOS = {

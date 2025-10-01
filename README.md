@@ -13,6 +13,16 @@ Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para 
 
 O projeto utiliza Vitest para testes unitários e Playwright para testes de integração (e2e). ESLint é usado para garantir a consistência do código.
 
+### Arquitetura dos Testes E2E
+
+Os testes E2E seguem uma arquitetura semântica em 3 camadas para garantir que sejam legíveis, robustos e fáceis de manter:
+
+1.  **Dados e Constantes (`/e2e/cdu/helpers/dados`):** Centraliza todos os seletores (`data-testid`), textos da UI e URLs, eliminando "strings mágicas" dos testes.
+2.  **Helpers - Ações e Verificações (`/e2e/cdu/helpers`):** Camada que encapsula toda a lógica de interação e verificação com o Playwright. As funções são nomeadas de forma semântica (ex: `criarProcessoCompleto`, `verificarProcessoFinalizadoNoPainel`) e são o único local onde `expect` e seletores complexos são permitidos.
+3.  **Especificações (`/e2e/cdu/*.spec.ts`):** Os arquivos de teste em si, que devem ser lidos como uma narrativa de usuário, orquestrando chamadas aos helpers sem conter detalhes técnicos.
+
+Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no código-fonte para criar seletores resilientes. Para uma documentação mais detalhada sobre a arquitetura e os helpers, consulte o [README dos testes E2E](./e2e/cdu/README.md).
+
 ### Localização dos Testes
 
 - **Testes Unitários (Vitest)**: Ficam localizados em diretórios `__tests__/` adjacentes aos arquivos que estão testando (ex: `src/components/__tests__/Navbar.spec.ts`).

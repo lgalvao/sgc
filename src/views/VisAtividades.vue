@@ -119,6 +119,7 @@
                 id="observacaoValidacao"
                 v-model="observacaoValidacao"
                 class="form-control"
+                data-testid="input-observacao-aceite"
                 rows="3"
               />
             </div>
@@ -216,6 +217,7 @@
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"
                 class="form-control"
+                data-testid="input-observacao-devolucao"
                 rows="3"
               />
             </div>
