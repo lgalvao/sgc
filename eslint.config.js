@@ -1,3 +1,5 @@
+// noinspection NpmUsedModulesInstalled
+
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
@@ -15,11 +17,8 @@ export default [
       "__mocks__/**"
     ],
   },
-    // Configurações recomendadas do TypeScript-ESLint
     ...tseslint.configs.recommended,
-    // Configurações recomendadas do Vue
     ...pluginVue.configs['flat/recommended'],
-    // Configuração principal para Vue, TS, JS files
   {
     files: ["**/*.{js,ts,vue}"],
     plugins: {
@@ -38,6 +37,18 @@ export default [
       },
     },
     rules: {
+      // Detect usages deprecadas (ex.: zod .passthrough())
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "CallExpression[callee.property.name='passthrough']",
+          "message": "Uso de .passthrough() está deprecado — substitua por .catchall(z.unknown()) ou ajuste o schema de forma explícita."
+        },
+        {
+          "selector": "MemberExpression[property.name='passthrough']",
+          "message": "Referência a .passthrough está deprecada — substitua por .catchall(z.unknown())."
+        }
+      ],
       // Custom overrides
       "vue/multi-word-component-names": "off",
       "@typescript-eslint/no-explicit-any": "off",

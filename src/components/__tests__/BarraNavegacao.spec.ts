@@ -1,6 +1,8 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {createPinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
+import {navigateAndAssertBreadcrumbs} from '@/test/uiHelpers';
 import {
     createRouter,
     createWebHistory,
@@ -95,8 +97,7 @@ describe('BarraNavegacao.vue', () => {
     let pinia: ReturnType<typeof createPinia>;
 
     beforeEach(() => {
-        pinia = createPinia();
-        setActivePinia(pinia);
+        pinia = initPinia();
 
         router = createRouter({
             history: createWebHistory(),
@@ -211,45 +212,23 @@ describe('BarraNavegacao.vue', () => {
     });
 
     describe('Lógica de Breadcrumbs (crumbs)', () => {
-        let perfilStore: ReturnType<typeof usePerfilStore>;
-
-        beforeEach(() => {
-            perfilStore = usePerfilStore();
-        })
-
-        it('deve exibir o breadcrumb home e o da página atual para uma rota simples', async () => {
-            await router.push('/alguma-pagina');
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(2);
-            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
-            expect(breadcrumbItems[1].text()).toBe('Alguma Página');
-        });
+      let perfilStore: ReturnType<typeof usePerfilStore>;
+   
+      beforeEach(() => {
+          perfilStore = usePerfilStore();
+      })
+   
+      it('deve exibir o breadcrumb home e o da página atual para uma rota simples', async () => {
+          await navigateAndAssertBreadcrumbs(router, mountComponent, '/alguma-pagina', ['Alguma Página']);
+      });
 
         it('deve popular a trilha para uma rota de processo', async () => {
-            await router.push('/processo/123');
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(2);
-            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
-            expect(breadcrumbItems[1].text()).toBe('Processo');
-            expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
+            await navigateAndAssertBreadcrumbs(router, mountComponent, '/processo/123', ['Processo']);
         });
 
         it('deve popular a trilha para uma rota de subprocesso para ADMIN', async () => {
             perfilStore.perfilSelecionado = Perfil.ADMIN;
-            await router.push('/processo/123/ABC');
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(3);
-            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
-            expect(breadcrumbItems[1].text()).toBe('Processo');
-            expect(breadcrumbItems[1].findComponent(RouterLink).props().to).toEqual({
-                name: 'Processo',
-                params: {idProcesso: 123}
-            });
-            expect(breadcrumbItems[2].text()).toBe('ABC');
-            expect(breadcrumbItems[2].find('a').exists()).toBe(false); // Last crumb is not a link
+            await navigateAndAssertBreadcrumbs(router, mountComponent, '/processo/123/ABC', ['Processo', 'ABC']);
         });
 
         it('deve popular a trilha para uma rota de subprocesso para CHEFE sem o crumb Processo', async () => {
@@ -265,23 +244,7 @@ describe('BarraNavegacao.vue', () => {
 
         it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa) para GESTOR', async () => {
             perfilStore.perfilSelecionado = Perfil.GESTOR;
-            await router.push('/processo/123/ABC/mapa');
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(4);
-            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
-            expect(breadcrumbItems[1].text()).toBe('Processo');
-            expect(breadcrumbItems[1].findComponent(RouterLink).props().to).toEqual({
-                name: 'Processo',
-                params: {idProcesso: 123}
-            });
-            expect(breadcrumbItems[2].text()).toBe('ABC');
-            expect(breadcrumbItems[2].findComponent(RouterLink).props().to).toEqual({
-                name: 'Subprocesso',
-                params: {idProcesso: 123, siglaUnidade: 'ABC'}
-            });
-            expect(breadcrumbItems[3].text()).toBe('Mapa');
-            expect(breadcrumbItems[3].find('a').exists()).toBe(false); // Last crumb is not a link
+            await navigateAndAssertBreadcrumbs(router, mountComponent, '/processo/123/ABC/mapa', ['Processo', 'ABC', 'Mapa']);
         });
 
         it('deve popular a trilha para uma rota de subprocesso com sub-página (mapa) para SERVIDOR sem o crumb Processo', async () => {
@@ -296,13 +259,7 @@ describe('BarraNavegacao.vue', () => {
         });
 
         it('deve popular a trilha para uma rota de unidade', async () => {
-            await router.push('/unidade/XYZ');
-            const wrapper = await mountComponent();
-            const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
-            expect(breadcrumbItems.length).toBe(2);
-            expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
-            expect(breadcrumbItems[1].text()).toBe('XYZ');
-            expect(breadcrumbItems[1].find('a').exists()).toBe(false); // Last crumb is not a link
+            await navigateAndAssertBreadcrumbs(router, mountComponent, '/unidade/XYZ', ['XYZ']);
         });
 
         it('deve popular a trilha para uma rota de unidade com sub-página (atribuicao)', async () => {

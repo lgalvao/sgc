@@ -1,39 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
 import {useAtividadesStore} from '../atividades';
 import type {Atividade, Conhecimento} from '@/types/tipos';
-
-const getMockAtividadesData = () => [
-    {
-        "id": 1,
-        "descricao": "Manutenção de sistemas administrativos criados pela unidade",
-        "idSubprocesso": 3,
-        "conhecimentos": [
-            {"id": 1, "descricao": "Criação de testes de integração em Cypress"}
-        ]
-    },
-    {
-        "id": 2,
-        "descricao": "Especificação de sistemas administrativos",
-        "idSubprocesso": 3,
-        "conhecimentos": [
-            {"id": 6, "descricao": "Modelagem de dados"}
-        ]
-    },
-    {
-        "id": 3,
-        "descricao": "Implantação de sistemas externos",
-        "idSubprocesso": 1, // Changed idSubprocesso for testing purposes
-        "conhecimentos": [
-            {"id": 40, "descricao": "Conhecimento em configuração de APIs de terceiros"}
-        ]
-    }
-];
+import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore} from '@/test/helpers';
 
 // Mock the atividades.json import at the top level
 vi.mock('../../mocks/atividades.json', async () => {
     return {
-        default: getMockAtividadesData(), // Use the function to get fresh data
+        default: getMockAtividadesData(), // Use the helper to get fresh data
     };
 });
 
@@ -41,7 +14,7 @@ describe('useAtividadesStore', () => {
     let atividadesStore: ReturnType<typeof useAtividadesStore>;
 
     beforeEach(async () => { // Make beforeEach async
-        setActivePinia(createPinia());
+        initPinia();
         // Dynamically import useAtividadesStore after the mock is set up
         const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
             useAtividadesStore: typeof useAtividadesStore
@@ -174,65 +147,39 @@ describe('useAtividadesStore', () => {
         });
 
         it('fetchAtividadesPorsubprocesso should fetch and add activities without duplication', async () => {
-            // Create a fresh store instance for this test
-            setActivePinia(createPinia());
-            const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
-                useAtividadesStore: typeof useAtividadesStore
-            };
-            const testAtividadesStore = useAtividadesStoreActual();
-
-            // Manually set the initial state for this test
-            testAtividadesStore.atividades = []; // Clear the array first
-            const initialAtividades = getMockAtividadesData();
-            testAtividadesStore.atividades = initialAtividades.map((a: Atividade) => ({
-                ...a,
-                conhecimentos: a.conhecimentos.map((c: Conhecimento) => ({...c}))
-            }));
-            testAtividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
-
-            // Spy on the fetchAtividadesPorsubprocesso action and mock its implementation
+            // Prepare a fresh store instance for this test using helper
+            const testAtividadesStore = await prepareFreshAtividadesStore();
+    
+            // Spy on the fetchAtividadesPorSubprocesso action and mock its implementation
             const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: number) {
                 const fetchedActivities: Atividade[] = [
                     {id: 4, descricao: "Fetched Activity 1", idSubprocesso: 3, conhecimentos: []},
                     {id: 1, descricao: "Existing Activity", idSubprocesso: 3, conhecimentos: []}, // Duplicate
                 ];
-
+    
                 const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.idSubprocesso === idSubprocesso);
-
+    
                 atividadesDoProcesso.forEach((novaAtividade: Atividade) => {
                     if (!testAtividadesStore.atividades.some((a: Atividade) => a.id === novaAtividade.id)) {
                         this.atividades.push(novaAtividade);
                     }
                 });
             });
-
+    
             const initialLength = testAtividadesStore.atividades.length; // This will be 3 (from mockAtividadesData)
             await testAtividadesStore.fetchAtividadesPorSubprocesso(3);
-
+    
             // Should add only non-duplicate fetched activity
             expect(testAtividadesStore.atividades.length).toBe(initialLength + 1); // Expects 3 + 1 = 4
             expect(testAtividadesStore.atividades.some((a: Atividade) => a.id === 4)).toBe(true);
             expect(testAtividadesStore.atividades.filter((a: Atividade) => a.id === 1).length).toBe(1); // Should not duplicate existing ID 1
-
+    
             fetchSpy.mockRestore(); // Restore the original implementation
         });
 
         it('fetchAtividadesPorSubprocesso should handle case when no activities found for subprocesso', async () => {
-            // Create a fresh store instance for this test
-            setActivePinia(createPinia());
-            const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
-                useAtividadesStore: typeof useAtividadesStore
-            };
-            const testAtividadesStore = useAtividadesStoreActual();
-
-            // Manually set the initial state for this test
-            testAtividadesStore.atividades = []; // Clear the array first
-            const initialAtividades = getMockAtividadesData();
-            testAtividadesStore.atividades = initialAtividades.map((a: Atividade) => ({
-                ...a,
-                conhecimentos: a.conhecimentos.map((c: Conhecimento) => ({...c}))
-            }));
-            testAtividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
+            // Prepare a fresh store instance for this test using helper
+            const testAtividadesStore = await prepareFreshAtividadesStore();
 
             const initialLength = testAtividadesStore.atividades.length;
 

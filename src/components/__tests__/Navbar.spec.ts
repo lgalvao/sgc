@@ -1,6 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, MockInstance, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {createPinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
 import {ref} from 'vue';
@@ -47,8 +48,7 @@ describe('Navbar.vue', () => {
     let pushSpy: MockInstance; // Remover os argumentos de tipo
 
     beforeEach(() => {
-        pinia = createPinia();
-        setActivePinia(pinia);
+        pinia = initPinia();
 
         router = createRouter({
             history: createWebHistory(),

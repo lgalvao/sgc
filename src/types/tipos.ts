@@ -49,9 +49,9 @@ export interface Subprocesso {
     dataLimiteEtapa2: Date | null;
     dataFimEtapa2: Date | null;
     sugestoes?: string;
-    observacoes?: string; // Adicionado
-    movimentacoes: Movimentacao[]; // Adicionado
-    analises: AnaliseValidacao[]; // Adicionado
+    observacoes?: string;
+    movimentacoes: Movimentacao[];
+    analises: AnaliseValidacao[];
     idMapaCopiado?: number;
 }
 

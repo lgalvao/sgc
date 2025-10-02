@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {mapResultadoAnalise, parseAnaliseDates, useAnalisesStore} from '../analises';
 import {ResultadoAnalise} from '@/types/tipos';
 
@@ -7,7 +7,7 @@ describe('useAnalisesStore', () => {
     let analisesStore: ReturnType<typeof useAnalisesStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         analisesStore = useAnalisesStore();
     });
 

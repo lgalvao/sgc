@@ -1,10 +1,11 @@
 import {defineStore} from 'pinia';
 import unidadesMock from '../mocks/unidades.json' assert {type: 'json'};
 import type {Unidade} from '@/types/tipos';
+import {mapUnidadesArray} from '@/mappers/unidades';
 
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
-        unidades: unidadesMock as unknown as Unidade[]
+        unidades: mapUnidadesArray(unidadesMock as any) as Unidade[]
     }),
     actions: {
         pesquisarUnidade(this: ReturnType<typeof useUnidadesStore>, sigla: string, units: Unidade[] = this.unidades): Unidade | null {
@@ -20,7 +21,7 @@ export const useUnidadesStore = defineStore('unidades', {
         getUnidadesSubordinadas(siglaUnidade: string): string[] {
             const unidadesEncontradas: string[] = [];
             const stack: Unidade[] = [];
-
+ 
             const unidadeRaiz = this.pesquisarUnidade(siglaUnidade);
             if (unidadeRaiz) {
                 stack.push(unidadeRaiz);
@@ -38,18 +39,18 @@ export const useUnidadesStore = defineStore('unidades', {
         },
         getUnidadeSuperior(siglaUnidade: string): string | null {
             const stack: { unit: Unidade, parentSigla: string | null }[] = [];
-
+ 
             for (const unidade of this.unidades) {
                 stack.push({unit: unidade, parentSigla: null});
             }
-
+ 
             while (stack.length > 0) {
                 const {unit: currentUnidade, parentSigla: currentParentSigla} = stack.pop()!;
-
+ 
                 if (currentUnidade.sigla === siglaUnidade) {
                     return currentParentSigla;
                 }
-
+ 
                 if (currentUnidade.filhas) {
                     for (let i = currentUnidade.filhas.length - 1; i >= 0; i--) {
                         stack.push({unit: currentUnidade.filhas[i], parentSigla: currentUnidade.sigla});

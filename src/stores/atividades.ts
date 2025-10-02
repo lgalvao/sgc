@@ -2,10 +2,11 @@ import {defineStore} from 'pinia';
 import atividadesMock from '../mocks/atividades.json';
 import type {Atividade, Conhecimento} from '@/types/tipos';
 import {TipoMudanca, useRevisaoStore} from './revisao';
+import {mapAtividadesArray} from '@/mappers/entidades';
 
 export const useAtividadesStore = defineStore('atividades', {
     state: () => {
-        const atividades = atividadesMock as Atividade[];
+        const atividades = mapAtividadesArray(atividadesMock as any) as Atividade[];
         let maxId = 0;
         atividades.forEach(atividade => {
             if (atividade.id > maxId) maxId = atividade.id;

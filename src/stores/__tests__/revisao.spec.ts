@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {TipoMudanca, useRevisaoStore} from '../revisao';
 
 // Mock the mapas store before importing the revisao store
@@ -15,7 +15,7 @@ describe('useRevisaoStore', () => {
     let revisaoStore: ReturnType<typeof useRevisaoStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         revisaoStore = useRevisaoStore();
         revisaoStore.limparMudancas();
         revisaoStore.setMudancasParaImpacto([]);

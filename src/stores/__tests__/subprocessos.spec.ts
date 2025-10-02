@@ -1,14 +1,15 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
 import {useSubprocessosStore} from '../subprocessos';
+import {initPinia} from '@/test/helpers';
 
 describe('useSubprocessosStore', () => {
     let subprocessosStore: ReturnType<typeof useSubprocessosStore>;
 
+  
     beforeEach(() => {
-        setActivePinia(createPinia());
-        subprocessosStore = useSubprocessosStore();
-    });
+          initPinia();
+          subprocessosStore = useSubprocessosStore();
+      });
 
     it('should initialize with mock subprocessos', () => {
         expect(subprocessosStore.subprocessos.length).toBeGreaterThan(0);

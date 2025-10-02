@@ -1,9 +1,9 @@
 import {beforeEach, describe, expect, it, Mock, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
 import {mapSituacaoProcesso, mapTipoProcesso, useProcessosStore} from '../processos'; // Importar as funções diretamente
 import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 import {useNotificacoesStore} from '../notificacoes';
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'; // Adicionado
+import {initPinia} from '@/test/helpers';
 
 // Mock the JSON imports
 vi.mock('../../mocks/processos.json', () => ({
@@ -214,8 +214,9 @@ describe('useProcessosStore', () => {
         idMapaCopiado: pu.idMapaCopiado,
     });
 
+    
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         processosStore = useProcessosStore();
         vi.clearAllMocks(); // Limpar todos os mocks antes de cada teste
         // Manually reset the store state based on the initial mock data, parsing dates

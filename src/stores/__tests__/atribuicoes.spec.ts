@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {useAtribuicaoTemporariaStore} from '../atribuicoes';
 import type {AtribuicaoTemporaria} from '@/types/tipos';
 
@@ -7,7 +7,7 @@ describe('useAtribuicaoTemporariaStore', () => {
     let atribuicaoTemporariaStore: ReturnType<typeof useAtribuicaoTemporariaStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
         atribuicaoTemporariaStore.$patch({atribuicoes: []});
     });

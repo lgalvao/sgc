@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {useServidoresStore} from '../servidores';
 
 // Mock the servidores.json import
@@ -26,7 +26,7 @@ describe('useServidoresStore', () => {
     let servidoresStore: ReturnType<typeof useServidoresStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         servidoresStore = useServidoresStore();
         // Manually reset the store state based on the initial mock data
         servidoresStore.$patch({

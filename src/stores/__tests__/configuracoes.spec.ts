@@ -1,4 +1,4 @@
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {useConfiguracoesStore} from '../configuracoes';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -20,8 +20,8 @@ Object.defineProperty(window, 'localStorage', {value: localStorageMock});
 
 describe('Configuracoes Store', () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
-        localStorageMock.clear(); // Limpa o localStorage antes de cada teste
+          initPinia();
+          localStorageMock.clear(); // Limpa o localStorage antes de cada teste
         // Reset mocks for localStorage methods
         vi.spyOn(localStorageMock, 'getItem').mockRestore();
         vi.spyOn(localStorageMock, 'setItem').mockRestore();

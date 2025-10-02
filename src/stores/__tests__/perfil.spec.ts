@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {usePerfilStore} from '../perfil';
 import {Perfil} from "@/types/tipos";
 
@@ -30,7 +31,7 @@ describe('usePerfilStore', () => {
         mockLocalStorage.clear();
         mockLocalStorage.setItem('idServidor', '9'); // Set default for initial state
 
-        setActivePinia(createPinia());
+        initPinia();
         perfilStore = usePerfilStore();
         // Reset the store state to its initial values based on mocked localStorage
         perfilStore.$reset();

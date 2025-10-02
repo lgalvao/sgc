@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {useAlertasStore} from '../alertas';
 import {usePerfilStore} from '../perfil';
 import type {Alerta} from '@/types/tipos';
@@ -65,7 +65,7 @@ describe('useAlertasStore', () => {
     let alertasStore: ReturnType<typeof useAlertasStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         alertasStore = useAlertasStore();
         // Reset the store state to the mock data before each test
         alertasStore.$reset(); // Pinia's $reset() method

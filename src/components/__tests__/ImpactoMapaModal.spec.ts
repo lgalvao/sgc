@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {TipoMudanca} from '@/stores/revisao';
 import type {Atividade, Competencia, Conhecimento, Mapa, Processo, Unidade} from '@/types/tipos';
 
@@ -95,7 +95,7 @@ vi.mock('@/stores/revisao', async (importOriginal) => {
 
 describe('ImpactoMapaModal.vue', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    initPinia();
 
     // Inicializar e configurar os mocks
     mockUnidadesStore.pesquisarUnidade = vi.fn(() => mockUnidade);

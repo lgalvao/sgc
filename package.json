@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.ts --fix",
+    "lint": "eslint . --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
@@ -16,8 +16,6 @@
     "coverage:unit:watch": "vitest --coverage",
     "coverage:e2e": "cross-env COLLECT_COVERAGE=true playwright test",
     "coverage:clean": "rimraf coverage .nyc_output .nyc_output_unit .nyc_output_e2e",
-    "screenshots:clean": "node scripts/clean-screenshots.js",
-    "screenshots:clean-and-test": "npm run screenshots:clean && npm run test:e2e",
     "coverage:report": "npm run coverage:unit && echo 'Coverage report generated in coverage/ directory'"
   },
   "dependencies": {
@@ -48,7 +46,7 @@
     "nyc": "^17.1.0",
     "playwright": "^1.55.1",
     "rimraf": "^6.0.1",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7",
     "vite-plugin-istanbul": "^7.2.0",

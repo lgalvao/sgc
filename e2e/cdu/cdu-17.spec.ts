@@ -8,12 +8,12 @@ import {
     loginComoAdmin,
     preencherDataModal,
     preencherObservacoesModal,
+    SELETORES,
     TEXTOS,
     verificarBotaoDisponibilizarHabilitado,
     verificarCampoObservacoesValor,
     verificarModalDisponibilizacaoVisivel,
-    verificarModalFechado,
-    SELETORES
+    verificarModalFechado
 } from './helpers';
 
 async function navegarParaMapa(page: Page) {

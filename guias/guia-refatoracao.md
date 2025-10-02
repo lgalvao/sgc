@@ -1,48 +1,62 @@
-# Guia de Refatoração e Desenvolvimento
+# Guia de Refatoração
 
-Este é um documento vivo que sumariza as lições aprendidas e as boas práticas observadas durante o processo de desenvolvimento, com foco em estratégias para modificação de código, depuração e resolução de problemas.
+Este guia documenta as convenções e passos recomendados para refatorações no projeto SGC.
 
-## 0. Princípios
+Objetivo
+- Padronizar mapeamentos entre o modelo relacional (snake_case) e a representação do frontend (camelCase).
+- Garantir contratos de dados via validação de mocks.
+- Minimizar mudanças disruptivas no backend usando mappers/adapters.
 
-*   **Seja Pragmático:** Não hesite em usar a abordagem "Ler, Modificar, Escrever" em vez de insistir em um `replace` que não funciona. O importante é progredir de forma segura.
-*   **Reconheça e Adapte-se:** Se uma estratégia não está funcionando, pare, analise o motivo e mude a abordagem.
-*   **Comunicação:** Se estiver em dúvida sobre o comportamento esperado ou a melhor forma de implementar algo, confirme o entendimento com o usuário.
+Resumo das decisões de mapeamento
+- Converter chaves snake_case → camelCase no frontend.
+- Campos de identificação:
+  - Abordagem híbrida: preservar `id: number` quando presente e também manter `titulo`/`usuarioTitulo` quando disponível.
+  - Frontend deve preferir `id` numérico para operações internas; manter `titulo` como referência funcional.
+- Datas: normalizar para ISO e converter para Date objetos no frontend usando `parseDate`.
+- Situações/enums: usar códigos do BD como fonte de verdade e helpers para labels (ver [`src/constants/situacoes.ts`](src/constants/situacoes.ts:1)).
 
-## 1. Entendimento do Contexto Existente
+Localização dos mappers
+- [`src/mappers/servidores.ts`](src/mappers/servidores.ts:1) — mapeia `VW_USUARIO` → `Servidor`.
+- [`src/mappers/unidades.ts`](src/mappers/unidades.ts:1) — mapeia `UNIDADE`, `UNIDADE_PROCESSO` → `Unidade` / `UnidadeSnapshot`.
+- [`src/mappers/entidades.ts`](src/mappers/entidades.ts:1) — mapas, atividades, competências, conhecimentos, movimentações, análises, alertas.
 
-*   **Análise Profunda:** Antes de qualquer alteração, dedique tempo para entender a arquitetura existente, os padrões de código, as convenções de nomenclatura e o fluxo de dados. Isso inclui ler arquivos relacionados, testes e configurações.
-*   **Mapeamento de Dependências:** Compreenda como os diferentes módulos e componentes interagem. Use ferramentas como `glob` e `search_file_content` para mapear as dependências e encontrar onde as funções ou componentes são utilizados.
-*   **Rede de Segurança com Testes:** Se a funcionalidade a ser alterada já possui testes, execute-os para garantir que estão passando e que servirão como uma rede de segurança. Se não houver testes, considere criar testes de alto nível antes de refatorar.
+Exemplos rápidos
+- snake_case JSON: `{ "codigo": 1, "nome": "X", "data_hora": "01/01/2020" }`
+- Depois do mapper: `{ id: 1, nome: "X", dataHora: "2020-01-01T00:00:00.000Z" }` (convertido para Date no frontend)
 
-## 2. Estratégias de Modificação de Código
+Validação e transformação de mocks
+- Validar: execute `node scripts/validar-mocks.js` (usa schemas Zod em [`src/validators/mocks.ts`](src/validators/mocks.ts:1)).
+- Transformar (dry-run): `node scripts/transformar-mocks-para-formato-frontend.js --dry`
+- Aplicar transformações: `node scripts/transformar-mocks-para-formato-frontend.js --apply`
+- Os backups são gerados em `src/mocks/backups/<timestamp>/` antes de sobrescrever.
 
-Para modificações complexas, múltiplas ou quando a sensibilidade do `replace` é um problema, a abordagem mais robusta e recomendada é:
+Checklist de qualidade antes de merge
+1. Rodar lint: `npm run lint`
+2. Rodar typecheck: `npm run typecheck`
+3. Rodar testes unitários: `npm run test:unit`
+4. Rodar testes E2E: `npx playwright test` (quando aplicável)
+5. Validar mocks: `node scripts/validar-mocks.js`
 
-1.  **Ler o arquivo inteiro** com `read_file`.
-2.  **Fazer as modificações no conteúdo em memória** (usando métodos de string ou manipulação de código).
-3.  **Escrever o conteúdo modificado de volta** com `write_file`, sobrescrevendo o arquivo original.
+Como adicionar um novo mapper
+- Criar função em `src/mappers/*` seguindo padrões existentes.
+- Tratar chaves alternativas (codigo/id; data_hora/dataHora).
+- Usar `parseDate` de `src/utils` para normalizar datas.
+- Adicionar testes unitários em `src/mappers/__tests__/`.
+- Atualizar stores para consumir o mapper em vez de manipular raw mocks.
 
-### Ferramenta `replace` (Para Alterações Cirúrgicas)
+Política de identificadores (detalhes)
+- Preferir trabalhar com `id: number` internamente.
+- Se o backend expõe `usuario_titulo` apenas como string chave, preserve-o no objeto mapeado (campo `usuarioTitulo`).
+- Evitar remover campos originais nos mappers — preserve informações úteis para diagnóstico.
 
-A ferramenta `replace` é poderosa para alterações granulares, mas exige precisão absoluta. Use-a quando a mudança for pequena e bem definida.
+Notas sobre enums e situações
+- Centralizar códigos em [`src/constants/situacoes.ts`](src/constants/situacoes.ts:1).
+- Mapear strings vindas do backend para enums TypeScript quando necessário (usar mappers para isso).
 
-*   **Precisão Extrema:** O argumento `old_string` deve ser **exatamente** igual ao texto no arquivo, incluindo quebras de linha, espaços e indentação.
-*   **Obtenha o Conteúdo Real:** Sempre use `read_file` imediatamente antes de um `replace` para copiar o `old_string` diretamente do arquivo.
-*   **Contexto é fundamental:** Inclua contexto suficiente (pelo menos 3 linhas antes e depois) no `old_string` para garantir que a correspondência seja única.
-*   **Múltiplas Substituições:** Se precisar substituir múltiplas ocorrências, o valor de `expected_replacements` deve ser **exato**.
+Passos operacionais para este repositório
+- Quando alterar mappers: atualizar e executar os testes unitários que cobrem os converters.
+- Se aplicar transformações nos mocks, revisar diffs do backup vs novo mock.
 
-## 3. Verificação e Validação
-
-Após cada alteração significativa, execute os seguintes comandos nesta ordem para garantir a qualidade e a correção do código.
-
-1.  **Linting (`npm run lint`):** Verifica o estilo do código e captura erros comuns. É a verificação mais rápida e deve ser a primeira.
-2.  **Verificação de Tipos (`npm run typecheck`):** Analisa o código TypeScript em busca de erros de tipo. Erros em arquivos de teste (`.spec.ts`) muitas vezes indicam que os *mocks* precisam ser atualizados para refletir as mudanças no código de produção.
-3.  **Testes Unitários (`npm run test`):** Executa a suíte de testes para validar a lógica da aplicação. Para agilizar, você pode rodar testes para um arquivo específico: `npm run test -- nome-do-arquivo.spec.ts`.
-
-## 4. Fluxo de Trabalho de Refatoração Recomendado
-
-1.  **Compreensão:** Inicie com a análise descrita na Seção 1.
-2.  **Implementação Cautelosa:** Aplique uma pequena e lógica alteração usando a estratégia da Seção 2.
-3.  **Verificação Contínua:** Execute o ciclo de validação da Seção 3 (`lint`, `typecheck`, `test`). Corrija os problemas antes de prosseguir.
-4.  **Repetição:** Volte ao passo 2 e continue fazendo pequenas alterações e verificações até que a refatoração esteja completa.
-5.  **Commit Atômico:** Agrupe as alterações em um commit lógico e bem descrito. Use `git status` e `git diff HEAD` para revisar tudo antes de comitar. Uma boa mensagem de commit explica o "porquê" da mudança, não apenas o "o quê".
+Histórico e contato
+- Mudanças principais: mappers implementados, validação Zod adicionada, transformador de mocks criado.
+- Para dúvidas, contate o autor do PR ou mantenedor do repositório.

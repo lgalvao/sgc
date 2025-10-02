@@ -1,13 +1,13 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {type TipoNotificacao, useNotificacoesStore} from '../notificacoes';
 
 describe('useNotificacoesStore', () => {
     let notificacoesStore: ReturnType<typeof useNotificacoesStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
-        notificacoesStore = useNotificacoesStore();
+          initPinia();
+          notificacoesStore = useNotificacoesStore();
         vi.useFakeTimers();
     });
 

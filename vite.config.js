@@ -37,6 +37,6 @@ export default defineConfig({
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
     },
     build: {
-        sourcemap: true, // Explicitly enable sourcemaps to hide the message
+        sourcemap: true
     },
 });

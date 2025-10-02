@@ -3,16 +3,16 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {
     criarCompetencia,
     editarCompetencia,
-    excluirCompetencia,
     esperarBotaoVisivel,
     esperarElementoVisivel,
     esperarTextoVisivel,
+    excluirCompetencia,
     gerarNomeUnico,
     irParaMapaCompetencias,
     loginComoAdmin,
     TEXTOS,
-    verificarCompetenciaVisivel,
-    verificarCompetenciaNaoVisivel
+    verificarCompetenciaNaoVisivel,
+    verificarCompetenciaVisivel
 } from './helpers';
 
 async function navegarParaMapa(page: Page) {

@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import {useMapasStore} from '../mapas';
 import type {Competencia, Mapa} from '@/types/tipos';
 
@@ -35,7 +35,7 @@ describe('useMapasStore', () => {
     let mapasStore: ReturnType<typeof useMapasStore>;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        initPinia();
         mapasStore = useMapasStore();
         // Reset the store state to the mock data before each test
         // Manually reset the state based on the initial mock data, parsing dates

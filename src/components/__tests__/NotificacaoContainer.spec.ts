@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
-import {createPinia, setActivePinia} from 'pinia';
+import {createPinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
 import NotificacaoContainer from '../NotificacaoContainer.vue';
 import {type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
 import {iconeTipo} from '@/utils';
@@ -10,8 +11,7 @@ describe('NotificacaoContainer.vue', () => {
     let pinia: ReturnType<typeof createPinia>;
 
     beforeEach(() => {
-        pinia = createPinia();
-        setActivePinia(pinia);
+        pinia = initPinia();
         notificacoesStore = useNotificacoesStore();
     });
 

@@ -1,14 +1,16 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
 import {useUnidadesStore} from '../unidades';
+import {initPinia} from '@/test/helpers';
+import {expectContainsAll} from '@/test/uiHelpers';
 
 describe('useUnidadesStore', () => {
     let unidadesStore: ReturnType<typeof useUnidadesStore>;
 
+  
     beforeEach(() => {
-        setActivePinia(createPinia());
-        unidadesStore = useUnidadesStore();
-    });
+          initPinia();
+          unidadesStore = useUnidadesStore();
+      });
 
     it('should initialize with mock unidades', () => {
         expect(unidadesStore.unidades.length).toBeGreaterThan(0);
@@ -41,33 +43,17 @@ describe('useUnidadesStore', () => {
 
         it('getUnidadesSubordinadas should return direct and indirect subordinate units for a root unit (e.g., "SEDOC")', () => {
             const subordinadas = unidadesStore.getUnidadesSubordinadas('SEDOC');
-            expect(subordinadas).toContain('SGP');
-            expect(subordinadas).toContain('COEDE');
-            expect(subordinadas).toContain('SEMARE');
-            expect(subordinadas).toContain('STIC');
-            expect(subordinadas).toContain('COSIS');
-            expect(subordinadas).toContain('SEDESENV');
-            expect(subordinadas).toContain('SEDIA');
-            expect(subordinadas).toContain('SESEL');
-            expect(subordinadas).toContain('COSINF');
-            expect(subordinadas).toContain('SENIC');
-            expect(subordinadas).toContain('COJUR');
-            expect(subordinadas).toContain('SEJUR');
-            expect(subordinadas).toContain('SEPRO');
+            expectContainsAll(subordinadas, [
+              'SGP','COEDE','SEMARE','STIC','COSIS','SEDESENV','SEDIA','SESEL','COSINF','SENIC','COJUR','SEJUR','SEPRO'
+            ]);
             expect(subordinadas.length).toBe(14); // Total de unidades no mock
         });
 
         it('getUnidadesSubordinadas should return subordinate units for an intermediate unit (e.g., "STIC")', () => {
             const subordinadas = unidadesStore.getUnidadesSubordinadas('STIC');
-            expect(subordinadas).toContain('COSIS');
-            expect(subordinadas).toContain('SEDESENV');
-            expect(subordinadas).toContain('SEDIA');
-            expect(subordinadas).toContain('SESEL');
-            expect(subordinadas).toContain('COSINF');
-            expect(subordinadas).toContain('SENIC');
-            expect(subordinadas).toContain('COJUR');
-            expect(subordinadas).toContain('SEJUR');
-            expect(subordinadas).toContain('SEPRO');
+            expectContainsAll(subordinadas, [
+              'COSIS','SEDESENV','SEDIA','SESEL','COSINF','SENIC','COJUR','SEJUR','SEPRO'
+            ]);
             expect(subordinadas.length).toBe(10);
         });
 
