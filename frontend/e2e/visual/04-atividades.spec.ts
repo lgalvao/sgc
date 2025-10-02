@@ -10,7 +10,7 @@ import {
     loginComoServidor,
     navegarParaCadastroAtividades,
     navegarParaVisualizacaoAtividades
-} from "~/cdu/helpers";
+} from "../cdu/helpers";
 
 test.describe('Captura de Telas - Atividades', () => {
     test('19 - Detalhes de Subprocesso (CHEFE)', async ({page}) => {
