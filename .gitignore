@@ -1,13 +1,19 @@
-logs
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/src/main/resources/static/
+
+# Spring Boot
 *.log
-npm-debug.log*
-node_modules
-dist
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-/playwright-report/
-/test-results/
-/screenshots/
-/coverage/
