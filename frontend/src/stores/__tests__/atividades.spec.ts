@@ -151,13 +151,14 @@ describe('useAtividadesStore', () => {
             const testAtividadesStore = await prepareFreshAtividadesStore();
     
             // Spy on the fetchAtividadesPorSubprocesso action and mock its implementation
-            const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: number) {
+            const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: unknown) {
+                const id = idSubprocesso as number;
                 const fetchedActivities: Atividade[] = [
                     {id: 4, descricao: "Fetched Activity 1", idSubprocesso: 3, conhecimentos: []},
                     {id: 1, descricao: "Existing Activity", idSubprocesso: 3, conhecimentos: []}, // Duplicate
                 ];
     
-                const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.idSubprocesso === idSubprocesso);
+                const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.idSubprocesso === id);
     
                 atividadesDoProcesso.forEach((novaAtividade: Atividade) => {
                     if (!testAtividadesStore.atividades.some((a: Atividade) => a.id === novaAtividade.id)) {

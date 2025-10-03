@@ -1,19 +1,59 @@
 spring:
-  application:
-    name: sgc
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: leonardo
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: sgc
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-  h2:
-    console:
-      enabled: true
 
 server:
   port: 8080
+
+# Propriedades do Sistema Acesso (placeholder)
+sistema-acesso:
+  url: https://sistema-acesso.example.com
+  apiKey: YOUR_API_KEY_HERE
+  maxRetries: 3
+  baseBackoffMs: 200
+  maxBackoffMs: 2000
+  connectTimeoutMs: 2000
+  readTimeoutMs: 5000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: leonardo
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: sgc
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false
+
+# Propriedades especiais para teste - apontar para um mock/local ou deixar vazio
+sistema-acesso:
+  url: http://localhost:9999
+  apiKey: test-key
+  maxRetries: 1
+  baseBackoffMs: 10
+  maxBackoffMs: 50
+  connectTimeoutMs: 500
+  readTimeoutMs: 1000
 
 ---
 spring:
