@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "VINCULACAO_UNIDADE")
+@Table(name = "VINCULACAO_UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor

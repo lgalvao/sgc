@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "UNIDADE_MAPA")
+@Table(name = "UNIDADE_MAPA", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor

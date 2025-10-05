@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "ADMINISTRADOR")
+@Table(name = "ADMINISTRADOR", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Testes de integração para os endpoints de Processo: create, iniciar, finalizar.
- * Usam H2 em memória (profile test).
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -89,7 +88,7 @@ public class ProcessoControllerIntegrationTest {
 
         // Iniciar processo (MAPEAMENTO) — enviar lista de unidades no corpo
         String unidadesJson = objectMapper.writeValueAsString(List.of(u1.getCodigo(), u2.getCodigo()));
-        mockMvc.perform(post("/api/processos/" + processoId + "/iniciar")
+        mockMvc.perform(post("/api/processos/%d/iniciar".formatted(processoId))
                         .param("tipo", "MAPEAMENTO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(unidadesJson))
@@ -103,14 +102,14 @@ public class ProcessoControllerIntegrationTest {
         assertThat(ups).anyMatch(u -> "UT2".equals(u.getSigla()));
 
         // Tentar iniciar novamente — deve retornar 400 (já iniciado)
-        mockMvc.perform(post("/api/processos/" + processoId + "/iniciar")
+        mockMvc.perform(post("/api/processos/%d/iniciar".formatted(processoId))
                         .param("tipo", "MAPEAMENTO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(unidadesJson))
                 .andExpect(status().isBadRequest());
 
         // Finalizar processo
-        mockMvc.perform(post("/api/processos/" + processoId + "/finalizar"))
+        mockMvc.perform(post("/api/processos/%d/finalizar".formatted(processoId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacao").value("FINALIZADO"));
 

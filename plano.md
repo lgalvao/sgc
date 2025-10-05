@@ -6,7 +6,6 @@ Objetivo: produzir um plano técnico e executável para implementar no backend o
 
 - Escopo: análise completa dos CDUs listados em [`reqs/`](reqs:1); definição de endpoints, DTOs, entidades, repositórios, serviços, eventos assíncronos, regras de estado e plano de testes.
 - Premissas:
-  - Backend Spring Boot + Spring Data JPA + H2 para testes.
   - Integração de autenticação via serviço externo (Sistema Acesso) conforme [`reqs/cdu-01.md`](reqs/cdu-01.md:1).
   - Modelo de dados base descrito em [`reqs/modelo-dados.md`](reqs/modelo-dados.md:1).
 
@@ -53,7 +52,6 @@ Objetivo: produzir um plano técnico e executável para implementar no backend o
   - Serviços: PainelService -> aplicar regras de visibilidade (unidades subordinadas).
   - Regras/Validações: listar apenas 'Criado' para ADMIN.
   - Eventos: none.
-  - Tests: MockMvc painel endpoints; repository query tests (H2).
   - Prioridade: Alta. Esforço: Médio.
   - Dependências: CDU-01 (auth).
 
@@ -93,7 +91,7 @@ Objetivo: produzir um plano técnico e executável para implementar no backend o
   - Serviços: ProcessoService.startMappingProcess(id).
   - Validações: verificar unidades não participando de processo ativo do mesmo tipo (reuse query).
   - Events: ProcessStartedEvent listeners: EmailNotificationService, AlertService.
-  - Tests: integration test for starting process (H2), assert subprocessos, mapas, movimentacoes e alertas criados; mock email.
+  - Tests: integration test for starting process , assert subprocessos, mapas, movimentacoes e alertas criados; mock email.
   - Prioridade: Alta. Esforço: Alto.
   - Dependências: CDU-03.
 
@@ -355,7 +353,7 @@ Sprint 7 (finalização & hardening)
 - Testes unitários:
   - Services: validações, regras de negócio (AtividadeService, MapaService, ProcessoService).
 - Testes de integração:
-  - MockMvc + H2 para endpoints críticos: login, criar/iniciar processo, disponibilizar cadastro, analisar, disponibilizar mapa, finalizar processo.
+  - MockMvc + BD para endpoints críticos: login, criar/iniciar processo, disponibilizar cadastro, analisar, disponibilizar mapa, finalizar processo.
 - Testes de contrato:
   - Contratos JSON para endpoints de painel e processos (usando Spring RestDocs ou Pact).
 - QA checklist:
@@ -396,7 +394,7 @@ Sprint 7 (finalização & hardening)
 - [ ] Implementar ImpactAnalysisService (CDU-12).
 - [ ] Implementar email adapter e AlertService (listeners de eventos).
 - [ ] Escrever testes unitários para services críticos.
-- [ ] Escrever testes de integração MockMvc/H2 para fluxos críticos.
+- [ ] Escrever testes de integração MockMvc para fluxos críticos.
 - [ ] Escrever scripts Flyway para migrações necessárias.
 - [ ] Documentar contratos API em README ou Spring RestDocs.
 

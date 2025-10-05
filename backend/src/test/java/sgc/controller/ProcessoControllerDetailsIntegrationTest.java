@@ -6,8 +6,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,18 +17,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Integration tests para o endpoint GET /api/processos/{id}/detalhes
- * - Usa H2 e carrega dados de backend/src/main/resources/data.sql via @Sql
  * - Testa caso feliz (ADMIN) e cenário de autorização negativa (GESTOR)
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Transactional
 public class ProcessoControllerDetailsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
+    @Sql("classpath:data.sql")
+    @Sql(statements = "DELETE FROM sgc.ALERTA; DELETE FROM sgc.SUBPROCESSO; DELETE FROM sgc.CONHECIMENTO; DELETE FROM sgc.COMPETENCIA_ATIVIDADE; DELETE FROM sgc.COMPETENCIA; DELETE FROM sgc.ATIVIDADE; DELETE FROM sgc.MAPA; DELETE FROM sgc.USUARIO; DELETE FROM sgc.UNIDADE; DELETE FROM sgc.PROCESSO;", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void detalhesProcesso_Admin_Ok() throws Exception {
         mockMvc.perform(get("/api/processos/1/detalhes")
                         .param("perfil", "ADMIN")

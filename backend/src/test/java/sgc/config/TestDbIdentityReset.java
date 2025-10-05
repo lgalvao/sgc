@@ -31,7 +31,6 @@ public class TestDbIdentityReset implements ApplicationRunner {
         };
         for (String table : tables) {
         try {
-            // H2 accepts ALTER TABLE ... ALTER COLUMN ... RESTART WITH n for identity columns
             jdbcTemplate.execute("ALTER TABLE " + table + " ALTER COLUMN codigo RESTART WITH 20000");
         } catch (Exception ignored) {
             // ignore tables/columns that don't exist in a given schema

@@ -1,7 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: leonardo
+    username: postgres
     password: postgres
   jpa:
     hibernate:
@@ -32,16 +32,16 @@ spring:
       on-profile: test
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: leonardo
+    username: postgres
     password: postgres
   jpa:
+    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
         default_schema: sgc
-        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: false
 
@@ -60,3 +60,22 @@ spring:
   config:
     activate:
       on-profile: dev
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
+logging:
+  level:
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.orm.jpa: ERROR
+    org.springframework.jdbc: ERROR
+    com.zaxxer.hikari: ERROR
+    org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    j.LocalContainerEntityManagerFactoryBean: ERROR

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Carrega dados iniciais na base H2 para facilitar testes manuais.
+ * Carrega dados iniciais na base para facilitar testes manuais.
  * Executado ao iniciar a aplicação (CommandLineRunner).
  * <p>
  * Observações:

@@ -66,7 +66,7 @@
 - Implementação de equals()/hashCode() em Ids embutidos críticos (ex.: [`backend/src/main/java/sgc/model/CompetenciaAtividade.java`](backend/src/main/java/sgc/model/CompetenciaAtividade.java:1)) para eliminar fragilidade em operações com chaves compostas.
 - Testes:
   - Testes unitários de controladores: [`backend/src/test/java/sgc/controller/ControllerUnitTests.java`](backend/src/test/java/sgc/controller/ControllerUnitTests.java:1) — adaptados para compatibilidade com DTOs.
-  - Testes de integração (MockMvc + H2): [`backend/src/test/java/sgc/IntegrationTests.java`](backend/src/test/java/sgc/IntegrationTests.java:1) — cobrindo fluxos principais (criar mapa, competência, atividade, conhecimento).
+  - Testes de integração (MockMvc + BD): [`backend/src/test/java/sgc/IntegrationTests.java`](backend/src/test/java/sgc/IntegrationTests.java:1) — cobrindo fluxos principais (criar mapa, competência, atividade, conhecimento).
   - A suíte de testes backend foi executada localmente: `./gradlew :backend:test` (BUILD SUCCESSFUL).
 
 ## Problemas encontrados e resoluções
@@ -77,7 +77,6 @@
 
 ## Próximos passos recomendados
 1. Implementar DTOs e validação para não expor entidades diretamente nas APIs.
-2. Escrever testes de integração Spring Boot que validem os endpoints com H2.
 3. Implementar equals/hashCode nas classes Id compostas.
 4. Adicionar OpenAPI/Swagger e documentação dos endpoints.
 5. Ajustar segurança/CORS e adicionar autenticação/roles.
@@ -86,7 +85,6 @@
 ## Como rodar localmente (com testes)
 1. Iniciar backend (vai compilar frontend, copiar assets e subir Spring Boot): ./gradlew :backend:bootRun
 2. Frontend: cd frontend && npm install && npm run dev
-3. H2 console: /h2-console (jdbc:h2:mem:testdb)
 4. Rodar testes unitários backend: ./gradlew :backend:test
 5. Rodar build completo: ./gradlew build
 
