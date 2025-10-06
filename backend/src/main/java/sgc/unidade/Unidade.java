@@ -15,7 +15,6 @@ import sgc.comum.Usuario;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Unidade extends BaseEntity {
-
     @Column(name = "nome")
     private String nome;
 

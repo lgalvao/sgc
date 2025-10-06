@@ -66,7 +66,7 @@ public class AnaliseValidacaoServiceImplTest {
         a2.setCodigo(202L);
 
         when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
-        when(analiseValidacaoRepository.findBySubprocessoCodigo(spId)).thenReturn(List.of(a1, a2));
+        when(analiseValidacaoRepository.findBySubprocesso_Codigo(spId)).thenReturn(List.of(a1, a2));
 
         List<AnaliseValidacao> lista = service.listarPorSubprocesso(spId);
         assertThat(lista).hasSize(2).extracting(AnaliseValidacao::getCodigo).containsExactlyInAnyOrder(201L, 202L);
@@ -75,10 +75,10 @@ public class AnaliseValidacaoServiceImplTest {
     @Test
     void removerPorSubprocesso_chamaRepositorio() {
         Long spId = 3L;
-        doNothing().when(analiseValidacaoRepository).deleteBySubprocessoCodigo(spId);
+        doNothing().when(analiseValidacaoRepository).deleteBySubprocesso_Codigo(spId);
 
         service.removerPorSubprocesso(spId);
 
-        verify(analiseValidacaoRepository, times(1)).deleteBySubprocessoCodigo(spId);
+        verify(analiseValidacaoRepository, times(1)).deleteBySubprocesso_Codigo(spId);
     }
 }

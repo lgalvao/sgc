@@ -130,20 +130,7 @@ public class SubprocessoMapper {
         List<MovimentacaoDTO> movDtos = new ArrayList<>();
         if (movimentacoes != null) {
             for (Movimentacao m : movimentacoes) {
-                MovimentacaoDTO md = new MovimentacaoDTO();
-                md.setCodigo(m.getCodigo());
-                md.setDataHora(m.getDataHora());
-                if (m.getUnidadeOrigem() != null) {
-                    md.setUnidadeOrigemCodigo(m.getUnidadeOrigem().getCodigo());
-                    md.setUnidadeOrigemSigla(m.getUnidadeOrigem().getSigla());
-                    md.setUnidadeOrigemNome(m.getUnidadeOrigem().getNome());
-                }
-                if (m.getUnidadeDestino() != null) {
-                    md.setUnidadeDestinoCodigo(m.getUnidadeDestino().getCodigo());
-                    md.setUnidadeDestinoSigla(m.getUnidadeDestino().getSigla());
-                    md.setUnidadeDestinoNome(m.getUnidadeDestino().getNome());
-                }
-                md.setDescricao(m.getDescricao());
+                MovimentacaoDTO md = getMovimentacaoDTO(m);
                 movDtos.add(md);
             }
         }
@@ -175,6 +162,24 @@ public class SubprocessoMapper {
         dto.setElementosDoProcesso(elementos);
 
         return dto;
+    }
+
+    private static MovimentacaoDTO getMovimentacaoDTO(Movimentacao m) {
+        MovimentacaoDTO md = new MovimentacaoDTO();
+        md.setCodigo(m.getCodigo());
+        md.setDataHora(m.getDataHora());
+        if (m.getUnidadeOrigem() != null) {
+            md.setUnidadeOrigemCodigo(m.getUnidadeOrigem().getCodigo());
+            md.setUnidadeOrigemSigla(m.getUnidadeOrigem().getSigla());
+            md.setUnidadeOrigemNome(m.getUnidadeOrigem().getNome());
+        }
+        if (m.getUnidadeDestino() != null) {
+            md.setUnidadeDestinoCodigo(m.getUnidadeDestino().getCodigo());
+            md.setUnidadeDestinoSigla(m.getUnidadeDestino().getSigla());
+            md.setUnidadeDestinoNome(m.getUnidadeDestino().getNome());
+        }
+        md.setDescricao(m.getDescricao());
+        return md;
     }
 
     private static SubprocessoDetalheDTO.ResponsavelDTO getResponsavelDTO(Subprocesso sp) {

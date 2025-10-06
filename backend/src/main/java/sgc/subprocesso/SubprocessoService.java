@@ -5,6 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.Alerta;
+import sgc.alerta.AlertaRepository;
+import sgc.atividade.AnaliseCadastro;
+import sgc.atividade.AnaliseValidacao;
 import sgc.atividade.Atividade;
 import sgc.atividade.AtividadeRepository;
 import sgc.comum.erros.ErroDominioAccessoNegado;
@@ -17,6 +21,9 @@ import sgc.notificacao.Notificacao;
 import sgc.notificacao.NotificacaoRepository;
 import sgc.notificacao.NotificationService;
 import sgc.processo.EventoSubprocessoDisponibilizado;
+import sgc.subprocesso.dto.AnaliseValidacaoDTO;
+import sgc.subprocesso.dto.MapaAjusteDTO;
+import sgc.subprocesso.dto.SugestoesDTO;
 import sgc.unidade.Unidade;
 
 import java.util.ArrayList;
@@ -42,9 +49,11 @@ public class SubprocessoService {
     private final AtividadeRepository atividadeRepository;
     private final ConhecimentoRepository conhecimentoRepository;
     private final AnaliseCadastroRepository analiseCadastroRepository;
+    private final AnaliseValidacaoRepository analiseValidacaoRepository;
     private final NotificacaoRepository notificacaoRepository;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final AlertaRepository alertaRepository;
 
     /**
      * Recupera os detalhes do subprocesso.
@@ -314,5 +323,477 @@ public class SubprocessoService {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    /**
+     * Disponibiliza o mapa de competências para validação (CDU-17).
+     */
+    @Transactional
+    public SubprocessoDTO disponibilizarMapa(Long subprocessoId, String observacoes, java.time.LocalDate dataLimiteEtapa2, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Validações
+        if (sp.getMapa() == null) {
+            throw new IllegalStateException("Subprocesso sem mapa associado");
+        }
+
+        // Atualizar situação e datas
+        sp.setSituacaoId("MAPA_DISPONIBILIZADO");
+        sp.setDataLimiteEtapa2(dataLimiteEtapa2);
+        sp.setDataFimEtapa1(java.time.LocalDateTime.now());
+        subprocessoRepository.save(sp);
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade());
+        mov.setUnidadeDestino(sp.getUnidade()); // permanece na mesma unidade
+        mov.setDescricao("Disponibilização do mapa de competências para validação");
+        movimentacaoRepository.save(mov);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Apresenta sugestões para o mapa (CDU-19).
+     */
+    @Transactional
+    public SubprocessoDTO apresentarSugestoes(Long subprocessoId, String sugestoes, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Atualizar mapa com sugestões
+        if (sp.getMapa() != null) {
+            sp.getMapa().setSugestoes(sugestoes);
+        }
+        sp.setSituacaoId("MAPA_COM_SUGESTOES");
+        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        subprocessoRepository.save(sp);
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade());
+        mov.setUnidadeDestino(sp.getUnidade().getUnidadeSuperior());
+        mov.setDescricao("Apresentação de sugestões para o mapa de competências");
+        movimentacaoRepository.save(mov);
+
+        // Limpar histórico de análise
+        if (analiseValidacaoRepository != null) {
+            analiseValidacaoRepository.deleteBySubprocesso_Codigo(sp.getCodigo());
+        }
+
+        // Notificação e alerta
+        notificarSugestoes(sp);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Valida o mapa de competências (CDU-19).
+     */
+    @Transactional
+    public SubprocessoDTO validarMapa(Long subprocessoId, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        sp.setSituacaoId("MAPA_VALIDADO");
+        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        subprocessoRepository.save(sp);
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade());
+        mov.setUnidadeDestino(sp.getUnidade().getUnidadeSuperior());
+        mov.setDescricao("Validação do mapa de competências");
+        movimentacaoRepository.save(mov);
+
+        // Limpar histórico de análise
+        if (analiseValidacaoRepository != null) {
+            analiseValidacaoRepository.deleteBySubprocesso_Codigo(sp.getCodigo());
+        }
+
+        // Notificação e alerta
+        notificarValidacao(sp);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Obtém as sugestões do mapa.
+     */
+    @Transactional(readOnly = true)
+    public SugestoesDTO obterSugestoes(Long subprocessoId) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        String sugestoes = sp.getMapa() != null ? sp.getMapa().getSugestoes() : null;
+        boolean sugestoesApresentadas = sugestoes != null && !sugestoes.trim().isEmpty();
+        String unidadeNome = sp.getUnidade() != null ? sp.getUnidade().getNome() : null;
+        return new SugestoesDTO(sugestoes, sugestoesApresentadas, unidadeNome);
+    }
+
+    /**
+     * Obtém o histórico de validação.
+     */
+    @Transactional(readOnly = true)
+    public List<AnaliseValidacaoDTO> obterHistoricoValidacao(Long subprocessoId) {
+        return analiseValidacaoRepository.findBySubprocesso_CodigoOrderByDataHoraDesc(subprocessoId)
+                .stream()
+                .map(this::mapearParaDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Devolve a validação para ajustes (CDU-20).
+     */
+    @Transactional
+    public SubprocessoDTO devolverValidacao(Long subprocessoId, String justificativa, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Registrar análise
+        AnaliseValidacao analise = new AnaliseValidacao();
+        analise.setSubprocesso(sp);
+        analise.setDataHora(java.time.LocalDateTime.now());
+        analise.setObservacoes(justificativa);
+        analiseValidacaoRepository.save(analise);
+
+        // Identificar unidade de devolução
+        Unidade unidadeDevolucao = sp.getUnidade();
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+        mov.setUnidadeDestino(unidadeDevolucao);
+        mov.setDescricao("Devolução da validação do mapa de competências para ajustes");
+        movimentacaoRepository.save(mov);
+
+        // Atualizar situação
+        sp.setSituacaoId("MAPA_DISPONIBILIZADO");
+        sp.setDataFimEtapa2(null);
+        subprocessoRepository.save(sp);
+
+        // Notificação e alerta
+        notificarDevolucao(sp, unidadeDevolucao);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Aceita a validação (CDU-20).
+     */
+    @Transactional
+    public SubprocessoDTO aceitarValidacao(Long subprocessoId, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Registrar análise
+        AnaliseValidacao analise = new AnaliseValidacao();
+        analise.setSubprocesso(sp);
+        analise.setDataHora(java.time.LocalDateTime.now());
+        analise.setObservacoes("Aceite da validação");
+        analiseValidacaoRepository.save(analise);
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+        mov.setUnidadeDestino(sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior());
+        mov.setDescricao("Mapa de competências validado");
+        movimentacaoRepository.save(mov);
+
+        // Notificação e alerta
+        notificarAceite(sp);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Homologa a validação (CDU-20).
+     */
+    @Transactional
+    public SubprocessoDTO homologarValidacao(Long subprocessoId, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        sp.setSituacaoId("MAPA_HOMOLOGADO");
+        subprocessoRepository.save(sp);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Obtém mapa para ajuste (CDU-16).
+     */
+    @Transactional(readOnly = true)
+    public MapaAjusteDTO obterMapaParaAjuste(Long subprocessoId) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        if (sp.getMapa() == null) {
+            throw new IllegalStateException("Subprocesso sem mapa");
+        }
+
+        // Implementar lógica para montar MapaAjusteDTO
+        Long mapaId = sp.getMapa().getCodigo();
+        String unidadeNome = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
+        List<sgc.subprocesso.dto.CompetenciaAjusteDTO> competencias = List.of(); // Placeholder
+        String justificativa = null; // Placeholder
+        return new MapaAjusteDTO(mapaId, unidadeNome, competencias, null);
+    }
+
+    /**
+     * Salva ajustes no mapa (CDU-16).
+     */
+    @Transactional
+    public SubprocessoDTO salvarAjustesMapa(Long subprocessoId, List<?> competencias, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Implementar lógica para salvar ajustes
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    /**
+     * Submete mapa ajustado (CDU-16).
+     */
+    @Transactional
+    public SubprocessoDTO submeterMapaAjustado(Long subprocessoId, String usuarioTitulo) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        sp.setSituacaoId("MAPA_AJUSTADO");
+        subprocessoRepository.save(sp);
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade());
+        mov.setUnidadeDestino(sp.getUnidade().getUnidadeSuperior());
+        mov.setDescricao("Submissão do mapa ajustado");
+        movimentacaoRepository.save(mov);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    // Metodos auxiliares de notificação
+
+    private void notificarSugestoes(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            // Email
+            try {
+                if (notificationService != null) {
+                    notificationService.enviarEmail(
+                            unidadeSuperior.getSigla(),
+                            "SGC: Sugestões apresentadas para o mapa de competências da " + sp.getUnidade().getSigla(),
+                            "A unidade " + sp.getUnidade().getSigla() + " apresentou sugestões para o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessas sugestões já pode ser realizada no sistema."
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+
+            // Alerta - simplificado
+            if (alertaRepository != null) {
+                Alerta alerta = new Alerta();
+                alerta.setDescricao("Sugestões para o mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise");
+                alerta.setProcesso(sp.getProcesso());
+                alerta.setDataHora(java.time.LocalDateTime.now());
+                alerta.setUnidadeOrigem(sp.getUnidade());
+                alerta.setUnidadeDestino(unidadeSuperior);
+                alertaRepository.save(alerta);
+            }
+        }
+    }
+
+    private void notificarValidacao(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            // Email
+            try {
+                if (notificationService != null) {
+                    notificationService.enviarEmail(
+                            unidadeSuperior.getSigla(),
+                            "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                            "A unidade " + sp.getUnidade().getSigla() + " validou o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessa validação já pode ser realizada no sistema."
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+
+            // Alerta
+            if (alertaRepository != null) {
+                Alerta alerta = new Alerta();
+                alerta.setDescricao("Validação do mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise");
+                alerta.setProcesso(sp.getProcesso());
+                alerta.setDataHora(java.time.LocalDateTime.now());
+                alerta.setUnidadeOrigem(sp.getUnidade());
+                alerta.setUnidadeDestino(unidadeSuperior);
+                alertaRepository.save(alerta);
+            }
+        }
+    }
+
+    private void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
+        // Email
+        try {
+            if (notificationService != null) {
+                notificationService.enviarEmail(
+                        unidadeDevolucao.getSigla(),
+                        "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
+                        "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvida para ajustes. Acompanhe o processo no sistema."
+                );
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Alerta
+        if (alertaRepository != null) {
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Cadastro de atividades e conhecimentos da unidade " + sp.getUnidade().getSigla() + " devolvido para ajustes");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+            alerta.setUnidadeDestino(unidadeDevolucao);
+            alertaRepository.save(alerta);
+        }
+    }
+
+    private void notificarAceite(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            // Email
+            try {
+                if (notificationService != null) {
+                    notificationService.enviarEmail(
+                            unidadeSuperior.getSigla(),
+                            "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                            "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi submetida para análise por essa unidade. A análise já pode ser realizada no sistema."
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+
+            // Alerta
+            if (alertaRepository != null) {
+                Alerta alerta = new Alerta();
+                alerta.setDescricao("Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise");
+                alerta.setProcesso(sp.getProcesso());
+                alerta.setDataHora(java.time.LocalDateTime.now());
+                alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+                alerta.setUnidadeDestino(unidadeSuperior);
+                alertaRepository.save(alerta);
+            }
+        }
+    }
+
+    private AnaliseValidacaoDTO mapearParaDTO(AnaliseValidacao analise) {
+        return new AnaliseValidacaoDTO(
+                analise.getCodigo(),
+                analise.getDataHora(),
+                analise.getObservacoes()
+        );
+    }
+
+    // Metodos para cadastro (CDU-13 e CDU-14) - placeholders, implementar conforme necessário
+
+    @Transactional
+    public SubprocessoDTO devolverCadastro(Long subprocessoId, String motivo, String observacoes, String usuario) {
+        Subprocesso sp = subprocessoRepository.findById(subprocessoId)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoId)));
+
+        // Registrar análise
+        AnaliseCadastro analise = new AnaliseCadastro();
+        analise.setSubprocesso(sp);
+        analise.setDataHora(java.time.LocalDateTime.now());
+        analise.setObservacoes(motivo + (observacoes != null && !observacoes.isEmpty() ? " - " + observacoes : ""));
+        analiseCadastroRepository.save(analise);
+
+        // Identificar unidade de devolução (unidade do subprocesso)
+        Unidade unidadeDevolucao = sp.getUnidade();
+
+        // Registrar movimentação
+        Movimentacao mov = new Movimentacao();
+        mov.setSubprocesso(sp);
+        mov.setDataHora(java.time.LocalDateTime.now());
+        mov.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior()); // Assumindo que a devolução vem da unidade superior
+        mov.setUnidadeDestino(unidadeDevolucao);
+        mov.setDescricao("Devolução do cadastro de atividades para ajustes: " + motivo);
+        movimentacaoRepository.save(mov);
+
+        // Atualizar situação
+        sp.setSituacaoId("CADASTRO_EM_ELABORACAO"); // Retorna para o estado inicial de elaboração
+        sp.setDataFimEtapa1(null); // Limpa a data de fim da etapa 1, pois foi devolvido
+        subprocessoRepository.save(sp);
+
+        // Notificação e alerta (similar a notificarDevolucao)
+        notificarDevolucaoCadastro(sp, unidadeDevolucao, motivo);
+
+        return SubprocessoMapper.toDTO(sp);
+    }
+
+    private void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
+        // Email
+        try {
+            if (notificationService != null) {
+                notificationService.enviarEmail(
+                        unidadeDevolucao.getSigla(),
+                        "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
+                        "O cadastro de atividades da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvido para ajustes com o motivo: " + motivo + ". Acompanhe o processo no sistema."
+                );
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Alerta
+        if (alertaRepository != null) {
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Cadastro de atividades da unidade " + sp.getUnidade().getSigla() + " devolvido para ajustes: " + motivo);
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+            alerta.setUnidadeDestino(unidadeDevolucao);
+            alertaRepository.save(alerta);
+        }
+    }
+
+    @Transactional
+    public SubprocessoDTO aceitarCadastro(Long subprocessoId, String observacoes, String usuario) {
+        // Implementar lógica
+        return null;
+    }
+
+    @Transactional
+    public SubprocessoDTO homologarCadastro(Long subprocessoId, String observacoes, String usuario) {
+        // Implementar lógica
+        return null;
+    }
+
+    @Transactional
+    public SubprocessoDTO devolverRevisaoCadastro(Long subprocessoId, String motivo, String observacoes, String usuario) {
+        // Implementar lógica
+        return null;
+    }
+
+    @Transactional
+    public SubprocessoDTO aceitarRevisaoCadastro(Long subprocessoId, String observacoes, String usuario) {
+        // Implementar lógica
+        return null;
+    }
+
+    @Transactional
+    public SubprocessoDTO homologarRevisaoCadastro(Long subprocessoId, String observacoes, String usuario) {
+        // Implementar lógica
+        return null;
     }
 }

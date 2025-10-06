@@ -13,10 +13,39 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    
+    // Spring Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+
+    // JWT (JSON Web Tokens)
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+    
+    // Spring Mail
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    
+    // Thymeleaf para templates HTML
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    
+    // Oracle JDBC Driver para integração com SGRH
+    implementation("com.oracle.database.jdbc:ojdbc11")
+    implementation("org.hibernate.orm:hibernate-core:6.6.31.Final")
+
+    // Caffeine Cache para otimizar consultas ao SGRH
+    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.hibernate.orm:hibernate-jcache:6.6.31.Final")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // Spring Security Test (opcional, para testes)
+    testImplementation("org.springframework.security:spring-security-test")
+    
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

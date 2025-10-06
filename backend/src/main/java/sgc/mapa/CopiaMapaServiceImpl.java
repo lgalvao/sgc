@@ -7,6 +7,7 @@ import sgc.atividade.Atividade;
 import sgc.atividade.AtividadeRepository;
 import sgc.conhecimento.Conhecimento;
 import sgc.conhecimento.ConhecimentoRepository;
+import sgc.unidade.Unidade;
 import sgc.unidade.UnidadeRepository;
 
 import java.util.Collections;
@@ -40,13 +41,17 @@ public class CopiaMapaServiceImpl implements CopiaMapaService {
     @Transactional
     public Mapa copyMapForUnit(Long sourceMapaId, Long targetUnidadeId) {
         Mapa source = mapaRepository.findById(sourceMapaId)
-                .orElseThrow(() -> new IllegalArgumentException("Mapa fonte não encontrado: " + sourceMapaId));
+                .orElseThrow(() -> new IllegalArgumentException("Mapa fonte não encontrado: %d".formatted(sourceMapaId)));
+
+        Unidade targetUnidade = unidadeRepository.findById(targetUnidadeId)
+                .orElseThrow(() -> new IllegalArgumentException("Unidade de destino não encontrada: %d".formatted(targetUnidadeId)));
 
         Mapa novo = new Mapa();
         novo.setDataHoraDisponibilizado(source.getDataHoraDisponibilizado());
         novo.setObservacoesDisponibilizacao(source.getObservacoesDisponibilizacao());
         novo.setSugestoesApresentadas(source.getSugestoesApresentadas());
         novo.setDataHoraHomologado(null);
+        novo.setUnidade(targetUnidade); // Associar o novo mapa à unidade de destino
 
         Mapa salvoMapa = mapaRepository.save(novo);
         Map<Long, Atividade> atividadeMap = new HashMap<>();

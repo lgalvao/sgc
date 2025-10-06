@@ -7,7 +7,10 @@ import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
+import sgc.notificacao.EmailNotificationService;
+import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.Subprocesso;
 import sgc.subprocesso.SubprocessoRepository;
@@ -47,6 +50,9 @@ public class ProcessoServiceDetailsTest {
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
         CopiaMapaService copiaMapaService = mock(CopiaMapaService.class);
         ApplicationEventPublisherStub publisher = new ApplicationEventPublisherStub();
+        EmailNotificationService emailService = mock(EmailNotificationService.class);
+        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        SgrhService sgrhService = mock(SgrhService.class);
 
         service = new ProcessoService(
                 processoRepository,
@@ -57,7 +63,10 @@ public class ProcessoServiceDetailsTest {
                 movimentacaoRepository,
                 unidadeMapaRepository,
                 copiaMapaService,
-                publisher
+                publisher,
+                emailService,
+                emailTemplateService,
+                sgrhService
         );
     }
 

@@ -48,7 +48,7 @@ public class CopiaMapaServiceTest {
         Mapa source = new Mapa();
         source.setCodigo(sourceMapaId);
         source.setObservacoesDisponibilizacao("obs");
-        source.setSugestoesApresentadas("sugestoes");
+        source.setSugestoesApresentadas(true);
 
         // atividade fonte que pertence ao mapa fonte
         Atividade a1 = new Atividade();

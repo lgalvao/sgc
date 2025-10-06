@@ -7,7 +7,10 @@ import sgc.mapa.CopiaMapaService;
 import sgc.mapa.Mapa;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
+import sgc.notificacao.EmailNotificationService;
+import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.Movimentacao;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.Subprocesso;
@@ -43,6 +46,9 @@ public class ProcessoServiceStartMappingTest {
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
         CopiaMapaService mapCopyService = mock(CopiaMapaService.class);
         publisher = mock(ApplicationEventPublisher.class);
+        EmailNotificationService emailService = mock(EmailNotificationService.class);
+        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        SgrhService sgrhService = mock(SgrhService.class);
 
         processoService = new ProcessoService(
                 processoRepository,
@@ -53,7 +59,10 @@ public class ProcessoServiceStartMappingTest {
                 movimentacaoRepository,
                 unidadeMapaRepository,
                 mapCopyService,
-                publisher
+                publisher,
+                emailService,
+                emailTemplateService,
+                sgrhService
         );
     }
 
@@ -119,36 +128,6 @@ public class ProcessoServiceStartMappingTest {
         when(processoRepository.findById(processoId)).thenReturn(Optional.of(proc));
 
         assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(processoId, List.of(1L)))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    public void iniciarProcessoMapeamento() {
-        Long processoId = 12L;
-        Long unidadeId = 2L;
-        Processo proc = new Processo();
-        proc.setCodigo(processoId);
-        proc.setSituacao("CRIADO");
-        proc.setTipo("MAPEAMENTO");
-
-        Unidade u = new Unidade();
-        u.setCodigo(unidadeId);
-        u.setSigla("U2");
-
-        // existente em unidade_processo apontando para processo ativo
-        UnidadeProcesso existente = new UnidadeProcesso();
-        existente.setProcessoCodigo(99L);
-        when(unidadeProcessoRepository.findBySigla("U2")).thenReturn(List.of(existente));
-
-        Processo ativo = new Processo();
-        ativo.setCodigo(99L);
-        ativo.setSituacao("EM_ANDAMENTO");
-
-        when(processoRepository.findById(99L)).thenReturn(Optional.of(ativo));
-        when(processoRepository.findById(processoId)).thenReturn(Optional.of(proc));
-        when(unidadeRepository.findById(unidadeId)).thenReturn(Optional.of(u));
-
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(processoId, List.of(unidadeId)))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

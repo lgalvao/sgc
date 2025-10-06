@@ -7,7 +7,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
+import sgc.notificacao.EmailNotificationService;
+import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.SubprocessoRepository;
 import sgc.unidade.Unidade;
@@ -42,6 +45,9 @@ public class ProcessoServiceTest {
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
         CopiaMapaService mapCopyService = mock(CopiaMapaService.class);
         publisher = mock(ApplicationEventPublisher.class);
+        EmailNotificationService emailService = mock(EmailNotificationService.class);
+        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        SgrhService sgrhService = mock(SgrhService.class);
 
         processoService = new ProcessoService(
                 processoRepository,
@@ -52,7 +58,10 @@ public class ProcessoServiceTest {
                 movimentacaoRepository,
                 unidadeMapaRepository,
                 mapCopyService,
-                publisher
+                publisher,
+                emailService,
+                emailTemplateService,
+                sgrhService
         );
     }
 

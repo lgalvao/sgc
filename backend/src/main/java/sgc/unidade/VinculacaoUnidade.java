@@ -17,7 +17,6 @@ import sgc.comum.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VinculacaoUnidade extends BaseEntity {
-
     @ManyToOne
     @JoinColumn(name = "unidade_anterior_codigo")
     private Unidade unidadeAnterior;

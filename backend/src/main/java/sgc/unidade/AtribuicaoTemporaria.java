@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtribuicaoTemporaria extends BaseEntity {
-
     @ManyToOne
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidade;

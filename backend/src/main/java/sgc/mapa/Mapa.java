@@ -2,12 +2,14 @@ package sgc.mapa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.BaseEntity;
+import sgc.unidade.Unidade;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +26,15 @@ public class Mapa extends BaseEntity {
     @Column(name = "observacoes_disponibilizacao", length = 1000)
     private String observacoesDisponibilizacao;
 
-    @Column(name = "sugestoes_apresentadas", length = 1000)
-    private String sugestoesApresentadas;
+    @Column(name = "sugestoes", columnDefinition = "TEXT")
+    private String sugestoes;
+
+    @Column(name = "sugestoes_apresentadas")
+    private Boolean sugestoesApresentadas = false;
 
     @Column(name = "data_hora_homologado")
     private LocalDateTime dataHoraHomologado;
+
+    @ManyToOne
+    private Unidade unidade;
 }

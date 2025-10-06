@@ -1,15 +1,74 @@
 spring:
   datasource:
+    # Datasource principal SGC (PostgreSQL)
     url: jdbc:postgresql://localhost:5432/postgres
     username: leonardo
     password: postgres
+
+  # Datasource SGRH (Oracle - Read Only)
+  # sgrh:
+  #   datasource:
+  #     url: ${SGRH_DB_URL:jdbc:oracle:thin:@//localhost:1521/SGRH}
+  #     username: ${SGRH_DB_USERNAME:sgrh_reader}
+  #     password: ${SGRH_DB_PASSWORD:}
+  #     driver-class-name: oracle.jdbc.OracleDriver
+  #     hikari:
+  #       maximum-pool-size: 5
+  #       minimum-idle: 2
+  #       read-only: true
+  #       connection-timeout: 30000
+  #       idle-timeout: 600000
+  #       max-lifetime: 1800000
+  
   jpa:
     hibernate.ddl-auto: update
     properties:
       hibernate.default_schema: sgc
     show-sql: false
+  
+  # Configuração de cache
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=1h
+    cache-names:
+      - sgrh-usuarios
+      - sgrh-unidades
+      - sgrh-responsabilidades
+      - sgrh-perfis
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+    default-encoding: UTF-8
+
 server:
   port: 8080
+
+# Configurações de segurança JWT
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production-please-use-at-least-32-characters}
+  expiration: 86400000  # 24 horas em milissegundos
+
+# Configurações do serviço de autenticação AD
+aplicacao:
+  ambiente-testes: ${AMBIENTE_TESTES:true}
+  url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:8081/api/acesso}
+  url-acesso-prod: ${URL_ACESSO_PROD:https://acesso.tre-pe.jus.br/api}
+  email:
+    remetente: ${EMAIL_REMETENTE:sgc@tre-pe.jus.br}
+    remetente-nome: "Sistema de Gestão de Competências"
+    assunto-prefixo: "[SGC]"
 
 logging:
   level:
@@ -20,3 +79,4 @@ logging:
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    sgc.auth: DEBUG  # Habilita logs de debug para autenticação

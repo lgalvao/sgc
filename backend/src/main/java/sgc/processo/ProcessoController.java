@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.comum.erros.ErroDominioProcesso;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller REST para Processos.
@@ -102,15 +104,32 @@ public class ProcessoController {
         }
     }
 
+    /**
+     * CDU-21 - Finalizar processo
+     * POST /api/processos/{id}/finalizar
+     * <p> <p>
+     * Finaliza um processo de mapeamento ou revisão, tornando os mapas vigentes
+     * e notificando todas as unidades participantes.
+     *
+     * @param id ID do processo a ser finalizado
+     * @return ProcessoDTO com dados do processo finalizado
+     */
     @PostMapping("/{id}/finalizar")
-    public ResponseEntity<ProcessoDTO> finalizarProcesso(@PathVariable Long id) {
+    public ResponseEntity<?> finalizarProcesso(@PathVariable Long id) {
         try {
             ProcessoDTO finalizado = processoService.finalizeProcess(id);
             return ResponseEntity.ok(finalizado);
         } catch (IllegalArgumentException e) {
+            // Processo não encontrado
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
+            // Processo em situação inválida para finalizar
+            return ResponseEntity.badRequest()
+                    .body(Map.of("erro", e.getMessage()));
+        } catch (ErroDominioProcesso e) {
+            // Validação de negócio falhou (ex: subprocessos não homologados)
+            return ResponseEntity.status(422) // Unprocessable Entity
+                    .body(Map.of("erro", e.getMessage()));
         }
     }
 }

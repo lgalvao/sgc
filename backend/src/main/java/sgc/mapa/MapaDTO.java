@@ -18,6 +18,6 @@ public class MapaDTO {
     private Long codigo;
     private LocalDateTime dataHoraDisponibilizado;
     private String observacoesDisponibilizacao;
-    private String sugestoesApresentadas;
+    private Boolean sugestoesApresentadas;
     private LocalDateTime dataHoraHomologado;
 }

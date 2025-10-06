@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Processo extends BaseEntity {
-
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 

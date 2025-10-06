@@ -1,6 +1,9 @@
 package sgc.subprocesso;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sgc.atividade.AnaliseValidacao;
 
@@ -17,7 +20,9 @@ public interface AnaliseValidacaoRepository extends JpaRepository<AnaliseValidac
      *
      * @param subprocessoCodigo id do subprocesso
      */
-    void deleteBySubprocessoCodigo(Long subprocessoCodigo);
+    @Modifying
+    @Query("DELETE FROM AnaliseValidacao av WHERE av.subprocesso.codigo = :codigo")
+    void deleteBySubprocesso_Codigo(@Param("codigo") Long subprocessoCodigo);
 
     /**
      * Recupera análises de validação vinculadas a um subprocesso.
@@ -25,5 +30,13 @@ public interface AnaliseValidacaoRepository extends JpaRepository<AnaliseValidac
      * @param subprocessoCodigo id do subprocesso
      * @return lista de AnaliseValidacao
      */
-    List<AnaliseValidacao> findBySubprocessoCodigo(Long subprocessoCodigo);
+    List<AnaliseValidacao> findBySubprocesso_Codigo(Long subprocessoCodigo);
+
+    /**
+     * Recupera análises de validação ordenadas por data decrescente (CDU-20 item 6).
+     *
+     * @param subprocessoCodigo id do subprocesso
+     * @return lista de AnaliseValidacao ordenada por data decrescente
+     */
+    List<AnaliseValidacao> findBySubprocesso_CodigoOrderByDataHoraDesc(Long subprocessoCodigo);
 }

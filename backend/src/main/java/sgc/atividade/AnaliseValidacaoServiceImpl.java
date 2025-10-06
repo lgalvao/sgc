@@ -27,7 +27,7 @@ public class AnaliseValidacaoServiceImpl implements AnaliseValidacaoService {
         if (subprocessoRepository.findById(subprocessoCodigo).isEmpty()) {
             throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + subprocessoCodigo);
         }
-        return analiseValidacaoRepository.findBySubprocessoCodigo(subprocessoCodigo);
+        return analiseValidacaoRepository.findBySubprocesso_Codigo(subprocessoCodigo);
     }
 
     @Override
@@ -47,6 +47,6 @@ public class AnaliseValidacaoServiceImpl implements AnaliseValidacaoService {
     @Override
     @Transactional
     public void removerPorSubprocesso(Long subprocessoCodigo) {
-        analiseValidacaoRepository.deleteBySubprocessoCodigo(subprocessoCodigo);
+        analiseValidacaoRepository.deleteBySubprocesso_Codigo(subprocessoCodigo);
     }
 }
