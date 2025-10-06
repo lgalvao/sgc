@@ -131,8 +131,7 @@ tasks.withType<Test> {
                 .filter { element ->
                     val className = element.className
                     // Include: Your app code, Spring framework (but not test internals)
-                    // TODO: Replace "com.yourcompany" with your actual package name
-                    (className.startsWith("com.yourcompany") ||
+                    (className.startsWith("sgc") ||
                             className.startsWith("org.springframework.web") ||
                             className.startsWith("org.springframework.data") ||
                             className.startsWith("org.springframework.boot") && !className.contains(".test.")) &&

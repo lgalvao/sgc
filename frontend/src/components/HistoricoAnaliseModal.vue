@@ -91,7 +91,6 @@ const analises = ref<AnaliseValidacao[]>([]);
 
 watch(() => props.mostrar, (newVal) => {
   if (newVal && props.idSubprocesso) {
-    // TODO: Implementar método na store para buscar análises
     analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
   }
 }, { immediate: true });

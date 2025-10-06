@@ -34,7 +34,7 @@ public class PainelService {
      * - perfil == "ADMIN" -> somente processos com situacao 'CRIADO'
      * - se unidadeCodigo informado -> somente processos vinculados a essa unidade (via UNIDADE_PROCESSO)
      * <p>
-     * Observação: para simplificar os testes iniciais este método realiza paginação em memória
+     * Observação: para simplificar os testes iniciais este metodo realiza paginação em memória
      * após aplicar os filtros. Em datasets grandes isso deve ser otimizado com queries específicas.
      *
      * @param perfil        perfil requisitante (obrigatório)
