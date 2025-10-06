@@ -134,4 +134,4 @@ Cada domínio possui um store dedicado:
 - **Contexto do Usuário**: Para obter o perfil e a unidade do usuário, utilize `perfilStore.perfilSelecionado` e `perfilStore.unidadeSelecionada`.
 - **Utilitários**: Use as funções centralizadas em `/src/utils/index.ts` para operações comuns (datas, IDs, etc.).
 - **Constantes**: Utilize as constantes em `/src/constants/` para evitar o uso de strings "mágicas".
-- **Notificações**: Use a store `notificacoes.ts` (via `useNotificacoesStore()`) para disparar feedbacks ao usuário com os métodos `sucesso()`, `erro()`, `aviso()`, etc.
+- **Notificações**: Use a store `notificacoes.ts` (via `useNotificacoesStore()`) para disparar feedbacks ao usuário com os Metodos `sucesso()`, `erro()`, `aviso()`, etc.

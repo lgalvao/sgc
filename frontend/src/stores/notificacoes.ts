@@ -57,7 +57,7 @@ export const useNotificacoesStore = defineStore('notificacoes', () => {
     notificacoes.value = [];
   };
 
-  // Métodos convenientes para tipos específicos
+  // Metodos convenientes para tipos específicos
   const sucesso = (titulo: string, mensagem: string, duracao?: number) => {
     return adicionarNotificacao({ tipo: 'success', titulo, mensagem, duracao });
   };

@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Controller para expor endpoints de análise (cadastro e validação).
- * Todos os métodos usam nomes e mensagens em português.
+ * Todos os Metodos usam nomes e mensagens em português.
  */
 @RestController
 @RequestMapping("/api/subprocessos/{id}")

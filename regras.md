@@ -6,7 +6,7 @@ Regras:
 - Usar português Brasileiro em todos os códigos
 - DTOs: usar Lombok para getters/setters/construtores. Preferir as anotações @Getter, @Setter, @NoArgsConstructor e @AllArgsConstructor. Exemplo: [`backend/src/main/java/sgc/dto/LoginResponse.java`](backend/src/main/java/sgc/dto/LoginResponse.java:1).
 - Imports: usar namespaces jakarta.* (ex.: `jakarta.validation`) em vez de javax.*.
-- Controllers: validar requests com `@Valid` nos métodos REST.
+- Controllers: validar requests com `@Valid` nos Metodos REST.
 - Clientes externos: sempre definir uma interface e uma implementação; tornar a implementação substituível por profile (ex.: profile "test" injeta mock).
 - Para testes use @MockitoBean e @MockitoSpyBean (NAO USE @MockBean e @SpyBean -- estao deprecated)
 - Para testes, use @SpringBootTest ou as anotações análogas mais específicas

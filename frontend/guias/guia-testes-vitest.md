@@ -6,7 +6,7 @@ Este guia detalha as melhores práticas e padrões para a criação de testes un
 
 **Vitest** é um framework de teste rápido e moderno, otimizado para projetos baseados em Vite. Ele oferece uma API familiar (inspirada em Jest) e excelente integração com TypeScript.
 
-**@vue/test-utils** é a biblioteca oficial para testar componentes Vue. Ela fornece métodos para montar e interagir com componentes Vue de forma isolada.
+**@vue/test-utils** é a biblioteca oficial para testar componentes Vue. Ela fornece Metodos para montar e interagir com componentes Vue de forma isolada.
 
 ## 2. Estrutura de um Teste Unitário
 
@@ -110,7 +110,7 @@ Usado para substituir módulos inteiros (como stores Pinia, composables, serviç
 import { useUnidadesStore } from '@/stores/unidades';
 const mockUnidadesStore = {
   pesquisarUnidade: vi.fn(), // Mock de uma função da store
-  // Outras propriedades ou métodos da store
+  // Outras propriedades ou Metodos da store
 };
 vi.mock('@/stores/unidades', () => ({
   useUnidadesStore: () => mockUnidadesStore,
@@ -141,15 +141,15 @@ vi.mock('@/stores/revisao', async (importOriginal) => {
 *   **Importante**: As definições dos objetos mock (ex: `mockUnidadesStore`) devem vir *antes* dos blocos `vi.mock` para evitar `ReferenceError`, pois `vi.mock` é içado para o topo do arquivo.
 *   Use `ref` em mocks de composables para simular reatividade.
 
-### 4.2. `vi.spyOn` para Métodos
+### 4.2. `vi.spyOn` para Metodos
 
-Monitora chamadas a métodos existentes sem alterar sua implementação original, ou permite alterar temporariamente a implementação.
+Monitora chamadas a Metodos existentes sem alterar sua implementação original, ou permite alterar temporariamente a implementação.
 
 ```typescript
 import { useRouter } from 'vue-router';
 // ...
 const router = useRouter();
-const pushSpy = vi.spyOn(router, 'push'); // Espiona o método 'push' do router
+const pushSpy = vi.spyOn(router, 'push'); // Espiona o Metodo 'push' do router
 
 // No teste, você pode verificar se foi chamado:
 expect(pushSpy).toHaveBeenCalledWith('/painel');
@@ -175,7 +175,7 @@ const mockUnidade: Unidade = {
 
 ## 5. Interação com Componentes
 
-O `@vue/test-utils` oferece métodos para encontrar elementos no DOM do componente e simular interações do usuário.
+O `@vue/test-utils` oferece Metodos para encontrar elementos no DOM do componente e simular interações do usuário.
 
 ```typescript
 // Encontrar elementos
@@ -188,7 +188,7 @@ await button.trigger('click'); // Simula um clique
 await input.setValue('novo valor'); // Define o valor de um input
 
 // Acessar a instância do componente
-const vm = wrapper.vm as MyComponentInstance; // Para acessar métodos ou computed properties
+const vm = wrapper.vm as MyComponentInstance; // Para acessar Metodos ou computed properties
 expect(vm.myComputedProperty).toBe('expected');
 ```
 

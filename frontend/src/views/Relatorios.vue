@@ -450,7 +450,7 @@ const getClasseStatus = (status: string) => {
   }
 }
 
-// Métodos
+// Metodos
 const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
