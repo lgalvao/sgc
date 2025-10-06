@@ -1,6 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {login} from "../utils/auth";
+import {login} from "~/utils/auth";
 
 async function getBreadcrumbItemsText(page: Page) {
     const items = page.locator('[data-testid="breadcrumbs"] [data-testid="breadcrumb-item"]')

@@ -53,15 +53,24 @@
 - /unidade/:siglaUnidade/atribuicao
     - Componente: CadAtribuicao.vue
     - Cadastra e edita atribuição temporárias, permitindo acesso excepcional com perfil CHEFE
-
+ 
 - /relatorios
     - Componente: Relatorios.vue
     - Painel de relatórios.
-
+ 
 - /historico
     - Componente: Historico.vue
     - Tabela de processos inativados, com navegação para mapas e detalhes do processo.
-
+ 
 - /configuracoes
     - Componente: Configuracoes.vue
     - Edição de configurações do sistema.
+ 
+- POST /api/subprocessos/{id}/disponibilizar-cadastro
+    - Descrição: Disponibiliza o cadastro de atividades de um subprocesso para análise (altera situação, registra movimentação e publica evento).
+    - Payload: nenhum
+    - Resposta de sucesso: 200 OK com mensagem curta "Cadastro de atividades disponibilizado"
+    - Erros comuns:
+        - 400 Bad Request -> quando há atividades sem conhecimentos (retorna { "atividadesSemConhecimento": [...] })
+        - 404 Not Found -> quando subprocesso não existe
+        - 500 Internal Server Error -> erro inesperado

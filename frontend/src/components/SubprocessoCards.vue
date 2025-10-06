@@ -135,7 +135,7 @@ const handleMapaClick = () => {
 
 .card-actionable.disabled-card {
   /* Allow clicks for testing purposes */
-  /* pointer-events: none; */
+  /* pointer-eventos: none; */
   opacity: 0.6;
 }
 </style>

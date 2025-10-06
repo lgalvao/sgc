@@ -5,14 +5,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.exception.DomainAccessDeniedException;
-import sgc.exception.DomainNotFoundException;
-import sgc.model.*;
-import sgc.repository.AtividadeRepository;
-import sgc.repository.ConhecimentoRepository;
-import sgc.repository.MovimentacaoRepository;
-import sgc.repository.SubprocessoRepository;
-import sgc.dto.SubprocessoDetailDTO;
+import sgc.atividade.Atividade;
+import sgc.atividade.AtividadeRepository;
+import sgc.comum.Usuario;
+import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.conhecimento.Conhecimento;
+import sgc.conhecimento.ConhecimentoRepository;
+import sgc.mapa.Mapa;
+import sgc.subprocesso.*;
+import sgc.unidade.Unidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,7 +90,7 @@ public class SubprocessoServiceTest {
         when(conhecimentoRepository.findAll()).thenReturn(List.of(kc));
 
         // Act
-        SubprocessoDetailDTO dto = subprocessoService.getDetails(spId, "ADMIN", null);
+        SubprocessoDetalheDTO dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
 
         // Assert
         assertNotNull(dto);
@@ -109,7 +111,7 @@ public class SubprocessoServiceTest {
     void casoNaoEncontrado_lancaDomainNotFoundException() {
         Long id = 99L;
         when(subprocessoRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrows(DomainNotFoundException.class, () -> subprocessoService.getDetails(id, "ADMIN", null));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.obterDetalhes(id, "ADMIN", null));
     }
 
     @Test
@@ -125,6 +127,6 @@ public class SubprocessoServiceTest {
 
         // usuário gestor com unidade diferente
         Long unidadeUsuario = 99L;
-        assertThrows(DomainAccessDeniedException.class, () -> subprocessoService.getDetails(spId, "GESTOR", unidadeUsuario));
+        assertThrows(ErroDominioAccessoNegado.class, () -> subprocessoService.obterDetalhes(spId, "GESTOR", unidadeUsuario));
     }
 }

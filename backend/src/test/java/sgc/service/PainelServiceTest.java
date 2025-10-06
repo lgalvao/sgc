@@ -10,12 +10,9 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import sgc.dto.ProcessoSummaryDTO;
-import sgc.model.Processo;
-import sgc.model.UnidadeProcesso;
-import sgc.repository.AlertaRepository;
-import sgc.repository.ProcessoRepository;
-import sgc.repository.UnidadeProcessoRepository;
+import sgc.alerta.AlertaRepository;
+import sgc.comum.PainelService;
+import sgc.processo.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +68,7 @@ public class PainelServiceTest {
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<ProcessoSummaryDTO> page = painelService.listarProcessos("USER", null, pageable);
+        Page<ProcessoResumoDTO> page = painelService.listarProcessos("USER", null, pageable);
 
         assertEquals(2, page.getTotalElements());
     }
@@ -101,7 +98,7 @@ public class PainelServiceTest {
         when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of(up2));
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<ProcessoSummaryDTO> page = painelService.listarProcessos("ADMIN", null, pageable);
+        Page<ProcessoResumoDTO> page = painelService.listarProcessos("ADMIN", null, pageable);
 
         assertEquals(1, page.getTotalElements());
         assertEquals(1L, page.getContent().getFirst().getCodigo());

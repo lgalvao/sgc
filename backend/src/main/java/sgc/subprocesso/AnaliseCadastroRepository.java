@@ -1,0 +1,30 @@
+package sgc.subprocesso;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import sgc.atividade.AnaliseCadastro;
+
+import java.util.List;
+
+/**
+ * Repositório para registros de análise do cadastro (ANALISE_CADASTRO).
+ * Fornece metodo para remover histórico relacionado a um subprocesso.
+ */
+@Repository
+public interface AnaliseCadastroRepository extends JpaRepository<AnaliseCadastro, Long> {
+
+    /**
+     * Remove todas as análises relacionadas ao subprocesso informado.
+     *
+     * @param subprocessoCodigo id do subprocesso
+     */
+    void deleteBySubprocessoCodigo(Long subprocessoCodigo);
+
+    /**
+     * Recupera análises vinculadas a um subprocesso.
+     *
+     * @param subprocessoCodigo id do subprocesso
+     * @return lista de AnaliseCadastro
+     */
+    List<AnaliseCadastro> findBySubprocessoCodigo(Long subprocessoCodigo);
+}

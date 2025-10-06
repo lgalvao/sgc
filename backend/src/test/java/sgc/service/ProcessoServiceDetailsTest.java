@@ -2,13 +2,17 @@ package sgc.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sgc.exception.DomainAccessDeniedException;
-import sgc.model.Processo;
-import sgc.model.Subprocesso;
-import sgc.model.Unidade;
-import sgc.model.UnidadeProcesso;
-import sgc.repository.*;
-import sgc.dto.ProcessDetailDTO;
+import org.springframework.lang.NonNull;
+import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.mapa.CopiaMapaService;
+import sgc.mapa.MapaRepository;
+import sgc.mapa.UnidadeMapaRepository;
+import sgc.processo.*;
+import sgc.subprocesso.MovimentacaoRepository;
+import sgc.subprocesso.Subprocesso;
+import sgc.subprocesso.SubprocessoRepository;
+import sgc.unidade.Unidade;
+import sgc.unidade.UnidadeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,16 +20,16 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Testes unitários para ProcessoService.getDetails(...)
  * <p>
- * - caso feliz: retorna ProcessDetailDTO com unidades e resumo de subprocessos
- * - caso sem permissão: lança DomainAccessDeniedException
+ * - caso feliz: retorna ProcessoDetalheDTO com unidades e resumo de subprocessos
+ * - caso sem permissão: lança ErroDominioAccessoNegado
  */
 public class ProcessoServiceDetailsTest {
-
     private ProcessoRepository processoRepository;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
@@ -41,7 +45,7 @@ public class ProcessoServiceDetailsTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        MapCopyService mapCopyService = mock(MapCopyService.class);
+        CopiaMapaService copiaMapaService = mock(CopiaMapaService.class);
         ApplicationEventPublisherStub publisher = new ApplicationEventPublisherStub();
 
         service = new ProcessoService(
@@ -52,13 +56,13 @@ public class ProcessoServiceDetailsTest {
                 mapaRepository,
                 movimentacaoRepository,
                 unidadeMapaRepository,
-                mapCopyService,
+                copiaMapaService,
                 publisher
         );
     }
 
     @Test
-    public void testGetDetails_HappyPath() {
+    public void testObterDetalhes_HappyPath() {
         // Arrange
         Processo p = new Processo();
         p.setCodigo(1L);
@@ -91,7 +95,7 @@ public class ProcessoServiceDetailsTest {
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
         // Act
-        ProcessDetailDTO dto = service.getDetails(1L, "ADMIN", null);
+        ProcessoDetalheDTO dto = service.obterDetalhes(1L, "ADMIN", null);
 
         // Assert
         assertNotNull(dto);
@@ -103,7 +107,7 @@ public class ProcessoServiceDetailsTest {
     }
 
     @Test
-    public void testGetDetails_UnauthorizedForGestor() {
+    public void testObterDetalhes_UnauthorizedForGestor() {
         // Arrange
         Processo p = new Processo();
         p.setCodigo(2L);
@@ -124,12 +128,13 @@ public class ProcessoServiceDetailsTest {
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(2L)).thenReturn(List.of(sp));
 
         // Act & Assert: gestor da unidade 10 não está presente nos subprocessos -> acesso negado
-        assertThrows(DomainAccessDeniedException.class, () -> service.getDetails(2L, "GESTOR", 10L));
+        assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(2L, "GESTOR", 10L));
     }
 
     // Pequeno stub local para ApplicationEventPublisher (não usamos eventos nos testes)
     static class ApplicationEventPublisherStub implements org.springframework.context.ApplicationEventPublisher {
         @Override
-        public void publishEvent(Object event) {}
+        public void publishEvent(@NonNull Object event) {
+        }
     }
 }

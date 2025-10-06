@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {cancelarModal, DADOS_TESTE, loginComoAdmin, loginComoGestor, TEXTOS, URLS} from "../cdu/helpers";
+import {cancelarModal, DADOS_TESTE, loginComoAdmin, loginComoGestor, TEXTOS, URLS} from "~/cdu/helpers";
 
 test.describe('Captura de Telas - Processos', () => {
     test('09 - Cadastro de Processo - Formulário Vazio (ADMIN)', async ({page}) => {

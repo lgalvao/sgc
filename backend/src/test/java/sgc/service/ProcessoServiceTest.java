@@ -4,18 +4,14 @@ import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.dto.CreateProcessRequest;
-import sgc.dto.ProcessoDTO;
-import sgc.model.Processo;
-import sgc.model.Unidade;
-import sgc.repository.ProcessoRepository;
-import sgc.repository.SubprocessoRepository;
-import sgc.repository.UnidadeProcessoRepository;
-import sgc.repository.UnidadeRepository;
-import sgc.repository.MapaRepository;
-import sgc.repository.MovimentacaoRepository;
-import sgc.repository.UnidadeMapaRepository;
-import sgc.service.MapCopyService;
+import sgc.mapa.CopiaMapaService;
+import sgc.mapa.MapaRepository;
+import sgc.mapa.UnidadeMapaRepository;
+import sgc.processo.*;
+import sgc.subprocesso.MovimentacaoRepository;
+import sgc.subprocesso.SubprocessoRepository;
+import sgc.unidade.Unidade;
+import sgc.unidade.UnidadeRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,9 +40,9 @@ public class ProcessoServiceTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        MapCopyService mapCopyService = mock(MapCopyService.class);
+        CopiaMapaService mapCopyService = mock(CopiaMapaService.class);
         publisher = mock(ApplicationEventPublisher.class);
- 
+
         processoService = new ProcessoService(
                 processoRepository,
                 unidadeRepository,
@@ -61,8 +57,8 @@ public class ProcessoServiceTest {
     }
 
     @Test
-    public void create_shouldPersistAndReturnDTO_whenRequestIsValid() {
-        CreateProcessRequest req = new CreateProcessRequest();
+    public void criar_shouldPersistAndReturnDTO_whenRequestIsValid() {
+        ReqCriarProcesso req = new ReqCriarProcesso();
         req.setDescricao("Processo de teste");
         req.setTipo("MAPEAMENTO");
         req.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
@@ -88,7 +84,7 @@ public class ProcessoServiceTest {
             return p;
         });
 
-        ProcessoDTO dto = processoService.create(req);
+        ProcessoDTO dto = processoService.criar(req);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(123L);
@@ -97,17 +93,17 @@ public class ProcessoServiceTest {
         assertThat(dto.getSituacao()).isEqualTo("CRIADO");
 
         // verificar que evento de criação foi publicado
-        verify(publisher, times(1)).publishEvent(any(ProcessoService.ProcessCreatedEvent.class));
+        verify(publisher, times(1)).publishEvent(any(ProcessoService.EventoProcessoCriado.class));
     }
 
     @Test
-    public void create_shouldThrowConstraintViolationException_whenDescricaoBlank() {
-        CreateProcessRequest req = new CreateProcessRequest();
+    public void criar_shouldThrowConstraintViolationException_whenDescricaoBlank() {
+        ReqCriarProcesso req = new ReqCriarProcesso();
         req.setDescricao("   "); // em branco
         req.setTipo("MAPEAMENTO");
         req.setUnidades(List.of(1L));
 
-        assertThatThrownBy(() -> processoService.create(req))
+        assertThatThrownBy(() -> processoService.criar(req))
                 .isInstanceOf(ConstraintViolationException.class);
 
         verifyNoInteractions(processoRepository);

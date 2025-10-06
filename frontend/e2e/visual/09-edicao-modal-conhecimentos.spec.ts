@@ -8,7 +8,7 @@ import {
     navegarParaCadastroAtividades,
     SELETORES,
     SELETORES_CSS
-} from "../cdu/helpers";
+} from "~/cdu/helpers";
 
 test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conhecimentos', () => {
 

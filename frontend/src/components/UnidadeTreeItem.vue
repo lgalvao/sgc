@@ -1,3 +1,4 @@
+<!--suppress Annotator -->
 <template>
   <div>
     <div class="form-check">

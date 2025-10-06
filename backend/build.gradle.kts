@@ -59,8 +59,22 @@ tasks.withType<Test> {
         "-Dlogging.level.org.springframework.jdbc=ERROR",
         "-Dspring.jpa.show-sql=false",
         "-Dspring.jpa.properties.hibernate.show_sql=false",
-        "-Dspring.jpa.properties.hibernate.format_sql=false"
+        "-Dspring.jpa.properties.hibernate.format_sql=false",
+        "-Dmockito.ext.disable=true", // Desabilita o self-attaching do Mockito
+        "-XX:+EnableDynamicAgentLoading", // Suprime o warning de carregamento dinâmico de agentes
+        "-Xshare:off" // Desabilita o compartilhamento de classes para suprimir o warning do OpenJDK
     )
+
+    // Adicionar o Mockito Java Agent
+    val byteBuddyAgentFile = project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
+
+    doFirst {
+        if (byteBuddyAgentFile != null) {
+            jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
+        } else {
+            logger.warn("byte-buddy-agent not found in testRuntimeClasspath. Mockito warnings might persist.")
+        }
+    }
 
     // Minimal console noise
     testLogging {

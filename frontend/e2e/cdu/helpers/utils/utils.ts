@@ -69,7 +69,7 @@ export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: 
             // continua para próximo fallback
         }
 
-        // 3) Se houver backdrop que intercepta pointer events, desabilitar pointerEvents via evaluateAll e tentar novamente
+        // 3) Se houver backdrop que intercepta pointer eventos, desabilitar pointerEvents via evaluateAll e tentar novamente
         try {
             await page.locator('.modal-backdrop, .modal.fade.show').evaluateAll((nodes: Element[]) => {
                 nodes.forEach(n => {

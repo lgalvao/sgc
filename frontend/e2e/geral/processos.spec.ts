@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {vueTest as test} from '../support/vue-specific-setup';
-import {login, loginAsGestor} from "../utils/auth";
+import {login, loginAsGestor} from "~/utils/auth";
 
 test.describe('Detalhes do Processo - Unidades', () => {
     test.beforeEach(async ({page}) => {

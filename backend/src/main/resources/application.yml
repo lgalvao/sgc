@@ -1,73 +1,15 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
+    username: leonardo
     password: postgres
   jpa:
-    hibernate:
-      ddl-auto: update
+    hibernate.ddl-auto: update
     properties:
-      hibernate:
-        default_schema: sgc
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-
+      hibernate.default_schema: sgc
+    show-sql: false
 server:
   port: 8080
-
-# Propriedades do Sistema Acesso (placeholder)
-sistema-acesso:
-  url: https://sistema-acesso.example.com
-  apiKey: YOUR_API_KEY_HERE
-  maxRetries: 3
-  baseBackoffMs: 200
-  maxBackoffMs: 2000
-  connectTimeoutMs: 2000
-  readTimeoutMs: 5000
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
-  jpa:
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-    properties:
-      hibernate:
-        default_schema: sgc
-  flyway:
-    enabled: false
-
-# Propriedades especiais para teste - apontar para um mock/local ou deixar vazio
-sistema-acesso:
-  url: http://localhost:9999
-  apiKey: test-key
-  maxRetries: 1
-  baseBackoffMs: 10
-  maxBackoffMs: 50
-  connectTimeoutMs: 500
-  readTimeoutMs: 1000
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  jpa:
-    show-sql: false
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: false
 
 logging:
   level:
@@ -78,4 +20,3 @@ logging:
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
-    j.LocalContainerEntityManagerFactoryBean: ERROR

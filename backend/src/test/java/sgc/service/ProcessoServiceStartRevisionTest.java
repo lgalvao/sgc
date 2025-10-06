@@ -3,10 +3,14 @@ package sgc.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.events.ProcessStartedEvent;
-import sgc.model.*;
-import sgc.repository.*;
-import sgc.service.MapCopyService;
+import sgc.mapa.*;
+import sgc.processo.*;
+import sgc.subprocesso.Movimentacao;
+import sgc.subprocesso.MovimentacaoRepository;
+import sgc.subprocesso.Subprocesso;
+import sgc.subprocesso.SubprocessoRepository;
+import sgc.unidade.Unidade;
+import sgc.unidade.UnidadeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +30,7 @@ public class ProcessoServiceStartRevisionTest {
     private SubprocessoRepository subprocessoRepository;
     private MovimentacaoRepository movimentacaoRepository;
     private UnidadeMapaRepository unidadeMapaRepository;
-    private MapCopyService mapCopyService;
+    private CopiaMapaService copiaMapaService;
     private ApplicationEventPublisher publisher;
 
     private ProcessoService processoService;
@@ -40,7 +44,7 @@ public class ProcessoServiceStartRevisionTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         movimentacaoRepository = mock(MovimentacaoRepository.class);
         unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        mapCopyService = mock(MapCopyService.class);
+        copiaMapaService = mock(CopiaMapaService.class);
         publisher = mock(ApplicationEventPublisher.class);
 
         processoService = new ProcessoService(
@@ -51,13 +55,13 @@ public class ProcessoServiceStartRevisionTest {
                 mapaRepository,
                 movimentacaoRepository,
                 unidadeMapaRepository,
-                mapCopyService,
+                copiaMapaService,
                 publisher
         );
     }
 
     @Test
-    public void startRevisionProcess_shouldCopyMapaCreateSubprocessoMovimentacao_andPublishEvent_whenHappyPath() {
+    public void startRevisionProcess_shouldCopyMapaCriarSubprocessoMovimentacao_andPublishEvent_whenHappyPath() {
         Long processoId = 20L;
         Long unidadeId = 2L;
         Long sourceMapaId = 400L;
@@ -91,7 +95,7 @@ public class ProcessoServiceStartRevisionTest {
 
         Mapa novoMapa = new Mapa();
         novoMapa.setCodigo(novoMapaId);
-        when(mapCopyService.copyMapForUnit(sourceMapaId, unidadeId)).thenReturn(novoMapa);
+        when(copiaMapaService.copyMapForUnit(sourceMapaId, unidadeId)).thenReturn(novoMapa);
 
         when(unidadeProcessoRepository.save(any(UnidadeProcesso.class))).thenAnswer(inv -> {
             UnidadeProcesso up = inv.getArgument(0);
@@ -119,11 +123,11 @@ public class ProcessoServiceStartRevisionTest {
         assertThat(dto.getSituacao()).isEqualToIgnoringCase("EM_ANDAMENTO");
 
         // verify that map copy was invoked and subprocesso created with novo mapa
-        verify(mapCopyService, times(1)).copyMapForUnit(sourceMapaId, unidadeId);
+        verify(copiaMapaService, times(1)).copyMapForUnit(sourceMapaId, unidadeId);
         verify(unidadeProcessoRepository, times(1)).save(any(UnidadeProcesso.class));
         verify(subprocessoRepository, times(1)).save(any(Subprocesso.class));
         verify(movimentacao_repository_safe(), times(1)).save(any(Movimentacao.class)); // helper to avoid import collision
-        verify(publisher, times(1)).publishEvent(any(ProcessStartedEvent.class));
+        verify(publisher, times(1)).publishEvent(any(EventoProcessoIniciado.class));
     }
 
     // workaround method to reference movimentacaoRepository verify without naming collision in static imports
