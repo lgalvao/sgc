@@ -25,27 +25,27 @@ public class ProcessoController {
     private final ProcessoService processoService;
 
     @PostMapping
-    public ResponseEntity<ProcessoDTO> criarProcesso(@Valid @RequestBody ReqCriarProcesso request) {
-        ProcessoDTO criado = processoService.criar(request);
+    public ResponseEntity<ProcessoDTO> criarProcesso(@Valid @RequestBody ReqCriarProcesso requisicao) {
+        ProcessoDTO criado = processoService.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProcessoDTO> obterProcesso(@PathVariable Long id) {
-        return processoService.getById(id)
+    public ResponseEntity<ProcessoDTO> obterPorId(@PathVariable Long id) {
+        return processoService.obterPorId(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProcessoDTO> atualizarProcesso(@PathVariable Long id, @Valid @RequestBody ReqAtualizarProcesso request) {
+    public ResponseEntity<ProcessoDTO> atualizarProcesso(@PathVariable Long id, @Valid @RequestBody ReqAtualizarProcesso requisicao) {
         try {
-            ProcessoDTO atualizado = processoService.atualizar(id, request);
+            ProcessoDTO atualizado = processoService.atualizar(id, requisicao);
             return ResponseEntity.ok(atualizado);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ex) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -55,16 +55,16 @@ public class ProcessoController {
         try {
             processoService.apagar(id);
             return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ex) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
      * Retorna os detalhes completos de um processo, incluindo unidades snapshot e resumo de subprocessos.
-     * Este endpoint delega para ProcessoService.getDetails e aplica tratamento de autorização.
+     * Este endpoint delega para ProcessoService.obterDetalhes e aplica tratamento de autorização.
      * <p>
      * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
      */
@@ -74,11 +74,11 @@ public class ProcessoController {
             @RequestParam(name = "perfil") String perfil,
             @RequestParam(name = "unidade", required = false) Long unidade) {
         try {
-            ProcessoDetalheDTO detail = processoService.obterDetalhes(id, perfil, unidade);
-            return ResponseEntity.ok(detail);
-        } catch (IllegalArgumentException e) {
+            ProcessoDetalheDTO detalhes = processoService.obterDetalhes(id, perfil, unidade);
+            return ResponseEntity.ok(detalhes);
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
-        } catch (ErroDominioAccessoNegado e) {
+        } catch (ErroDominioAccessoNegado ex) {
             return ResponseEntity.status(403).build();
         }
     }
@@ -96,13 +96,13 @@ public class ProcessoController {
         try {
             ProcessoDTO resultado;
             if ("REVISAO".equalsIgnoreCase(tipo)) {
-                resultado = processoService.startRevisionProcess(id, unidades);
+                resultado = processoService.iniciarProcessoRevisao(id, unidades);
             } else {
                 // por padrão, inicia mapeamento
                 resultado = processoService.iniciarProcessoMapeamento(id, unidades);
             }
             return ResponseEntity.ok(resultado);
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -120,19 +120,19 @@ public class ProcessoController {
     @PostMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizarProcesso(@PathVariable Long id) {
         try {
-            ProcessoDTO finalizado = processoService.finalizeProcess(id);
+            ProcessoDTO finalizado = processoService.finalizarProcesso(id);
             return ResponseEntity.ok(finalizado);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             // Processo não encontrado
             return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ex) {
             // Processo em situação inválida para finalizar
             return ResponseEntity.badRequest()
-                    .body(Map.of("erro", e.getMessage()));
-        } catch (ErroProcesso e) {
+                    .body(Map.of("erro", ex.getMessage()));
+        } catch (ErroProcesso ex) {
             // Validação de negócio falhou (ex: subprocessos não homologados)
-            return ResponseEntity.status(422) // Unprocessable Entity
-                    .body(Map.of("erro", e.getMessage()));
+            return ResponseEntity.status(422) // Entidade não processável
+                    .body(Map.of("erro", ex.getMessage()));
         }
     }
 }

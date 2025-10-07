@@ -37,22 +37,22 @@ public class ProcessoServiceFinalizeTest {
     @Mock
     private UnidadeMapaRepository unidadeMapaRepository;
     @Mock
-    private ApplicationEventPublisher publisher;
+    private ApplicationEventPublisher publicadorDeEventos;
     @Mock
-    private EmailNotificationService emailService;
+    private EmailNotificationService servicoDeEmail;
     @Mock
-    private EmailTemplateService emailTemplateService;
+    private EmailTemplateService servicoDeTemplateDeEmail;
     @Mock
     private SgrhService sgrhService;
     @Mock
     private ProcessoMapper processoMapper;
 
-    // Mocks for dependencies not directly used in finalizeProcess but required by constructor
+    // Mocks para dependências não usadas diretamente em finalizarProcesso, mas exigidas pelo construtor
     @Mock private UnidadeRepository unidadeRepository;
     @Mock private UnidadeProcessoRepository unidadeProcessoRepository;
     @Mock private MapaRepository mapaRepository;
     @Mock private MovimentacaoRepository movimentacaoRepository;
-    @Mock private CopiaMapaService copiaMapaService;
+    @Mock private CopiaMapaService servicoDeCopiaDeMapa;
     @Mock private ProcessoDetalheMapper processoDetalheMapper;
 
 
@@ -83,42 +83,41 @@ public class ProcessoServiceFinalizeTest {
         subprocessoPendente = new Subprocesso();
         subprocessoPendente.setCodigo(101L);
         subprocessoPendente.setUnidade(unidade);
-        subprocessoPendente.setSituacaoId("MAPA_VALIDADO"); // Not homologated
+        subprocessoPendente.setSituacaoId("MAPA_VALIDADO"); // Não homologado
     }
 
     @Test
-    void finalizeProcess_shouldThrowErroProcesso_whenSubprocessosAreNotHomologated() {
+    void finalizarProcesso_deveLancarErroProcesso_quandoSubprocessosNaoEstaoHomologados() {
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L))
             .thenReturn(List.of(subprocessoHomologado, subprocessoPendente));
 
-        assertThatThrownBy(() -> processoService.finalizeProcess(1L))
+        assertThatThrownBy(() -> processoService.finalizarProcesso(1L))
             .isInstanceOf(ErroProcesso.class)
             .hasMessageContaining("Unidades pendentes:")
             .hasMessageContaining("TEST (Situação: MAPA_VALIDADO)");
 
         verify(processoRepository, never()).save(any(Processo.class));
-        verify(publisher, never()).publishEvent(any(ProcessoService.EventoProcessoFinalizado.class));
+        verify(publicadorDeEventos, never()).publishEvent(any(ProcessoService.EventoDeProcessoFinalizado.class));
     }
 
     @Test
-    void finalizeProcess_shouldUpdateStatusAndMakeMapasVigentes_whenAllSubprocessosAreHomologated() {
+    void finalizarProcesso_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
         // Arrange
-        subprocessoHomologado.setMapa(new sgc.mapa.Mapa()); // Ensure map exists
+        subprocessoHomologado.setMapa(new sgc.mapa.Mapa()); // Garante que o mapa existe
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepository.save(any(Processo.class))).thenReturn(processo);
-        when(unidadeMapaRepository.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty()); // Assume no existing vigentes
+        when(unidadeMapaRepository.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty()); // Assume que não há mapa vigente
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(new sgc.processo.dto.ProcessoDTO());
 
-
         // Act
-        processoService.finalizeProcess(1L);
+        processoService.finalizarProcesso(1L);
 
         // Assert
         verify(processoRepository, times(1)).save(processo);
         verify(unidadeMapaRepository, times(1)).save(any(sgc.mapa.UnidadeMapa.class));
-        verify(publisher, times(1)).publishEvent(any(ProcessoService.EventoProcessoFinalizado.class));
-        // We can add more detailed verification for notification sending if needed
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoFinalizado.class));
+        // Podemos adicionar verificações mais detalhadas para o envio de notificações, se necessário
     }
 }
