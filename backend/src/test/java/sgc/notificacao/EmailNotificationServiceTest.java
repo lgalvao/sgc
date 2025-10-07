@@ -1,7 +1,5 @@
 package sgc.notificacao;
 
-import jakarta.mail.BodyPart;
-import jakarta.mail.Multipart;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,25 +62,15 @@ class EmailNotificationServiceTest {
         verify(mailSender).send(mimeMessageCaptor.capture());
 
         MimeMessage capturedMessage = mimeMessageCaptor.getValue();
-        
-        String content = "";
-        Object messageContent = capturedMessage.getContent();
-        if (messageContent instanceof Multipart) {
-            Multipart multipart = (Multipart) messageContent;
-            for (int i = 0; i < multipart.getCount(); i++) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                if (bodyPart.getContentType().startsWith("text/html")) {
-                    content = (String) bodyPart.getContent();
-                    break;
-                }
-            }
-        } else {
-            content = (String) messageContent;
-        }
+
+        // Use a more robust method to check the content
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        capturedMessage.writeTo(os);
+        String content = os.toString("UTF-8");
 
         assertEquals(to, capturedMessage.getAllRecipients()[0].toString());
         assertEquals("[SGC] Test Subject", capturedMessage.getSubject());
-        assertTrue(content.contains(htmlBody));
+        assertTrue(content.contains(htmlBody), "O corpo do e-mail não contém o HTML esperado.");
         assertEquals("Test Sender <test@sender.com>", capturedMessage.getFrom()[0].toString());
         
         verify(notificacaoRepository, times(1)).save(any(Notificacao.class));

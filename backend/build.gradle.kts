@@ -79,6 +79,7 @@ tasks.withType<Test> {
 
     // JVM settings for stability and suppress Hibernate logging
     jvmArgs = listOf(
+        "--enable-preview",
         "-Xmx2g",
         "-XX:+UseParallelGC",
         "-Dlogging.level.org.hibernate=ERROR",
@@ -282,6 +283,7 @@ data class TestFailure(
 
 // Enable incremental compilation
 tasks.withType<JavaCompile> {
+    options.compilerArgs.add("--enable-preview")
     options.apply {
         isIncremental = true
         isFork = true
