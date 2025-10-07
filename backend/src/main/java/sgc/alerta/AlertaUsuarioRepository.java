@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AlertaUsuarioRepository extends JpaRepository<AlertaUsuario, AlertaUsuario.Id> {
+public interface AlertaUsuarioRepository extends JpaRepository<AlertaUsuario, AlertaUsuario.Chave> {
     List<AlertaUsuario> findByIdUsuarioTitulo(String usuarioTitulo);
     List<AlertaUsuario> findByIdAlertaCodigo(Long alertaCodigo);
 }

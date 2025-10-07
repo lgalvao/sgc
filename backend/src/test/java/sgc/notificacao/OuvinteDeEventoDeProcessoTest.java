@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.AlertaService;
+import sgc.alerta.ServicoAlerta;
 import sgc.processo.EventoProcessoIniciado;
 import sgc.processo.Processo;
 import sgc.processo.ProcessoRepository;
@@ -31,14 +31,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessoEventListenerTest {
+class OuvinteDeEventoDeProcessoTest {
 
     @Mock
-    private AlertaService alertaService;
+    private ServicoAlerta servicoAlerta;
     @Mock
-    private EmailNotificationService emailService;
+    private ServicoNotificacaoEmail servicoNotificacaoEmail;
     @Mock
-    private EmailTemplateService emailTemplateService;
+    private ServicoDeTemplateDeEmail servicoDeTemplateDeEmail;
     @Mock
     private SgrhService sgrhService;
     @Mock
@@ -47,7 +47,7 @@ class ProcessoEventListenerTest {
     private SubprocessoRepository subprocessoRepository;
 
     @InjectMocks
-    private ProcessoEventListener eventListener;
+    private OuvinteDeEventoDeProcesso ouvinteDeEvento;
 
     private Processo processo;
     private Subprocesso subprocessoOperacional;
@@ -76,7 +76,7 @@ class ProcessoEventListenerTest {
 
     @Test
     @DisplayName("Deve processar evento, criar alertas e enviar e-mails para unidade operacional")
-    void handleProcessoIniciado_deveProcessarCompleto_quandoUnidadeOperacional() {
+    void aoIniciarProcesso_deveProcessarCompleto_quandoUnidadeOperacional() {
         // Arrange
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L))
@@ -93,21 +93,21 @@ class ProcessoEventListenerTest {
         when(sgrhService.buscarUsuarioPorTitulo("T123")).thenReturn(Optional.of(titular));
         when(sgrhService.buscarUsuarioPorTitulo("S456")).thenReturn(Optional.of(substituto));
 
-        when(emailTemplateService.criarEmailProcessoIniciado(any(), any(), any(), any()))
+        when(servicoDeTemplateDeEmail.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Operacional</body></html>");
 
         // Act
-        eventListener.handleProcessoIniciado(evento);
+        ouvinteDeEvento.aoIniciarProcesso(evento);
 
         // Assert
-        verify(alertaService, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional));
+        verify(servicoAlerta, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional));
         
-        verify(emailService, times(1)).enviarEmailHtml(
+        verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
                 eq("titular@test.com"),
                 anyString(),
                 contains("Email Operacional")
         );
-        verify(emailService, times(1)).enviarEmailHtml(
+        verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
                 eq("substituto@test.com"),
                 anyString(),
                 contains("Email Operacional")
@@ -116,31 +116,31 @@ class ProcessoEventListenerTest {
     
     @Test
     @DisplayName("Não deve fazer nada se o processo não for encontrado")
-    void handleProcessoIniciado_naoDeveFazerNada_quandoProcessoNaoEncontrado() {
+    void aoIniciarProcesso_naoDeveFazerNada_quandoProcessoNaoEncontrado() {
         // Arrange
         when(processoRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act
-        eventListener.handleProcessoIniciado(evento);
+        ouvinteDeEvento.aoIniciarProcesso(evento);
 
         // Assert
         verify(subprocessoRepository, never()).findByProcessoCodigoWithUnidade(anyLong());
-        verify(alertaService, never()).criarAlertasProcessoIniciado(any(), any());
-        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(servicoAlerta, never()).criarAlertasProcessoIniciado(any(), any());
+        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
     @DisplayName("Não deve enviar e-mails se não houver subprocessos")
-    void handleProcessoIniciado_naoDeveEnviarEmails_quandoNaoHouverSubprocessos() {
+    void aoIniciarProcesso_naoDeveEnviarEmails_quandoNaoHouverSubprocessos() {
         // Arrange
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         // Act
-        eventListener.handleProcessoIniciado(evento);
+        ouvinteDeEvento.aoIniciarProcesso(evento);
 
         // Assert
-        verify(alertaService, never()).criarAlertasProcessoIniciado(any(), any());
-        verify(emailService, never()).enviarEmailHtml(any(), any(), any());
+        verify(servicoAlerta, never()).criarAlertasProcessoIniciado(any(), any());
+        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
     }
 }

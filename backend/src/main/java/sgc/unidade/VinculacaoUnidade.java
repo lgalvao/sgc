@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 
 @Entity
 @Table(name = "VINCULACAO_UNIDADE", schema = "sgc")
@@ -16,7 +16,7 @@ import sgc.comum.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VinculacaoUnidade extends BaseEntity {
+public class VinculacaoUnidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_anterior_codigo")
     private Unidade unidadeAnterior;

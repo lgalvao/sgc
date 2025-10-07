@@ -11,17 +11,17 @@ Este pacote implementa a integração do SGC com o SGRH (Sistema de Gestão de R
 ## Status da Implementação
 
 ✅ **Estrutura Completa Criada**
-- Entidades JPA para as views do Oracle
-- Repositórios somente leitura
+- Entidades JPA para views Oracle
+- Repositories read-only
 - DTOs para transferência de dados
-- Serviço com interface e implementação
-- Configuração de fonte de dados (datasource) separada
+- Service com interface e implementação
+- Configuração de datasource separado
 - Cache configurado
 
-⚠️ **Dados Simulados (Mock) Ativos**
-- Todos os métodos do `SgrhServiceImpl` retornam dados simulados.
-- A estrutura está pronta para se conectar ao Oracle.
-- Marcadores `// TODO: Conectar ao banco SGRH real` indicam onde substituir os dados simulados.
+⚠️ **Dados MOCK Ativos**
+- Todos os Metodos do `SgrhServiceImpl` retornam dados MOCK
+- A estrutura está pronta para conectar ao Oracle
+- Marcadores `// TODO: Conectar ao banco SGRH real` indicam onde substituir
 
 ## Estrutura de Pacotes
 
@@ -32,7 +32,7 @@ sgc/sgrh/
 │   ├── VwUnidade.java
 │   ├── VwResponsabilidade.java
 │   └── VwUsuarioPerfilUnidade.java
-├── repository/          # Repositórios somente leitura
+├── repository/          # Repositories read-only
 │   ├── VwUsuarioRepository.java
 │   ├── VwUnidadeRepository.java
 │   ├── VwResponsabilidadeRepository.java
@@ -74,7 +74,7 @@ Já adicionadas ao `build.gradle.kts`:
 O cache está configurado com:
 - **Tipo**: Caffeine
 - **Tamanho máximo**: 500 entradas
-- **Expiração**: 1 hora após a escrita
+- **Expiração**: 1 hora após escrita
 
 Caches disponíveis:
 - `sgrh-usuarios`
@@ -84,7 +84,7 @@ Caches disponíveis:
 
 ## Uso
 
-### Injetar o Serviço
+### Injetar o Service
 
 ```java
 @Service
@@ -108,27 +108,27 @@ public class MinhaClasse {
 }
 ```
 
-### Métodos Disponíveis
+### Metodos Disponíveis
 
 #### Usuários
 - `buscarUsuarioPorTitulo(String titulo)` - Busca por CPF
-- `buscarUsuarioPorEmail(String email)` - Busca por e-mail
-- `buscarUsuariosAtivos()` - Lista todos os usuários ativos
+- `buscarUsuarioPorEmail(String email)` - Busca por email
+- `buscarUsuariosAtivos()` - Lista todos ativos
 
 #### Unidades
 - `buscarUnidadePorCodigo(Long codigo)` - Busca por código
-- `buscarUnidadesAtivas()` - Lista todas as unidades ativas
-- `buscarSubunidades(Long codigoPai)` - Lista as unidades filhas de uma unidade
-- `construirArvoreHierarquica()` - Monta a árvore completa
+- `buscarUnidadesAtivas()` - Lista todas ativas
+- `buscarSubunidades(Long codigoPai)` - Lista filhos de uma unidade
+- `construirArvoreHierarquica()` - Monta árvore completa
 
 #### Responsabilidades
 - `buscarResponsavelUnidade(Long unidadeCodigo)` - Busca titular/substituto
-- `buscarUnidadesOndeEhResponsavel(String titulo)` - Lista as unidades de responsabilidade de um servidor
+- `buscarUnidadesOndeEhResponsavel(String titulo)` - Lista unidades do servidor
 
 #### Perfis
-- `buscarPerfisUsuario(String titulo)` - Lista os perfis com suas respectivas unidades
-- `usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo)` - Verifica se o usuário tem um perfil em uma unidade
-- `buscarUnidadesPorPerfil(String titulo, String perfil)` - Lista as unidades associadas a um perfil do usuário
+- `buscarPerfisUsuario(String titulo)` - Lista perfis com unidades
+- `usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo)` - Verifica perfil
+- `buscarUnidadesPorPerfil(String titulo, String perfil)` - Lista unidades por perfil
 
 ## Integração com AuthService
 
@@ -143,12 +143,12 @@ public class AuthService {
     private List<PerfilDto> buscarPerfisUsuario(String titulo) {
         // Busca perfis via SGRH
         List<sgc.sgrh.dto.PerfilDto> perfisSgrh = sgrhService.buscarPerfisUsuario(titulo);
-        // Converte para o DTO de segurança...
+        // Converte para DTO do seguranca...
     }
 }
 ```
 
-## Migração de Dados Simulados (Mock) para Conexão Real
+## Migração de MOCK para Real
 
 ### Passo 1: Configurar Conexão Oracle
 
@@ -160,26 +160,26 @@ SGRH_DB_PASSWORD=senha_segura
 
 ### Passo 2: Verificar Views no Oracle
 
-Confirme que as views existem no schema `SGRH`:
+Confirme que as views existem:
 - `SGRH.VW_USUARIO`
 - `SGRH.VW_UNIDADE`
 - `SGRH.VW_RESPONSABILIDADE`
 - `SGRH.VW_USUARIO_PERFIL_UNIDADE`
 
-### Passo 3: Substituir o Código Simulado
+### Passo 3: Descomentar Código Real
 
-No `SgrhServiceImpl.java`, substitua cada método simulado:
+No `SgrhServiceImpl.java`, substitua cada Metodo MOCK:
 
-**ANTES (Simulado):**
+**ANTES (MOCK):**
 ```java
 public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
     // TODO: Conectar ao banco SGRH real
-    log.warn("SGRH SIMULADO: Buscando usuário por título: {}", titulo);
-    return Optional.of(new UsuarioDto(...)); // dados fictícios
+    log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
+    return Optional.of(new UsuarioDto(...)); // dados fake
 }
 ```
 
-**DEPOIS (Real):**
+**DEPOIS (REAL):**
 ```java
 public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
     log.debug("Buscando usuário por título no SGRH: {}", titulo);
@@ -194,7 +194,7 @@ public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
 }
 ```
 
-### Passo 4: Testar a Conexão
+### Passo 4: Testar Conexão
 
 ```java
 @SpringBootTest
@@ -204,14 +204,14 @@ class SgrhServiceIntegrationTest {
     private SgrhService sgrhService;
     
     @Test
-    void testarBuscaDeUsuario() {
+    void testBuscarUsuario() {
         Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo("12345678901");
         assertThat(usuario).isPresent();
     }
 }
 ```
 
-## Solução de Problemas
+## Troubleshooting
 
 ### Erro de Conexão Oracle
 
@@ -219,7 +219,7 @@ class SgrhServiceIntegrationTest {
 Caused by: java.sql.SQLException: Listener refused the connection
 ```
 
-**Solução**: Verifique a URL, porta e SID/Service Name do Oracle.
+**Solução**: Verificar URL, porta e SID/Service Name do Oracle.
 
 ### Erro de Permissão
 
@@ -227,22 +227,22 @@ Caused by: java.sql.SQLException: Listener refused the connection
 ORA-00942: table or view does not exist
 ```
 
-**Solução**: Garanta que o usuário de banco de dados tenha permissão de `SELECT` nas views do schema SGRH.
+**Solução**: Garantir que o usuário tem `SELECT` nas views do schema SGRH.
 
-### Cache Não Funciona
+### Cache não Funciona
 
-**Solução**: Verifique se a anotação `@EnableCaching` está ativa na classe de configuração principal da aplicação.
+**Solução**: Verificar se `@EnableCaching` está ativo na configuração principal.
 
-### Baixo Desempenho
+### Performance Lenta
 
 **Solução**: 
-- Aumentar o `pool` de conexões no `application.yml`.
-- Ajustar os tempos de expiração do cache.
-- Criar índices nas colunas consultadas das views Oracle.
+- Aumentar pool de conexões no `application.yml`
+- Ajustar tempos de cache
+- Criar índices nas views Oracle
 
 ## Logs
 
-Para depuração (debug), habilite os seguintes logs no `application.yml`:
+Para debug, habilite logs do SGRH:
 
 ```yaml
 logging:
@@ -255,24 +255,24 @@ logging:
 ## Segurança
 
 ⚠️ **IMPORTANTE**:
-- A fonte de dados (datasource) do SGRH deve ser **somente leitura (read-only)**.
-- O `pool` de conexões deve ser limitado (ex: 5 conexões).
-- O `timeout` de conexão deve ser configurado (ex: 30 segundos).
-- Todas as transações devem ser marcadas como somente leitura.
-- **NUNCA** permita operações de `INSERT`, `UPDATE` ou `DELETE`.
+- Datasource SGRH é **READ-ONLY**
+- Pool de conexões limitado a 5
+- Timeout de 30 segundos
+- Todas transações são read-only
+- NUNCA permitir INSERT/UPDATE/DELETE
 
 ## Próximos Passos
 
 1. ✅ Estrutura criada
-2. ⏳ Conectar ao banco de dados Oracle SGRH real
-3. ⏳ Remover os dados simulados (mock)
+2. ⏳ Conectar ao Oracle SGRH real
+3. ⏳ Remover dados MOCK
 4. ⏳ Adicionar testes de integração
-5. ⏳ Monitorar o desempenho
-6. ⏳ Documentar o mapeamento de campos das views
+5. ⏳ Monitorar performance
+6. ⏳ Documentar mapeamento de campos das views
 
 ## Contatos
 
-Para dúvidas sobre as views do SGRH no Oracle, contate:
+Para dúvidas sobre as views Oracle do SGRH, contatar:
 - Equipe de RH
 - DBA responsável pelo Oracle
 
@@ -280,4 +280,4 @@ Para dúvidas sobre as views do SGRH no Oracle, contate:
 
 **Data de Criação**: 2025-01-06  
 **Última Atualização**: 2025-01-06  
-**Status**: ✅ Estrutura Completa | ⚠️ Usando Dados Simulados (Mock)
+**Status**: ✅ Estrutura Completa | ⚠️ Usando MOCK

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.mapa.Mapa;
 
 @Entity
@@ -14,7 +14,7 @@ import sgc.mapa.Mapa;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Competencia extends BaseEntity {
+public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
     private Mapa mapa;

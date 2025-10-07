@@ -13,15 +13,15 @@ import java.util.concurrent.Executor;
  */
 @Configuration
 @EnableAsync
-public class AsyncConfig {
+public class ConfiguracaoAssincrona {
     
     /**
      * Configura um pool de threads dedicado para envio de e-mails.
      * 
      * @return Executor configurado para processar e-mails de forma assíncrona
      */
-    @Bean(name = "emailTaskExecutor")
-    public Executor emailTaskExecutor() {
+    @Bean(name = "executorDeTarefasDeEmail")
+    public Executor executorDeTarefasDeEmail() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);           // Mínimo de threads ativas
         executor.setMaxPoolSize(5);            // Máximo de threads

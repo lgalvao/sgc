@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.Alerta;
-import sgc.alerta.AlertaService;
+import sgc.alerta.ServicoAlerta;
 import sgc.processo.EventoProcessoIniciado;
 import sgc.processo.Processo;
 import sgc.processo.ProcessoRepository;
@@ -25,205 +25,163 @@ import java.util.Optional;
  * Listener para eventos de processo.
  * <p>
  * Processa eventos de processo iniciado, criando alertas e enviando e-mails
- * para as unidades participantes de forma diferenciada conforme tipo de unidade.
+ * para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProcessoEventListener {
-    private final AlertaService alertaService;
-    private final EmailNotificationService emailService;
-    private final EmailTemplateService emailTemplateService;
+public class OuvinteDeEventoDeProcesso {
+    private final ServicoAlerta servicoAlerta;
+    private final ServicoNotificacaoEmail servicoNotificacaoEmail;
+    private final ServicoDeTemplateDeEmail servicoDeTemplateDeEmail;
     private final SgrhService sgrhService;
     private final ProcessoRepository processoRepository;
     private final SubprocessoRepository subprocessoRepository;
 
     /**
-     * Processa evento de processo iniciado.
+     * Processa o evento de processo iniciado.
      * Cria alertas diferenciados e envia e-mails para as unidades.
      *
-     * @param evento Evento contendo dados do processo iniciado
+     * @param evento Evento contendo os dados do processo iniciado
      */
     @EventListener
     @Async
     @Transactional
-    public void handleProcessoIniciado(EventoProcessoIniciado evento) {
-        log.info("Processando evento de processo iniciado: processoId={}, tipo={}",
+    public void aoIniciarProcesso(EventoProcessoIniciado evento) {
+        log.info("Processando evento de processo iniciado: idProcesso={}, tipo={}",
                 evento.processoId(), evento.tipo());
 
         try {
-            // Buscar processo completo
             Processo processo = processoRepository.findById(evento.processoId())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "Processo não encontrado: " + evento.processoId()));
 
-            // Buscar subprocessos criados
             List<Subprocesso> subprocessos = subprocessoRepository
                     .findByProcessoCodigoWithUnidade(evento.processoId());
 
             if (subprocessos.isEmpty()) {
-                log.warn("Nenhum subprocesso encontrado para processo {}", evento.processoId());
+                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.processoId());
                 return;
             }
 
-            log.info("Encontrados {} subprocessos para processo {}",
+            log.info("Encontrados {} subprocessos para o processo {}",
                     subprocessos.size(), evento.processoId());
 
             // 1. Criar alertas diferenciados por tipo de unidade
-            List<Alerta> alertas = alertaService.criarAlertasProcessoIniciado(
+            List<Alerta> alertas = servicoAlerta.criarAlertasProcessoIniciado(
                     processo,
                     subprocessos
             );
-            log.info("Criados {} alertas para processo {}", alertas.size(), processo.getCodigo());
+            log.info("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
 
             // 2. Enviar e-mails para cada subprocesso
             for (Subprocesso subprocesso : subprocessos) {
                 try {
-                    enviarEmailProcessoIniciado(processo, subprocesso);
+                    enviarEmailDeProcessoIniciado(processo, subprocesso);
                 } catch (Exception e) {
-                    log.error("Erro ao enviar e-mail para subprocesso {}: {}", subprocesso.getCodigo(), e.getMessage(), e);
-                    // Continua processando outros subprocessos
+                    log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getMessage(), e);
                 }
             }
 
-            log.info("Processamento de evento concluído para processo {}", processo.getCodigo());
+            log.info("Processamento de evento concluído para o processo {}", processo.getCodigo());
         } catch (Exception e) {
             log.error("Erro ao processar evento de processo iniciado: {}", e.getMessage(), e);
-            // Não propaga exceção para não interromper outros listeners
         }
     }
 
-    /**
-     * Envia e-mail de processo iniciado para responsável da unidade.
-     *
-     * @param processo    Processo iniciado
-     * @param subprocesso Subprocesso da unidade
-     */
-    private void enviarEmailProcessoIniciado(Processo processo, Subprocesso subprocesso) {
+    private void enviarEmailDeProcessoIniciado(Processo processo, Subprocesso subprocesso) {
         if (subprocesso.getUnidade() == null) {
             log.warn("Subprocesso {} sem unidade associada", subprocesso.getCodigo());
             return;
         }
 
-        Long unidadeCodigo = subprocesso.getUnidade().getCodigo();
+        Long codigoUnidade = subprocesso.getUnidade().getCodigo();
 
         try {
-            // Buscar dados da unidade via SGRH
-            UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(unidadeCodigo)
+            UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(codigoUnidade)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "Unidade não encontrada no SGRH: " + unidadeCodigo));
+                            "Unidade não encontrada no SGRH: " + codigoUnidade));
 
-            // Buscar responsável da unidade
-            Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(unidadeCodigo);
+            Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
 
-            if (responsavel.isEmpty() || responsavel.get().titularTitulo() == null) {
-                log.warn("Responsável não encontrado para unidade {} ({})",
-                        unidade.nome(), unidadeCodigo);
+            if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {
+                log.warn("Responsável não encontrado para a unidade {} ({})",
+                        unidade.nome(), codigoUnidade);
                 return;
             }
 
-            // Buscar e-mail do titular
-            UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavel.get().titularTitulo()).orElse(null);
+            UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavelOpt.get().titularTitulo()).orElse(null);
 
             if (titular == null || titular.email() == null || titular.email().isBlank()) {
-                log.warn("E-mail não encontrado para titular {} da unidade {}",
-                        responsavel.get().titularTitulo(), unidade.nome());
+                log.warn("E-mail não encontrado para o titular {} da unidade {}",
+                        responsavelOpt.get().titularTitulo(), unidade.nome());
                 return;
             }
 
-            // Determinar tipo de e-mail baseado no tipo de unidade
             String assunto;
-            String htmlBody;
+            String corpoHtml;
             String tipoUnidade = unidade.tipo();
 
             if ("OPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
-                // E-mail para unidade operacional
                 assunto = "Processo Iniciado - " + processo.getDescricao();
-                htmlBody = emailTemplateService.criarEmailProcessoIniciado(
+                corpoHtml = servicoDeTemplateDeEmail.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         processo.getTipo(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-
             } else if ("INTERMEDIARIA".equalsIgnoreCase(tipoUnidade)) {
-                // E-mail para unidade intermediária
                 assunto = "Processo Iniciado em Unidades Subordinadas - " + processo.getDescricao();
-                htmlBody = criarEmailUnidadeIntermediaria(
+                corpoHtml = criarEmailParaUnidadeIntermediaria(
                         unidade.nome(),
                         processo.getDescricao(),
                         processo.getTipo(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-
             } else if ("INTEROPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
-                // E-mail para unidade interoperacional (combina os dois tipos)
                 assunto = "Processo Iniciado - " + processo.getDescricao();
-                htmlBody = criarEmailUnidadeInteroperacional(
+                corpoHtml = criarEmailParaUnidadeInteroperacional(
                         unidade.nome(),
                         processo.getDescricao(),
                         processo.getTipo(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-
             } else {
                 log.warn("Tipo de unidade desconhecido: {} (unidade={})",
-                        tipoUnidade, unidadeCodigo);
+                        tipoUnidade, codigoUnidade);
                 return;
             }
 
-            // Enviar e-mail
-            emailService.enviarEmailHtml(
-                    titular.email(),
-                    assunto,
-                    htmlBody
-            );
-
-            log.info("E-mail enviado para unidade {} ({}) - Destinatário: {} ({})",
+            servicoNotificacaoEmail.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+            log.info("E-mail enviado para a unidade {} ({}) - Destinatário: {} ({})",
                     unidade.sigla(), tipoUnidade, titular.nome(), titular.email());
 
-            // Se houver substituto com e-mail, também envia
-            if (responsavel.get().substitutoTitulo() != null) {
-                enviarEmailParaSubstituto(responsavel.get().substitutoTitulo(),
-                        assunto, htmlBody, unidade.nome());
+            if (responsavelOpt.get().substitutoTitulo() != null) {
+                enviarEmailParaSubstituto(responsavelOpt.get().substitutoTitulo(), assunto, corpoHtml, unidade.nome());
             }
 
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail para unidade {}: {}",
-                    unidadeCodigo, e.getMessage(), e);
-            // Não interrompe o fluxo se o e-mail falhar
+            log.error("Erro ao enviar e-mail para a unidade {}: {}",
+                    codigoUnidade, e.getMessage(), e);
         }
     }
 
-    /**
-     * Envia e-mail para o substituto da unidade.
-     */
-    private void enviarEmailParaSubstituto(String substitutoTitulo, String assunto,
-                                           String htmlBody, String nomeUnidade) {
+    private void enviarEmailParaSubstituto(String tituloSubstituto, String assunto,
+                                           String corpoHtml, String nomeUnidade) {
         try {
-            UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(substitutoTitulo)
-                    .orElse(null);
-
+            UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
-                emailService.enviarEmailHtml(
-                        substituto.email(),
-                        assunto,
-                        htmlBody
-                );
-
-                log.info("E-mail enviado para substituto da unidade {} - Destinatário: {} ({})",
+                servicoNotificacaoEmail.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
+                log.info("E-mail enviado para o substituto da unidade {} - Destinatário: {} ({})",
                         nomeUnidade, substituto.nome(), substituto.email());
             }
         } catch (Exception e) {
-            log.warn("Erro ao enviar e-mail para substituto da unidade {}: {}",
+            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}",
                     nomeUnidade, e.getMessage());
         }
     }
 
-    /**
-     * Cria HTML de e-mail específico para unidades intermediárias.
-     */
-    private String criarEmailUnidadeIntermediaria(String nomeUnidade, String nomeProcesso,
+    private String criarEmailParaUnidadeIntermediaria(String nomeUnidade, String nomeProcesso,
                                                   String tipoProcesso, java.time.LocalDate dataLimite) {
         String dataFormatada = dataLimite != null ?
                 String.format("%02d/%02d/%d",
@@ -244,9 +202,9 @@ public class ProcessoEventListener {
                         
                         <p><strong>Informações importantes:</strong></p>
                         <ul>
-                            <li>As unidades subordinadas já podem iniciar o cadastro de atividades e conhecimentos</li>
-                            <li>À medida que os cadastros forem disponibilizados, será possível visualizar e realizar a validação</li>
-                            <li>Acompanhe o andamento no sistema SGC</li>
+                            <li>As unidades subordinadas já podem iniciar o cadastro de atividades e conhecimentos.</li>
+                            <li>À medida que os cadastros forem disponibilizados, será possível visualizar e realizar a validação.</li>
+                            <li>Acompanhe o andamento no sistema SGC.</li>
                         </ul>
                         
                         <p style="margin-top: 20px;">
@@ -259,14 +217,11 @@ public class ProcessoEventListener {
                         """,
                 tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
 
-        return emailTemplateService.criarTemplateBase(
+        return servicoDeTemplateDeEmail.criarTemplateBase(
                 "Processo Iniciado em Unidades Subordinadas", conteudo);
     }
 
-    /**
-     * Cria HTML de e-mail específico para unidades interoperacionais.
-     */
-    private String criarEmailUnidadeInteroperacional(String nomeUnidade, String nomeProcesso,
+    private String criarEmailParaUnidadeInteroperacional(String nomeUnidade, String nomeProcesso,
                                                      String tipoProcesso, java.time.LocalDate dataLimite) {
         String dataFormatada = dataLimite != null ?
                 String.format("%02d/%02d/%d",
@@ -286,13 +241,13 @@ public class ProcessoEventListener {
                         </div>
                         
                         <div style="background-color: #fff3cd; padding: 15px; margin: 15px 0; border-left: 4px solid #ffc107;">
-                            <p style="margin: 0;"><strong>⚠ Atenção:</strong> Sua unidade é do tipo <strong>Interoperacional</strong></p>
+                            <p style="margin: 0;"><strong>⚠ Atenção:</strong> Sua unidade é do tipo <strong>Interoperacional</strong>.</p>
                         </div>
                         
                         <p><strong>Você deverá realizar DUAS ações:</strong></p>
                         <ol>
-                            <li><strong>Como unidade operacional:</strong> Realizar o cadastro de atividades e conhecimentos da sua própria unidade</li>
-                            <li><strong>Como unidade intermediária:</strong> Validar os mapas das unidades subordinadas quando forem disponibilizados</li>
+                            <li><strong>Como unidade operacional:</strong> Realizar o cadastro de atividades e conhecimentos da sua própria unidade.</li>
+                            <li><strong>Como unidade intermediária:</strong> Validar os mapas das unidades subordinadas quando forem disponibilizados.</li>
                         </ol>
                         
                         <p style="margin-top: 20px;">
@@ -305,7 +260,7 @@ public class ProcessoEventListener {
                         """,
                 tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
 
-        return emailTemplateService.criarTemplateBase(
+        return servicoDeTemplateDeEmail.criarTemplateBase(
                 "Processo Iniciado - Unidade Interoperacional", conteudo);
     }
 }

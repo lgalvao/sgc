@@ -12,7 +12,7 @@ import java.util.List;
  * Responsável por criar alertas diferenciados para unidades participantes
  * de processos, considerando os tipos de unidade (OPERACIONAL, INTERMEDIÁRIA, INTEROPERACIONAL).
  */
-public interface AlertaService {
+public interface ServicoAlerta {
     
     /**
      * Cria um alerta para uma unidade específica.

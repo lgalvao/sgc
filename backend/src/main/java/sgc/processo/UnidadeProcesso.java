@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 
 @Entity
 @Table(name = "UNIDADE_PROCESSO", schema = "sgc")
@@ -15,7 +15,7 @@ import sgc.comum.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UnidadeProcesso extends BaseEntity {
+public class UnidadeProcesso extends EntidadeBase {
 
     @Column(name = "processo_codigo")
     private Long processoCodigo;

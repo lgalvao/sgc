@@ -24,8 +24,8 @@ O sistema de alertas é projetado para garantir que os usuários relevantes seja
   - `ManyToOne` com `Alerta`.
   - `ManyToOne` com `Usuario`.
 
-### 3. `AlertaService.java` (Interface)
-**Localização:** `backend/src/main/java/sgc/alerta/AlertaService.java`
+### 3. `ServicoAlerta.java` (Interface)
+**Localização:** `backend/src/main/java/sgc/alerta/ServicoAlerta.java`
 - **Descrição:** Define o contrato para os serviços que gerenciam alertas.
 - **Métodos Principais:**
   - `criarAlerta(...)`: Cria um alerta genérico para uma unidade de destino.
@@ -33,9 +33,9 @@ O sistema de alertas é projetado para garantir que os usuários relevantes seja
   - `criarAlertaCadastroDisponibilizado(...)`: Cria um alerta para notificar sobre um cadastro que foi disponibilizado.
   - `criarAlertaCadastroDevolvido(...)`: Cria um alerta para notificar sobre um cadastro que foi devolvido com um motivo.
 
-### 4. `AlertaServiceImpl.java` (Implementação)
-**Localização:** `backend/src/main/java/sgc/alerta/AlertaServiceImpl.java`
-- **Descrição:** Implementação concreta da interface `AlertaService`. Contém a lógica de negócio para criar e salvar os alertas e suas associações com os usuários.
+### 4. `ServicoAlertaImpl.java` (Implementação)
+**Localização:** `backend/src/main/java/sgc/alerta/ServicoAlertaImpl.java`
+- **Descrição:** Implementação concreta da interface `ServicoAlerta`. Contém a lógica de negócio para criar e salvar os alertas e suas associações com os usuários.
 - **Funcionalidades:**
   - Determina os destinatários de um alerta (responsável da unidade e superiores).
   - Customiza as mensagens de alerta com base no tipo de unidade (Operacional, Intermediária).
@@ -51,15 +51,15 @@ O sistema de alertas é projetado para garantir que os usuários relevantes seja
 
 ## Fluxo de Criação de Alerta
 
-1.  **Invocação do Serviço**: Um serviço de nível superior (ex: `ProcessoService`) chama um método em `AlertaService` (ex: `criarAlertasProcessoIniciado`).
-2.  **Lógica de Negócio**: `AlertaServiceImpl` processa a requisição, determina a mensagem, os destinatários e outras propriedades do alerta.
+1.  **Invocação do Serviço**: Um serviço de nível superior (ex: `ProcessoService`) chama um método em `ServicoAlerta` (ex: `criarAlertasProcessoIniciado`).
+2.  **Lógica de Negócio**: `ServicoAlertaImpl` processa a requisição, determina a mensagem, os destinatários e outras propriedades do alerta.
 3.  **Criação da Entidade**: Uma nova instância de `Alerta` é criada.
 4.  **Identificação dos Destinatários**: O serviço busca os usuários associados à unidade de destino.
 5.  **Persistência**: O `Alerta` e as associações `AlertaUsuario` são salvos no banco de dados através dos respectivos repositórios.
 
 ## Como Usar
 
-Para criar um alerta, injete `AlertaService` em seu componente e chame o método apropriado.
+Para criar um alerta, injete `ServicoAlerta` em seu componente e chame o método apropriado.
 
 **Exemplo:**
 ```java
@@ -67,7 +67,7 @@ Para criar um alerta, injete `AlertaService` em seu componente e chame o método
 public class GestaoDeProcessosService {
 
     @Autowired
-    private AlertaService alertaService;
+    private ServicoAlerta servicoAlerta;
 
     @Autowired
     private ProcessoRepository processoRepository;
@@ -80,7 +80,7 @@ public class GestaoDeProcessosService {
         List<Subprocesso> subprocessos = ...;
 
         // Cria os alertas para o início do processo
-        alertaService.criarAlertasProcessoIniciado(processo, subprocessos);
+        servicoAlerta.criarAlertasProcessoIniciado(processo, subprocessos);
     }
 }
 ```
