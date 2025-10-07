@@ -7,24 +7,17 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Serviço responsável por criar templates HTML para diferentes tipos de e-mail.
- * Cada Metodo cria um template específico para um caso de uso do sistema.
+ * Cada método cria um template específico para um caso de uso do sistema.
  */
 @Service
-public class EmailTemplateService {
+public class ServicoDeTemplateDeEmail {
     
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     /**
      * Template para notificar início de processo (CDU-04, CDU-05).
-     * Enviado para: Responsável da unidade + superiores hierárquicos
-     * 
-     * @param nomeUnidade Nome da unidade onde o processo foi iniciado
-     * @param nomeProcesso Nome do processo iniciado
-     * @param tipoProcesso Tipo do processo (Mapeamento/Revisão)
-     * @param dataLimite Data limite para conclusão da primeira etapa
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailProcessoIniciado(
+    public String criarEmailDeProcessoIniciado(
             String nomeUnidade, 
             String nomeProcesso, 
             String tipoProcesso,
@@ -56,21 +49,15 @@ public class EmailTemplateService {
                         </p>
                         """,
             tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, 
-            dataLimite.format(FORMATTER));
+            dataLimite.format(FORMATADOR));
         
         return criarTemplateBase("Processo Iniciado - " + tipoProcesso, conteudo);
     }
     
     /**
      * Template para notificar disponibilização de cadastro (CDU-09, CDU-10).
-     * Enviado para: Gestor SEDOC
-     * 
-     * @param nomeUnidade Nome da unidade que disponibilizou o cadastro
-     * @param nomeProcesso Nome do processo
-     * @param quantidadeAtividades Quantidade de atividades cadastradas
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailCadastroDisponibilizado(
+    public String criarEmailDeCadastroDisponibilizado(
             String nomeUnidade,
             String nomeProcesso,
             int quantidadeAtividades) {
@@ -106,15 +93,8 @@ public class EmailTemplateService {
     
     /**
      * Template para notificar devolução de cadastro (CDU-13).
-     * Enviado para: Responsável da unidade
-     * 
-     * @param nomeUnidade Nome da unidade
-     * @param nomeProcesso Nome do processo
-     * @param motivo Motivo da devolução
-     * @param observacoes Observações do analista
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailCadastroDevolvido(
+    public String criarEmailDeCadastroDevolvido(
             String nomeUnidade,
             String nomeProcesso,
             String motivo,
@@ -157,14 +137,8 @@ public class EmailTemplateService {
     
     /**
      * Template para notificar disponibilização de mapa (CDU-17).
-     * Enviado para: Responsável + superiores hierárquicos
-     * 
-     * @param nomeUnidade Nome da unidade
-     * @param nomeProcesso Nome do processo
-     * @param dataLimiteValidacao Data limite para validação do mapa
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailMapaDisponibilizado(
+    public String criarEmailDeMapaDisponibilizado(
             String nomeUnidade,
             String nomeProcesso,
             LocalDate dataLimiteValidacao) {
@@ -193,20 +167,15 @@ public class EmailTemplateService {
                             </a>
                         </p>
                         """,
-            nomeUnidade, nomeProcesso, dataLimiteValidacao.format(FORMATTER));
+            nomeUnidade, nomeProcesso, dataLimiteValidacao.format(FORMATADOR));
         
         return criarTemplateBase("Mapa de Competências Disponibilizado", conteudo);
     }
     
     /**
      * Template para notificar validação de mapa (CDU-18).
-     * Enviado para: Gestor SEDOC
-     * 
-     * @param nomeUnidade Nome da unidade
-     * @param nomeProcesso Nome do processo
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailMapaValidado(
+    public String criarEmailDeMapaValidado(
             String nomeUnidade,
             String nomeProcesso) {
         
@@ -236,14 +205,8 @@ public class EmailTemplateService {
     
     /**
      * Template para notificar finalização de processo (CDU-21).
-     * Enviado para: Todas as unidades participantes
-     *
-     * @param nomeProcesso Nome do processo finalizado
-     * @param dataFinalizacao Data de finalização
-     * @param quantidadeMapas Quantidade de mapas agora vigentes
-     * @return HTML formatado para o e-mail
      */
-    public String criarEmailProcessoFinalizado(
+    public String criarEmailDeProcessoFinalizado(
             String nomeProcesso,
             LocalDate dataFinalizacao,
             int quantidadeMapas) {
@@ -275,26 +238,15 @@ public class EmailTemplateService {
                             </a>
                         </p>
                         """,
-            nomeProcesso, dataFinalizacao.format(FORMATTER), quantidadeMapas);
+            nomeProcesso, dataFinalizacao.format(FORMATADOR), quantidadeMapas);
         
         return criarTemplateBase("Processo Finalizado - Mapas Vigentes", conteudo);
     }
     
     /**
-     * Template para notificar finalização de processo (CDU-21) - Versão simplificada.
-     * Permite mensagem personalizada conforme o tipo de unidade.
-     * <p>
-     * Enviado para:
-     * - Unidades operacionais: "Mapas vigentes, processo finalizado"
-     * - Unidades intermediárias: "Mapas das subordinadas vigentes"
-     * - Unidades interoperacionais: Ambas as mensagens
-     *
-     * @param siglaUnidade Sigla da unidade destinatária
-     * @param nomeProcesso Nome do processo finalizado
-     * @param mensagemPersonalizada Mensagem específica conforme tipo de unidade
-     * @return HTML formatado para o e-mail
+     * Template para notificar finalização de processo por unidade (CDU-21).
      */
-    public String criarEmailProcessoFinalizadoUnidade(
+    public String criarEmailDeProcessoFinalizadoPorUnidade(
             String siglaUnidade,
             String nomeProcesso,
             String mensagemPersonalizada) {
@@ -328,14 +280,6 @@ public class EmailTemplateService {
         return criarTemplateBase("SGC: Conclusão do processo " + nomeProcesso, conteudo);
     }
     
-    /**
-     * Cria o template base HTML comum para todos os e-mails.
-     * Inclui cabeçalho, rodapé e estilos padronizados.
-     *
-     * @param titulo Título do e-mail
-     * @param conteudo Conteúdo HTML específico do e-mail
-     * @return HTML completo formatado
-     */
     public String criarTemplateBase(String titulo, String conteudo) {
         return String.format("""
             <!DOCTYPE html>

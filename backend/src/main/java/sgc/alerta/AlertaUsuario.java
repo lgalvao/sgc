@@ -20,13 +20,13 @@ public class AlertaUsuario implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
-    public static class Id implements Serializable {
+    public static class Chave implements Serializable {
         private Long alertaCodigo;
         private String usuarioTitulo;
     }
 
     @EmbeddedId
-    private Id id;
+    private Chave id;
 
     @MapsId("alertaCodigo")
     @ManyToOne

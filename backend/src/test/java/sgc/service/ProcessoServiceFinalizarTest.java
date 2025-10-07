@@ -1,6 +1,7 @@
 package sgc.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,8 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
-import sgc.notificacao.EmailNotificationService;
-import sgc.notificacao.EmailTemplateService;
+import sgc.notificacao.ServicoNotificacaoEmail;
+import sgc.notificacao.ServicoDeTemplateDeEmail;
 import sgc.processo.*;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
@@ -28,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProcessoServiceFinalizeTest {
+public class ProcessoServiceFinalizarTest {
 
     @Mock
     private ProcessoRepository processoRepository;
@@ -39,15 +40,14 @@ public class ProcessoServiceFinalizeTest {
     @Mock
     private ApplicationEventPublisher publicadorDeEventos;
     @Mock
-    private EmailNotificationService servicoDeEmail;
+    private ServicoNotificacaoEmail servicoNotificacaoEmail;
     @Mock
-    private EmailTemplateService servicoDeTemplateDeEmail;
+    private ServicoDeTemplateDeEmail servicoDeTemplateDeEmail;
     @Mock
     private SgrhService sgrhService;
     @Mock
     private ProcessoMapper processoMapper;
 
-    // Mocks para dependências não usadas diretamente em finalizarProcesso, mas exigidas pelo construtor
     @Mock private UnidadeRepository unidadeRepository;
     @Mock private UnidadeProcessoRepository unidadeProcessoRepository;
     @Mock private MapaRepository mapaRepository;
@@ -83,10 +83,11 @@ public class ProcessoServiceFinalizeTest {
         subprocessoPendente = new Subprocesso();
         subprocessoPendente.setCodigo(101L);
         subprocessoPendente.setUnidade(unidade);
-        subprocessoPendente.setSituacaoId("MAPA_VALIDADO"); // Não homologado
+        subprocessoPendente.setSituacaoId("MAPA_VALIDADO");
     }
 
     @Test
+    @DisplayName("finalizarProcesso deve lançar ErroProcesso quando subprocessos não estão homologados")
     void finalizarProcesso_deveLancarErroProcesso_quandoSubprocessosNaoEstaoHomologados() {
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L))
@@ -102,13 +103,14 @@ public class ProcessoServiceFinalizeTest {
     }
 
     @Test
+    @DisplayName("finalizarProcesso deve atualizar status e tornar mapas vigentes quando todos os subprocessos estão homologados")
     void finalizarProcesso_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
         // Arrange
-        subprocessoHomologado.setMapa(new sgc.mapa.Mapa()); // Garante que o mapa existe
+        subprocessoHomologado.setMapa(new sgc.mapa.Mapa());
         when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepository.save(any(Processo.class))).thenReturn(processo);
-        when(unidadeMapaRepository.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty()); // Assume que não há mapa vigente
+        when(unidadeMapaRepository.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(new sgc.processo.dto.ProcessoDTO());
 
         // Act
@@ -118,6 +120,5 @@ public class ProcessoServiceFinalizeTest {
         verify(processoRepository, times(1)).save(processo);
         verify(unidadeMapaRepository, times(1)).save(any(sgc.mapa.UnidadeMapa.class));
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoFinalizado.class));
-        // Podemos adicionar verificações mais detalhadas para o envio de notificações, se necessário
     }
 }

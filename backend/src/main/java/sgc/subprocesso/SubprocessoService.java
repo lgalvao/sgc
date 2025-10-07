@@ -20,7 +20,7 @@ import sgc.conhecimento.ConhecimentoMapper;
 import sgc.conhecimento.ConhecimentoRepository;
 import sgc.notificacao.Notificacao;
 import sgc.notificacao.NotificacaoRepository;
-import sgc.notificacao.NotificationService;
+import sgc.notificacao.ServicoNotificacao;
 import sgc.processo.EventoSubprocessoDisponibilizado;
 import sgc.subprocesso.dto.AnaliseValidacaoDTO;
 import sgc.subprocesso.dto.MapaAjusteDTO;
@@ -46,7 +46,7 @@ public class SubprocessoService {
     private final AnaliseCadastroRepository analiseCadastroRepository;
     private final AnaliseValidacaoRepository analiseValidacaoRepository;
     private final NotificacaoRepository notificacaoRepository;
-    private final NotificationService notificationService;
+    private final ServicoNotificacao servicoNotificacao;
     private final ApplicationEventPublisher eventPublisher;
     private final AlertaRepository alertaRepository;
     private final AtividadeMapper atividadeMapper;
@@ -224,8 +224,8 @@ public class SubprocessoService {
         }
 
         try {
-            if (notificationService != null && unidadeSuperior != null) {
-                notificationService.enviarEmail(
+            if (servicoNotificacao != null && unidadeSuperior != null) {
+                servicoNotificacao.enviarEmail(
                         unidadeSuperior.getSigla(),
                         "Cadastro disponibilizado",
                         "Cadastro de atividades disponibilizado para análise"
@@ -291,8 +291,8 @@ public class SubprocessoService {
         }
 
         try {
-            if (notificationService != null && unidadeSuperior != null) {
-                notificationService.enviarEmail(unidadeSuperior.getSigla(),
+            if (servicoNotificacao != null && unidadeSuperior != null) {
+                servicoNotificacao.enviarEmail(unidadeSuperior.getSigla(),
                         "Revisão do cadastro disponibilizada",
                         "Revisão do cadastro de atividades disponibilizada para análise"
                 );
@@ -533,7 +533,7 @@ public class SubprocessoService {
         );
 
         try {
-            notificationService.enviarEmail(unidade.getSigla(), emailSubject, emailBody);
+            servicoNotificacao.enviarEmail(unidade.getSigla(), emailSubject, emailBody);
         } catch (Exception e) {
             log.error("Falha ao enviar e-mail de disponibilização de mapa para unidade {}: {}", unidade.getSigla(), e.getMessage());
         }
@@ -541,7 +541,7 @@ public class SubprocessoService {
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
             try {
-                notificationService.enviarEmail(superior.getSigla(), emailSubject, emailBody);
+                servicoNotificacao.enviarEmail(superior.getSigla(), emailSubject, emailBody);
             } catch (Exception e) {
                 log.error("Falha ao enviar e-mail de disponibilização de mapa para unidade superior {}: {}", superior.getSigla(), e.getMessage());
             }
@@ -561,8 +561,8 @@ public class SubprocessoService {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
             try {
-                if (notificationService != null) {
-                    notificationService.enviarEmail(
+                if (servicoNotificacao != null) {
+                    servicoNotificacao.enviarEmail(
                             unidadeSuperior.getSigla(),
                             "SGC: Sugestões apresentadas para o mapa de competências da " + sp.getUnidade().getSigla(),
                             "A unidade " + sp.getUnidade().getSigla() + " apresentou sugestões para o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessas sugestões já pode ser realizada no sistema."
@@ -587,8 +587,8 @@ public class SubprocessoService {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
             try {
-                if (notificationService != null) {
-                    notificationService.enviarEmail(
+                if (servicoNotificacao != null) {
+                    servicoNotificacao.enviarEmail(
                             unidadeSuperior.getSigla(),
                             "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
                             "A unidade " + sp.getUnidade().getSigla() + " validou o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessa validação já pode ser realizada no sistema."
@@ -611,8 +611,8 @@ public class SubprocessoService {
 
     private void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
         try {
-            if (notificationService != null) {
-                notificationService.enviarEmail(
+            if (servicoNotificacao != null) {
+                servicoNotificacao.enviarEmail(
                         unidadeDevolucao.getSigla(),
                         "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
                         "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvida para ajustes. Acompanhe o processo no sistema."
@@ -636,8 +636,8 @@ public class SubprocessoService {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior();
         if (unidadeSuperior != null) {
             try {
-                if (notificationService != null) {
-                    notificationService.enviarEmail(
+                if (servicoNotificacao != null) {
+                    servicoNotificacao.enviarEmail(
                             unidadeSuperior.getSigla(),
                             "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
                             "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi submetida para análise por essa unidade. A análise já pode ser realizada no sistema."
@@ -698,8 +698,8 @@ public class SubprocessoService {
 
     private void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
         try {
-            if (notificationService != null) {
-                notificationService.enviarEmail(
+            if (servicoNotificacao != null) {
+                servicoNotificacao.enviarEmail(
                         unidadeDevolucao.getSigla(),
                         "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
                         "O cadastro de atividades da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvido para ajustes com o motivo: " + motivo + ". Acompanhe o processo no sistema."

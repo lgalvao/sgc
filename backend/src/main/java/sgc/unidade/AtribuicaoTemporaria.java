@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.comum.Usuario;
 
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AtribuicaoTemporaria extends BaseEntity {
+public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidade;

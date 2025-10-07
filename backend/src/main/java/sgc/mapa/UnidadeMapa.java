@@ -2,7 +2,7 @@ package sgc.mapa;
 
 import jakarta.persistence.*;
 import lombok.*;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.unidade.Unidade;
 
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UnidadeMapa extends BaseEntity {
+public class UnidadeMapa extends EntidadeBase {
     @Column(name = "unidade_codigo", unique = true, nullable = false)
     private Long unidadeCodigo;
 

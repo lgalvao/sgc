@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.mapa.Mapa;
 import sgc.processo.Processo;
 import sgc.unidade.Unidade;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subprocesso extends BaseEntity {
+public class Subprocesso extends EntidadeBase {
 
     @ManyToOne
     @JoinColumn(name = "processo_codigo")

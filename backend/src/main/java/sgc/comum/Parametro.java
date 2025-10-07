@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Parametro extends BaseEntity {
+public class Parametro extends EntidadeBase {
 
     @Column(name = "chave", length = 50)
     private String chave;

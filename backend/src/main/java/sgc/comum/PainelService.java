@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Service responsável por compor as visões do painel (processos e alertas)
+ * Serviço responsável por compor as visões do painel (processos e alertas).
  * Aplica regras de visibilidade e realiza o mapeamento para DTOs.
  */
 @Service
@@ -30,61 +30,60 @@ public class PainelService {
     private final UnidadeProcessoRepository unidadeProcessoRepository;
 
     /**
-     * Lista processos aplicando regra de visibilidade por perfil e/ou unidade.
+     * Lista processos aplicando a regra de visibilidade por perfil e/ou unidade.
      * Regras implementadas:
-     * - perfil == "ADMIN" -> somente processos com situacao 'CRIADO'
-     * - se unidadeCodigo informado -> somente processos vinculados a essa unidade (via UNIDADE_PROCESSO)
+     * - perfil == "ADMIN" -> somente processos com situação 'CRIADO'
+     * - se codigoUnidade informado -> somente processos vinculados a essa unidade (via UNIDADE_PROCESSO)
      * <p>
-     * Observação: para simplificar os testes iniciais este metodo realiza paginação em memória
-     * após aplicar os filtros. Em datasets grandes isso deve ser otimizado com queries específicas.
+     * Observação: para simplificar os testes iniciais, este método realiza a paginação em memória
+     * após aplicar os filtros. Em conjuntos de dados grandes, isso deve ser otimizado com queries específicas.
      *
-     * @param perfil        perfil requisitante (obrigatório)
-     * @param unidadeCodigo filtro opcional por unidade
-     * @param pageable      paginação
+     * @param perfil        perfil do requisitante (obrigatório)
+     * @param codigoUnidade filtro opcional por unidade
+     * @param pageable      informações de paginação
      * @return página de ProcessoResumoDTO
      */
-    public Page<ProcessoResumoDTO> listarProcessos(String perfil, Long unidadeCodigo, Pageable pageable) {
+    public Page<ProcessoResumoDTO> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
         if (perfil == null || perfil.isBlank()) {
-            throw new IllegalArgumentException("Parâmetro 'perfil' é obrigatório");
+            throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
         }
 
-        // obter todos os processos (simplificação para testes)
-        List<Processo> todos = processoRepository.findAll();
+        // Obter todos os processos (simplificação para testes)
+        List<Processo> todosOsProcessos = processoRepository.findAll();
 
-        // aplicar filtro por perfil
-        List<Processo> filtrados = new ArrayList<>();
-        for (Processo p : todos) {
+        // Aplicar filtro por perfil e unidade
+        List<Processo> processosFiltrados = new ArrayList<>();
+        for (Processo processo : todosOsProcessos) {
             if ("ADMIN".equalsIgnoreCase(perfil)) {
-                if (!"CRIADO".equalsIgnoreCase(nullableUpper(p.getSituacao()))) {
+                if (!"CRIADO".equalsIgnoreCase(paraMaiusculasNulo(processo.getSituacao()))) {
                     continue;
                 }
             }
-            // filtro por unidade: checar se existe UnidadeProcesso vinculada ao processo com unidadeCodigo
-            if (unidadeCodigo != null) {
-                List<UnidadeProcesso> ups = unidadeProcessoRepository.findByProcessoCodigo(p.getCodigo());
-                boolean pertence = ups.stream().anyMatch(u -> Objects.equals(u.getCodigo(), unidadeCodigo));
+            if (codigoUnidade != null) {
+                List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepository.findByProcessoCodigo(processo.getCodigo());
+                boolean pertence = unidadesDoProcesso.stream().anyMatch(up -> Objects.equals(up.getCodigo(), codigoUnidade));
                 if (!pertence) {
                     continue;
                 }
             }
-            filtrados.add(p);
+            processosFiltrados.add(processo);
         }
 
-        // mapear para DTOs
-        List<ProcessoResumoDTO> dtos = filtrados.stream()
-                .map(p -> {
+        // Mapear para DTOs
+        List<ProcessoResumoDTO> listaDeDtos = processosFiltrados.stream()
+                .map(processo -> {
                     ProcessoResumoDTO dto = new ProcessoResumoDTO();
-                    dto.setCodigo(p.getCodigo());
-                    dto.setDescricao(p.getDescricao());
-                    dto.setSituacao(p.getSituacao());
-                    dto.setTipo(p.getTipo());
-                    dto.setDataLimite(p.getDataLimite());
-                    dto.setDataCriacao(p.getDataCriacao());
+                    dto.setCodigo(processo.getCodigo());
+                    dto.setDescricao(processo.getDescricao());
+                    dto.setSituacao(processo.getSituacao());
+                    dto.setTipo(processo.getTipo());
+                    dto.setDataLimite(processo.getDataLimite());
+                    dto.setDataCriacao(processo.getDataCriacao());
 
-                    // tentar obter uma unidade vinculada (primeira encontrada)
-                    List<UnidadeProcesso> ups = unidadeProcessoRepository.findByProcessoCodigo(p.getCodigo());
-                    if (!ups.isEmpty()) {
-                        UnidadeProcesso up = ups.getFirst();
+                    // Tentar obter uma unidade vinculada (a primeira encontrada)
+                    List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepository.findByProcessoCodigo(processo.getCodigo());
+                    if (!unidadesDoProcesso.isEmpty()) {
+                        UnidadeProcesso up = unidadesDoProcesso.getFirst();
                         dto.setUnidadeCodigo(up.getCodigo());
                         dto.setUnidadeNome(up.getNome());
                     }
@@ -92,76 +91,77 @@ public class PainelService {
                 })
                 .collect(Collectors.toList());
 
-        // paginação em memória
-        int total = dtos.size();
-        int pageSize = pageable.getPageSize();
-        int fromIndex = (int) pageable.getOffset();
-        int toIndex = Math.min(fromIndex + pageSize, total);
-        List<ProcessoResumoDTO> pageContent;
-        if (fromIndex >= total || fromIndex < 0) {
-            pageContent = List.of();
+        // Paginação em memória
+        int total = listaDeDtos.size();
+        int tamanhoPagina = pageable.getPageSize();
+        int indiceInicial = (int) pageable.getOffset();
+        int indiceFinal = Math.min(indiceInicial + tamanhoPagina, total);
+
+        List<ProcessoResumoDTO> conteudoDaPagina;
+        if (indiceInicial >= total || indiceInicial < 0) {
+            conteudoDaPagina = List.of();
         } else {
-            pageContent = dtos.subList(fromIndex, toIndex);
+            conteudoDaPagina = listaDeDtos.subList(indiceInicial, indiceFinal);
         }
 
-        return new PageImpl<>(pageContent, pageable, total);
+        return new PageImpl<>(conteudoDaPagina, pageable, total);
     }
 
     /**
-     * Lista alertas visíveis para o usuário/unidade autenticada.
+     * Lista os alertas visíveis para o usuário/unidade.
      * Regras básicas:
      * - se usuarioTitulo informado -> alertas destinados ao usuário
-     * - se unidadeCodigo informado -> alertas destinados à unidade
+     * - se codigoUnidade informado -> alertas destinados à unidade
      * - se ambos nulos -> retorna todos (para administração/testes)
      *
      * @param usuarioTitulo título do usuário autenticado (opcional)
-     * @param unidadeCodigo código da unidade autenticada (opcional)
-     * @param pageable      paginação
+     * @param codigoUnidade código da unidade autenticada (opcional)
+     * @param pageable      informações de paginação
      * @return página de AlertaDto
      */
-    public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long unidadeCodigo, Pageable pageable) {
-        List<Alerta> todos = alertaRepository.findAll();
+    public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
+        List<Alerta> todosOsAlertas = alertaRepository.findAll();
 
-        List<Alerta> filtrados = todos.stream()
-                .filter(a -> {
+        List<Alerta> alertasFiltrados = todosOsAlertas.stream()
+                .filter(alerta -> {
                     if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-                        return a.getUsuarioDestino() != null && usuarioTitulo.equalsIgnoreCase(a.getUsuarioDestino().getTitulo());
+                        return alerta.getUsuarioDestino() != null && usuarioTitulo.equalsIgnoreCase(alerta.getUsuarioDestino().getTitulo());
                     }
-                    if (unidadeCodigo != null) {
-                        return a.getUnidadeDestino() != null && Objects.equals(a.getUnidadeDestino().getCodigo(), unidadeCodigo);
+                    if (codigoUnidade != null) {
+                        return alerta.getUnidadeDestino() != null && Objects.equals(alerta.getUnidadeDestino().getCodigo(), codigoUnidade);
                     }
                     return true;
                 })
                 .toList();
 
-        List<AlertaDto> dtos = filtrados.stream().map(a -> {
+        List<AlertaDto> listaDeDtos = alertasFiltrados.stream().map(alerta -> {
             AlertaDto dto = new AlertaDto();
-            dto.setCodigo(a.getCodigo());
-            dto.setDescricao(a.getDescricao());
-            dto.setDataHora(a.getDataHora());
-            dto.setProcessoCodigo(a.getProcesso() != null ? a.getProcesso().getCodigo() : null);
-            dto.setUnidadeOrigemCodigo(a.getUnidadeOrigem() != null ? a.getUnidadeOrigem().getCodigo() : null);
-            dto.setUnidadeDestinoCodigo(a.getUnidadeDestino() != null ? a.getUnidadeDestino().getCodigo() : null);
-            dto.setUsuarioDestinoTitulo(a.getUsuarioDestino() != null ? a.getUsuarioDestino().getTitulo() : null);
+            dto.setCodigo(alerta.getCodigo());
+            dto.setDescricao(alerta.getDescricao());
+            dto.setDataHora(alerta.getDataHora());
+            dto.setProcessoCodigo(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null);
+            dto.setUnidadeOrigemCodigo(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null);
+            dto.setUnidadeDestinoCodigo(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null);
+            dto.setUsuarioDestinoTitulo(alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null);
             return dto;
         }).collect(Collectors.toList());
 
-        int total = dtos.size();
-        int pageSize = pageable.getPageSize();
-        int fromIndex = (int) pageable.getOffset();
-        int toIndex = Math.min(fromIndex + pageSize, total);
+        int total = listaDeDtos.size();
+        int tamanhoPagina = pageable.getPageSize();
+        int indiceInicial = (int) pageable.getOffset();
+        int indiceFinal = Math.min(indiceInicial + tamanhoPagina, total);
 
-        List<AlertaDto> pageContent;
-        if (fromIndex >= total || fromIndex < 0) {
-            pageContent = List.of();
+        List<AlertaDto> conteudoDaPagina;
+        if (indiceInicial >= total || indiceInicial < 0) {
+            conteudoDaPagina = List.of();
         } else {
-            pageContent = dtos.subList(fromIndex, toIndex);
+            conteudoDaPagina = listaDeDtos.subList(indiceInicial, indiceFinal);
         }
 
-        return new PageImpl<>(pageContent, pageable, total);
+        return new PageImpl<>(conteudoDaPagina, pageable, total);
     }
 
-    private String nullableUpper(String s) {
+    private String paraMaiusculasNulo(String s) {
         return s == null ? null : s.toUpperCase();
     }
 }

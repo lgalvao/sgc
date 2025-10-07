@@ -8,7 +8,7 @@ package sgc.notificacao;
  * @param corpo Conteúdo do e-mail (texto ou HTML)
  * @param html Se true, o corpo será tratado como HTML; se false, como texto simples
  */
-public record EmailDto(
+public record DtoEmail(
     String destinatario,
     String assunto,
     String corpo,
@@ -17,7 +17,7 @@ public record EmailDto(
     /**
      * Construtor para e-mails de texto simples.
      */
-    public EmailDto(String destinatario, String assunto, String corpo) {
+    public DtoEmail(String destinatario, String assunto, String corpo) {
         this(destinatario, assunto, corpo, false);
     }
 }

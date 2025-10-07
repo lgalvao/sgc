@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.comum.Usuario;
 import sgc.processo.Processo;
 import sgc.unidade.Unidade;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Alerta extends BaseEntity {
+public class Alerta extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;

@@ -7,8 +7,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
-import sgc.notificacao.EmailNotificationService;
-import sgc.notificacao.EmailTemplateService;
+import sgc.notificacao.ServicoNotificacaoEmail;
+import sgc.notificacao.ServicoDeTemplateDeEmail;
 import sgc.processo.*;
 import sgc.processo.dto.ProcessoDTO;
 import sgc.processo.dto.ReqCriarProcesso;
@@ -48,8 +48,8 @@ public class ProcessoServiceTest {
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        EmailNotificationService servicoDeEmail = mock(EmailNotificationService.class);
-        EmailTemplateService servicoDeTemplateDeEmail = mock(EmailTemplateService.class);
+        ServicoNotificacaoEmail servicoNotificacaoEmail = mock(ServicoNotificacaoEmail.class);
+        ServicoDeTemplateDeEmail servicoDeTemplateDeEmail = mock(ServicoDeTemplateDeEmail.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
@@ -64,7 +64,7 @@ public class ProcessoServiceTest {
                 unidadeMapaRepository,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                servicoDeEmail,
+                servicoNotificacaoEmail,
                 servicoDeTemplateDeEmail,
                 sgrhService,
                 processoMapper,
@@ -80,29 +80,27 @@ public class ProcessoServiceTest {
         requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
         requisicao.setUnidades(List.of(1L, 2L));
 
-        // Preparar mocks: as unidades existem
-        Unidade unidade1 = new Unidade();
-        unidade1.setCodigo(1L);
-        unidade1.setNome("Unidade 1");
-        unidade1.setSigla("U1");
-        Unidade unidade2 = new Unidade();
-        unidade2.setCodigo(2L);
-        unidade2.setNome("Unidade 2");
-        unidade2.setSigla("U2");
+        Unidade u1 = new Unidade();
+        u1.setCodigo(1L);
+        u1.setNome("Unidade 1");
+        u1.setSigla("U1");
+        Unidade u2 = new Unidade();
+        u2.setCodigo(2L);
+        u2.setNome("Unidade 2");
+        u2.setSigla("U2");
 
-        when(unidadeRepository.findById(1L)).thenReturn(Optional.of(unidade1));
-        when(unidadeRepository.findById(2L)).thenReturn(Optional.of(unidade2));
+        when(unidadeRepository.findById(1L)).thenReturn(Optional.of(u1));
+        when(unidadeRepository.findById(2L)).thenReturn(Optional.of(u2));
 
-        // Quando salvar o processo, retornar com o código gerado
         when(processoRepository.save(any(Processo.class))).thenAnswer(invocation -> {
-            Processo processo = invocation.getArgument(0);
-            processo.setCodigo(123L);
-            return processo;
+            Processo p = invocation.getArgument(0);
+            p.setCodigo(123L);
+            return p;
         });
 
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
-            Processo processo = invocation.getArgument(0);
-            return new ProcessoDTO(processo.getCodigo(), processo.getDataCriacao(), processo.getDataFinalizacao(), processo.getDataLimite(), processo.getDescricao(), processo.getSituacao(), processo.getTipo());
+            Processo p = invocation.getArgument(0);
+            return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
         });
 
         ProcessoDTO dto = processoService.criar(requisicao);
@@ -113,14 +111,13 @@ public class ProcessoServiceTest {
         assertThat(dto.getTipo()).isEqualTo("MAPEAMENTO");
         assertThat(dto.getSituacao()).isEqualTo("CRIADO");
 
-        // Verificar que o evento de criação foi publicado
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoCriado.class));
     }
 
     @Test
     public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
         ReqCriarProcesso requisicao = new ReqCriarProcesso();
-        requisicao.setDescricao("   "); // em branco
+        requisicao.setDescricao("   ");
         requisicao.setTipo("MAPEAMENTO");
         requisicao.setUnidades(List.of(1L));
 

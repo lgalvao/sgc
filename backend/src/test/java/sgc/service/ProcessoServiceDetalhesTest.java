@@ -8,8 +8,8 @@ import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
-import sgc.notificacao.EmailNotificationService;
-import sgc.notificacao.EmailTemplateService;
+import sgc.notificacao.ServicoNotificacaoEmail;
+import sgc.notificacao.ServicoDeTemplateDeEmail;
 import sgc.processo.*;
 import sgc.processo.dto.ProcessoDetalheDTO;
 import sgc.processo.dto.ProcessoResumoDTO;
@@ -33,19 +33,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Testes unitários para ProcessoService.getDetails(...)
- * <p>
- * - caso feliz: retorna ProcessoDetalheDTO com unidades e resumo de
- * subprocessos
- * - caso sem permissão: lança ErroDominioAccessoNegado
+ * Testes unitários para ProcessoService.obterDetalhes(...).
  */
-public class ProcessoServiceDetailsTest {
+public class ProcessoServiceDetalhesTest {
     private ProcessoRepository processoRepository;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
     private ProcessoDetalheMapper processoDetalheMapper;
 
-    private ProcessoService service;
+    private ProcessoService servico;
 
     @BeforeEach
     public void setup() {
@@ -56,15 +52,15 @@ public class ProcessoServiceDetailsTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        CopiaMapaService copiaMapaService = mock(CopiaMapaService.class);
-        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
-        EmailNotificationService emailService = mock(EmailNotificationService.class);
-        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
+        ApplicationEventPublisher publicadorDeEventos = mock(ApplicationEventPublisher.class);
+        ServicoNotificacaoEmail servicoNotificacaoEmail = mock(ServicoNotificacaoEmail.class);
+        ServicoDeTemplateDeEmail servicoDeTemplateDeEmail = mock(ServicoDeTemplateDeEmail.class);
         SgrhService sgrhService = mock(SgrhService.class);
         ProcessoMapper processoMapper = mock(ProcessoMapper.class);
         processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
-        service = new ProcessoService(
+        servico = new ProcessoService(
                 processoRepository,
                 unidadeRepository,
                 unidadeProcessoRepository,
@@ -72,17 +68,17 @@ public class ProcessoServiceDetailsTest {
                 mapaRepository,
                 movimentacaoRepository,
                 unidadeMapaRepository,
-                copiaMapaService,
-                publisher,
-                emailService,
-                emailTemplateService,
+                servicoDeCopiaDeMapa,
+                publicadorDeEventos,
+                servicoNotificacaoEmail,
+                servicoDeTemplateDeEmail,
                 sgrhService,
                 processoMapper,
                 processoDetalheMapper);
     }
 
     @Test
-    public void testObterDetalhes_HappyPath() {
+    public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {
         // Arrange
         Processo p = mock(Processo.class);
         LocalDateTime dataCriacao = LocalDateTime.now();
@@ -133,7 +129,7 @@ public class ProcessoServiceDetailsTest {
                 .thenReturn(processoDetalheDTO);
 
         // Act
-        ProcessoDetalheDTO dto = service.obterDetalhes(1L, "ADMIN", null);
+        ProcessoDetalheDTO dto = servico.obterDetalhes(1L, "ADMIN", null);
 
         // Assert
         assertNotNull(dto);
@@ -146,7 +142,7 @@ public class ProcessoServiceDetailsTest {
     }
 
     @Test
-    public void testObterDetalhes_UnauthorizedForGestor() {
+    public void obterDetalhes_deveLancarExcecao_quandoGestorNaoAutorizado() {
         // Arrange
         Processo p = new Processo();
         p.setCodigo(2L);
@@ -166,8 +162,7 @@ public class ProcessoServiceDetailsTest {
         when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of());
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(2L)).thenReturn(List.of(sp));
 
-        // Act & Assert: gestor da unidade 10 não está presente nos subprocessos ->
-        // acesso negado
-        assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(2L, "GESTOR", 10L));
+        // Act & Assert
+        assertThrows(ErroDominioAccessoNegado.class, () -> servico.obterDetalhes(2L, "GESTOR", 10L));
     }
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.atividade.Atividade;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 
 @Entity
 @Table(name = "CONHECIMENTO", schema = "sgc")
@@ -14,7 +14,7 @@ import sgc.comum.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Conhecimento extends BaseEntity {
+public class Conhecimento extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "atividade_codigo")
     private Atividade atividade;

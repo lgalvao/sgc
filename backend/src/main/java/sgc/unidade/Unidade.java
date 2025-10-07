@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.BaseEntity;
+import sgc.comum.EntidadeBase;
 import sgc.comum.Usuario;
 
 @Entity
@@ -14,7 +14,7 @@ import sgc.comum.Usuario;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Unidade extends BaseEntity {
+public class Unidade extends EntidadeBase {
     @Column(name = "nome")
     private String nome;
 
