@@ -1,4 +1,3 @@
-
 package sgc.competencia;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +106,42 @@ class CompetenciaAtividadeControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void vincular_quandoAtividadeNaoEncontrada_deveRetornarBadRequest() throws Exception {
+        // Given
+        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
+        request.setAtividadeCodigo(99L); // Non-existent
+        request.setCompetenciaCodigo(1L);
+
+        when(atividadeRepository.findById(99L)).thenReturn(Optional.empty());
+        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(new Competencia()));
+
+        // When & Then
+        mockMvc.perform(post("/api/competencia-atividades")
+                        .with(user("testuser")).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void vincular_quandoCompetenciaNaoEncontrada_deveRetornarBadRequest() throws Exception {
+        // Given
+        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
+        request.setAtividadeCodigo(1L);
+        request.setCompetenciaCodigo(99L); // Non-existent
+
+        when(atividadeRepository.findById(1L)).thenReturn(Optional.of(new Atividade()));
+        when(competenciaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        mockMvc.perform(post("/api/competencia-atividades")
+                        .with(user("testuser")).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -1,4 +1,3 @@
-
 package sgc.competencia;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -122,6 +121,20 @@ class CompetenciaControllerTest {
     }
 
     @Test
+    void criarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
+        // Given
+        CompetenciaDTO dto = new CompetenciaDTO();
+        dto.setDescricao(" "); // Descrição inválida
+
+        // When & Then
+        mockMvc.perform(post("/api/competencias")
+                        .with(user("testuser")).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void atualizarCompetencia_quandoEncontrada_deveAtualizarEretornarCompetencia() throws Exception {
         // Given
         CompetenciaDTO dto = new CompetenciaDTO();
@@ -150,6 +163,22 @@ class CompetenciaControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricao").value("Competencia Atualizada"));
+    }
+
+    @Test
+    void atualizarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
+        // Given
+        CompetenciaDTO dto = new CompetenciaDTO();
+        dto.setDescricao(""); // Descrição inválida
+
+        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(new Competencia()));
+
+        // When & Then
+        mockMvc.perform(put("/api/competencias/1")
+                        .with(user("testuser")).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
