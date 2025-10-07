@@ -9,11 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.quality.Strictness;
 import sgc.alerta.AlertaRepository;
 import sgc.atividade.AnaliseCadastro;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.notificacao.NotificationService;
 import sgc.subprocesso.*;
+import sgc.atividade.AnaliseValidacao;
+import sgc.subprocesso.AnaliseValidacaoRepository;
 import sgc.unidade.Unidade;
 
 import java.util.Optional;
@@ -31,6 +34,8 @@ public class SubprocessoServiceActionsTest {
     private MovimentacaoRepository movimentacaoRepository;
     @Mock
     private AnaliseCadastroRepository analiseCadastroRepository;
+    @Mock
+    private AnaliseValidacaoRepository analiseValidacaoRepository;
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -260,5 +265,63 @@ public class SubprocessoServiceActionsTest {
 
         assertThrows(IllegalStateException.class,
                 () -> subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
+    }
+
+    // Testes para devolverCadastro
+    @Test
+    void devolverCadastro_shouldChangeSituacaoAndSaveAnaliseAndMovimentacao_whenValid() {
+        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
+        when(analiseCadastroRepository.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        SubprocessoDTO result = subprocessoService.devolverCadastro(1L, "Motivo Teste", "Observações", usuarioTitulo);
+
+        assertNotNull(result);
+        assertEquals("CADASTRO_EM_ELABORACAO", result.getSituacaoId());
+        assertNull(subprocesso.getDataFimEtapa1()); // dataFimEtapa1 should be reset
+
+        ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
+        verify(analiseCadastroRepository, times(1)).save(analiseCaptor.capture());
+        assertTrue(analiseCaptor.getValue().getObservacoes().contains("Motivo Teste"));
+        assertTrue(analiseCaptor.getValue().getObservacoes().contains("Observações"));
+
+        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
+        verify(movimentacaoRepository, times(1)).save(movCaptor.capture());
+        assertTrue(movCaptor.getValue().getDescricao().contains("Devolução do cadastro de atividades"));
+        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
+
+        verify(notificationService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(alertaRepository, times(1)).save(any(sgc.alerta.Alerta.class));
+    }
+
+    // Testes para devolverValidacao
+    @Test
+    void devolverValidacao_shouldChangeSituacaoAndSaveAnalise_whenValid() {
+        subprocesso.setSituacaoId("MAPA_VALIDADO"); // A situation that allows this action
+        unidadeSuperior.setUnidadeSuperior(new Unidade()); // Ensure there's a higher level unit
+        when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
+        when(analiseValidacaoRepository.save(any(AnaliseValidacao.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        SubprocessoDTO result = subprocessoService.devolverValidacao(1L, "Justificativa Teste", usuarioTitulo);
+
+        assertNotNull(result);
+        assertEquals("MAPA_DISPONIBILIZADO", result.getSituacaoId());
+        assertNull(subprocesso.getDataFimEtapa2());
+
+        ArgumentCaptor<AnaliseValidacao> analiseCaptor = ArgumentCaptor.forClass(AnaliseValidacao.class);
+        verify(analiseValidacaoRepository, times(1)).save(analiseCaptor.capture());
+        assertEquals("Justificativa Teste", analiseCaptor.getValue().getObservacoes());
+
+        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
+        verify(movimentacaoRepository, times(1)).save(movCaptor.capture());
+        assertEquals("Devolução da validação do mapa de competências para ajustes", movCaptor.getValue().getDescricao());
+        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
+
+        verify(notificationService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(alertaRepository, times(1)).save(any(sgc.alerta.Alerta.class));
     }
 }
