@@ -86,6 +86,5 @@ public class CompetenciaAtividadeController {
     public static class VinculoRequest {
         private Long atividadeCodigo;
         private Long competenciaCodigo;
-
     }
 }

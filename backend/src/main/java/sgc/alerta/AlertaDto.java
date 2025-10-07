@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlertaDTO {
+public class AlertaDto {
     private Long codigo;
     private Long processoCodigo;
     private String descricao;

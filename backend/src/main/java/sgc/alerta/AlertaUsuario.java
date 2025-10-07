@@ -1,10 +1,7 @@
 package sgc.alerta;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.comum.Usuario;
 
 import java.io.Serializable;
@@ -23,23 +20,10 @@ public class AlertaUsuario implements Serializable {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class Id implements Serializable {
         private Long alertaCodigo;
         private String usuarioTitulo;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Id id = (Id) o;
-            return Objects.equals(alertaCodigo, id.alertaCodigo) &&
-                    Objects.equals(usuarioTitulo, id.usuarioTitulo);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(alertaCodigo, usuarioTitulo);
-        }
     }
 
     @EmbeddedId

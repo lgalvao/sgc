@@ -7,9 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.Alerta;
-import sgc.alerta.AlertaDTO;
+import sgc.alerta.AlertaDto;
 import sgc.alerta.AlertaRepository;
 import sgc.processo.*;
+import sgc.processo.dto.ProcessoResumoDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,9 +117,9 @@ public class PainelService {
      * @param usuarioTitulo título do usuário autenticado (opcional)
      * @param unidadeCodigo código da unidade autenticada (opcional)
      * @param pageable      paginação
-     * @return página de AlertaDTO
+     * @return página de AlertaDto
      */
-    public Page<AlertaDTO> listarAlertas(String usuarioTitulo, Long unidadeCodigo, Pageable pageable) {
+    public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long unidadeCodigo, Pageable pageable) {
         List<Alerta> todos = alertaRepository.findAll();
 
         List<Alerta> filtrados = todos.stream()
@@ -133,8 +134,8 @@ public class PainelService {
                 })
                 .toList();
 
-        List<AlertaDTO> dtos = filtrados.stream().map(a -> {
-            AlertaDTO dto = new AlertaDTO();
+        List<AlertaDto> dtos = filtrados.stream().map(a -> {
+            AlertaDto dto = new AlertaDto();
             dto.setCodigo(a.getCodigo());
             dto.setDescricao(a.getDescricao());
             dto.setDataHora(a.getDataHora());
@@ -150,7 +151,7 @@ public class PainelService {
         int fromIndex = (int) pageable.getOffset();
         int toIndex = Math.min(fromIndex + pageSize, total);
 
-        List<AlertaDTO> pageContent;
+        List<AlertaDto> pageContent;
         if (fromIndex >= total || fromIndex < 0) {
             pageContent = List.of();
         } else {

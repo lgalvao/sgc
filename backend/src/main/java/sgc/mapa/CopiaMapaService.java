@@ -14,5 +14,5 @@ public interface CopiaMapaService {
      * @return novo Mapa salvo
      * @throws IllegalArgumentException se o mapa fonte ou unidade alvo não existirem
      */
-    Mapa copyMapForUnit(Long sourceMapaId, Long targetUnidadeId);
+    Mapa copiarMapaParaUnidade(Long sourceMapaId, Long targetUnidadeId);
 }

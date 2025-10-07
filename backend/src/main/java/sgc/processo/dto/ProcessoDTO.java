@@ -1,4 +1,4 @@
-package sgc.processo;
+package sgc.processo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

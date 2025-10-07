@@ -143,7 +143,7 @@ public class AuthService {
     private List<PerfilDto> buscarPerfisUsuario(String titulo) {
         // Busca perfis via SGRH
         List<sgc.sgrh.dto.PerfilDto> perfisSgrh = sgrhService.buscarPerfisUsuario(titulo);
-        // Converte para DTO do auth...
+        // Converte para DTO do seguranca...
     }
 }
 ```

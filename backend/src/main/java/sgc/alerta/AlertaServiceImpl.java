@@ -28,7 +28,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class AlertaServiceImpl implements AlertaService {
-    
     private final AlertaRepository alertaRepository;
     private final AlertaUsuarioRepository alertaUsuarioRepository;
     private final UnidadeRepository unidadeRepository;

@@ -10,6 +10,7 @@ import sgc.mapa.UnidadeMapaRepository;
 import sgc.notificacao.EmailNotificationService;
 import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.processo.dto.ProcessoDTO;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.Movimentacao;
 import sgc.subprocesso.MovimentacaoRepository;
@@ -33,6 +34,7 @@ public class ProcessoServiceStartMappingTest {
     private MapaRepository mapaRepository;
     private MovimentacaoRepository movimentacaoRepository;
     private ApplicationEventPublisher publisher;
+    private ProcessoMapper processoMapper;
     private ProcessoService processoService;
 
     @BeforeEach
@@ -49,6 +51,8 @@ public class ProcessoServiceStartMappingTest {
         EmailNotificationService emailService = mock(EmailNotificationService.class);
         EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
+        processoMapper = mock(ProcessoMapper.class);
+        ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
         processoService = new ProcessoService(
                 processoRepository,
@@ -62,7 +66,9 @@ public class ProcessoServiceStartMappingTest {
                 publisher,
                 emailService,
                 emailTemplateService,
-                sgrhService
+                sgrhService,
+                processoMapper,
+                processoDetalheMapper
         );
     }
 
@@ -101,6 +107,10 @@ public class ProcessoServiceStartMappingTest {
             return mv;
         });
         when(processoRepository.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+            Processo p = invocation.getArgument(0);
+            return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
+        });
 
         // execute
         var dto = processoService.iniciarProcessoMapeamento(processoId, List.of(unidadeId));

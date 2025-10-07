@@ -1,29 +1,27 @@
 package sgc.atividade;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import sgc.mapa.Mapa;
 
 /**
- * Mapper entre Atividade e AtividadeDTO.
+ * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
  */
-public class AtividadeMapper {
-    public static AtividadeDTO toDTO(Atividade a) {
-        if (a == null) return null;
-        Long mapaCodigo = a.getMapa() != null ? a.getMapa().getCodigo() : null;
-        return new AtividadeDTO(a.getCodigo(), mapaCodigo, a.getDescricao());
-    }
+@Mapper(componentModel = "spring")
+public interface AtividadeMapper {
 
-    public static Atividade toEntity(AtividadeDTO dto) {
-        if (dto == null) return null;
-        Atividade a = new Atividade();
-        a.setCodigo(dto.getCodigo());
-        if (dto.getMapaCodigo() != null) {
-            Mapa m = new Mapa();
-            m.setCodigo(dto.getMapaCodigo());
-            a.setMapa(m);
-        } else {
-            a.setMapa(null);
+    @Mapping(source = "mapa.codigo", target = "mapaCodigo")
+    AtividadeDTO toDTO(Atividade atividade);
+
+    @Mapping(source = "mapaCodigo", target = "mapa")
+    Atividade toEntity(AtividadeDTO atividadeDTO);
+
+    default Mapa map(Long value) {
+        if (value == null) {
+            return null;
         }
-        a.setDescricao(dto.getDescricao());
-        return a;
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(value);
+        return mapa;
     }
 }

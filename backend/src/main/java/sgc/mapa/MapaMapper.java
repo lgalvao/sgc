@@ -1,28 +1,17 @@
 package sgc.mapa;
 
-/**
- * Mapper entre Mapa e MapaDTO.
- */
-public class MapaMapper {
-    public static MapaDTO toDTO(Mapa m) {
-        if (m == null) return null;
-        return new MapaDTO(
-                m.getCodigo(),
-                m.getDataHoraDisponibilizado(),
-                m.getObservacoesDisponibilizacao(),
-                m.getSugestoesApresentadas(),
-                m.getDataHoraHomologado()
-        );
-    }
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import sgc.mapa.dto.MapaDto;
 
-    public static Mapa toEntity(MapaDTO dto) {
-        if (dto == null) return null;
-        Mapa m = new Mapa();
-        m.setCodigo(dto.getCodigo());
-        m.setDataHoraDisponibilizado(dto.getDataHoraDisponibilizado());
-        m.setObservacoesDisponibilizacao(dto.getObservacoesDisponibilizacao());
-        m.setSugestoesApresentadas(dto.getSugestoesApresentadas());
-        m.setDataHoraHomologado(dto.getDataHoraHomologado());
-        return m;
-    }
+/**
+ * Mapper (usando MapStruct) entre a entidade Mapa e seu DTO.
+ */
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface MapaMapper {
+
+    MapaDto toDTO(Mapa mapa);
+
+    Mapa toEntity(MapaDto mapaDto);
+
 }

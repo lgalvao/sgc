@@ -14,7 +14,6 @@ import java.util.Optional;
  */
 @Repository
 public interface UnidadeMapaRepository extends JpaRepository<UnidadeMapa, Long> {
-    
     /**
      * Busca o mapa vigente de uma unidade específica.
      *
@@ -22,7 +21,7 @@ public interface UnidadeMapaRepository extends JpaRepository<UnidadeMapa, Long> 
      * @return Optional contendo o registro de mapa vigente se existir
      */
     Optional<UnidadeMapa> findByUnidadeCodigo(Long unidadeCodigo);
-    
+
     /**
      * Busca todas as unidades que utilizam um mapa específico como vigente.
      *
@@ -30,7 +29,7 @@ public interface UnidadeMapaRepository extends JpaRepository<UnidadeMapa, Long> 
      * @return Lista de registros UnidadeMapa que apontam para este mapa
      */
     List<UnidadeMapa> findByMapaVigenteCodigo(Long mapaVigenteCodigo);
-    
+
     /**
      * Busca o mapa vigente de uma unidade com data de vigência.
      * Retorna o mais recente caso haja múltiplos registros (não deveria ocorrer devido à constraint).
@@ -39,10 +38,10 @@ public interface UnidadeMapaRepository extends JpaRepository<UnidadeMapa, Long> 
      * @return Optional contendo o mapa vigente mais recente
      */
     @Query("""
-        SELECT um FROM UnidadeMapa um
-        WHERE um.unidadeCodigo = :unidadeCodigo
-        AND um.dataVigencia IS NOT NULL
-        ORDER BY um.dataVigencia DESC
-        """)
+            SELECT um FROM UnidadeMapa um
+            WHERE um.unidadeCodigo = :unidadeCodigo
+            AND um.dataVigencia IS NOT NULL
+            ORDER BY um.dataVigencia DESC
+            """)
     Optional<UnidadeMapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
 }

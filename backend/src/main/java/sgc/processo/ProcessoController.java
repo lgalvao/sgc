@@ -4,8 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sgc.processo.dto.ProcessoDTO;
+import sgc.processo.dto.ProcessoDetalheDTO;
+import sgc.processo.dto.ReqAtualizarProcesso;
+import sgc.processo.dto.ReqCriarProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioProcesso;
 
 import java.net.URI;
 import java.util.List;
@@ -126,7 +129,7 @@ public class ProcessoController {
             // Processo em situação inválida para finalizar
             return ResponseEntity.badRequest()
                     .body(Map.of("erro", e.getMessage()));
-        } catch (ErroDominioProcesso e) {
+        } catch (ErroProcesso e) {
             // Validação de negócio falhou (ex: subprocessos não homologados)
             return ResponseEntity.status(422) // Unprocessable Entity
                     .body(Map.of("erro", e.getMessage()));

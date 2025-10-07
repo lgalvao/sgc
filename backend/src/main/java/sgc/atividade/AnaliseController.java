@@ -3,7 +3,7 @@ package sgc.atividade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class AnaliseController {
         try {
             List<AnaliseCadastro> lista = analiseCadastroService.listarPorSubprocesso(id);
             return ResponseEntity.ok(lista);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno");
@@ -38,7 +38,7 @@ public class AnaliseController {
             String observacoes = payload != null ? payload.getOrDefault("observacoes", "") : "";
             AnaliseCadastro criado = analiseCadastroService.criarAnalise(id, observacoes);
             return ResponseEntity.status(201).body(criado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -52,7 +52,7 @@ public class AnaliseController {
         try {
             List<AnaliseValidacao> lista = analiseValidacaoService.listarPorSubprocesso(id);
             return ResponseEntity.ok(lista);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno");
@@ -66,7 +66,7 @@ public class AnaliseController {
             String observacoes = payload != null ? payload.getOrDefault("observacoes", "") : "";
             AnaliseValidacao criado = analiseValidacaoService.criarAnalise(id, observacoes);
             return ResponseEntity.status(201).body(criado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

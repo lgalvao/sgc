@@ -1,29 +1,27 @@
 package sgc.conhecimento;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import sgc.atividade.Atividade;
 
 /**
- * Mapper entre Conhecimento e ConhecimentoDTO.
+ * Mapper (usando MapStruct) entre a entidade Conhecimento e seu DTO.
  */
-public class ConhecimentoMapper {
-    public static ConhecimentoDTO toDTO(Conhecimento c) {
-        if (c == null) return null;
-        Long atividadeCodigo = c.getAtividade() != null ? c.getAtividade().getCodigo() : null;
-        return new ConhecimentoDTO(c.getCodigo(), atividadeCodigo, c.getDescricao());
-    }
+@Mapper(componentModel = "spring")
+public interface ConhecimentoMapper {
 
-    public static Conhecimento toEntity(ConhecimentoDTO dto) {
-        if (dto == null) return null;
-        Conhecimento c = new Conhecimento();
-        c.setCodigo(dto.getCodigo());
-        if (dto.getAtividadeCodigo() != null) {
-            Atividade a = new Atividade();
-            a.setCodigo(dto.getAtividadeCodigo());
-            c.setAtividade(a);
-        } else {
-            c.setAtividade(null);
+    @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
+    ConhecimentoDTO toDTO(Conhecimento conhecimento);
+
+    @Mapping(source = "atividadeCodigo", target = "atividade")
+    Conhecimento toEntity(ConhecimentoDTO conhecimentoDTO);
+
+    default Atividade map(Long value) {
+        if (value == null) {
+            return null;
         }
-        c.setDescricao(dto.getDescricao());
-        return c;
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(value);
+        return atividade;
     }
 }

@@ -7,8 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.comum.erros.ErroDominioSubprocesso;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.Mapa;
 import sgc.mapa.MapaService;
@@ -39,12 +38,13 @@ public class SubprocessoController {
     private final SubprocessoService subprocessoService;
     private final MapaService mapaService;
     private final ImpactoMapaService impactoMapaService;
+    private final SubprocessoMapper subprocessoMapper;
 
     @GetMapping
     public List<SubprocessoDTO> listarSubprocessos() {
         return subprocessoRepository.findAll()
                 .stream()
-                .map(SubprocessoMapper::toDTO)
+                .map(subprocessoMapper::toDTO)
                 .toList();
     }
 
@@ -62,7 +62,7 @@ public class SubprocessoController {
         try {
             SubprocessoDetalheDTO detail = subprocessoService.obterDetalhes(id, perfil, unidadeUsuario);
             return ResponseEntity.ok(detail);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (ErroDominioAccessoNegado e) {
             return ResponseEntity.status(403).body(e.getMessage());
@@ -88,7 +88,7 @@ public class SubprocessoController {
 
             subprocessoService.disponibilizarCadastroAcao(id);
             return ResponseEntity.ok("Cadastro de atividades disponibilizado");
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -113,7 +113,7 @@ public class SubprocessoController {
 
             subprocessoService.disponibilizarRevisaoAcao(id);
             return ResponseEntity.ok("Revisão do cadastro de atividades disponibilizada");
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -131,7 +131,7 @@ public class SubprocessoController {
         try {
             var payload = subprocessoService.obterCadastro(id);
             return ResponseEntity.ok(payload);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno");
@@ -140,11 +140,11 @@ public class SubprocessoController {
 
     @PostMapping
     public ResponseEntity<SubprocessoDTO> criarSubprocesso(@Valid @RequestBody SubprocessoDTO subprocessoDto) {
-        var entity = SubprocessoMapper.toEntity(subprocessoDto);
+        var entity = subprocessoMapper.toEntity(subprocessoDto);
         var salvo = subprocessoRepository.save(entity);
 
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(SubprocessoMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(subprocessoMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
@@ -181,7 +181,7 @@ public class SubprocessoController {
                     subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
                     subprocesso.setSituacaoId(subprocessoDto.getSituacaoId());
                     var atualizado = subprocessoRepository.save(subprocesso);
-                    return ResponseEntity.ok(SubprocessoMapper.toDTO(atualizado));
+                    return ResponseEntity.ok(subprocessoMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -202,7 +202,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -226,7 +226,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -250,7 +250,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -275,7 +275,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -299,7 +299,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -323,7 +323,7 @@ public class SubprocessoController {
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
             );
             return ResponseEntity.ok(resultado);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -348,7 +348,7 @@ public class SubprocessoController {
         try {
             ImpactoMapaDto impactos = impactoMapaService.verificarImpactos(id);
             return ResponseEntity.ok(impactos);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
@@ -368,9 +368,9 @@ public class SubprocessoController {
     @GetMapping("/{id}/mapa")
     public ResponseEntity<?> obterMapa(@PathVariable Long id) {
         try {
-            MapaCompletoDto mapa = mapaService.obterMapaDoSubprocesso(id);
+            MapaCompletoDto mapa = mapaService.obterMapaSubprocesso(id);
             return ResponseEntity.ok(mapa);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
@@ -401,9 +401,9 @@ public class SubprocessoController {
         try {
             // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada
             String usuarioTitulo = "USUARIO_ATUAL";
-            MapaCompletoDto mapa = mapaService.salvarMapaDoSubprocesso(id, request, usuarioTitulo);
+            MapaCompletoDto mapa = mapaService.salvarMapaSubprocesso(id, request, usuarioTitulo);
             return ResponseEntity.ok(mapa);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -439,7 +439,7 @@ public class SubprocessoController {
                 usuarioTitulo
             );
             return ResponseEntity.ok(subprocesso);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -473,9 +473,9 @@ public class SubprocessoController {
                 usuarioTitulo
             );
             return ResponseEntity.ok(subprocesso);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
-        } catch (ErroDominioSubprocesso | IllegalStateException e) {
+        } catch (ErroSubprocesso | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
@@ -500,9 +500,9 @@ public class SubprocessoController {
 
             SubprocessoDTO subprocesso = subprocessoService.validarMapa(id, usuarioTitulo);
             return ResponseEntity.ok(subprocesso);
-        } catch (ErroDominioNaoEncontrado e) {
+        } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
-        } catch (ErroDominioSubprocesso | IllegalStateException e) {
+        } catch (ErroSubprocesso | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));

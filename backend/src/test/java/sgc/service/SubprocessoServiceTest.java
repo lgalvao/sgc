@@ -6,11 +6,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.Atividade;
+import sgc.atividade.AtividadeMapper;
 import sgc.atividade.AtividadeRepository;
 import sgc.comum.Usuario;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.Conhecimento;
+import sgc.conhecimento.ConhecimentoMapper;
 import sgc.conhecimento.ConhecimentoRepository;
 import sgc.mapa.Mapa;
 import sgc.subprocesso.*;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SubprocessoServiceTest {
@@ -39,6 +41,18 @@ public class SubprocessoServiceTest {
     @Mock
     private ConhecimentoRepository conhecimentoRepository;
 
+    @Mock
+    private AtividadeMapper atividadeMapper;
+
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
+
+    @Mock
+    private MovimentacaoMapper movimentacaoMapper;
+
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
+
     @InjectMocks
     private SubprocessoService subprocessoService;
 
@@ -46,16 +60,16 @@ public class SubprocessoServiceTest {
     void casoFeliz_retornaDetalhesComMovimentacoesEElementos() {
         // Arrange
         Long spId = 1L;
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(10L);
-        unidade.setNome("Unidade X");
-        unidade.setSigla("UX");
+        Unidade unidade = mock(Unidade.class);
+        when(unidade.getCodigo()).thenReturn(10L);
+        when(unidade.getNome()).thenReturn("Unidade X");
+        when(unidade.getSigla()).thenReturn("UX");
         Usuario titular = new Usuario();
         titular.setTitulo("0001");
         titular.setNome("Titular X");
         titular.setEmail("titular@exemplo");
         titular.setRamal("1234");
-        unidade.setTitular(titular);
+        when(unidade.getTitular()).thenReturn(titular);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -67,12 +81,20 @@ public class SubprocessoServiceTest {
         sp.setSituacaoId("EM_ANDAMENTO");
         sp.setDataLimiteEtapa1(LocalDate.of(2025, 12, 31));
 
-        Movimentacao mov = new Movimentacao();
-        mov.setCodigo(500L);
-        mov.setDataHora(LocalDateTime.now());
-        mov.setUnidadeDestino(unidade);
-        mov.setDescricao("Mov desc");
-        mov.setUnidadeOrigem(null);
+        Movimentacao mov = mock(Movimentacao.class);
+        // No need to stub mov's methods directly if we are stubbing the mapper
+        // when(mov.getCodigo()).thenReturn(500L);
+        // when(mov.getDataHora()).thenReturn(LocalDateTime.now());
+        // when(mov.getDescricao()).thenReturn("Mov desc");
+        // when(mov.getUnidadeOrigem()).thenReturn(null);
+
+        MovimentacaoDTO movDto = new MovimentacaoDTO(
+                500L,
+                LocalDateTime.now(),
+                null, null, null, // unidadeOrigem
+                unidade.getCodigo(), unidade.getSigla(), unidade.getNome(), // unidadeDestino
+                "Mov desc"
+        );
 
         Atividade at = new Atividade();
         at.setCodigo(200L);
@@ -86,6 +108,7 @@ public class SubprocessoServiceTest {
 
         when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(sp));
         when(movimentacaoRepository.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(mov));
+        when(movimentacaoMapper.toDTO(any(Movimentacao.class))).thenReturn(movDto); // Stub the mapper
         when(atividadeRepository.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
         when(conhecimentoRepository.findAll()).thenReturn(List.of(kc));
 
@@ -99,6 +122,7 @@ public class SubprocessoServiceTest {
         assertEquals("EM_ANDAMENTO", dto.getSituacao());
         assertNotNull(dto.getMovimentacoes());
         assertEquals(1, dto.getMovimentacoes().size());
+        assertEquals(movDto.getCodigo(), dto.getMovimentacoes().get(0).getCodigo()); // Verify movDto is used
         assertNotNull(dto.getElementosDoProcesso());
         // deve conter pelo menos a atividade e o conhecimento como elementos
         boolean temAtividade = dto.getElementosDoProcesso().stream().anyMatch(e -> "ATIVIDADE".equals(e.getTipo()));

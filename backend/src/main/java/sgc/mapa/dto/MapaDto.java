@@ -1,4 +1,4 @@
-package sgc.mapa;
+package sgc.mapa.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +14,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MapaDTO {
+public class MapaDto {
     private Long codigo;
     private LocalDateTime dataHoraDisponibilizado;
     private String observacoesDisponibilizacao;
     private Boolean sugestoesApresentadas;
     private LocalDateTime dataHoraHomologado;
+    private String sugestoes;
 }

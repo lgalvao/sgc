@@ -1,4 +1,4 @@
-package sgc.processo;
+package sgc.processo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;

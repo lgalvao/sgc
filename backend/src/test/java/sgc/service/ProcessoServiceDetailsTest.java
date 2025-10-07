@@ -2,7 +2,7 @@ package sgc.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.lang.NonNull;
+import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.MapaRepository;
@@ -10,6 +10,9 @@ import sgc.mapa.UnidadeMapaRepository;
 import sgc.notificacao.EmailNotificationService;
 import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.processo.dto.ProcessoDetalheDTO;
+import sgc.processo.dto.ProcessoDetalheDTO.UnidadeParticipanteDTO;
+import sgc.processo.dto.ProcessoResumoDTO;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.Subprocesso;
@@ -19,12 +22,17 @@ import sgc.unidade.UnidadeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.Mockito;
 
 /**
  * Testes unitários para ProcessoService.getDetails(...)
@@ -36,6 +44,8 @@ public class ProcessoServiceDetailsTest {
     private ProcessoRepository processoRepository;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
+    private ProcessoMapper processoMapper;
+    private ProcessoDetalheMapper processoDetalheMapper;
 
     private ProcessoService service;
 
@@ -49,10 +59,12 @@ public class ProcessoServiceDetailsTest {
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
         CopiaMapaService copiaMapaService = mock(CopiaMapaService.class);
-        ApplicationEventPublisherStub publisher = new ApplicationEventPublisherStub();
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
         EmailNotificationService emailService = mock(EmailNotificationService.class);
         EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
+        processoMapper = mock(ProcessoMapper.class);
+        processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
         service = new ProcessoService(
                 processoRepository,
@@ -66,20 +78,27 @@ public class ProcessoServiceDetailsTest {
                 publisher,
                 emailService,
                 emailTemplateService,
-                sgrhService
+                sgrhService,
+                processoMapper,
+                processoDetalheMapper
         );
     }
 
     @Test
     public void testObterDetalhes_HappyPath() {
         // Arrange
-        Processo p = new Processo();
-        p.setCodigo(1L);
-        p.setDescricao("Proc Teste");
-        p.setTipo("MAPEAMENTO");
-        p.setSituacao("EM_ANDAMENTO");
-        p.setDataCriacao(LocalDateTime.now());
-        p.setDataLimite(LocalDate.now().plusDays(7));
+        Processo p = mock(Processo.class);
+        LocalDateTime dataCriacao = LocalDateTime.now();
+        LocalDate dataLimite = LocalDate.now().plusDays(7);
+        LocalDateTime dataFinalizacao = null;
+
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getDescricao()).thenReturn("Proc Teste");
+        when(p.getTipo()).thenReturn("MAPEAMENTO");
+        when(p.getSituacao()).thenReturn("EM_ANDAMENTO");
+        when(p.getDataCriacao()).thenReturn(dataCriacao);
+        when(p.getDataLimite()).thenReturn(dataLimite);
+        when(p.getDataFinalizacao()).thenReturn(dataFinalizacao);
 
         UnidadeProcesso up = new UnidadeProcesso();
         up.setCodigo(10L);
@@ -99,9 +118,20 @@ public class ProcessoServiceDetailsTest {
         sp.setSituacaoId("PENDENTE");
         sp.setDataLimiteEtapa1(LocalDate.now().plusDays(5));
 
+        ProcessoDetalheDTO.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDTO.UnidadeParticipanteDTO(10L, "Diretoria X", "DX", null, "PENDENTE", LocalDate.now().plusDays(7), new ArrayList<>());
+        ProcessoResumoDTO processoResumoDTO = new ProcessoResumoDTO(100L, null, "PENDENTE", null, LocalDate.now().plusDays(5), null, 10L, "Diretoria X");
+
+        ProcessoDetalheDTO processoDetalheDTO = new ProcessoDetalheDTO(
+                1L, "Proc Teste", "MAPEAMENTO", "EM_ANDAMENTO",
+                dataLimite, dataCriacao, dataFinalizacao,
+                List.of(unidadeParticipanteDTO),
+                List.of(processoResumoDTO)
+        );
+
         when(processoRepository.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+        Mockito.lenient().when(processoDetalheMapper.toDetailDTO(eq(p), anyList(), anyList())).thenReturn(processoDetalheDTO);
 
         // Act
         ProcessoDetalheDTO dto = service.obterDetalhes(1L, "ADMIN", null);
@@ -138,12 +168,5 @@ public class ProcessoServiceDetailsTest {
 
         // Act & Assert: gestor da unidade 10 não está presente nos subprocessos -> acesso negado
         assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(2L, "GESTOR", 10L));
-    }
-
-    // Pequeno stub local para ApplicationEventPublisher (não usamos eventos nos testes)
-    static class ApplicationEventPublisherStub implements org.springframework.context.ApplicationEventPublisher {
-        @Override
-        public void publishEvent(@NonNull Object event) {
-        }
     }
 }

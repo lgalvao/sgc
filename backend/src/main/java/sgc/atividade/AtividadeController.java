@@ -19,27 +19,30 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AtividadeController {
     private final AtividadeRepository atividadeRepository;
+    private final AtividadeMapper atividadeMapper;
 
     @GetMapping
     public List<AtividadeDTO> listarAtividades() {
         return atividadeRepository.findAll()
                 .stream()
-                .map(AtividadeMapper::toDTO)
+                .map(atividadeMapper::toDTO)
                 .toList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AtividadeDTO> obterAtividade(@PathVariable Long id) {
-        Optional<Atividade> a = atividadeRepository.findById(id);
-        return a.map(AtividadeMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return atividadeRepository.findById(id)
+                .map(atividadeMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<AtividadeDTO> criarAtividade(@Valid @RequestBody AtividadeDTO atividadeDto) {
-        var entity = AtividadeMapper.toEntity(atividadeDto);
+        var entity = atividadeMapper.toEntity(atividadeDto);
         var salvo = atividadeRepository.save(entity);
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(AtividadeMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(atividadeMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
@@ -47,16 +50,13 @@ public class AtividadeController {
                                                            @Valid @RequestBody AtividadeDTO atividadeDto) {
         return atividadeRepository.findById(id)
                 .map(existing -> {
-                    if (atividadeDto.getMapaCodigo() != null) {
-                        Mapa m = new Mapa();
-                        m.setCodigo(atividadeDto.getMapaCodigo());
-                        existing.setMapa(m);
-                    } else {
-                        existing.setMapa(null);
-                    }
-                    existing.setDescricao(atividadeDto.getDescricao());
+                    // Mapeia os campos do DTO para a entidade existente
+                    var entityToUpdate = atividadeMapper.toEntity(atividadeDto);
+                    existing.setDescricao(entityToUpdate.getDescricao());
+                    existing.setMapa(entityToUpdate.getMapa());
+                    
                     var atualizado = atividadeRepository.save(existing);
-                    return ResponseEntity.ok(AtividadeMapper.toDTO(atualizado));
+                    return ResponseEntity.ok(atividadeMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -14,7 +14,6 @@ import java.util.List;
  */
 @Repository
 public interface CompetenciaAtividadeRepository extends JpaRepository<CompetenciaAtividade, CompetenciaAtividade.Id> {
-    
     /**
      * Busca todos os vínculos de uma competência.
      *

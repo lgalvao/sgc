@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.alerta.AlertaDTO;
-import sgc.processo.ProcessoResumoDTO;
+import sgc.alerta.AlertaDto;
+import sgc.processo.dto.ProcessoResumoDTO;
 
 @RestController
 @RequestMapping("/api/painel")
@@ -37,12 +37,12 @@ public class PainelController {
      * Se usuário/unidade não forem informados, retorna todos (uso administrativo/testes).
      */
     @GetMapping("/alertas")
-    public ResponseEntity<Page<AlertaDTO>> listarAlertas(
+    public ResponseEntity<Page<AlertaDto>> listarAlertas(
             @RequestParam(name = "usuarioTitulo", required = false) String usuarioTitulo,
             @RequestParam(name = "unidade", required = false) Long unidade,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        Page<AlertaDTO> page = painelService.listarAlertas(usuarioTitulo, unidade, pageable);
+        Page<AlertaDto> page = painelService.listarAlertas(usuarioTitulo, unidade, pageable);
         return ResponseEntity.ok(page);
     }
 }

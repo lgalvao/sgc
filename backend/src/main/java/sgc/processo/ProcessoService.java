@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.processo.dto.ProcessoDTO;
+import sgc.processo.dto.ProcessoDetalheDTO;
+import sgc.processo.dto.ReqAtualizarProcesso;
+import sgc.processo.dto.ReqCriarProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.comum.erros.ErroDominioProcesso;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.*;
 import sgc.notificacao.EmailNotificationService;
 import sgc.notificacao.EmailTemplateService;
@@ -56,6 +59,8 @@ public class ProcessoService {
     private final EmailNotificationService emailService;
     private final EmailTemplateService emailTemplateService;
     private final SgrhService sgrhService;
+    private final ProcessoMapper processoMapper;
+    private final ProcessoDetalheMapper processoDetalheMapper;
 
     @Transactional
     public ProcessoDTO criar(ReqCriarProcesso req) {
@@ -86,7 +91,7 @@ public class ProcessoService {
         // publicar evento de criação (outros listeners farão envio de e-mails/alertas)
         publisher.publishEvent(new EventoProcessoCriado(this, salvo.getCodigo()));
 
-        return ProcessoMapper.toDTO(salvo);
+        return processoMapper.toDTO(salvo);
     }
 
     @Transactional
@@ -102,7 +107,7 @@ public class ProcessoService {
                     return processoRepository.save(existing);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Processo não encontrado: " + id));
-        return ProcessoMapper.toDTO(atualizado);
+        return processoMapper.toDTO(atualizado);
     }
 
     @Transactional
@@ -117,7 +122,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDTO> getById(Long id) {
-        return processoRepository.findById(id).map(ProcessoMapper::toDTO);
+        return processoRepository.findById(id).map(processoMapper::toDTO);
     }
 
     /**
@@ -165,7 +170,7 @@ public class ProcessoService {
             throw new ErroDominioAccessoNegado("Perfil sem permissão.");
         }
 
-        return ProcessoMapper.toDetailDTO(proc, unidadesProcesso, subprocessos);
+        return processoDetalheMapper.toDetailDTO(proc, unidadesProcesso, subprocessos);
     }
 
     /**
@@ -237,7 +242,7 @@ public class ProcessoService {
                 unidadesLista
         ));
 
-        return ProcessoMapper.toDTO(salvo);
+        return processoMapper.toDTO(salvo);
     }
 
     /**
@@ -329,7 +334,7 @@ public class ProcessoService {
             }
 
             // Criar cópia do mapa vigente para o processo de revisão
-            Mapa novoMapa = copiaMapaService.copyMapForUnit(sourceMapaId, unidadeCodigo);
+            Mapa novoMapa = copiaMapaService.copiarMapaParaUnidade(sourceMapaId, unidadeCodigo);
 
             // Criar snapshot da unidade em UNIDADE_PROCESSO
             UnidadeProcesso up = getProcesso(proc, unidade);
@@ -366,7 +371,7 @@ public class ProcessoService {
                 unidadesLista
         ));
 
-        return ProcessoMapper.toDTO(salvo);
+        return processoMapper.toDTO(salvo);
     }
 
     /**
@@ -417,9 +422,9 @@ public class ProcessoService {
      *
      * @param id ID do processo
      * @return DTO do processo finalizado
-     * @throws ErroDominioNaoEncontrado se processo não encontrado
+     * @throws ErroEntidadeNaoEncontrada se processo não encontrado
      * @throws IllegalStateException    se processo não está em andamento
-     * @throws ErroDominioProcesso      se há subprocessos não homologados
+     * @throws ErroProcesso      se há subprocessos não homologados
      */
     @Transactional
     public ProcessoDTO finalizeProcess(Long id) {
@@ -427,7 +432,7 @@ public class ProcessoService {
 
         // 1. Buscar processo
         Processo processo = processoRepository.findById(id)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
         // 2. Validar situação do processo
         if (processo.getSituacao() == null || !"EM_ANDAMENTO".equalsIgnoreCase(processo.getSituacao())) {
@@ -453,7 +458,7 @@ public class ProcessoService {
 
         log.info("Processo finalizado com sucesso: codigo={}", id);
 
-        return ProcessoMapper.toDTO(processo);
+        return processoMapper.toDTO(processo);
     }
 
     /**
@@ -462,7 +467,7 @@ public class ProcessoService {
      * Lança exceção detalhada listando TODAS as unidades que ainda não estão homologadas.
      *
      * @param processo Processo sendo finalizado
-     * @throws ErroDominioProcesso se houver subprocessos não homologados
+     * @throws ErroProcesso se houver subprocessos não homologados
      */
     private void validarTodosSubprocessosHomologados(Processo processo) {
         log.debug("Validando homologação de subprocessos do processo {}", processo.getCodigo());
@@ -485,7 +490,7 @@ public class ProcessoService {
             );
 
             log.warn("Validação falhou: {} subprocessos não homologados", subprocessosPendentes.size());
-            throw new ErroDominioProcesso(mensagem);
+            throw new ErroProcesso(mensagem);
         }
 
         log.info("Validação OK: {} subprocessos homologados", subprocessos.size());
@@ -517,7 +522,7 @@ public class ProcessoService {
      * Se unidade não possui mapa vigente: CRIA novo registro
      *
      * @param processo Processo sendo finalizado
-     * @throws ErroDominioNaoEncontrado se mapa de algum subprocesso não for encontrado
+     * @throws ErroEntidadeNaoEncontrada se mapa de algum subprocesso não for encontrado
      */
     private void tornarMapasVigentes(Processo processo) {
         log.info("Tornando mapas vigentes para processo {}", processo.getCodigo());
@@ -542,7 +547,7 @@ public class ProcessoService {
 
             if (mapaSubprocesso == null) {
                 log.error("Subprocesso {} sem mapa associado", subprocesso.getCodigo());
-                throw new ErroDominioNaoEncontrado(
+                throw new ErroEntidadeNaoEncontrada(
                         "Mapa não encontrado para subprocesso " + subprocesso.getCodigo()
                 );
             }
@@ -632,7 +637,7 @@ public class ProcessoService {
 
                 // Buscar dados da unidade para identificar tipo
                 UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(unidadeCodigo)
-                        .orElseThrow(() -> new ErroDominioNaoEncontrado(
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                                 "Unidade não encontrada: " + unidadeCodigo));
 
                 // Criar mensagem diferenciada conforme tipo de unidade (item 9.1 e 9.2)

@@ -1,5 +1,6 @@
 package sgc.mapa;
 
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 
@@ -10,13 +11,12 @@ import sgc.mapa.dto.SalvarMapaRequest;
  * incluindo competências e vínculos com atividades de forma agregada.
  */
 public interface MapaService {
-    
     /**
      * Obtém um mapa completo com todas as competências e atividades vinculadas.
      * 
      * @param mapaId Código do mapa
      * @return DTO com o mapa completo aninhado
-     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o mapa não existir
+     * @throws ErroEntidadeNaoEncontrada se o mapa não existir
      */
     MapaCompletoDto obterMapaCompleto(Long mapaId);
     
@@ -34,7 +34,7 @@ public interface MapaService {
      * @param request Request com dados do mapa completo
      * @param usuarioTitulo Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
-     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o mapa não existir
+     * @throws ErroEntidadeNaoEncontrada se o mapa não existir
      */
     MapaCompletoDto salvarMapaCompleto(Long mapaId, SalvarMapaRequest request, String usuarioTitulo);
     
@@ -43,9 +43,9 @@ public interface MapaService {
      * 
      * @param subprocessoId Código do subprocesso
      * @return DTO com o mapa completo do subprocesso
-     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o subprocesso ou mapa não existir
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou mapa não existir
      */
-    MapaCompletoDto obterMapaDoSubprocesso(Long subprocessoId);
+    MapaCompletoDto obterMapaSubprocesso(Long subprocessoId);
     
     /**
      * Salva o mapa de um subprocesso.
@@ -57,10 +57,10 @@ public interface MapaService {
      * @param request Request com dados do mapa completo
      * @param usuarioTitulo Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
-     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o subprocesso ou mapa não existir
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou mapa não existir
      * @throws IllegalStateException se a situação do subprocesso não permitir a operação
      */
-    MapaCompletoDto salvarMapaDoSubprocesso(Long subprocessoId, SalvarMapaRequest request, String usuarioTitulo);
+    MapaCompletoDto salvarMapaSubprocesso(Long subprocessoId, SalvarMapaRequest request, String usuarioTitulo);
     
     /**
      * Valida se o mapa está completo e pronto para ser disponibilizado.

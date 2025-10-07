@@ -91,7 +91,7 @@ public class CopiaMapaServiceTest {
         });
 
         // execute
-        Mapa novo = mapCopyService.copyMapForUnit(sourceMapaId, unidadeId);
+        Mapa novo = mapCopyService.copiarMapaParaUnidade(sourceMapaId, unidadeId);
 
         // asserts
         assertThat(novo).isNotNull();
@@ -104,13 +104,13 @@ public class CopiaMapaServiceTest {
     }
 
     @Test
-    public void copyMapForUnit_shouldThrow_whenMapaFonteNaoEncontrado() {
+    public void copiarMapaParaUnidade_shouldThrow_whenMapaFonteNaoEncontrado() {
         Long sourceMapaId = 777L;
         Long unidadeId = 1L;
 
         when(mapaRepository.findById(sourceMapaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mapCopyService.copyMapForUnit(sourceMapaId, unidadeId))
+        assertThatThrownBy(() -> mapCopyService.copiarMapaParaUnidade(sourceMapaId, unidadeId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Mapa fonte não encontrado");
     }

@@ -19,12 +19,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompetenciaController {
     private final CompetenciaRepository competenciaRepository;
+    private final CompetenciaMapper competenciaMapper;
 
     @GetMapping
     public List<CompetenciaDTO> listarCompetencias() {
         return competenciaRepository.findAll()
                 .stream()
-                .map(CompetenciaMapper::toDTO)
+                .map(competenciaMapper::toDTO)
                 .toList();
     }
 
@@ -32,15 +33,15 @@ public class CompetenciaController {
     public ResponseEntity<CompetenciaDTO> obterCompetencia(@PathVariable Long id) {
 
         Optional<sgc.competencia.Competencia> c = competenciaRepository.findById(id);
-        return c.map(CompetenciaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return c.map(competenciaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<CompetenciaDTO> criarCompetencia(@Valid @RequestBody CompetenciaDTO competenciaDto) {
-        var entity = CompetenciaMapper.toEntity(competenciaDto);
+        var entity = competenciaMapper.toEntity(competenciaDto);
         var salvo = competenciaRepository.save(entity);
         URI uri = URI.create("/api/competencias/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(CompetenciaMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(competenciaMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
@@ -56,7 +57,7 @@ public class CompetenciaController {
                     }
                     existing.setDescricao(competenciaDto.getDescricao());
                     var atualizado = competenciaRepository.save(existing);
-                    return ResponseEntity.ok(CompetenciaMapper.toDTO(atualizado));
+                    return ResponseEntity.ok(competenciaMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alerta extends BaseEntity {
-
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;

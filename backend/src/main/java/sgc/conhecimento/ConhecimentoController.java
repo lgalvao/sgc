@@ -19,43 +19,42 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ConhecimentoController {
     private final ConhecimentoRepository conhecimentoRepository;
+    private final ConhecimentoMapper conhecimentoMapper;
 
     @GetMapping
     public List<ConhecimentoDTO> listarConhecimentos() {
         return conhecimentoRepository.findAll()
                 .stream()
-                .map(ConhecimentoMapper::toDTO)
+                .map(conhecimentoMapper::toDTO)
                 .toList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ConhecimentoDTO> obterConhecimento(@PathVariable Long id) {
-        Optional<Conhecimento> c = conhecimentoRepository.findById(id);
-        return c.map(ConhecimentoMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return conhecimentoRepository.findById(id)
+                .map(conhecimentoMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<ConhecimentoDTO> criarConhecimento(@Valid @RequestBody ConhecimentoDTO conhecimentoDto) {
-        var entity = ConhecimentoMapper.toEntity(conhecimentoDto);
+        var entity = conhecimentoMapper.toEntity(conhecimentoDto);
         var salvo = conhecimentoRepository.save(entity);
         URI uri = URI.create("/api/conhecimentos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(ConhecimentoMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(conhecimentoMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ConhecimentoDTO> atualizarConhecimento(@PathVariable Long id, @Valid @RequestBody ConhecimentoDTO conhecimentoDto) {
         return conhecimentoRepository.findById(id)
                 .map(existing -> {
-                    if (conhecimentoDto.getAtividadeCodigo() != null) {
-                        Atividade a = new Atividade();
-                        a.setCodigo(conhecimentoDto.getAtividadeCodigo());
-                        existing.setAtividade(a);
-                    } else {
-                        existing.setAtividade(null);
-                    }
-                    existing.setDescricao(conhecimentoDto.getDescricao());
+                    var entityToUpdate = conhecimentoMapper.toEntity(conhecimentoDto);
+                    existing.setDescricao(entityToUpdate.getDescricao());
+                    existing.setAtividade(entityToUpdate.getAtividade());
+                    
                     var atualizado = conhecimentoRepository.save(existing);
-                    return ResponseEntity.ok(ConhecimentoMapper.toDTO(atualizado));
+                    return ResponseEntity.ok(conhecimentoMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

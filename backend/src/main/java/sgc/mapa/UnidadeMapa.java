@@ -20,7 +20,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnidadeMapa extends BaseEntity {
-
     @Column(name = "unidade_codigo", unique = true, nullable = false)
     private Long unidadeCodigo;
 

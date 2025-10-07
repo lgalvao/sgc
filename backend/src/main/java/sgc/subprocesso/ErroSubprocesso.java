@@ -1,11 +1,11 @@
-package sgc.comum.erros;
+package sgc.subprocesso;
 
 /**
  * Exceção lançada quando há erro de domínio relacionado ao subprocesso.
  * Usada para validações de regras de negócio do subprocesso.
  */
-public class ErroDominioSubprocesso extends RuntimeException {
-    public ErroDominioSubprocesso(String message) {
+public class ErroSubprocesso extends RuntimeException {
+    public ErroSubprocesso(String message) {
         super(message);
     }
 }

@@ -3,7 +3,7 @@ package sgc.atividade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.AnaliseCadastroRepository;
 import sgc.subprocesso.Subprocesso;
 import sgc.subprocesso.SubprocessoRepository;
@@ -26,7 +26,7 @@ public class AnaliseCadastroServiceImpl implements AnaliseCadastroService {
     public List<AnaliseCadastro> listarPorSubprocesso(Long subprocessoCodigo) {
         // valida existência do subprocesso antes de consultar
         if (subprocessoRepository.findById(subprocessoCodigo).isEmpty()) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoCodigo));
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(subprocessoCodigo));
         }
         return analiseCadastroRepository.findBySubprocessoCodigo(subprocessoCodigo);
     }
@@ -35,7 +35,7 @@ public class AnaliseCadastroServiceImpl implements AnaliseCadastroService {
     @Transactional
     public AnaliseCadastro criarAnalise(Long subprocessoCodigo, String observacoes) {
         Subprocesso sp = subprocessoRepository.findById(subprocessoCodigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(subprocessoCodigo)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(subprocessoCodigo)));
 
         AnaliseCadastro a = new AnaliseCadastro();
         a.setSubprocesso(sp);

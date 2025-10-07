@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import sgc.alerta.AlertaRepository;
 import sgc.comum.PainelService;
 import sgc.processo.*;
+import sgc.processo.dto.ProcessoResumoDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

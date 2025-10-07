@@ -39,7 +39,7 @@ public class CopiaMapaServiceImpl implements CopiaMapaService {
 
     @Override
     @Transactional
-    public Mapa copyMapForUnit(Long sourceMapaId, Long targetUnidadeId) {
+    public Mapa copiarMapaParaUnidade(Long sourceMapaId, Long targetUnidadeId) {
         Mapa source = mapaRepository.findById(sourceMapaId)
                 .orElseThrow(() -> new IllegalArgumentException("Mapa fonte não encontrado: %d".formatted(sourceMapaId)));
 

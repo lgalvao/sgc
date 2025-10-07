@@ -10,6 +10,8 @@ import sgc.mapa.UnidadeMapaRepository;
 import sgc.notificacao.EmailNotificationService;
 import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
+import sgc.processo.dto.ProcessoDTO;
+import sgc.processo.dto.ReqCriarProcesso;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.SubprocessoRepository;
@@ -31,6 +33,7 @@ public class ProcessoServiceTest {
     private ProcessoRepository processoRepository;
     private UnidadeRepository unidadeRepository;
     private ApplicationEventPublisher publisher;
+    private ProcessoMapper processoMapper;
 
     private ProcessoService processoService;
 
@@ -48,6 +51,8 @@ public class ProcessoServiceTest {
         EmailNotificationService emailService = mock(EmailNotificationService.class);
         EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
+        processoMapper = mock(ProcessoMapper.class);
+        ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
         processoService = new ProcessoService(
                 processoRepository,
@@ -61,7 +66,9 @@ public class ProcessoServiceTest {
                 publisher,
                 emailService,
                 emailTemplateService,
-                sgrhService
+                sgrhService,
+                processoMapper,
+                processoDetalheMapper
         );
     }
 
@@ -91,6 +98,11 @@ public class ProcessoServiceTest {
             Processo p = invocation.getArgument(0);
             p.setCodigo(123L);
             return p;
+        });
+
+        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+            Processo p = invocation.getArgument(0);
+            return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
         });
 
         ProcessoDTO dto = processoService.criar(req);

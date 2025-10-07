@@ -1,4 +1,4 @@
-package sgc.notificacao.dto;
+package sgc.notificacao;
 
 /**
  * DTO para envio de e-mails.

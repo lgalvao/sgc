@@ -12,7 +12,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.notificacao.dto.EmailDto;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
@@ -36,7 +35,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailNotificationService implements NotificationService {
-
     private final JavaMailSender mailSender;
     private final NotificacaoRepository notificacaoRepository;
 
@@ -49,13 +47,10 @@ public class EmailNotificationService implements NotificationService {
     @Value("${aplicacao.email.assunto-prefixo}")
     private String assuntoPrefixo;
 
-    // Pattern para validação de e-mail
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-    );
-
+    // Padrão para validação de e-mail
+    private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final int MAX_TENTATIVAS = 3;
-    private static final long DELAY_ENTRE_TENTATIVAS_MS = 1000;
+    private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
     /**
      * Implementação da interface NotificationService.
@@ -149,8 +144,7 @@ public class EmailNotificationService implements NotificationService {
             tentativa++;
 
             try {
-                log.debug("Tentativa {} de {} para enviar e-mail para: {}",
-                        tentativa, MAX_TENTATIVAS, email.destinatario());
+                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, email.destinatario());
 
                 enviarEmailSMTP(email);
 
@@ -166,7 +160,7 @@ public class EmailNotificationService implements NotificationService {
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
                         // Aguardar antes de tentar novamente (backoff linear)
-                        Thread.sleep(DELAY_ENTRE_TENTATIVAS_MS * tentativa);
+                        Thread.sleep(ESPERA_ENTRE_TENTATIVAS_MS * tentativa);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         log.error("Thread interrompida durante retry", ie);
@@ -233,7 +227,6 @@ public class EmailNotificationService implements NotificationService {
 
         // Subprocesso e unidades podem ser configurados posteriormente se necessário
         // Por enquanto, apenas persistimos as informações básicas do e-mail
-
         return notificacao;
     }
 
@@ -247,7 +240,7 @@ public class EmailNotificationService implements NotificationService {
         if (email == null || email.trim().isEmpty()) {
             return false;
         }
-        return EMAIL_PATTERN.matcher(email.trim()).matches();
+        return PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 
     /**
@@ -257,7 +250,6 @@ public class EmailNotificationService implements NotificationService {
      * @return String com configurações
      */
     public String getConfiguracao() {
-        return String.format("Remetente: %s <%s>, Prefixo: %s",
-                remetenteNome, remetente, assuntoPrefixo);
+        return String.format("Remetente: %s <%s>, Prefixo: %s", remetenteNome, remetente, assuntoPrefixo);
     }
 }

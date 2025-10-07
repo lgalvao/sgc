@@ -1,29 +1,27 @@
 package sgc.competencia;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import sgc.mapa.Mapa;
 
 /**
- * Mapeador entre Competencia e CompetenciaDTO.
+ * Mapper (usando MapStruct) entre a entidade Competencia e seu DTO.
  */
-public class CompetenciaMapper {
-    public static CompetenciaDTO toDTO(Competencia c) {
-        if (c == null) return null;
-        Long mapaCodigo = c.getMapa() != null ? c.getMapa().getCodigo() : null;
-        return new CompetenciaDTO(c.getCodigo(), mapaCodigo, c.getDescricao());
-    }
+@Mapper(componentModel = "spring")
+public interface CompetenciaMapper {
 
-    public static Competencia toEntity(CompetenciaDTO dto) {
-        if (dto == null) return null;
-        Competencia c = new Competencia();
-        c.setCodigo(dto.getCodigo());
-        if (dto.getMapaCodigo() != null) {
-            Mapa m = new Mapa();
-            m.setCodigo(dto.getMapaCodigo());
-            c.setMapa(m);
-        } else {
-            c.setMapa(null);
+    @Mapping(source = "mapa.codigo", target = "mapaCodigo")
+    CompetenciaDTO toDTO(Competencia competencia);
+
+    @Mapping(source = "mapaCodigo", target = "mapa")
+    Competencia toEntity(CompetenciaDTO competenciaDTO);
+
+    default Mapa map(Long value) {
+        if (value == null) {
+            return null;
         }
-        c.setDescricao(dto.getDescricao());
-        return c;
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(value);
+        return mapa;
     }
 }

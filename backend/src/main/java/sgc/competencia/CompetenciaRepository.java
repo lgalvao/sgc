@@ -12,7 +12,6 @@ import java.util.List;
  */
 @Repository
 public interface CompetenciaRepository extends JpaRepository<Competencia, Long> {
-    
     /**
      * Busca todas as competências de um mapa.
      *
@@ -21,7 +20,7 @@ public interface CompetenciaRepository extends JpaRepository<Competencia, Long> 
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
-    
+
     /**
      * Busca todas as competências de um mapa ordenadas por descrição.
      *

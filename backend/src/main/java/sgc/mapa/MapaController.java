@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 
 import java.net.URI;
@@ -22,31 +23,32 @@ import java.util.Optional;
 public class MapaController {
     private final MapaRepository mapaRepository;
     private final MapaService mapaService;
+    private final MapaMapper mapaMapper;
 
     @GetMapping
-    public List<MapaDTO> listarMapas() {
+    public List<MapaDto> listarMapas() {
         return mapaRepository.findAll()
                 .stream()
-                .map(MapaMapper::toDTO)
+                .map(mapaMapper::toDTO)
                 .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MapaDTO> obterMapa(@PathVariable Long id) {
+    public ResponseEntity<MapaDto> obterMapa(@PathVariable Long id) {
         Optional<Mapa> m = mapaRepository.findById(id);
-        return m.map(MapaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return m.map(mapaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<MapaDTO> criarMapa(@Valid @RequestBody MapaDTO mapaDto) {
-        var entity = MapaMapper.toEntity(mapaDto);
+    public ResponseEntity<MapaDto> criarMapa(@Valid @RequestBody MapaDto mapaDto) {
+        var entity = mapaMapper.toEntity(mapaDto);
         var salvo = mapaRepository.save(entity);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(MapaMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MapaDTO> atualizarMapa(@PathVariable Long id, @Valid @RequestBody MapaDTO mapaDto) {
+    public ResponseEntity<MapaDto> atualizarMapa(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
         return mapaRepository.findById(id)
                 .map(existing -> {
                     existing.setDataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado());
@@ -54,7 +56,7 @@ public class MapaController {
                     existing.setSugestoesApresentadas(mapaDto.getSugestoesApresentadas());
                     existing.setDataHoraHomologado(mapaDto.getDataHoraHomologado());
                     var atualizado = mapaRepository.save(existing);
-                    return ResponseEntity.ok(MapaMapper.toDTO(atualizado));
+                    return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -62,13 +64,12 @@ public class MapaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirMapa(@PathVariable Long id) {
         return mapaRepository.findById(id)
-                .map(existing -> {
+                .map(_ -> {
                     mapaRepository.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                }).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    
+
     /**
      * CDU-15 - Obter mapa completo com competências e atividades aninhadas.
      * GET /api/mapas/{id}/completo
@@ -88,7 +89,7 @@ public class MapaController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     /**
      * CDU-15 - Salvar mapa completo (criar/editar competências + vínculos).
      * PUT /api/mapas/{id}/completo
@@ -100,15 +101,15 @@ public class MapaController {
      * - Atualiza competências existentes
      * - Atualiza vínculos com atividades
      *
-     * @param id Código do mapa
+     * @param id      Código do mapa
      * @param request Request com dados do mapa completo
      * @return Mapa completo atualizado
      */
     @PutMapping("/{id}/completo")
     @Transactional
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
-        @PathVariable Long id,
-        @RequestBody @Valid SalvarMapaRequest request
+            @PathVariable Long id,
+            @RequestBody @Valid SalvarMapaRequest request
     ) {
         try {
             // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada

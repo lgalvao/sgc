@@ -10,7 +10,6 @@ import java.util.List;
  */
 @Repository
 public interface ProcessoRepository extends JpaRepository<Processo, Long> {
-    
     /**
      * Busca processos por situação.
      *

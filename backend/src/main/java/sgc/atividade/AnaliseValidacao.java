@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnaliseValidacao extends BaseEntity {
-
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
     private Subprocesso subprocesso;

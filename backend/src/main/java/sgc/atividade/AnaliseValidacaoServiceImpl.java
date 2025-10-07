@@ -3,7 +3,7 @@ package sgc.atividade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.AnaliseValidacaoRepository;
 import sgc.subprocesso.Subprocesso;
 import sgc.subprocesso.SubprocessoRepository;
@@ -17,7 +17,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AnaliseValidacaoServiceImpl implements AnaliseValidacaoService {
-
     private final AnaliseValidacaoRepository analiseValidacaoRepository;
     private final SubprocessoRepository subprocessoRepository;
 
@@ -25,7 +24,7 @@ public class AnaliseValidacaoServiceImpl implements AnaliseValidacaoService {
     @Transactional(readOnly = true)
     public List<AnaliseValidacao> listarPorSubprocesso(Long subprocessoCodigo) {
         if (subprocessoRepository.findById(subprocessoCodigo).isEmpty()) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + subprocessoCodigo);
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + subprocessoCodigo);
         }
         return analiseValidacaoRepository.findBySubprocesso_Codigo(subprocessoCodigo);
     }
@@ -34,7 +33,7 @@ public class AnaliseValidacaoServiceImpl implements AnaliseValidacaoService {
     @Transactional
     public AnaliseValidacao criarAnalise(Long subprocessoCodigo, String observacoes) {
         Subprocesso sp = subprocessoRepository.findById(subprocessoCodigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + subprocessoCodigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + subprocessoCodigo));
 
         AnaliseValidacao a = new AnaliseValidacao();
         a.setSubprocesso(sp);
