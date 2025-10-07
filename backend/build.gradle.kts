@@ -67,10 +67,9 @@ tasks.withType<BootRun> {
 tasks.withType<Test> {
     useJUnitPlatform()
 
-    // Desabilita o JaCoCo por padrão para acelerar a execução normal dos testes.
-    // Ele será reativado condicionalmente para tarefas de cobertura.
+    // JaCoCo is now enabled by default for all test runs to ensure coverage report generation.
     extensions.findByType<JacocoTaskExtension>()?.apply {
-        isEnabled = false
+        isEnabled = true
     }
 
     // Performance optimization for agent iterations
@@ -373,21 +372,4 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") { // N
     }
 }
 
-// =================================================================================
-// CONDITIONAL JACOCO CONFIGURATION
-// =================================================================================
-// Re-ativa o JaCoCo apenas quando tarefas específicas de cobertura são executadas.
-// Isso evita a sobrecarga do agente JaCoCo durante as execuções de teste padrão.
-    gradle.taskGraph.whenReady(object : Action<TaskExecutionGraph> {
-    override fun execute(graph: TaskExecutionGraph) {
-        val coverageTaskNames = listOf("jacocoTestReport", "jacocoTestCoverageVerification")
-        if (coverageTaskNames.any { graph.hasTask(it) }) {
-            tasks.named<Test>("test") {
-                logger.lifecycle("JaCoCo agent enabled for coverage analysis.")
-                extensions.findByType<JacocoTaskExtension>()?.apply {
-                    isEnabled = true
-                }
-            }
-        }
-    }
-})
+// Conditional JaCoCo configuration has been removed as it is now enabled by default.
