@@ -61,13 +61,13 @@ O backend utiliza **JUnit 5** para testes. O arquivo de build do Gradle (`C:\sgc
 * **Rodar todos os testes (otimizado para agente):**
 
     ```bash
-    gradle :backend:agentTest --console=plain
+    gradle :backend:agentTest
     ```
 
 * **Rodar uma única classe de teste:**
 
     ```bash
-    gradle testClass -PtestClass=SeuNomeDeClasse --console=plain
+    gradle testClass -PtestClass=SeuNomeDeClasse
     ```
 
 ### Desenvolvimento do Frontend

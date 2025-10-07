@@ -1,3 +1,5 @@
+@file:Suppress("ObjectLiteralToLambda")
+
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -5,54 +7,36 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     java
-    id("org.springframework.boot")
-    id("io.spring.dependency-management")
+    id("org.springframework.boot") version "3.5.6" // É uma boa prática definir a versão do plugin
+    id("io.spring.dependency-management") version "1.1.7" // É uma boa prática definir a versão do plugin
     jacoco
 }
+
+// Definição de versões em um só lugar para facilitar a manutenção
+extra["jjwt.version"] = "0.13.0"
+extra["mapstruct.version"] = "1.6.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-
-    // Spring Security
     implementation("org.springframework.boot:spring-boot-starter-security")
-
-
-    // JWT (JSON Web Tokens)
-    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
-
-    // Spring Mail
+    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-
-    // Thymeleaf para templates HTML
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-
-    // Oracle JDBC Driver para integração com SGRH
     implementation("com.oracle.database.jdbc:ojdbc11")
-    implementation("org.hibernate.orm:hibernate-core:6.6.31.Final")
-
-    // Caffeine Cache para otimizar consultas ao SGRH
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.hibernate.orm:hibernate-jcache:6.6.31.Final")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    // Spring Security Test (opcional, para testes)
     testImplementation("org.springframework.security:spring-security-test")
-
-    // MapStruct
-    implementation("org.mapstruct:mapstruct:1.5.5.Final")
-
+    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -73,7 +57,7 @@ tasks.withType<BootJar> {
 }
 
 tasks.withType<BootRun> {
-    isEnabled = true
+    // isEnabled = true é o padrão, não precisa ser declarado.
 }
 
 // ============================================
@@ -83,9 +67,15 @@ tasks.withType<BootRun> {
 tasks.withType<Test> {
     useJUnitPlatform()
 
+    // Desabilita o JaCoCo por padrão para acelerar a execução normal dos testes.
+    // Ele será reativado condicionalmente para tarefas de cobertura.
+    extensions.findByType<JacocoTaskExtension>()?.apply {
+        isEnabled = false
+    }
+
     // Performance optimization for agent iterations
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(2)
-    setForkEvery(100) // Restart JVM every 100 tests to prevent memory leaks
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    forkEvery = 100L // Corrigido: 'setForkEvery' está obsoleto
 
     // JVM settings for stability and suppress Hibernate logging
     jvmArgs = listOf(
@@ -97,9 +87,10 @@ tasks.withType<Test> {
         "-Dspring.jpa.show-sql=false",
         "-Dspring.jpa.properties.hibernate.show_sql=false",
         "-Dspring.jpa.properties.hibernate.format_sql=false",
+        "-Xshare:off",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true", // Desabilita o self-attaching do Mockito
-        "-XX:+EnableDynamicAgentLoading", // Suprime o warning de carregamento dinâmico de agentes
-        "-Xshare:off" // Desabilita o compartilhamento de classes para suprimir o warning do OpenJDK
+        "-XX:+EnableDynamicAgentLoading" // Suprime o warning de carregamento dinâmico de agentes
     )
 
     // Adicionar o Mockito Java Agent
@@ -362,7 +353,7 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 }
 
 // Add coverage verification task
-tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerif") {
+tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") { // Nome corrigido para 'Verification'
     dependsOn(tasks.named("jacocoTestReport"))
 
     sourceDirectories.setFrom(files(sourceSets.main.get().allSource.srcDirs))
@@ -379,3 +370,22 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerif") {
         }
     }
 }
+
+// =================================================================================
+// CONDITIONAL JACOCO CONFIGURATION
+// =================================================================================
+// Re-ativa o JaCoCo apenas quando tarefas específicas de cobertura são executadas.
+// Isso evita a sobrecarga do agente JaCoCo durante as execuções de teste padrão.
+    gradle.taskGraph.whenReady(object : Action<TaskExecutionGraph> {
+    override fun execute(graph: TaskExecutionGraph) {
+        val coverageTaskNames = listOf("jacocoTestReport", "jacocoTestCoverageVerification")
+        if (coverageTaskNames.any { graph.hasTask(it) }) {
+            tasks.named<Test>("test") {
+                logger.lifecycle("JaCoCo agent enabled for coverage analysis.")
+                extensions.findByType<JacocoTaskExtension>()?.apply {
+                    isEnabled = true
+                }
+            }
+        }
+    }
+})
