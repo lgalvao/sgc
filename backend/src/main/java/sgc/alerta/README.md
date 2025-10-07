@@ -43,7 +43,7 @@ O sistema de alertas é projetado para garantir que os usuários relevantes seja
 
 ### 5. `AlertaRepository.java` e `AlertaUsuarioRepository.java`
 **Localização:** `backend/src/main/java/sgc/alerta/`
-- **Descrição:** Interfaces Spring Data JPA para acesso aos dados das entidades `Alerta` and `AlertaUsuario`.
+- **Descrição:** Interfaces Spring Data JPA para acesso aos dados das entidades `Alerta` e `AlertaUsuario`.
 
 ### 6. `AlertaDto.java`
 **Localização:** `backend/src/main/java/sgc/alerta/AlertaDto.java`

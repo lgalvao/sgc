@@ -33,7 +33,7 @@ public class ProcessoServiceStartMappingTest {
     private SubprocessoRepository subprocessoRepository;
     private MapaRepository mapaRepository;
     private MovimentacaoRepository movimentacaoRepository;
-    private ApplicationEventPublisher publisher;
+    private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
     private ProcessoService processoService;
 
@@ -46,10 +46,10 @@ public class ProcessoServiceStartMappingTest {
         mapaRepository = mock(MapaRepository.class);
         movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        CopiaMapaService mapCopyService = mock(CopiaMapaService.class);
-        publisher = mock(ApplicationEventPublisher.class);
-        EmailNotificationService emailService = mock(EmailNotificationService.class);
-        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
+        publicadorDeEventos = mock(ApplicationEventPublisher.class);
+        EmailNotificationService servicoDeEmail = mock(EmailNotificationService.class);
+        EmailTemplateService servicoDeTemplateDeEmail = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
@@ -62,10 +62,10 @@ public class ProcessoServiceStartMappingTest {
                 mapaRepository,
                 movimentacaoRepository,
                 unidadeMapaRepository,
-                mapCopyService,
-                publisher,
-                emailService,
-                emailTemplateService,
+                servicoDeCopiaDeMapa,
+                publicadorDeEventos,
+                servicoDeEmail,
+                servicoDeTemplateDeEmail,
                 sgrhService,
                 processoMapper,
                 processoDetalheMapper
@@ -73,28 +73,28 @@ public class ProcessoServiceStartMappingTest {
     }
 
     @Test
-    public void iniciarProcessoMapeamento_shouldCriarSubprocessoMapaMovimentacao_andPublishEvent_whenHappyPath() {
-        Long processoId = 10L;
-        Long unidadeId = 1L;
+    public void iniciarProcessoMapeamento_deveCriarSubprocessoMapaMovimentacao_ePublicarEvento_quandoFluxoNormal() {
+        Long idProcesso = 10L;
+        Long idUnidade = 1L;
 
-        Processo proc = new Processo();
-        proc.setCodigo(processoId);
-        proc.setSituacao("CRIADO");
-        proc.setTipo("MAPEAMENTO");
+        Processo processo = new Processo();
+        processo.setCodigo(idProcesso);
+        processo.setSituacao("CRIADO");
+        processo.setTipo("MAPEAMENTO");
 
-        Unidade u = new Unidade();
-        u.setCodigo(unidadeId);
-        u.setSigla("U1");
-        u.setNome("Unidade 1");
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(idUnidade);
+        unidade.setSigla("U1");
+        unidade.setNome("Unidade 1");
 
-        // mocks
-        when(processoRepository.findById(processoId)).thenReturn(Optional.of(proc));
-        when(unidadeRepository.findById(unidadeId)).thenReturn(Optional.of(u));
-        when(unidadeProcessoRepository.findBySigla("U1")).thenReturn(List.of());
+        // Mocks
+        when(processoRepository.findById(idProcesso)).thenReturn(Optional.of(processo));
+        when(unidadeRepository.findById(idUnidade)).thenReturn(Optional.of(unidade));
+        when(processoRepository.findBySituacao(anyString())).thenReturn(List.of()); // Simula que a unidade não está em outro processo
         when(mapaRepository.save(any(Mapa.class))).thenAnswer(inv -> {
-            Mapa m = inv.getArgument(0);
-            m.setCodigo(100L);
-            return m;
+            Mapa mapa = inv.getArgument(0);
+            mapa.setCodigo(100L);
+            return mapa;
         });
         when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> {
             Subprocesso s = inv.getArgument(0);
@@ -112,32 +112,32 @@ public class ProcessoServiceStartMappingTest {
             return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
         });
 
-        // execute
-        var dto = processoService.iniciarProcessoMapeamento(processoId, List.of(unidadeId));
+        // Execução
+        var dto = processoService.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
 
-        // asserts
+        // Asserções
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(processoId);
+        assertThat(dto.getCodigo()).isEqualTo(idProcesso);
         assertThat(dto.getSituacao()).isEqualToIgnoringCase("EM_ANDAMENTO");
 
-        // verify saves and event publication
+        // Verificar saves e publicação de evento
         verify(unidadeProcessoRepository, times(1)).save(any(UnidadeProcesso.class));
         verify(mapaRepository, times(1)).save(any(Mapa.class));
         verify(subprocessoRepository, times(1)).save(any(Subprocesso.class));
         verify(movimentacaoRepository, times(1)).save(any(Movimentacao.class));
-        verify(publisher, times(1)).publishEvent(any(EventoProcessoIniciado.class));
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoIniciado.class));
     }
 
     @Test
-    public void iniciarProcessoMapeamento_shouldThrow_whenProcessoNotCriado() {
-        Long processoId = 11L;
-        Processo proc = new Processo();
-        proc.setCodigo(processoId);
-        proc.setSituacao("EM_ANDAMENTO"); // inválido para iniciar
+    public void iniciarProcessoMapeamento_deveLancarExcecao_quandoProcessoNaoEstaNaSituacaoCriado() {
+        Long idProcesso = 11L;
+        Processo processo = new Processo();
+        processo.setCodigo(idProcesso);
+        processo.setSituacao("EM_ANDAMENTO"); // Inválido para iniciar
 
-        when(processoRepository.findById(processoId)).thenReturn(Optional.of(proc));
+        when(processoRepository.findById(idProcesso)).thenReturn(Optional.of(processo));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(processoId, List.of(1L)))
+        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(idProcesso, List.of(1L)))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

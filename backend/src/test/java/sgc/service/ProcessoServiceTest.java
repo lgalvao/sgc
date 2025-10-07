@@ -27,12 +27,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para ProcessoService cobrindo fluxo feliz de criação e validação.
+ * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
  */
 public class ProcessoServiceTest {
     private ProcessoRepository processoRepository;
     private UnidadeRepository unidadeRepository;
-    private ApplicationEventPublisher publisher;
+    private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
 
     private ProcessoService processoService;
@@ -46,10 +46,10 @@ public class ProcessoServiceTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        CopiaMapaService mapCopyService = mock(CopiaMapaService.class);
-        publisher = mock(ApplicationEventPublisher.class);
-        EmailNotificationService emailService = mock(EmailNotificationService.class);
-        EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
+        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
+        publicadorDeEventos = mock(ApplicationEventPublisher.class);
+        EmailNotificationService servicoDeEmail = mock(EmailNotificationService.class);
+        EmailTemplateService servicoDeTemplateDeEmail = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
@@ -62,10 +62,10 @@ public class ProcessoServiceTest {
                 mapaRepository,
                 movimentacaoRepository,
                 unidadeMapaRepository,
-                mapCopyService,
-                publisher,
-                emailService,
-                emailTemplateService,
+                servicoDeCopiaDeMapa,
+                publicadorDeEventos,
+                servicoDeEmail,
+                servicoDeTemplateDeEmail,
                 sgrhService,
                 processoMapper,
                 processoDetalheMapper
@@ -73,39 +73,39 @@ public class ProcessoServiceTest {
     }
 
     @Test
-    public void criar_shouldPersistAndReturnDTO_whenRequestIsValid() {
-        ReqCriarProcesso req = new ReqCriarProcesso();
-        req.setDescricao("Processo de teste");
-        req.setTipo("MAPEAMENTO");
-        req.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
-        req.setUnidades(List.of(1L, 2L));
+    public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
+        ReqCriarProcesso requisicao = new ReqCriarProcesso();
+        requisicao.setDescricao("Processo de teste");
+        requisicao.setTipo("MAPEAMENTO");
+        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
+        requisicao.setUnidades(List.of(1L, 2L));
 
-        // preparar mocks: unidades existem
-        Unidade u1 = new Unidade();
-        u1.setCodigo(1L);
-        u1.setNome("Unidade 1");
-        u1.setSigla("U1");
-        Unidade u2 = new Unidade();
-        u2.setCodigo(2L);
-        u2.setNome("Unidade 2");
-        u2.setSigla("U2");
+        // Preparar mocks: as unidades existem
+        Unidade unidade1 = new Unidade();
+        unidade1.setCodigo(1L);
+        unidade1.setNome("Unidade 1");
+        unidade1.setSigla("U1");
+        Unidade unidade2 = new Unidade();
+        unidade2.setCodigo(2L);
+        unidade2.setNome("Unidade 2");
+        unidade2.setSigla("U2");
 
-        when(unidadeRepository.findById(1L)).thenReturn(Optional.of(u1));
-        when(unidadeRepository.findById(2L)).thenReturn(Optional.of(u2));
+        when(unidadeRepository.findById(1L)).thenReturn(Optional.of(unidade1));
+        when(unidadeRepository.findById(2L)).thenReturn(Optional.of(unidade2));
 
-        // quando salvar o processo, retornar com código gerado
+        // Quando salvar o processo, retornar com o código gerado
         when(processoRepository.save(any(Processo.class))).thenAnswer(invocation -> {
-            Processo p = invocation.getArgument(0);
-            p.setCodigo(123L);
-            return p;
+            Processo processo = invocation.getArgument(0);
+            processo.setCodigo(123L);
+            return processo;
         });
 
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
-            Processo p = invocation.getArgument(0);
-            return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
+            Processo processo = invocation.getArgument(0);
+            return new ProcessoDTO(processo.getCodigo(), processo.getDataCriacao(), processo.getDataFinalizacao(), processo.getDataLimite(), processo.getDescricao(), processo.getSituacao(), processo.getTipo());
         });
 
-        ProcessoDTO dto = processoService.criar(req);
+        ProcessoDTO dto = processoService.criar(requisicao);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(123L);
@@ -113,21 +113,21 @@ public class ProcessoServiceTest {
         assertThat(dto.getTipo()).isEqualTo("MAPEAMENTO");
         assertThat(dto.getSituacao()).isEqualTo("CRIADO");
 
-        // verificar que evento de criação foi publicado
-        verify(publisher, times(1)).publishEvent(any(ProcessoService.EventoProcessoCriado.class));
+        // Verificar que o evento de criação foi publicado
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoCriado.class));
     }
 
     @Test
-    public void criar_shouldThrowConstraintViolationException_whenDescricaoBlank() {
-        ReqCriarProcesso req = new ReqCriarProcesso();
-        req.setDescricao("   "); // em branco
-        req.setTipo("MAPEAMENTO");
-        req.setUnidades(List.of(1L));
+    public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
+        ReqCriarProcesso requisicao = new ReqCriarProcesso();
+        requisicao.setDescricao("   "); // em branco
+        requisicao.setTipo("MAPEAMENTO");
+        requisicao.setUnidades(List.of(1L));
 
-        assertThatThrownBy(() -> processoService.criar(req))
+        assertThatThrownBy(() -> processoService.criar(requisicao))
                 .isInstanceOf(ConstraintViolationException.class);
 
         verifyNoInteractions(processoRepository);
-        verifyNoInteractions(publisher);
+        verifyNoInteractions(publicadorDeEventos);
     }
 }
