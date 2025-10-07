@@ -4,11 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.Mapa;
-
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Controlador REST para gerenciar Atividades usando DTOs.
@@ -47,14 +44,14 @@ public class AtividadeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AtividadeDTO> atualizarAtividade(@PathVariable Long id,
-                                                           @Valid @RequestBody AtividadeDTO atividadeDto) {
+            @Valid @RequestBody AtividadeDTO atividadeDto) {
         return atividadeRepository.findById(id)
                 .map(existing -> {
                     // Mapeia os campos do DTO para a entidade existente
                     var entityToUpdate = atividadeMapper.toEntity(atividadeDto);
                     existing.setDescricao(entityToUpdate.getDescricao());
                     existing.setMapa(entityToUpdate.getMapa());
-                    
+
                     var atualizado = atividadeRepository.save(existing);
                     return ResponseEntity.ok(atividadeMapper.toDTO(atualizado));
                 })
@@ -64,7 +61,7 @@ public class AtividadeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirAtividade(@PathVariable Long id) {
         return atividadeRepository.findById(id)
-                .map(existing -> {
+                .map(_ -> {
                     atividadeRepository.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 })

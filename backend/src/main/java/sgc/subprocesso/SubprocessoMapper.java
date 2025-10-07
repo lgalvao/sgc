@@ -8,7 +8,6 @@ import org.mapstruct.Mapping;
  */
 @Mapper(componentModel = "spring")
 public interface SubprocessoMapper {
-
     @Mapping(source = "processo.codigo", target = "processoCodigo")
     @Mapping(source = "unidade.codigo", target = "unidadeCodigo")
     @Mapping(source = "mapa.codigo", target = "mapaCodigo")

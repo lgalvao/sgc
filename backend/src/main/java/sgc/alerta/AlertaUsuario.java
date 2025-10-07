@@ -6,7 +6,6 @@ import sgc.comum.Usuario;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "ALERTA_USUARIO", schema = "sgc")

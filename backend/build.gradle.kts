@@ -7,13 +7,14 @@ plugins {
     java
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    jacoco
 }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    
+
     // Spring Security
     implementation("org.springframework.boot:spring-boot-starter-security")
 
@@ -22,13 +23,13 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
-    
+
     // Spring Mail
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    
+
     // Thymeleaf para templates HTML
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    
+
     // Oracle JDBC Driver para integração com SGRH
     implementation("com.oracle.database.jdbc:ojdbc11")
     implementation("org.hibernate.orm:hibernate-core:6.6.31.Final")
@@ -51,7 +52,7 @@ dependencies {
 
     // MapStruct
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
-    
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -83,7 +84,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     // Performance optimization for agent iterations
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(2)
     setForkEvery(100) // Restart JVM every 100 tests to prevent memory leaks
 
     // JVM settings for stability and suppress Hibernate logging
@@ -102,7 +103,8 @@ tasks.withType<Test> {
     )
 
     // Adicionar o Mockito Java Agent
-    val byteBuddyAgentFile = project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
+    val byteBuddyAgentFile =
+        project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
 
     doFirst {
         if (byteBuddyAgentFile != null) {
@@ -186,7 +188,7 @@ tasks.withType<Test> {
             failures: List<TestFailure>,
             skipped: List<String>
         ) {
-            println("AGENT TEST SUMMARY")
+            println("RESUMO")
             println()
             println("Status: ${if (result.failedTestCount == 0L) "✅ PASSED" else "❌ FAILED"}")
             println("Total:   ${result.testCount}")
@@ -197,13 +199,11 @@ tasks.withType<Test> {
 
             if (failures.isNotEmpty()) {
                 println("\n" + "-".repeat(80))
-                println("FAILURES (${failures.size})")
+                println("FALHAS (${failures.size})")
                 println("-".repeat(80))
-
                 failures.forEachIndexed { index, failure ->
                     println("\n${index + 1}. ${failure.testClass}.${failure.testMethod}")
-                    println("   Error: ${failure.errorType}: ${failure.errorMessage}")
-
+                    println("   Erro: ${failure.errorType}: ${failure.errorMessage}")
                     if (failure.stackTrace.isNotEmpty()) {
                         println("   Stack trace (application code only):")
                         failure.stackTrace.forEach { line ->
@@ -212,13 +212,11 @@ tasks.withType<Test> {
                     }
                 }
             }
-
             if (skipped.isNotEmpty()) {
-                println("SKIPPED (${skipped.size})")
+                println("IGNORADOS (${skipped.size})")
                 println("-".repeat(80))
                 skipped.forEach { println("  • $it") }
             }
-
             println("\n" + "=".repeat(80))
             println()
 
@@ -323,9 +321,7 @@ tasks.register("agentTest") {
 tasks.register<Test>("testClass") {
     group = "verification"
     description = "Run a single test class: ./gradlew testClass -PtestClass=YourTestClass"
-
     useJUnitPlatform()
-
     filter {
         val className = project.findProperty("testClass") as? String
         if (className != null) {
@@ -337,5 +333,49 @@ tasks.register<Test>("testClass") {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
+    }
+}
+
+// ============================================
+// JACOCO TEST COVERAGE CONFIGURATION
+// ============================================
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("test"))
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test"))
+    }
+
+    // Specify all source directories
+    sourceDirectories.setFrom(files(sourceSets.main.get().allSource.srcDirs))
+
+    // Specify all class directories
+    classDirectories.setFrom(files(sourceSets.main.get().output))
+
+    // Specify where to find the execution data
+    executionData.setFrom(fileTree(layout.buildDirectory) {
+        include("jacoco/*.exec")
+    })
+}
+
+// Add coverage verification task
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerif") {
+    dependsOn(tasks.named("jacocoTestReport"))
+
+    sourceDirectories.setFrom(files(sourceSets.main.get().allSource.srcDirs))
+    classDirectories.setFrom(files(sourceSets.main.get().output))
+    executionData.setFrom(fileTree(layout.buildDirectory) {
+        include("jacoco/*.exec")
+    })
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.0".toBigDecimal() // Adjust as needed
+            }
+        }
     }
 }

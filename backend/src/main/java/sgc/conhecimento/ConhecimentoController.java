@@ -4,11 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.atividade.Atividade;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Controlador REST para gerenciar Conhecimentos usando DTOs.
@@ -46,13 +44,14 @@ public class ConhecimentoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ConhecimentoDTO> atualizarConhecimento(@PathVariable Long id, @Valid @RequestBody ConhecimentoDTO conhecimentoDto) {
+    public ResponseEntity<ConhecimentoDTO> atualizarConhecimento(@PathVariable Long id,
+            @Valid @RequestBody ConhecimentoDTO conhecimentoDto) {
         return conhecimentoRepository.findById(id)
                 .map(existing -> {
                     var entityToUpdate = conhecimentoMapper.toEntity(conhecimentoDto);
                     existing.setDescricao(entityToUpdate.getDescricao());
                     existing.setAtividade(entityToUpdate.getAtividade());
-                    
+
                     var atualizado = conhecimentoRepository.save(existing);
                     return ResponseEntity.ok(conhecimentoMapper.toDTO(atualizado));
                 })
@@ -62,7 +61,7 @@ public class ConhecimentoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirConhecimento(@PathVariable Long id) {
         return conhecimentoRepository.findById(id)
-                .map(existing -> {
+                .map(_ -> {
                     conhecimentoRepository.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 })

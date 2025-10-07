@@ -2,6 +2,7 @@ package sgc.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.mapa.CopiaMapaService;
@@ -11,7 +12,6 @@ import sgc.notificacao.EmailNotificationService;
 import sgc.notificacao.EmailTemplateService;
 import sgc.processo.*;
 import sgc.processo.dto.ProcessoDetalheDTO;
-import sgc.processo.dto.ProcessoDetalheDTO.UnidadeParticipanteDTO;
 import sgc.processo.dto.ProcessoResumoDTO;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
@@ -27,24 +27,22 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Testes unitários para ProcessoService.getDetails(...)
  * <p>
- * - caso feliz: retorna ProcessoDetalheDTO com unidades e resumo de subprocessos
+ * - caso feliz: retorna ProcessoDetalheDTO com unidades e resumo de
+ * subprocessos
  * - caso sem permissão: lança ErroDominioAccessoNegado
  */
 public class ProcessoServiceDetailsTest {
     private ProcessoRepository processoRepository;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
-    private ProcessoMapper processoMapper;
     private ProcessoDetalheMapper processoDetalheMapper;
 
     private ProcessoService service;
@@ -63,7 +61,7 @@ public class ProcessoServiceDetailsTest {
         EmailNotificationService emailService = mock(EmailNotificationService.class);
         EmailTemplateService emailTemplateService = mock(EmailTemplateService.class);
         SgrhService sgrhService = mock(SgrhService.class);
-        processoMapper = mock(ProcessoMapper.class);
+        ProcessoMapper processoMapper = mock(ProcessoMapper.class);
         processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
         service = new ProcessoService(
@@ -80,8 +78,7 @@ public class ProcessoServiceDetailsTest {
                 emailTemplateService,
                 sgrhService,
                 processoMapper,
-                processoDetalheMapper
-        );
+                processoDetalheMapper);
     }
 
     @Test
@@ -118,20 +115,22 @@ public class ProcessoServiceDetailsTest {
         sp.setSituacaoId("PENDENTE");
         sp.setDataLimiteEtapa1(LocalDate.now().plusDays(5));
 
-        ProcessoDetalheDTO.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDTO.UnidadeParticipanteDTO(10L, "Diretoria X", "DX", null, "PENDENTE", LocalDate.now().plusDays(7), new ArrayList<>());
-        ProcessoResumoDTO processoResumoDTO = new ProcessoResumoDTO(100L, null, "PENDENTE", null, LocalDate.now().plusDays(5), null, 10L, "Diretoria X");
+        ProcessoDetalheDTO.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDTO.UnidadeParticipanteDTO(
+                10L, "Diretoria X", "DX", null, "PENDENTE", LocalDate.now().plusDays(7), new ArrayList<>());
+        ProcessoResumoDTO processoResumoDTO = new ProcessoResumoDTO(100L, null, "PENDENTE", null,
+                LocalDate.now().plusDays(5), null, 10L, "Diretoria X");
 
         ProcessoDetalheDTO processoDetalheDTO = new ProcessoDetalheDTO(
                 1L, "Proc Teste", "MAPEAMENTO", "EM_ANDAMENTO",
                 dataLimite, dataCriacao, dataFinalizacao,
                 List.of(unidadeParticipanteDTO),
-                List.of(processoResumoDTO)
-        );
+                List.of(processoResumoDTO));
 
         when(processoRepository.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
-        Mockito.lenient().when(processoDetalheMapper.toDetailDTO(eq(p), anyList(), anyList())).thenReturn(processoDetalheDTO);
+        Mockito.lenient().when(processoDetalheMapper.toDetailDTO(eq(p), anyList(), anyList()))
+                .thenReturn(processoDetalheDTO);
 
         // Act
         ProcessoDetalheDTO dto = service.obterDetalhes(1L, "ADMIN", null);
@@ -142,7 +141,8 @@ public class ProcessoServiceDetailsTest {
         assertNotNull(dto.getUnidades());
         assertTrue(dto.getUnidades().stream().anyMatch(u -> "DX".equals(u.getSigla())));
         assertNotNull(dto.getResumoSubprocessos());
-        assertTrue(dto.getResumoSubprocessos().stream().anyMatch(s -> s.getCodigo() != null && s.getSituacao() != null));
+        assertTrue(
+                dto.getResumoSubprocessos().stream().anyMatch(s -> s.getCodigo() != null && s.getSituacao() != null));
     }
 
     @Test
@@ -166,7 +166,8 @@ public class ProcessoServiceDetailsTest {
         when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of());
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(2L)).thenReturn(List.of(sp));
 
-        // Act & Assert: gestor da unidade 10 não está presente nos subprocessos -> acesso negado
+        // Act & Assert: gestor da unidade 10 não está presente nos subprocessos ->
+        // acesso negado
         assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(2L, "GESTOR", 10L));
     }
 }

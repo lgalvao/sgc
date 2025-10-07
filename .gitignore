@@ -14,6 +14,8 @@ frontend/dist/
 
 # Backend
 backend/src/main/resources/static/
+backend/build/
+backend/out/
 
 # Spring Boot
 *.log
