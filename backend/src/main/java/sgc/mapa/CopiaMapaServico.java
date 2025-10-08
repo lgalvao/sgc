@@ -4,7 +4,7 @@ package sgc.mapa;
  * Serviço responsável por copiar um mapa vigente para outra unidade.
  * A implementação deve clonar o mapa e suas atividades/conhecimentos mantendo integridade.
  */
-public interface CopiaMapaService {
+public interface CopiaMapaServico {
     /**
      * Copia o mapa identificado por sourceMapaId para a unidade targetUnidadeId.
      * Retorna o Mapa recém-criado (com novo id).

@@ -9,11 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.quality.Strictness;
 import sgc.alerta.AlertaRepository;
 import sgc.atividade.AnaliseCadastro;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.notificacao.NotificationService;
+import sgc.notificacao.ServicoNotificacao;
 import sgc.subprocesso.*;
 import sgc.atividade.AnaliseValidacao;
 import sgc.subprocesso.AnaliseValidacaoRepository;
@@ -25,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT) // Adicionar esta anotação
-public class SubprocessoServiceActionsTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class ServicoSubprocessoActionsTest {
 
     @Mock
     private SubprocessoRepository subprocessoRepository;
@@ -37,14 +36,14 @@ public class SubprocessoServiceActionsTest {
     @Mock
     private AnaliseValidacaoRepository analiseValidacaoRepository;
     @Mock
-    private NotificationService notificationService;
+    private ServicoNotificacao servicoNotificacao;
     @Mock
     private AlertaRepository alertaRepository;
     @Mock
     private SubprocessoMapper subprocessoMapper;
 
     @InjectMocks
-    private SubprocessoService subprocessoService;
+    private ServicoSubprocesso servicoSubprocesso;
 
     private Subprocesso subprocesso;
     private Unidade unidadeSubordinada;
@@ -62,13 +61,13 @@ public class SubprocessoServiceActionsTest {
         unidadeSuperior.setCodigo(20L);
         unidadeSuperior.setSigla("UNID_SUP");
         unidadeSuperior.setNome("Unidade Superior");
-        unidadeSubordinada.setUnidadeSuperior(unidadeSuperior); // Define a unidade superior
+        unidadeSubordinada.setUnidadeSuperior(unidadeSuperior);
 
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         subprocesso.setUnidade(unidadeSubordinada);
         subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
-        subprocesso.setProcesso(new sgc.processo.Processo()); // Mock simples de processo
+        subprocesso.setProcesso(new sgc.processo.Processo());
         subprocesso.getProcesso().setDescricao("Processo Teste");
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
@@ -80,18 +79,17 @@ public class SubprocessoServiceActionsTest {
         });
     }
 
-    // Testes para aceitarCadastro
     @Test
-    void aceitarCadastro_shouldSaveAnaliseAndMovimentacao_whenValid() {
+    void aceitarCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
         subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepository.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.aceitarCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("CADASTRO_DISPONIBILIZADO", result.getSituacaoId()); // Situação não muda
+        assertEquals("CADASTRO_DISPONIBILIZADO", result.getSituacaoId());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepository, times(1)).save(analiseCaptor.capture());
@@ -105,48 +103,39 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        // Verificar que as notificações e alertas não são chamados diretamente aqui,
-        // mas seriam em um listener ou método específico
-        verifyNoInteractions(notificationService);
+        verifyNoInteractions(servicoNotificacao);
         verifyNoInteractions(alertaRepository);
     }
 
     @Test
-    void aceitarCadastro_shouldThrowException_whenSubprocessoNotFound() {
+    void aceitarCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ErroDominioNaoEncontrado.class,
-                () -> subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> servicoSubprocesso.aceitarCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
-    void aceitarCadastro_shouldThrowException_whenInvalidSituacao() {
+    void aceitarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
         subprocesso.setSituacaoId("OUTRA_SITUACAO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThrows(IllegalStateException.class,
-                () -> subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(IllegalStateException.class, () -> servicoSubprocesso.aceitarCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
-    void aceitarCadastro_shouldThrowException_whenUnidadeSuperiorNotFound() {
-        unidadeSubordinada.setUnidadeSuperior(null); // Remove unidade superior
+    void aceitarCadastro_deveLancarExcecao_quandoUnidadeSuperiorNaoEncontrada() {
+        unidadeSubordinada.setUnidadeSuperior(null);
         subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThrows(IllegalStateException.class,
-                () -> subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(IllegalStateException.class, () -> servicoSubprocesso.aceitarCadastro(1L, "Observações", usuarioTitulo));
     }
 
-    // Testes para homologarCadastro
     @Test
-    void homologarCadastro_shouldChangeSituacaoAndSaveMovimentacao_whenValid() {
+    void homologarCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
         subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.homologarCadastro(1L, "Observações", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.homologarCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
         assertEquals("CADASTRO_HOMOLOGADO", result.getSituacaoId());
@@ -154,8 +143,6 @@ public class SubprocessoServiceActionsTest {
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepository, times(1)).save(movCaptor.capture());
         assertEquals("Cadastro de atividades e conhecimentos homologado", movCaptor.getValue().getDescricao());
-        // Conforme análise, a origem e destino deveriam ser SEDOC, mas o código atual
-        // usa unidade superior
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
@@ -163,34 +150,29 @@ public class SubprocessoServiceActionsTest {
     }
 
     @Test
-    void homologarCadastro_shouldThrowException_whenSubprocessoNotFound() {
+    void homologarCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ErroDominioNaoEncontrado.class,
-                () -> subprocessoService.homologarCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> servicoSubprocesso.homologarCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
-    void homologarCadastro_shouldThrowException_whenInvalidSituacao() {
+    void homologarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
         subprocesso.setSituacaoId("OUTRA_SITUACAO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThrows(IllegalStateException.class,
-                () -> subprocessoService.homologarCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(IllegalStateException.class, () -> servicoSubprocesso.homologarCadastro(1L, "Observações", usuarioTitulo));
     }
 
-    // Testes para aceitarRevisaoCadastro
     @Test
-    void aceitarRevisaoCadastro_shouldSaveAnaliseAndMovimentacao_whenValid() {
+    void aceitarRevisaoCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
         subprocesso.setSituacaoId("REVISAO_CADASTRO_DISPONIBILIZADA");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepository.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("REVISAO_CADASTRO_DISPONIBILIZADA", result.getSituacaoId()); // Situação não muda
+        assertEquals("REVISAO_CADASTRO_DISPONIBILIZADA", result.getSituacaoId());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepository, times(1)).save(analiseCaptor.capture());
@@ -204,46 +186,38 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        verifyNoInteractions(notificationService);
+        verifyNoInteractions(servicoNotificacao);
         verifyNoInteractions(alertaRepository);
     }
 
     @Test
-    void aceitarRevisaoCadastro_shouldThrowException_whenSubprocessoNotFound() {
+    void aceitarRevisaoCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ErroDominioNaoEncontrado.class,
-                () -> subprocessoService.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> servicoSubprocesso.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
-    void aceitarRevisaoCadastro_shouldThrowException_whenInvalidSituacao() {
+    void aceitarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
         subprocesso.setSituacaoId("OUTRA_SITUACAO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThrows(IllegalStateException.class,
-                () -> subprocessoService.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(IllegalStateException.class, () -> servicoSubprocesso.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
-    // Testes para homologarRevisaoCadastro
     @Test
-    void homologarRevisaoCadastro_shouldChangeSituacaoAndSaveMovimentacao_whenValid() {
+    void homologarRevisaoCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
         subprocesso.setSituacaoId("REVISAO_CADASTRO_DISPONIBILIZADA");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
         assertEquals("REVISAO_CADASTRO_HOMOLOGADA", result.getSituacaoId());
 
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepository, times(1)).save(movCaptor.capture());
-        assertEquals("Revisão do cadastro de atividades e conhecimentos homologada",
-                movCaptor.getValue().getDescricao());
-        // Conforme análise, a origem e destino deveriam ser SEDOC, mas o código atual
-        // usa unidade superior
+        assertEquals("Revisão do cadastro de atividades e conhecimentos homologada", movCaptor.getValue().getDescricao());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
@@ -251,36 +225,31 @@ public class SubprocessoServiceActionsTest {
     }
 
     @Test
-    void homologarRevisaoCadastro_shouldThrowException_whenSubprocessoNotFound() {
+    void homologarRevisaoCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ErroDominioNaoEncontrado.class,
-                () -> subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> servicoSubprocesso.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
-    void homologarRevisaoCadastro_shouldThrowException_whenInvalidSituacao() {
+    void homologarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
         subprocesso.setSituacaoId("OUTRA_SITUACAO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
-
-        assertThrows(IllegalStateException.class,
-                () -> subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
+        assertThrows(IllegalStateException.class, () -> servicoSubprocesso.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
-    // Testes para devolverCadastro
     @Test
-    void devolverCadastro_shouldChangeSituacaoAndSaveAnaliseAndMovimentacao_whenValid() {
+    void devolverCadastro_deveMudarSituacaoESalvarAnaliseEMovimentacao_quandoValido() {
         subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepository.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.devolverCadastro(1L, "Motivo Teste", "Observações", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.devolverCadastro(1L, "Motivo Teste", "Observações", usuarioTitulo);
 
         assertNotNull(result);
         assertEquals("CADASTRO_EM_ELABORACAO", result.getSituacaoId());
-        assertNull(subprocesso.getDataFimEtapa1()); // dataFimEtapa1 should be reset
+        assertNull(subprocesso.getDataFimEtapa1());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepository, times(1)).save(analiseCaptor.capture());
@@ -292,21 +261,20 @@ public class SubprocessoServiceActionsTest {
         assertTrue(movCaptor.getValue().getDescricao().contains("Devolução do cadastro de atividades"));
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificationService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(servicoNotificacao, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
         verify(alertaRepository, times(1)).save(any(sgc.alerta.Alerta.class));
     }
 
-    // Testes para devolverValidacao
     @Test
-    void devolverValidacao_shouldChangeSituacaoAndSaveAnalise_whenValid() {
-        subprocesso.setSituacaoId("MAPA_VALIDADO"); // A situation that allows this action
-        unidadeSuperior.setUnidadeSuperior(new Unidade()); // Ensure there's a higher level unit
+    void devolverValidacao_deveMudarSituacaoESalvarAnalise_quandoValido() {
+        subprocesso.setSituacaoId("MAPA_VALIDADO");
+        unidadeSuperior.setUnidadeSuperior(new Unidade());
         when(subprocessoRepository.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseValidacaoRepository.save(any(AnaliseValidacao.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepository.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subprocessoRepository.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubprocessoDTO result = subprocessoService.devolverValidacao(1L, "Justificativa Teste", usuarioTitulo);
+        SubprocessoDTO result = servicoSubprocesso.devolverValidacao(1L, "Justificativa Teste", usuarioTitulo);
 
         assertNotNull(result);
         assertEquals("MAPA_DISPONIBILIZADO", result.getSituacaoId());
@@ -321,7 +289,7 @@ public class SubprocessoServiceActionsTest {
         assertEquals("Devolução da validação do mapa de competências para ajustes", movCaptor.getValue().getDescricao());
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificationService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(servicoNotificacao, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
         verify(alertaRepository, times(1)).save(any(sgc.alerta.Alerta.class));
     }
 }

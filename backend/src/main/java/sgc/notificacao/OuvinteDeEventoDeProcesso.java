@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.Alerta;
 import sgc.alerta.ServicoAlerta;
-import sgc.processo.EventoProcessoIniciado;
+import sgc.processo.ProcessoIniciadoEvento;
 import sgc.processo.Processo;
-import sgc.processo.ProcessoRepository;
+import sgc.processo.RepositorioProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
@@ -35,7 +35,7 @@ public class OuvinteDeEventoDeProcesso {
     private final ServicoNotificacaoEmail servicoNotificacaoEmail;
     private final ServicoDeTemplateDeEmail servicoDeTemplateDeEmail;
     private final SgrhService sgrhService;
-    private final ProcessoRepository processoRepository;
+    private final RepositorioProcesso repositorioProcesso;
     private final SubprocessoRepository subprocessoRepository;
 
     /**
@@ -47,25 +47,25 @@ public class OuvinteDeEventoDeProcesso {
     @EventListener
     @Async
     @Transactional
-    public void aoIniciarProcesso(EventoProcessoIniciado evento) {
+    public void aoIniciarProcesso(ProcessoIniciadoEvento evento) {
         log.info("Processando evento de processo iniciado: idProcesso={}, tipo={}",
-                evento.processoId(), evento.tipo());
+                evento.idProcesso(), evento.tipo());
 
         try {
-            Processo processo = processoRepository.findById(evento.processoId())
+            Processo processo = repositorioProcesso.findById(evento.idProcesso())
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "Processo não encontrado: " + evento.processoId()));
+                            "Processo não encontrado: " + evento.idProcesso()));
 
             List<Subprocesso> subprocessos = subprocessoRepository
-                    .findByProcessoCodigoWithUnidade(evento.processoId());
+                    .findByProcessoCodigoWithUnidade(evento.idProcesso());
 
             if (subprocessos.isEmpty()) {
-                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.processoId());
+                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.idProcesso());
                 return;
             }
 
             log.info("Encontrados {} subprocessos para o processo {}",
-                    subprocessos.size(), evento.processoId());
+                    subprocessos.size(), evento.idProcesso());
 
             // 1. Criar alertas diferenciados por tipo de unidade
             List<Alerta> alertas = servicoAlerta.criarAlertasProcessoIniciado(

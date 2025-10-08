@@ -8,7 +8,7 @@ import sgc.mapa.dto.ImpactoMapaDto;
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
  */
-public interface ImpactoMapaService {
+public interface ImpactoMapaServico {
     
     /**
      * Verifica impactos no mapa de competências comparando o cadastro atual

@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.atividade.Atividade;
-import sgc.atividade.AtividadeRepository;
+import sgc.atividade.RepositorioAtividade;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -21,27 +21,26 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CompetenciaAtividadeController.class)
-class CompetenciaAtividadeControllerTest {
+@WebMvcTest(CompetenciaAtividadeControlador.class)
+class CompetenciaAtividadeControladorTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CompetenciaAtividadeRepository competenciaAtividadeRepository;
+    private CompetenciaAtividadeRepository repositorioCompetenciaAtividade;
 
     @MockitoBean
-    private AtividadeRepository atividadeRepository;
+    private RepositorioAtividade repositorioAtividade;
 
     @MockitoBean
-    private CompetenciaRepository competenciaRepository;
+    private CompetenciaRepository repositorioCompetencia;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void listarVinculos_deveRetornarListaDeVinculos() throws Exception {
-        // Given
+    void listar_deveRetornarListaDeVinculos() throws Exception {
         Atividade atividade = new Atividade();
         atividade.setCodigo(1L);
 
@@ -54,9 +53,8 @@ class CompetenciaAtividadeControllerTest {
         vinculo.setAtividade(atividade);
         vinculo.setCompetencia(competencia);
 
-        when(competenciaAtividadeRepository.findAll()).thenReturn(Collections.singletonList(vinculo));
+        when(repositorioCompetenciaAtividade.findAll()).thenReturn(Collections.singletonList(vinculo));
 
-        // When & Then
         mockMvc.perform(get("/api/competencia-atividades").with(user("testuser")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -66,7 +64,6 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void listarPorAtividade_deveRetornarListaDeVinculos() throws Exception {
-        // Given
         Atividade atividade = new Atividade();
         atividade.setCodigo(1L);
 
@@ -79,9 +76,8 @@ class CompetenciaAtividadeControllerTest {
         vinculo.setAtividade(atividade);
         vinculo.setCompetencia(competencia);
 
-        when(competenciaAtividadeRepository.findAll()).thenReturn(Collections.singletonList(vinculo));
+        when(repositorioCompetenciaAtividade.findAll()).thenReturn(Collections.singletonList(vinculo));
 
-        // When & Then
         mockMvc.perform(get("/api/competencia-atividades/por-atividade/1").with(user("testuser")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -90,17 +86,15 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void vincular_comSucesso_deveCriarVinculo() throws Exception {
-        // Given
-        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
-        request.setAtividadeCodigo(1L);
-        request.setCompetenciaCodigo(1L);
+        CompetenciaAtividadeControlador.RequisicaoVinculo request = new CompetenciaAtividadeControlador.RequisicaoVinculo();
+        request.setIdAtividade(1L);
+        request.setIdCompetencia(1L);
 
-        when(atividadeRepository.findById(1L)).thenReturn(Optional.of(new Atividade()));
-        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(new Competencia()));
-        when(competenciaAtividadeRepository.existsById(any())).thenReturn(false);
-        when(competenciaAtividadeRepository.save(any())).thenReturn(new CompetenciaAtividade());
+        when(repositorioAtividade.findById(1L)).thenReturn(Optional.of(new Atividade()));
+        when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(new Competencia()));
+        when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(false);
+        when(repositorioCompetenciaAtividade.save(any())).thenReturn(new CompetenciaAtividade());
 
-        // When & Then
         mockMvc.perform(post("/api/competencia-atividades")
                 .with(user("testuser")).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,15 +104,13 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void vincular_quandoAtividadeNaoEncontrada_deveRetornarBadRequest() throws Exception {
-        // Given
-        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
-        request.setAtividadeCodigo(99L); // Non-existent
-        request.setCompetenciaCodigo(1L);
+        CompetenciaAtividadeControlador.RequisicaoVinculo request = new CompetenciaAtividadeControlador.RequisicaoVinculo();
+        request.setIdAtividade(99L);
+        request.setIdCompetencia(1L);
 
-        when(atividadeRepository.findById(99L)).thenReturn(Optional.empty());
-        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(new Competencia()));
+        when(repositorioAtividade.findById(99L)).thenReturn(Optional.empty());
+        when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(new Competencia()));
 
-        // When & Then
         mockMvc.perform(post("/api/competencia-atividades")
                         .with(user("testuser")).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,15 +120,13 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void vincular_quandoCompetenciaNaoEncontrada_deveRetornarBadRequest() throws Exception {
-        // Given
-        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
-        request.setAtividadeCodigo(1L);
-        request.setCompetenciaCodigo(99L); // Non-existent
+        CompetenciaAtividadeControlador.RequisicaoVinculo request = new CompetenciaAtividadeControlador.RequisicaoVinculo();
+        request.setIdAtividade(1L);
+        request.setIdCompetencia(99L);
 
-        when(atividadeRepository.findById(1L)).thenReturn(Optional.of(new Atividade()));
-        when(competenciaRepository.findById(99L)).thenReturn(Optional.empty());
+        when(repositorioAtividade.findById(1L)).thenReturn(Optional.of(new Atividade()));
+        when(repositorioCompetencia.findById(99L)).thenReturn(Optional.empty());
 
-        // When & Then
         mockMvc.perform(post("/api/competencia-atividades")
                         .with(user("testuser")).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -146,16 +136,14 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void vincular_quandoVinculoJaExiste_deveRetornarConflict() throws Exception {
-        // Given
-        CompetenciaAtividadeController.VinculoRequest request = new CompetenciaAtividadeController.VinculoRequest();
-        request.setAtividadeCodigo(1L);
-        request.setCompetenciaCodigo(1L);
+        CompetenciaAtividadeControlador.RequisicaoVinculo request = new CompetenciaAtividadeControlador.RequisicaoVinculo();
+        request.setIdAtividade(1L);
+        request.setIdCompetencia(1L);
 
-        when(atividadeRepository.findById(1L)).thenReturn(Optional.of(new Atividade()));
-        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(new Competencia()));
-        when(competenciaAtividadeRepository.existsById(any())).thenReturn(true);
+        when(repositorioAtividade.findById(1L)).thenReturn(Optional.of(new Atividade()));
+        when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(new Competencia()));
+        when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(true);
 
-        // When & Then
         mockMvc.perform(post("/api/competencia-atividades")
                 .with(user("testuser")).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -165,23 +153,19 @@ class CompetenciaAtividadeControllerTest {
 
     @Test
     void desvincular_comSucesso_deveRemoverVinculo() throws Exception {
-        // Given
-        when(competenciaAtividadeRepository.existsById(any())).thenReturn(true);
-        doNothing().when(competenciaAtividadeRepository).deleteById(any());
+        when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(true);
+        doNothing().when(repositorioCompetenciaAtividade).deleteById(any());
 
-        // When & Then
-        mockMvc.perform(delete("/api/competencia-atividades?atividadeCodigo=1&competenciaCodigo=1")
+        mockMvc.perform(delete("/api/competencia-atividades?idAtividade=1&idCompetencia=1")
                 .with(user("testuser")).with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void desvincular_quandoNaoEncontrado_deveRetornarNotFound() throws Exception {
-        // Given
-        when(competenciaAtividadeRepository.existsById(any())).thenReturn(false);
+        when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(false);
 
-        // When & Then
-        mockMvc.perform(delete("/api/competencia-atividades?atividadeCodigo=1&competenciaCodigo=1")
+        mockMvc.perform(delete("/api/competencia-atividades?idAtividade=1&idCompetencia=1")
                 .with(user("testuser")).with(csrf()))
                 .andExpect(status().isNotFound());
     }

@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.processo.dto.ProcessoDTO;
 import sgc.processo.dto.ProcessoDetalheDTO;
-import sgc.processo.dto.ReqAtualizarProcesso;
-import sgc.processo.dto.ReqCriarProcesso;
+import sgc.processo.dto.RequisicaoAtualizarProcesso;
+import sgc.processo.dto.RequisicaoCriarProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 
 import java.net.URI;
@@ -21,27 +21,27 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
-public class ProcessoController {
-    private final ProcessoService processoService;
+public class ProcessoControlador {
+    private final ServicoProcesso servicoProcesso;
 
     @PostMapping
-    public ResponseEntity<ProcessoDTO> criarProcesso(@Valid @RequestBody ReqCriarProcesso requisicao) {
-        ProcessoDTO criado = processoService.criar(requisicao);
+    public ResponseEntity<ProcessoDTO> criar(@Valid @RequestBody RequisicaoCriarProcesso requisicao) {
+        ProcessoDTO criado = servicoProcesso.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProcessoDTO> obterPorId(@PathVariable Long id) {
-        return processoService.obterPorId(id)
+        return servicoProcesso.obterPorId(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProcessoDTO> atualizarProcesso(@PathVariable Long id, @Valid @RequestBody ReqAtualizarProcesso requisicao) {
+    public ResponseEntity<ProcessoDTO> atualizar(@PathVariable Long id, @Valid @RequestBody RequisicaoAtualizarProcesso requisicao) {
         try {
-            ProcessoDTO atualizado = processoService.atualizar(id, requisicao);
+            ProcessoDTO atualizado = servicoProcesso.atualizar(id, requisicao);
             return ResponseEntity.ok(atualizado);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
@@ -51,9 +51,9 @@ public class ProcessoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirProcesso(@PathVariable Long id) {
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
         try {
-            processoService.apagar(id);
+            servicoProcesso.apagar(id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
@@ -64,17 +64,17 @@ public class ProcessoController {
 
     /**
      * Retorna os detalhes completos de um processo, incluindo unidades snapshot e resumo de subprocessos.
-     * Este endpoint delega para ProcessoService.obterDetalhes e aplica tratamento de autorização.
+     * Este endpoint delega para ServicoProcesso.obterDetalhes e aplica tratamento de autorização.
      * <p>
      * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
      */
     @GetMapping("/{id}/detalhes")
-    public ResponseEntity<ProcessoDetalheDTO> detalhesProcesso(
+    public ResponseEntity<ProcessoDetalheDTO> obterDetalhes(
             @PathVariable Long id,
             @RequestParam(name = "perfil") String perfil,
             @RequestParam(name = "unidade", required = false) Long unidade) {
         try {
-            ProcessoDetalheDTO detalhes = processoService.obterDetalhes(id, perfil, unidade);
+            ProcessoDetalheDTO detalhes = servicoProcesso.obterDetalhes(id, perfil, unidade);
             return ResponseEntity.ok(detalhes);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
@@ -88,7 +88,7 @@ public class ProcessoController {
      * O corpo opcional pode conter uma lista de unidades (IDs) que participam do início.
      */
     @PostMapping("/{id}/iniciar")
-    public ResponseEntity<ProcessoDTO> iniciarProcesso(
+    public ResponseEntity<ProcessoDTO> iniciar(
             @PathVariable Long id,
             @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
             @RequestBody(required = false) List<Long> unidades) {
@@ -96,10 +96,10 @@ public class ProcessoController {
         try {
             ProcessoDTO resultado;
             if ("REVISAO".equalsIgnoreCase(tipo)) {
-                resultado = processoService.iniciarProcessoRevisao(id, unidades);
+                resultado = servicoProcesso.iniciarProcessoRevisao(id, unidades);
             } else {
                 // por padrão, inicia mapeamento
-                resultado = processoService.iniciarProcessoMapeamento(id, unidades);
+                resultado = servicoProcesso.iniciarProcessoMapeamento(id, unidades);
             }
             return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException | IllegalStateException ex) {
@@ -118,9 +118,9 @@ public class ProcessoController {
      * @return ProcessoDTO com dados do processo finalizado
      */
     @PostMapping("/{id}/finalizar")
-    public ResponseEntity<?> finalizarProcesso(@PathVariable Long id) {
+    public ResponseEntity<?> finalizar(@PathVariable Long id) {
         try {
-            ProcessoDTO finalizado = processoService.finalizarProcesso(id);
+            ProcessoDTO finalizado = servicoProcesso.finalizar(id);
             return ResponseEntity.ok(finalizado);
         } catch (IllegalArgumentException ex) {
             // Processo não encontrado
@@ -129,7 +129,7 @@ public class ProcessoController {
             // Processo em situação inválida para finalizar
             return ResponseEntity.badRequest()
                     .body(Map.of("erro", ex.getMessage()));
-        } catch (ErroProcesso ex) {
+        } catch (ProcessoErro ex) {
             // Validação de negócio falhou (ex: subprocessos não homologados)
             return ResponseEntity.status(422) // Entidade não processável
                     .body(Map.of("erro", ex.getMessage()));

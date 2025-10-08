@@ -8,19 +8,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.ImpactoMapaService;
+import sgc.mapa.ImpactoMapaServico;
 import sgc.mapa.Mapa;
-import sgc.mapa.MapaService;
+import sgc.mapa.MapaServico;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.processo.Processo;
-import sgc.subprocesso.dto.AnaliseValidacaoDTO;
-import sgc.subprocesso.dto.DevolverValidacaoRequest;
-import sgc.subprocesso.dto.SugestoesDTO;
+import sgc.subprocesso.dto.*;
 import sgc.unidade.Unidade;
-import sgc.subprocesso.dto.MapaAjusteDTO;
-import sgc.subprocesso.dto.SalvarAjustesRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -33,15 +29,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
-public class SubprocessoController {
+public class SubprocessoControlador {
     private final SubprocessoRepository subprocessoRepository;
-    private final SubprocessoService subprocessoService;
-    private final MapaService mapaService;
-    private final ImpactoMapaService impactoMapaService;
+    private final ServicoSubprocesso servicoSubprocesso;
+    private final MapaServico mapaServico;
+    private final ImpactoMapaServico impactoMapaServico;
     private final SubprocessoMapper subprocessoMapper;
 
     @GetMapping
-    public List<SubprocessoDTO> listarSubprocessos() {
+    public List<SubprocessoDTO> listar() {
         return subprocessoRepository.findAll()
                 .stream()
                 .map(subprocessoMapper::toDTO)
@@ -56,11 +52,11 @@ public class SubprocessoController {
      * extraídos do token.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterSubprocesso(@PathVariable Long id,
+    public ResponseEntity<?> obterPorId(@PathVariable Long id,
                                               @RequestParam(required = false) String perfil,
                                               @RequestParam(required = false) Long unidadeUsuario) {
         try {
-            SubprocessoDetalheDTO detail = subprocessoService.obterDetalhes(id, perfil, unidadeUsuario);
+            SubprocessoDetalheDTO detail = servicoSubprocesso.obterDetalhes(id, perfil, unidadeUsuario);
             return ResponseEntity.ok(detail);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -78,7 +74,7 @@ public class SubprocessoController {
     public ResponseEntity<?> disponibilizarCadastro(@PathVariable Long id) {
         try {
             // validar atividades sem conhecimento
-            var faltando = subprocessoService.obterAtividadesSemConhecimento(id);
+            var faltando = servicoSubprocesso.obterAtividadesSemConhecimento(id);
             if (faltando != null && !faltando.isEmpty()) {
                 var lista = faltando.stream()
                         .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
@@ -86,7 +82,7 @@ public class SubprocessoController {
                 return ResponseEntity.badRequest().body(Map.of("atividadesSemConhecimento", lista));
             }
 
-            subprocessoService.disponibilizarCadastroAcao(id);
+            servicoSubprocesso.disponibilizarCadastro(id);
             return ResponseEntity.ok("Cadastro de atividades disponibilizado");
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -103,7 +99,7 @@ public class SubprocessoController {
     @PostMapping("/{id}/disponibilizar-revisao")
     public ResponseEntity<?> disponibilizarRevisao(@PathVariable Long id) {
         try {
-            var faltando = subprocessoService.obterAtividadesSemConhecimento(id);
+            var faltando = servicoSubprocesso.obterAtividadesSemConhecimento(id);
             if (faltando != null && !faltando.isEmpty()) {
                 var lista = faltando.stream()
                         .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
@@ -111,7 +107,7 @@ public class SubprocessoController {
                 return ResponseEntity.badRequest().body(Map.of("atividadesSemConhecimento", lista));
             }
 
-            subprocessoService.disponibilizarRevisaoAcao(id);
+            servicoSubprocesso.disponibilizarRevisao(id);
             return ResponseEntity.ok("Revisão do cadastro de atividades disponibilizada");
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -129,7 +125,7 @@ public class SubprocessoController {
     @GetMapping("/{id}/cadastro")
     public ResponseEntity<?> obterCadastro(@PathVariable Long id) {
         try {
-            var payload = subprocessoService.obterCadastro(id);
+            var payload = servicoSubprocesso.obterCadastro(id);
             return ResponseEntity.ok(payload);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -139,7 +135,7 @@ public class SubprocessoController {
     }
 
     @PostMapping
-    public ResponseEntity<SubprocessoDTO> criarSubprocesso(@Valid @RequestBody SubprocessoDTO subprocessoDto) {
+    public ResponseEntity<SubprocessoDTO> criar(@Valid @RequestBody SubprocessoDTO subprocessoDto) {
         var entity = subprocessoMapper.toEntity(subprocessoDto);
         var salvo = subprocessoRepository.save(entity);
 
@@ -148,7 +144,7 @@ public class SubprocessoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SubprocessoDTO> atualizarSubprocesso(@PathVariable Long id, @Valid @RequestBody SubprocessoDTO subprocessoDto) {
+    public ResponseEntity<SubprocessoDTO> atualizar(@PathVariable Long id, @Valid @RequestBody SubprocessoDTO subprocessoDto) {
         return subprocessoRepository.findById(id)
                 .map(subprocesso -> {
                     if (subprocessoDto.getProcessoCodigo() != null) {
@@ -195,7 +191,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.devolverCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.devolverCadastro(
                 id,
                 request.motivo(),
                 request.observacoes(),
@@ -220,7 +216,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.aceitarCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.aceitarCadastro(
                 id,
                 request.observacoes(),
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
@@ -244,7 +240,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.homologarCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.homologarCadastro(
                 id,
                 request.observacoes(),
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
@@ -268,7 +264,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.devolverRevisaoCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.devolverRevisaoCadastro(
                 id,
                 request.motivo(),
                 request.observacoes(),
@@ -293,7 +289,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.aceitarRevisaoCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.aceitarRevisaoCadastro(
                 id,
                 request.observacoes(),
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
@@ -317,7 +313,7 @@ public class SubprocessoController {
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroRequest request) {
         try {
-            SubprocessoDTO resultado = subprocessoService.homologarRevisaoCadastro(
+            SubprocessoDTO resultado = servicoSubprocesso.homologarRevisaoCadastro(
                 id,
                 request.observacoes(),
                 "USUARIO_ATUAL" // TODO: extrair do token JWT
@@ -335,18 +331,11 @@ public class SubprocessoController {
     /**
      * CDU-12 - Verificar impactos no mapa de competências
      * GET /api/subprocessos/{id}/impactos-mapa
-     * <p>
-     * Compara o cadastro atual do subprocesso com o mapa vigente da unidade
-     * e retorna as atividades inseridas, removidas, alteradas e as competências
-     * impactadas por essas mudanças.
-     *
-     * @param id Código do subprocesso
-     * @return Análise de impactos no mapa
      */
     @GetMapping("/{id}/impactos-mapa")
     public ResponseEntity<?> verificarImpactos(@PathVariable Long id) {
         try {
-            ImpactoMapaDto impactos = impactoMapaService.verificarImpactos(id);
+            ImpactoMapaDto impactos = impactoMapaServico.verificarImpactos(id);
             return ResponseEntity.ok(impactos);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -358,17 +347,11 @@ public class SubprocessoController {
     /**
      * CDU-15 - Obter mapa de competências de um subprocesso.
      * GET /api/subprocessos/{id}/mapa
-     * <p>
-     * Retorna o mapa completo com todas as competências e atividades
-     * vinculadas do subprocesso.
-     *
-     * @param id Código do subprocesso
-     * @return Mapa completo do subprocesso
      */
     @GetMapping("/{id}/mapa")
     public ResponseEntity<?> obterMapa(@PathVariable Long id) {
         try {
-            MapaCompletoDto mapa = mapaService.obterMapaSubprocesso(id);
+            MapaCompletoDto mapa = mapaServico.obterMapaSubprocesso(id);
             return ResponseEntity.ok(mapa);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -380,17 +363,6 @@ public class SubprocessoController {
     /**
      * CDU-15 - Criar/Editar mapa de competências de um subprocesso.
      * PUT /api/subprocessos/{id}/mapa
-     * <p>
-     * Operação atômica que salva o mapa completo do subprocesso.
-     * Se for a primeira vez que competências são criadas,
-     * atualiza a situação do subprocesso para MAPA_CRIADO.
-     * <p>
-     * Pré-condições:
-     * - Subprocesso deve estar em situação CADASTRO_HOMOLOGADO ou MAPA_CRIADO
-     *
-     * @param id Código do subprocesso
-     * @param request Request com dados do mapa completo
-     * @return Mapa completo atualizado
      */
     @PutMapping("/{id}/mapa")
     @Transactional
@@ -399,9 +371,8 @@ public class SubprocessoController {
         @RequestBody @Valid SalvarMapaRequest request
     ) {
         try {
-            // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada
             String usuarioTitulo = "USUARIO_ATUAL";
-            MapaCompletoDto mapa = mapaService.salvarMapaSubprocesso(id, request, usuarioTitulo);
+            MapaCompletoDto mapa = mapaServico.salvarMapaSubprocesso(id, request, usuarioTitulo);
             return ResponseEntity.ok(mapa);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -415,13 +386,6 @@ public class SubprocessoController {
     /**
      * CDU-17 - Disponibilizar mapa de competências para validação
      * POST /api/subprocessos/{id}/disponibilizar-mapa
-     * <p>
-     * Valida que todas competências têm atividades e todas atividades têm competências,
-     * então disponibiliza o mapa para validação pela unidade.
-     *
-     * @param id Código do subprocesso
-     * @param request Request com observações e data limite
-     * @return Subprocesso atualizado
      */
     @PostMapping("/{id}/disponibilizar-mapa")
     @Transactional
@@ -429,10 +393,9 @@ public class SubprocessoController {
             @PathVariable Long id,
             @RequestBody @Valid DisponibilizarMapaRequest request) {
         try {
-            // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada
             String usuarioTitulo = "USUARIO_ATUAL";
             
-            SubprocessoDTO subprocesso = subprocessoService.disponibilizarMapa(
+            SubprocessoDTO subprocesso = servicoSubprocesso.disponibilizarMapa(
                 id,
                 request.observacoes(),
                 request.dataLimiteEtapa2(),
@@ -451,23 +414,16 @@ public class SubprocessoController {
     /**
      * CDU-19 item 8 - Apresentar sugestões ao mapa
      * POST /api/subprocessos/{id}/apresentar-sugestoes
-     * <p>
-     * Permite ao CHEFE da unidade apresentar sugestões sobre o mapa disponibilizado.
-     * 
-     * @param id Código do subprocesso
-     * @param request Request com as sugestões
-     * @return Subprocesso atualizado com situação MAPA_COM_SUGESTOES
      */
     @PostMapping("/{id}/apresentar-sugestoes")
     @Transactional
     public ResponseEntity<?> apresentarSugestoes(
             @PathVariable Long id,
-            @RequestBody @Valid sgc.subprocesso.dto.ApresentarSugestoesRequest request) {
+            @RequestBody @Valid ApresentarSugestoesRequest request) {
         try {
-            // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada
             String usuarioTitulo = "USUARIO_ATUAL";
             
-            SubprocessoDTO subprocesso = subprocessoService.apresentarSugestoes(
+            SubprocessoDTO subprocesso = servicoSubprocesso.apresentarSugestoes(
                 id, 
                 request.sugestoes(),
                 usuarioTitulo
@@ -485,20 +441,14 @@ public class SubprocessoController {
     /**
      * CDU-19 item 9 - Validar mapa (sem sugestões)
      * POST /api/subprocessos/{id}/validar-mapa
-     * <p>
-     * Permite ao CHEFE da unidade validar o mapa disponibilizado sem apresentar sugestões.
-     *
-     * @param id Código do subprocesso
-     * @return Subprocesso atualizado com situação MAPA_VALIDADO
      */
     @PostMapping("/{id}/validar-mapa")
     @Transactional
     public ResponseEntity<?> validarMapa(@PathVariable Long id) {
         try {
-            // TODO: Extrair usuarioTitulo do token JWT quando autenticação estiver implementada
             String usuarioTitulo = "USUARIO_ATUAL";
 
-            SubprocessoDTO subprocesso = subprocessoService.validarMapa(id, usuarioTitulo);
+            SubprocessoDTO subprocesso = servicoSubprocesso.validarMapa(id, usuarioTitulo);
             return ResponseEntity.ok(subprocesso);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
@@ -515,7 +465,7 @@ public class SubprocessoController {
      */
     @GetMapping("/{id}/sugestoes")
     public ResponseEntity<SugestoesDTO> obterSugestoes(@PathVariable Long id) {
-        SugestoesDTO sugestoes = subprocessoService.obterSugestoes(id);
+        SugestoesDTO sugestoes = servicoSubprocesso.obterSugestoes(id);
         return ResponseEntity.ok(sugestoes);
     }
 
@@ -525,7 +475,7 @@ public class SubprocessoController {
      */
     @GetMapping("/{id}/historico-validacao")
     public ResponseEntity<List<AnaliseValidacaoDTO>> obterHistoricoValidacao(@PathVariable Long id) {
-        List<AnaliseValidacaoDTO> historico = subprocessoService.obterHistoricoValidacao(id);
+        List<AnaliseValidacaoDTO> historico = servicoSubprocesso.obterHistoricoValidacao(id);
         return ResponseEntity.ok(historico);
     }
 
@@ -539,7 +489,7 @@ public class SubprocessoController {
         @PathVariable Long id,
         @RequestBody @Valid DevolverValidacaoRequest request
     ) {
-        SubprocessoDTO subprocesso = subprocessoService.devolverValidacao(
+        SubprocessoDTO subprocesso = servicoSubprocesso.devolverValidacao(
             id,
             request.justificativa(),
             "USUARIO_ATUAL" // TODO: extrair do token JWT
@@ -554,7 +504,7 @@ public class SubprocessoController {
     @PostMapping("/{id}/aceitar-validacao")
     @Transactional
     public ResponseEntity<SubprocessoDTO> aceitarValidacao(@PathVariable Long id) {
-        SubprocessoDTO subprocesso = subprocessoService.aceitarValidacao(id, "USUARIO_ATUAL");
+        SubprocessoDTO subprocesso = servicoSubprocesso.aceitarValidacao(id, "USUARIO_ATUAL");
         return ResponseEntity.ok(subprocesso);
     }
 
@@ -565,12 +515,12 @@ public class SubprocessoController {
     @PostMapping("/{id}/homologar-validacao")
     @Transactional
     public ResponseEntity<SubprocessoDTO> homologarValidacao(@PathVariable Long id) {
-        SubprocessoDTO subprocesso = subprocessoService.homologarValidacao(id, "USUARIO_ATUAL");
+        SubprocessoDTO subprocesso = servicoSubprocesso.homologarValidacao(id, "USUARIO_ATUAL");
         return ResponseEntity.ok(subprocesso);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirSubprocesso(@PathVariable Long id) {
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
         return subprocessoRepository.findById(id)
                 .map(_ -> {
                     subprocessoRepository.deleteById(id);
@@ -585,7 +535,7 @@ public class SubprocessoController {
      */
     @GetMapping("/{id}/mapa-ajuste")
     public ResponseEntity<MapaAjusteDTO> obterMapaParaAjuste(@PathVariable Long id) {
-        MapaAjusteDTO mapa = subprocessoService.obterMapaParaAjuste(id);
+        MapaAjusteDTO mapa = servicoSubprocesso.obterMapaParaAjuste(id);
         return ResponseEntity.ok(mapa);
     }
 
@@ -600,7 +550,7 @@ public class SubprocessoController {
         @RequestBody @Valid SalvarAjustesRequest request,
         @AuthenticationPrincipal String usuarioTitulo
     ) {
-        SubprocessoDTO subprocesso = subprocessoService.salvarAjustesMapa(
+        SubprocessoDTO subprocesso = servicoSubprocesso.salvarAjustesMapa(
             id,
             request.competencias(),
             usuarioTitulo
@@ -618,7 +568,7 @@ public class SubprocessoController {
         @PathVariable Long id,
         @AuthenticationPrincipal String usuarioTitulo
     ) {
-        SubprocessoDTO subprocesso = subprocessoService.submeterMapaAjustado(id, usuarioTitulo);
+        SubprocessoDTO subprocesso = servicoSubprocesso.submeterMapaAjustado(id, usuarioTitulo);
         return ResponseEntity.ok(subprocesso);
     }
 }

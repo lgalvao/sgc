@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PainelServiceTest {
     @Mock
-    private ProcessoRepository processoRepository;
+    private RepositorioProcesso repositorioProcesso;
 
     @Mock
     private AlertaRepository alertaRepository;
@@ -65,7 +65,7 @@ public class PainelServiceTest {
         up2.setProcessoCodigo(2L);
         up2.setNome("Unidade 11");
 
-        when(processoRepository.findAll()).thenReturn(List.of(p1, p2));
+        when(repositorioProcesso.findAll()).thenReturn(List.of(p1, p2));
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
 
         Pageable pageable = PageRequest.of(0, 10);
@@ -94,7 +94,7 @@ public class PainelServiceTest {
         up2.setCodigo(11L);
         up2.setProcessoCodigo(2L);
 
-        when(processoRepository.findAll()).thenReturn(List.of(p1, p2));
+        when(repositorioProcesso.findAll()).thenReturn(List.of(p1, p2));
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
         when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of(up2));
 
