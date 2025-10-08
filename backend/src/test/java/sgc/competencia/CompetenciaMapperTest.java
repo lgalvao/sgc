@@ -2,7 +2,10 @@ package sgc.competencia;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.mapa.Mapa;
+import sgc.competencia.dto.CompetenciaDto;
+import sgc.competencia.dto.CompetenciaMapper;
+import sgc.competencia.modelo.Competencia;
+import sgc.mapa.modelo.Mapa;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +22,7 @@ class CompetenciaMapperTest {
         competencia.setCodigo(10L);
 
         // When
-        CompetenciaDTO dto = mapper.toDTO(competencia);
+        CompetenciaDto dto = mapper.toDTO(competencia);
 
         // Then
         assertNotNull(dto);
@@ -35,7 +38,7 @@ class CompetenciaMapperTest {
         competencia.setCodigo(10L);
 
         // When
-        CompetenciaDTO dto = mapper.toDTO(competencia);
+        CompetenciaDto dto = mapper.toDTO(competencia);
 
         // Then
         assertNotNull(dto);
@@ -47,7 +50,7 @@ class CompetenciaMapperTest {
     @Test
     void toEntity_comMapaCodigo_deveMapearCorretamente() {
         // Given
-        CompetenciaDTO dto = new CompetenciaDTO(10L, 1L, "Descrição Teste");
+        CompetenciaDto dto = new CompetenciaDto(10L, 1L, "Descrição Teste");
 
         // When
         Competencia competencia = mapper.toEntity(dto);
@@ -63,7 +66,7 @@ class CompetenciaMapperTest {
     @Test
     void toEntity_semMapaCodigo_deveMapearCorretamente() {
         // Given
-        CompetenciaDTO dto = new CompetenciaDTO(10L, null, "Descrição Teste");
+        CompetenciaDto dto = new CompetenciaDto(10L, null, "Descrição Teste");
 
         // When
         Competencia competencia = mapper.toEntity(dto);

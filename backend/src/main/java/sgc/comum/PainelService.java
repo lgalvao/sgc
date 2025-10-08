@@ -6,11 +6,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.Alerta;
 import sgc.alerta.AlertaDto;
-import sgc.alerta.AlertaRepository;
-import sgc.processo.*;
-import sgc.processo.dto.ProcessoResumoDTO;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.UnidadeProcesso;
+import sgc.processo.modelo.UnidadeProcessoRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +28,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PainelService {
-    private final RepositorioProcesso repositorioProcesso;
-    private final AlertaRepository alertaRepository;
-    private final UnidadeProcessoRepository unidadeProcessoRepository;
+    private final ProcessoRepo processoRepo;
+    private final AlertaRepo alertaRepo;
+    private final UnidadeProcessoRepo unidadeProcessoRepo;
 
     /**
      * Lista processos aplicando a regra de visibilidade por perfil e/ou unidade.
@@ -41,15 +44,15 @@ public class PainelService {
      * @param perfil        perfil do requisitante (obrigatório)
      * @param codigoUnidade filtro opcional por unidade
      * @param pageable      informações de paginação
-     * @return página de ProcessoResumoDTO
+     * @return página de ProcessoResumoDto
      */
-    public Page<ProcessoResumoDTO> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
+    public Page<ProcessoResumoDto> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
         if (perfil == null || perfil.isBlank()) {
             throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
         }
 
         // Obter todos os processos (simplificação para testes)
-        List<Processo> todosOsProcessos = repositorioProcesso.findAll();
+        List<Processo> todosOsProcessos = processoRepo.findAll();
 
         // Aplicar filtro por perfil e unidade
         List<Processo> processosFiltrados = new ArrayList<>();
@@ -60,7 +63,7 @@ public class PainelService {
                 }
             }
             if (codigoUnidade != null) {
-                List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepository.findByProcessoCodigo(processo.getCodigo());
+                List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
                 boolean pertence = unidadesDoProcesso.stream().anyMatch(up -> Objects.equals(up.getCodigo(), codigoUnidade));
                 if (!pertence) {
                     continue;
@@ -70,9 +73,9 @@ public class PainelService {
         }
 
         // Mapear para DTOs
-        List<ProcessoResumoDTO> listaDeDtos = processosFiltrados.stream()
+        List<ProcessoResumoDto> listaDeDtos = processosFiltrados.stream()
                 .map(processo -> {
-                    ProcessoResumoDTO dto = new ProcessoResumoDTO();
+                    ProcessoResumoDto dto = new ProcessoResumoDto();
                     dto.setCodigo(processo.getCodigo());
                     dto.setDescricao(processo.getDescricao());
                     dto.setSituacao(processo.getSituacao());
@@ -81,7 +84,7 @@ public class PainelService {
                     dto.setDataCriacao(processo.getDataCriacao());
 
                     // Tentar obter uma unidade vinculada (a primeira encontrada)
-                    List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepository.findByProcessoCodigo(processo.getCodigo());
+                    List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
                     if (!unidadesDoProcesso.isEmpty()) {
                         UnidadeProcesso up = unidadesDoProcesso.getFirst();
                         dto.setUnidadeCodigo(up.getCodigo());
@@ -97,7 +100,7 @@ public class PainelService {
         int indiceInicial = (int) pageable.getOffset();
         int indiceFinal = Math.min(indiceInicial + tamanhoPagina, total);
 
-        List<ProcessoResumoDTO> conteudoDaPagina;
+        List<ProcessoResumoDto> conteudoDaPagina;
         if (indiceInicial >= total || indiceInicial < 0) {
             conteudoDaPagina = List.of();
         } else {
@@ -120,7 +123,7 @@ public class PainelService {
      * @return página de AlertaDto
      */
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
-        List<Alerta> todosOsAlertas = alertaRepository.findAll();
+        List<Alerta> todosOsAlertas = alertaRepo.findAll();
 
         List<Alerta> alertasFiltrados = todosOsAlertas.stream()
                 .filter(alerta -> {

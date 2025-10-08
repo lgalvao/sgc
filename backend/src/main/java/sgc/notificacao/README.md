@@ -45,7 +45,7 @@ public record DtoEmail(
     String assunto,
     String corpo,
     boolean html
-)
+){}
 ```
 
 ### 4. ConfiguracaoAssincrona.java
@@ -96,7 +96,7 @@ private ServicoNotificacaoEmail servicoNotificacaoEmail;
 @Autowired
 private ServicoDeTemplateDeEmail servicoDeTemplateDeEmail;
 
-String corpoHtml = servicoDeTemplateDeEmail.criarEmailDeProcessoIniciado(...);
+String corpoHtml = servicoDeTemplateDeEmail.criarEmailDeProcessoIniciado(/*...*/);
 
 servicoNotificacaoEmail.enviarEmailHtml(
     "responsavel@tre-pe.jus.br",

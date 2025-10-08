@@ -6,17 +6,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.RepositorioAtividade;
-import sgc.competencia.Competencia;
-import sgc.competencia.CompetenciaAtividade;
-import sgc.competencia.CompetenciaAtividadeRepository;
-import sgc.competencia.CompetenciaRepository;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.subprocesso.Subprocesso;
-import sgc.subprocesso.SubprocessoRepository;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,21 +30,19 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MapaServicoImplTest {
+class MapaServiceImplTest {
 
     @Mock
-    private MapaRepository repositorioMapa;
+    private MapaRepo repositorioMapa;
     @Mock
-    private CompetenciaRepository repositorioCompetencia;
+    private CompetenciaRepo repositorioCompetencia;
     @Mock
-    private CompetenciaAtividadeRepository repositorioCompetenciaAtividade;
+    private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     @Mock
-    private RepositorioAtividade repositorioAtividade;
-    @Mock
-    private SubprocessoRepository repositorioSubprocesso;
+    private SubprocessoRepo repositorioSubprocesso;
 
     @InjectMocks
-    private MapaServicoImpl mapaServico;
+    private MapaServiceImpl mapaServico;
 
     private Mapa mapa;
     private Subprocesso subprocesso;
@@ -83,7 +82,7 @@ class MapaServicoImplTest {
         assertThat(mapaCompleto.subprocessoCodigo()).isEqualTo(100L);
         assertThat(mapaCompleto.observacoes()).isEqualTo("Observações do Mapa");
         assertThat(mapaCompleto.competencias()).hasSize(1);
-        assertThat(mapaCompleto.competencias().get(0).descricao()).isEqualTo("Competência 1");
+        assertThat(mapaCompleto.competencias().getFirst().descricao()).isEqualTo("Competência 1");
     }
 
     @Test
@@ -91,8 +90,8 @@ class MapaServicoImplTest {
         when(repositorioMapa.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-            .hasMessage("Mapa não encontrado: 1");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessage("Mapa não encontrado: 1");
     }
 
     @Test
@@ -114,8 +113,8 @@ class MapaServicoImplTest {
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
         assertThatThrownBy(() -> mapaServico.obterMapaSubprocesso(100L))
-            .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-            .hasMessage("Subprocesso não possui mapa associado");
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessage("Subprocesso não possui mapa associado");
     }
 
     @Test
@@ -126,8 +125,8 @@ class MapaServicoImplTest {
         when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> mapaServico.validarMapaCompleto(1L))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("A competência 'Competência 1' não possui atividades vinculadas");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("A competência 'Competência 1' não possui atividades vinculadas");
     }
 
     @Test
@@ -153,7 +152,7 @@ class MapaServicoImplTest {
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
         assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, "user"))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: INVALIDA");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: INVALIDA");
     }
 }

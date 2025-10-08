@@ -10,10 +10,12 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import sgc.alerta.AlertaRepository;
 import sgc.comum.PainelService;
-import sgc.processo.*;
-import sgc.processo.dto.ProcessoResumoDTO;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.UnidadeProcesso;
+import sgc.processo.modelo.UnidadeProcessoRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,13 +28,10 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PainelServiceTest {
     @Mock
-    private RepositorioProcesso repositorioProcesso;
+    private ProcessoRepo processoRepo;
 
     @Mock
-    private AlertaRepository alertaRepository;
-
-    @Mock
-    private UnidadeProcessoRepository unidadeProcessoRepository;
+    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     @InjectMocks
     private PainelService painelService;
@@ -65,11 +64,11 @@ public class PainelServiceTest {
         up2.setProcessoCodigo(2L);
         up2.setNome("Unidade 11");
 
-        when(repositorioProcesso.findAll()).thenReturn(List.of(p1, p2));
-        when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
+        when(processoRepo.findAll()).thenReturn(List.of(p1, p2));
+        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<ProcessoResumoDTO> page = painelService.listarProcessos("USER", null, pageable);
+        Page<ProcessoResumoDto> page = painelService.listarProcessos("USER", null, pageable);
 
         assertEquals(2, page.getTotalElements());
     }
@@ -94,12 +93,12 @@ public class PainelServiceTest {
         up2.setCodigo(11L);
         up2.setProcessoCodigo(2L);
 
-        when(repositorioProcesso.findAll()).thenReturn(List.of(p1, p2));
-        when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
-        when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of(up2));
+        when(processoRepo.findAll()).thenReturn(List.of(p1, p2));
+        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
+        when(unidadeProcessoRepo.findByProcessoCodigo(2L)).thenReturn(List.of(up2));
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<ProcessoResumoDTO> page = painelService.listarProcessos("ADMIN", null, pageable);
+        Page<ProcessoResumoDto> page = painelService.listarProcessos("ADMIN", null, pageable);
 
         assertEquals(1, page.getTotalElements());
         assertEquals(1L, page.getContent().getFirst().getCodigo());

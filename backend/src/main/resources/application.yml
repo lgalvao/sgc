@@ -1,32 +1,12 @@
 spring:
   datasource:
-    # Datasource principal SGC (PostgreSQL)
     url: jdbc:postgresql://localhost:5432/postgres
     username: leonardo
     password: postgres
-
-  # Datasource SGRH (Oracle - Read Only)
-  # sgrh:
-  #   datasource:
-  #     url: ${SGRH_DB_URL:jdbc:oracle:thin:@//localhost:1521/SGRH}
-  #     username: ${SGRH_DB_USERNAME:sgrh_reader}
-  #     password: ${SGRH_DB_PASSWORD:}
-  #     driver-class-name: oracle.jdbc.OracleDriver
-  #     hikari:
-  #       maximum-pool-size: 5
-  #       minimum-idle: 2
-  #       read-only: true
-  #       connection-timeout: 30000
-  #       idle-timeout: 600000
-  #       max-lifetime: 1800000
-  
   jpa:
     hibernate.ddl-auto: update
-    properties:
-      hibernate.default_schema: sgc
+    properties.hibernate.default_schema: sgc
     show-sql: false
-  
-  # Configuração de cache
   cache:
     type: caffeine
     caffeine:
@@ -54,13 +34,9 @@ spring:
 
 server:
   port: 8080
-
-# Configurações de segurança JWT
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production-please-use-at-least-32-characters}
   expiration: 86400000  # 24 horas em milissegundos
-
-# Configurações do serviço de autenticação AD
 aplicacao:
   ambiente-testes: ${AMBIENTE_TESTES:true}
   url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:8081/api/acesso}
@@ -69,7 +45,6 @@ aplicacao:
     remetente: ${EMAIL_REMETENTE:sgc@tre-pe.jus.br}
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
-
 logging:
   level:
     org.hibernate: ERROR

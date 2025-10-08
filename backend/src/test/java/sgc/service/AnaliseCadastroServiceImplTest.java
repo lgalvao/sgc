@@ -3,11 +3,11 @@ package sgc.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import sgc.atividade.AnaliseCadastro;
-import sgc.atividade.AnaliseCadastroServiceImpl;
-import sgc.subprocesso.AnaliseCadastroRepository;
-import sgc.subprocesso.Subprocesso;
-import sgc.subprocesso.SubprocessoRepository;
+import sgc.analise.AnaliseCadastroServiceImpl;
+import sgc.analise.modelo.AnaliseCadastro;
+import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,15 +21,15 @@ import static org.mockito.Mockito.*;
  */
 public class AnaliseCadastroServiceImplTest {
 
-    private AnaliseCadastroRepository analiseCadastroRepository;
-    private SubprocessoRepository subprocessoRepository;
+    private AnaliseCadastroRepo analiseCadastroRepo;
+    private SubprocessoRepo subprocessoRepo;
     private AnaliseCadastroServiceImpl service;
 
     @BeforeEach
     void setup() {
-        analiseCadastroRepository = mock(AnaliseCadastroRepository.class);
-        subprocessoRepository = mock(SubprocessoRepository.class);
-        service = new AnaliseCadastroServiceImpl(analiseCadastroRepository, subprocessoRepository);
+        analiseCadastroRepo = mock(AnaliseCadastroRepo.class);
+        subprocessoRepo = mock(SubprocessoRepo.class);
+        service = new AnaliseCadastroServiceImpl(analiseCadastroRepo, subprocessoRepo);
     }
 
     @Test
@@ -38,10 +38,10 @@ public class AnaliseCadastroServiceImplTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(spId);
 
-        when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
 
         ArgumentCaptor<AnaliseCadastro> captor = ArgumentCaptor.forClass(AnaliseCadastro.class);
-        when(analiseCadastroRepository.save(any(AnaliseCadastro.class))).thenAnswer(inv -> {
+        when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> {
             AnaliseCadastro a = inv.getArgument(0);
             a.setCodigo(10L);
             return a;
@@ -49,7 +49,7 @@ public class AnaliseCadastroServiceImplTest {
 
         AnaliseCadastro criado = service.criarAnalise(spId, "Observações de teste");
 
-        verify(analiseCadastroRepository, times(1)).save(captor.capture());
+        verify(analiseCadastroRepo, times(1)).save(captor.capture());
         AnaliseCadastro salvo = captor.getValue();
 
         assertThat(salvo.getSubprocesso()).isEqualTo(sp);
@@ -65,8 +65,8 @@ public class AnaliseCadastroServiceImplTest {
         AnaliseCadastro a2 = new AnaliseCadastro();
         a2.setCodigo(102L);
 
-        when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
-        when(analiseCadastroRepository.findBySubprocessoCodigo(spId)).thenReturn(List.of(a1, a2));
+        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
+        when(analiseCadastroRepo.findBySubprocessoCodigo(spId)).thenReturn(List.of(a1, a2));
 
         List<AnaliseCadastro> lista = service.listarPorSubprocesso(spId);
         assertThat(lista).hasSize(2).extracting(AnaliseCadastro::getCodigo).containsExactlyInAnyOrder(101L, 102L);
@@ -75,10 +75,10 @@ public class AnaliseCadastroServiceImplTest {
     @Test
     void removerPorSubprocesso_chamaRepositorio() {
         Long spId = 3L;
-        doNothing().when(analiseCadastroRepository).deleteBySubprocessoCodigo(spId);
+        doNothing().when(analiseCadastroRepo).deleteBySubprocessoCodigo(spId);
 
         service.removerPorSubprocesso(spId);
 
-        verify(analiseCadastroRepository, times(1)).deleteBySubprocessoCodigo(spId);
+        verify(analiseCadastroRepo, times(1)).deleteBySubprocessoCodigo(spId);
     }
 }

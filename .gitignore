@@ -18,4 +18,4 @@ backend/build/
 backend/out/
 
 # Spring Boot
-*.log
+*.log!/backend/src/main/generated/

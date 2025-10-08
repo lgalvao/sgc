@@ -4,7 +4,7 @@ Objetivo: padronizar DTOs e práticas de desenvolvimento neste repositório.
 
 Regras:
 - Usar português Brasileiro em todos os códigos
-- DTOs: usar Lombok para getters/setters/construtores. Preferir as anotações @Getter, @Setter, @NoArgsConstructor e @AllArgsConstructor. Exemplo: [`backend/src/main/java/sgc/dto/LoginResponse.java`](backend/src/main/java/sgc/dto/LoginResponse.java:1).
+- DTOs: usar Lombok para getters/setters/construtores. Preferir as anotações @Getter, @Setter, @NoArgsConstructor e @AllArgsConstructor.
 - Imports: usar namespaces jakarta.* (ex.: `jakarta.validation`) em vez de javax.*.
 - Controllers: validar requests com `@Valid` nos Metodos REST.
 - Clientes externos: sempre definir uma interface e uma implementação; tornar a implementação substituível por profile (ex.: profile "test" injeta mock).

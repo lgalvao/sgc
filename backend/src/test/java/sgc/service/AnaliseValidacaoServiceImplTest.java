@@ -3,11 +3,11 @@ package sgc.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import sgc.atividade.AnaliseValidacao;
-import sgc.atividade.AnaliseValidacaoServiceImpl;
-import sgc.subprocesso.AnaliseValidacaoRepository;
-import sgc.subprocesso.Subprocesso;
-import sgc.subprocesso.SubprocessoRepository;
+import sgc.analise.AnaliseValidacaoServiceImpl;
+import sgc.analise.modelo.AnaliseValidacao;
+import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,15 +21,15 @@ import static org.mockito.Mockito.*;
  */
 public class AnaliseValidacaoServiceImplTest {
 
-    private AnaliseValidacaoRepository analiseValidacaoRepository;
-    private SubprocessoRepository subprocessoRepository;
+    private AnaliseValidacaoRepo analiseValidacaoRepo;
+    private SubprocessoRepo subprocessoRepo;
     private AnaliseValidacaoServiceImpl service;
 
     @BeforeEach
     void setup() {
-        analiseValidacaoRepository = mock(AnaliseValidacaoRepository.class);
-        subprocessoRepository = mock(SubprocessoRepository.class);
-        service = new AnaliseValidacaoServiceImpl(analiseValidacaoRepository, subprocessoRepository);
+        analiseValidacaoRepo = mock(AnaliseValidacaoRepo.class);
+        subprocessoRepo = mock(SubprocessoRepo.class);
+        service = new AnaliseValidacaoServiceImpl(analiseValidacaoRepo, subprocessoRepo);
     }
 
     @Test
@@ -38,9 +38,9 @@ public class AnaliseValidacaoServiceImplTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(spId);
 
-        when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
 
-        when(analiseValidacaoRepository.save(any(AnaliseValidacao.class))).thenAnswer(inv -> {
+        when(analiseValidacaoRepo.save(any(AnaliseValidacao.class))).thenAnswer(inv -> {
             AnaliseValidacao a = inv.getArgument(0);
             a.setCodigo(10L);
             return a;
@@ -49,7 +49,7 @@ public class AnaliseValidacaoServiceImplTest {
         AnaliseValidacao criado = service.criarAnalise(spId, "Observações validacao");
 
         ArgumentCaptor<AnaliseValidacao> captor = ArgumentCaptor.forClass(AnaliseValidacao.class);
-        verify(analiseValidacaoRepository).save(captor.capture());
+        verify(analiseValidacaoRepo).save(captor.capture());
         AnaliseValidacao salvo = captor.getValue();
 
         assertThat(salvo.getSubprocesso()).isEqualTo(sp);
@@ -65,8 +65,8 @@ public class AnaliseValidacaoServiceImplTest {
         AnaliseValidacao a2 = new AnaliseValidacao();
         a2.setCodigo(202L);
 
-        when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
-        when(analiseValidacaoRepository.findBySubprocesso_Codigo(spId)).thenReturn(List.of(a1, a2));
+        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
+        when(analiseValidacaoRepo.findBySubprocesso_Codigo(spId)).thenReturn(List.of(a1, a2));
 
         List<AnaliseValidacao> lista = service.listarPorSubprocesso(spId);
         assertThat(lista).hasSize(2).extracting(AnaliseValidacao::getCodigo).containsExactlyInAnyOrder(201L, 202L);
@@ -75,10 +75,10 @@ public class AnaliseValidacaoServiceImplTest {
     @Test
     void removerPorSubprocesso_chamaRepositorio() {
         Long spId = 3L;
-        doNothing().when(analiseValidacaoRepository).deleteBySubprocesso_Codigo(spId);
+        doNothing().when(analiseValidacaoRepo).deleteBySubprocesso_Codigo(spId);
 
         service.removerPorSubprocesso(spId);
 
-        verify(analiseValidacaoRepository, times(1)).deleteBySubprocesso_Codigo(spId);
+        verify(analiseValidacaoRepo, times(1)).deleteBySubprocesso_Codigo(spId);
     }
 }

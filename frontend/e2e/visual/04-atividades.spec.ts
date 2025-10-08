@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
-import {DADOS_TESTE, SELETORES, TEXTOS} from "~/cdu/helpers";
 import {
     cancelarModal,
+    DADOS_TESTE,
     gerarNomeUnico,
     irParaSubprocesso,
     loginComoAdmin,
@@ -9,7 +9,9 @@ import {
     loginComoGestor,
     loginComoServidor,
     navegarParaCadastroAtividades,
-    navegarParaVisualizacaoAtividades
+    navegarParaVisualizacaoAtividades,
+    SELETORES,
+    TEXTOS
 } from "~/cdu/helpers";
 
 test.describe('Captura de Telas - Atividades', () => {
