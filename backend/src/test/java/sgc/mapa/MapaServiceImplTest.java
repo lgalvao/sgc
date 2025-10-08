@@ -40,6 +40,8 @@ class MapaServiceImplTest {
     private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private sgc.atividade.modelo.AtividadeRepo atividadeRepo;
 
     @InjectMocks
     private MapaServiceImpl mapaServico;
@@ -139,6 +141,7 @@ class MapaServiceImplTest {
         when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapa);
         when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(competencia));
         when(repositorioCompetencia.save(any(Competencia.class))).thenReturn(competencia);
+        when(atividadeRepo.existsById(1L)).thenReturn(true);
 
         mapaServico.salvarMapaSubprocesso(100L, request, "user");
 
