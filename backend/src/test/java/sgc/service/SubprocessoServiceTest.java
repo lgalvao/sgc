@@ -23,6 +23,15 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.subprocesso.dto.AtividadeAjusteDto;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.ConhecimentoAjusteDto;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import java.util.ArrayList;
 import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
@@ -74,6 +83,10 @@ public class SubprocessoServiceTest {
     private sgc.conhecimento.dto.ConhecimentoMapper conhecimentoMapper;
     @Mock
     private sgc.subprocesso.dto.SubprocessoMapper subprocessoMapper;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
+    @Mock
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
 
     @InjectMocks
@@ -291,5 +304,77 @@ public class SubprocessoServiceTest {
         verify(alertaRepo).save(alertaCaptor.capture());
         assertEquals("Seu mapa de competências está disponível para validação (Processo: Processo de Teste)", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeMock, alertaCaptor.getValue().getUnidadeDestino());
+    }
+
+    @Test
+    void obterMapaParaAjuste_deveRetornarDtoCompleto() {
+        // Arrange
+        setupBasico();
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(100L);
+        when(subprocessoMock.getMapa()).thenReturn(mapa);
+
+        Competencia comp = new Competencia();
+        comp.setCodigo(200L);
+        comp.setDescricao("Competencia Teste");
+        when(competenciaRepo.findByMapaCodigo(100L)).thenReturn(List.of(comp));
+
+        Atividade ativ = new Atividade();
+        ativ.setCodigo(300L);
+        ativ.setDescricao("Atividade Teste");
+        when(atividadeRepository.findByMapaCodigo(100L)).thenReturn(List.of(ativ));
+
+        Conhecimento con = new Conhecimento();
+        con.setCodigo(400L);
+        con.setDescricao("Conhecimento Teste");
+        when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(con));
+
+        when(competenciaAtividadeRepo.existsById(any())).thenReturn(true);
+
+        // Act
+        MapaAjusteDto dto = subprocessoService.obterMapaParaAjuste(1L);
+
+        // Assert
+        assertNotNull(dto);
+        assertEquals(100L, dto.mapaId());
+        assertEquals(1, dto.competencias().size());
+        assertEquals(1, dto.competencias().get(0).atividades().size());
+        assertEquals(1, dto.competencias().get(0).atividades().get(0).conhecimentos().size());
+        assertTrue(dto.competencias().get(0).atividades().get(0).conhecimentos().get(0).incluido());
+    }
+
+    @Test
+    void salvarAjustesMapa_deveLimparEVincularNovamente() {
+        // Arrange
+        setupBasico();
+        when(subprocessoMock.getSituacaoId()).thenReturn("MAPA_DISPONIBILIZADO");
+        when(competenciaAtividadeRepo.findByCompetenciaCodigo(anyLong())).thenReturn(List.of(new CompetenciaAtividade()));
+
+
+        ConhecimentoAjusteDto conDtoIncluido = new ConhecimentoAjusteDto(400L, "Conhecimento 1", true);
+        AtividadeAjusteDto ativDto = new AtividadeAjusteDto(300L, "Atividade 1", List.of(conDtoIncluido));
+        CompetenciaAjusteDto compDto = new CompetenciaAjusteDto(200L, "Competencia 1", List.of(ativDto));
+        List<CompetenciaAjusteDto> requestDtos = List.of(compDto);
+
+        // Act
+        subprocessoService.salvarAjustesMapa(1L, requestDtos, "user_teste");
+
+        // Assert
+        verify(competenciaAtividadeRepo).deleteAll(any());
+        verify(competenciaAtividadeRepo).save(any(CompetenciaAtividade.class));
+        verify(subprocessoMock).setSituacaoId("MAPA_AJUSTADO");
+        verify(subprocessoRepo).save(subprocessoMock);
+    }
+
+    @Test
+    void salvarAjustesMapa_deveLancarExcecao_quandoSituacaoInvalida() {
+        // Arrange
+        setupBasico();
+        when(subprocessoMock.getSituacaoId()).thenReturn("SITUACAO_INVALIDA");
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste");
+        });
     }
 }

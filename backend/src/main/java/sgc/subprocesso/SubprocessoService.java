@@ -14,6 +14,10 @@ import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.dto.ConhecimentoDto;
@@ -50,6 +54,8 @@ public class SubprocessoService {
     private final AnaliseCadastroRepo repositorioAnaliseCadastro;
     private final AnaliseValidacaoRepo repositorioAnaliseValidacao;
     private final NotificacaoRepo repositorioNotificacao;
+    private final CompetenciaRepo competenciaRepo;
+    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final NotificacaoService notificacaoService;
     private final ApplicationEventPublisher publicadorDeEventos;
     private final AlertaRepo repositorioAlerta;
@@ -383,21 +389,60 @@ public class SubprocessoService {
         Long idMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
 
-        String justificativa = "Ajustes necessários conforme análise anterior.";
+        String justificativa = repositorioAnaliseValidacao.findFirstBySubprocesso_CodigoOrderByDataHoraDesc(idSubprocesso)
+                .map(AnaliseValidacao::getObservacoes)
+                .orElse(null);
 
-        return new MapaAjusteDto(idMapa, nomeUnidade, new ArrayList<>(), justificativa);
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(idMapa);
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);
+        List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
+
+        for (Competencia comp : competencias) {
+            List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
+            for (Atividade ativ : atividades) {
+                List<Conhecimento> conhecimentos = repositorioConhecimento.findByAtividadeCodigo(ativ.getCodigo());
+                boolean isLinked = competenciaAtividadeRepo.existsById(new CompetenciaAtividade.Id(comp.getCodigo(), ativ.getCodigo()));
+                List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentos.stream()
+                        .map(con -> new ConhecimentoAjusteDto(con.getCodigo(), con.getDescricao(), isLinked))
+                        .collect(Collectors.toList());
+                atividadeDtos.add(new AtividadeAjusteDto(ativ.getCodigo(), ativ.getDescricao(), conhecimentoDtos));
+            }
+            competenciaDtos.add(new CompetenciaAjusteDto(comp.getCodigo(), comp.getDescricao(), atividadeDtos));
+        }
+
+        return new MapaAjusteDto(idMapa, nomeUnidade, competenciaDtos, justificativa);
     }
 
     @Transactional
-    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<?> competencias, String usuarioTitulo) {
+    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTitulo) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_HOMOLOGADA".equals(sp.getSituacaoId())) {
-            throw new IllegalStateException("Ajustes no mapa só podem ser feitos quando a revisão do cadastro está homologada.");
+        if (!"REVISAO_CADASTRO_HOMOLOGADA".equals(sp.getSituacaoId()) &&
+            !"MAPA_DISPONIBILIZADO".equals(sp.getSituacaoId()) &&
+            !"MAPA_AJUSTADO".equals(sp.getSituacaoId())) {
+             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacaoId());
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            List<CompetenciaAtividade> linksExistentes = competenciaAtividadeRepo.findByCompetenciaCodigo(compDto.competenciaId());
+            if (linksExistentes != null && !linksExistentes.isEmpty()) {
+                competenciaAtividadeRepo.deleteAll(linksExistentes);
+            }
+        }
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            for (AtividadeAjusteDto ativDto : compDto.atividades()) {
+                boolean deveVincular = ativDto.conhecimentos().stream().anyMatch(ConhecimentoAjusteDto::incluido);
+                if (deveVincular) {
+                    CompetenciaAtividade novoLink = new CompetenciaAtividade();
+                    novoLink.setId(new CompetenciaAtividade.Id(compDto.competenciaId(), ativDto.atividadeId()));
+                    competenciaAtividadeRepo.save(novoLink);
+                }
+            }
+        }
 
         sp.setSituacaoId("MAPA_AJUSTADO");
         repositorioSubprocesso.save(sp);

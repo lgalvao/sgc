@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositório para registros de análise de validação (ANALISE_VALIDACAO).
@@ -38,4 +39,12 @@ public interface AnaliseValidacaoRepo extends JpaRepository<AnaliseValidacao, Lo
      * @return lista de AnaliseValidacao ordenada por data decrescente
      */
     List<AnaliseValidacao> findBySubprocesso_CodigoOrderByDataHoraDesc(Long subprocessoCodigo);
+
+    /**
+     * Recupera a análise de validação mais recente para um subprocesso (CDU-16).
+     *
+     * @param subprocessoCodigo id do subprocesso
+     * @return Optional contendo a AnaliseValidacao mais recente
+     */
+    Optional<AnaliseValidacao> findFirstBySubprocesso_CodigoOrderByDataHoraDesc(Long subprocessoCodigo);
 }
