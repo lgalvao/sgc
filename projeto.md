@@ -225,14 +225,13 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 ### CDU-16: Ajustar mapa de competências
 
-**Status Backend:** 🟨 Parcial (30%)
+**Status Backend:** ✅ Implementado
 **Backend - Implementado:**
 
-- ✅ Endpoints `GET /mapa-ajuste`, `PUT /mapa-ajuste` e `POST /submeter-mapa-ajustado` foram criados.
-- ✅ A lógica para `submeterMapaAjustado` está implementada.
-**Backend - Pendente:**
-- ❌ **`obterMapaParaAjuste`:** A lógica de preenchimento do `MapaAjusteDTO` está incompleta (lista de competências vazia, justificativa fixa).
-- ❌ **`salvarAjustesMapa`:** A lógica de persistência das alterações no mapa (competências, atividades, conhecimentos, vínculos) está faltando.
+- ✅ Endpoints `GET /mapa-ajuste`, `PUT /mapa-ajuste` e `POST /submeter-mapa-ajustado` funcionais.
+- ✅ **`obterMapaParaAjuste`:** Lógica de preenchimento do `MapaAjusteDTO` com a árvore de competências, atividades e conhecimentos, e justificativa de devolução, está completa.
+- ✅ **`salvarAjustesMapa`:** Lógica de persistência que remove vínculos antigos e cria novos com base nos dados ajustados está implementada.
+- ✅ Validação de estado robusta, permitindo o ajuste em múltiplos cenários.
 
 ---
 
@@ -325,9 +324,6 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 - 🟨 **CDU-14 (Análise de Revisão de Cadastro):**
   - **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados.
-- 🟨 **CDU-16 (Ajustar Mapa):**
-  - **`obterMapaParaAjuste`:** A lógica de preenchimento do `MapaAjusteDTO` está incompleta (lista de competências vazia, justificativa fixa).
-  - **`salvarAjustesMapa`:** A lógica de persistência das alterações no mapa (competências, atividades, conhecimentos, vínculos) está faltando.
 - 🟨 **CDU-08 (Manter Cadastro):**
   - **Funcionalidade de importação de atividades:** Não há endpoints ou métodos no `SubprocessoService` relacionados à importação de atividades. É necessário criar um endpoint `POST /api/subprocessos/{id}/importar-atividades` e um método correspondente no serviço para validar, copiar atividades e conhecimentos, e registrar movimentação.
 - 🟨 **CDU-02 (Painel):**
@@ -382,7 +378,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 | CDU-13 | Analisar cadastro       | 🟩 95%  | 🔴 CRÍTICA |
 | CDU-14 | Analisar revisão cad.   | 🟨 60%  | 🔴 CRÍTICA |
 | CDU-15 | Manter mapa             | ✅ 100%  | ✅ CRÍTICA |
-| CDU-16 | Ajustar mapa            | 🟨 30%  | 🟡 ALTA    |
+| CDU-16 | Ajustar mapa            | ✅ 100%  | 🟡 ALTA    |
 | CDU-17 | Disponibilizar mapa     | ✅ 100% | 🔴 CRÍTICA |
 | CDU-18 | Visualizar mapa         | ✅ 100%  | 🟢 MÉDIA   |
 | CDU-19 | Validar mapa            | ✅ 100%  | ✅ CRÍTICA |
