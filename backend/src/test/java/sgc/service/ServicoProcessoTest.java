@@ -4,7 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.mapa.CopiaMapaService;
+import sgc.mapa.CopiaMapaServico;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
 import sgc.notificacao.ServicoNotificacaoEmail;
@@ -46,7 +46,7 @@ public class ServicoProcessoTest {
         MapaRepository mapaRepository = mock(MapaRepository.class);
         MovimentacaoRepository movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
+        CopiaMapaServico servicoDeCopiaDeMapa = mock(CopiaMapaServico.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         ServicoNotificacaoEmail servicoNotificacaoEmail = mock(ServicoNotificacaoEmail.class);
         ServicoDeTemplateDeEmail servicoDeTemplateDeEmail = mock(ServicoDeTemplateDeEmail.class);

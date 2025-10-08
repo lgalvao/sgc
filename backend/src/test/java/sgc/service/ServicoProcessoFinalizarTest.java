@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.mapa.CopiaMapaService;
+import sgc.mapa.CopiaMapaServico;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
 import sgc.notificacao.ServicoNotificacaoEmail;
@@ -52,7 +52,7 @@ public class ServicoProcessoFinalizarTest {
     @Mock private UnidadeProcessoRepository unidadeProcessoRepository;
     @Mock private MapaRepository mapaRepository;
     @Mock private MovimentacaoRepository movimentacaoRepository;
-    @Mock private CopiaMapaService servicoDeCopiaDeMapa;
+    @Mock private CopiaMapaServico servicoDeCopiaDeMapa;
     @Mock private ProcessoDetalheMapper processoDetalheMapper;
 
 

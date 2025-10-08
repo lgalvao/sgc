@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.Atividade;
 import sgc.atividade.AtividadeMapper;
-import sgc.atividade.AtividadeRepository;
+import sgc.atividade.RepositorioAtividade;
 import sgc.comum.Usuario;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
@@ -36,7 +36,7 @@ public class ServicoSubprocessoTest {
     private MovimentacaoRepository movimentacaoRepository;
 
     @Mock
-    private AtividadeRepository atividadeRepository;
+    private RepositorioAtividade atividadeRepository;
 
     @Mock
     private ConhecimentoRepository conhecimentoRepository;
