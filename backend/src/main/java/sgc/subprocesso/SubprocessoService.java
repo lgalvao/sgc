@@ -799,4 +799,51 @@ public class SubprocessoService {
 
         return subprocessoMapper.toDTO(sp);
     }
+
+    @Transactional
+    public void importarAtividades(Long idSubprocessoDestino, Long idSubprocessoOrigem) {
+        Subprocesso spDestino = repositorioSubprocesso.findById(idSubprocessoDestino)
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: " + idSubprocessoDestino));
+
+        if (!"CADASTRO_EM_ELABORACAO".equals(spDestino.getSituacaoId())) {
+            throw new IllegalStateException("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
+        }
+
+        Subprocesso spOrigem = repositorioSubprocesso.findById(idSubprocessoOrigem)
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de origem não encontrado: " + idSubprocessoOrigem));
+
+        if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
+            throw new IllegalStateException("Subprocesso de origem ou destino não possui mapa associado.");
+        }
+
+        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());
+        if (atividadesOrigem == null || atividadesOrigem.isEmpty()) {
+            return; // Nada a importar
+        }
+
+        for (Atividade atividadeOrigem : atividadesOrigem) {
+            Atividade novaAtividade = new Atividade();
+            novaAtividade.setDescricao(atividadeOrigem.getDescricao());
+            novaAtividade.setMapa(spDestino.getMapa());
+            Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
+
+            List<Conhecimento> conhecimentosOrigem = repositorioConhecimento.findByAtividadeCodigo(atividadeOrigem.getCodigo());
+            if (conhecimentosOrigem != null) {
+                for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
+                    Conhecimento novoConhecimento = new Conhecimento();
+                    novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
+                    novoConhecimento.setAtividade(atividadeSalva);
+                    repositorioConhecimento.save(novoConhecimento);
+                }
+            }
+        }
+
+        String descricaoMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+            spOrigem.getCodigo(),
+            spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
+
+        repositorioMovimentacao.save(new Movimentacao(spDestino, spDestino.getUnidade(), spDestino.getUnidade(), descricaoMovimentacao));
+
+        log.info("Atividades importadas com sucesso do subprocesso {} para {}", idSubprocessoOrigem, idSubprocessoDestino);
+    }
 }

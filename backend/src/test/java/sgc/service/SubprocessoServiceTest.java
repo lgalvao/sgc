@@ -377,4 +377,74 @@ public class SubprocessoServiceTest {
             subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste");
         });
     }
+
+    @Test
+    void importarAtividades_deveCopiarAtividadesEConhecimentos() {
+        // Arrange
+        Unidade unidadeDestino = new Unidade();
+        unidadeDestino.setCodigo(10L);
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(100L);
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(1L);
+        spDestino.setSituacaoId("CADASTRO_EM_ELABORACAO");
+        spDestino.setMapa(mapaDestino);
+        spDestino.setUnidade(unidadeDestino);
+        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(spDestino));
+
+        Unidade unidadeOrigem = new Unidade();
+        unidadeOrigem.setCodigo(20L);
+        unidadeOrigem.setSigla("ORIG");
+        Mapa mapaOrigem = new Mapa();
+        mapaOrigem.setCodigo(200L);
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(2L);
+        spOrigem.setMapa(mapaOrigem);
+        spOrigem.setUnidade(unidadeOrigem);
+        when(subprocessoRepo.findById(2L)).thenReturn(Optional.of(spOrigem));
+
+        Atividade atividadeOrigem = new Atividade();
+        atividadeOrigem.setCodigo(300L);
+        atividadeOrigem.setDescricao("Atividade Original");
+        when(atividadeRepository.findByMapaCodigo(200L)).thenReturn(List.of(atividadeOrigem));
+
+        Conhecimento conhecimentoOrigem = new Conhecimento();
+        conhecimentoOrigem.setCodigo(400L);
+        conhecimentoOrigem.setDescricao("Conhecimento Original");
+        when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(conhecimentoOrigem));
+
+        when(atividadeRepository.save(any(Atividade.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // Act
+        subprocessoService.importarAtividades(1L, 2L);
+
+        // Assert
+        ArgumentCaptor<Atividade> atividadeCaptor = ArgumentCaptor.forClass(Atividade.class);
+        verify(atividadeRepository).save(atividadeCaptor.capture());
+        assertEquals("Atividade Original", atividadeCaptor.getValue().getDescricao());
+        assertEquals(mapaDestino, atividadeCaptor.getValue().getMapa());
+
+        ArgumentCaptor<Conhecimento> conhecimentoCaptor = ArgumentCaptor.forClass(Conhecimento.class);
+        verify(conhecimentoRepo).save(conhecimentoCaptor.capture());
+        assertEquals("Conhecimento Original", conhecimentoCaptor.getValue().getDescricao());
+        assertNotNull(conhecimentoCaptor.getValue().getAtividade());
+
+        ArgumentCaptor<Movimentacao> movimentacaoCaptor = ArgumentCaptor.forClass(Movimentacao.class);
+        verify(movimentacaoRepo).save(movimentacaoCaptor.capture());
+        assertTrue(movimentacaoCaptor.getValue().getDescricao().contains("Importação de atividades do subprocesso #2"));
+    }
+
+    @Test
+    void importarAtividades_deveLancarExcecao_quandoSituacaoDestinoInvalida() {
+        // Arrange
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(1L);
+        spDestino.setSituacaoId("OUTRA_SITUACAO");
+        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(spDestino));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            subprocessoService.importarAtividades(1L, 2L);
+        });
+    }
 }
