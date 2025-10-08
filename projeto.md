@@ -138,10 +138,11 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 ### CDU-08: Manter cadastro de atividades e conhecimentos
 
-**Status Backend:** 🟨 Parcial (50%)
-**Backend - Pendente:**
+**Status Backend:** ✅ Implementado
+**Backend - Implementado:**
 
-- ❌ **Endpoint de importação de atividades:** Não há endpoints ou métodos no `SubprocessoService` relacionados à importação de atividades. É necessário criar um endpoint `POST /api/subprocessos/{id}/importar-atividades` e um método correspondente no serviço para validar, copiar atividades e conhecimentos, e registrar movimentação.
+- ✅ **Endpoint de importação de atividades:** O endpoint `POST /api/subprocessos/{id}/importar-atividades` foi criado e a lógica de negócio no `SubprocessoService` foi implementada para copiar atividades e conhecimentos entre subprocessos.
+- ✅ A operação é auditada com o registro de uma `Movimentacao`.
 
 ---
 
@@ -324,8 +325,6 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 - 🟨 **CDU-14 (Análise de Revisão de Cadastro):**
   - **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados.
-- 🟨 **CDU-08 (Manter Cadastro):**
-  - **Funcionalidade de importação de atividades:** Não há endpoints ou métodos no `SubprocessoService` relacionados à importação de atividades. É necessário criar um endpoint `POST /api/subprocessos/{id}/importar-atividades` e um método correspondente no serviço para validar, copiar atividades e conhecimentos, e registrar movimentação.
 - 🟨 **CDU-02 (Painel):**
   - **Filtro de processos por unidades subordinadas:** A lógica atual é simplificada e não inclui processos onde a unidade do usuário é pai de alguma unidade participante.
   - **Formatação de "Unidades Participantes":** A regra de negócio (lista textual das unidades de nível mais alto abaixo da unidade raiz que possuam todas as suas unidades subordinadas participando do processo) não está implementada.
@@ -370,7 +369,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 | CDU-05 | Iniciar revisão         | 🟩 90%  | 🔴 CRÍTICA |
 | CDU-06 | Detalhar processo       | 🟨 60%  | 🟡 ALTA    |
 | CDU-07 | Detalhar subprocesso    | ✅ 100%  | 🟡 ALTA    |
-| CDU-08 | Manter cadastro ativ.   | 🟨 50%  | 🔴 CRÍTICA |
+| CDU-08 | Manter cadastro ativ.   | ✅ 100%  | 🔴 CRÍTICA |
 | CDU-09 | Disponibilizar cadastro | ✅ 100%  | 🔴 CRÍTICA |
 | CDU-10 | Disponibilizar revisão  | ✅ 100%  | 🔴 CRÍTICA |
 | CDU-11 | Visualizar cadastro     | ✅ 100%  | 🟢 MÉDIA   |

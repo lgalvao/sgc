@@ -22,3 +22,26 @@ O processo de corrigir esses erros de forma iterativa (um de cada vez) se mostro
 
 ## Próximos Passos (Recomendação)
 Conforme solicitado, este trabalho está sendo submetido em seu estado atual. A próxima tarefa deve se concentrar em corrigir os 19 erros de compilação restantes de forma sistemática para estabilizar o build antes de continuar com a tradução dos pacotes restantes.
+
+---
+
+## Problemas de Build e Teste
+
+### Descoberta de Testes do Gradle
+
+**Problema:** Novas classes de teste adicionadas ao projeto não estão sendo descobertas ou executadas pela tarefa `test` do Gradle.
+
+**Contexto:**
+- Foi criada a classe `AlertaServiceImplTest.java` no pacote `backend/src/test/java/sgc/service/`, seguindo o padrão de organização dos demais testes de serviço.
+- O build (`./gradlew build`) é concluído com sucesso, mas o número total de testes executados não aumenta, indicando que a nova classe de teste foi ignorada.
+
+**Tentativas de Solução (sem sucesso):**
+1.  **`./gradlew clean build`**: Limpar o build não resolveu o problema, descartando a hipótese de cache.
+2.  **Verificação de Dependências**: Todos os mocks necessários para a injeção de dependências na classe de teste foram adicionados.
+3.  **Execução de Teste Específico**: A tarefa `:backend:testClass` também não conseguiu executar a classe de teste, embora a própria tarefa tenha sido corrigida para usar o padrão de filtro correto.
+
+**Hipótese:**
+A causa raiz é desconhecida, mas suspeita-se de uma configuração implícita ou de um comportamento inesperado no plugin de teste do Gradle que impede a descoberta de novos arquivos de teste em determinados cenários, mesmo quando eles parecem seguir a estrutura do projeto.
+
+**Próximos Passos (Recomendação):**
+Conforme solicitado, este trabalho está sendo submetido com a funcionalidade implementada, mas sem os testes correspondentes sendo executados na suíte principal. A próxima tarefa deve focar em diagnosticar e resolver o problema de descoberta de testes do Gradle para garantir que a cobertura do código possa ser expandida adequadamente.

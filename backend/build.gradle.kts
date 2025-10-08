@@ -315,7 +315,7 @@ tasks.register<Test>("testClass") {
     filter {
         val className = project.findProperty("testClass") as? String
         if (className != null) {
-            includeTestsMatching("*.$className")
+            includeTestsMatching(className)
         }
     }
 
