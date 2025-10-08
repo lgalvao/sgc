@@ -65,6 +65,9 @@ tasks.withType<BootRun> {
 tasks.withType<Test> {
     useJUnitPlatform()
 
+    // Explicitly include all test classes to fix discovery issues.
+    include("**/*Test.class", "**/*Tests.class")
+
     // JaCoCo is now enabled by default for all test runs to ensure coverage report generation.
     extensions.findByType<JacocoTaskExtension>()?.apply {
         isEnabled = true
@@ -253,6 +256,12 @@ tasks.withType<Test> {
     failFast = project.hasProperty("failFast")
 }
 
+tasks.named<Test>("test") {
+    // Explicitly set the test sources and classpath to ensure they are correctly detected.
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+}
+
 // Data class for test failures
 data class TestFailure(
     val testClass: String,
@@ -311,11 +320,17 @@ tasks.register("agentTest") {
 tasks.register<Test>("testClass") {
     group = "verification"
     description = "Run a single test class: ./gradlew testClass -PtestClass=YourTestClass"
+
+    // Explicitly set the test sources and classpath to ensure they are correctly detected.
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+
     useJUnitPlatform()
     filter {
         val className = project.findProperty("testClass") as? String
         if (className != null) {
-            includeTestsMatching(className)
+            // Use wildcard matching to ensure classes are found regardless of exact path.
+            includeTestsMatching("*$className")
         }
     }
 
@@ -371,3 +386,31 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") { // N
 }
 
 // Conditional JaCoCo configuration has been removed as it is now enabled by default.
+
+
+// ============================================
+// WORKAROUND FOR TEST DISCOVERY ISSUE
+// ============================================
+// A new source set and task are defined to run tests that are not discovered by the default 'test' task.
+// To use, place problematic test files in 'src/undiscoveredTest/java'.
+sourceSets {
+    val undiscoveredTest by creating {
+        java.srcDir("src/undiscoveredTest/java")
+        resources.srcDir("src/undiscoveredTest/resources")
+        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().compileClasspath
+        runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().runtimeClasspath
+    }
+}
+
+val undiscoveredTestTask = tasks.register<Test>("undiscoveredTest") {
+    description = "Runs tests from the 'undiscoveredTest' source set."
+    group = "Verification"
+    testClassesDirs = sourceSets.getByName("undiscoveredTest").output.classesDirs
+    classpath = sourceSets.getByName("undiscoveredTest").runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter(tasks.named("test"))
+}
+
+tasks.named("check") {
+    dependsOn(undiscoveredTestTask)
+}
