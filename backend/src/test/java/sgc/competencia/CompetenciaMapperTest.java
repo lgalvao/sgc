@@ -15,16 +15,13 @@ class CompetenciaMapperTest {
 
     @Test
     void toDTO_comMapa_deveMapearCorretamente() {
-        // Given
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
         Competencia competencia = new Competencia(mapa, "Descrição Teste");
         competencia.setCodigo(10L);
 
-        // When
         CompetenciaDto dto = mapper.toDTO(competencia);
 
-        // Then
         assertNotNull(dto);
         assertEquals(10L, dto.getCodigo());
         assertEquals(1L, dto.getMapaCodigo());
@@ -33,14 +30,11 @@ class CompetenciaMapperTest {
 
     @Test
     void toDTO_semMapa_deveMapearCorretamente() {
-        // Given
         Competencia competencia = new Competencia(null, "Descrição Teste");
         competencia.setCodigo(10L);
 
-        // When
         CompetenciaDto dto = mapper.toDTO(competencia);
 
-        // Then
         assertNotNull(dto);
         assertEquals(10L, dto.getCodigo());
         assertNull(dto.getMapaCodigo());
@@ -49,13 +43,10 @@ class CompetenciaMapperTest {
 
     @Test
     void toEntity_comMapaCodigo_deveMapearCorretamente() {
-        // Given
         CompetenciaDto dto = new CompetenciaDto(10L, 1L, "Descrição Teste");
 
-        // When
         Competencia competencia = mapper.toEntity(dto);
 
-        // Then
         assertNotNull(competencia);
         assertEquals(10L, competencia.getCodigo());
         assertNotNull(competencia.getMapa());
@@ -65,13 +56,10 @@ class CompetenciaMapperTest {
 
     @Test
     void toEntity_semMapaCodigo_deveMapearCorretamente() {
-        // Given
         CompetenciaDto dto = new CompetenciaDto(10L, null, "Descrição Teste");
 
-        // When
         Competencia competencia = mapper.toEntity(dto);
 
-        // Then
         assertNotNull(competencia);
         assertEquals(10L, competencia.getCodigo());
         assertNull(competencia.getMapa());
@@ -80,10 +68,8 @@ class CompetenciaMapperTest {
 
     @Test
     void map_comValorNulo_deveRetornarNulo() {
-        // When
         Mapa mapa = mapper.map(null);
 
-        // Then
         assertNull(mapa);
     }
 }

@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CompetenciaAtividadeControle.class)
 class CompetenciaAtividadeControleTest {
-
     @Autowired
     private MockMvc mockMvc;
 

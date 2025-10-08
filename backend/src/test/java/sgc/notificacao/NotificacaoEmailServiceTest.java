@@ -49,7 +49,6 @@ class NotificacaoEmailServiceTest {
     @Test
     @DisplayName("Deve enviar e-mail HTML com sucesso")
     void enviarEmailHtml_deveEnviarComSucesso() throws Exception {
-        // Arrange
         when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -57,10 +56,8 @@ class NotificacaoEmailServiceTest {
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
-        // Act
         servicoNotificacaoEmail.enviarEmailHtml(para, assunto, corpoHtml);
 
-        // Assert
         ArgumentCaptor<MimeMessage> captorMimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
         verify(enviadorDeEmail).send(captorMimeMessage.capture());
 
@@ -81,15 +78,12 @@ class NotificacaoEmailServiceTest {
     @Test
     @DisplayName("Não deve enviar e-mail para endereço inválido")
     void enviarEmailHtml_naoDeveEnviarParaEnderecoInvalido() {
-        // Arrange
         String para = "invalid-email";
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
-        // Act
         servicoNotificacaoEmail.enviarEmailHtml(para, assunto, corpoHtml);
 
-        // Assert
         verify(enviadorDeEmail, never()).createMimeMessage();
         verify(enviadorDeEmail, never()).send(any(MimeMessage.class));
         verify(repositorioNotificacao, never()).save(any(Notificacao.class));

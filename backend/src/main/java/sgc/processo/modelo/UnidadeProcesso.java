@@ -19,6 +19,9 @@ public class UnidadeProcesso extends EntidadeBase {
     @Column(name = "processo_codigo")
     private Long processoCodigo;
 
+    @Column(name = "unidade_codigo")
+    private Long unidadeCodigo;
+
     @Column(name = "nome")
     private String nome;
 
@@ -36,4 +39,5 @@ public class UnidadeProcesso extends EntidadeBase {
 
     @Column(name = "unidade_superior_codigo")
     private Long unidadeSuperiorCodigo;
+
 }

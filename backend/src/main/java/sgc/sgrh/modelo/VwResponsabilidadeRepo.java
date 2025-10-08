@@ -16,7 +16,6 @@ import java.util.Optional;
  */
 @Repository
 public interface VwResponsabilidadeRepo extends JpaRepository<VwResponsabilidade, Long> {
-    
     /**
      * Busca responsabilidade ativa de uma unidade.
      */

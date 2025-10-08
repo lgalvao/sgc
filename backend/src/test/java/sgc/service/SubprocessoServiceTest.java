@@ -5,18 +5,27 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.modelo.Usuario;
+import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
+import sgc.notificacao.NotificacaoService;
+import sgc.notificacao.modelo.NotificacaoRepo;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.dto.MovimentacaoMapper;
 import sgc.subprocesso.dto.SubprocessoDetalheDto;
+import sgc.subprocesso.dto.SubprocessoMapper;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -36,25 +45,38 @@ public class SubprocessoServiceTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
-
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
-
     @Mock
-    private AtividadeRepo atividadeRepository;
-
+    private AtividadeRepo atividadeRepo;
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
-
+    @Mock
+    private AnaliseCadastroRepo repositorioAnaliseCadastro;
+    @Mock
+    private AnaliseValidacaoRepo repositorioAnaliseValidacao;
+    @Mock
+    private NotificacaoRepo repositorioNotificacao;
+    @Mock
+    private NotificacaoService notificacaoService;
+    @Mock
+    private ApplicationEventPublisher publicadorDeEventos;
+    @Mock
+    private AlertaRepo repositorioAlerta;
+    @Mock
+    private AtividadeMapper atividadeMapper;
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
     @Mock
     private MovimentacaoMapper movimentacaoMapper;
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
 
     @InjectMocks
     private SubprocessoService subprocessoService;
 
     @Test
     void casoFeliz_retornaDetalhesComMovimentacoesEElementos() {
-        // Arrange
         Long spId = 1L;
         Unidade unidade = mock(Unidade.class);
         when(unidade.getCodigo()).thenReturn(10L);
@@ -99,13 +121,11 @@ public class SubprocessoServiceTest {
         when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(mov));
         when(movimentacaoMapper.toDTO(any(Movimentacao.class))).thenReturn(movDto);
-        when(atividadeRepository.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
+        when(atividadeRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
         when(conhecimentoRepo.findAll()).thenReturn(List.of(kc));
 
-        // Act
         SubprocessoDetalheDto dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
 
-        // Assert
         assertNotNull(dto);
         assertNotNull(dto.getUnidade());
         assertEquals(unidade.getCodigo(), dto.getUnidade().getCodigo());

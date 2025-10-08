@@ -55,14 +55,11 @@ class ImpactoMapaServiceImplTest {
 
     @Test
     void verificarImpactos_deveRetornarSemImpactos_quandoNaoHaMapaVigente() {
-        // Arrange
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
-        // Act
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.temImpactos()).isFalse();
         assertThat(result.totalAtividadesInseridas()).isZero();
@@ -76,7 +73,6 @@ class ImpactoMapaServiceImplTest {
 
     @Test
     void verificarImpactos_deveDetectarRemovidas_quandoAtividadeEhRemovida() {
-        // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
         Mapa mapaSubprocesso = new Mapa();
@@ -109,10 +105,8 @@ class ImpactoMapaServiceImplTest {
         when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
 
 
-        // Act
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
-        // Assert
         assertThat(result.temImpactos()).isTrue();
         assertThat(result.totalAtividadesRemovidas()).isEqualTo(1);
         assertThat(result.atividadesRemovidas()).hasSize(1);
@@ -123,7 +117,6 @@ class ImpactoMapaServiceImplTest {
 
     @Test
     void verificarImpactos_deveDetectarSemImpactos_quandoMapasSaoIguais() {
-        // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
         Mapa mapaSubprocesso = new Mapa();
@@ -150,10 +143,8 @@ class ImpactoMapaServiceImplTest {
         when(atividadeRepo.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividade));
 
 
-        // Act
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
-        // Assert
         assertThat(result.temImpactos()).isFalse();
         assertThat(result.totalAtividadesInseridas()).isZero();
         assertThat(result.totalAtividadesRemovidas()).isZero();
@@ -162,7 +153,6 @@ class ImpactoMapaServiceImplTest {
 
     @Test
     void verificarImpactos_deveDetectarInseridas_quandoAtividadeEhNova() {
-        // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
         Mapa mapaSubprocesso = new Mapa();
@@ -181,10 +171,8 @@ class ImpactoMapaServiceImplTest {
 
         when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.Collections.emptyList());
 
-        // Act
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
-        // Assert
         assertThat(result.temImpactos()).isTrue();
         assertThat(result.totalAtividadesInseridas()).isEqualTo(1);
         assertThat(result.atividadesInseridas()).hasSize(1);
@@ -194,7 +182,6 @@ class ImpactoMapaServiceImplTest {
 
     @Test
     void verificarImpactos_deveDetectarAlteradas_quandoAtividadeEhModificada() {
-        // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
         Mapa mapaSubprocesso = new Mapa();
@@ -231,10 +218,8 @@ class ImpactoMapaServiceImplTest {
         when(repositorioCompetenciaAtividade.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
         when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
 
-        // Act
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
-        // Assert
         assertThat(result.temImpactos()).isTrue();
         assertThat(result.totalAtividadesAlteradas()).isEqualTo(1);
         assertThat(result.atividadesAlteradas()).hasSize(1);

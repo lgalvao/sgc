@@ -12,7 +12,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDetalheMapper;
+import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoMapper;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.Processo;
@@ -45,7 +45,7 @@ public class ProcessoServiceDetalhesTest {
     private ProcessoRepo processoRepo;
     private UnidadeProcessoRepo unidadeProcessoRepo;
     private SubprocessoRepo subprocessoRepo;
-    private ProcessoDetalheMapper processoDetalheMapper;
+    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     private ProcessoService servico;
 
@@ -64,7 +64,7 @@ public class ProcessoServiceDetalhesTest {
         NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         ProcessoMapper processoMapper = mock(ProcessoMapper.class);
-        processoDetalheMapper = mock(ProcessoDetalheMapper.class);
+        processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
 
         servico = new ProcessoService(
                 processoRepo,
@@ -80,12 +80,11 @@ public class ProcessoServiceDetalhesTest {
                 notificacaoTemplateEmailService,
                 sgrhService,
                 processoMapper,
-                processoDetalheMapper);
+                processoDetalheMapperCustom);
     }
 
     @Test
     public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {
-        // Arrange
         Processo p = mock(Processo.class);
         LocalDateTime dataCriacao = LocalDateTime.now();
         LocalDate dataLimite = LocalDate.now().plusDays(7);
@@ -131,13 +130,11 @@ public class ProcessoServiceDetalhesTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
-        Mockito.lenient().when(processoDetalheMapper.toDetailDTO(eq(p), anyList(), anyList()))
+        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p), anyList(), anyList()))
                 .thenReturn(processoDetalheDTO);
 
-        // Act
         ProcessoDetalheDto dto = servico.obterDetalhes(1L, "ADMIN", null);
 
-        // Assert
         assertNotNull(dto);
         assertEquals(p.getCodigo(), dto.getCodigo());
         assertNotNull(dto.getUnidades());
@@ -149,7 +146,6 @@ public class ProcessoServiceDetalhesTest {
 
     @Test
     public void obterDetalhes_deveLancarExcecao_quandoGestorNaoAutorizado() {
-        // Arrange
         Processo p = new Processo();
         p.setCodigo(2L);
         p.setDescricao("Proc Teste 2");

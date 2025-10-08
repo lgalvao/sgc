@@ -64,7 +64,6 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve criar alerta e notificar titular e substituto quando houver responsável")
     void criarAlerta_comResponsavelCompleto_deveSalvarAlertaEAlertasDeUsuario() {
-        // Given
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(servicoSgrh.buscarResponsavelUnidade(10L)).thenReturn(Optional.of(responsavelDto));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> {
@@ -73,11 +72,9 @@ class AlertaServiceImplTest {
             return alerta;
         });
 
-        // When
         Alerta alertaSalvo = servicoAlerta.criarAlerta(
                 processo, "TESTE", 10L, "Descrição de teste", LocalDate.now());
 
-        // Then
         assertNotNull(alertaSalvo);
         assertEquals(processo, alertaSalvo.getProcesso());
         assertEquals(unidadeDestino, alertaSalvo.getUnidadeDestino());
@@ -89,7 +86,6 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve criar alerta apenas para o titular quando não houver substituto")
     void criarAlerta_comApenasTitular_deveSalvarAlertaEUmAlertaDeUsuario() {
-        // Given
         ResponsavelDto titularApenas = new ResponsavelDto(10L, "Gestor", "12345", null, null);
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(servicoSgrh.buscarResponsavelUnidade(10L)).thenReturn(Optional.of(titularApenas));
@@ -99,10 +95,8 @@ class AlertaServiceImplTest {
             return alerta;
         });
 
-        // When
         servicoAlerta.criarAlerta(processo, "TESTE", 10L, "Descrição", LocalDate.now());
 
-        // Then
         verify(repositorioAlerta, times(1)).save(any(Alerta.class));
         verify(repositorioAlertaUsuario, times(1)).save(any(AlertaUsuario.class));
     }
@@ -110,15 +104,12 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve criar alerta mas não notificar ninguém se SGRH não retornar responsável")
     void criarAlerta_semResponsavel_deveSalvarApenasAlerta() {
-        // Given
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(servicoSgrh.buscarResponsavelUnidade(10L)).thenReturn(Optional.empty());
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // When
         servicoAlerta.criarAlerta(processo, "TESTE", 10L, "Descrição", LocalDate.now());
 
-        // Then
         verify(repositorioAlerta, times(1)).save(any(Alerta.class));
         verify(repositorioAlertaUsuario, never()).save(any(AlertaUsuario.class));
     }
@@ -126,15 +117,12 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve criar alerta mesmo que SGRH lance uma exceção")
     void criarAlerta_comErroNoSgrh_deveSalvarApenasAlerta() {
-        // Given
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(servicoSgrh.buscarResponsavelUnidade(10L)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // When
         servicoAlerta.criarAlerta(processo, "TESTE", 10L, "Descrição", LocalDate.now());
 
-        // Then
         verify(repositorioAlerta, times(1)).save(any(Alerta.class));
         verify(repositorioAlertaUsuario, never()).save(any(AlertaUsuario.class));
     }
@@ -142,7 +130,6 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve lançar exceção ao tentar criar alerta para unidade inexistente")
     void criarAlerta_unidadeInexistente_deveLancarIllegalArgumentException() {
-        // Given
         when(repositorioUnidade.findById(anyLong())).thenReturn(Optional.empty());
 
         // When & Then
@@ -154,7 +141,6 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve retornar um alerta para unidade OPERACIONAL")
     void criarAlertasProcessoIniciado_unidadeOperacional_deveRetornarUmAlerta() {
-        // Given
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidadeDestino);
         subprocesso.setDataLimiteEtapa1(LocalDate.now());
@@ -164,17 +150,14 @@ class AlertaServiceImplTest {
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        // When
         List<Alerta> alertas = servicoAlerta.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
 
-        // Then
         assertEquals(1, alertas.size());
     }
 
     @Test
     @DisplayName("Deve retornar um alerta para unidade INTERMEDIARIA")
     void criarAlertasProcessoIniciado_unidadeIntermediaria_deveRetornarUmAlerta() {
-        // Given
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidadeDestino);
         subprocesso.setDataLimiteEtapa1(LocalDate.now());
@@ -184,17 +167,14 @@ class AlertaServiceImplTest {
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        // When
         List<Alerta> alertas = servicoAlerta.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
 
-        // Then
         assertEquals(1, alertas.size());
     }
 
     @Test
     @DisplayName("Deve retornar dois alertas para unidade INTEROPERACIONAL")
     void criarAlertasProcessoIniciado_unidadeInteroperacional_deveRetornarDoisAlertas() {
-        // Given
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidadeDestino);
         subprocesso.setDataLimiteEtapa1(LocalDate.now());
@@ -204,10 +184,8 @@ class AlertaServiceImplTest {
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        // When
         List<Alerta> alertas = servicoAlerta.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
 
-        // Then
         assertEquals(2, alertas.size());
     }
 }

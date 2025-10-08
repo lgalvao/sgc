@@ -31,11 +31,7 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-usuarios", key = "#titulo")
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
-
-        // Dados MOCK para testes
         return Optional.of(new UsuarioDto(
                 titulo,
                 "Usuário Mock " + titulo,
@@ -47,10 +43,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-usuarios", key = "#email")
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
-        // TODO: Conectar ao banco SGRH real
-
-        log.warn("MOCK SGRH: Buscando usuário por email: {}", email);
-
         String titulo = email.split("@")[0];
         return Optional.of(new UsuarioDto(
                 titulo,
@@ -81,11 +73,7 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-unidades", key = "#codigo")
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando unidade por código: {}", codigo);
-
-        // Dados MOCK
         Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
         return Optional.ofNullable(unidadesMock.get(codigo));
     }
@@ -103,10 +91,7 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-unidades", key = "'subunidades-' + #codigoPai")
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando subunidades de: {}", codigoPai);
-
         return criarUnidadesMock().values().stream()
                 .filter(u -> codigoPai.equals(u.codigoPai()))
                 .collect(Collectors.toList());
@@ -115,8 +100,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable("sgrh-arvore-unidades")
     public List<UnidadeDto> construirArvoreHierarquica() {
-        // TODO: Conectar ao banco SGRH real e montar árvore
-
         log.warn("MOCK SGRH: Construindo árvore hierárquica de unidades");
 
         Map<Long, UnidadeDto> todasUnidades = criarUnidadesMock();
@@ -132,7 +115,6 @@ public class SgrhServiceImpl implements SgrhService {
         }
 
         // Construir árvore recursivamente
-
         return todasUnidades.values().stream()
                 .filter(u -> u.codigoPai() == null)
                 .map(u -> construirArvore(u, subunidadesPorPai))
@@ -159,8 +141,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-responsabilidades", key = "#unidadeCodigo")
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando responsável da unidade: {}", unidadeCodigo);
 
         return Optional.of(new ResponsavelDto(
@@ -174,8 +154,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-responsabilidades", key = "'unidades-' + #titulo")
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando unidades onde {} é responsável", titulo);
 
         // Mock: retorna algumas unidades
@@ -187,8 +165,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-perfis", key = "#titulo")
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando perfis do usuário: {}", titulo);
 
         return List.of(
@@ -199,8 +175,6 @@ public class SgrhServiceImpl implements SgrhService {
 
     @Override
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Verificando se {} tem perfil {} na unidade {}", titulo, perfil, unidadeCodigo);
 
         // Mock: retorna true para alguns casos
@@ -210,8 +184,6 @@ public class SgrhServiceImpl implements SgrhService {
     @Override
     @Cacheable(value = "sgrh-perfis", key = "#titulo + '-' + #perfil")
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Buscando unidades onde {} tem perfil {}", titulo, perfil);
 
         return switch (perfil) {
@@ -222,11 +194,8 @@ public class SgrhServiceImpl implements SgrhService {
         };
     }
 
-    // ========== MetodoS AUXILIARES ==========
-
     /**
      * Cria unidades MOCK para testes.
-     * TODO: Remover quando conectar ao banco SGRH real.
      */
     private Map<Long, UnidadeDto> criarUnidadesMock() {
         Map<Long, UnidadeDto> unidades = new HashMap<>();
@@ -235,8 +204,7 @@ public class SgrhServiceImpl implements SgrhService {
         unidades.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "INTERMEDIARIA"));
 
         // Nível 1
-        unidades.put(2L,
-                new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
+        unidades.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
         unidades.put(3L, new UnidadeDto(3L, "COP - Coordenadoria Operacional", "COP", 1L, "INTERMEDIARIA"));
 
         // Nível 2

@@ -52,7 +52,7 @@ public class ProcessoService {
     private final NotificacaoTemplateEmailService notificacaoTemplateEmailService;
     private final SgrhService sgrhService;
     private final ProcessoMapper processoMapper;
-    private final ProcessoDetalheMapper processoDetalheMapper;
+    private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
@@ -144,7 +144,7 @@ public class ProcessoService {
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);
 
-        return processoDetalheMapper.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
+        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
     }
 
     @Transactional
@@ -291,6 +291,7 @@ public class ProcessoService {
     private UnidadeProcesso criarSnapshotUnidadeProcesso(Processo processo, Unidade unidade) {
         return new UnidadeProcesso(
             processo.getCodigo(),
+            unidade.getCodigo(), // Adicionado o código da unidade
             unidade.getNome(),
             unidade.getSigla(),
             unidade.getTitular() != null ? unidade.getTitular().getTitulo() : null,

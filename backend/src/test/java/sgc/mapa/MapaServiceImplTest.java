@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
@@ -40,6 +41,8 @@ class MapaServiceImplTest {
     private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     @InjectMocks
     private MapaServiceImpl mapaServico;

@@ -11,7 +11,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheMapper;
+import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.ProcessoMapper;
 import sgc.processo.eventos.ProcessoCriadoEvento;
@@ -58,7 +58,7 @@ public class ProcessoServiceTest {
         NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
-        ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
+        ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
 
         processoService = new ProcessoService(
                 processoRepo,
@@ -74,7 +74,7 @@ public class ProcessoServiceTest {
                 notificacaoTemplateEmailService,
                 sgrhService,
                 processoMapper,
-                processoDetalheMapper
+                processoDetalheMapperCustom
         );
     }
 

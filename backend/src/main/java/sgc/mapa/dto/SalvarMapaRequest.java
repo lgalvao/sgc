@@ -11,7 +11,7 @@ import java.util.List;
  * e vínculos com atividades de uma vez.
  */
 public record SalvarMapaRequest(
-    String observacoes,  // Observações do mapa (opcional)
+    String observacoes,
     
     @NotNull(message = "Lista de competências não pode ser nula")
     @Valid

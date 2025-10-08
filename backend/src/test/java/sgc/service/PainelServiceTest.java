@@ -1,15 +1,14 @@
 package sgc.service;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgc.comum.PainelService;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.Processo;
@@ -24,16 +23,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PainelServiceTest {
-    @Mock
+    @MockitoBean
     private ProcessoRepo processoRepo;
 
-    @Mock
+    @MockitoBean
     private UnidadeProcessoRepo unidadeProcessoRepo;
 
-    @InjectMocks
+    @Autowired
     private PainelService painelService;
 
     @Test

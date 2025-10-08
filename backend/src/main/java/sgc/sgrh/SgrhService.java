@@ -15,9 +15,7 @@ import java.util.Optional;
  * e perfis nas views do Oracle SGRH.
  */
 public interface SgrhService {
-    
     // ========== USUÁRIOS ==========
-    
     /**
      * Busca usuário por título (CPF).
      * 

@@ -17,8 +17,8 @@ public interface UnidadeProcessoRepo extends JpaRepository<UnidadeProcesso, Long
      * @param codigosUnidades A lista de códigos de unidade a serem verificados.
      * @return Uma lista de códigos de unidade que já estão em um processo ativo.
      */
-    @Query("SELECT up.unidade.codigo FROM UnidadeProcesso up " +
-           "WHERE up.processo.situacao = 'EM_ANDAMENTO' " +
-           "AND up.unidade.codigo IN :codigosUnidades")
+    @Query("SELECT up.unidadeCodigo FROM UnidadeProcesso up JOIN Processo p ON up.processoCodigo = p.codigo " +
+           "WHERE p.situacao = 'EM_ANDAMENTO' " +
+           "AND up.unidadeCodigo IN :codigosUnidades")
     List<Long> findUnidadesInProcessosAtivos(@Param("codigosUnidades") List<Long> codigosUnidades);
 }

@@ -62,26 +62,6 @@ spring:
       password: ${SGRH_DB_PASSWORD:}
 ```
 
-### 2. Dependências
-
-Já adicionadas ao `build.gradle.kts`:
-- `com.oracle.database.jdbc:ojdbc11:23.3.0.23.09`
-- `com.github.ben-manes.caffeine:caffeine:3.1.8`
-- `org.springframework.boot:spring-boot-starter-cache`
-
-### 3. Cache
-
-O cache está configurado com:
-- **Tipo**: Caffeine
-- **Tamanho máximo**: 500 entradas
-- **Expiração**: 1 hora após escrita
-
-Caches disponíveis:
-- `sgrh-usuarios`
-- `sgrh-unidades`
-- `sgrh-responsabilidades`
-- `sgrh-perfis`
-
 ## Uso
 
 ### Injetar o Service

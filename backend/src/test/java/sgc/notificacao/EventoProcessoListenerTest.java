@@ -73,7 +73,6 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Deve processar evento, criar alertas e enviar e-mails para unidade operacional")
     void aoIniciarProcesso_deveProcessarCompleto_quandoUnidadeOperacional() {
-        // Arrange
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                 .thenReturn(List.of(subprocessoOperacional));
@@ -92,10 +91,8 @@ class EventoProcessoListenerTest {
         when(notificacaoTemplateEmailService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Operacional</body></html>");
 
-        // Act
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        // Assert
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional));
         
         verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
@@ -113,13 +110,10 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Não deve fazer nada se o processo não for encontrado")
     void aoIniciarProcesso_naoDeveFazerNada_quandoProcessoNaoEncontrado() {
-        // Arrange
         when(processoRepo.findById(1L)).thenReturn(Optional.empty());
 
-        // Act
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        // Assert
         verify(subprocessoRepo, never()).findByProcessoCodigoWithUnidade(anyLong());
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), any());
         verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
@@ -128,14 +122,11 @@ class EventoProcessoListenerTest {
     @Test
     @DisplayName("Não deve enviar e-mails se não houver subprocessos")
     void aoIniciarProcesso_naoDeveEnviarEmails_quandoNaoHouverSubprocessos() {
-        // Arrange
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-        // Act
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        // Assert
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), any());
         verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
     }

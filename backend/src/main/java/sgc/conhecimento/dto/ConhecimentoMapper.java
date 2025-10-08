@@ -10,7 +10,6 @@ import sgc.conhecimento.modelo.Conhecimento;
  */
 @Mapper(componentModel = "spring")
 public interface ConhecimentoMapper {
-
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
     ConhecimentoDto toDTO(Conhecimento conhecimento);
 
@@ -18,9 +17,8 @@ public interface ConhecimentoMapper {
     Conhecimento toEntity(ConhecimentoDto conhecimentoDTO);
 
     default Atividade map(Long value) {
-        if (value == null) {
-            return null;
-        }
+        if (value == null) return null;
+
         Atividade atividade = new Atividade();
         atividade.setCodigo(value);
         return atividade;

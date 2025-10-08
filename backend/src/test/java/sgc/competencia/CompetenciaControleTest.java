@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CompetenciaControle.class)
 class CompetenciaControleTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,7 +39,6 @@ class CompetenciaControleTest {
 
     @Test
     void listarCompetencias_deveRetornarListaDeCompetencias() throws Exception {
-        // Given
         Competencia competencia = new Competencia();
         competencia.setCodigo(1L);
         competencia.setDescricao("Test Desc");
@@ -62,7 +60,6 @@ class CompetenciaControleTest {
 
     @Test
     void obterCompetencia_quandoEncontrada_deveRetornarCompetencia() throws Exception {
-        // Given
         Competencia competencia = new Competencia();
         competencia.setCodigo(1L);
         competencia.setDescricao("Test Desc");
@@ -84,7 +81,6 @@ class CompetenciaControleTest {
 
     @Test
     void obterCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        // Given
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
@@ -94,7 +90,6 @@ class CompetenciaControleTest {
 
     @Test
     void criarCompetencia_deveCriarEretornarCompetencia() throws Exception {
-        // Given
         CompetenciaDto dto = new CompetenciaDto();
         dto.setDescricao("Nova Competencia");
 
@@ -126,7 +121,6 @@ class CompetenciaControleTest {
 
     @Test
     void criarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        // Given
         CompetenciaDto dto = new CompetenciaDto();
         dto.setDescricao(" "); // Descrição inválida
 
@@ -140,7 +134,6 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_quandoEncontrada_deveAtualizarEretornarCompetencia() throws Exception {
-        // Given
         CompetenciaDto dto = new CompetenciaDto();
         dto.setDescricao("Competencia Atualizada");
 
@@ -171,7 +164,6 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        // Given
         CompetenciaDto dto = new CompetenciaDto();
         dto.setDescricao(""); // Descrição inválida
 
@@ -187,7 +179,6 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        // Given
         CompetenciaDto dto = new CompetenciaDto();
         dto.setDescricao("Nao importa");
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
@@ -202,7 +193,6 @@ class CompetenciaControleTest {
 
     @Test
     void excluirCompetencia_quandoEncontrada_deveRetornarNoContent() throws Exception {
-        // Given
         Competencia existingEntity = new Competencia();
         existingEntity.setCodigo(1L);
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(existingEntity));
@@ -215,7 +205,6 @@ class CompetenciaControleTest {
 
     @Test
     void excluirCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        // Given
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then

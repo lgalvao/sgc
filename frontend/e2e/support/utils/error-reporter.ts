@@ -66,7 +66,7 @@ export class ErrorReporter {
         if (totalErrors === 0) return;
 
         console.error(`\n🚨 RELATÓRIO DE ERROS - ${totalErrors} erro(s) encontrado(s)`);
-        console.error('='.repeat(80));
+        console.error('='.repeat(10));
         Object.entries(this.errors).forEach(([type, errors]) => {
             if (errors.length > 0) {
                 console.error(`\n📋 ${type.toUpperCase()} (${errors.length}):`);
@@ -85,7 +85,7 @@ export class ErrorReporter {
             }
         });
 
-        console.error('\n' + '='.repeat(80) + '\n');
+        console.error('\n' + '='.repeat(10) + '\n');
     }
 
     public hasErrors(): boolean {

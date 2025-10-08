@@ -5,7 +5,7 @@
 
 ---
 
-## 1. SUMÁRIO EXECUTIVO
+## 1. RESUMO EXECUTIVO
 
 O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado de desenvolvimento no backend, com a vasta maioria das funcionalidades e fluxos de processo implementados e funcionais. A análise anterior estava significativamente desatualizada.
 
@@ -14,28 +14,11 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 ### Estado Geral
 
-- ✅ **Frontend:** 95% implementado (funcional com mocks, pronto para integração)
-- ✅ **Backend:** 85% implementado (lógica de negócio principal e fluxos críticos completos)
-- 🟨 **Integrações:** 80% implementadas (AD e E-mail funcionais, SGRH com MOCK)
+- ✅ **Frontend:** 90% implementado (funcional com mocks, pronto para integração)
+- ✅ **Backend:** 50% implementado (lógica de negócio parcial e alguns fluxos críticos)
+- 🟨 **Integrações:** 80% implementadas (AD e E-mail com código mas sem integração real, SGRH com MOCK)
 
-### Progresso Recente
-
-- A análise revelou que a implementação do backend está significativamente mais avançada do que o documentado anteriormente.
-- ✅ **Fluxos Críticos (CDU-12, 15, 18, 20, 21):** Anteriormente marcados como não implementados ou parciais, agora estão **totalmente funcionais**.
-- ✅ **Sistema de Alertas e Notificações:** Totalmente integrado aos fluxos de processo via listeners de eventos, ao contrário da análise anterior que os marcava como incompletos.
-- ✅ **Serviços Agregados:** Serviços de alto nível para gestão de mapas e análise de impactos, antes considerados ausentes, estão implementados.
-
-**Próxima Prioridade:** Finalizar os serviços parciais (CDU-13, 14, 16), integrar o Frontend e substituir o MOCK do SGRH.
-
----
-
-## 2. ARQUITETURA DO SISTEMA
-
-(Sem alterações nesta seção, a arquitetura permanece a mesma)
-
----
-
-## 3. ANÁLISE POR CASO DE USO (CDU)
+## 2. ANÁLISE POR CASO DE USO (CDU)
 
 ### 📊 Legenda de Status
 
@@ -398,22 +381,3 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 - **Implementação Backend Média:** ~85%
 - **CDUs Completos/Quase Completos:** 15/21 (71%)
-
----
-
-## 7. CONCLUSÃO
-
-O Sistema de Gestão de Competências possui uma **base sólida e um backend em estágio avançado de implementação**, muito além do que a análise anterior sugeria. A maioria dos fluxos de negócio críticos, incluindo a criação e finalização de processos, gestão de mapas, análise de impactos e validações, está funcional.
-
-**Pontos Fortes Atuais:**
-
-- ✅ Arquitetura robusta e escalável.
-- ✅ Lógica de negócio principal implementada para a maioria dos CDUs.
-- ✅ Sistemas de notificação e alerta integrados e funcionais.
-- ✅ Modelo de dados e entidades JPA completos.
-
-**Pontos de Atenção Críticos:**
-
-- ⚠️ **Integração com SGRH:** A substituição da camada de MOCK é o principal bloqueio para testes de ponta a ponta com dados reais.
-- ⚠️ **Lógica Incompleta:** Alguns fluxos de análise (CDU-13, 14) e ajuste (CDU-16) precisam ter seus métodos de serviço finalizados.
-- ⚠️ **Baixa Cobertura de Testes:** A ausência de testes de integração representa um risco para a estabilidade e manutenibilidade do sistema.
