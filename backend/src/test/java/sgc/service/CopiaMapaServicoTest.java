@@ -3,10 +3,10 @@ package sgc.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sgc.atividade.Atividade;
-import sgc.atividade.AtividadeRepository;
+import sgc.atividade.RepositorioAtividade;
 import sgc.conhecimento.Conhecimento;
 import sgc.conhecimento.ConhecimentoRepository;
-import sgc.mapa.CopiaMapaServiceImpl;
+import sgc.mapa.CopiaMapaServicoImpl;
 import sgc.mapa.Mapa;
 import sgc.mapa.MapaRepository;
 import sgc.unidade.Unidade;
@@ -20,24 +20,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for CopiaMapaServiceImpl.
+ * Unit tests for CopiaMapaServicoImpl.
  */
-public class CopiaMapaServiceTest {
+public class CopiaMapaServicoTest {
 
     private MapaRepository mapaRepository;
-    private AtividadeRepository atividadeRepository;
+    private RepositorioAtividade atividadeRepository;
     private ConhecimentoRepository conhecimentoRepository;
     private UnidadeRepository unidadeRepository;
 
-    private CopiaMapaServiceImpl mapCopyService;
+    private CopiaMapaServicoImpl mapCopyService;
 
     @BeforeEach
     public void setup() {
         mapaRepository = mock(MapaRepository.class);
-        atividadeRepository = mock(AtividadeRepository.class);
+        atividadeRepository = mock(RepositorioAtividade.class);
         conhecimentoRepository = mock(ConhecimentoRepository.class);
         unidadeRepository = mock(UnidadeRepository.class);
-        mapCopyService = new CopiaMapaServiceImpl(mapaRepository, atividadeRepository, conhecimentoRepository, unidadeRepository);
+        mapCopyService = new CopiaMapaServicoImpl(mapaRepository, atividadeRepository, conhecimentoRepository, unidadeRepository);
     }
 
     @Test

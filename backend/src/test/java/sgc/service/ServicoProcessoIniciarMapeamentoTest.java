@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.mapa.CopiaMapaService;
+import sgc.mapa.CopiaMapaServico;
 import sgc.mapa.Mapa;
 import sgc.mapa.MapaRepository;
 import sgc.mapa.UnidadeMapaRepository;
@@ -48,7 +48,7 @@ public class ServicoProcessoIniciarMapeamentoTest {
         mapaRepository = mock(MapaRepository.class);
         movimentacaoRepository = mock(MovimentacaoRepository.class);
         UnidadeMapaRepository unidadeMapaRepository = mock(UnidadeMapaRepository.class);
-        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
+        CopiaMapaServico servicoDeCopiaDeMapa = mock(CopiaMapaServico.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         ServicoNotificacaoEmail servicoNotificacaoEmail = mock(ServicoNotificacaoEmail.class);
         ServicoDeTemplateDeEmail servicoDeTemplateDeEmail = mock(ServicoDeTemplateDeEmail.class);
