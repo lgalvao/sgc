@@ -187,26 +187,28 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 ### CDU-13: Analisar cadastro de atividades (Mapeamento)
 
-**Status Backend:** 🟨 Parcial (75%)
+**Status Backend:** 🟩 Quase Completo (95%)
 **Backend - Implementado:**
 
 - ✅ Endpoints `devolver-cadastro`, `aceitar-cadastro`, `homologar-cadastro` existem.
 - ✅ **Lógica de `devolverCadastro` está completa.**
+- ✅ **`aceitarCadastro` (GESTOR):** A notificação por e-mail para a unidade superior e a criação de alerta foram implementadas.
+- ✅ **`homologarCadastro` (ADMIN):** A lógica de movimentação foi corrigida.
 **Backend - Pendente:**
-- ❌ **`aceitarCadastro` (GESTOR):** A notificação por e-mail para a unidade superior e a criação de alerta estão faltando.
-- ❌ **`homologarCadastro` (ADMIN):** A movimentação atual usa `sp.getUnidade().getUnidadeSuperior()` para origem e destino, o que pode não ser "SEDOC" conforme o requisito.
+- ⚠️ A lógica de `homologarCadastro` (ADMIN) ainda assume que a movimentação ocorre na unidade superior, o que pode não corresponder a "SEDOC" em todos os cenários. Requer validação funcional.
 
 ---
 
 ### CDU-14: Analisar revisão de cadastro
 
-**Status Backend:** 🟨 Parcial (30%)
+**Status Backend:** 🟨 Parcial (60%)
 **Backend - Situação:**
 
 - ✅ Endpoints para `devolver`, `aceitar` e `homologar` a revisão existem.
+- ✅ **`aceitarRevisaoCadastro` (GESTOR):** A notificação por e-mail para a unidade superior e a criação de alerta foram implementadas.
+- ✅ **`homologarRevisaoCadastro` (ADMIN):** A lógica de movimentação e mudança de estado foi implementada.
 **Backend - Pendente:**
-- ❌ **`aceitarRevisaoCadastro` (GESTOR):** A notificação por e-mail para a unidade superior e a criação de alerta estão faltando.
-- ❌ **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados. A movimentação atual usa `sp.getUnidade().getUnidadeSuperior()` para origem e destino, o que pode não ser "SEDOC" conforme o requisito.
+- ❌ **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados.
 
 ---
 
@@ -236,13 +238,12 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 ### CDU-17: Disponibilizar mapa de competências
 
-**Status Backend:** 🟩 Quase Completo (70%)
+**Status Backend:** ✅ Implementado
 **Backend - Implementado:**
 
 - ✅ Endpoint `POST /api/subprocessos/{id}/disponibilizar-mapa` funcional.
 - ✅ `SubprocessoService.disponibilizarMapa` com validações, mudança de situação e movimentação.
-**Backend - Pendente:**
-- ❌ **Envio de notificações e criação de alertas:** A implementação de `notificarDisponibilizacaoMapa` está incompleta, usando assunto e corpo genéricos para e-mails e descrição genérica para alertas, não seguindo os modelos do CDU-17 (itens 16, 17 e 18).
+- ✅ **Envio de notificações e criação de alertas:** A implementação de `notificarDisponibilizacaoMapa` foi corrigida e agora segue os modelos especificados no CDU-17.
 
 ---
 
@@ -322,17 +323,11 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 **Criticidade:** 🟡 MÉDIA
 
-- 🟨 **CDU-13 (Análise de Cadastro - Mapeamento):**
-  - **`aceitarCadastro` (GESTOR):** Falta implementar o envio de notificação por e-mail para a unidade superior e a criação de alerta.
-  - **`homologarCadastro` (ADMIN):** A movimentação atual usa `sp.getUnidade().getUnidadeSuperior()` para origem e destino, o que pode não ser "SEDOC" conforme o requisito.
 - 🟨 **CDU-14 (Análise de Revisão de Cadastro):**
-  - **`aceitarRevisaoCadastro` (GESTOR):** Falta implementar o envio de notificação por e-mail para a unidade superior e a criação de alerta.
-  - **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados. A movimentação atual usa `sp.getUnidade().getUnidadeSuperior()` para origem e destino, o que pode não ser "SEDOC" conforme o requisito.
+  - **`homologarRevisaoCadastro` (ADMIN):** A lógica de verificação de impactos no mapa e o fluxo condicional de diálogo de confirmação (itens 12.2 e 12.3 do CDU-14) não estão implementados.
 - 🟨 **CDU-16 (Ajustar Mapa):**
   - **`obterMapaParaAjuste`:** A lógica de preenchimento do `MapaAjusteDTO` está incompleta (lista de competências vazia, justificativa fixa).
   - **`salvarAjustesMapa`:** A lógica de persistência das alterações no mapa (competências, atividades, conhecimentos, vínculos) está faltando.
-- 🟨 **CDU-17 (Disponibilizar Mapa):**
-  - **Envio de notificações e criação de alertas:** A implementação de `notificarDisponibilizacaoMapa` está incompleta, usando assunto e corpo genéricos para e-mails e descrição genérica para alertas, não seguindo os modelos do CDU-17 (itens 16, 17 e 18).
 - 🟨 **CDU-08 (Manter Cadastro):**
   - **Funcionalidade de importação de atividades:** Não há endpoints ou métodos no `SubprocessoService` relacionados à importação de atividades. É necessário criar um endpoint `POST /api/subprocessos/{id}/importar-atividades` e um método correspondente no serviço para validar, copiar atividades e conhecimentos, e registrar movimentação.
 - 🟨 **CDU-02 (Painel):**
@@ -384,11 +379,11 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 | CDU-10 | Disponibilizar revisão  | ✅ 100%  | 🔴 CRÍTICA |
 | CDU-11 | Visualizar cadastro     | ✅ 100%  | 🟢 MÉDIA   |
 | CDU-12 | Verificar impactos      | ✅ 100%  | ✅ CRÍTICA |
-| CDU-13 | Analisar cadastro       | 🟨 75%  | 🔴 CRÍTICA |
-| CDU-14 | Analisar revisão cad.   | 🟨 30%  | 🔴 CRÍTICA |
+| CDU-13 | Analisar cadastro       | 🟩 95%  | 🔴 CRÍTICA |
+| CDU-14 | Analisar revisão cad.   | 🟨 60%  | 🔴 CRÍTICA |
 | CDU-15 | Manter mapa             | ✅ 100%  | ✅ CRÍTICA |
 | CDU-16 | Ajustar mapa            | 🟨 30%  | 🟡 ALTA    |
-| CDU-17 | Disponibilizar mapa     | 🟩 70%  | 🔴 CRÍTICA |
+| CDU-17 | Disponibilizar mapa     | ✅ 100% | 🔴 CRÍTICA |
 | CDU-18 | Visualizar mapa         | ✅ 100%  | 🟢 MÉDIA   |
 | CDU-19 | Validar mapa            | ✅ 100%  | ✅ CRÍTICA |
 | CDU-20 | Analisar validação      | ✅ 100%  | ✅ CRÍTICA |
