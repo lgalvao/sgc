@@ -231,4 +231,20 @@ public class AlertaServiceImpl implements AlertaService {
         }
         return String.format("%02d/%02d/%d", data.getDayOfMonth(), data.getMonthValue(), data.getYear());
     }
+
+    @Override
+    @Transactional
+    public void marcarComoLido(String usuarioTitulo, Long alertaId) {
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+        AlertaUsuario alertaUsuario = repositorioAlertaUsuario.findById(id)
+            .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(
+                "Não foi encontrado o alerta " + alertaId + " para o usuário " + usuarioTitulo
+            ));
+
+        if (alertaUsuario.getDataHoraLeitura() == null) {
+            alertaUsuario.setDataHoraLeitura(LocalDateTime.now());
+            repositorioAlertaUsuario.save(alertaUsuario);
+            log.info("Alerta {} marcado como lido para o usuário {}", alertaId, usuarioTitulo);
+        }
+    }
 }

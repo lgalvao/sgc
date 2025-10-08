@@ -76,4 +76,13 @@ public interface AlertaService {
         Long unidadeDestinoCodigo,
         String motivo
     );
+
+    /**
+     * Marca um alerta como lido para um usuário específico.
+     * CDU-02
+     *
+     * @param usuarioTitulo O título (matrícula) do usuário que leu o alerta.
+     * @param alertaId O ID do alerta a ser marcado como lido.
+     */
+    void marcarComoLido(String usuarioTitulo, Long alertaId);
 }
