@@ -112,8 +112,8 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        verifyNoInteractions(notificacaoService);
-        verifyNoInteractions(alertaRepo);
+        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 
     @Test
@@ -195,8 +195,8 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        verifyNoInteractions(notificacaoService);
-        verifyNoInteractions(alertaRepo);
+        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 
     @Test
