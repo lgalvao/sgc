@@ -35,4 +35,16 @@ public class Movimentacao extends EntidadeBase {
 
     @Column(name = "descricao")
     private String descricao;
+
+    /**
+     * Construtor de conveniência para registrar uma nova movimentação.
+     * A data e hora são preenchidas automaticamente.
+     */
+    public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao) {
+        this.subprocesso = subprocesso;
+        this.unidadeOrigem = unidadeOrigem;
+        this.unidadeDestino = unidadeDestino;
+        this.descricao = descricao;
+        this.dataHora = LocalDateTime.now();
+    }
 }

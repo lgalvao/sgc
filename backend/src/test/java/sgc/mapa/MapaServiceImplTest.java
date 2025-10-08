@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.AtividadeRepository;
+import sgc.atividade.RepositorioAtividade;
 import sgc.competencia.Competencia;
 import sgc.competencia.CompetenciaAtividade;
 import sgc.competencia.CompetenciaAtividadeRepository;
@@ -29,21 +29,21 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MapaServiceImplTest {
+class MapaServicoImplTest {
 
     @Mock
-    private MapaRepository mapaRepository;
+    private MapaRepository repositorioMapa;
     @Mock
-    private CompetenciaRepository competenciaRepository;
+    private CompetenciaRepository repositorioCompetencia;
     @Mock
-    private CompetenciaAtividadeRepository competenciaAtividadeRepository;
+    private CompetenciaAtividadeRepository repositorioCompetenciaAtividade;
     @Mock
-    private AtividadeRepository atividadeRepository;
+    private RepositorioAtividade repositorioAtividade;
     @Mock
-    private SubprocessoRepository subprocessoRepository;
+    private SubprocessoRepository repositorioSubprocesso;
 
     @InjectMocks
-    private MapaServiceImpl mapaService;
+    private MapaServicoImpl mapaServico;
 
     private Mapa mapa;
     private Subprocesso subprocesso;
@@ -71,12 +71,12 @@ class MapaServiceImplTest {
 
     @Test
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
-        when(mapaRepository.findById(1L)).thenReturn(Optional.of(mapa));
-        when(subprocessoRepository.findAll()).thenReturn(List.of(subprocesso));
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(competenciaAtividadeRepository.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
+        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
+        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
+        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 
-        MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L);
+        MapaCompletoDto mapaCompleto = mapaServico.obterMapaCompleto(1L);
 
         assertThat(mapaCompleto).isNotNull();
         assertThat(mapaCompleto.codigo()).isEqualTo(1L);
@@ -88,21 +88,21 @@ class MapaServiceImplTest {
 
     @Test
     void obterMapaCompleto_deveLancarErro_quandoMapaNaoEncontrado() {
-        when(mapaRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(repositorioMapa.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L))
+        assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class)
             .hasMessage("Mapa não encontrado: 1");
     }
 
     @Test
     void obterMapaSubprocesso_deveRetornarMapa_quandoSubprocessoTemMapa() {
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findById(1L)).thenReturn(Optional.of(mapa));
-        when(subprocessoRepository.findAll()).thenReturn(List.of(subprocesso));
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
+        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
 
-        MapaCompletoDto result = mapaService.obterMapaSubprocesso(100L);
+        MapaCompletoDto result = mapaServico.obterMapaSubprocesso(100L);
 
         assertThat(result).isNotNull();
         assertThat(result.codigo()).isEqualTo(mapa.getCodigo());
@@ -111,21 +111,21 @@ class MapaServiceImplTest {
     @Test
     void obterMapaSubprocesso_deveLancarErro_quandoSubprocessoNaoTemMapa() {
         subprocesso.setMapa(null);
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
-        assertThatThrownBy(() -> mapaService.obterMapaSubprocesso(100L))
+        assertThatThrownBy(() -> mapaServico.obterMapaSubprocesso(100L))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class)
             .hasMessage("Subprocesso não possui mapa associado");
     }
 
     @Test
     void validarMapaCompleto_deveLancarErro_quandoCompetenciaNaoTemAtividades() {
-        when(mapaRepository.findById(1L)).thenReturn(Optional.of(mapa));
-        when(subprocessoRepository.findAll()).thenReturn(List.of(subprocesso));
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(competenciaAtividadeRepository.findByCompetenciaCodigo(1L)).thenReturn(Collections.emptyList());
+        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
+        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
+        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(Collections.emptyList());
 
-        assertThatThrownBy(() -> mapaService.validarMapaCompleto(1L))
+        assertThatThrownBy(() -> mapaServico.validarMapaCompleto(1L))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("A competência 'Competência 1' não possui atividades vinculadas");
     }
@@ -134,14 +134,14 @@ class MapaServiceImplTest {
     void salvarMapaSubprocesso_deveAtualizarSituacao_quandoPrimeiraEdicao() {
         SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of(new CompetenciaMapaDto(1L, "Comp 1", List.of(1L))));
         subprocesso.setSituacaoId("CADASTRO_HOMOLOGADO");
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
-        when(mapaRepository.findById(1L)).thenReturn(Optional.of(mapa));
-        when(mapaRepository.save(any(Mapa.class))).thenReturn(mapa);
-        when(competenciaRepository.findById(1L)).thenReturn(Optional.of(competencia));
-        when(competenciaRepository.save(any(Competencia.class))).thenReturn(competencia);
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
+        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
+        when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapa);
+        when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(competencia));
+        when(repositorioCompetencia.save(any(Competencia.class))).thenReturn(competencia);
 
-        mapaService.salvarMapaSubprocesso(100L, request, "user");
+        mapaServico.salvarMapaSubprocesso(100L, request, "user");
 
         assertThat(subprocesso.getSituacaoId()).isEqualTo("MAPA_CRIADO");
     }
@@ -150,9 +150,9 @@ class MapaServiceImplTest {
     void salvarMapaSubprocesso_deveLancarErro_quandoSituacaoInvalida() {
         SalvarMapaRequest request = new SalvarMapaRequest("Obs", Collections.emptyList());
         subprocesso.setSituacaoId("INVALIDA");
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
-        assertThatThrownBy(() -> mapaService.salvarMapaSubprocesso(100L, request, "user"))
+        assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, "user"))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: INVALIDA");
     }

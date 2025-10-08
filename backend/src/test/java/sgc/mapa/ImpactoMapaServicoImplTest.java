@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.AtividadeRepository;
+import sgc.atividade.RepositorioAtividade;
 import sgc.atividade.Atividade;
 import sgc.competencia.Competencia;
 import sgc.competencia.CompetenciaAtividade;
@@ -24,21 +24,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ImpactoMapaServiceImplTest {
+class ImpactoMapaServicoImplTest {
 
     @Mock
-    private SubprocessoRepository subprocessoRepository;
+    private SubprocessoRepository repositorioSubprocesso;
     @Mock
-    private MapaRepository mapaRepository;
+    private MapaRepository repositorioMapa;
     @Mock
-    private AtividadeRepository atividadeRepository;
+    private RepositorioAtividade repositorioAtividade;
     @Mock
-    private CompetenciaRepository competenciaRepository;
+    private CompetenciaRepository repositorioCompetencia;
     @Mock
-    private CompetenciaAtividadeRepository competenciaAtividadeRepository;
+    private CompetenciaAtividadeRepository repositorioCompetenciaAtividade;
 
     @InjectMocks
-    private ImpactoMapaServiceImpl impactoMapaService;
+    private ImpactoMapaServicoImpl impactoMapaServico;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -54,13 +54,13 @@ class ImpactoMapaServiceImplTest {
     }
 
     @Test
-    void verificarImpactos_shouldReturnNoImpacts_whenNoMapaVigenteExists() {
+    void verificarImpactos_deveRetornarSemImpactos_quandoNaoHaMapaVigente() {
         // Arrange
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.empty());
 
         // Act
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(100L);
+        ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
         // Assert
         assertThat(result).isNotNull();
@@ -75,7 +75,7 @@ class ImpactoMapaServiceImplTest {
     }
 
     @Test
-    void verificarImpactos_shouldDetectRemovidas_whenAtividadeIsRemoved() {
+    void verificarImpactos_deveDetectarRemovidas_quandoAtividadeEhRemovida() {
         // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
@@ -95,25 +95,22 @@ class ImpactoMapaServiceImplTest {
         CompetenciaAtividade vinculo = new CompetenciaAtividade();
         vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
 
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepository.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
 
-        // Mapa do subprocesso (atual) está vazio
-        when(atividadeRepository.findByMapaCodigo(2L)).thenReturn(java.util.Collections.emptyList());
+        when(repositorioAtividade.findByMapaCodigo(2L)).thenReturn(java.util.Collections.emptyList());
 
-        // Mapa vigente continha a atividade
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(competenciaAtividadeRepository.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepository.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeRemovida));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
+        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
+        when(repositorioAtividade.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeRemovida));
 
-        // Mocks para identificar a competência impactada
-        when(competenciaAtividadeRepository.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
-        when(competenciaRepository.findById(20L)).thenReturn(Optional.of(competencia));
+        when(repositorioCompetenciaAtividade.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
+        when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
 
 
         // Act
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(100L);
+        ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
         // Assert
         assertThat(result.temImpactos()).isTrue();
@@ -125,7 +122,7 @@ class ImpactoMapaServiceImplTest {
     }
 
     @Test
-    void verificarImpactos_shouldDetectNoImpacts_whenMapsAreEqual() {
+    void verificarImpactos_deveDetectarSemImpactos_quandoMapasSaoIguais() {
         // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
@@ -143,19 +140,18 @@ class ImpactoMapaServiceImplTest {
         CompetenciaAtividade vinculo = new CompetenciaAtividade();
         vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
 
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepository.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
 
-        // Both maps return the same activity
-        when(atividadeRepository.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividade));
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(competenciaAtividadeRepository.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepository.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividade));
+        when(repositorioAtividade.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividade));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
+        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
+        when(repositorioAtividade.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividade));
 
 
         // Act
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(100L);
+        ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
         // Assert
         assertThat(result.temImpactos()).isFalse();
@@ -165,7 +161,7 @@ class ImpactoMapaServiceImplTest {
     }
 
     @Test
-    void verificarImpactos_shouldDetectInseridas_whenAtividadeIsNew() {
+    void verificarImpactos_deveDetectarInseridas_quandoAtividadeEhNova() {
         // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
@@ -177,29 +173,27 @@ class ImpactoMapaServiceImplTest {
         atividadeNova.setDescricao("Atividade Nova");
         atividadeNova.setMapa(mapaSubprocesso);
 
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepository.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
 
-        // Mapa do subprocesso tem a nova atividade
-        when(atividadeRepository.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeNova));
+        when(repositorioAtividade.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeNova));
 
-        // Mapa vigente está vazio
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(java.util.Collections.emptyList());
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.Collections.emptyList());
 
         // Act
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(100L);
+        ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
         // Assert
         assertThat(result.temImpactos()).isTrue();
         assertThat(result.totalAtividadesInseridas()).isEqualTo(1);
         assertThat(result.atividadesInseridas()).hasSize(1);
         assertThat(result.atividadesInseridas().get(0).descricao()).isEqualTo("Atividade Nova");
-        assertThat(result.competenciasImpactadas()).isEmpty(); // Inserções não impactam competências existentes
+        assertThat(result.competenciasImpactadas()).isEmpty();
     }
 
     @Test
-    void verificarImpactos_shouldDetectAlteradas_whenAtividadeIsModified() {
+    void verificarImpactos_deveDetectarAlteradas_quandoAtividadeEhModificada() {
         // Arrange
         Mapa mapaVigente = new Mapa();
         mapaVigente.setCodigo(1L);
@@ -224,24 +218,21 @@ class ImpactoMapaServiceImplTest {
         CompetenciaAtividade vinculo = new CompetenciaAtividade();
         vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
 
-        when(subprocessoRepository.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(mapaRepository.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
-        when(mapaRepository.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
+        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
+        when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
+        when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
 
-        // Mapa do subprocesso tem a atividade com a nova descrição
-        when(atividadeRepository.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeAtual));
+        when(repositorioAtividade.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeAtual));
 
-        // Mapa vigente tem a atividade com a descrição antiga
-        when(competenciaRepository.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(competenciaAtividadeRepository.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepository.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeVigente));
+        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
+        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
+        when(repositorioAtividade.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeVigente));
 
-        // Mocks para identificar a competência impactada
-        when(competenciaAtividadeRepository.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
-        when(competenciaRepository.findById(20L)).thenReturn(Optional.of(competencia));
+        when(repositorioCompetenciaAtividade.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
+        when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
 
         // Act
-        ImpactoMapaDto result = impactoMapaService.verificarImpactos(100L);
+        ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L);
 
         // Assert
         assertThat(result.temImpactos()).isTrue();

@@ -10,7 +10,7 @@ import sgc.mapa.dto.SalvarMapaRequest;
  * Provê operações de alto nível para manipular mapas completos,
  * incluindo competências e vínculos com atividades de forma agregada.
  */
-public interface MapaService {
+public interface MapaServico {
     /**
      * Obtém um mapa completo com todas as competências e atividades vinculadas.
      * 

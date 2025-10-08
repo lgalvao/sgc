@@ -47,4 +47,15 @@ public class Subprocesso extends EntidadeBase {
 
     @Column(name = "situacao_id", length = 50)
     private String situacaoId;
+
+    /**
+     * Construtor de conveniência para criar um novo subprocesso no início de um processo.
+     */
+    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, String situacaoId, LocalDate dataLimiteEtapa1) {
+        this.processo = processo;
+        this.unidade = unidade;
+        this.mapa = mapa;
+        this.situacaoId = situacaoId;
+        this.dataLimiteEtapa1 = dataLimiteEtapa1;
+    }
 }

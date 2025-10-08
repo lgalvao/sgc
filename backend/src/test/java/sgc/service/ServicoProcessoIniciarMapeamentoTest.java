@@ -27,9 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@DisplayName("Testes para o início de mapeamento no ProcessoService")
-public class ProcessoServiceIniciarMapeamentoTest {
-    private ProcessoRepository processoRepository;
+@DisplayName("Testes para o início de mapeamento no ServicoProcesso")
+public class ServicoProcessoIniciarMapeamentoTest {
+    private RepositorioProcesso repositorioProcesso;
     private UnidadeRepository unidadeRepository;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
@@ -37,11 +37,11 @@ public class ProcessoServiceIniciarMapeamentoTest {
     private MovimentacaoRepository movimentacaoRepository;
     private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
-    private ProcessoService processoService;
+    private ServicoProcesso servicoProcesso;
 
     @BeforeEach
     public void setup() {
-        processoRepository = mock(ProcessoRepository.class);
+        repositorioProcesso = mock(RepositorioProcesso.class);
         unidadeRepository = mock(UnidadeRepository.class);
         unidadeProcessoRepository = mock(UnidadeProcessoRepository.class);
         subprocessoRepository = mock(SubprocessoRepository.class);
@@ -56,8 +56,8 @@ public class ProcessoServiceIniciarMapeamentoTest {
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
-        processoService = new ProcessoService(
-                processoRepository,
+        servicoProcesso = new ServicoProcesso(
+                repositorioProcesso,
                 unidadeRepository,
                 unidadeProcessoRepository,
                 subprocessoRepository,
@@ -91,9 +91,9 @@ public class ProcessoServiceIniciarMapeamentoTest {
         unidade.setNome("Unidade 1");
 
         // Mocks
-        when(processoRepository.findById(idProcesso)).thenReturn(Optional.of(processo));
+        when(repositorioProcesso.findById(idProcesso)).thenReturn(Optional.of(processo));
         when(unidadeRepository.findById(idUnidade)).thenReturn(Optional.of(unidade));
-        when(processoRepository.findBySituacao(anyString())).thenReturn(List.of());
+        when(unidadeProcessoRepository.findUnidadesInProcessosAtivos(anyList())).thenReturn(List.of());
 
         when(mapaRepository.save(any(Mapa.class))).thenAnswer(inv -> {
             Mapa m = inv.getArgument(0);
@@ -110,14 +110,14 @@ public class ProcessoServiceIniciarMapeamentoTest {
             mv.setCodigo(300L);
             return mv;
         });
-        when(processoRepository.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(repositorioProcesso.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
         });
 
         // Execução
-        var dto = processoService.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
+        var dto = servicoProcesso.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
 
         // Asserções
         assertThat(dto).isNotNull();
@@ -129,7 +129,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         verify(mapaRepository, times(1)).save(any(Mapa.class));
         verify(subprocessoRepository, times(1)).save(any(Subprocesso.class));
         verify(movimentacaoRepository, times(1)).save(any(Movimentacao.class));
-        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoIniciado.class));
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoIniciadoEvento.class));
     }
 
     @Test
@@ -140,9 +140,9 @@ public class ProcessoServiceIniciarMapeamentoTest {
         processo.setCodigo(idProcesso);
         processo.setSituacao("EM_ANDAMENTO");
 
-        when(processoRepository.findById(idProcesso)).thenReturn(Optional.of(processo));
+        when(repositorioProcesso.findById(idProcesso)).thenReturn(Optional.of(processo));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(idProcesso, List.of(1L)))
+        assertThatThrownBy(() -> servicoProcesso.iniciarProcessoMapeamento(idProcesso, List.of(1L)))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
  * Repositório JPA para a entidade Atividade.
  */
 @Repository
-public interface AtividadeRepository extends JpaRepository<Atividade, Long> {
+public interface RepositorioAtividade extends JpaRepository<Atividade, Long> {
     /**
      * Recupera as atividades vinculadas a um mapa.
      *

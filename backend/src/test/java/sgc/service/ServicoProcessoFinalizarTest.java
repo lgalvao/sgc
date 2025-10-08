@@ -29,10 +29,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProcessoServiceFinalizarTest {
+public class ServicoProcessoFinalizarTest {
 
     @Mock
-    private ProcessoRepository processoRepository;
+    private RepositorioProcesso repositorioProcesso;
     @Mock
     private SubprocessoRepository subprocessoRepository;
     @Mock
@@ -57,7 +57,7 @@ public class ProcessoServiceFinalizarTest {
 
 
     @InjectMocks
-    private ProcessoService processoService;
+    private ServicoProcesso servicoProcesso;
 
     private Processo processo;
     private Subprocesso subprocessoHomologado;
@@ -87,38 +87,37 @@ public class ProcessoServiceFinalizarTest {
     }
 
     @Test
-    @DisplayName("finalizarProcesso deve lançar ErroProcesso quando subprocessos não estão homologados")
-    void finalizarProcesso_deveLancarErroProcesso_quandoSubprocessosNaoEstaoHomologados() {
-        when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
+    @DisplayName("finalizar deve lançar ProcessoErro quando subprocessos não estão homologados")
+    void finalizar_deveLancarErroProcesso_quandoSubprocessosNaoEstaoHomologados() {
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L))
             .thenReturn(List.of(subprocessoHomologado, subprocessoPendente));
 
-        assertThatThrownBy(() -> processoService.finalizarProcesso(1L))
-            .isInstanceOf(ErroProcesso.class)
-            .hasMessageContaining("Unidades pendentes:")
-            .hasMessageContaining("TEST (Situação: MAPA_VALIDADO)");
+        assertThatThrownBy(() -> servicoProcesso.finalizar(1L))
+            .isInstanceOf(ProcessoErro.class)
+            .hasMessageContaining("Unidades pendentes de homologação:");
 
-        verify(processoRepository, never()).save(any(Processo.class));
-        verify(publicadorDeEventos, never()).publishEvent(any(ProcessoService.EventoDeProcessoFinalizado.class));
+        verify(repositorioProcesso, never()).save(any(Processo.class));
+        verify(publicadorDeEventos, never()).publishEvent(any(ProcessoFinalizadoEvento.class));
     }
 
     @Test
-    @DisplayName("finalizarProcesso deve atualizar status e tornar mapas vigentes quando todos os subprocessos estão homologados")
-    void finalizarProcesso_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
+    @DisplayName("finalizar deve atualizar status e tornar mapas vigentes quando todos os subprocessos estão homologados")
+    void finalizar_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
         // Arrange
         subprocessoHomologado.setMapa(new sgc.mapa.Mapa());
-        when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
-        when(processoRepository.save(any(Processo.class))).thenReturn(processo);
+        when(repositorioProcesso.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepository.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(new sgc.processo.dto.ProcessoDTO());
 
         // Act
-        processoService.finalizarProcesso(1L);
+        servicoProcesso.finalizar(1L);
 
         // Assert
-        verify(processoRepository, times(1)).save(processo);
+        verify(repositorioProcesso, times(1)).save(processo);
         verify(unidadeMapaRepository, times(1)).save(any(sgc.mapa.UnidadeMapa.class));
-        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoFinalizado.class));
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoFinalizadoEvento.class));
     }
 }

@@ -11,11 +11,16 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * DTO usado para atualizar um processo existente.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqCriarProcesso {
+public class RequisicaoAtualizarProcesso {
+    private Long codigo;
+
     @NotBlank(message = "Preencha a descrição")
     private String descricao;
 

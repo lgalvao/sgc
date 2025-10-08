@@ -11,7 +11,7 @@ import sgc.notificacao.ServicoNotificacaoEmail;
 import sgc.notificacao.ServicoDeTemplateDeEmail;
 import sgc.processo.*;
 import sgc.processo.dto.ProcessoDTO;
-import sgc.processo.dto.ReqCriarProcesso;
+import sgc.processo.dto.RequisicaoCriarProcesso;
 import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.MovimentacaoRepository;
 import sgc.subprocesso.SubprocessoRepository;
@@ -27,19 +27,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
+ * Testes unitários para ServicoProcesso, cobrindo o fluxo de criação e validações.
  */
-public class ProcessoServiceTest {
-    private ProcessoRepository processoRepository;
+public class ServicoProcessoTest {
+    private RepositorioProcesso repositorioProcesso;
     private UnidadeRepository unidadeRepository;
     private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
 
-    private ProcessoService processoService;
+    private ServicoProcesso servicoProcesso;
 
     @BeforeEach
     public void setup() {
-        processoRepository = mock(ProcessoRepository.class);
+        repositorioProcesso = mock(RepositorioProcesso.class);
         unidadeRepository = mock(UnidadeRepository.class);
         UnidadeProcessoRepository unidadeProcessoRepository = mock(UnidadeProcessoRepository.class);
         SubprocessoRepository subprocessoRepository = mock(SubprocessoRepository.class);
@@ -54,8 +54,8 @@ public class ProcessoServiceTest {
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapper processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
-        processoService = new ProcessoService(
-                processoRepository,
+        servicoProcesso = new ServicoProcesso(
+                repositorioProcesso,
                 unidadeRepository,
                 unidadeProcessoRepository,
                 subprocessoRepository,
@@ -74,7 +74,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
-        ReqCriarProcesso requisicao = new ReqCriarProcesso();
+        RequisicaoCriarProcesso requisicao = new RequisicaoCriarProcesso();
         requisicao.setDescricao("Processo de teste");
         requisicao.setTipo("MAPEAMENTO");
         requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
@@ -92,7 +92,7 @@ public class ProcessoServiceTest {
         when(unidadeRepository.findById(1L)).thenReturn(Optional.of(u1));
         when(unidadeRepository.findById(2L)).thenReturn(Optional.of(u2));
 
-        when(processoRepository.save(any(Processo.class))).thenAnswer(invocation -> {
+        when(repositorioProcesso.save(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             p.setCodigo(123L);
             return p;
@@ -103,7 +103,7 @@ public class ProcessoServiceTest {
             return new ProcessoDTO(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
         });
 
-        ProcessoDTO dto = processoService.criar(requisicao);
+        ProcessoDTO dto = servicoProcesso.criar(requisicao);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(123L);
@@ -111,20 +111,20 @@ public class ProcessoServiceTest {
         assertThat(dto.getTipo()).isEqualTo("MAPEAMENTO");
         assertThat(dto.getSituacao()).isEqualTo("CRIADO");
 
-        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoService.EventoDeProcessoCriado.class));
+        verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoCriadoEvento.class));
     }
 
     @Test
     public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
-        ReqCriarProcesso requisicao = new ReqCriarProcesso();
+        RequisicaoCriarProcesso requisicao = new RequisicaoCriarProcesso();
         requisicao.setDescricao("   ");
         requisicao.setTipo("MAPEAMENTO");
         requisicao.setUnidades(List.of(1L));
 
-        assertThatThrownBy(() -> processoService.criar(requisicao))
+        assertThatThrownBy(() -> servicoProcesso.criar(requisicao))
                 .isInstanceOf(ConstraintViolationException.class);
 
-        verifyNoInteractions(processoRepository);
+        verifyNoInteractions(repositorioProcesso);
         verifyNoInteractions(publicadorDeEventos);
     }
 }

@@ -8,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.ServicoAlerta;
-import sgc.processo.EventoProcessoIniciado;
+import sgc.processo.ProcessoIniciadoEvento;
 import sgc.processo.Processo;
-import sgc.processo.ProcessoRepository;
+import sgc.processo.RepositorioProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
@@ -42,7 +42,7 @@ class OuvinteDeEventoDeProcessoTest {
     @Mock
     private SgrhService sgrhService;
     @Mock
-    private ProcessoRepository processoRepository;
+    private RepositorioProcesso repositorioProcesso;
     @Mock
     private SubprocessoRepository subprocessoRepository;
 
@@ -52,7 +52,7 @@ class OuvinteDeEventoDeProcessoTest {
     private Processo processo;
     private Subprocesso subprocessoOperacional;
     private Unidade unidadeOperacional;
-    private EventoProcessoIniciado evento;
+    private ProcessoIniciadoEvento evento;
 
     @BeforeEach
     void setUp() {
@@ -71,14 +71,14 @@ class OuvinteDeEventoDeProcessoTest {
         subprocessoOperacional.setUnidade(unidadeOperacional);
         subprocessoOperacional.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
 
-        evento = new EventoProcessoIniciado(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
+        evento = new ProcessoIniciadoEvento(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
     }
 
     @Test
     @DisplayName("Deve processar evento, criar alertas e enviar e-mails para unidade operacional")
     void aoIniciarProcesso_deveProcessarCompleto_quandoUnidadeOperacional() {
         // Arrange
-        when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L))
                 .thenReturn(List.of(subprocessoOperacional));
 
@@ -118,7 +118,7 @@ class OuvinteDeEventoDeProcessoTest {
     @DisplayName("Não deve fazer nada se o processo não for encontrado")
     void aoIniciarProcesso_naoDeveFazerNada_quandoProcessoNaoEncontrado() {
         // Arrange
-        when(processoRepository.findById(1L)).thenReturn(Optional.empty());
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.empty());
 
         // Act
         ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -133,7 +133,7 @@ class OuvinteDeEventoDeProcessoTest {
     @DisplayName("Não deve enviar e-mails se não houver subprocessos")
     void aoIniciarProcesso_naoDeveEnviarEmails_quandoNaoHouverSubprocessos() {
         // Arrange
-        when(processoRepository.findById(1L)).thenReturn(Optional.of(processo));
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         // Act

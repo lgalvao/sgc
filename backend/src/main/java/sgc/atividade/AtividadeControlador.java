@@ -14,55 +14,55 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
-public class AtividadeController {
-    private final AtividadeRepository atividadeRepository;
+public class AtividadeControlador {
+    private final RepositorioAtividade repositorioAtividade;
     private final AtividadeMapper atividadeMapper;
 
     @GetMapping
-    public List<AtividadeDTO> listarAtividades() {
-        return atividadeRepository.findAll()
+    public List<AtividadeDTO> listar() {
+        return repositorioAtividade.findAll()
                 .stream()
                 .map(atividadeMapper::toDTO)
                 .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AtividadeDTO> obterAtividade(@PathVariable Long id) {
-        return atividadeRepository.findById(id)
+    public ResponseEntity<AtividadeDTO> obterPorId(@PathVariable Long id) {
+        return repositorioAtividade.findById(id)
                 .map(atividadeMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<AtividadeDTO> criarAtividade(@Valid @RequestBody AtividadeDTO atividadeDto) {
-        var entity = atividadeMapper.toEntity(atividadeDto);
-        var salvo = atividadeRepository.save(entity);
+    public ResponseEntity<AtividadeDTO> criar(@Valid @RequestBody AtividadeDTO atividadeDto) {
+        var entidade = atividadeMapper.toEntity(atividadeDto);
+        var salvo = repositorioAtividade.save(entidade);
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(atividadeMapper.toDTO(salvo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AtividadeDTO> atualizarAtividade(@PathVariable Long id,
+    public ResponseEntity<AtividadeDTO> atualizar(@PathVariable Long id,
             @Valid @RequestBody AtividadeDTO atividadeDto) {
-        return atividadeRepository.findById(id)
-                .map(existing -> {
+        return repositorioAtividade.findById(id)
+                .map(existente -> {
                     // Mapeia os campos do DTO para a entidade existente
-                    var entityToUpdate = atividadeMapper.toEntity(atividadeDto);
-                    existing.setDescricao(entityToUpdate.getDescricao());
-                    existing.setMapa(entityToUpdate.getMapa());
+                    var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
+                    existente.setDescricao(entidadeParaAtualizar.getDescricao());
+                    existente.setMapa(entidadeParaAtualizar.getMapa());
 
-                    var atualizado = atividadeRepository.save(existing);
+                    var atualizado = repositorioAtividade.save(existente);
                     return ResponseEntity.ok(atividadeMapper.toDTO(atualizado));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirAtividade(@PathVariable Long id) {
-        return atividadeRepository.findById(id)
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        return repositorioAtividade.findById(id)
                 .map(_ -> {
-                    atividadeRepository.deleteById(id);
+                    repositorioAtividade.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

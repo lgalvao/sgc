@@ -1,6 +1,8 @@
 package sgc.processo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,4 +11,14 @@ import java.util.List;
 public interface UnidadeProcessoRepository extends JpaRepository<UnidadeProcesso, Long> {
     List<UnidadeProcesso> findByProcessoCodigo(Long processoCodigo);
     List<UnidadeProcesso> findBySigla(String sigla);
+
+    /**
+     * Busca, dentre uma lista de códigos de unidade, quais já estão participando de algum processo ativo ('EM_ANDAMENTO').
+     * @param codigosUnidades A lista de códigos de unidade a serem verificados.
+     * @return Uma lista de códigos de unidade que já estão em um processo ativo.
+     */
+    @Query("SELECT up.unidade.codigo FROM UnidadeProcesso up " +
+           "WHERE up.processo.situacao = 'EM_ANDAMENTO' " +
+           "AND up.unidade.codigo IN :codigosUnidades")
+    List<Long> findUnidadesInProcessosAtivos(@Param("codigosUnidades") List<Long> codigosUnidades);
 }

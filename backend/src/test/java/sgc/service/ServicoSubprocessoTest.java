@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SubprocessoServiceTest {
+public class ServicoSubprocessoTest {
 
     @Mock
     private SubprocessoRepository subprocessoRepository;
@@ -54,7 +54,7 @@ public class SubprocessoServiceTest {
     private SubprocessoMapper subprocessoMapper;
 
     @InjectMocks
-    private SubprocessoService subprocessoService;
+    private ServicoSubprocesso servicoSubprocesso;
 
     @Test
     void casoFeliz_retornaDetalhesComMovimentacoesEElementos() {
@@ -82,17 +82,11 @@ public class SubprocessoServiceTest {
         sp.setDataLimiteEtapa1(LocalDate.of(2025, 12, 31));
 
         Movimentacao mov = mock(Movimentacao.class);
-        // No need to stub mov's methods directly if we are stubbing the mapper
-        // when(mov.getCodigo()).thenReturn(500L);
-        // when(mov.getDataHora()).thenReturn(LocalDateTime.now());
-        // when(mov.getDescricao()).thenReturn("Mov desc");
-        // when(mov.getUnidadeOrigem()).thenReturn(null);
-
         MovimentacaoDTO movDto = new MovimentacaoDTO(
                 500L,
                 LocalDateTime.now(),
-                null, null, null, // unidadeOrigem
-                unidade.getCodigo(), unidade.getSigla(), unidade.getNome(), // unidadeDestino
+                null, null, null,
+                unidade.getCodigo(), unidade.getSigla(), unidade.getNome(),
                 "Mov desc"
         );
 
@@ -108,12 +102,12 @@ public class SubprocessoServiceTest {
 
         when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(sp));
         when(movimentacaoRepository.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(mov));
-        when(movimentacaoMapper.toDTO(any(Movimentacao.class))).thenReturn(movDto); // Stub the mapper
+        when(movimentacaoMapper.toDTO(any(Movimentacao.class))).thenReturn(movDto);
         when(atividadeRepository.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
         when(conhecimentoRepository.findAll()).thenReturn(List.of(kc));
 
         // Act
-        SubprocessoDetalheDTO dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
+        SubprocessoDetalheDTO dto = servicoSubprocesso.obterDetalhes(spId, "ADMIN", null);
 
         // Assert
         assertNotNull(dto);
@@ -122,9 +116,8 @@ public class SubprocessoServiceTest {
         assertEquals("EM_ANDAMENTO", dto.getSituacao());
         assertNotNull(dto.getMovimentacoes());
         assertEquals(1, dto.getMovimentacoes().size());
-        assertEquals(movDto.getCodigo(), dto.getMovimentacoes().get(0).getCodigo()); // Verify movDto is used
+        assertEquals(movDto.getCodigo(), dto.getMovimentacoes().get(0).getCodigo());
         assertNotNull(dto.getElementosDoProcesso());
-        // deve conter pelo menos a atividade e o conhecimento como elementos
         boolean temAtividade = dto.getElementosDoProcesso().stream().anyMatch(e -> "ATIVIDADE".equals(e.getTipo()));
         boolean temConhecimento = dto.getElementosDoProcesso().stream().anyMatch(e -> "CONHECIMENTO".equals(e.getTipo()));
         assertTrue(temAtividade, "Esperado elemento do tipo ATIVIDADE");
@@ -135,7 +128,7 @@ public class SubprocessoServiceTest {
     void casoNaoEncontrado_lancaDomainNotFoundException() {
         Long id = 99L;
         when(subprocessoRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.obterDetalhes(id, "ADMIN", null));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> servicoSubprocesso.obterDetalhes(id, "ADMIN", null));
     }
 
     @Test
@@ -149,8 +142,7 @@ public class SubprocessoServiceTest {
 
         when(subprocessoRepository.findById(spId)).thenReturn(Optional.of(sp));
 
-        // usuário gestor com unidade diferente
         Long unidadeUsuario = 99L;
-        assertThrows(ErroDominioAccessoNegado.class, () -> subprocessoService.obterDetalhes(spId, "GESTOR", unidadeUsuario));
+        assertThrows(ErroDominioAccessoNegado.class, () -> servicoSubprocesso.obterDetalhes(spId, "GESTOR", unidadeUsuario));
     }
 }

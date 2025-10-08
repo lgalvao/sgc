@@ -33,19 +33,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Testes unitários para ProcessoService.obterDetalhes(...).
+ * Testes unitários para ServicoProcesso.obterDetalhes(...).
  */
-public class ProcessoServiceDetalhesTest {
-    private ProcessoRepository processoRepository;
+public class ServicoProcessoDetalhesTest {
+    private RepositorioProcesso repositorioProcesso;
     private UnidadeProcessoRepository unidadeProcessoRepository;
     private SubprocessoRepository subprocessoRepository;
     private ProcessoDetalheMapper processoDetalheMapper;
 
-    private ProcessoService servico;
+    private ServicoProcesso servico;
 
     @BeforeEach
     public void setup() {
-        processoRepository = mock(ProcessoRepository.class);
+        repositorioProcesso = mock(RepositorioProcesso.class);
         UnidadeRepository unidadeRepository = mock(UnidadeRepository.class);
         unidadeProcessoRepository = mock(UnidadeProcessoRepository.class);
         subprocessoRepository = mock(SubprocessoRepository.class);
@@ -60,8 +60,8 @@ public class ProcessoServiceDetalhesTest {
         ProcessoMapper processoMapper = mock(ProcessoMapper.class);
         processoDetalheMapper = mock(ProcessoDetalheMapper.class);
 
-        servico = new ProcessoService(
-                processoRepository,
+        servico = new ServicoProcesso(
+                repositorioProcesso,
                 unidadeRepository,
                 unidadeProcessoRepository,
                 subprocessoRepository,
@@ -122,9 +122,10 @@ public class ProcessoServiceDetalhesTest {
                 List.of(unidadeParticipanteDTO),
                 List.of(processoResumoDTO));
 
-        when(processoRepository.findById(1L)).thenReturn(Optional.of(p));
+        when(repositorioProcesso.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeProcessoRepository.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepository.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+        when(subprocessoRepository.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
         Mockito.lenient().when(processoDetalheMapper.toDetailDTO(eq(p), anyList(), anyList()))
                 .thenReturn(processoDetalheDTO);
 
@@ -148,19 +149,8 @@ public class ProcessoServiceDetalhesTest {
         p.setCodigo(2L);
         p.setDescricao("Proc Teste 2");
 
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(99L);
-        unidade.setSigla("OX");
-        unidade.setNome("Outra");
-
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(200L);
-        sp.setUnidade(unidade);
-        sp.setSituacaoId("PENDENTE");
-
-        when(processoRepository.findById(2L)).thenReturn(Optional.of(p));
-        when(unidadeProcessoRepository.findByProcessoCodigo(2L)).thenReturn(List.of());
-        when(subprocessoRepository.findByProcessoCodigoWithUnidade(2L)).thenReturn(List.of(sp));
+        when(repositorioProcesso.findById(2L)).thenReturn(Optional.of(p));
+        when(subprocessoRepository.existsByProcessoCodigoAndUnidadeCodigo(2L, 10L)).thenReturn(false);
 
         // Act & Assert
         assertThrows(ErroDominioAccessoNegado.class, () -> servico.obterDetalhes(2L, "GESTOR", 10L));

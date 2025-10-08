@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PainelService {
-    private final ProcessoRepository processoRepository;
+    private final RepositorioProcesso repositorioProcesso;
     private final AlertaRepository alertaRepository;
     private final UnidadeProcessoRepository unidadeProcessoRepository;
 
@@ -49,7 +49,7 @@ public class PainelService {
         }
 
         // Obter todos os processos (simplificação para testes)
-        List<Processo> todosOsProcessos = processoRepository.findAll();
+        List<Processo> todosOsProcessos = repositorioProcesso.findAll();
 
         // Aplicar filtro por perfil e unidade
         List<Processo> processosFiltrados = new ArrayList<>();

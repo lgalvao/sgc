@@ -36,4 +36,12 @@ public class UnidadeMapa extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mapa_vigente_codigo", insertable = false, updatable = false)
     private Mapa mapaVigente;
+
+    /**
+     * Construtor de conveniência para criar uma nova associação entre Unidade e Mapa.
+     * @param unidadeCodigo O código da unidade.
+     */
+    public UnidadeMapa(Long unidadeCodigo) {
+        this.unidadeCodigo = unidadeCodigo;
+    }
 }

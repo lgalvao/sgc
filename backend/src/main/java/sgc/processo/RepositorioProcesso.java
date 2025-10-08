@@ -9,7 +9,7 @@ import java.util.List;
  * Repositório JPA para a entidade Processo.
  */
 @Repository
-public interface ProcessoRepository extends JpaRepository<Processo, Long> {
+public interface RepositorioProcesso extends JpaRepository<Processo, Long> {
     /**
      * Busca processos por situação.
      *
