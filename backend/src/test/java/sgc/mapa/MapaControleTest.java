@@ -56,8 +56,7 @@ public class MapaControleTest {
     void listar_DeveRetornarListaDeMapas() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        MapaDto mapaDto = new MapaDto();
-        mapaDto.setCodigo(1L);
+        MapaDto mapaDto = new MapaDto(1L, null, null, null, null, null);
 
         when(repositorioMapa.findAll()).thenReturn(List.of(mapa));
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
@@ -71,8 +70,7 @@ public class MapaControleTest {
     void obterPorId_QuandoMapaExiste_DeveRetornarOk() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        MapaDto mapaDto = new MapaDto();
-        mapaDto.setCodigo(1L);
+        MapaDto mapaDto = new MapaDto(1L, null, null, null, null, null);
 
         when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
@@ -92,8 +90,7 @@ public class MapaControleTest {
 
     @Test
     void criar_ComDadosValidos_DeveRetornarCreated() throws Exception {
-        MapaDto mapaDto = new MapaDto();
-        mapaDto.setCodigo(1L);
+        MapaDto mapaDto = new MapaDto(1L, null, null, null, null, null);
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
@@ -110,8 +107,7 @@ public class MapaControleTest {
 
     @Test
     void atualizar_QuandoMapaExiste_DeveRetornarOk() throws Exception {
-        MapaDto mapaDto = new MapaDto();
-        mapaDto.setCodigo(1L);
+        MapaDto mapaDto = new MapaDto(1L, null, null, null, null, null);
         Mapa mapaExistente = new Mapa();
         mapaExistente.setCodigo(1L);
 
@@ -128,8 +124,7 @@ public class MapaControleTest {
 
     @Test
     void atualizar_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        MapaDto mapaDto = new MapaDto();
-        mapaDto.setCodigo(1L);
+        MapaDto mapaDto = new MapaDto(1L, null, null, null, null, null);
 
         when(repositorioMapa.findById(1L)).thenReturn(Optional.empty());
 
