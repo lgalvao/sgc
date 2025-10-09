@@ -35,19 +35,24 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class SubprocessoServiceActionsTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
+
     @Mock
     private AnaliseCadastroRepo analiseCadastroRepo;
+
     @Mock
     private AnaliseValidacaoRepo analiseValidacaoRepo;
+
     @Mock
     private NotificacaoService notificacaoService;
+
     @Mock
     private AlertaRepo alertaRepo;
+
     @Mock
     private SubprocessoMapper subprocessoMapper;
 

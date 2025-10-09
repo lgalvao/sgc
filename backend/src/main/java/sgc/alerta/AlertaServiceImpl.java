@@ -8,10 +8,12 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;
 import sgc.alerta.modelo.AlertaUsuarioRepo;
+import sgc.comum.modelo.UsuarioRepo;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.dto.UsuarioDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -36,6 +38,7 @@ public class AlertaServiceImpl implements AlertaService {
     private final AlertaUsuarioRepo repositorioAlertaUsuario;
     private final UnidadeRepo repositorioUnidade;
     private final SgrhService servicoSgrh;
+    private final sgc.comum.modelo.UsuarioRepo usuarioRepo;
     
     @Override
     @Transactional
@@ -71,11 +74,11 @@ public class AlertaServiceImpl implements AlertaService {
             
             if (responsavel.isPresent() && responsavel.get().titularTitulo() != null) {
                 // Criar AlertaUsuario para o titular
-                criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo());
+                criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo(), codigoUnidadeDestino);
                 
                 // Se houver substituto, também o adiciona
                 if (responsavel.get().substitutoTitulo() != null) {
-                    criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo());
+                    criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codigoUnidadeDestino);
                 }
             } else {
                 log.warn("Responsável não encontrado para a unidade {}", codigoUnidadeDestino);
@@ -93,19 +96,13 @@ public class AlertaServiceImpl implements AlertaService {
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(
             Processo processo,
+            List<Long> codigosUnidades,
             List<Subprocesso> subprocessos) {
         
-        log.info("Criando alertas para processo iniciado: {} subprocessos", subprocessos.size());
+        log.info("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
         List<Alerta> alertasCriados = new ArrayList<>();
         
-        for (Subprocesso subprocesso : subprocessos) {
-            if (subprocesso.getUnidade() == null) {
-                log.warn("Subprocesso sem unidade: {}", subprocesso.getCodigo());
-                continue;
-            }
-            
-            Long codigoUnidade = subprocesso.getUnidade().getCodigo();
-            
+        for (Long codigoUnidade : codigosUnidades) {
             try {
                 // Buscar tipo da unidade via SGRH
                 Optional<UnidadeDto> unidadeDtoOptional = servicoSgrh.buscarUnidadePorCodigo(codigoUnidade);
@@ -117,7 +114,12 @@ public class AlertaServiceImpl implements AlertaService {
                 
                 String tipoUnidade = unidadeDtoOptional.get().tipo();
                 String nomeProcesso = processo.getDescricao();
-                LocalDate dataLimite = subprocesso.getDataLimiteEtapa1();
+                // Encontrar o subprocesso correspondente para obter a data limite
+                LocalDate dataLimite = subprocessos.stream()
+                    .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codigoUnidade))
+                    .map(Subprocesso::getDataLimiteEtapa1)
+                    .findFirst()
+                    .orElse(processo.getDataLimite()); // Fallback para a data limite do processo se não encontrar subprocesso
                 
                 // Criar alertas baseados no tipo de unidade
                 if ("OPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
@@ -147,6 +149,7 @@ public class AlertaServiceImpl implements AlertaService {
                             nomeProcesso,
                             formatarData(dataLimite)
                     );
+                    log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_OP: {}", descOperacional);
                     Alerta alertaOperacional = criarAlerta(processo, "PROCESSO_INICIADO_INTEROPERACIONAL_OP", codigoUnidade, descOperacional, dataLimite);
                     alertasCriados.add(alertaOperacional);
                     
@@ -156,6 +159,7 @@ public class AlertaServiceImpl implements AlertaService {
                             nomeProcesso,
                             formatarData(dataLimite)
                     );
+                    log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_INT: {}", descIntermediaria);
                     Alerta alertaIntermediaria = criarAlerta(processo, "PROCESSO_INICIADO_INTEROPERACIONAL_INT", codigoUnidade, descIntermediaria, dataLimite);
                     alertasCriados.add(alertaIntermediaria);
                     
@@ -164,7 +168,7 @@ public class AlertaServiceImpl implements AlertaService {
                 }
                 
             } catch (Exception e) {
-                log.error("Erro ao criar alerta para o subprocesso {}: {}", subprocesso.getCodigo(), e.getMessage(), e);
+                log.error("Erro ao criar alerta para a unidade {}: {}", codigoUnidade, e.getMessage(), e);
             }
         }
         
@@ -210,14 +214,32 @@ public class AlertaServiceImpl implements AlertaService {
         return criarAlerta(processo, "CADASTRO_DEVOLVIDO", codigoUnidadeDestino, descricao, null);
     }
     
-    private void criarAlertaUsuario(Alerta alerta, String usuarioTitulo) {
+    private void criarAlertaUsuario(Alerta alerta, String usuarioTitulo, Long codigoUnidade) {
         try {
+            sgc.comum.modelo.Usuario usuario = usuarioRepo.findById(usuarioTitulo)
+                    .orElseGet(() -> {
+                        log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH...", usuarioTitulo);
+                        return servicoSgrh.buscarUsuarioPorTitulo(usuarioTitulo)
+                                .map(usuarioDto -> {
+                                    sgc.comum.modelo.Usuario novoUsuario = new sgc.comum.modelo.Usuario();
+                                    novoUsuario.setTitulo(usuarioDto.titulo());
+                                    novoUsuario.setNome(usuarioDto.nome());
+                                    novoUsuario.setEmail(usuarioDto.email());
+                                    novoUsuario.setRamal(null);
+                                    repositorioUnidade.findById(codigoUnidade).ifPresent(novoUsuario::setUnidade);
+                                    sgc.comum.modelo.Usuario savedUsuario = usuarioRepo.save(novoUsuario);
+                                    return usuarioRepo.findById(savedUsuario.getTitulo()).orElseThrow(); // Re-fetch to ensure it's fully managed
+                                })
+                                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado no SGRH: " + usuarioTitulo));
+                    });
+
             AlertaUsuario alertaUsuario = new AlertaUsuario();
             AlertaUsuario.Chave id = new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo);
             alertaUsuario.setId(id);
             alertaUsuario.setAlerta(alerta);
+            alertaUsuario.setUsuario(usuario); // Definir o usuário
             alertaUsuario.setDataHoraLeitura(null); // Não lido
-            
+
             repositorioAlertaUsuario.save(alertaUsuario);
             log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), usuarioTitulo);
         } catch (Exception e) {

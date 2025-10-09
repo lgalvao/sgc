@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomExceptionsTest {
-
     @Test
     @DisplayName("Deve instanciar ErroDominioAccessoNegado")
     void testErroDominioAccessoNegado() {

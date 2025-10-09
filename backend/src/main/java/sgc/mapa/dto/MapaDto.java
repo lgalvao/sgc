@@ -1,24 +1,15 @@
 package sgc.mapa.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 /**
  * DTO para Mapa usado nas APIs.
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class MapaDto {
-    private Long codigo;
-    private LocalDateTime dataHoraDisponibilizado;
-    private String observacoesDisponibilizacao;
-    private Boolean sugestoesApresentadas;
-    private LocalDateTime dataHoraHomologado;
-    private String sugestoes;
-}
+public record MapaDto(
+    Long codigo,
+    LocalDateTime dataHoraDisponibilizado,
+    String observacoesDisponibilizacao,
+    Boolean sugestoesApresentadas,
+    LocalDateTime dataHoraHomologado,
+    String sugestoes
+) {}

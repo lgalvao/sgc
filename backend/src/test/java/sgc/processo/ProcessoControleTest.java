@@ -3,12 +3,11 @@ package sgc.processo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.comum.erros.ErroDominioAccessoNegado;
@@ -29,10 +28,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(ProcessoControle.class)
 public class ProcessoControleTest {
-
-    @Mock
+    @MockitoBean
     private ProcessoService processoService;
 
     @Captor
@@ -68,8 +66,8 @@ public class ProcessoControleTest {
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/processos/1"))
                 .andExpect(jsonPath("$.codigo").value(1L))
@@ -89,8 +87,8 @@ public class ProcessoControleTest {
         req.setUnidades(List.of(1L));
 
         mockMvc.perform(post("/api/processos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -135,8 +133,8 @@ public class ProcessoControleTest {
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
         mockMvc.perform(put("/api/processos/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L))
                 .andExpect(jsonPath("$.descricao").value("Processo Atualizado"));
@@ -152,12 +150,12 @@ public class ProcessoControleTest {
         req.setDescricao("Teste");
         req.setTipo("MAPEAMENTO");
         req.setUnidades(List.of(1L));
-        
+
         doThrow(new IllegalArgumentException()).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
         mockMvc.perform(put("/api/processos/999")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound());
     }
 
@@ -167,12 +165,12 @@ public class ProcessoControleTest {
         req.setDescricao("Teste");
         req.setTipo("MAPEAMENTO");
         req.setUnidades(List.of(1L));
-        
+
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
         mockMvc.perform(put("/api/processos/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -241,8 +239,8 @@ public class ProcessoControleTest {
         when(processoService.iniciarProcessoMapeamento(eq(1L), any(List.class))).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos/1/iniciar")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(List.of(1L))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
 
@@ -258,8 +256,8 @@ public class ProcessoControleTest {
         when(processoService.iniciarProcessoRevisao(eq(1L), any(List.class))).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos/1/iniciar?tipo=REVISAO")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(List.of(1L))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
 
@@ -271,8 +269,8 @@ public class ProcessoControleTest {
         doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), any(List.class));
 
         mockMvc.perform(post("/api/processos/999/iniciar")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(List.of(1L))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isBadRequest());
     }
 

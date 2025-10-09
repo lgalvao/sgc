@@ -14,18 +14,21 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AlertaServiceImplTest {
-
     @Mock
     private AlertaUsuarioRepo alertaUsuarioRepo;
+
     @Mock
     private sgc.alerta.modelo.AlertaRepo alertaRepo;
+
     @Mock
     private sgc.unidade.modelo.UnidadeRepo unidadeRepo;
+
     @Mock
     private sgc.sgrh.SgrhService sgrhService;
 

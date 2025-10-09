@@ -9,11 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class EventosTest {
-
     @Test
     void processoCriadoEvento_Getters() {
         ProcessoCriadoEvento evento = new ProcessoCriadoEvento(this, 1L);
-        
+
         assertEquals(1L, evento.getIdProcesso());
         assertEquals(this, evento.getSource());
     }
@@ -21,7 +20,7 @@ class EventosTest {
     @Test
     void processoFinalizadoEvento_Getters() {
         ProcessoFinalizadoEvento evento = new ProcessoFinalizadoEvento(this, 1L);
-        
+
         assertEquals(1L, evento.getIdProcesso());
         assertEquals(this, evento.getSource());
     }
@@ -29,9 +28,9 @@ class EventosTest {
     @Test
     void processoIniciadoEvento_Getters() {
         ProcessoIniciadoEvento evento = new ProcessoIniciadoEvento(
-            1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L)
+                1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L)
         );
-        
+
         assertEquals(1L, evento.idProcesso());
         assertEquals("MAPEAMENTO", evento.tipo());
         assertNotNull(evento.dataHoraInicio());
@@ -41,7 +40,7 @@ class EventosTest {
     @Test
     void subprocessoDisponibilizadoEvento_Getters() {
         SubprocessoDisponibilizadoEvento evento = new SubprocessoDisponibilizadoEvento(1L);
-        
+
         assertEquals(1L, evento.idSubprocesso());
     }
 }

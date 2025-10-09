@@ -1,5 +1,6 @@
 package sgc.subprocesso.dto;
 
+import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 import sgc.subprocesso.modelo.Movimentacao;
@@ -7,7 +8,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -19,17 +20,27 @@ public class MovimentacaoMapperImpl implements MovimentacaoMapper {
             return null;
         }
 
-        MovimentacaoDto movimentacaoDto = new MovimentacaoDto();
+        Long unidadeOrigemCodigo = null;
+        String unidadeOrigemSigla = null;
+        String unidadeOrigemNome = null;
+        Long unidadeDestinoCodigo = null;
+        String unidadeDestinoSigla = null;
+        String unidadeDestinoNome = null;
+        Long codigo = null;
+        LocalDateTime dataHora = null;
+        String descricao = null;
 
-        movimentacaoDto.setUnidadeOrigemCodigo( movimentacaoUnidadeOrigemCodigo( movimentacao ) );
-        movimentacaoDto.setUnidadeOrigemSigla( movimentacaoUnidadeOrigemSigla( movimentacao ) );
-        movimentacaoDto.setUnidadeOrigemNome( movimentacaoUnidadeOrigemNome( movimentacao ) );
-        movimentacaoDto.setUnidadeDestinoCodigo( movimentacaoUnidadeDestinoCodigo( movimentacao ) );
-        movimentacaoDto.setUnidadeDestinoSigla( movimentacaoUnidadeDestinoSigla( movimentacao ) );
-        movimentacaoDto.setUnidadeDestinoNome( movimentacaoUnidadeDestinoNome( movimentacao ) );
-        movimentacaoDto.setCodigo( movimentacao.getCodigo() );
-        movimentacaoDto.setDataHora( movimentacao.getDataHora() );
-        movimentacaoDto.setDescricao( movimentacao.getDescricao() );
+        unidadeOrigemCodigo = movimentacaoUnidadeOrigemCodigo( movimentacao );
+        unidadeOrigemSigla = movimentacaoUnidadeOrigemSigla( movimentacao );
+        unidadeOrigemNome = movimentacaoUnidadeOrigemNome( movimentacao );
+        unidadeDestinoCodigo = movimentacaoUnidadeDestinoCodigo( movimentacao );
+        unidadeDestinoSigla = movimentacaoUnidadeDestinoSigla( movimentacao );
+        unidadeDestinoNome = movimentacaoUnidadeDestinoNome( movimentacao );
+        codigo = movimentacao.getCodigo();
+        dataHora = movimentacao.getDataHora();
+        descricao = movimentacao.getDescricao();
+
+        MovimentacaoDto movimentacaoDto = new MovimentacaoDto( codigo, dataHora, unidadeOrigemCodigo, unidadeOrigemSigla, unidadeOrigemNome, unidadeDestinoCodigo, unidadeDestinoSigla, unidadeDestinoNome, descricao );
 
         return movimentacaoDto;
     }

@@ -7,7 +7,7 @@ import sgc.conhecimento.modelo.Conhecimento;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -19,11 +19,15 @@ public class ConhecimentoMapperImpl implements ConhecimentoMapper {
             return null;
         }
 
-        ConhecimentoDto conhecimentoDto = new ConhecimentoDto();
+        Long atividadeCodigo = null;
+        Long codigo = null;
+        String descricao = null;
 
-        conhecimentoDto.setAtividadeCodigo( conhecimentoAtividadeCodigo( conhecimento ) );
-        conhecimentoDto.setCodigo( conhecimento.getCodigo() );
-        conhecimentoDto.setDescricao( conhecimento.getDescricao() );
+        atividadeCodigo = conhecimentoAtividadeCodigo( conhecimento );
+        codigo = conhecimento.getCodigo();
+        descricao = conhecimento.getDescricao();
+
+        ConhecimentoDto conhecimentoDto = new ConhecimentoDto( codigo, atividadeCodigo, descricao );
 
         return conhecimentoDto;
     }
@@ -36,9 +40,9 @@ public class ConhecimentoMapperImpl implements ConhecimentoMapper {
 
         Conhecimento conhecimento = new Conhecimento();
 
-        conhecimento.setAtividade( map( conhecimentoDTO.getAtividadeCodigo() ) );
-        conhecimento.setCodigo( conhecimentoDTO.getCodigo() );
-        conhecimento.setDescricao( conhecimentoDTO.getDescricao() );
+        conhecimento.setAtividade( map( conhecimentoDTO.atividadeCodigo() ) );
+        conhecimento.setCodigo( conhecimentoDTO.codigo() );
+        conhecimento.setDescricao( conhecimentoDTO.descricao() );
 
         return conhecimento;
     }

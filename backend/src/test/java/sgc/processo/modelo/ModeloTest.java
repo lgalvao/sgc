@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ModeloTest {
-
     @Test
     void processo_GettersAndSetters() {
         Processo processo = new Processo();

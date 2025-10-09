@@ -56,15 +56,15 @@ public class ProcessoService {
 
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
-        if (requisicao.getDescricao() == null || requisicao.getDescricao().isBlank()) {
+        if (requisicao.descricao() == null || requisicao.descricao().isBlank()) {
             throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
         }
-        if (requisicao.getUnidades() == null || requisicao.getUnidades().isEmpty()) {
+        if (requisicao.unidades() == null || requisicao.unidades().isEmpty()) {
             throw new ConstraintViolationException("Pelo menos uma unidade participante deve ser selecionada.", null);
         }
 
-        if ("REVISAO".equalsIgnoreCase(requisicao.getTipo()) || "DIAGNOSTICO".equalsIgnoreCase(requisicao.getTipo())) {
-            for (Long codigoUnidade : requisicao.getUnidades()) {
+        if ("REVISAO".equalsIgnoreCase(requisicao.tipo()) || "DIAGNOSTICO".equalsIgnoreCase(requisicao.tipo())) {
+            for (Long codigoUnidade : requisicao.unidades()) {
                 if (unidadeRepo.findById(codigoUnidade).isEmpty()) {
                     throw new ErroEntidadeNaoEncontrada("Unidade com código " + codigoUnidade + " não foi encontrada.");
                 }
@@ -72,9 +72,9 @@ public class ProcessoService {
         }
 
         Processo processo = new Processo();
-        processo.setDescricao(requisicao.getDescricao());
-        processo.setTipo(requisicao.getTipo());
-        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+        processo.setDescricao(requisicao.descricao());
+        processo.setTipo(requisicao.tipo());
+        processo.setDataLimite(requisicao.dataLimiteEtapa1());
         processo.setSituacao("CRIADO");
         processo.setDataCriacao(LocalDateTime.now());
 
@@ -95,9 +95,9 @@ public class ProcessoService {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
-        processo.setDescricao(requisicao.getDescricao());
-        processo.setTipo(requisicao.getTipo());
-        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+        processo.setDescricao(requisicao.descricao());
+        processo.setTipo(requisicao.tipo());
+        processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
         Processo processoAtualizado = processoRepo.save(processo);
         log.info("Processo {} atualizado com sucesso.", id);
@@ -277,14 +277,15 @@ public class ProcessoService {
 
     private void validarUnidadesComMapasVigentes(List<Long> codigosUnidades) {
         for (Long codigoUnidade : codigosUnidades) {
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com código " + codigoUnidade + " não foi encontrada ao validar mapas vigentes."));
+
             boolean hasMapaVigente = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
                 .map(UnidadeMapa::getMapaVigenteCodigo).isPresent();
 
             if (!hasMapaVigente) {
-                Unidade unidade = unidadeRepo.findById(codigoUnidade).orElse(null);
-                String sigla = unidade != null ? unidade.getSigla() : "Código " + codigoUnidade;
                 throw new ErroProcesso(String.format(
-                    "A unidade %s não possui mapa vigente e não pode participar de um processo de revisão.", sigla
+                    "A unidade %s não possui mapa vigente e não pode participar de um processo de revisão.", unidade.getSigla()
                 ));
             }
         }

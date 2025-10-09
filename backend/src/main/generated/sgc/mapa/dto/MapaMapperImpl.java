@@ -1,12 +1,13 @@
 package sgc.mapa.dto;
 
+import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 import sgc.mapa.modelo.Mapa;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -18,14 +19,21 @@ public class MapaMapperImpl implements MapaMapper {
             return null;
         }
 
-        MapaDto mapaDto = new MapaDto();
+        Long codigo = null;
+        LocalDateTime dataHoraDisponibilizado = null;
+        String observacoesDisponibilizacao = null;
+        Boolean sugestoesApresentadas = null;
+        LocalDateTime dataHoraHomologado = null;
+        String sugestoes = null;
 
-        mapaDto.setCodigo( mapa.getCodigo() );
-        mapaDto.setDataHoraDisponibilizado( mapa.getDataHoraDisponibilizado() );
-        mapaDto.setObservacoesDisponibilizacao( mapa.getObservacoesDisponibilizacao() );
-        mapaDto.setSugestoesApresentadas( mapa.getSugestoesApresentadas() );
-        mapaDto.setDataHoraHomologado( mapa.getDataHoraHomologado() );
-        mapaDto.setSugestoes( mapa.getSugestoes() );
+        codigo = mapa.getCodigo();
+        dataHoraDisponibilizado = mapa.getDataHoraDisponibilizado();
+        observacoesDisponibilizacao = mapa.getObservacoesDisponibilizacao();
+        sugestoesApresentadas = mapa.getSugestoesApresentadas();
+        dataHoraHomologado = mapa.getDataHoraHomologado();
+        sugestoes = mapa.getSugestoes();
+
+        MapaDto mapaDto = new MapaDto( codigo, dataHoraDisponibilizado, observacoesDisponibilizacao, sugestoesApresentadas, dataHoraHomologado, sugestoes );
 
         return mapaDto;
     }
@@ -38,12 +46,12 @@ public class MapaMapperImpl implements MapaMapper {
 
         Mapa mapa = new Mapa();
 
-        mapa.setCodigo( mapaDto.getCodigo() );
-        mapa.setDataHoraDisponibilizado( mapaDto.getDataHoraDisponibilizado() );
-        mapa.setObservacoesDisponibilizacao( mapaDto.getObservacoesDisponibilizacao() );
-        mapa.setSugestoes( mapaDto.getSugestoes() );
-        mapa.setSugestoesApresentadas( mapaDto.getSugestoesApresentadas() );
-        mapa.setDataHoraHomologado( mapaDto.getDataHoraHomologado() );
+        mapa.setCodigo( mapaDto.codigo() );
+        mapa.setDataHoraDisponibilizado( mapaDto.dataHoraDisponibilizado() );
+        mapa.setObservacoesDisponibilizacao( mapaDto.observacoesDisponibilizacao() );
+        mapa.setSugestoes( mapaDto.sugestoes() );
+        mapa.setSugestoesApresentadas( mapaDto.sugestoesApresentadas() );
+        mapa.setDataHoraHomologado( mapaDto.dataHoraHomologado() );
 
         return mapa;
     }

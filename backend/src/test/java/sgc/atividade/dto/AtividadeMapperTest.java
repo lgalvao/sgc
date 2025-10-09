@@ -26,9 +26,9 @@ class AtividadeMapperTest {
         AtividadeDto dto = mapper.toDTO(atividade);
 
         // Verify mapping
-        assertEquals(1L, dto.getCodigo());
-        assertEquals(100L, dto.getMapaCodigo());
-        assertEquals("Test Description", dto.getDescricao());
+        assertEquals(1L, dto.codigo());
+        assertEquals(100L, dto.mapaCodigo());
+        assertEquals("Test Description", dto.descricao());
     }
 
     @Test

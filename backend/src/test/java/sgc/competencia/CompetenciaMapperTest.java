@@ -10,7 +10,6 @@ import sgc.mapa.modelo.Mapa;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompetenciaMapperTest {
-
     private final CompetenciaMapper mapper = Mappers.getMapper(CompetenciaMapper.class);
 
     @Test

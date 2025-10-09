@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
  * Cobrem criar, listar e remover análises de cadastro.
  */
 public class AnaliseCadastroServiceImplTest {
-
     private AnaliseCadastroRepo analiseCadastroRepo;
     private SubprocessoRepo subprocessoRepo;
     private AnaliseCadastroServiceImpl service;

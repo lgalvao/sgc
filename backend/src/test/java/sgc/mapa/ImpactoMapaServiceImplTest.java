@@ -26,15 +26,18 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceImplTest {
-
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
+
     @Mock
     private MapaRepo repositorioMapa;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private CompetenciaRepo repositorioCompetencia;
+
     @Mock
     private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 

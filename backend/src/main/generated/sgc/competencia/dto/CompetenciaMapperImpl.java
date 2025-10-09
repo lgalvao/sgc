@@ -7,7 +7,7 @@ import sgc.mapa.modelo.Mapa;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -19,11 +19,15 @@ public class CompetenciaMapperImpl implements CompetenciaMapper {
             return null;
         }
 
-        CompetenciaDto competenciaDto = new CompetenciaDto();
+        Long mapaCodigo = null;
+        Long codigo = null;
+        String descricao = null;
 
-        competenciaDto.setMapaCodigo( competenciaMapaCodigo( competencia ) );
-        competenciaDto.setCodigo( competencia.getCodigo() );
-        competenciaDto.setDescricao( competencia.getDescricao() );
+        mapaCodigo = competenciaMapaCodigo( competencia );
+        codigo = competencia.getCodigo();
+        descricao = competencia.getDescricao();
+
+        CompetenciaDto competenciaDto = new CompetenciaDto( codigo, mapaCodigo, descricao );
 
         return competenciaDto;
     }
@@ -36,9 +40,9 @@ public class CompetenciaMapperImpl implements CompetenciaMapper {
 
         Competencia competencia = new Competencia();
 
-        competencia.setMapa( map( competenciaDTO.getMapaCodigo() ) );
-        competencia.setCodigo( competenciaDTO.getCodigo() );
-        competencia.setDescricao( competenciaDTO.getDescricao() );
+        competencia.setMapa( map( competenciaDTO.mapaCodigo() ) );
+        competencia.setCodigo( competenciaDTO.codigo() );
+        competencia.setDescricao( competenciaDTO.descricao() );
 
         return competencia;
     }

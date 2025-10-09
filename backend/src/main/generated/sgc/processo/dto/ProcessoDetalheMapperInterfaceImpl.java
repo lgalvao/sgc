@@ -1,5 +1,8 @@
 package sgc.processo.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 import sgc.processo.modelo.Processo;
@@ -9,7 +12,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -21,15 +24,26 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        ProcessoDetalheDto processoDetalheDto = new ProcessoDetalheDto();
+        Long codigo = null;
+        String descricao = null;
+        String tipo = null;
+        String situacao = null;
+        LocalDate dataLimite = null;
+        LocalDateTime dataCriacao = null;
+        LocalDateTime dataFinalizacao = null;
 
-        processoDetalheDto.setCodigo( processo.getCodigo() );
-        processoDetalheDto.setDescricao( processo.getDescricao() );
-        processoDetalheDto.setTipo( processo.getTipo() );
-        processoDetalheDto.setSituacao( processo.getSituacao() );
-        processoDetalheDto.setDataLimite( processo.getDataLimite() );
-        processoDetalheDto.setDataCriacao( processo.getDataCriacao() );
-        processoDetalheDto.setDataFinalizacao( processo.getDataFinalizacao() );
+        codigo = processo.getCodigo();
+        descricao = processo.getDescricao();
+        tipo = processo.getTipo();
+        situacao = processo.getSituacao();
+        dataLimite = processo.getDataLimite();
+        dataCriacao = processo.getDataCriacao();
+        dataFinalizacao = processo.getDataFinalizacao();
+
+        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = null;
+        List<ProcessoResumoDto> resumoSubprocessos = null;
+
+        ProcessoDetalheDto processoDetalheDto = new ProcessoDetalheDto( codigo, descricao, tipo, situacao, dataLimite, dataCriacao, dataFinalizacao, unidades, resumoSubprocessos );
 
         return processoDetalheDto;
     }
@@ -40,12 +54,21 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO();
+        Long unidadeCodigo = null;
+        String nome = null;
+        String sigla = null;
+        Long unidadeSuperiorCodigo = null;
 
-        unidadeParticipanteDTO.setUnidadeCodigo( unidadeProcesso.getUnidadeCodigo() );
-        unidadeParticipanteDTO.setNome( unidadeProcesso.getNome() );
-        unidadeParticipanteDTO.setSigla( unidadeProcesso.getSigla() );
-        unidadeParticipanteDTO.setUnidadeSuperiorCodigo( unidadeProcesso.getUnidadeSuperiorCodigo() );
+        unidadeCodigo = unidadeProcesso.getUnidadeCodigo();
+        nome = unidadeProcesso.getNome();
+        sigla = unidadeProcesso.getSigla();
+        unidadeSuperiorCodigo = unidadeProcesso.getUnidadeSuperiorCodigo();
+
+        List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
+        String situacaoSubprocesso = null;
+        LocalDate dataLimite = null;
+
+        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
 
         return unidadeParticipanteDTO;
     }
@@ -56,9 +79,19 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        ProcessoResumoDto processoResumoDto = new ProcessoResumoDto();
+        Long codigo = null;
 
-        processoResumoDto.setCodigo( subprocesso.getCodigo() );
+        codigo = subprocesso.getCodigo();
+
+        String descricao = null;
+        String situacao = null;
+        String tipo = null;
+        LocalDate dataLimite = null;
+        LocalDateTime dataCriacao = null;
+        Long unidadeCodigo = null;
+        String unidadeNome = null;
+
+        ProcessoResumoDto processoResumoDto = new ProcessoResumoDto( codigo, descricao, situacao, tipo, dataLimite, dataCriacao, unidadeCodigo, unidadeNome );
 
         return processoResumoDto;
     }
@@ -69,14 +102,23 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO();
+        Long unidadeCodigo = null;
+        String nome = null;
+        String sigla = null;
+        Long unidadeSuperiorCodigo = null;
+        String situacaoSubprocesso = null;
+        LocalDate dataLimite = null;
 
-        unidadeParticipanteDTO.setUnidadeCodigo( subprocessoUnidadeCodigo( subprocesso ) );
-        unidadeParticipanteDTO.setNome( subprocessoUnidadeNome( subprocesso ) );
-        unidadeParticipanteDTO.setSigla( subprocessoUnidadeSigla( subprocesso ) );
-        unidadeParticipanteDTO.setUnidadeSuperiorCodigo( subprocessoUnidadeUnidadeSuperiorCodigo( subprocesso ) );
-        unidadeParticipanteDTO.setSituacaoSubprocesso( subprocesso.getSituacaoId() );
-        unidadeParticipanteDTO.setDataLimite( subprocesso.getDataLimiteEtapa1() );
+        unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
+        nome = subprocessoUnidadeNome( subprocesso );
+        sigla = subprocessoUnidadeSigla( subprocesso );
+        unidadeSuperiorCodigo = subprocessoUnidadeUnidadeSuperiorCodigo( subprocesso );
+        situacaoSubprocesso = subprocesso.getSituacaoId();
+        dataLimite = subprocesso.getDataLimiteEtapa1();
+
+        List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
+
+        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
 
         return unidadeParticipanteDTO;
     }

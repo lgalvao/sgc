@@ -10,7 +10,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProcessoDetalheDtoTest {
-
     @Test
     void testProcessoDetalheDtoConstructorAndGettersSetters() {
         // Create test data
@@ -22,7 +21,6 @@ class ProcessoDetalheDtoTest {
             new ProcessoDetalheDto.UnidadeParticipanteDTO(1L, "Test Unit", "TU", 10L, "ATIVO", LocalDate.now(), new ArrayList<>());
         unidades.add(unidade);
 
-        // Test constructor with parameters
         ProcessoDetalheDto dto = new ProcessoDetalheDto(
             1L,
             "Test Description",

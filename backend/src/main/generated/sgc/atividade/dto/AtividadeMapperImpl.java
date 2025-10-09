@@ -7,7 +7,7 @@ import sgc.mapa.modelo.Mapa;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T08:37:38-0300",
+    date = "2025-10-09T14:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -19,11 +19,15 @@ public class AtividadeMapperImpl implements AtividadeMapper {
             return null;
         }
 
-        AtividadeDto atividadeDto = new AtividadeDto();
+        Long mapaCodigo = null;
+        Long codigo = null;
+        String descricao = null;
 
-        atividadeDto.setMapaCodigo( atividadeMapaCodigo( atividade ) );
-        atividadeDto.setCodigo( atividade.getCodigo() );
-        atividadeDto.setDescricao( atividade.getDescricao() );
+        mapaCodigo = atividadeMapaCodigo( atividade );
+        codigo = atividade.getCodigo();
+        descricao = atividade.getDescricao();
+
+        AtividadeDto atividadeDto = new AtividadeDto( codigo, mapaCodigo, descricao );
 
         return atividadeDto;
     }
@@ -36,9 +40,9 @@ public class AtividadeMapperImpl implements AtividadeMapper {
 
         Atividade atividade = new Atividade();
 
-        atividade.setMapa( map( atividadeDTO.getMapaCodigo() ) );
-        atividade.setCodigo( atividadeDTO.getCodigo() );
-        atividade.setDescricao( atividadeDTO.getDescricao() );
+        atividade.setMapa( map( atividadeDTO.mapaCodigo() ) );
+        atividade.setCodigo( atividadeDTO.codigo() );
+        atividade.setDescricao( atividadeDTO.descricao() );
 
         return atividade;
     }

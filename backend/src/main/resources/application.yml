@@ -55,3 +55,4 @@ logging:
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
     sgc.auth: DEBUG  # Habilita logs de debug para autenticação
+    sgc: INFO

@@ -46,6 +46,7 @@ public interface AlertaService {
      */
     List<Alerta> criarAlertasProcessoIniciado(
         Processo processo,
+        List<Long> codigosUnidades,
         List<Subprocesso> subprocessos
     );
     

@@ -75,22 +75,27 @@ public class PainelService {
         // Mapear para DTOs
         List<ProcessoResumoDto> listaDeDtos = processosFiltrados.stream()
                 .map(processo -> {
-                    ProcessoResumoDto dto = new ProcessoResumoDto();
-                    dto.setCodigo(processo.getCodigo());
-                    dto.setDescricao(processo.getDescricao());
-                    dto.setSituacao(processo.getSituacao());
-                    dto.setTipo(processo.getTipo());
-                    dto.setDataLimite(processo.getDataLimite());
-                    dto.setDataCriacao(processo.getDataCriacao());
+                    Long unidadeCodigo = null;
+                    String unidadeNome = null;
 
                     // Tentar obter uma unidade vinculada (a primeira encontrada)
                     List<UnidadeProcesso> unidadesDoProcesso = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
                     if (!unidadesDoProcesso.isEmpty()) {
                         UnidadeProcesso up = unidadesDoProcesso.getFirst();
-                        dto.setUnidadeCodigo(up.getCodigo());
-                        dto.setUnidadeNome(up.getNome());
+                        unidadeCodigo = up.getCodigo();
+                        unidadeNome = up.getNome();
                     }
-                    return dto;
+
+                    return new ProcessoResumoDto(
+                        processo.getCodigo(),
+                        processo.getDescricao(),
+                        processo.getSituacao(),
+                        processo.getTipo(),
+                        processo.getDataLimite(),
+                        processo.getDataCriacao(),
+                        unidadeCodigo,
+                        unidadeNome
+                    );
                 })
                 .collect(Collectors.toList());
 
@@ -138,15 +143,15 @@ public class PainelService {
                 .toList();
 
         List<AlertaDto> listaDeDtos = alertasFiltrados.stream().map(alerta -> {
-            AlertaDto dto = new AlertaDto();
-            dto.setCodigo(alerta.getCodigo());
-            dto.setDescricao(alerta.getDescricao());
-            dto.setDataHora(alerta.getDataHora());
-            dto.setProcessoCodigo(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null);
-            dto.setUnidadeOrigemCodigo(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null);
-            dto.setUnidadeDestinoCodigo(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null);
-            dto.setUsuarioDestinoTitulo(alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null);
-            return dto;
+            return new AlertaDto(
+                alerta.getCodigo(),
+                alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null,
+                alerta.getDescricao(),
+                alerta.getDataHora(),
+                alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
+                alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
+                alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null
+            );
         }).collect(Collectors.toList());
 
         int total = listaDeDtos.size();

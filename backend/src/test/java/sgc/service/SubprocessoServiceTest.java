@@ -1,107 +1,109 @@
 package sgc.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.analise.modelo.AnaliseCadastro;
+import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.modelo.Usuario;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
+import sgc.notificacao.NotificacaoService;
+import sgc.processo.modelo.Processo;
 import sgc.subprocesso.SubprocessoService;
-import sgc.subprocesso.dto.MovimentacaoDto;
-import sgc.subprocesso.dto.MovimentacaoMapper;
-import sgc.subprocesso.dto.SubprocessoDetalheDto;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.AnaliseCadastro;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.ConhecimentoAjusteDto;
-import sgc.subprocesso.dto.MapaAjusteDto;
-import java.util.ArrayList;
-import sgc.analise.modelo.AnaliseCadastroRepo;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.Processo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import sgc.subprocesso.dto.SubprocessoDto;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class SubprocessoServiceTest {
-
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
+
     @Mock
     private AtividadeRepo atividadeRepository;
+
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
+
     @Mock
     private MovimentacaoMapper movimentacaoMapper;
+
     @Mock
     private NotificacaoService notificacaoService;
+
     @Mock
     private AlertaRepo alertaRepo;
+
     @Mock
     private AnaliseCadastroRepo analiseCadastroRepo;
+
     @Mock
     private sgc.analise.modelo.AnaliseValidacaoRepo analiseValidacaoRepo;
+
     @Mock
     private sgc.notificacao.modelo.NotificacaoRepo repositorioNotificacao;
+
     @Mock
     private org.springframework.context.ApplicationEventPublisher applicationEventPublisher;
+
     @Mock
     private sgc.atividade.dto.AtividadeMapper atividadeMapper;
+
     @Mock
     private sgc.conhecimento.dto.ConhecimentoMapper conhecimentoMapper;
+
     @Mock
     private sgc.subprocesso.dto.SubprocessoMapper subprocessoMapper;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
+
     @Mock
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
 
     @InjectMocks
     private SubprocessoService subprocessoService;
 
-
-
     private Unidade unidadeMock;
     private Unidade unidadeSuperiorMock;
     private Subprocesso subprocessoMock;
-    private Processo processoMock;
 
     void setupBasico() {
-        processoMock = mock(Processo.class);
+        Processo processoMock = mock(Processo.class);
         when(processoMock.getDescricao()).thenReturn("Processo de Teste");
 
         unidadeSuperiorMock = mock(Unidade.class);
@@ -127,7 +129,6 @@ public class SubprocessoServiceTest {
             return dto;
         });
     }
-
 
     @Test
     void casoFeliz_retornaDetalhesComMovimentacoesEElementos() {

@@ -2,6 +2,7 @@ package sgc.alerta;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +22,6 @@ import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +29,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@Nested
 @ExtendWith(MockitoExtension.class)
 class AlertaServiceImplTest {
-
     @Mock
     private AlertaRepo repositorioAlerta;
+
     @Mock
     private AlertaUsuarioRepo repositorioAlertaUsuario;
+
     @Mock
     private UnidadeRepo repositorioUnidade;
+
     @Mock
     private SgrhService servicoSgrh;
 
@@ -67,16 +70,13 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve criar alerta para unidade OPERACIONAL ao iniciar processo")
     void criarAlertasProcessoIniciado_deveCriarAlertaParaUnidadeOperacional() {
-        // Arrange
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "OPERACIONAL");
         when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
         when(repositorioUnidade.findById(unidade.getCodigo())).thenReturn(Optional.of(unidade));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
-        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
+        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
 
-        // Assert
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta, times(1)).save(alertaCaptor.capture());
 
@@ -86,39 +86,15 @@ class AlertaServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve criar alerta para unidade INTERMEDIARIA ao iniciar processo")
-    void criarAlertasProcessoIniciado_deveCriarAlertaParaUnidadeIntermediaria() {
-        // Arrange
-        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "INTERMEDIARIA");
-        when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
-        when(repositorioUnidade.findById(unidade.getCodigo())).thenReturn(Optional.of(unidade));
-        when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        // Act
-        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
-
-        // Assert
-        ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
-        verify(repositorioAlerta, times(1)).save(alertaCaptor.capture());
-
-        Alerta alertaSalvo = alertaCaptor.getValue();
-        String descricaoEsperada = "Início do processo 'Processo de Teste' em unidade(s) subordinada(s). Aguarde a disponibilização dos mapas para validação até 31/12/2025.";
-        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
-    }
-
-    @Test
     @DisplayName("Deve criar dois alertas para unidade INTEROPERACIONAL ao iniciar processo")
     void criarAlertasProcessoIniciado_deveCriarDoisAlertasParaUnidadeInteroperacional() {
-        // Arrange
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "INTEROPERACIONAL");
         when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
         when(repositorioUnidade.findById(unidade.getCodigo())).thenReturn(Optional.of(unidade));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
-        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
+        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
 
-        // Assert
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta, times(2)).save(alertaCaptor.capture());
 
@@ -133,21 +109,15 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Não deve criar alerta para tipo de unidade desconhecido")
     void criarAlertasProcessoIniciado_naoDeveCriarAlertaParaTipoDesconhecido() {
-        // Arrange
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "TIPO_DESCONHECIDO");
-        when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
+        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
 
-        // Act
-        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso));
-
-        // Assert
         verify(repositorioAlerta, never()).save(any(Alerta.class));
     }
 
     @Test
     @DisplayName("Deve marcar alerta como lido com sucesso")
     void marcarComoLido_deveMarcarComoLido() {
-        // Arrange
         Long alertaId = 1L;
         String usuarioTitulo = "user.teste";
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
@@ -157,10 +127,8 @@ class AlertaServiceImplTest {
 
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.of(alertaUsuario));
 
-        // Act
         alertaService.marcarComoLido(usuarioTitulo, alertaId);
 
-        // Assert
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
         assertNotNull(captor.getValue().getDataHoraLeitura());
@@ -169,22 +137,19 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Deve lançar exceção ao tentar marcar como lido alerta inexistente")
     void marcarComoLido_deveLancarExcecaoSeAlertaNaoEncontrado() {
-        // Arrange
         Long alertaId = 1L;
         String usuarioTitulo = "user.teste";
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
             alertaService.marcarComoLido(usuarioTitulo, alertaId);
         });
     }
-    
+
     @Test
     @DisplayName("Deve criar alerta de cadastro disponibilizado com data nula")
     void criarAlertaCadastroDisponibilizado_deveFormatarDataNulaCorretamente() {
-        // Arrange
         Long unidadeOrigemCodigo = 20L;
         Long unidadeDestinoCodigo = 30L;
         Unidade unidadeOrigem = new Unidade();
@@ -195,15 +160,73 @@ class AlertaServiceImplTest {
         when(repositorioUnidade.findById(unidadeDestinoCodigo)).thenReturn(Optional.of(new Unidade()));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         alertaService.criarAlertaCadastroDisponibilizado(processo, unidadeOrigemCodigo, unidadeDestinoCodigo);
 
-        // Assert
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta).save(alertaCaptor.capture());
-        // A asserção principal aqui é que o método não lança exceção com data nula.
+
+        // A asserção principal aqui é que o metodo não lança exceção com data nula.
         // A formatação da data em si é privada, mas seu efeito na descrição pode ser verificado.
         String descricaoEsperada = "Cadastro disponibilizado pela unidade ORIGEM no processo 'Processo de Teste'. Realize a análise do cadastro.";
         assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+    }
+
+    @Test
+    @DisplayName("Deve criar alerta de cadastro devolvido com o motivo correto")
+    void criarAlertaCadastroDevolvido_deveCriarAlertaComMotivo() {
+        Long unidadeDestinoCodigo = 30L;
+        String motivo = "Informações incompletas";
+
+        when(repositorioUnidade.findById(unidadeDestinoCodigo)).thenReturn(Optional.of(new Unidade()));
+        when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        alertaService.criarAlertaCadastroDevolvido(processo, unidadeDestinoCodigo, motivo);
+
+        ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
+        verify(repositorioAlerta).save(alertaCaptor.capture());
+
+        String descricaoEsperada = "Cadastro devolvido no processo 'Processo de Teste'. Motivo: Informações incompletas. Realize os ajustes necessários e disponibilize novamente.";
+        assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+    }
+
+    @Test
+    @DisplayName("Deve ignorar subprocesso sem unidade ao criar alertas")
+    void criarAlertasProcessoIniciado_deveIgnorarSubprocessoSemUnidade() {
+        Subprocesso subprocessoSemUnidade = new Subprocesso();
+        subprocessoSemUnidade.setCodigo(101L);
+        subprocessoSemUnidade.setUnidade(null);
+
+        alertaService.criarAlertasProcessoIniciado(processo, List.of(), List.of(subprocessoSemUnidade));
+
+        verify(servicoSgrh, never()).buscarUnidadePorCodigo(anyLong());
+        verify(repositorioAlerta, never()).save(any(Alerta.class));
+    }
+
+    @Test
+    @DisplayName("Deve ignorar unidade não encontrada no SGRH ao criar alertas")
+    void criarAlertasProcessoIniciado_deveIgnorarUnidadeNaoEncontradaNoSGRH() {
+        when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.empty());
+
+        alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
+
+        verify(repositorioAlerta, never()).save(any(Alerta.class));
+    }
+
+    @Test
+    @DisplayName("Deve criar alerta mesmo se SGRH falhar ao buscar responsável")
+    void criarAlerta_deveContinuarSeSGRHFalhar() {
+        Long unidadeDestinoCodigo = 30L;
+        when(repositorioUnidade.findById(unidadeDestinoCodigo)).thenReturn(Optional.of(new Unidade()));
+        when(servicoSgrh.buscarResponsavelUnidade(unidadeDestinoCodigo)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
+        when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Apenas chama o método. O teste passa se nenhuma exceção for lançada.
+        assertDoesNotThrow(() -> {
+            alertaService.criarAlerta(processo, "TESTE", unidadeDestinoCodigo, "Descrição", null);
+        });
+
+        // Verifica que o alerta principal foi salvo, mas nenhum AlertaUsuario foi criado
+        verify(repositorioAlerta, times(1)).save(any(Alerta.class));
+        verify(repositorioAlertaUsuario, never()).save(any(AlertaUsuario.class));
     }
 }

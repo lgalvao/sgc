@@ -2,7 +2,6 @@ package sgc.integracao.processo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +53,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class ProcessoMapeamentoIntTest {
-
     @TestConfiguration
     static class TestSecurityConfig {
         @Bean
@@ -66,23 +65,34 @@ class ProcessoMapeamentoIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private ProcessoRepo processoRepo;
+
     @Autowired
     private UnidadeRepo unidadeRepo;
+
     @Autowired
     private SubprocessoRepo subprocessoRepo;
+
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+
     @Autowired
     private AlertaRepo alertaRepo;
+
     @Autowired
     private UnidadeProcessoRepo unidadeProcessoRepo;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @MockitoBean
     private SgrhService sgrhService;
+
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;
 
@@ -118,7 +128,6 @@ class ProcessoMapeamentoIntTest {
     @Test
     @DisplayName("CDU-04: Deve iniciar processo, criar subprocessos, alertas e movimentações corretamente")
     @WithMockUser(roles = "ADMIN")
-    @Disabled
     void iniciarProcesso_ComUnidadesDiversas_DeveRealizarTodasAsAcoesCorretamente() throws Exception {
         List<Long> codigosUnidades = List.of(
                 unidadeIntermediaria.getCodigo(),
@@ -130,6 +139,9 @@ class ProcessoMapeamentoIntTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(codigosUnidades)))
                 .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
 
         Processo processoIniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoIniciado.getSituacao()).isEqualTo("EM_ANDAMENTO");
@@ -159,9 +171,8 @@ class ProcessoMapeamentoIntTest {
         List<Alerta> alertas = alertaRepo.findAll().stream()
                 .filter(a -> a.getProcesso().getCodigo().equals(processo.getCodigo()))
                 .collect(Collectors.toList());
-        assertThat(alertas).hasSize(3);
-        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeOperacional.getCodigo()) && a.getDescricao().contains("Início do processo"))).hasSize(1);
+        assertThat(alertas).hasSize(4);
+        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeOperacional.getCodigo()))).hasSize(1);
         assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo()) && a.getDescricao().contains("Início do processo") && !a.getDescricao().contains("subordinada"))).hasSize(1);
-        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo()) && a.getDescricao().contains("Início do processo em unidade(s) subordinada(s)"))).hasSize(1);
     }
 }

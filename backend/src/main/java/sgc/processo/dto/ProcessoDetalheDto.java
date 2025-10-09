@@ -1,41 +1,68 @@
 package sgc.processo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProcessoDetalheDto {
-    private Long codigo;
-    private String descricao;
-    private String tipo;
-    private String situacao;
-    private LocalDate dataLimite;
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataFinalizacao;
-    private List<UnidadeParticipanteDTO> unidades = new ArrayList<>();
-    private List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+public record ProcessoDetalheDto(
+    Long codigo,
+    String descricao,
+    String tipo,
+    String situacao,
+    LocalDate dataLimite,
+    LocalDateTime dataCriacao,
+    LocalDateTime dataFinalizacao,
+    List<UnidadeParticipanteDTO> unidades,
+    List<ProcessoResumoDto> resumoSubprocessos
+) {
+    public ProcessoDetalheDto(
+        Long codigo,
+        String descricao,
+        String tipo,
+        String situacao,
+        LocalDate dataLimite,
+        LocalDateTime dataCriacao,
+        LocalDateTime dataFinalizacao,
+        List<UnidadeParticipanteDTO> unidades,
+        List<ProcessoResumoDto> resumoSubprocessos
+    ) {
+        this.codigo = codigo;
+        this.descricao = descricao;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.dataLimite = dataLimite;
+        this.dataCriacao = dataCriacao;
+        this.dataFinalizacao = dataFinalizacao;
+        this.unidades = unidades != null ? unidades : new ArrayList<>();
+        this.resumoSubprocessos = resumoSubprocessos != null ? resumoSubprocessos : new ArrayList<>();
+    }
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UnidadeParticipanteDTO {
-        private Long unidadeCodigo;
-        private String nome;
-        private String sigla;
-        private Long unidadeSuperiorCodigo;
-        private String situacaoSubprocesso;
-        private LocalDate dataLimite;
-        private List<UnidadeParticipanteDTO> filhos = new ArrayList<>();
+    public record UnidadeParticipanteDTO(
+        Long unidadeCodigo,
+        String nome,
+        String sigla,
+        Long unidadeSuperiorCodigo,
+        String situacaoSubprocesso,
+        LocalDate dataLimite,
+        List<UnidadeParticipanteDTO> filhos
+    ) {
+        public UnidadeParticipanteDTO(
+            Long unidadeCodigo,
+            String nome,
+            String sigla,
+            Long unidadeSuperiorCodigo,
+            String situacaoSubprocesso,
+            LocalDate dataLimite,
+            List<UnidadeParticipanteDTO> filhos
+        ) {
+            this.unidadeCodigo = unidadeCodigo;
+            this.nome = nome;
+            this.sigla = sigla;
+            this.unidadeSuperiorCodigo = unidadeSuperiorCodigo;
+            this.situacaoSubprocesso = situacaoSubprocesso;
+            this.dataLimite = dataLimite;
+            this.filhos = filhos != null ? filhos : new ArrayList<>();
+        }
     }
 }

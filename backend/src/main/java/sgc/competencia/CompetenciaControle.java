@@ -52,14 +52,14 @@ public class CompetenciaControle {
     public ResponseEntity<CompetenciaDto> atualizarCompetencia(@PathVariable Long id, @Valid @RequestBody CompetenciaDto competenciaDto) {
         return competenciaRepo.findById(id)
                 .map(existing -> {
-                    if (competenciaDto.getMapaCodigo() != null) {
+                    if (competenciaDto.mapaCodigo() != null) {
                         Mapa m = new Mapa();
-                        m.setCodigo(competenciaDto.getMapaCodigo());
+                        m.setCodigo(competenciaDto.mapaCodigo());
                         existing.setMapa(m);
                     } else {
                         existing.setMapa(null);
                     }
-                    existing.setDescricao(competenciaDto.getDescricao());
+                    existing.setDescricao(competenciaDto.descricao());
                     var atualizado = competenciaRepo.save(existing);
                     return ResponseEntity.ok(competenciaMapper.toDTO(atualizado));
                 })

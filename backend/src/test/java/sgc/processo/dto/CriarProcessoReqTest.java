@@ -9,7 +9,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CriarProcessoReqTest {
-
     @Test
     void testCriarProcessoReqConstructorAndGettersSetters() {
         // Create test data

@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoDetalheMapperCustomTest {
-
     @Mock
     private ProcessoDetalheMapperInterface processoDetalheMapperInterface;
 
@@ -34,17 +33,13 @@ class ProcessoDetalheMapperCustomTest {
     @Test
     @DisplayName("Deve retornar nulo se o processo for nulo")
     void toDetailDTO_quandoProcessoNulo_retornaNulo() {
-        // Act
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(null, Collections.emptyList(), Collections.emptyList());
-
-        // Assert
         assertNull(resultDto);
     }
 
     @Test
     @DisplayName("Deve mapear processo e associar UnidadeProcesso com Subprocesso correspondente")
     void toDetailDTO_deveAssociarUnidadeESubprocesso() {
-        // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Teste");
@@ -68,10 +63,8 @@ class ProcessoDetalheMapperCustomTest {
         when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
         when(processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(unidadeProcesso)).thenReturn(unidadeDto);
 
-        // Act
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, List.of(unidadeProcesso), List.of(subprocesso));
 
-        // Assert
         assertNotNull(resultDto);
         assertEquals(1, resultDto.getUnidades().size());
         ProcessoDetalheDto.UnidadeParticipanteDTO resultUnidade = resultDto.getUnidades().get(0);
@@ -83,7 +76,6 @@ class ProcessoDetalheMapperCustomTest {
     @Test
     @DisplayName("Deve criar nova unidade participante se Subprocesso não tem UnidadeProcesso correspondente")
     void toDetailDTO_deveCriarUnidadeParaSubprocessoSemCorrespondencia() {
-        // Arrange
         Processo processo = new Processo();
         processo.setCodigo(1L);
 
@@ -100,10 +92,8 @@ class ProcessoDetalheMapperCustomTest {
         when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
         when(processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(subprocesso)).thenReturn(unidadeDtoSub);
 
-        // Act
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, Collections.emptyList(), List.of(subprocesso));
 
-        // Assert
         assertNotNull(resultDto);
         assertEquals(1, resultDto.getUnidades().size());
         assertEquals("UNID-B", resultDto.getUnidades().get(0).getSigla());
