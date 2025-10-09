@@ -51,32 +51,8 @@ class AtualizarProcessoReqTest {
         assertEquals(Long.valueOf(3L), req.unidades().get(0));
     }
 
-    @Test
     void testAtualizarProcessoReqNoArgsConstructor() {
-        // Test no-args constructor
-        AtualizarProcessoReq req = new AtualizarProcessoReq();
-
-        // Initially should be null/empty
-        assertNull(req.getCodigo());
-        assertNull(req.getDescricao());
-        assertNull(req.getTipo());
-        assertNull(req.getDataLimiteEtapa1());
-        assertNull(req.getUnidades());
-
-        // Test setting values
-        req.setCodigo(1L);
-        req.setDescricao("Test Description");
-        req.setTipo("TIPO_A");
-        req.setDataLimiteEtapa1(LocalDate.now());
-        
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
-        req.setUnidades(unidades);
-
-        assertEquals(1L, req.getCodigo());
-        assertEquals("Test Description", req.getDescricao());
-        assertEquals("TIPO_A", req.getTipo());
-        assertNotNull(req.getDataLimiteEtapa1());
-        assertEquals(1, req.getUnidades().size());
+        // This test is invalid for a record and is the source of compilation errors.
+        // It's being removed.
     }
 }

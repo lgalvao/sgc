@@ -80,11 +80,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("Processo de teste");
-        requisicao.setTipo("MAPEAMENTO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
-        requisicao.setUnidades(List.of(1L, 2L));
+        var requisicao = new CriarProcessoReq("Processo de teste", "MAPEAMENTO", LocalDate.now().plusDays(10), List.of(1L, 2L));
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
@@ -112,20 +108,17 @@ public class ProcessoServiceTest {
         ProcessoDto dto = processoService.criar(requisicao);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(123L);
-        assertThat(dto.getDescricao()).isEqualTo("Processo de teste");
-        assertThat(dto.getTipo()).isEqualTo("MAPEAMENTO");
-        assertThat(dto.getSituacao()).isEqualTo("CRIADO");
+        assertThat(dto.codigo()).isEqualTo(123L);
+        assertThat(dto.descricao()).isEqualTo("Processo de teste");
+        assertThat(dto.tipo()).isEqualTo("MAPEAMENTO");
+        assertThat(dto.situacao()).isEqualTo("CRIADO");
 
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoCriadoEvento.class));
     }
 
     @Test
     public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("   ");
-        requisicao.setTipo("MAPEAMENTO");
-        requisicao.setUnidades(List.of(1L));
+        var requisicao = new CriarProcessoReq("   ", "MAPEAMENTO", null, List.of(1L));
 
         assertThatThrownBy(() -> processoService.criar(requisicao))
                 .isInstanceOf(ConstraintViolationException.class);

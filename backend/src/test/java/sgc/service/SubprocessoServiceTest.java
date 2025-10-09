@@ -187,7 +187,7 @@ public class SubprocessoServiceTest {
         assertEquals("EM_ANDAMENTO", dto.getSituacao());
         assertNotNull(dto.getMovimentacoes());
         assertEquals(1, dto.getMovimentacoes().size());
-        assertEquals(movDto.getCodigo(), dto.getMovimentacoes().getFirst().getCodigo());
+        assertEquals(movDto.codigo(), dto.getMovimentacoes().getFirst().codigo());
         assertNotNull(dto.getElementosDoProcesso());
         boolean temAtividade = dto.getElementosDoProcesso().stream().anyMatch(e -> "ATIVIDADE".equals(e.getTipo()));
         boolean temConhecimento = dto.getElementosDoProcesso().stream().anyMatch(e -> "CONHECIMENTO".equals(e.getTipo()));
