@@ -256,11 +256,8 @@ tasks.withType<Test> {
     failFast = project.hasProperty("failFast")
 }
 
-tasks.named<Test>("test") {
-    // Explicitly set the test sources and classpath to ensure they are correctly detected.
-    testClassesDirs = sourceSets.test.get().output.classesDirs
-    classpath = sourceSets.test.get().runtimeClasspath
-}
+// The tasks.named<Test>("test") block was removed as it was overriding the global
+// test configuration and suppressing the custom test output.
 
 // Data class for test failures
 data class TestFailure(
@@ -321,10 +318,7 @@ tasks.register<Test>("testClass") {
     group = "verification"
     description = "Run a single test class: ./gradlew testClass -PtestClass=YourTestClass"
 
-    // Explicitly set the test sources and classpath to ensure they are correctly detected.
-    testClassesDirs = sourceSets.test.get().output.classesDirs
-    classpath = sourceSets.test.get().runtimeClasspath
-
+    // testClassesDirs and classpath are now inferred by default.
     useJUnitPlatform()
     filter {
         val className = project.findProperty("testClass") as? String
@@ -388,29 +382,7 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") { // N
 // Conditional JaCoCo configuration has been removed as it is now enabled by default.
 
 
-// ============================================
-// WORKAROUND FOR TEST DISCOVERY ISSUE
-// ============================================
-// A new source set and task are defined to run tests that are not discovered by the default 'test' task.
-// To use, place problematic test files in 'src/undiscoveredTest/java'.
-sourceSets {
-    val undiscoveredTest by creating {
-        java.srcDir("src/undiscoveredTest/java")
-        resources.srcDir("src/undiscoveredTest/resources")
-        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().compileClasspath
-        runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().runtimeClasspath
-    }
-}
-
-val undiscoveredTestTask = tasks.register<Test>("undiscoveredTest") {
-    description = "Runs tests from the 'undiscoveredTest' source set."
-    group = "Verification"
-    testClassesDirs = sourceSets.getByName("undiscoveredTest").output.classesDirs
-    classpath = sourceSets.getByName("undiscoveredTest").runtimeClasspath
-    useJUnitPlatform()
-    shouldRunAfter(tasks.named("test"))
-}
-
+// The undiscoveredTest source set and task have been removed as the issue is resolved.
 tasks.named("check") {
-    dependsOn(undiscoveredTestTask)
+    // No longer depends on the removed undiscoveredTestTask
 }
