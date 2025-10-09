@@ -8,6 +8,11 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 extra["jjwt.version"] = "0.13.0"
 extra["mapstruct.version"] = "1.6.3"
 
@@ -33,6 +38,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility:4.2.1")
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.h2database:h2")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -65,7 +71,8 @@ tasks.withType<Test> {
         "-Xshare:off",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
-        "-XX:+EnableDynamicAgentLoading"
+        "-XX:+EnableDynamicAgentLoading",
+        "--enable-preview"
     )
 
     val byteBuddyAgentFile =
@@ -243,6 +250,7 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
 }
 

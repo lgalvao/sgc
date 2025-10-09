@@ -94,31 +94,27 @@ public class SubprocessoService {
     }
 
     private SubprocessoDetalheDto paraDetalheDTO(Subprocesso sp, List<Movimentacao> movimentacoes, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
-        SubprocessoDetalheDto dto = new SubprocessoDetalheDto();
-
+        SubprocessoDetalheDto.UnidadeDTO unidadeDto = null;
+        SubprocessoDetalheDto.ResponsavelDTO responsavelDto = null;
         if (sp.getUnidade() != null) {
-            dto.setUnidade(new SubprocessoDetalheDto.UnidadeDTO(sp.getUnidade().getCodigo(), sp.getUnidade().getSigla(), sp.getUnidade().getNome()));
-        }
-
-        if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
-            var titular = sp.getUnidade().getTitular();
-            dto.setResponsavel(new SubprocessoDetalheDto.ResponsavelDTO(null, titular.getNome(), null, titular.getRamal(), titular.getEmail()));
-        }
-
-        dto.setSituacao(sp.getSituacaoId());
-
-        if (movimentacoes != null && !movimentacoes.isEmpty()) {
-            Movimentacao m = movimentacoes.getFirst();
-            if (m.getUnidadeDestino() != null) {
-                dto.setLocalizacaoAtual(m.getUnidadeDestino().getSigla());
+            unidadeDto = new SubprocessoDetalheDto.UnidadeDTO(sp.getUnidade().getCodigo(), sp.getUnidade().getSigla(), sp.getUnidade().getNome());
+            if (sp.getUnidade().getTitular() != null) {
+                var titular = sp.getUnidade().getTitular();
+                responsavelDto = new SubprocessoDetalheDto.ResponsavelDTO(null, titular.getNome(), null, titular.getRamal(), titular.getEmail());
             }
         }
 
-        dto.setPrazoEtapaAtual(sp.getDataLimiteEtapa1() != null ? sp.getDataLimiteEtapa1() : sp.getDataLimiteEtapa2());
-
-        if (movimentacoes != null) {
-            dto.setMovimentacoes(movimentacoes.stream().map(movimentacaoMapper::toDTO).collect(Collectors.toList()));
+        String localizacaoAtual = null;
+        if (movimentacoes != null && !movimentacoes.isEmpty()) {
+            Movimentacao m = movimentacoes.getFirst();
+            if (m.getUnidadeDestino() != null) {
+                localizacaoAtual = m.getUnidadeDestino().getSigla();
+            }
         }
+
+        List<MovimentacaoDto> movimentacoesDto = (movimentacoes != null)
+                ? movimentacoes.stream().map(movimentacaoMapper::toDTO).collect(Collectors.toList())
+                : emptyList();
 
         List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = new ArrayList<>();
         if (atividades != null) {
@@ -127,9 +123,16 @@ public class SubprocessoService {
         if (conhecimentos != null) {
             conhecimentos.forEach(c -> elementos.add(new SubprocessoDetalheDto.ElementoProcessoDTO("CONHECIMENTO", conhecimentoMapper.toDTO(c))));
         }
-        dto.setElementosDoProcesso(elementos);
 
-        return dto;
+        return SubprocessoDetalheDto.builder()
+            .unidade(unidadeDto)
+            .responsavel(responsavelDto)
+            .situacao(sp.getSituacaoId())
+            .localizacaoAtual(localizacaoAtual)
+            .prazoEtapaAtual(sp.getDataLimiteEtapa1() != null ? sp.getDataLimiteEtapa1() : sp.getDataLimiteEtapa2())
+            .movimentacoes(movimentacoesDto)
+            .elementosDoProcesso(elementos)
+            .build();
     }
 
     @Transactional(readOnly = true)

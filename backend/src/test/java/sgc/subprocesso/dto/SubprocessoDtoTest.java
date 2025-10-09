@@ -133,32 +133,7 @@ class SubprocessoDtoTest {
     }
 
     @Test
-    void MovimentacaoDto_GettersAndSetters() {
-        MovimentacaoDto dto = new MovimentacaoDto();
-
-        dto.setCodigo(1L);
-        dto.setDataHora(LocalDateTime.now());
-        dto.setUnidadeOrigemCodigo(1L);
-        dto.setUnidadeOrigemSigla("SIGLA_ORIGEM");
-        dto.setUnidadeOrigemNome("Unidade Origem");
-        dto.setUnidadeDestinoCodigo(2L);
-        dto.setUnidadeDestinoSigla("SIGLA_DESTINO");
-        dto.setUnidadeDestinoNome("Unidade Destino");
-        dto.setDescricao("Descrição");
-
-        assertEquals(1L, dto.getCodigo());
-        assertNotNull(dto.getDataHora());
-        assertEquals(1L, dto.getUnidadeOrigemCodigo());
-        assertEquals("SIGLA_ORIGEM", dto.getUnidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
-        assertEquals(2L, dto.getUnidadeDestinoCodigo());
-        assertEquals("SIGLA_DESTINO", dto.getUnidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
-        assertEquals("Descrição", dto.getDescricao());
-    }
-
-    @Test
-    void MovimentacaoDto_AutowiredConstructor() {
+    void MovimentacaoDto_RecordConstructorAndAccessors() {
         LocalDateTime now = LocalDateTime.now();
         MovimentacaoDto dto = new MovimentacaoDto(
                 1L,
@@ -172,15 +147,15 @@ class SubprocessoDtoTest {
                 "Descrição"
         );
 
-        assertEquals(1L, dto.getCodigo());
-        assertEquals(now, dto.getDataHora());
-        assertEquals(1L, dto.getUnidadeOrigemCodigo());
-        assertEquals("SIGLA_ORIGEM", dto.getUnidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
-        assertEquals(2L, dto.getUnidadeDestinoCodigo());
-        assertEquals("SIGLA_DESTINO", dto.getUnidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
-        assertEquals("Descrição", dto.getDescricao());
+        assertEquals(1L, dto.codigo());
+        assertEquals(now, dto.dataHora());
+        assertEquals(1L, dto.unidadeOrigemCodigo());
+        assertEquals("SIGLA_ORIGEM", dto.unidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
+        assertEquals(2L, dto.unidadeDestinoCodigo());
+        assertEquals("SIGLA_DESTINO", dto.unidadeDestinoSigla());
+        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
+        assertEquals("Descrição", dto.descricao());
     }
 
     @Test
@@ -214,85 +189,57 @@ class SubprocessoDtoTest {
     }
 
     @Test
-    void SubprocessoDetalheDto_GettersAndSetters() {
-        SubprocessoDetalheDto dto = new SubprocessoDetalheDto();
-
+    void SubprocessoDetalheDto_BuilderAndGetters() {
         SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, "SIGLA", "Nome");
         SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, "Nome", "Tipo", "Ramal", "email@exemplo.com");
+        LocalDate prazo = LocalDate.now();
 
-        dto.setUnidade(unidade);
-        dto.setResponsavel(responsavel);
-        dto.setSituacao("SITUACAO");
-        dto.setLocalizacaoAtual("Localizacao");
-        dto.setPrazoEtapaAtual(LocalDate.now());
-        dto.setMovimentacoes(List.of());
-        dto.setElementosDoProcesso(List.of());
+        SubprocessoDetalheDto dto = SubprocessoDetalheDto.builder()
+                .unidade(unidade)
+                .responsavel(responsavel)
+                .situacao("SITUACAO")
+                .localizacaoAtual("Localizacao")
+                .prazoEtapaAtual(prazo)
+                .movimentacoes(List.of())
+                .elementosDoProcesso(List.of())
+                .build();
 
         assertEquals(unidade, dto.getUnidade());
         assertEquals(responsavel, dto.getResponsavel());
         assertEquals("SITUACAO", dto.getSituacao());
         assertEquals("Localizacao", dto.getLocalizacaoAtual());
-        assertNotNull(dto.getPrazoEtapaAtual());
+        assertEquals(prazo, dto.getPrazoEtapaAtual());
         assertEquals(List.of(), dto.getMovimentacoes());
         assertEquals(List.of(), dto.getElementosDoProcesso());
     }
 
     @Test
-    void SubprocessoDetalheDto_UnidadeDTO_GettersAndSetters() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO();
+    void SubprocessoDetalheDto_UnidadeDTO_RecordConstructorAndAccessors() {
+        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, "SIGLA", "Nome");
 
-        unidade.setCodigo(1L);
-        unidade.setSigla("SIGLA");
-        unidade.setNome("Nome");
-
-        assertEquals(1L, unidade.getCodigo());
-        assertEquals("SIGLA", unidade.getSigla());
-        assertEquals("Nome", unidade.getNome());
-
-        SubprocessoDetalheDto.UnidadeDTO unidade2 = new SubprocessoDetalheDto.UnidadeDTO(1L, "SIGLA", "Nome");
-        assertEquals(1L, unidade2.getCodigo());
-        assertEquals("SIGLA", unidade2.getSigla());
-        assertEquals("Nome", unidade2.getNome());
+        assertEquals(1L, unidade.codigo());
+        assertEquals("SIGLA", unidade.sigla());
+        assertEquals("Nome", unidade.nome());
     }
 
     @Test
-    void SubprocessoDetalheDto_ResponsavelDTO_GettersAndSetters() {
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO();
+    void SubprocessoDetalheDto_ResponsavelDTO_RecordConstructorAndAccessors() {
+        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, "Nome", "Tipo", "Ramal", "email@exemplo.com");
 
-        responsavel.setId(1L);
-        responsavel.setNome("Nome");
-        responsavel.setTipoResponsabilidade("Tipo");
-        responsavel.setRamal("Ramal");
-        responsavel.setEmail("email@exemplo.com");
-
-        assertEquals(1L, responsavel.getId());
-        assertEquals("Nome", responsavel.getNome());
-        assertEquals("Tipo", responsavel.getTipoResponsabilidade());
-        assertEquals("Ramal", responsavel.getRamal());
-        assertEquals("email@exemplo.com", responsavel.getEmail());
-
-        SubprocessoDetalheDto.ResponsavelDTO responsavel2 = new SubprocessoDetalheDto.ResponsavelDTO(1L, "Nome", "Tipo", "Ramal", "email@exemplo.com");
-        assertEquals(1L, responsavel2.getId());
-        assertEquals("Nome", responsavel2.getNome());
-        assertEquals("Tipo", responsavel2.getTipoResponsabilidade());
-        assertEquals("Ramal", responsavel2.getRamal());
-        assertEquals("email@exemplo.com", responsavel2.getEmail());
+        assertEquals(1L, responsavel.id());
+        assertEquals("Nome", responsavel.nome());
+        assertEquals("Tipo", responsavel.tipoResponsabilidade());
+        assertEquals("Ramal", responsavel.ramal());
+        assertEquals("email@exemplo.com", responsavel.email());
     }
 
     @Test
-    void SubprocessoDetalheDto_ElementoProcessoDTO_GettersAndSetters() {
-        SubprocessoDetalheDto.ElementoProcessoDTO elemento = new SubprocessoDetalheDto.ElementoProcessoDTO();
-
+    void SubprocessoDetalheDto_ElementoProcessoDTO_RecordConstructorAndAccessors() {
         Object payload = new Object();
-        elemento.setTipo("TIPO");
-        elemento.setPayload(payload);
+        SubprocessoDetalheDto.ElementoProcessoDTO elemento = new SubprocessoDetalheDto.ElementoProcessoDTO("TIPO", payload);
 
-        assertEquals("TIPO", elemento.getTipo());
-        assertEquals(payload, elemento.getPayload());
-
-        SubprocessoDetalheDto.ElementoProcessoDTO elemento2 = new SubprocessoDetalheDto.ElementoProcessoDTO("TIPO", payload);
-        assertEquals("TIPO", elemento2.getTipo());
-        assertEquals(payload, elemento2.getPayload());
+        assertEquals("TIPO", elemento.tipo());
+        assertEquals(payload, elemento.payload());
     }
 
     @Test

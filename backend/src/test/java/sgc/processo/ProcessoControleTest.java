@@ -53,15 +53,9 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        CriarProcessoReq req = new CriarProcessoReq();
-        req.setDescricao("Novo Processo");
-        req.setTipo("MAPEAMENTO");
-        req.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        req.setUnidades(List.of(1L));
+        CriarProcessoReq req = new CriarProcessoReq("Novo Processo", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
 
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Novo Processo");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Novo Processo", null, null);
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
@@ -75,16 +69,12 @@ public class ProcessoControleTest {
 
         verify(processoService).criar(criarCaptor.capture());
         CriarProcessoReq capturado = criarCaptor.getValue();
-        assertEquals("Novo Processo", capturado.getDescricao());
+        assertEquals("Novo Processo", capturado.descricao());
     }
 
     @Test
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        CriarProcessoReq req = new CriarProcessoReq();
-        req.setDescricao(""); // inválido
-        req.setTipo("MAPEAMENTO");
-        req.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        req.setUnidades(List.of(1L));
+        CriarProcessoReq req = new CriarProcessoReq("", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
 
         mockMvc.perform(post("/api/processos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,9 +84,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Teste");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Processo Teste", null, null);
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -120,15 +108,9 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        AtualizarProcessoReq req = new AtualizarProcessoReq();
-        req.setDescricao("Processo Atualizado");
-        req.setTipo("REVISAO");
-        req.setDataLimiteEtapa1(LocalDate.now().plusDays(45));
-        req.setUnidades(List.of(1L));
+        AtualizarProcessoReq req = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
 
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Atualizado");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Processo Atualizado", null, null);
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
@@ -141,15 +123,12 @@ public class ProcessoControleTest {
 
         verify(processoService).atualizar(eq(1L), atualizarCaptor.capture());
         AtualizarProcessoReq capturado = atualizarCaptor.getValue();
-        assertEquals("Processo Atualizado", capturado.getDescricao());
+        assertEquals("Processo Atualizado", capturado.descricao());
     }
 
     @Test
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        AtualizarProcessoReq req = new AtualizarProcessoReq();
-        req.setDescricao("Teste");
-        req.setTipo("MAPEAMENTO");
-        req.setUnidades(List.of(1L));
+        AtualizarProcessoReq req = new AtualizarProcessoReq(999L, "Teste", "MAPEAMENTO", null, List.of(1L));
 
         doThrow(new IllegalArgumentException()).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
@@ -161,10 +140,7 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        AtualizarProcessoReq req = new AtualizarProcessoReq();
-        req.setDescricao("Teste");
-        req.setTipo("MAPEAMENTO");
-        req.setUnidades(List.of(1L));
+        AtualizarProcessoReq req = new AtualizarProcessoReq(1L, "Teste", "MAPEAMENTO", null, List.of(1L));
 
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
@@ -200,9 +176,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
-        ProcessoDetalheDto dto = new ProcessoDetalheDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Detalhado");
+        ProcessoDetalheDto dto = new ProcessoDetalheDto(1L, "Processo Detalhado", null, null, null, null, null, null, null);
 
         when(processoService.obterDetalhes(eq(1L), eq("ADMIN"), isNull())).thenReturn(dto);
 
@@ -232,9 +206,7 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Iniciado");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Processo Iniciado", null, null);
 
         when(processoService.iniciarProcessoMapeamento(eq(1L), any(List.class))).thenReturn(dto);
 
@@ -249,9 +221,7 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo de Revisão Iniciado");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Processo de Revisão Iniciado", null, null);
 
         when(processoService.iniciarProcessoRevisao(eq(1L), any(List.class))).thenReturn(dto);
 
@@ -276,9 +246,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Finalizado");
+        ProcessoDto dto = new ProcessoDto(1L, null, null, null, "Processo Finalizado", null, null);
 
         when(processoService.finalizar(1L)).thenReturn(dto);
 

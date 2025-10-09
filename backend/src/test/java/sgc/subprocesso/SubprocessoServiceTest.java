@@ -177,7 +177,7 @@ public class SubprocessoServiceTest {
 
         List<Conhecimento> conhecimentos = Collections.singletonList(mock(Conhecimento.class));
         when(repositorioConhecimento.findByAtividadeCodigo(anyLong())).thenReturn(conhecimentos);
-        when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(new sgc.conhecimento.dto.ConhecimentoDto());
+        when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(new sgc.conhecimento.dto.ConhecimentoDto(1L, 1L, "Conhecimento Teste"));
 
         SubprocessoCadastroDto result = subprocessoService.obterCadastro(id);
 

@@ -9,74 +9,48 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AtualizarProcessoReqTest {
+
     @Test
-    void testAtualizarProcessoReqConstructorAndGettersSetters() {
+    void testAtualizarProcessoReqRecord() {
         // Create test data
         List<Long> unidades = new ArrayList<>();
         unidades.add(1L);
         unidades.add(2L);
+        LocalDate dataLimite = LocalDate.now();
 
-        // Test constructor with parameters
+        // Test constructor and accessors
         AtualizarProcessoReq req = new AtualizarProcessoReq(
             1L,
             "Test Description",
             "TIPO_A",
-            LocalDate.now(),
+            dataLimite,
             unidades
         );
 
-        // Test getters
         assertEquals(1L, req.codigo());
         assertEquals("Test Description", req.descricao());
         assertEquals("TIPO_A", req.tipo());
-        assertNotNull(req.dataLimiteEtapa1());
+        assertEquals(dataLimite, req.dataLimiteEtapa1());
         assertEquals(2, req.unidades().size());
-        assertEquals(Long.valueOf(1L), req.unidades().get(0));
-        assertEquals(Long.valueOf(2L), req.unidades().get(1));
-
-        // Test setters (records are immutable, so we create a new instance)
-        req = new AtualizarProcessoReq(
-            2L,
-            "New Description",
-            "TIPO_B",
-            LocalDate.now().plusDays(1),
-            new ArrayList<>(List.of(3L))
-        );
-
-        assertEquals(2L, req.codigo());
-        assertEquals("New Description", req.descricao());
-        assertEquals("TIPO_B", req.tipo());
-        assertNotNull(req.dataLimiteEtapa1());
-        assertEquals(1, req.unidades().size());
-        assertEquals(Long.valueOf(3L), req.unidades().get(0));
+        assertEquals(1L, req.unidades().get(0));
+        assertEquals(2L, req.unidades().get(1));
     }
 
     @Test
-    void testAtualizarProcessoReqNoArgsConstructor() {
-        // Test no-args constructor
-        AtualizarProcessoReq req = new AtualizarProcessoReq();
+    void testRecordWithNullValues() {
+        // Test with null for optional fields
+        AtualizarProcessoReq req = new AtualizarProcessoReq(
+            5L,
+            "Partial Description",
+            null,
+            null,
+            List.of(1L)
+        );
 
-        // Initially should be null/empty
-        assertNull(req.getCodigo());
-        assertNull(req.getDescricao());
-        assertNull(req.getTipo());
-        assertNull(req.getDataLimiteEtapa1());
-        assertNull(req.getUnidades());
-
-        // Test setting values
-        req.setCodigo(1L);
-        req.setDescricao("Test Description");
-        req.setTipo("TIPO_A");
-        req.setDataLimiteEtapa1(LocalDate.now());
-        
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
-        req.setUnidades(unidades);
-
-        assertEquals(1L, req.getCodigo());
-        assertEquals("Test Description", req.getDescricao());
-        assertEquals("TIPO_A", req.getTipo());
-        assertNotNull(req.getDataLimiteEtapa1());
-        assertEquals(1, req.getUnidades().size());
+        assertEquals(5L, req.codigo());
+        assertEquals("Partial Description", req.descricao());
+        assertNull(req.tipo());
+        assertNull(req.dataLimiteEtapa1());
+        assertNotNull(req.unidades());
     }
 }

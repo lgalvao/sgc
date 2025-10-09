@@ -1,9 +1,7 @@
 package sgc.subprocesso.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,10 +9,8 @@ import java.util.List;
 /**
  * DTO com os detalhes necessários para a tela de Detalhes do Subprocesso (CDU-07).
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class SubprocessoDetalheDto {
     private UnidadeDTO unidade;
     private ResponsavelDTO responsavel;
@@ -24,42 +20,30 @@ public class SubprocessoDetalheDto {
     private List<MovimentacaoDto> movimentacoes;
     private List<ElementoProcessoDTO> elementosDoProcesso;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UnidadeDTO {
-        private Long codigo;
-        private String sigla;
-        private String nome;
-    }
+    public record UnidadeDTO(
+        Long codigo,
+        String sigla,
+        String nome
+    ) {}
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ResponsavelDTO {
-        private Long id;
-        private String nome;
-        private String tipoResponsabilidade;
-        private String ramal;
-        private String email;
-    }
+    public record ResponsavelDTO(
+        Long id,
+        String nome,
+        String tipoResponsabilidade,
+        String ramal,
+        String email
+    ) {}
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ElementoProcessoDTO {
+    public record ElementoProcessoDTO(
         /**
          * Ex.: "ATIVIDADE", "CONHECIMENTO", "MAPA", "DIAGNOSTICO", etc.
          */
-        private String tipo;
+        String tipo,
 
         /**
          * Payload variável: pode ser AtividadeDto, ConhecimentoDto, MapaResumoDTO ou outro objeto.
          * Usamos Object para permitir flexibilidade no mapeamento do backend.
          */
-        private Object payload;
-    }
+        Object payload
+    ) {}
 }

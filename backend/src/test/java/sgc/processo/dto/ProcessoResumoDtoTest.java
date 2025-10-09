@@ -8,78 +8,38 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProcessoResumoDtoTest {
+
     @Test
-    void testProcessoResumoDtoConstructorAndGettersSetters() {
-        // Test constructor with parameters
+    void testProcessoResumoDtoRecord() {
+        // Create test data
+        Long codigo = 1L;
+        String descricao = "Test Description";
+        String situacao = "ATIVO";
+        String tipo = "TIPO_A";
+        LocalDate dataLimite = LocalDate.now();
+        LocalDateTime dataCriacao = LocalDateTime.now();
+        Long unidadeCodigo = 10L;
+        String unidadeNome = "Test Unit";
+
+        // Test constructor and accessors
         ProcessoResumoDto dto = new ProcessoResumoDto(
-            1L,
-            "Test Description",
-            "ATIVO",
-            "TIPO_A",
-            LocalDate.now(),
-            LocalDateTime.now(),
-            10L,
-            "Test Unit"
+            codigo,
+            descricao,
+            situacao,
+            tipo,
+            dataLimite,
+            dataCriacao,
+            unidadeCodigo,
+            unidadeNome
         );
 
-        // Test getters
-        assertEquals(1L, dto.getCodigo());
-        assertEquals("Test Description", dto.getDescricao());
-        assertEquals("ATIVO", dto.getSituacao());
-        assertEquals("TIPO_A", dto.getTipo());
-        assertNotNull(dto.getDataLimite());
-        assertNotNull(dto.getDataCriacao());
-        assertEquals(10L, dto.getUnidadeCodigo());
-        assertEquals("Test Unit", dto.getUnidadeNome());
-
-        // Test setters
-        dto.setCodigo(2L);
-        dto.setDescricao("New Description");
-        dto.setSituacao("CANCELADO");
-        dto.setTipo("TIPO_B");
-        dto.setDataLimite(LocalDate.now().plusDays(1));
-        dto.setUnidadeCodigo(20L);
-        dto.setUnidadeNome("New Unit");
-
-        assertEquals(2L, dto.getCodigo());
-        assertEquals("New Description", dto.getDescricao());
-        assertEquals("CANCELADO", dto.getSituacao());
-        assertEquals("TIPO_B", dto.getTipo());
-        assertNotNull(dto.getDataLimite());
-        assertEquals(20L, dto.getUnidadeCodigo());
-        assertEquals("New Unit", dto.getUnidadeNome());
-    }
-
-    @Test
-    void testProcessoResumoDtoNoArgsConstructor() {
-        // Test no-args constructor
-        ProcessoResumoDto dto = new ProcessoResumoDto();
-
-        // Initially should be null/0
-        assertNull(dto.getCodigo());
-        assertNull(dto.getDescricao());
-        assertNull(dto.getSituacao());
-        assertNull(dto.getTipo());
-        assertNull(dto.getDataLimite());
-        assertNull(dto.getDataCriacao());
-        assertNull(dto.getUnidadeCodigo());
-        assertNull(dto.getUnidadeNome());
-
-        // Test setting values
-        dto.setCodigo(1L);
-        dto.setDescricao("Test Description");
-        dto.setSituacao("ATIVO");
-        dto.setTipo("TIPO_A");
-        dto.setDataLimite(LocalDate.now());
-        dto.setUnidadeCodigo(10L);
-        dto.setUnidadeNome("Test Unit");
-
-        assertEquals(1L, dto.getCodigo());
-        assertEquals("Test Description", dto.getDescricao());
-        assertEquals("ATIVO", dto.getSituacao());
-        assertEquals("TIPO_A", dto.getTipo());
-        assertNotNull(dto.getDataLimite());
-        assertEquals(10L, dto.getUnidadeCodigo());
-        assertEquals("Test Unit", dto.getUnidadeNome());
+        assertEquals(codigo, dto.codigo());
+        assertEquals(descricao, dto.descricao());
+        assertEquals(situacao, dto.situacao());
+        assertEquals(tipo, dto.tipo());
+        assertEquals(dataLimite, dto.dataLimite());
+        assertEquals(dataCriacao, dto.dataCriacao());
+        assertEquals(unidadeCodigo, dto.unidadeCodigo());
+        assertEquals(unidadeNome, dto.unidadeNome());
     }
 }
