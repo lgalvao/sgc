@@ -128,8 +128,8 @@ public class ProcessoServiceIniciarMapeamentoTest {
 
         // Asserções
         assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(idProcesso);
-        assertThat(dto.getSituacao()).isEqualToIgnoringCase("EM_ANDAMENTO");
+        assertThat(dto.codigo()).isEqualTo(idProcesso);
+        assertThat(dto.situacao()).isEqualToIgnoringCase("EM_ANDAMENTO");
 
         // Verificar saves e publicação de evento
         verify(unidadeProcessoRepo, times(1)).save(any(UnidadeProcesso.class));

@@ -136,12 +136,12 @@ public class ProcessoServiceDetalhesTest {
         ProcessoDetalheDto dto = servico.obterDetalhes(1L, "ADMIN", null);
 
         assertNotNull(dto);
-        assertEquals(p.getCodigo(), dto.getCodigo());
-        assertNotNull(dto.getUnidades());
-        assertTrue(dto.getUnidades().stream().anyMatch(u -> "DX".equals(u.getSigla())));
-        assertNotNull(dto.getResumoSubprocessos());
+        assertEquals(p.getCodigo(), dto.codigo());
+        assertNotNull(dto.unidades());
+        assertTrue(dto.unidades().stream().anyMatch(u -> "DX".equals(u.sigla())));
+        assertNotNull(dto.resumoSubprocessos());
         assertTrue(
-                dto.getResumoSubprocessos().stream().anyMatch(s -> s.getCodigo() != null && s.getSituacao() != null));
+                dto.resumoSubprocessos().stream().anyMatch(s -> s.codigo() != null && s.situacao() != null));
     }
 
     @Test

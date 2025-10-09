@@ -29,13 +29,13 @@ class ProcessoMapperTest {
         ProcessoDto dto = mapper.toDTO(processo);
 
         // Verify mapping
-        assertEquals(1L, dto.getCodigo());
-        assertEquals("Test Description", dto.getDescricao());
-        assertEquals("ATIVO", dto.getSituacao());
-        assertEquals("TIPO_A", dto.getTipo());
-        assertNotNull(dto.getDataCriacao());
-        assertNotNull(dto.getDataFinalizacao());
-        assertNotNull(dto.getDataLimite());
+        assertEquals(1L, dto.codigo());
+        assertEquals("Test Description", dto.descricao());
+        assertEquals("ATIVO", dto.situacao());
+        assertEquals("TIPO_A", dto.tipo());
+        assertNotNull(dto.dataCriacao());
+        assertNotNull(dto.dataFinalizacao());
+        assertNotNull(dto.dataLimite());
     }
 
     @Test

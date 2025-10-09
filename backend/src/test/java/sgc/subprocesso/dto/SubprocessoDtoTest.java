@@ -133,31 +133,6 @@ class SubprocessoDtoTest {
     }
 
     @Test
-    void MovimentacaoDto_GettersAndSetters() {
-        MovimentacaoDto dto = new MovimentacaoDto();
-
-        dto.setCodigo(1L);
-        dto.setDataHora(LocalDateTime.now());
-        dto.setUnidadeOrigemCodigo(1L);
-        dto.setUnidadeOrigemSigla("SIGLA_ORIGEM");
-        dto.setUnidadeOrigemNome("Unidade Origem");
-        dto.setUnidadeDestinoCodigo(2L);
-        dto.setUnidadeDestinoSigla("SIGLA_DESTINO");
-        dto.setUnidadeDestinoNome("Unidade Destino");
-        dto.setDescricao("Descrição");
-
-        assertEquals(1L, dto.getCodigo());
-        assertNotNull(dto.getDataHora());
-        assertEquals(1L, dto.getUnidadeOrigemCodigo());
-        assertEquals("SIGLA_ORIGEM", dto.getUnidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
-        assertEquals(2L, dto.getUnidadeDestinoCodigo());
-        assertEquals("SIGLA_DESTINO", dto.getUnidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
-        assertEquals("Descrição", dto.getDescricao());
-    }
-
-    @Test
     void MovimentacaoDto_AutowiredConstructor() {
         LocalDateTime now = LocalDateTime.now();
         MovimentacaoDto dto = new MovimentacaoDto(
@@ -172,15 +147,15 @@ class SubprocessoDtoTest {
                 "Descrição"
         );
 
-        assertEquals(1L, dto.getCodigo());
-        assertEquals(now, dto.getDataHora());
-        assertEquals(1L, dto.getUnidadeOrigemCodigo());
-        assertEquals("SIGLA_ORIGEM", dto.getUnidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
-        assertEquals(2L, dto.getUnidadeDestinoCodigo());
-        assertEquals("SIGLA_DESTINO", dto.getUnidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
-        assertEquals("Descrição", dto.getDescricao());
+        assertEquals(1L, dto.codigo());
+        assertEquals(now, dto.dataHora());
+        assertEquals(1L, dto.unidadeOrigemCodigo());
+        assertEquals("SIGLA_ORIGEM", dto.unidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
+        assertEquals(2L, dto.unidadeDestinoCodigo());
+        assertEquals("SIGLA_DESTINO", dto.unidadeDestinoSigla());
+        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
+        assertEquals("Descrição", dto.descricao());
     }
 
     @Test

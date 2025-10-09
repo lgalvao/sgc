@@ -25,23 +25,8 @@ class ConhecimentoDtoTest {
         assertEquals("New Description", dto.descricao());
     }
 
-    @Test
     void testConhecimentoDtoNoArgsConstructor() {
-        // Test no-args constructor
-        ConhecimentoDto dto = new ConhecimentoDto();
-
-        // Initially should be null/0
-        assertNull(dto.getCodigo());
-        assertNull(dto.getAtividadeCodigo());
-        assertNull(dto.getDescricao());
-
-        // Test setting values
-        dto.setCodigo(1L);
-        dto.setAtividadeCodigo(100L);
-        dto.setDescricao("Test Description");
-
-        assertEquals(1L, dto.getCodigo());
-        assertEquals(100L, dto.getAtividadeCodigo());
-        assertEquals("Test Description", dto.getDescricao());
+        // This test is invalid for a record and is the source of compilation errors.
+        // It's being removed.
     }
 }

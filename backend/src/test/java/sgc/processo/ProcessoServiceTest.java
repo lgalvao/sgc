@@ -110,11 +110,8 @@ public class ProcessoServiceTest {
 
     @Test
     void criar_ProcessoValido_CriaComSucesso() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("Processo de Teste");
-        requisicao.setTipo("MAPEAMENTO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        requisicao.setUnidades(List.of(1L));
+        var dataLimite = LocalDate.now().plusDays(30);
+        var requisicao = new CriarProcessoReq("Processo de Teste", "MAPEAMENTO", dataLimite, List.of(1L));
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -122,9 +119,7 @@ public class ProcessoServiceTest {
         processo.setSituacao("CRIADO");
         processo.setDataCriacao(LocalDateTime.now());
 
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo de Teste");
+        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo de Teste", null, null);
 
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(dto);
@@ -132,21 +127,17 @@ public class ProcessoServiceTest {
         ProcessoDto resultado = processoService.criar(requisicao);
 
         assertNotNull(resultado);
-        assertEquals(1L, resultado.getCodigo());
-        assertEquals("Processo de Teste", resultado.getDescricao());
+        assertEquals(1L, resultado.codigo());
+        assertEquals("Processo de Teste", resultado.descricao());
         verify(processoRepo).save(any(Processo.class));
         verify(publicadorDeEventos).publishEvent(any(ProcessoCriadoEvento.class));
     }
 
     @Test
     void criar_SemDescricao_LancaConstraintViolationException() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("");
-        requisicao.setTipo("MAPEAMENTO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        requisicao.setUnidades(List.of(1L));
+        var requisicao = new CriarProcessoReq("", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
 
-        var exception = assertThrows(jakarta.validation.ConstraintViolationException.class, 
+        var exception = assertThrows(jakarta.validation.ConstraintViolationException.class,
             () -> processoService.criar(requisicao));
         
         assertEquals("A descrição do processo é obrigatória.", exception.getMessage());
@@ -154,13 +145,9 @@ public class ProcessoServiceTest {
 
     @Test
     void criar_SemUnidades_LancaConstraintViolationException() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("Processo de Teste");
-        requisicao.setTipo("MAPEAMENTO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        requisicao.setUnidades(Collections.emptyList());
+        var requisicao = new CriarProcessoReq("Processo de Teste", "MAPEAMENTO", LocalDate.now().plusDays(30), Collections.emptyList());
 
-        var exception = assertThrows(jakarta.validation.ConstraintViolationException.class, 
+        var exception = assertThrows(jakarta.validation.ConstraintViolationException.class,
             () -> processoService.criar(requisicao));
         
         assertEquals("Pelo menos uma unidade participante deve ser selecionada.", exception.getMessage());
@@ -168,15 +155,11 @@ public class ProcessoServiceTest {
 
     @Test
     void criar_TipoRevisaoComUnidadeNaoEncontrada_LancaErroEntidadeNaoEncontrada() {
-        CriarProcessoReq requisicao = new CriarProcessoReq();
-        requisicao.setDescricao("Processo de Teste");
-        requisicao.setTipo("REVISAO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(30));
-        requisicao.setUnidades(List.of(999L));
+        var requisicao = new CriarProcessoReq("Processo de Teste", "REVISAO", LocalDate.now().plusDays(30), List.of(999L));
 
         when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
 
-        var exception = assertThrows(ErroEntidadeNaoEncontrada.class, 
+        var exception = assertThrows(ErroEntidadeNaoEncontrada.class,
             () -> processoService.criar(requisicao));
         
         assertEquals("Unidade com código 999 não foi encontrada.", exception.getMessage());
@@ -184,21 +167,14 @@ public class ProcessoServiceTest {
 
     @Test
     void atualizar_ProcessoExisteAtualizaComSucesso() {
-        AtualizarProcessoReq requisicao = new AtualizarProcessoReq();
-        requisicao.setCodigo(1L);
-        requisicao.setDescricao("Processo Atualizado");
-        requisicao.setTipo("REVISAO");
-        requisicao.setDataLimiteEtapa1(LocalDate.now().plusDays(45));
-        requisicao.setUnidades(List.of(1L));
+        var requisicao = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Original");
         processo.setSituacao("CRIADO");
 
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
-        dto.setDescricao("Processo Atualizado");
+        var dto = new ProcessoDto(1L, null, null, null, "Processo Atualizado", null, null);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
@@ -207,13 +183,13 @@ public class ProcessoServiceTest {
         ProcessoDto resultado = processoService.atualizar(1L, requisicao);
 
         assertNotNull(resultado);
-        assertEquals("Processo Atualizado", resultado.getDescricao());
+        assertEquals("Processo Atualizado", resultado.descricao());
         verify(processoRepo).save(any(Processo.class));
     }
 
     @Test
     void atualizar_ProcessoNaoEncontrado_LancaErroEntidadeNaoEncontrada() {
-        AtualizarProcessoReq requisicao = new AtualizarProcessoReq();
+        var requisicao = new AtualizarProcessoReq(999L, "Desc", "TIPO", null, List.of(1L));
         
         when(processoRepo.findById(999L)).thenReturn(Optional.empty());
 
@@ -225,7 +201,7 @@ public class ProcessoServiceTest {
 
     @Test
     void atualizar_ProcessoNaoCriado_LancaIllegalStateException() {
-        AtualizarProcessoReq requisicao = new AtualizarProcessoReq();
+        var requisicao = new AtualizarProcessoReq(1L, "Desc", "TIPO", null, List.of(1L));
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -281,8 +257,7 @@ public class ProcessoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
 
-        ProcessoDto dto = new ProcessoDto();
-        dto.setCodigo(1L);
+        var dto = new ProcessoDto(1L, null, null, null, null, null, null);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(processoMapper.toDTO(processo)).thenReturn(dto);
@@ -290,7 +265,7 @@ public class ProcessoServiceTest {
         var resultado = processoService.obterPorId(1L);
 
         assertTrue(resultado.isPresent());
-        assertEquals(1L, resultado.get().getCodigo());
+        assertEquals(1L, resultado.get().codigo());
     }
 
     @Test
@@ -328,8 +303,7 @@ public class ProcessoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
 
-        ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
-        detalhes.setCodigo(1L);
+        var detalhes = new ProcessoDetalheDto(1L, null, null, null, null, null, null, List.of(), List.of());
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(Collections.emptyList());
@@ -339,7 +313,7 @@ public class ProcessoServiceTest {
         ProcessoDetalheDto resultado = processoService.obterDetalhes(1L, "ADMIN", null);
 
         assertNotNull(resultado);
-        assertEquals(1L, resultado.getCodigo());
+        assertEquals(1L, resultado.codigo());
     }
 
     @Test
@@ -358,8 +332,7 @@ public class ProcessoServiceTest {
         processo.setCodigo(1L);
         Long idUnidadeUsuario = 10L;
 
-        ProcessoDetalheDto detalhes = new ProcessoDetalheDto();
-        detalhes.setCodigo(1L);
+        var detalhes = new ProcessoDetalheDto(1L, null, null, null, null, null, null, List.of(), List.of());
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, idUnidadeUsuario)).thenReturn(true);
@@ -368,7 +341,7 @@ public class ProcessoServiceTest {
         ProcessoDetalheDto resultado = processoService.obterDetalhes(1L, "GESTOR", idUnidadeUsuario);
 
         assertNotNull(resultado);
-        assertEquals(1L, resultado.getCodigo());
+        assertEquals(1L, resultado.codigo());
     }
 
     @Test
@@ -411,15 +384,13 @@ public class ProcessoServiceTest {
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            ProcessoDto dto = new ProcessoDto();
-            dto.setCodigo(p.getCodigo());
-            return dto;
+            return new ProcessoDto(p.getCodigo(), null, null, null, null, null, null);
         });
 
         ProcessoDto resultado = processoService.iniciarProcessoMapeamento(1L, List.of(1L));
 
         assertNotNull(resultado);
-        assertEquals(1L, resultado.getCodigo());
+        assertEquals(1L, resultado.codigo());
         verify(processoRepo).save(argThat(p -> "EM_ANDAMENTO".equals(p.getSituacao())));
         verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
 
@@ -492,15 +463,13 @@ public class ProcessoServiceTest {
         when(processoRepo.save(any(Processo.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            ProcessoDto dto = new ProcessoDto();
-            dto.setCodigo(p.getCodigo());
-            return dto;
+            return new ProcessoDto(p.getCodigo(), null, null, null, null, null, null);
         });
 
         ProcessoDto resultado = processoService.finalizar(1L);
 
         assertNotNull(resultado);
-        assertEquals(1L, resultado.getCodigo());
+        assertEquals(1L, resultado.codigo());
         verify(processoRepo).save(argThat(p -> "FINALIZADO".equals(p.getSituacao())));
         verify(publicadorDeEventos).publishEvent(any(ProcessoFinalizadoEvento.class));
     }
@@ -565,7 +534,7 @@ public class ProcessoServiceTest {
             when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaNovo);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
             when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-            when(processoMapper.toDTO(processo)).thenReturn(new ProcessoDto());
+            when(processoMapper.toDTO(processo)).thenReturn(new ProcessoDto(null, null, null, null, null, null, null));
     
             processoService.iniciarProcessoRevisao(1L, List.of(1L));
     
