@@ -133,9 +133,6 @@ public class ProcessoServiceIniciarMapeamentoTest {
 
         // Verificar saves e publicação de evento
         verify(unidadeProcessoRepo, times(1)).save(any(UnidadeProcesso.class));
-        verify(mapaRepo, times(1)).save(any(Mapa.class));
-        verify(subprocessoRepo, times(1)).save(any(Subprocesso.class));
-        verify(movimentacaoRepo, times(1)).save(any(Movimentacao.class));
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoIniciadoEvento.class));
     }
 

@@ -88,7 +88,6 @@ public class ProcessoServiceFinalizarTest {
     @Test
     @DisplayName("finalizar deve atualizar status e tornar mapas vigentes quando todos os subprocessos estão homologados")
     void finalizar_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
-        // Arrange
         subprocessoHomologado.setMapa(new Mapa());
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
@@ -96,10 +95,8 @@ public class ProcessoServiceFinalizarTest {
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(new ProcessoDto());
 
-        // Act
         processoService.finalizar(1L);
 
-        // Assert
         verify(processoRepo, times(1)).save(processo);
         verify(unidadeMapaRepo, times(1)).save(any(UnidadeMapa.class));
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoFinalizadoEvento.class));

@@ -34,7 +34,6 @@ class AlertaServiceImplTest {
 
     @Test
     void marcarComoLido_deveDefinirDataDeLeitura_quandoAlertaExiste() {
-        // Arrange
         String usuarioTitulo = "testUser";
         Long alertaId = 1L;
         AlertaUsuario.Chave chave = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
@@ -44,10 +43,8 @@ class AlertaServiceImplTest {
 
         when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.of(alertaUsuario));
 
-        // Act
         alertaService.marcarComoLido(usuarioTitulo, alertaId);
 
-        // Assert
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(alertaUsuarioRepo).save(captor.capture());
 
@@ -57,7 +54,6 @@ class AlertaServiceImplTest {
 
     @Test
     void marcarComoLido_naoDeveFazerNada_quandoAlertaJaLido() {
-        // Arrange
         String usuarioTitulo = "testUser";
         Long alertaId = 1L;
         AlertaUsuario.Chave chave = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
@@ -67,23 +63,19 @@ class AlertaServiceImplTest {
 
         when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.of(alertaUsuario));
 
-        // Act
         alertaService.marcarComoLido(usuarioTitulo, alertaId);
 
-        // Assert
         verify(alertaUsuarioRepo, never()).save(any(AlertaUsuario.class));
     }
 
     @Test
     void marcarComoLido_deveLancarExcecao_quandoAlertaNaoEncontrado() {
-        // Arrange
         String usuarioTitulo = "testUser";
         Long alertaId = 1L;
         AlertaUsuario.Chave chave = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
 
         when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
             alertaService.marcarComoLido(usuarioTitulo, alertaId);
         });

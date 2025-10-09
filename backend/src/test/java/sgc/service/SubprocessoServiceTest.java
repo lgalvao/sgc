@@ -1,5 +1,6 @@
 package sgc.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -74,7 +75,7 @@ public class SubprocessoServiceTest {
     @Mock
     private sgc.analise.modelo.AnaliseValidacaoRepo analiseValidacaoRepo;
     @Mock
-    private sgc.notificacao.modelo.NotificacaoRepo notificacaoRepo;
+    private sgc.notificacao.modelo.NotificacaoRepo repositorioNotificacao;
     @Mock
     private org.springframework.context.ApplicationEventPublisher applicationEventPublisher;
     @Mock
@@ -91,6 +92,8 @@ public class SubprocessoServiceTest {
 
     @InjectMocks
     private SubprocessoService subprocessoService;
+
+
 
     private Unidade unidadeMock;
     private Unidade unidadeSuperiorMock;
@@ -128,7 +131,6 @@ public class SubprocessoServiceTest {
 
     @Test
     void casoFeliz_retornaDetalhesComMovimentacoesEElementos() {
-        // Arrange
         Long spId = 1L;
         Unidade unidade = mock(Unidade.class);
         when(unidade.getCodigo()).thenReturn(10L);
@@ -176,10 +178,8 @@ public class SubprocessoServiceTest {
         when(atividadeRepository.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
         when(conhecimentoRepo.findAll()).thenReturn(List.of(kc));
 
-        // Act
         SubprocessoDetalheDto dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
 
-        // Assert
         assertNotNull(dto);
         assertNotNull(dto.getUnidade());
         assertEquals(unidade.getCodigo(), dto.getUnidade().getCodigo());
@@ -218,14 +218,11 @@ public class SubprocessoServiceTest {
 
     @Test
     void aceitarCadastro_deveNotificarESalvarAlerta() {
-        // Arrange
         setupBasico();
         when(subprocessoMock.getSituacaoId()).thenReturn("CADASTRO_DISPONIBILIZADO");
 
-        // Act
         subprocessoService.aceitarCadastro(1L, "Observações de teste", "analista_teste");
 
-        // Assert
         verify(analiseCadastroRepo).save(any(AnaliseCadastro.class));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
 
@@ -243,14 +240,11 @@ public class SubprocessoServiceTest {
 
     @Test
     void aceitarRevisaoCadastro_deveNotificarESalvarAlerta() {
-        // Arrange
         setupBasico();
         when(subprocessoMock.getSituacaoId()).thenReturn("REVISAO_CADASTRO_DISPONIBILIZADA");
 
-        // Act
         subprocessoService.aceitarRevisaoCadastro(1L, "Obs teste", "analista_teste");
 
-        // Assert
         verify(analiseCadastroRepo).save(any(AnaliseCadastro.class));
         verify(movimentacaoRepo).save(any(Movimentacao.class));
 
@@ -268,17 +262,14 @@ public class SubprocessoServiceTest {
 
     @Test
     void disponibilizarMapa_deveEnviarEmailsEAlertasCorretos() {
-        // Arrange
         setupBasico();
         LocalDate dataLimite = LocalDate.of(2025, 10, 31);
         String dataLimiteFormatada = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         when(subprocessoMock.getMapa()).thenReturn(mock(Mapa.class));
         when(subprocessoMock.getDataLimiteEtapa2()).thenReturn(dataLimite);
 
-        // Act
         subprocessoService.disponibilizarMapa(1L, "obs", dataLimite, "user");
 
-        // Assert
         ArgumentCaptor<String> siglaCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
@@ -308,7 +299,6 @@ public class SubprocessoServiceTest {
 
     @Test
     void obterMapaParaAjuste_deveRetornarDtoCompleto() {
-        // Arrange
         setupBasico();
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -329,12 +319,14 @@ public class SubprocessoServiceTest {
         con.setDescricao("Conhecimento Teste");
         when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(con));
 
-        when(competenciaAtividadeRepo.existsById(any())).thenReturn(true);
+        when(competenciaAtividadeRepo.existsById(any(CompetenciaAtividade.Id.class))).thenReturn(true);
 
-        // Act
+        CompetenciaAtividade caLink = mock(CompetenciaAtividade.class);
+        when(caLink.getAtividade()).thenReturn(ativ);
+        when(competenciaAtividadeRepo.findByCompetenciaCodigo(comp.getCodigo())).thenReturn(List.of(caLink));
+
         MapaAjusteDto dto = subprocessoService.obterMapaParaAjuste(1L);
 
-        // Assert
         assertNotNull(dto);
         assertEquals(100L, dto.mapaId());
         assertEquals(1, dto.competencias().size());
@@ -345,10 +337,10 @@ public class SubprocessoServiceTest {
 
     @Test
     void salvarAjustesMapa_deveLimparEVincularNovamente() {
-        // Arrange
         setupBasico();
         when(subprocessoMock.getSituacaoId()).thenReturn("MAPA_DISPONIBILIZADO");
-        when(competenciaAtividadeRepo.findByCompetenciaCodigo(anyLong())).thenReturn(List.of(new CompetenciaAtividade()));
+        List<CompetenciaAtividade> existingLinks = List.of(mock(CompetenciaAtividade.class));
+        when(competenciaAtividadeRepo.findByCompetenciaCodigo(anyLong())).thenReturn(existingLinks);
 
 
         ConhecimentoAjusteDto conDtoIncluido = new ConhecimentoAjusteDto(400L, "Conhecimento 1", true);
@@ -356,11 +348,9 @@ public class SubprocessoServiceTest {
         CompetenciaAjusteDto compDto = new CompetenciaAjusteDto(200L, "Competencia 1", List.of(ativDto));
         List<CompetenciaAjusteDto> requestDtos = List.of(compDto);
 
-        // Act
         subprocessoService.salvarAjustesMapa(1L, requestDtos, "user_teste");
 
-        // Assert
-        verify(competenciaAtividadeRepo).deleteAll(any());
+        verify(competenciaAtividadeRepo).deleteAll(existingLinks);
         verify(competenciaAtividadeRepo).save(any(CompetenciaAtividade.class));
         verify(subprocessoMock).setSituacaoId("MAPA_AJUSTADO");
         verify(subprocessoRepo).save(subprocessoMock);
@@ -368,11 +358,9 @@ public class SubprocessoServiceTest {
 
     @Test
     void salvarAjustesMapa_deveLancarExcecao_quandoSituacaoInvalida() {
-        // Arrange
         setupBasico();
         when(subprocessoMock.getSituacaoId()).thenReturn("SITUACAO_INVALIDA");
 
-        // Act & Assert
         assertThrows(IllegalStateException.class, () -> {
             subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste");
         });
@@ -380,7 +368,6 @@ public class SubprocessoServiceTest {
 
     @Test
     void importarAtividades_deveCopiarAtividadesEConhecimentos() {
-        // Arrange
         Unidade unidadeDestino = new Unidade();
         unidadeDestino.setCodigo(10L);
         Mapa mapaDestino = new Mapa();
@@ -413,12 +400,14 @@ public class SubprocessoServiceTest {
         conhecimentoOrigem.setDescricao("Conhecimento Original");
         when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(conhecimentoOrigem));
 
-        when(atividadeRepository.save(any(Atividade.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(atividadeRepository.save(any(Atividade.class))).thenAnswer(inv -> {
+            Atividade savedAtividade = inv.getArgument(0);
+            savedAtividade.setCodigo(301L); // Simulate DB generating an ID
+            return savedAtividade;
+        });
 
-        // Act
         subprocessoService.importarAtividades(1L, 2L);
 
-        // Assert
         ArgumentCaptor<Atividade> atividadeCaptor = ArgumentCaptor.forClass(Atividade.class);
         verify(atividadeRepository).save(atividadeCaptor.capture());
         assertEquals("Atividade Original", atividadeCaptor.getValue().getDescricao());
@@ -436,13 +425,16 @@ public class SubprocessoServiceTest {
 
     @Test
     void importarAtividades_deveLancarExcecao_quandoSituacaoDestinoInvalida() {
-        // Arrange
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(1L);
         spDestino.setSituacaoId("OUTRA_SITUACAO");
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(spDestino));
 
-        // Act & Assert
+        // Mock para o subprocesso de origem para evitar o NaoEncontrado
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(2L);
+        when(subprocessoRepo.findById(2L)).thenReturn(Optional.of(spOrigem));
+
         assertThrows(IllegalStateException.class, () -> {
             subprocessoService.importarAtividades(1L, 2L);
         });

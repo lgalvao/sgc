@@ -56,50 +56,18 @@ src/
 ```java
 @Test
 void exemploTeste() {
-    // Arrange (organização)
+    // Arrange (Organizar)
     SubprocessoService service = new SubprocessoService(...);
     when(repositorio.findById(1L)).thenReturn(Optional.of(subprocesso));
     
-    // Act (ação)
+    // Act (Agir)
     SubprocessoDto resultado = service.obterDetalhes(1L, "ADMIN", null);
     
-    // Assert (afirmação)
+    // Assert (Validar)
     assertNotNull(resultado);
     verify(repositorio).findById(1L);
 }
 ```
-
-### 2. Testes Isolados e Determinísticos
-- Evite dependências externas (banco de dados, serviços externos)
-- Utilize mocks para depender de classes externas
-- Garanta que os testes possam ser executados em qualquer ordem
-- Não compartilhe estado entre testes
-- Evite dependências de horário, data ou valores aleatórios
-
-### 3. Cobertura de Casos de Uso
-- Teste casos de sucesso e falha
-- Inclua validações de entrada
-- Verifique exceções esperadas
-- Teste regras de negócio críticas
-- Verifique transições de estado e efeitos colaterais
-
-### 4. Nomenclatura Clara e Descritiva
-- Use nomes que descrevem claramente o cenário testado
-- Siga o padrão: `método_cenário_comportamentoEsperado`
-- Exemplos:
-  - `disponibilizarCadastro_SubprocessoValido_AtualizaSituacao()`
-  - `obterDetalhes_PerfilNaoAutorizado_LancaAcessoNegado()`
-
-### 5. Evite Testes Frágeis
-- Não verifique detalhes de implementação interna
-- Foque no comportamento público e resultados
-- Teste o que o código faz, não como faz
-- Evite excesso de mocking que pode quebrar com pequenas mudanças
-
-### 6. Testes Expressivos
-- Use variáveis com nomes descritivos
-- Comente apenas quando necessário para explicar "por que", não "o que"
-- Organize os testes para serem legíveis como especificações
 
 ## Padrões de Teste por Camada
 
@@ -133,7 +101,7 @@ void disponibilizarCadastro_SubprocessoComMapa_RealizaDisponibilizacao() {
     
     when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocesso));
 
-    // When (quando o método é chamado)
+    // When (quando o metodo é chamado)
     service.disponibilizarCadastro(1L);
 
     // Then (então verifique o comportamento esperado)

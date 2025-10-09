@@ -313,16 +313,6 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
   - **Formatação de "Unidades Participantes":** A regra de negócio (lista textual das unidades de nível mais alto abaixo da unidade raiz que possuam todas as suas unidades subordinadas participando do processo) não está implementada.
   - **Funcionalidade para marcar alertas como visualizados:** Não há métodos para marcar alertas como visualizados.
 
-### 5.2 Integrações
-
-**Criticidade:** 🔴 ALTA
-
-- ❌ **SGRH:** Substituir a implementação MOCK do `SgrhService` pela integração real com o banco de dados Oracle para consumir as views. Isso envolve:
-  - Descomentar as configurações do datasource SGRH no `application.yml` e preencher com os dados de conexão reais.
-  - Para cada método em `SgrhServiceImpl`, remover o código de mock e implementar a lógica de consulta aos respectivos repositórios (`VwUsuarioRepository`, `VwUnidadeRepository`, `VwResponsabilidadeRepository`, `VwUsuarioPerfilUnidadeRepository`).
-  - Implementar os métodos de conversão de entidades JPA para DTOs.
-  - A lógica de `construirArvoreHierarquica` precisará ser implementada de forma eficiente.
-
 ### 5.3 Testes
 
 **Criticidade:** 🟡 MÉDIA
@@ -330,7 +320,6 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 - ⚠️ **Cobertura de Testes:** A cobertura de testes do backend é básica. É crucial:
   - **Adicionar testes de integração (`@SpringBootTest`):** Criar classes de teste para os principais fluxos de negócio (CDUs), verificando a interação entre serviços, transições de estado, criação de entidades, alertas e envio de e-mails. Exemplos incluem: início de processo, disponibilização de cadastro/revisão/mapa, análise de cadastro/revisão/validação, e finalização de processo.
   - **Ampliar testes unitários:** Revisar e criar testes unitários abrangentes para todos os métodos de serviço, especialmente aqueles identificados como incompletos ou com placeholders, garantindo que a lógica de negócio, validações e chamadas a outros componentes estejam corretas.
-  - ✅ **Progresso:** Testes unitários para os métodos `aceitarCadastro`, `homologarCadastro`, `aceitarRevisaoCadastro` e `homologarRevisaoCadastro` no `SubprocessoService` foram criados e passaram com sucesso.
 
 ### 5.4 Estratégia Recomendada
 
@@ -368,6 +357,5 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 | CDU-21 | Finalizar processo      | ✅ 100%  | ✅ CRÍTICA |
 
 **Estatísticas:**
-
-- **Implementação Backend Média:** ~85%
+- 
 - **CDUs Completos/Quase Completos:** 15/21 (71%)

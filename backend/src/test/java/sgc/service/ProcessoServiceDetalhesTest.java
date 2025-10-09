@@ -153,7 +153,6 @@ public class ProcessoServiceDetalhesTest {
         when(processoRepo.findById(2L)).thenReturn(Optional.of(p));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(2L, 10L)).thenReturn(false);
 
-        // Act & Assert
         assertThrows(ErroDominioAccessoNegado.class, () -> servico.obterDetalhes(2L, "GESTOR", 10L));
     }
 }

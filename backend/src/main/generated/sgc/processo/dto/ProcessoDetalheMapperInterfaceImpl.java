@@ -9,7 +9,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-08T14:30:14-0300",
+    date = "2025-10-09T08:37:38-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -42,6 +42,7 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
 
         ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO();
 
+        unidadeParticipanteDTO.setUnidadeCodigo( unidadeProcesso.getUnidadeCodigo() );
         unidadeParticipanteDTO.setNome( unidadeProcesso.getNome() );
         unidadeParticipanteDTO.setSigla( unidadeProcesso.getSigla() );
         unidadeParticipanteDTO.setUnidadeSuperiorCodigo( unidadeProcesso.getUnidadeSuperiorCodigo() );

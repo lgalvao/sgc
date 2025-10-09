@@ -169,12 +169,14 @@ public class ProcessoService {
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
 
-            Mapa mapa = mapaRepo.save(new Mapa());
+            if ("OPERACIONAL".equals(unidade.getTipo()) || "INTEROPERACIONAL".equals(unidade.getTipo())) {
+                Mapa mapa = mapaRepo.save(new Mapa());
 
-            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, "PENDENTE", processo.getDataLimite());
-            Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+                Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, "PENDENTE", processo.getDataLimite());
+                Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
-            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
+                movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
+            }
         }
 
         processo.setSituacao("EM_ANDAMENTO");

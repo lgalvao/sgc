@@ -3,7 +3,6 @@ package sgc.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
@@ -45,7 +44,6 @@ public class EventoProcessoListener {
      * @param evento Evento contendo os dados do processo iniciado
      */
     @EventListener
-    @Async
     @Transactional
     public void aoIniciarProcesso(ProcessoIniciadoEvento evento) {
         log.info("Processando evento de processo iniciado: idProcesso={}, tipo={}",

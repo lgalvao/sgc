@@ -19,3 +19,4 @@ backend/out/
 
 # Spring Boot
 *.log!/backend/src/main/generated/
+/htmlReport/

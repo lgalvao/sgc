@@ -14,7 +14,6 @@ import java.util.Map;
 @RequestMapping("/api/alertas")
 @RequiredArgsConstructor
 public class AlertaControle {
-
     private final AlertaService alertaService;
 
     /**
