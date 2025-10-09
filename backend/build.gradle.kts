@@ -254,9 +254,6 @@ tasks.register("agentTest") {
     group = "verification"
     description = "Run tests with agent-optimized output"
     dependsOn("test")
-    doLast {
-        println("\n✅ Agent test complete. Check output above for summary.")
-    }
 }
 
 tasks.register<Test>("testClass") {

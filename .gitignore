@@ -1,22 +1,12 @@
-# Gradle
 .gradle/
 build/
 !gradle-wrapper.jar
-
-# IDE
 .idea/
 *.iml
 *.iws
-
-# Frontend
 frontend/node_modules/
 frontend/dist/
-
-# Backend
 backend/src/main/resources/static/
 backend/build/
 backend/out/
-
-# Spring Boot
 *.log!/backend/src/main/generated/
-/htmlReport/
