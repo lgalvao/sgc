@@ -115,7 +115,7 @@ class PainelServiceTest {
         var result = painelService.listarProcessos("ADMIN", null, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().get(0).getCodigo());
+        assertEquals(1L, result.getContent().get(0).codigo());
         verify(processoRepo, times(1)).findAll();
     }
 
@@ -144,9 +144,9 @@ class PainelServiceTest {
         var result = painelService.listarProcessos("USUARIO", 10L, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().get(0).getCodigo());
-        assertEquals(10L, result.getContent().get(0).getUnidadeCodigo());
-        assertEquals("Unidade 1", result.getContent().get(0).getUnidadeNome());
+        assertEquals(1L, result.getContent().get(0).codigo());
+        assertEquals(10L, result.getContent().get(0).unidadeCodigo());
+        assertEquals("Unidade 1", result.getContent().get(0).unidadeNome());
         verify(processoRepo, times(1)).findAll();
     }
 

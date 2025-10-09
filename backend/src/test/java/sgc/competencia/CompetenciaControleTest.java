@@ -43,9 +43,7 @@ class CompetenciaControleTest {
         competencia.setCodigo(1L);
         competencia.setDescricao("Test Desc");
 
-        CompetenciaDto competenciaDTO = new CompetenciaDto();
-        competenciaDTO.setCodigo(1L);
-        competenciaDTO.setDescricao("Test Desc");
+        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, "Test Desc");
 
         when(competenciaRepo.findAll()).thenReturn(Collections.singletonList(competencia));
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
@@ -64,9 +62,7 @@ class CompetenciaControleTest {
         competencia.setCodigo(1L);
         competencia.setDescricao("Test Desc");
 
-        CompetenciaDto competenciaDTO = new CompetenciaDto();
-        competenciaDTO.setCodigo(1L);
-        competenciaDTO.setDescricao("Test Desc");
+        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, "Test Desc");
 
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
@@ -90,19 +86,16 @@ class CompetenciaControleTest {
 
     @Test
     void criarCompetencia_deveCriarEretornarCompetencia() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto();
-        dto.setDescricao("Nova Competencia");
+        CompetenciaDto dto = new CompetenciaDto(null, null, "Nova Competencia");
 
         Competencia entity = new Competencia();
-        entity.setDescricao(dto.getDescricao());
+        entity.setDescricao(dto.descricao());
 
         Competencia savedEntity = new Competencia();
         savedEntity.setCodigo(1L);
         savedEntity.setDescricao(entity.getDescricao());
 
-        CompetenciaDto savedDto = new CompetenciaDto();
-        savedDto.setCodigo(savedEntity.getCodigo());
-        savedDto.setDescricao(savedEntity.getDescricao());
+        CompetenciaDto savedDto = new CompetenciaDto(savedEntity.getCodigo(), null, savedEntity.getDescricao());
 
         when(competenciaMapper.toEntity(any(CompetenciaDto.class))).thenReturn(entity);
         when(competenciaRepo.save(any(Competencia.class))).thenReturn(savedEntity);
@@ -121,8 +114,7 @@ class CompetenciaControleTest {
 
     @Test
     void criarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto();
-        dto.setDescricao(" "); // Descrição inválida
+        CompetenciaDto dto = new CompetenciaDto(null, null, " "); // Descrição inválida
 
         // When & Then
         mockMvc.perform(post("/api/competencias")
@@ -134,8 +126,7 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_quandoEncontrada_deveAtualizarEretornarCompetencia() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto();
-        dto.setDescricao("Competencia Atualizada");
+        CompetenciaDto dto = new CompetenciaDto(null, null, "Competencia Atualizada");
 
         Competencia existingEntity = new Competencia();
         existingEntity.setCodigo(1L);
@@ -143,11 +134,9 @@ class CompetenciaControleTest {
 
         Competencia updatedEntity = new Competencia();
         updatedEntity.setCodigo(1L);
-        updatedEntity.setDescricao(dto.getDescricao());
+        updatedEntity.setDescricao(dto.descricao());
 
-        CompetenciaDto updatedDto = new CompetenciaDto();
-        updatedDto.setCodigo(1L);
-        updatedDto.setDescricao(dto.getDescricao());
+        CompetenciaDto updatedDto = new CompetenciaDto(1L, null, dto.descricao());
 
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(existingEntity));
         when(competenciaRepo.save(any(Competencia.class))).thenReturn(updatedEntity);
@@ -164,8 +153,7 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto();
-        dto.setDescricao(""); // Descrição inválida
+        CompetenciaDto dto = new CompetenciaDto(null, null, ""); // Descrição inválida
 
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(new Competencia()));
 
@@ -179,8 +167,7 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto();
-        dto.setDescricao("Nao importa");
+        CompetenciaDto dto = new CompetenciaDto(null, null, "Nao importa");
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then

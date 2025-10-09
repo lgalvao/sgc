@@ -22,9 +22,9 @@ class CompetenciaMapperTest {
         CompetenciaDto dto = mapper.toDTO(competencia);
 
         assertNotNull(dto);
-        assertEquals(10L, dto.getCodigo());
-        assertEquals(1L, dto.getMapaCodigo());
-        assertEquals("Descrição Teste", dto.getDescricao());
+        assertEquals(10L, dto.codigo());
+        assertEquals(1L, dto.mapaCodigo());
+        assertEquals("Descrição Teste", dto.descricao());
     }
 
     @Test
@@ -35,9 +35,9 @@ class CompetenciaMapperTest {
         CompetenciaDto dto = mapper.toDTO(competencia);
 
         assertNotNull(dto);
-        assertEquals(10L, dto.getCodigo());
-        assertNull(dto.getMapaCodigo());
-        assertEquals("Descrição Teste", dto.getDescricao());
+        assertEquals(10L, dto.codigo());
+        assertNull(dto.mapaCodigo());
+        assertEquals("Descrição Teste", dto.descricao());
     }
 
     @Test

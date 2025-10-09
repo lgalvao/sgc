@@ -13,18 +13,16 @@ class ConhecimentoDtoTest {
         ConhecimentoDto dto = new ConhecimentoDto(1L, 100L, "Test Description");
 
         // Test getters
-        assertEquals(1L, dto.getCodigo());
-        assertEquals(100L, dto.getAtividadeCodigo());
-        assertEquals("Test Description", dto.getDescricao());
+        assertEquals(1L, dto.codigo());
+        assertEquals(100L, dto.atividadeCodigo());
+        assertEquals("Test Description", dto.descricao());
 
-        // Test setters
-        dto.setCodigo(2L);
-        dto.setAtividadeCodigo(200L);
-        dto.setDescricao("New Description");
+        // Test setters (records are immutable, so we create a new instance)
+        dto = new ConhecimentoDto(2L, 200L, "New Description");
 
-        assertEquals(2L, dto.getCodigo());
-        assertEquals(200L, dto.getAtividadeCodigo());
-        assertEquals("New Description", dto.getDescricao());
+        assertEquals(2L, dto.codigo());
+        assertEquals(200L, dto.atividadeCodigo());
+        assertEquals("New Description", dto.descricao());
     }
 
     @Test
