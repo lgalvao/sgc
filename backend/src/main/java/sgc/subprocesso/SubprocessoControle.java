@@ -573,4 +573,26 @@ public class SubprocessoControle {
         SubprocessoDto subprocesso = subprocessoService.submeterMapaAjustado(id, usuarioTitulo);
         return ResponseEntity.ok(subprocesso);
     }
+
+    /**
+     * CDU-08 - Importar atividades de outro subprocesso
+     * POST /api/subprocessos/{id}/importar-atividades
+     */
+    @PostMapping("/{id}/importar-atividades")
+    @Transactional
+    public ResponseEntity<?> importarAtividades(
+        @PathVariable Long id,
+        @RequestBody @Valid ImportarAtividadesRequest request
+    ) {
+        try {
+            subprocessoService.importarAtividades(id, request.subprocessoOrigemId());
+            return ResponseEntity.ok(Map.of("message", "Atividades importadas com sucesso."));
+        } catch (ErroEntidadeNaoEncontrada e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Erro interno ao importar atividades."));
+        }
+    }
 }

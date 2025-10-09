@@ -1,13 +1,16 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     java
     id("org.springframework.boot") version "3.5.6" // É uma boa prática definir a versão do plugin
     id("io.spring.dependency-management") version "1.1.7" // É uma boa prática definir a versão do plugin
+    jacoco
 }
 
+// Definição de versões em um só lugar para facilitar a manutenção
 extra["jjwt.version"] = "0.13.0"
 extra["mapstruct.version"] = "1.6.3"
 
@@ -36,6 +39,7 @@ dependencies {
 }
 
 tasks.named<ProcessResources>("processResources") {
+    // Build frontend only when explicitly requested to avoid running frontend build during backend tests.
     if (project.hasProperty("withFrontend") && project.property("withFrontend").toString() == "true") {
         dependsOn(":copyFrontend")
     }
@@ -50,9 +54,24 @@ tasks.withType<BootJar> {
     mainClass.set("sgc.SgcApplication")
 }
 
+tasks.withType<BootRun> {
+    // isEnabled = true é o padrão, não precisa ser declarado.
+}
+
+// ============================================
 // AGENT-OPTIMIZED TEST CONFIGURATION
+// ============================================
+
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    // Explicitly include all test classes to fix discovery issues.
+    include("**/*Test.class", "**/*Tests.class")
+
+    // JaCoCo is now enabled by default for all test runs to ensure coverage report generation.
+    extensions.findByType<JacocoTaskExtension>()?.apply {
+        isEnabled = true
+    }
 
     // Performance optimization for agent iterations
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
@@ -87,15 +106,17 @@ tasks.withType<Test> {
         }
     }
 
+    // Minimal console noise
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED)
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showCauses = true
         showStackTraces = true
-        showStandardStreams = false
+        showStandardStreams = false // Suppress System.out/err during tests
     }
 
+    // Custom test listener for agent-friendly output
     addTestListener(object : TestListener {
         private val failures = mutableListOf<TestFailure>()
         private val skipped = mutableListOf<String>()
@@ -127,7 +148,10 @@ tasks.withType<Test> {
         }
 
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            if (suite.parent == null) outputAgentSummary(result, failures, skipped)
+            // Only output summary for root suite (all tests completed)
+            if (suite.parent == null) {
+                outputAgentSummary(result, failures, skipped)
+            }
         }
 
         private fun filterStackTrace(exception: Throwable?): List<String> {
@@ -136,10 +160,12 @@ tasks.withType<Test> {
             return exception.stackTrace
                 .filter { element ->
                     val className = element.className
+                    // Include: Your app code, Spring framework (but not test internals)
                     (className.startsWith("sgc") ||
                             className.startsWith("org.springframework.web") ||
                             className.startsWith("org.springframework.data") ||
                             className.startsWith("org.springframework.boot") && !className.contains(".test.")) &&
+                            // Exclude: Build tool internals
                             !className.contains("gradle") &&
                             !className.contains("junit.platform.launcher")
                 }
@@ -164,9 +190,9 @@ tasks.withType<Test> {
             println("Time:    ${result.endTime - result.startTime}ms")
 
             if (failures.isNotEmpty()) {
-                println("\n" + "-".repeat(10))
+                println("\n" + "-".repeat(80))
                 println("FALHAS (${failures.size})")
-                println("-".repeat(10))
+                println("-".repeat(80))
                 failures.forEachIndexed { index, failure ->
                     println("\n${index + 1}. ${failure.testClass}.${failure.testMethod}")
                     println("   Erro: ${failure.errorType}: ${failure.errorMessage}")
@@ -180,10 +206,10 @@ tasks.withType<Test> {
             }
             if (skipped.isNotEmpty()) {
                 println("IGNORADOS (${skipped.size})")
-                println("-".repeat(10))
+                println("-".repeat(80))
                 skipped.forEach { println("  • $it") }
             }
-            println("\n" + "=".repeat(10))
+            println("\n" + "=".repeat(80))
             println()
 
             // Machine-readable JSON output for advanced agent parsing
@@ -230,6 +256,9 @@ tasks.withType<Test> {
     failFast = project.hasProperty("failFast")
 }
 
+// The tasks.named<Test>("test") block was removed as it was overriding the global
+// test configuration and suppressing the custom test output.
+
 // Data class for test failures
 data class TestFailure(
     val testClass: String,
@@ -251,7 +280,10 @@ data class TestFailure(
     """.trimIndent()
 }
 
+// ============================================
 // BUILD OPTIMIZATION FOR AGENT ITERATIONS
+// ============================================
+
 // Enable incremental compilation
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("--enable-preview")
@@ -267,6 +299,11 @@ tasks.named("build") {
     outputs.cacheIf { true }
 }
 
+// ============================================
+// AGENT HELPER TASKS
+// ============================================
+
+// Quick test with minimal output - perfect for agents
 tasks.register("agentTest") {
     group = "verification"
     description = "Run tests with agent-optimized output"
@@ -280,16 +317,72 @@ tasks.register("agentTest") {
 tasks.register<Test>("testClass") {
     group = "verification"
     description = "Run a single test class: ./gradlew testClass -PtestClass=YourTestClass"
+
+    // testClassesDirs and classpath are now inferred by default.
     useJUnitPlatform()
     filter {
         val className = project.findProperty("testClass") as? String
         if (className != null) {
-            includeTestsMatching("*.$className")
+            // Use wildcard matching to ensure classes are found regardless of exact path.
+            includeTestsMatching("*$className")
         }
     }
+
     testLogging {
         events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
     }
+}
+
+// ============================================
+// JACOCO TEST COVERAGE CONFIGURATION
+// ============================================
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("test"))
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test"))
+    }
+
+    // Specify all source directories
+    sourceDirectories.setFrom(files(sourceSets.main.get().allSource.srcDirs))
+
+    // Specify all class directories
+    classDirectories.setFrom(files(sourceSets.main.get().output))
+
+    // Specify where to find the execution data
+    executionData.setFrom(fileTree(layout.buildDirectory) {
+        include("jacoco/*.exec")
+    })
+}
+
+// Add coverage verification task
+tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") { // Nome corrigido para 'Verification'
+    dependsOn(tasks.named("jacocoTestReport"))
+
+    sourceDirectories.setFrom(files(sourceSets.main.get().allSource.srcDirs))
+    classDirectories.setFrom(files(sourceSets.main.get().output))
+    executionData.setFrom(fileTree(layout.buildDirectory) {
+        include("jacoco/*.exec")
+    })
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.0".toBigDecimal() // Adjust as needed
+            }
+        }
+    }
+}
+
+// Conditional JaCoCo configuration has been removed as it is now enabled by default.
+
+
+// The undiscoveredTest source set and task have been removed as the issue is resolved.
+tasks.named("check") {
+    // No longer depends on the removed undiscoveredTestTask
 }

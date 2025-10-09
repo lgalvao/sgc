@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
@@ -42,7 +41,7 @@ class MapaServiceImplTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private AtividadeRepo atividadeRepo;
+    private sgc.atividade.modelo.AtividadeRepo atividadeRepo;
 
     @InjectMocks
     private MapaServiceImpl mapaServico;
@@ -142,6 +141,7 @@ class MapaServiceImplTest {
         when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapa);
         when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(competencia));
         when(repositorioCompetencia.save(any(Competencia.class))).thenReturn(competencia);
+        when(atividadeRepo.existsById(1L)).thenReturn(true);
 
         mapaServico.salvarMapaSubprocesso(100L, request, "user");
 

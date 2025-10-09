@@ -14,6 +14,10 @@ import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.dto.ConhecimentoDto;
@@ -50,6 +54,8 @@ public class SubprocessoService {
     private final AnaliseCadastroRepo repositorioAnaliseCadastro;
     private final AnaliseValidacaoRepo repositorioAnaliseValidacao;
     private final NotificacaoRepo repositorioNotificacao;
+    private final CompetenciaRepo competenciaRepo;
+    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final NotificacaoService notificacaoService;
     private final ApplicationEventPublisher publicadorDeEventos;
     private final AlertaRepo repositorioAlerta;
@@ -383,21 +389,60 @@ public class SubprocessoService {
         Long idMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
 
-        String justificativa = "Ajustes necessários conforme análise anterior.";
+        String justificativa = repositorioAnaliseValidacao.findFirstBySubprocesso_CodigoOrderByDataHoraDesc(idSubprocesso)
+                .map(AnaliseValidacao::getObservacoes)
+                .orElse(null);
 
-        return new MapaAjusteDto(idMapa, nomeUnidade, new ArrayList<>(), justificativa);
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(idMapa);
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);
+        List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
+
+        for (Competencia comp : competencias) {
+            List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
+            for (Atividade ativ : atividades) {
+                List<Conhecimento> conhecimentos = repositorioConhecimento.findByAtividadeCodigo(ativ.getCodigo());
+                boolean isLinked = competenciaAtividadeRepo.existsById(new CompetenciaAtividade.Id(comp.getCodigo(), ativ.getCodigo()));
+                List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentos.stream()
+                        .map(con -> new ConhecimentoAjusteDto(con.getCodigo(), con.getDescricao(), isLinked))
+                        .collect(Collectors.toList());
+                atividadeDtos.add(new AtividadeAjusteDto(ativ.getCodigo(), ativ.getDescricao(), conhecimentoDtos));
+            }
+            competenciaDtos.add(new CompetenciaAjusteDto(comp.getCodigo(), comp.getDescricao(), atividadeDtos));
+        }
+
+        return new MapaAjusteDto(idMapa, nomeUnidade, competenciaDtos, justificativa);
     }
 
     @Transactional
-    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<?> competencias, String usuarioTitulo) {
+    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTitulo) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_HOMOLOGADA".equals(sp.getSituacaoId())) {
-            throw new IllegalStateException("Ajustes no mapa só podem ser feitos quando a revisão do cadastro está homologada.");
+        if (!"REVISAO_CADASTRO_HOMOLOGADA".equals(sp.getSituacaoId()) &&
+            !"MAPA_DISPONIBILIZADO".equals(sp.getSituacaoId()) &&
+            !"MAPA_AJUSTADO".equals(sp.getSituacaoId())) {
+             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacaoId());
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            List<CompetenciaAtividade> linksExistentes = competenciaAtividadeRepo.findByCompetenciaCodigo(compDto.competenciaId());
+            if (linksExistentes != null && !linksExistentes.isEmpty()) {
+                competenciaAtividadeRepo.deleteAll(linksExistentes);
+            }
+        }
+
+        for (CompetenciaAjusteDto compDto : competencias) {
+            for (AtividadeAjusteDto ativDto : compDto.atividades()) {
+                boolean deveVincular = ativDto.conhecimentos().stream().anyMatch(ConhecimentoAjusteDto::incluido);
+                if (deveVincular) {
+                    CompetenciaAtividade novoLink = new CompetenciaAtividade();
+                    novoLink.setId(new CompetenciaAtividade.Id(compDto.competenciaId(), ativDto.atividadeId()));
+                    competenciaAtividadeRepo.save(novoLink);
+                }
+            }
+        }
 
         sp.setSituacaoId("MAPA_AJUSTADO");
         repositorioSubprocesso.save(sp);
@@ -422,27 +467,40 @@ public class SubprocessoService {
         Unidade unidade = sp.getUnidade();
         if (unidade == null) return;
 
-        String assunto = "SGC: Mapa de competências disponibilizado para validação";
-        String corpo = String.format(
-            "O mapa de competências da unidade %s foi disponibilizado para validação no processo '%s'. O prazo para conclusão desta etapa é %s.",
-            unidade.getSigla(),
-            sp.getProcesso().getDescricao(),
-            sp.getDataLimiteEtapa2()
+        String nomeProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidade = unidade.getSigla();
+        String dataLimite = sp.getDataLimiteEtapa2().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        // Item 17: E-mail para a própria unidade
+        String assuntoUnidade = "SGC: Mapa de Competências da sua unidade disponibilizado para validação";
+        String corpoUnidade = String.format(
+            "O mapa de competências da sua unidade (%s) foi disponibilizado para validação no processo '%s'. O prazo para conclusão desta etapa é %s.",
+            siglaUnidade,
+            nomeProcesso,
+            dataLimite
         );
+        notificacaoService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
-        notificacaoService.enviarEmail(unidade.getSigla(), assunto, corpo);
-
+        // Item 18: E-mail para as unidades superiores
+        String assuntoSuperior = "SGC: Mapa de Competências da unidade " + siglaUnidade + " disponibilizado para validação";
+        String corpoSuperior = String.format(
+            "O mapa de competências da unidade %s foi disponibilizado para validação no processo '%s'. O prazo para conclusão desta etapa é %s. Acompanhe o processo no sistema.",
+            siglaUnidade,
+            nomeProcesso,
+            dataLimite
+        );
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            notificacaoService.enviarEmail(superior.getSigla(), assunto, corpo);
+            notificacaoService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
             superior = superior.getUnidadeSuperior();
         }
 
+        // Item 16: Alerta para a própria unidade
         Alerta alerta = new Alerta();
-        alerta.setDescricao("Mapa de competências da unidade " + unidade.getSigla() + " disponibilizado para análise");
+        alerta.setDescricao(String.format("Seu mapa de competências está disponível para validação (Processo: %s)", nomeProcesso));
         alerta.setProcesso(sp.getProcesso());
         alerta.setDataHora(java.time.LocalDateTime.now());
-        alerta.setUnidadeOrigem(null);
+        alerta.setUnidadeOrigem(null); // Origem é o sistema
         alerta.setUnidadeDestino(unidade);
         repositorioAlerta.save(alerta);
     }
@@ -593,7 +651,35 @@ public class SubprocessoService {
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Cadastro de atividades e conhecimentos aceito"));
         log.info("Notificando unidade {} sobre aceite do cadastro da unidade {}", unidadeDestino.getSigla(), unidadeOrigem.getSigla());
 
+        // Notificar unidade superior
+        notificarAceiteCadastro(sp, unidadeDestino);
+
         return subprocessoMapper.toDTO(sp);
+    }
+
+    private void notificarAceiteCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeOrigem = sp.getUnidade().getSigla();
+        String nomeProcesso = sp.getProcesso().getDescricao();
+
+        // 1. Enviar E-mail
+        String assunto = "SGC: Cadastro da unidade " + siglaUnidadeOrigem + " aceito e aguardando homologação";
+        String corpo = String.format(
+            "O cadastro de atividades e conhecimentos da unidade %s, referente ao processo '%s', foi aceito e está disponível para homologação.",
+            siglaUnidadeOrigem,
+            nomeProcesso
+        );
+        notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+
+        // 2. Criar Alerta
+        Alerta alerta = new Alerta();
+        alerta.setDescricao("Cadastro da unidade " + siglaUnidadeOrigem + " aguardando homologação");
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade());
+        alerta.setUnidadeDestino(unidadeDestino);
+        repositorioAlerta.save(alerta);
     }
 
     @Transactional
@@ -605,7 +691,9 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), sp.getUnidade().getUnidadeSuperior(), "Cadastro de atividades e conhecimentos homologado"));
+        Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
+        // A homologação é uma ação final do ADMIN (SEDOC), a movimentação termina na própria unidade de origem.
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Cadastro de atividades e conhecimentos homologado"));
         sp.setSituacaoId("CADASTRO_HOMOLOGADO");
         repositorioSubprocesso.save(sp);
 
@@ -662,7 +750,35 @@ public class SubprocessoService {
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
 
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
+
+        notificarAceiteRevisaoCadastro(sp, unidadeDestino);
+
         return subprocessoMapper.toDTO(sp);
+    }
+
+    private void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeOrigem = sp.getUnidade().getSigla();
+        String nomeProcesso = sp.getProcesso().getDescricao();
+
+        // 1. Enviar E-mail
+        String assunto = "SGC: Revisão de cadastro da " + siglaUnidadeOrigem + " aceita e aguardando homologação";
+        String corpo = String.format(
+            "A revisão do cadastro de atividades e conhecimentos da unidade %s, referente ao processo '%s', foi aceita e está disponível para homologação.",
+            siglaUnidadeOrigem,
+            nomeProcesso
+        );
+        notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+
+        // 2. Criar Alerta
+        Alerta alerta = new Alerta();
+        alerta.setDescricao("Revisão de cadastro da unidade " + siglaUnidadeOrigem + " aguardando homologação");
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade());
+        alerta.setUnidadeDestino(unidadeDestino);
+        repositorioAlerta.save(alerta);
     }
 
     @Transactional
@@ -674,10 +790,60 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), sp.getUnidade().getUnidadeSuperior(), "Revisão do cadastro de atividades e conhecimentos homologada"));
+        Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Revisão do cadastro de atividades e conhecimentos homologada"));
         sp.setSituacaoId("REVISAO_CADASTRO_HOMOLOGADA");
         repositorioSubprocesso.save(sp);
 
+        log.info("Revisão do subprocesso {} homologada com sucesso.", idSubprocesso);
+
         return subprocessoMapper.toDTO(sp);
+    }
+
+    @Transactional
+    public void importarAtividades(Long idSubprocessoDestino, Long idSubprocessoOrigem) {
+        Subprocesso spDestino = repositorioSubprocesso.findById(idSubprocessoDestino)
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: " + idSubprocessoDestino));
+
+        if (!"CADASTRO_EM_ELABORACAO".equals(spDestino.getSituacaoId())) {
+            throw new IllegalStateException("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
+        }
+
+        Subprocesso spOrigem = repositorioSubprocesso.findById(idSubprocessoOrigem)
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de origem não encontrado: " + idSubprocessoOrigem));
+
+        if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
+            throw new IllegalStateException("Subprocesso de origem ou destino não possui mapa associado.");
+        }
+
+        List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());
+        if (atividadesOrigem == null || atividadesOrigem.isEmpty()) {
+            return; // Nada a importar
+        }
+
+        for (Atividade atividadeOrigem : atividadesOrigem) {
+            Atividade novaAtividade = new Atividade();
+            novaAtividade.setDescricao(atividadeOrigem.getDescricao());
+            novaAtividade.setMapa(spDestino.getMapa());
+            Atividade atividadeSalva = atividadeRepo.save(novaAtividade);
+
+            List<Conhecimento> conhecimentosOrigem = repositorioConhecimento.findByAtividadeCodigo(atividadeOrigem.getCodigo());
+            if (conhecimentosOrigem != null) {
+                for (Conhecimento conhecimentoOrigem : conhecimentosOrigem) {
+                    Conhecimento novoConhecimento = new Conhecimento();
+                    novoConhecimento.setDescricao(conhecimentoOrigem.getDescricao());
+                    novoConhecimento.setAtividade(atividadeSalva);
+                    repositorioConhecimento.save(novoConhecimento);
+                }
+            }
+        }
+
+        String descricaoMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+            spOrigem.getCodigo(),
+            spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
+
+        repositorioMovimentacao.save(new Movimentacao(spDestino, spDestino.getUnidade(), spDestino.getUnidade(), descricaoMovimentacao));
+
+        log.info("Atividades importadas com sucesso do subprocesso {} para {}", idSubprocessoOrigem, idSubprocessoDestino);
     }
 }
