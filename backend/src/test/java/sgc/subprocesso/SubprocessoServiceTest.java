@@ -273,7 +273,7 @@ public class SubprocessoServiceTest {
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.disponibilizarMapa(id, "observacoes", LocalDate.now(), "usuario");
 
@@ -306,7 +306,7 @@ public class SubprocessoServiceTest {
         subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.apresentarSugestoes(id, "sugestoes", "usuario");
 
@@ -326,7 +326,7 @@ public class SubprocessoServiceTest {
         subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.validarMapa(id, "usuario");
 
@@ -381,7 +381,7 @@ public class SubprocessoServiceTest {
         subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.devolverValidacao(id, "justificativa", "usuario");
 
@@ -404,7 +404,7 @@ public class SubprocessoServiceTest {
         unidadeSuperior.setUnidadeSuperior(unidadeSuperSuperior);
         subprocesso.getUnidade().setUnidadeSuperior(unidadeSuperior);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.aceitarValidacao(id, "usuario");
 
@@ -420,7 +420,7 @@ public class SubprocessoServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.homologarValidacao(id, "usuario");
 
@@ -467,7 +467,7 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setSituacaoId("REVISAO_CADASTRO_HOMOLOGADA");
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.salvarAjustesMapa(id, new ArrayList<>(), "usuario");
 
@@ -499,7 +499,7 @@ public class SubprocessoServiceTest {
         subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.submeterMapaAjustado(id, "usuario");
 
@@ -521,7 +521,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.devolverCadastro(id, "motivo", "observacoes", "usuario");
 
@@ -544,7 +544,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.aceitarCadastro(id, "observacoes", "usuario");
 
@@ -580,7 +580,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.homologarCadastro(id, "observacoes", "usuario");
 
@@ -600,7 +600,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.devolverRevisaoCadastro(id, "motivo", "observacoes", "usuario");
 
@@ -622,7 +622,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(id, "observacoes", "usuario");
 
@@ -642,7 +642,7 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(new SubprocessoDto());
+        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(id, "observacoes", "usuario");
 

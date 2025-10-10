@@ -56,7 +56,7 @@ class ProcessoDetalheDtoTest {
         assertEquals(limitDate, dto.dataLimite());
         assertNotNull(dto.filhos());
         assertEquals(1, dto.filhos().size());
-        assertEquals(2L, dto.filhos().get(0).unidadeCodigo());
+        assertEquals(2L, dto.filhos().getFirst().unidadeCodigo());
     }
 
     @Test

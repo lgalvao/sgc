@@ -227,43 +227,31 @@ class SubprocessoDtoTest {
     }
 
     @Test
-    void SubprocessoDto_GettersAndSetters() {
-        SubprocessoDto dto = new SubprocessoDto();
-
+    void SubprocessoDto_Builder_Test() {
         LocalDate dataLimite = LocalDate.now().plusDays(10);
         LocalDateTime dataFim = LocalDateTime.now();
 
-        dto.setCodigo(1L);
-        dto.setProcessoCodigo(1L);
-        dto.setUnidadeCodigo(1L);
-        dto.setMapaCodigo(1L);
-        dto.setDataLimiteEtapa1(dataLimite);
-        dto.setDataFimEtapa1(dataFim);
-        dto.setDataLimiteEtapa2(dataLimite);
-        dto.setDataFimEtapa2(dataFim);
-        dto.setSituacaoId("SITUACAO");
+        SubprocessoDto dto = SubprocessoDto.builder()
+            .codigo(1L)
+            .processoCodigo(2L)
+            .unidadeCodigo(3L)
+            .mapaCodigo(4L)
+            .dataLimiteEtapa1(dataLimite)
+            .dataFimEtapa1(dataFim)
+            .dataLimiteEtapa2(dataLimite.plusDays(1))
+            .dataFimEtapa2(dataFim.plusHours(1))
+            .situacaoId("TESTE")
+            .build();
 
         assertEquals(1L, dto.getCodigo());
-        assertEquals(1L, dto.getProcessoCodigo());
-        assertEquals(1L, dto.getUnidadeCodigo());
-        assertEquals(1L, dto.getMapaCodigo());
+        assertEquals(2L, dto.getProcessoCodigo());
+        assertEquals(3L, dto.getUnidadeCodigo());
+        assertEquals(4L, dto.getMapaCodigo());
         assertEquals(dataLimite, dto.getDataLimiteEtapa1());
         assertEquals(dataFim, dto.getDataFimEtapa1());
-        assertEquals(dataLimite, dto.getDataLimiteEtapa2());
-        assertEquals(dataFim, dto.getDataFimEtapa2());
-        assertEquals("SITUACAO", dto.getSituacaoId());
-
-        // Test constructor
-        SubprocessoDto dto2 = new SubprocessoDto(1L, 1L, 1L, 1L, dataLimite, dataFim, dataLimite, dataFim, "SITUACAO");
-        assertEquals(1L, dto2.getCodigo());
-        assertEquals(1L, dto2.getProcessoCodigo());
-        assertEquals(1L, dto2.getUnidadeCodigo());
-        assertEquals(1L, dto2.getMapaCodigo());
-        assertEquals(dataLimite, dto2.getDataLimiteEtapa1());
-        assertEquals(dataFim, dto2.getDataFimEtapa1());
-        assertEquals(dataLimite, dto2.getDataLimiteEtapa2());
-        assertEquals(dataFim, dto2.getDataFimEtapa2());
-        assertEquals("SITUACAO", dto2.getSituacaoId());
+        assertEquals(dataLimite.plusDays(1), dto.getDataLimiteEtapa2());
+        assertEquals(dataFim.plusHours(1), dto.getDataFimEtapa2());
+        assertEquals("TESTE", dto.getSituacaoId());
     }
 
     @Test

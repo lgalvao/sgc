@@ -88,15 +88,16 @@ Este plano será um guia. A execução será iterativa, focando em um DTO ou um 
 
 Esta seção rastreia o progresso da refatoração dos DTOs.
 
-### DTOs Concluídos (Revisados e Convertidos para Record)
+### DTOs Concluídos
 
-A maioria dos DTOs já foi convertida para `record`. Os seguintes DTOs foram revisados ou refatorados recentemente:
+A maioria dos DTOs já foi convertida para `record` ou `class` com `@Builder`. Os seguintes DTOs foram revisados ou refatorados recentemente:
 
-*   `sgc.subprocesso.dto.SubprocessoCadastroDto`
-*   `sgc.subprocesso.dto.SubprocessoDetalheDto`
+*   `sgc.subprocesso.dto.SubprocessoCadastroDto` (convertido para `record`)
+*   `sgc.subprocesso.dto.SubprocessoDetalheDto` (convertido para `record`)
+*   `sgc.subprocesso.dto.SubprocessoDto` (convertido para `class` com `@Builder`)
 
 ### DTOs Pendentes (Para Análise)
 
 A lista a seguir contém DTOs que foram identificados como classes e ainda precisam ser analisados e potencialmente refatorados.
 
-*   `sgc.subprocesso.dto.SubprocessoDto`
+*(Nenhum DTO pendente no momento)*

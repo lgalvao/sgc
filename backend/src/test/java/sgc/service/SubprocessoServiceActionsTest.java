@@ -86,7 +86,7 @@ public class SubprocessoServiceActionsTest {
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
             Subprocesso sp = inv.getArgument(0);
-            SubprocessoDto dto = new SubprocessoDto();
+            SubprocessoDto dto = SubprocessoDto.builder().build();
             dto.setCodigo(sp.getCodigo());
             dto.setSituacaoId(sp.getSituacaoId());
             return dto;

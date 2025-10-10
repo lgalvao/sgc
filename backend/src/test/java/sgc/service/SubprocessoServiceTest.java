@@ -12,6 +12,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
@@ -51,34 +52,43 @@ import static org.mockito.Mockito.*;
 public class SubprocessoServiceTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
+
     @Mock
     private MovimentacaoRepo repositorioMovimentacao;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private ConhecimentoRepo repositorioConhecimento;
+
     @Mock
     private AnaliseCadastroRepo repositorioAnaliseCadastro;
+
     @Mock
-    private sgc.analise.modelo.AnaliseValidacaoRepo repositorioAnaliseValidacao;
-    @Mock
-    private sgc.notificacao.modelo.NotificacaoRepo repositorioNotificacao;
+    private AnaliseValidacaoRepo repositorioAnaliseValidacao;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
+
     @Mock
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+
     @Mock
     private NotificacaoService notificacaoService;
-    @Mock
-    private org.springframework.context.ApplicationEventPublisher publicadorDeEventos;
+
     @Mock
     private AlertaRepo repositorioAlerta;
+
     @Mock
     private AtividadeMapper atividadeMapper;
+
     @Mock
     private ConhecimentoMapper conhecimentoMapper;
+
     @Mock
     private MovimentacaoMapper movimentacaoMapper;
+
     @Mock
     private SubprocessoMapper subprocessoMapper;
 

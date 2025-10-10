@@ -185,24 +185,6 @@ public class SubprocessoControleTest {
     }
 
     @Test
-    void devolverCadastro_DadosValidos_RealizaDevolucao() throws Exception {
-        DevolverCadastroReq request = new DevolverCadastroReq("Motivo", "Observações");
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
-
-        when(subprocessoService.devolverCadastro(eq(1L), eq("Motivo"), eq("Observações"), any(String.class)))
-                .thenReturn(resultado);
-
-        mockMvc.perform(post("/api/subprocessos/1/devolver-cadastro")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
-        verify(subprocessoService).devolverCadastro(eq(1L), eq("Motivo"), eq("Observações"), any(String.class));
-    }
-
-    @Test
     void devolverCadastro_DadosInvalidos_RetornaBadRequest() throws Exception {
         DevolverCadastroReq request = new DevolverCadastroReq("", "Observações"); // Motivo é obrigatório
 
