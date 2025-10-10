@@ -33,4 +33,16 @@ public class Usuario implements Serializable {
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidade;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return java.util.Objects.equals(titulo, usuario.titulo);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(titulo);
+    }
 }

@@ -10,7 +10,9 @@ import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import sgc.comum.modelo.Usuario;
+import sgc.comum.modelo.UsuarioRepo;
 
 import java.net.URI;
 import java.util.List;
@@ -27,6 +29,7 @@ public class AtividadeControle {
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoRepo conhecimentoRepo;
     private final SubprocessoRepo subprocessoRepo;
+    private final UsuarioRepo usuarioRepo;
 
     @GetMapping
     public List<AtividadeDto> listar() {
@@ -45,17 +48,24 @@ public class AtividadeControle {
     }
 
     @PostMapping
-    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal Usuario usuario) {
+    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(403).build();
+        }
+
         var subprocessoOptional = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo());
         if (subprocessoOptional.isEmpty()) {
             return ResponseEntity.unprocessableEntity().build();
         }
         var subprocesso = subprocessoOptional.get();
+
+        var usuarioOptional = usuarioRepo.findByTitulo(userDetails.getUsername());
+        if (usuarioOptional.isEmpty() || !usuarioOptional.get().equals(subprocesso.getUnidade().getTitular())) {
+            return ResponseEntity.status(403).build();
+        }
+
         if (subprocesso.getSituacao().isFinalizado()) {
             return ResponseEntity.unprocessableEntity().build();
-        }
-        if (!subprocesso.getUnidade().getTitular().equals(usuario)) {
-            return ResponseEntity.status(403).build();
         }
 
         var entidade = atividadeMapper.toEntity(atividadeDto);

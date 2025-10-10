@@ -171,7 +171,10 @@ class CDU08IntegrationTest {
         void deveEditarConhecimento() throws Exception {
             Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Edição de Conhecimento"));
             Conhecimento conhecimento = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento Original"));
-            String conhecimentoEditadoJson = "{\"descricao\": \"Conhecimento Editado\"}";
+            String conhecimentoEditadoJson = String.format(
+                "{\"descricao\": \"Conhecimento Editado\", \"atividadeCodigo\": %d}",
+                atividade.getCodigo()
+            );
 
             mockMvc.perform(put("/api/conhecimentos/{id}", conhecimento.getCodigo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -250,7 +253,11 @@ class CDU08IntegrationTest {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos de outro mapa finalizado")
         void deveImportarAtividadesEConhecimentos() throws Exception {
-            String importRequestJson = String.format("{\"subprocessoOrigemId\": %d}", processoFonte.getCodigo());
+            // Corrigido para usar o ID do subprocesso de origem, não do processo.
+            Subprocesso subprocessoFonte = subprocessoRepo.findByMapaCodigo(mapaFonte.getCodigo())
+                .orElseThrow(() -> new IllegalStateException("Subprocesso fonte não encontrado para o mapa " + mapaFonte.getCodigo()));
+
+            String importRequestJson = String.format("{\"subprocessoOrigemId\": %d}", subprocessoFonte.getCodigo());
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoMapeamento.getCodigo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -305,7 +312,11 @@ class CDU08IntegrationTest {
         @WithMockUser(username = "outro", roles = {"GESTOR"})
         @DisplayName("Não deve permitir acesso a usuário não autorizado")
         void naoDevePermitirAcessoUsuarioNaoAutorizado() throws Exception {
-            String novaAtividadeJson = "{\"descricao\": \"Atividade Não Autorizada\"}";
+            var outroUsuario = new sgc.comum.modelo.Usuario();
+            outroUsuario.setTitulo("outro");
+            usuarioRepo.save(outroUsuario);
+
+            String novaAtividadeJson = String.format("{\"descricao\": \"Atividade Nao Autorizada\", \"mapaCodigo\": %d}", mapaMapeamento.getCodigo());
 
             mockMvc.perform(post("/api/atividades")
                     .contentType(MediaType.APPLICATION_JSON)
