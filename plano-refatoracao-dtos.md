@@ -34,7 +34,7 @@ Para cada DTO, a escolha entre `record` e `class` com `@Builder` será baseada n
 
 ### Etapa 4.1: Identificação dos DTOs
 
-1.  **Localizar DTOs:** Realizar uma busca por arquivos `.java` dentro do pacote `sgc` do módulo `backend` que representem DTOs. Isso pode incluir classes em pacotes como `sgc.dto`, `sgc.request`, `sgc.response`, ou classes com nomes que terminam em `DTO`.
+1.  **Localizar DTOs:** Realizar uma busca por arquivos `.java` dentro do pacote `sgc` do módulo `backend` que representem DTOs. Isso pode incluir classes em pacotes como `*.dto`ou classes com nomes que terminam em `Dto`.
     *   Comando de busca inicial: `glob 'backend/src/main/java/sgc/**/*.java'`
 
 ### Etapa 4.2: Análise e Decisão por DTO
@@ -83,3 +83,20 @@ Para cada DTO, a escolha entre `record` e `class` com `@Builder` será baseada n
 ---
 
 Este plano será um guia. A execução será iterativa, focando em um DTO ou um grupo de DTOs por vez.
+
+## 6. Status da Refatoração
+
+Esta seção rastreia o progresso da refatoração dos DTOs.
+
+### DTOs Concluídos (Revisados e Convertidos para Record)
+
+A maioria dos DTOs já foi convertida para `record`. Os seguintes DTOs foram revisados ou refatorados recentemente:
+
+*   `sgc.subprocesso.dto.SubprocessoCadastroDto`
+*   `sgc.subprocesso.dto.SubprocessoDetalheDto`
+
+### DTOs Pendentes (Para Análise)
+
+A lista a seguir contém DTOs que foram identificados como classes e ainda precisam ser analisados e potencialmente refatorados.
+
+*   `sgc.subprocesso.dto.SubprocessoDto`

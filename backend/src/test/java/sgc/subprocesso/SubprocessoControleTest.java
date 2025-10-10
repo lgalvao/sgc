@@ -78,8 +78,7 @@ public class SubprocessoControleTest {
 
     @Test
     void obterPorId_SubprocessoEncontrado_RetornaDetalhes() throws Exception {
-        SubprocessoDetalheDto detalhes = new SubprocessoDetalheDto();
-        detalhes.setSituacao("CADASTRO_EM_ELABORACAO");
+        SubprocessoDetalheDto detalhes = new SubprocessoDetalheDto(null, null, "CADASTRO_EM_ELABORACAO", null, null, Collections.emptyList(), Collections.emptyList());
         when(subprocessoService.obterDetalhes(eq(1L), any(String.class), any(Long.class))).thenReturn(detalhes);
 
         mockMvc.perform(get("/api/subprocessos/1?perfil=GESTOR&unidadeUsuario=1"))

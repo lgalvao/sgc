@@ -72,21 +72,6 @@ public class SubprocessoServiceTest {
     private AnaliseCadastroRepo analiseCadastroRepo;
 
     @Mock
-    private sgc.analise.modelo.AnaliseValidacaoRepo analiseValidacaoRepo;
-
-    @Mock
-    private sgc.notificacao.modelo.NotificacaoRepo repositorioNotificacao;
-
-    @Mock
-    private org.springframework.context.ApplicationEventPublisher applicationEventPublisher;
-
-    @Mock
-    private sgc.atividade.dto.AtividadeMapper atividadeMapper;
-
-    @Mock
-    private sgc.conhecimento.dto.ConhecimentoMapper conhecimentoMapper;
-
-    @Mock
     private sgc.subprocesso.dto.SubprocessoMapper subprocessoMapper;
 
     @Mock
@@ -182,15 +167,15 @@ public class SubprocessoServiceTest {
         SubprocessoDetalheDto dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
 
         assertNotNull(dto);
-        assertNotNull(dto.getUnidade());
-        assertEquals(unidade.getCodigo(), dto.getUnidade().getCodigo());
-        assertEquals("EM_ANDAMENTO", dto.getSituacao());
-        assertNotNull(dto.getMovimentacoes());
-        assertEquals(1, dto.getMovimentacoes().size());
-        assertEquals(movDto.codigo(), dto.getMovimentacoes().getFirst().codigo());
-        assertNotNull(dto.getElementosDoProcesso());
-        boolean temAtividade = dto.getElementosDoProcesso().stream().anyMatch(e -> "ATIVIDADE".equals(e.getTipo()));
-        boolean temConhecimento = dto.getElementosDoProcesso().stream().anyMatch(e -> "CONHECIMENTO".equals(e.getTipo()));
+        assertNotNull(dto.unidade());
+        assertEquals(unidade.getCodigo(), dto.unidade().codigo());
+        assertEquals("EM_ANDAMENTO", dto.situacao());
+        assertNotNull(dto.movimentacoes());
+        assertEquals(1, dto.movimentacoes().size());
+        assertEquals(movDto.codigo(), dto.movimentacoes().getFirst().codigo());
+        assertNotNull(dto.elementosDoProcesso());
+        boolean temAtividade = dto.elementosDoProcesso().stream().anyMatch(e -> "ATIVIDADE".equals(e.tipo()));
+        boolean temConhecimento = dto.elementosDoProcesso().stream().anyMatch(e -> "CONHECIMENTO".equals(e.tipo()));
         assertTrue(temAtividade, "Esperado elemento do tipo ATIVIDADE");
         assertTrue(temConhecimento, "Esperado elemento do tipo CONHECIMENTO");
     }

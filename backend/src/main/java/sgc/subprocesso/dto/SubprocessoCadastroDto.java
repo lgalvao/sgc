@@ -18,20 +18,14 @@ import java.util.List;
  *   ]
  * }
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SubprocessoCadastroDto {
-    private Long subprocessoId;
-    private String unidadeSigla;
-    private List<AtividadeCadastroDTO> atividades;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AtividadeCadastroDTO {
-        private Long id;
-        private String descricao;
-        private List<ConhecimentoDto> conhecimentos;
-    }
+public record SubprocessoCadastroDto(
+    Long subprocessoId,
+    String unidadeSigla,
+    List<AtividadeCadastroDTO> atividades
+) {
+    public record AtividadeCadastroDTO(
+        Long id,
+        String descricao,
+        List<ConhecimentoDto> conhecimentos
+    ) {}
 }
