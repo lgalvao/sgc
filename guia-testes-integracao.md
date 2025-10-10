@@ -22,17 +22,24 @@ Este guia fornece recomendações e um passo a passo para a criação de testes 
 
 ## 3. Escrevendo os Testes
 
+- **Organização com Classes Aninhadas:** Para casos de uso complexos, utilize classes aninhadas (`@Nested`) com a anotação `@DisplayName` para agrupar os testes por funcionalidade (ex: Criação, Edição, Remoção, Importação). Isso melhora significativamente a legibilidade e a organização da suíte de testes.
+
 - **Cenários de Sucesso:**
   - Crie um teste para o fluxo principal do caso de uso.
   - Use o `MockMvc` para realizar requisições HTTP para os endpoints da API.
   - Verifique o status da resposta (ex: `status().isOk()`, `status().isCreated()`).
   - Utilize `jsonPath` para fazer asserções sobre o corpo da resposta JSON, validando os dados retornados.
+  - Use o `AssertJ` (`assertThat`) para fazer asserções no estado do banco de dados após a operação, garantindo que a persistência ocorreu como esperado.
+
 - **Cenários de Falha:**
   - Crie testes para os fluxos alternativos e de erro.
   - Teste casos como a não localização de recursos (`status().isNotFound()`).
   - Teste a validação de entrada e as regras de negócio (`status().isBadRequest()`, `status().isUnprocessableEntity()`).
+
 - **Diferentes Perfis de Usuário:**
   - Use `@WithMockUser` em nível de método para testar o comportamento da API para diferentes perfis (ex: `ADMIN` vs. `GESTOR`).
+
+- **Cenários de Teste Complexos:** Para funcionalidades que exigem um conjunto de dados específico (como um fluxo de importação), você pode adicionar um método `@BeforeEach` dentro da classe `@Nested` correspondente. Isso permite criar dados de teste especializados apenas para aquele subconjunto de testes, mantendo o `setUp` principal mais limpo.
 
 ## 4. Endpoints e DTOs
 

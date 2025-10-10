@@ -17,6 +17,13 @@ import sgc.unidade.enums.TipoUnidade;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Unidade extends EntidadeBase {
+
+    public Unidade(String nome, String sigla) {
+        this.nome = nome;
+        this.sigla = sigla;
+        this.situacao = SituacaoUnidade.ATIVA;
+        this.tipo = TipoUnidade.OPERACIONAL;
+    }
     @Column(name = "nome")
     private String nome;
 

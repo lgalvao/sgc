@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,6 +42,12 @@ class AtividadeControleTest {
 
     @MockitoBean
     private AtividadeMapper atividadeMapper;
+
+    @MockitoBean
+    private sgc.conhecimento.modelo.ConhecimentoRepo conhecimentoRepo;
+
+    @MockitoBean
+    private sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
 
     @Nested
     @DisplayName("Testes para listar atividades")
@@ -120,15 +127,25 @@ class AtividadeControleTest {
             mapa.setCodigo(10L);
             atividade.setMapa(mapa);
 
+            var chefe = new sgc.comum.modelo.Usuario();
+            chefe.setTitulo("chefe");
+            var unidade = new sgc.unidade.modelo.Unidade();
+            unidade.setTitular(chefe);
+            var subprocesso = new sgc.subprocesso.modelo.Subprocesso();
+            subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocesso.setUnidade(unidade);
+
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, "Nova Atividade");
 
+            when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(subprocesso));
             when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(atividade);
             when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividade);
             when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeSalvaDto);
 
             mockMvc.perform(post("/api/atividades").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+                            .content(objectMapper.writeValueAsString(atividadeDto))
+                            .with(user("chefe")))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", "/api/atividades/1"))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -205,12 +222,13 @@ class AtividadeControleTest {
             atividade.setCodigo(1L);
 
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            doNothing().when(atividadeRepo).deleteById(1L);
+            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(Collections.emptyList());
+            doNothing().when(atividadeRepo).delete(any(Atividade.class));
 
             mockMvc.perform(delete("/api/atividades/1").with(csrf()))
                     .andExpect(status().isNoContent());
 
-            verify(atividadeRepo, times(1)).deleteById(1L);
+            verify(atividadeRepo, times(1)).delete(any(Atividade.class));
         }
 
         @Test
