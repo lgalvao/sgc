@@ -1,6 +1,7 @@
 package sgc.integracao.processo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import sgc.alerta.modelo.AlertaRepo;
 import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.notificacao.NotificacaoEmailService;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcesso;
@@ -34,13 +36,10 @@ import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
-
-import jakarta.persistence.EntityManager;
-import sgc.processo.enums.TipoProcesso;
 import sgc.unidade.enums.SituacaoUnidade;
 import sgc.unidade.enums.TipoUnidade;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -113,15 +112,41 @@ class ProcessoMapeamentoIntTest {
             return Optional.of(new UnidadeDto(u.getCodigo(), u.getNome(), u.getSigla(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null, u.getTipo().name()));
         });
         when(sgrhService.buscarResponsavelUnidade(anyLong()))
-                .thenAnswer(i -> Optional.of(new ResponsavelDto(i.getArgument(0), "T000000", "Titular Fulano", null, null)));
+                .thenAnswer(i -> Optional.of(new ResponsavelDto(i.getArgument(0),
+                        "T000000",
+                        "Titular Fulano",
+                        null,
+                        null))
+                );
 
         when(sgrhService.buscarUsuarioPorTitulo(anyString()))
-                .thenReturn(Optional.of(new UsuarioDto("T000000", "Fulano de Tal", "fulano@tre.jus.br", "12345", "Analista")));
+                .thenReturn(Optional.of(new UsuarioDto("T000000",
+                        "Fulano de Tal",
+                        "fulano@tre.jus.br",
+                        "12345",
+                        "Analista")));
         doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
-        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", null, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
-        unidadeOperacional = unidadeRepo.save(new Unidade("Unidade Operacional", "UOP", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
-        unidadeInteroperacional = unidadeRepo.save(new Unidade("Unidade Interoperacional", "UINTER", null, TipoUnidade.INTEROPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
+        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária",
+                "UINT",
+                null,
+                TipoUnidade.INTERMEDIARIA,
+                SituacaoUnidade.ATIVA,
+                null));
+
+        unidadeOperacional = unidadeRepo.save(new Unidade("Unidade Operacional",
+                "UOP",
+                null,
+                TipoUnidade.OPERACIONAL,
+                SituacaoUnidade.ATIVA,
+                unidadeIntermediaria));
+
+        unidadeInteroperacional = unidadeRepo.save(new Unidade("Unidade Interoperacional",
+                "UINTER",
+                null,
+                TipoUnidade.INTEROPERACIONAL,
+                SituacaoUnidade.ATIVA,
+                unidadeIntermediaria));
 
         processo = new Processo();
         processo.setDescricao("Processo de Mapeamento Teste");
