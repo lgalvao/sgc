@@ -90,14 +90,49 @@ Esta seção rastreia o progresso da refatoração dos DTOs.
 
 ### DTOs Concluídos
 
-A maioria dos DTOs já foi convertida para `record` ou `class` com `@Builder`. Os seguintes DTOs foram revisados ou refatorados recentemente:
+Todos os DTOs identificados foram revisados e, quando aplicável, convertidos para `record` ou confirmados como `record`.
 
 *   `sgc.subprocesso.dto.SubprocessoCadastroDto` (convertido para `record`)
 *   `sgc.subprocesso.dto.SubprocessoDetalheDto` (convertido para `record`)
-*   `sgc.subprocesso.dto.SubprocessoDto` (convertido para `class` com `@Builder`)
+*   `sgc.subprocesso.dto.SubprocessoDto` (convertido para `record`)
+*   `sgc.subprocesso.dto.MovimentacaoDto` (é um `record`)
+*   `sgc.processo.dto.ProcessoResumoDto` (é um `record`)
+*   `sgc.processo.dto.ProcessoDto` (é um `record`)
+*   `sgc.processo.dto.ProcessoDetalheDto` (é um `record`)
+*   `sgc.processo.dto.CriarProcessoReq` (é um `record`)
+*   `sgc.processo.dto.AtualizarProcessoReq` (é um `record`)
+*   `sgc.mapa.dto.MapaDto` (é um `record`)
+*   `sgc.conhecimento.dto.ConhecimentoDto` (é um `record`)
+*   `sgc.competencia.dto.CompetenciaDto` (é um `record`)
+*   `sgc.atividade.dto.AtividadeDto` (é um `record`)
+*   `sgc.alerta.AlertaDto` (é um `record`)
+*   `sgc.mapa.dto.AtividadeImpactadaDto` (é um `record`)
+*   `sgc.mapa.dto.CompetenciaImpactadaDto` (é um `record`)
+*   `sgc.mapa.dto.CompetenciaMapaDto` (é um `record`)
+*   `sgc.mapa.dto.ImpactoMapaDto` (é um `record`)
+*   `sgc.mapa.dto.MapaCompletoDto` (é um `record`)
+*   `sgc.mapa.dto.SalvarMapaRequest` (é um `record`)
+*   `sgc.notificacao.dto.EmailDto` (é um `record`)
+*   `sgc.sgrh.dto.PerfilDto` (é um `record`)
+*   `sgc.sgrh.dto.ResponsavelDto` (é um `record`)
+*   `sgc.sgrh.dto.UnidadeDto` (é um `record`)
+*   `sgc.sgrh.dto.UsuarioDto` (é um `record`)
+*   `sgc.subprocesso.dto.AceitarCadastroReq` (é um `record`)
+*   `sgc.subprocesso.dto.AnaliseValidacaoDto` (é um `record`)
+*   `sgc.subprocesso.dto.ApresentarSugestoesReq` (é um `record`)
+*   `sgc.subprocesso.dto.AtividadeAjusteDto` (é um `record`)
+*   `sgc.subprocesso.dto.CompetenciaAjusteDto` (é um `record`)
+*   `sgc.subprocesso.dto.ConhecimentoAjusteDto` (é um `record`)
+*   `sgc.subprocesso.dto.DevolverCadastroReq` (é um `record`)
+*   `sgc.subprocesso.dto.DevolverValidacaoReq` (é um `record`)
+*   `sgc.subprocesso.dto.DisponibilizarMapaReq` (é um `record`)
+*   `sgc.subprocesso.dto.HomologarCadastroReq` (é um `record`)
+*   `sgc.subprocesso.dto.ImportarAtividadesRequest` (é um `record`)
+*   `sgc.subprocesso.dto.MapaAjusteDto` (é um `record`)
+*   `sgc.subprocesso.dto.SalvarAjustesReq` (é um `record`)
+*   `sgc.subprocesso.dto.SugestoesDto` (é um `record`)
+*   `sgc.unidade.dto.PerfilUnidadeDto` (refatorado para `record`)
 
 ### DTOs Pendentes (Para Análise)
-
-A lista a seguir contém DTOs que foram identificados como classes e ainda precisam ser analisados e potencialmente refatorados.
 
 *(Nenhum DTO pendente no momento)*

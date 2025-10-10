@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SgrhServiceImplTest {
-
     private SgrhService sgrhService;
 
     @BeforeEach

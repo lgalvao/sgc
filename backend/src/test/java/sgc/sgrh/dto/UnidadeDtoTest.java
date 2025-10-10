@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class UnidadeDtoTest {
-
     @Test
     void testUnidadeDtoConstructorWithSubunidades() {
         // Test record constructor with subunidades

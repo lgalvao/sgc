@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
  * Cobrem criar, listar e remover análises de validação.
  */
 public class AnaliseValidacaoServiceImplTest {
-
     private AnaliseValidacaoRepo analiseValidacaoRepo;
     private SubprocessoRepo subprocessoRepo;
     private AnaliseValidacaoServiceImpl service;

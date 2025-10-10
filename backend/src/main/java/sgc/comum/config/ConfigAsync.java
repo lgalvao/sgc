@@ -14,7 +14,6 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableAsync
 public class ConfigAsync {
-    
     /**
      * Configura um pool de threads dedicado para envio de e-mails.
      * 

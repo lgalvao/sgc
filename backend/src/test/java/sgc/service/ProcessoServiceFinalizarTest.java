@@ -30,17 +30,21 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProcessoServiceFinalizarTest {
-
     @Mock
     private ProcessoRepo processoRepo;
+
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
+
     @Mock
     private ApplicationEventPublisher publicadorDeEventos;
+
     @Mock
     private ProcessoMapper processoMapper;
+
     @InjectMocks
     private ProcessoService processoService;
 

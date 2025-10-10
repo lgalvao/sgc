@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
  * Unit tests for CopiaMapaServiceImpl.
  */
 public class CopiaMapaServiceTest {
-
     private MapaRepo mapaRepo;
     private AtividadeRepo atividadeRepository;
     private ConhecimentoRepo conhecimentoRepo;

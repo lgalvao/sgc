@@ -1,14 +1,13 @@
 package sgc.service;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgc.comum.PainelService;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.Processo;
@@ -23,16 +22,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@MockitoSettings(strictness = Strictness.LENIENT)
+@ExtendWith(MockitoExtension.class)
 public class PainelServiceTest {
-    @MockitoBean
+    @Mock
     private ProcessoRepo processoRepo;
 
-    @MockitoBean
+    @Mock
     private UnidadeProcessoRepo unidadeProcessoRepo;
 
-    @Autowired
+    @InjectMocks
     private PainelService painelService;
 
     @Test
@@ -94,7 +92,6 @@ public class PainelServiceTest {
 
         when(processoRepo.findAll()).thenReturn(List.of(p1, p2));
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up1));
-        when(unidadeProcessoRepo.findByProcessoCodigo(2L)).thenReturn(List.of(up2));
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<ProcessoResumoDto> page = painelService.listarProcessos("ADMIN", null, pageable);
