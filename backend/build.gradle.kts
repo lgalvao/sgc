@@ -9,8 +9,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 extra["jjwt.version"] = "0.13.0"
@@ -38,6 +38,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.h2database:h2")
     testImplementation("org.awaitility:awaitility:4.2.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
@@ -74,7 +75,8 @@ tasks.withType<Test> {
         "-Xshare:off",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
-        "-XX:+EnableDynamicAgentLoading"
+        "-XX:+EnableDynamicAgentLoading",
+        "--enable-preview"
     )
 
     val byteBuddyAgentFile =
