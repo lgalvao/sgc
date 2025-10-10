@@ -2,25 +2,28 @@ package sgc.conhecimento.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 
-/**
- * Mapper (usando MapStruct) entre a entidade Conhecimento e seu DTO.
- */
 @Mapper(componentModel = "spring")
-public interface ConhecimentoMapper {
+public abstract class ConhecimentoMapper {
+
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+
     @Mapping(source = "atividade.codigo", target = "atividadeCodigo")
-    ConhecimentoDto toDTO(Conhecimento conhecimento);
+    public abstract ConhecimentoDto toDTO(Conhecimento conhecimento);
 
     @Mapping(source = "atividadeCodigo", target = "atividade")
-    Conhecimento toEntity(ConhecimentoDto conhecimentoDTO);
+    public abstract Conhecimento toEntity(ConhecimentoDto conhecimentoDTO);
 
-    default Atividade map(Long value) {
-        if (value == null) return null;
-
-        Atividade atividade = new Atividade();
-        atividade.setCodigo(value);
-        return atividade;
+    public Atividade map(Long value) {
+        if (value == null) {
+            return null;
+        }
+        return atividadeRepo.findById(value)
+            .orElseThrow(() -> new RuntimeException("Atividade não encontrada com o código: " + value));
     }
 }

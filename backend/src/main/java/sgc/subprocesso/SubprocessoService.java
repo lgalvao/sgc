@@ -830,7 +830,15 @@ public class SubprocessoService {
             return; // Nada a importar
         }
 
+        List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(spDestino.getMapa().getCodigo())
+            .stream()
+            .map(Atividade::getDescricao)
+            .collect(Collectors.toList());
+
         for (Atividade atividadeOrigem : atividadesOrigem) {
+            if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
+                continue; // Pula a importação se a atividade já existe
+            }
             Atividade novaAtividade = new Atividade();
             novaAtividade.setDescricao(atividadeOrigem.getDescricao());
             novaAtividade.setMapa(spDestino.getMapa());

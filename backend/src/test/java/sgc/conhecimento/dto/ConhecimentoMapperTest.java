@@ -1,15 +1,28 @@
 package sgc.conhecimento.dto;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class ConhecimentoMapperTest {
 
-    private final ConhecimentoMapper mapper = Mappers.getMapper(ConhecimentoMapper.class);
+    @Mock
+    private AtividadeRepo atividadeRepo;
+
+    @InjectMocks
+    private ConhecimentoMapperImpl mapper;
 
     @Test
     void testToDTO() {
@@ -35,6 +48,9 @@ class ConhecimentoMapperTest {
     void testToEntity() {
         // Create a ConhecimentoDto
         ConhecimentoDto dto = new ConhecimentoDto(1L, 100L, "Test Description");
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(100L);
+        when(atividadeRepo.findById(100L)).thenReturn(Optional.of(atividade));
 
         // Map to entity
         Conhecimento conhecimento = mapper.toEntity(dto);
@@ -56,6 +72,9 @@ class ConhecimentoMapperTest {
     @Test
     void testMapWithValidValue() {
         // Test mapping with valid value
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(100L);
+        when(atividadeRepo.findById(100L)).thenReturn(Optional.of(atividade));
         Atividade result = mapper.map(100L);
         assertNotNull(result);
         assertEquals(100L, result.getCodigo());

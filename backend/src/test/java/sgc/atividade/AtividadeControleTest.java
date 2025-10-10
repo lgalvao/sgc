@@ -49,6 +49,9 @@ class AtividadeControleTest {
     @MockitoBean
     private sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
 
+    @MockitoBean
+    private sgc.comum.modelo.UsuarioRepo usuarioRepo;
+
     @Nested
     @DisplayName("Testes para listar atividades")
     class ListarAtividades {
@@ -137,6 +140,7 @@ class AtividadeControleTest {
 
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, "Nova Atividade");
 
+            when(usuarioRepo.findByTitulo("chefe")).thenReturn(Optional.of(chefe));
             when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(subprocesso));
             when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(atividade);
             when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividade);
@@ -160,7 +164,8 @@ class AtividadeControleTest {
 
             mockMvc.perform(post("/api/atividades").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(atividadeDto)))
+                            .content(objectMapper.writeValueAsString(atividadeDto))
+                            .with(user("user")))
                     .andExpect(status().isBadRequest());
         }
     }
