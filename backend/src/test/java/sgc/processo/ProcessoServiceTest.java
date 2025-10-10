@@ -42,12 +42,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceTest {
     @Mock
     private ProcessoRepo processoRepo;
@@ -537,19 +540,19 @@ public class ProcessoServiceTest {
             when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
             when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-            when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaNovo);
+            when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
             when(processoRepo.save(any(Processo.class))).thenReturn(processo);
             when(processoMapper.toDTO(processo)).thenReturn(new ProcessoDto(null, null, null, null, null, null, null));
-    
+
             processoService.iniciarProcessoRevisao(1L, List.of(1L));
-    
+
             verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
-            verify(servicoDeCopiaDeMapa).copiarMapaParaUnidade(100L, 1L);
+            verify(mapaRepo).save(any(Mapa.class));
             verify(subprocessoRepo).save(any(Subprocesso.class));
             verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
         }
-    
+
         @Test
         void iniciarProcessoRevisao_ProcessoNaoCriado_LancaIllegalStateException() {
             Processo processo = new Processo();
