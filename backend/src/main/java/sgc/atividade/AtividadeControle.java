@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.subprocesso.modelo.SubprocessoRepo;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import sgc.comum.modelo.Usuario;
 
 import java.net.URI;
 import java.util.List;
@@ -21,6 +25,8 @@ import java.util.List;
 public class AtividadeControle {
     private final AtividadeRepo atividadeRepo;
     private final AtividadeMapper atividadeMapper;
+    private final ConhecimentoRepo conhecimentoRepo;
+    private final SubprocessoRepo subprocessoRepo;
 
     @GetMapping
     public List<AtividadeDto> listar() {
@@ -39,7 +45,19 @@ public class AtividadeControle {
     }
 
     @PostMapping
-    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto) {
+    public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal Usuario usuario) {
+        var subprocessoOptional = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo());
+        if (subprocessoOptional.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
+        var subprocesso = subprocessoOptional.get();
+        if (subprocesso.getSituacao().isFinalizado()) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
+        if (!subprocesso.getUnidade().getTitular().equals(usuario)) {
+            return ResponseEntity.status(403).build();
+        }
+
         var entidade = atividadeMapper.toEntity(atividadeDto);
         var salvo = atividadeRepo.save(entidade);
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
@@ -65,8 +83,10 @@ public class AtividadeControle {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         return atividadeRepo.findById(id)
-                .map(_ -> {
-                    atividadeRepo.deleteById(id);
+                .map(atividade -> {
+                    var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
+                    conhecimentoRepo.deleteAll(conhecimentos);
+                    atividadeRepo.delete(atividade);
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

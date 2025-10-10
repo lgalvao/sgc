@@ -13,5 +13,9 @@ public enum SituacaoSubprocesso {
     REVISAO_CADASTRO_EM_ANDAMENTO,
     REVISAO_CADASTRO_DISPONIBILIZADA,
     REVISAO_CADASTRO_HOMOLOGADA,
-    MAPA_AJUSTADO
+    MAPA_AJUSTADO;
+
+    public boolean isFinalizado() {
+        return this == MAPA_HOMOLOGADO;
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositório JPA para a entidade Subprocesso.
@@ -20,4 +21,6 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 
     boolean existsByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
+
+    Optional<Subprocesso> findByMapaCodigo(Long mapaCodigo);
 }
