@@ -20,9 +20,19 @@ public interface ProcessoDetalheMapperInterface {
     // Mapeamento de entidade para DTO de participante
     @Mapping(target = "filhos", ignore = true)
     // Assumindo que filhos não vem diretamente de UnidadeProcesso
+    @Mapping(target = "situacaoSubprocesso", ignore = true)
+    @Mapping(target = "dataLimite", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDTO unidadeProcessoToUnidadeParticipanteDTO(UnidadeProcesso unidadeProcesso);
 
     // Mapeamento de subprocesso para DTO de resumo
+    @Mapping(target = "codigo", source = "processo.codigo")
+    @Mapping(target = "descricao", source = "processo.descricao")
+    @Mapping(target = "situacao", source = "processo.situacao")
+    @Mapping(target = "tipo", source = "processo.tipo")
+    @Mapping(target = "dataLimite", source = "processo.dataLimite")
+    @Mapping(target = "dataCriacao", source = "processo.dataCriacao")
+    @Mapping(target = "unidadeCodigo", source = "unidade.codigo")
+    @Mapping(target = "unidadeNome", source = "unidade.nome")
     ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso);
 
     // Mapeamento de subprocesso para DTO de participante (usado quando não há UnidadeProcesso correspondente)
