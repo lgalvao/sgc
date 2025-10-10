@@ -212,17 +212,12 @@ public class ProcessoService {
         }
 
         validarUnidadesNaoEmProcessosAtivos(codigosUnidades);
-        validarUnidadesComMapasVigentes(codigosUnidades);
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
 
-            Long idMapaOrigem = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
-                    .map(UnidadeMapa::getMapaVigenteCodigo)
-                    .orElseThrow(() -> new ErroProcesso("Mapa vigente não encontrado para a unidade: " + codigoUnidade));
-
-            Mapa mapaNovo = servicoDeCopiaDeMapa.copiarMapaParaUnidade(idMapaOrigem, codigoUnidade);
+            Mapa mapaNovo = mapaRepo.save(new Mapa());
 
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
