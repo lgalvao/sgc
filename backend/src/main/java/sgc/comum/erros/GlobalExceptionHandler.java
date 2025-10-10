@@ -3,8 +3,13 @@ package sgc.comum.erros;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.validation.FieldError;
+
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -86,5 +91,28 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
         body.put("erro", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", "Validation failed");
+        body.put("errors", ex.getBindingResult().getAllErrors().stream()
+            .map(error -> {
+                Map<String, String> errorDetails = new HashMap<>();
+                if (error instanceof FieldError) {
+                    errorDetails.put("field", ((FieldError) error).getField());
+                } else {
+                    errorDetails.put("object", error.getObjectName());
+                }
+                errorDetails.put("defaultMessage", error.getDefaultMessage());
+                return errorDetails;
+            })
+            .toList());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
