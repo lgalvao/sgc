@@ -41,6 +41,16 @@ Este guia fornece recomendações e um passo a passo para a criação de testes 
   - `GET /api/processos/{id}/detalhes`: Retorna um `ProcessoDetalheDto` com informações completas, incluindo listas de entidades relacionadas (como as unidades participantes).
 - **Consulte o DTO:** Antes de escrever as asserções com `jsonPath`, verifique a definição do DTO retornado pelo endpoint para garantir que você está validando os campos corretos.
 
+## 5. Dicas e Armadilhas Comuns
+
+- **Convenção de Nomenclatura:** Lembre-se que os controladores do projeto seguem a convenção de nomenclatura `NomeDoRecursoControle.java` (ex: `SubprocessoControle.java`).
+
+- **Parâmetros de Segurança:** Alguns endpoints podem exigir parâmetros adicionais para fins de autorização, mesmo quando se utiliza `@WithMockUser`. Por exemplo, um endpoint pode precisar de `?perfil=ADMIN` na URL para validar o acesso. Se receber um erro 403 (Forbidden) inesperado, verifique se a implementação do `Controller` ou do `Service` esperam algum parâmetro de perfil.
+
+- **Testando Cenários de Erro:**
+  - **Status HTTP:** Para erros que são tratados pelo `Controller` e retornam um status HTTP específico (como 404 Not Found), você pode usar `mockMvc` e esperar o status correspondente.
+  - **Exceções de Serviço:** Para erros que ocorrem na camada de serviço e não são tratados de forma específica no `Controller` (resultando em um erro 500 Internal Server Error), uma abordagem mais robusta é testar diretamente a camada de serviço. Injete o `Service` no seu teste e use `assertThrows` para verificar se a exceção esperada (ex: `ErroDominioNaoEncontrado`) é lançada. Isso torna o teste mais preciso e menos acoplado à implementação do `Controller`.
+
 ## Exemplo de Esqueleto de Teste
 
 ```java
