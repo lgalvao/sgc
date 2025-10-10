@@ -7,23 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.enums.TipoProcesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
-import sgc.comum.enums.SituacaoProcesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
-import java.util.Collections;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
