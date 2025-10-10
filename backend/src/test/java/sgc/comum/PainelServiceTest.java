@@ -18,10 +18,10 @@ import sgc.processo.modelo.UnidadeProcessoRepo;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,7 +115,7 @@ class PainelServiceTest {
         var result = painelService.listarProcessos("ADMIN", null, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().get(0).codigo());
+        assertEquals(1L, result.getContent().getFirst().codigo());
         verify(processoRepo, times(1)).findAll();
     }
 
@@ -137,16 +137,16 @@ class PainelServiceTest {
         unidadeProcesso1.setNome("Unidade 1");
 
         when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
-        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(Arrays.asList(unidadeProcesso1));
+        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(unidadeProcesso1));
         when(unidadeProcessoRepo.findByProcessoCodigo(2L)).thenReturn(Collections.emptyList());
 
         Pageable pageable = PageRequest.of(0, 10);
         var result = painelService.listarProcessos("USUARIO", 10L, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().get(0).codigo());
-        assertEquals(10L, result.getContent().get(0).unidadeCodigo());
-        assertEquals("Unidade 1", result.getContent().get(0).unidadeNome());
+        assertEquals(1L, result.getContent().getFirst().codigo());
+        assertEquals(10L, result.getContent().getFirst().unidadeCodigo());
+        assertEquals("Unidade 1", result.getContent().getFirst().unidadeNome());
         verify(processoRepo, times(1)).findAll();
     }
 
@@ -183,7 +183,7 @@ class PainelServiceTest {
         processo1.setDescricao("Processo 1");
         processo1.setSituacao("ATIVO");
 
-        when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1));
+        when(processoRepo.findAll()).thenReturn(List.of(processo1));
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
 
         Pageable pageable = PageRequest.of(10, 5); // Página muito alta

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @Nested
@@ -109,9 +108,7 @@ class AlertaServiceImplTest {
     @Test
     @DisplayName("Não deve criar alerta para tipo de unidade desconhecido")
     void criarAlertasProcessoIniciado_naoDeveCriarAlertaParaTipoDesconhecido() {
-        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "TIPO_DESCONHECIDO");
         alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
-
         verify(repositorioAlerta, never()).save(any(Alerta.class));
     }
 
@@ -142,9 +139,7 @@ class AlertaServiceImplTest {
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-            alertaService.marcarComoLido(usuarioTitulo, alertaId);
-        });
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTitulo, alertaId));
     }
 
     @Test

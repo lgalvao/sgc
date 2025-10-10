@@ -65,6 +65,6 @@ class ModeloTest {
         ErroProcesso erro = new ErroProcesso("Mensagem de erro do processo");
 
         assertEquals("Mensagem de erro do processo", erro.getMessage());
-        assertTrue(erro instanceof RuntimeException);
+        assertInstanceOf(RuntimeException.class, erro);
     }
 }

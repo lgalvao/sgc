@@ -48,11 +48,6 @@ class AtualizarProcessoReqTest {
         assertEquals("TIPO_B", req.tipo());
         assertNotNull(req.dataLimiteEtapa1());
         assertEquals(1, req.unidades().size());
-        assertEquals(Long.valueOf(3L), req.unidades().get(0));
-    }
-
-    void testAtualizarProcessoReqNoArgsConstructor() {
-        // This test is invalid for a record and is the source of compilation errors.
-        // It's being removed.
+        assertEquals(Long.valueOf(3L), req.unidades().getFirst());
     }
 }

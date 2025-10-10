@@ -22,18 +22,19 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CopiaMapaServiceImplTest {
-
     @Mock
     private MapaRepo repositorioMapa;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private ConhecimentoRepo repositorioConhecimento;
+
     @Mock
     private UnidadeRepo repositorioUnidade;
 

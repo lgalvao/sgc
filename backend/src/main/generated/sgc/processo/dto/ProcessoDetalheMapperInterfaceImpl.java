@@ -12,7 +12,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-09T14:38:41-0300",
+    date = "2025-10-10T09:00:46-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -80,9 +80,6 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         }
 
         Long codigo = null;
-
-        codigo = subprocesso.getCodigo();
-
         String descricao = null;
         String situacao = null;
         String tipo = null;
@@ -90,6 +87,15 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         LocalDateTime dataCriacao = null;
         Long unidadeCodigo = null;
         String unidadeNome = null;
+
+        codigo = subprocessoProcessoCodigo( subprocesso );
+        descricao = subprocessoProcessoDescricao( subprocesso );
+        situacao = subprocessoProcessoSituacao( subprocesso );
+        tipo = subprocessoProcessoTipo( subprocesso );
+        dataLimite = subprocessoProcessoDataLimite( subprocesso );
+        dataCriacao = subprocessoProcessoDataCriacao( subprocesso );
+        unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
+        unidadeNome = subprocessoUnidadeNome( subprocesso );
 
         ProcessoResumoDto processoResumoDto = new ProcessoResumoDto( codigo, descricao, situacao, tipo, dataLimite, dataCriacao, unidadeCodigo, unidadeNome );
 
@@ -121,6 +127,54 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
 
         return unidadeParticipanteDTO;
+    }
+
+    private Long subprocessoProcessoCodigo(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getCodigo();
+    }
+
+    private String subprocessoProcessoDescricao(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getDescricao();
+    }
+
+    private String subprocessoProcessoSituacao(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getSituacao();
+    }
+
+    private String subprocessoProcessoTipo(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getTipo();
+    }
+
+    private LocalDate subprocessoProcessoDataLimite(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getDataLimite();
+    }
+
+    private LocalDateTime subprocessoProcessoDataCriacao(Subprocesso subprocesso) {
+        Processo processo = subprocesso.getProcesso();
+        if ( processo == null ) {
+            return null;
+        }
+        return processo.getDataCriacao();
     }
 
     private Long subprocessoUnidadeCodigo(Subprocesso subprocesso) {

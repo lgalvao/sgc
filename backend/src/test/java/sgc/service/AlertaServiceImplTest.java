@@ -23,15 +23,6 @@ class AlertaServiceImplTest {
     @Mock
     private AlertaUsuarioRepo alertaUsuarioRepo;
 
-    @Mock
-    private sgc.alerta.modelo.AlertaRepo alertaRepo;
-
-    @Mock
-    private sgc.unidade.modelo.UnidadeRepo unidadeRepo;
-
-    @Mock
-    private sgc.sgrh.SgrhService sgrhService;
-
     @InjectMocks
     private AlertaServiceImpl alertaService;
 
@@ -79,8 +70,6 @@ class AlertaServiceImplTest {
 
         when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-            alertaService.marcarComoLido(usuarioTitulo, alertaId);
-        });
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTitulo, alertaId));
     }
 }

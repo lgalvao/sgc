@@ -67,7 +67,7 @@ class ProcessoDetalheMapperCustomTest {
 
         assertNotNull(resultDto);
         assertEquals(1, resultDto.unidades().size());
-        ProcessoDetalheDto.UnidadeParticipanteDTO resultUnidade = resultDto.unidades().get(0);
+        ProcessoDetalheDto.UnidadeParticipanteDTO resultUnidade = resultDto.unidades().getFirst();
         assertEquals(subprocesso.getSituacaoId(), resultUnidade.situacaoSubprocesso());
         assertEquals(subprocesso.getDataLimiteEtapa1(), resultUnidade.dataLimite());
         verify(processoDetalheMapperInterface, never()).subprocessoToUnidadeParticipanteDTO(any());
@@ -95,7 +95,7 @@ class ProcessoDetalheMapperCustomTest {
 
         assertNotNull(resultDto);
         assertEquals(1, resultDto.unidades().size());
-        assertEquals("UNID-B", resultDto.unidades().get(0).sigla());
+        assertEquals("UNID-B", resultDto.unidades().getFirst().sigla());
         verify(processoDetalheMapperInterface, times(1)).subprocessoToUnidadeParticipanteDTO(subprocesso);
         verify(processoDetalheMapperInterface, never()).unidadeProcessoToUnidadeParticipanteDTO(any());
     }

@@ -142,17 +142,15 @@ public class PainelService {
                 })
                 .toList();
 
-        List<AlertaDto> listaDeDtos = alertasFiltrados.stream().map(alerta -> {
-            return new AlertaDto(
-                alerta.getCodigo(),
-                alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null,
-                alerta.getDescricao(),
-                alerta.getDataHora(),
-                alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
-                alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
-                alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null
-            );
-        }).collect(Collectors.toList());
+        List<AlertaDto> listaDeDtos = alertasFiltrados.stream().map(alerta -> new AlertaDto(
+            alerta.getCodigo(),
+            alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null,
+            alerta.getDescricao(),
+            alerta.getDataHora(),
+            alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
+            alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
+            alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null
+        )).collect(Collectors.toList());
 
         int total = listaDeDtos.size();
         int tamanhoPagina = pageable.getPageSize();

@@ -3,10 +3,8 @@ package sgc.conhecimento.dto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ConhecimentoDtoTest {
-
     @Test
     void testConhecimentoDtoConstructorAndGettersSetters() {
         // Test constructor with parameters
@@ -23,10 +21,5 @@ class ConhecimentoDtoTest {
         assertEquals(2L, dto.codigo());
         assertEquals(200L, dto.atividadeCodigo());
         assertEquals("New Description", dto.descricao());
-    }
-
-    void testConhecimentoDtoNoArgsConstructor() {
-        // This test is invalid for a record and is the source of compilation errors.
-        // It's being removed.
     }
 }

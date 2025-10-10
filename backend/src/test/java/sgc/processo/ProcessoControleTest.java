@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -205,7 +203,7 @@ public class ProcessoControleTest {
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
         var dto = new ProcessoDto(1L, null, null, null, "Processo Iniciado", "EM_ANDAMENTO", "MAPEAMENTO");
 
-        when(processoService.iniciarProcessoMapeamento(eq(1L), any(List.class))).thenReturn(dto);
+        when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -220,7 +218,7 @@ public class ProcessoControleTest {
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
         var dto = new ProcessoDto(1L, null, null, null, "Processo de Revisão Iniciado", "EM_ANDAMENTO", "REVISAO");
 
-        when(processoService.iniciarProcessoRevisao(eq(1L), any(List.class))).thenReturn(dto);
+        when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos/1/iniciar?tipo=REVISAO")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -233,7 +231,7 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
-        doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), any(List.class));
+        doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), anyList());
 
         mockMvc.perform(post("/api/processos/999/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -52,7 +52,7 @@ class SgrhServiceImplTest {
         assertFalse(result.isEmpty());
         assertEquals(3, result.size());
         
-        UsuarioDto primeiro = result.get(0);
+        UsuarioDto primeiro = result.getFirst();
         assertEquals("12345678901", primeiro.titulo());
         assertEquals("joao.silva@tre-pe.jus.br", primeiro.email());
     }

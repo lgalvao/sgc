@@ -9,8 +9,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 extra["jjwt.version"] = "0.13.0"
@@ -71,8 +71,7 @@ tasks.withType<Test> {
         "-Xshare:off",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
-        "-XX:+EnableDynamicAgentLoading",
-        "--enable-preview"
+        "-XX:+EnableDynamicAgentLoading"
     )
 
     val byteBuddyAgentFile =

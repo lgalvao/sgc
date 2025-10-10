@@ -12,6 +12,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
@@ -21,6 +22,7 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.modelo.Usuario;
+import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
@@ -48,37 +50,37 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class SubprocessoServiceTest {
     @Mock
-    private SubprocessoRepo subprocessoRepo;
-
+    private SubprocessoRepo repositorioSubprocesso;
     @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-
+    private MovimentacaoRepo repositorioMovimentacao;
     @Mock
-    private AtividadeRepo atividadeRepository;
-
+    private AtividadeRepo atividadeRepo;
     @Mock
-    private ConhecimentoRepo conhecimentoRepo;
-
+    private ConhecimentoRepo repositorioConhecimento;
     @Mock
-    private MovimentacaoMapper movimentacaoMapper;
-
+    private AnaliseCadastroRepo repositorioAnaliseCadastro;
     @Mock
-    private NotificacaoService notificacaoService;
-
+    private sgc.analise.modelo.AnaliseValidacaoRepo repositorioAnaliseValidacao;
     @Mock
-    private AlertaRepo alertaRepo;
-
-    @Mock
-    private AnaliseCadastroRepo analiseCadastroRepo;
-
-    @Mock
-    private sgc.subprocesso.dto.SubprocessoMapper subprocessoMapper;
-
+    private sgc.notificacao.modelo.NotificacaoRepo repositorioNotificacao;
     @Mock
     private CompetenciaRepo competenciaRepo;
-
     @Mock
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Mock
+    private NotificacaoService notificacaoService;
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher publicadorDeEventos;
+    @Mock
+    private AlertaRepo repositorioAlerta;
+    @Mock
+    private AtividadeMapper atividadeMapper;
+    @Mock
+    private ConhecimentoMapper conhecimentoMapper;
+    @Mock
+    private MovimentacaoMapper movimentacaoMapper;
+    @Mock
+    private SubprocessoMapper subprocessoMapper;
 
     @InjectMocks
     private SubprocessoService subprocessoService;
@@ -104,7 +106,7 @@ public class SubprocessoServiceTest {
         when(subprocessoMock.getUnidade()).thenReturn(unidadeMock);
         when(subprocessoMock.getProcesso()).thenReturn(processoMock);
 
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocessoMock));
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocessoMock));
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
             Subprocesso sp = inv.getArgument(0);
@@ -158,11 +160,11 @@ public class SubprocessoServiceTest {
         kc.setAtividade(at);
         kc.setDescricao("Conhecimento 1");
 
-        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(mov));
+        when(repositorioSubprocesso.findById(spId)).thenReturn(Optional.of(sp));
+        when(repositorioMovimentacao.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(mov));
         when(movimentacaoMapper.toDTO(any(Movimentacao.class))).thenReturn(movDto);
-        when(atividadeRepository.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
-        when(conhecimentoRepo.findAll()).thenReturn(List.of(kc));
+        when(atividadeRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(List.of(at));
+        when(repositorioConhecimento.findAll()).thenReturn(List.of(kc));
 
         SubprocessoDetalheDto dto = subprocessoService.obterDetalhes(spId, "ADMIN", null);
 
@@ -183,7 +185,7 @@ public class SubprocessoServiceTest {
     @Test
     void casoNaoEncontrado_lancaDomainNotFoundException() {
         Long id = 99L;
-        when(subprocessoRepo.findById(id)).thenReturn(Optional.empty());
+        when(repositorioSubprocesso.findById(id)).thenReturn(Optional.empty());
         assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.obterDetalhes(id, "ADMIN", null));
     }
 
@@ -196,7 +198,7 @@ public class SubprocessoServiceTest {
         sp.setCodigo(spId);
         sp.setUnidade(unidade);
 
-        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
+        when(repositorioSubprocesso.findById(spId)).thenReturn(Optional.of(sp));
 
         Long unidadeUsuario = 99L;
         assertThrows(ErroDominioAccessoNegado.class, () -> subprocessoService.obterDetalhes(spId, "GESTOR", unidadeUsuario));
@@ -209,8 +211,8 @@ public class SubprocessoServiceTest {
 
         subprocessoService.aceitarCadastro(1L, "Observações de teste", "analista_teste");
 
-        verify(analiseCadastroRepo).save(any(AnaliseCadastro.class));
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(repositorioAnaliseCadastro).save(any(AnaliseCadastro.class));
+        verify(repositorioMovimentacao).save(any(Movimentacao.class));
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
@@ -219,7 +221,7 @@ public class SubprocessoServiceTest {
         assertTrue(corpoCaptor.getValue().contains("foi aceito e está disponível para homologação"));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaRepo).save(alertaCaptor.capture());
+        verify(repositorioAlerta).save(alertaCaptor.capture());
         assertEquals("Cadastro da unidade UN aguardando homologação", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeSuperiorMock, alertaCaptor.getValue().getUnidadeDestino());
     }
@@ -231,8 +233,8 @@ public class SubprocessoServiceTest {
 
         subprocessoService.aceitarRevisaoCadastro(1L, "Obs teste", "analista_teste");
 
-        verify(analiseCadastroRepo).save(any(AnaliseCadastro.class));
-        verify(movimentacaoRepo).save(any(Movimentacao.class));
+        verify(repositorioAnaliseCadastro).save(any(AnaliseCadastro.class));
+        verify(repositorioMovimentacao).save(any(Movimentacao.class));
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
@@ -241,7 +243,7 @@ public class SubprocessoServiceTest {
         assertTrue(corpoCaptor.getValue().contains("foi aceita e está disponível para homologação"));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaRepo).save(alertaCaptor.capture());
+        verify(repositorioAlerta).save(alertaCaptor.capture());
         assertEquals("Revisão de cadastro da unidade UN aguardando homologação", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeSuperiorMock, alertaCaptor.getValue().getUnidadeDestino());
     }
@@ -266,10 +268,10 @@ public class SubprocessoServiceTest {
         List<String> corpos = corpoCaptor.getAllValues();
 
         // Email 1 (para a própria unidade)
-        assertEquals("UN", siglas.get(0));
-        assertEquals("SGC: Mapa de Competências da sua unidade disponibilizado para validação", assuntos.get(0));
-        assertTrue(corpos.get(0).contains("O mapa de competências da sua unidade (UN) foi disponibilizado para validação"));
-        assertTrue(corpos.get(0).contains(dataLimiteFormatada));
+        assertEquals("UN", siglas.getFirst());
+        assertEquals("SGC: Mapa de Competências da sua unidade disponibilizado para validação", assuntos.getFirst());
+        assertTrue(corpos.getFirst().contains("O mapa de competências da sua unidade (UN) foi disponibilizado para validação"));
+        assertTrue(corpos.getFirst().contains(dataLimiteFormatada));
 
         // Email 2 (para a unidade superior)
         assertEquals("SUP", siglas.get(1));
@@ -278,7 +280,7 @@ public class SubprocessoServiceTest {
         assertTrue(corpos.get(1).contains("Acompanhe o processo no sistema."));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
-        verify(alertaRepo).save(alertaCaptor.capture());
+        verify(repositorioAlerta).save(alertaCaptor.capture());
         assertEquals("Seu mapa de competências está disponível para validação (Processo: Processo de Teste)", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeMock, alertaCaptor.getValue().getUnidadeDestino());
     }
@@ -298,12 +300,12 @@ public class SubprocessoServiceTest {
         Atividade ativ = new Atividade();
         ativ.setCodigo(300L);
         ativ.setDescricao("Atividade Teste");
-        when(atividadeRepository.findByMapaCodigo(100L)).thenReturn(List.of(ativ));
+        when(atividadeRepo.findByMapaCodigo(100L)).thenReturn(List.of(ativ));
 
         Conhecimento con = new Conhecimento();
         con.setCodigo(400L);
         con.setDescricao("Conhecimento Teste");
-        when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(con));
+        when(repositorioConhecimento.findByAtividadeCodigo(300L)).thenReturn(List.of(con));
 
         when(competenciaAtividadeRepo.existsById(any(CompetenciaAtividade.Id.class))).thenReturn(true);
 
@@ -316,9 +318,9 @@ public class SubprocessoServiceTest {
         assertNotNull(dto);
         assertEquals(100L, dto.mapaId());
         assertEquals(1, dto.competencias().size());
-        assertEquals(1, dto.competencias().get(0).atividades().size());
-        assertEquals(1, dto.competencias().get(0).atividades().get(0).conhecimentos().size());
-        assertTrue(dto.competencias().get(0).atividades().get(0).conhecimentos().get(0).incluido());
+        assertEquals(1, dto.competencias().getFirst().atividades().size());
+        assertEquals(1, dto.competencias().getFirst().atividades().getFirst().conhecimentos().size());
+        assertTrue(dto.competencias().getFirst().atividades().getFirst().conhecimentos().getFirst().incluido());
     }
 
     @Test
@@ -339,7 +341,7 @@ public class SubprocessoServiceTest {
         verify(competenciaAtividadeRepo).deleteAll(existingLinks);
         verify(competenciaAtividadeRepo).save(any(CompetenciaAtividade.class));
         verify(subprocessoMock).setSituacaoId("MAPA_AJUSTADO");
-        verify(subprocessoRepo).save(subprocessoMock);
+        verify(repositorioSubprocesso).save(subprocessoMock);
     }
 
     @Test
@@ -347,9 +349,7 @@ public class SubprocessoServiceTest {
         setupBasico();
         when(subprocessoMock.getSituacaoId()).thenReturn("SITUACAO_INVALIDA");
 
-        assertThrows(IllegalStateException.class, () -> {
-            subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste");
-        });
+        assertThrows(IllegalStateException.class, () -> subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste"));
     }
 
     @Test
@@ -363,7 +363,7 @@ public class SubprocessoServiceTest {
         spDestino.setSituacaoId("CADASTRO_EM_ELABORACAO");
         spDestino.setMapa(mapaDestino);
         spDestino.setUnidade(unidadeDestino);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(spDestino));
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(spDestino));
 
         Unidade unidadeOrigem = new Unidade();
         unidadeOrigem.setCodigo(20L);
@@ -374,19 +374,19 @@ public class SubprocessoServiceTest {
         spOrigem.setCodigo(2L);
         spOrigem.setMapa(mapaOrigem);
         spOrigem.setUnidade(unidadeOrigem);
-        when(subprocessoRepo.findById(2L)).thenReturn(Optional.of(spOrigem));
+        when(repositorioSubprocesso.findById(2L)).thenReturn(Optional.of(spOrigem));
 
         Atividade atividadeOrigem = new Atividade();
         atividadeOrigem.setCodigo(300L);
         atividadeOrigem.setDescricao("Atividade Original");
-        when(atividadeRepository.findByMapaCodigo(200L)).thenReturn(List.of(atividadeOrigem));
+        when(atividadeRepo.findByMapaCodigo(200L)).thenReturn(List.of(atividadeOrigem));
 
         Conhecimento conhecimentoOrigem = new Conhecimento();
         conhecimentoOrigem.setCodigo(400L);
         conhecimentoOrigem.setDescricao("Conhecimento Original");
-        when(conhecimentoRepo.findByAtividadeCodigo(300L)).thenReturn(List.of(conhecimentoOrigem));
+        when(repositorioConhecimento.findByAtividadeCodigo(300L)).thenReturn(List.of(conhecimentoOrigem));
 
-        when(atividadeRepository.save(any(Atividade.class))).thenAnswer(inv -> {
+        when(atividadeRepo.save(any(Atividade.class))).thenAnswer(inv -> {
             Atividade savedAtividade = inv.getArgument(0);
             savedAtividade.setCodigo(301L); // Simulate DB generating an ID
             return savedAtividade;
@@ -395,17 +395,17 @@ public class SubprocessoServiceTest {
         subprocessoService.importarAtividades(1L, 2L);
 
         ArgumentCaptor<Atividade> atividadeCaptor = ArgumentCaptor.forClass(Atividade.class);
-        verify(atividadeRepository).save(atividadeCaptor.capture());
+        verify(atividadeRepo).save(atividadeCaptor.capture());
         assertEquals("Atividade Original", atividadeCaptor.getValue().getDescricao());
         assertEquals(mapaDestino, atividadeCaptor.getValue().getMapa());
 
         ArgumentCaptor<Conhecimento> conhecimentoCaptor = ArgumentCaptor.forClass(Conhecimento.class);
-        verify(conhecimentoRepo).save(conhecimentoCaptor.capture());
+        verify(repositorioConhecimento).save(conhecimentoCaptor.capture());
         assertEquals("Conhecimento Original", conhecimentoCaptor.getValue().getDescricao());
         assertNotNull(conhecimentoCaptor.getValue().getAtividade());
 
         ArgumentCaptor<Movimentacao> movimentacaoCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo).save(movimentacaoCaptor.capture());
+        verify(repositorioMovimentacao).save(movimentacaoCaptor.capture());
         assertTrue(movimentacaoCaptor.getValue().getDescricao().contains("Importação de atividades do subprocesso #2"));
     }
 
@@ -414,15 +414,13 @@ public class SubprocessoServiceTest {
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(1L);
         spDestino.setSituacaoId("OUTRA_SITUACAO");
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(spDestino));
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(spDestino));
 
         // Mock para o subprocesso de origem para evitar o NaoEncontrado
         Subprocesso spOrigem = new Subprocesso();
         spOrigem.setCodigo(2L);
-        when(subprocessoRepo.findById(2L)).thenReturn(Optional.of(spOrigem));
+        when(repositorioSubprocesso.findById(2L)).thenReturn(Optional.of(spOrigem));
 
-        assertThrows(IllegalStateException.class, () -> {
-            subprocessoService.importarAtividades(1L, 2L);
-        });
+        assertThrows(IllegalStateException.class, () -> subprocessoService.importarAtividades(1L, 2L));
     }
 }
