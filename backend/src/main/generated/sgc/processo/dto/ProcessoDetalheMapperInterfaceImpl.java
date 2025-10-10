@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -12,7 +15,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T09:00:46-0300",
+    date = "2025-10-10T13:02:29-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -27,14 +30,16 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         Long codigo = null;
         String descricao = null;
         String tipo = null;
-        String situacao = null;
+        SituacaoProcesso situacao = null;
         LocalDate dataLimite = null;
         LocalDateTime dataCriacao = null;
         LocalDateTime dataFinalizacao = null;
 
         codigo = processo.getCodigo();
         descricao = processo.getDescricao();
-        tipo = processo.getTipo();
+        if ( processo.getTipo() != null ) {
+            tipo = processo.getTipo().name();
+        }
         situacao = processo.getSituacao();
         dataLimite = processo.getDataLimite();
         dataCriacao = processo.getDataCriacao();
@@ -65,7 +70,7 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         unidadeSuperiorCodigo = unidadeProcesso.getUnidadeSuperiorCodigo();
 
         List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
-        String situacaoSubprocesso = null;
+        SituacaoSubprocesso situacaoSubprocesso = null;
         LocalDate dataLimite = null;
 
         ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
@@ -81,7 +86,7 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
 
         Long codigo = null;
         String descricao = null;
-        String situacao = null;
+        SituacaoProcesso situacao = null;
         String tipo = null;
         LocalDate dataLimite = null;
         LocalDateTime dataCriacao = null;
@@ -91,7 +96,10 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         codigo = subprocessoProcessoCodigo( subprocesso );
         descricao = subprocessoProcessoDescricao( subprocesso );
         situacao = subprocessoProcessoSituacao( subprocesso );
-        tipo = subprocessoProcessoTipo( subprocesso );
+        TipoProcesso tipo1 = subprocessoProcessoTipo( subprocesso );
+        if ( tipo1 != null ) {
+            tipo = tipo1.name();
+        }
         dataLimite = subprocessoProcessoDataLimite( subprocesso );
         dataCriacao = subprocessoProcessoDataCriacao( subprocesso );
         unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
@@ -112,14 +120,14 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         String nome = null;
         String sigla = null;
         Long unidadeSuperiorCodigo = null;
-        String situacaoSubprocesso = null;
+        SituacaoSubprocesso situacaoSubprocesso = null;
         LocalDate dataLimite = null;
 
         unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
         nome = subprocessoUnidadeNome( subprocesso );
         sigla = subprocessoUnidadeSigla( subprocesso );
         unidadeSuperiorCodigo = subprocessoUnidadeUnidadeSuperiorCodigo( subprocesso );
-        situacaoSubprocesso = subprocesso.getSituacaoId();
+        situacaoSubprocesso = subprocesso.getSituacao();
         dataLimite = subprocesso.getDataLimiteEtapa1();
 
         List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
@@ -145,7 +153,7 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         return processo.getDescricao();
     }
 
-    private String subprocessoProcessoSituacao(Subprocesso subprocesso) {
+    private SituacaoProcesso subprocessoProcessoSituacao(Subprocesso subprocesso) {
         Processo processo = subprocesso.getProcesso();
         if ( processo == null ) {
             return null;
@@ -153,7 +161,7 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
         return processo.getSituacao();
     }
 
-    private String subprocessoProcessoTipo(Subprocesso subprocesso) {
+    private TipoProcesso subprocessoProcessoTipo(Subprocesso subprocesso) {
         Processo processo = subprocesso.getProcesso();
         if ( processo == null ) {
             return null;

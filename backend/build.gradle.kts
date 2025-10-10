@@ -21,9 +21,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("com.github.ben-manes.caffeine:caffeine")
@@ -31,14 +28,19 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
+    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.awaitility:awaitility:4.2.1")
-    testImplementation("com.h2database:h2")
-    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testAnnotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.named<ProcessResources>("processResources") {

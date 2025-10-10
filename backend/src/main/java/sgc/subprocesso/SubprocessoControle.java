@@ -177,7 +177,7 @@ public class SubprocessoControle {
                     subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
                     subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataLimiteEtapa2());
                     subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
-                    subprocesso.setSituacaoId(subprocessoDto.getSituacaoId());
+                    subprocesso.setSituacao(subprocessoDto.getSituacao());
                     var atualizado = subprocessoRepo.save(subprocesso);
                     return ResponseEntity.ok(subprocessoMapper.toDTO(atualizado));
                 })

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.enums.TipoAlerta;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;
@@ -13,6 +14,7 @@ import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
+import sgc.unidade.enums.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -37,23 +39,23 @@ public class AlertaServiceImpl implements AlertaService {
     private final UnidadeRepo repositorioUnidade;
     private final SgrhService servicoSgrh;
     private final sgc.comum.modelo.UsuarioRepo usuarioRepo;
-    
+
     @Override
     @Transactional
     public Alerta criarAlerta(
             Processo processo,
-            String tipoAlerta,
+            TipoAlerta tipoAlerta,
             Long codigoUnidadeDestino,
             String descricao,
             LocalDate dataLimite) {
-        
+
         log.debug("Criando alerta tipo={} para unidade={}", tipoAlerta, codigoUnidadeDestino);
-        
+
         // Buscar unidade destino
         Unidade unidadeDestino = repositorioUnidade.findById(codigoUnidadeDestino)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Unidade não encontrada: " + codigoUnidadeDestino));
-        
+
         // Criar alerta
         Alerta alerta = new Alerta();
         alerta.setProcesso(processo);
@@ -61,19 +63,19 @@ public class AlertaServiceImpl implements AlertaService {
         alerta.setUnidadeOrigem(null); // SEDOC não tem registro como unidade
         alerta.setUnidadeDestino(unidadeDestino);
         alerta.setDescricao(descricao);
-        
+
         Alerta alertaSalvo = repositorioAlerta.save(alerta);
         log.info("Alerta criado: código={}, tipo={}, unidade={}",
                 alertaSalvo.getCodigo(), tipoAlerta, unidadeDestino.getSigla());
-        
+
         // Buscar responsável da unidade via SGRH
         try {
             Optional<ResponsavelDto> responsavel = servicoSgrh.buscarResponsavelUnidade(codigoUnidadeDestino);
-            
+
             if (responsavel.isPresent() && responsavel.get().titularTitulo() != null) {
                 // Criar AlertaUsuario para o titular
                 criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo(), codigoUnidadeDestino);
-                
+
                 // Se houver substituto, também o adiciona
                 if (responsavel.get().substitutoTitulo() != null) {
                     criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codigoUnidadeDestino);
@@ -82,35 +84,35 @@ public class AlertaServiceImpl implements AlertaService {
                 log.warn("Responsável não encontrado para a unidade {}", codigoUnidadeDestino);
             }
         } catch (Exception e) {
-            log.error("Erro ao buscar responsável da unidade {}: {}", 
+            log.error("Erro ao buscar responsável da unidade {}: {}",
                     codigoUnidadeDestino, e.getMessage(), e);
             // Não interrompe o fluxo se não conseguir buscar o responsável
         }
-        
+
         return alertaSalvo;
     }
-    
+
     @Override
     @Transactional
     public List<Alerta> criarAlertasProcessoIniciado(
             Processo processo,
             List<Long> codigosUnidades,
             List<Subprocesso> subprocessos) {
-        
+
         log.info("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
         List<Alerta> alertasCriados = new ArrayList<>();
-        
+
         for (Long codigoUnidade : codigosUnidades) {
             try {
                 // Buscar tipo da unidade via SGRH
                 Optional<UnidadeDto> unidadeDtoOptional = servicoSgrh.buscarUnidadePorCodigo(codigoUnidade);
-                
+
                 if (unidadeDtoOptional.isEmpty()) {
                     log.warn("Unidade não encontrada no SGRH: {}", codigoUnidade);
                     continue;
                 }
-                
-                String tipoUnidade = unidadeDtoOptional.get().tipo();
+
+                TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().tipo());
                 String nomeProcesso = processo.getDescricao();
                 // Encontrar o subprocesso correspondente para obter a data limite
                 LocalDate dataLimite = subprocessos.stream()
@@ -118,39 +120,39 @@ public class AlertaServiceImpl implements AlertaService {
                     .map(Subprocesso::getDataLimiteEtapa1)
                     .findFirst()
                     .orElse(processo.getDataLimite()); // Fallback para a data limite do processo se não encontrar subprocesso
-                
+
                 // Criar alertas baseados no tipo de unidade
-                if ("OPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
+                if (TipoUnidade.OPERACIONAL.equals(tipoUnidade)) {
                     String descricao = String.format(
                             "Início do processo '%s'. Preencha as atividades e conhecimentos até %s.",
                             nomeProcesso,
                             formatarData(dataLimite)
                     );
-                    
-                    Alerta alerta = criarAlerta(processo, "PROCESSO_INICIADO_OPERACIONAL", codigoUnidade, descricao, dataLimite);
+
+                    Alerta alerta = criarAlerta(processo, TipoAlerta.PROCESSO_INICIADO_OPERACIONAL, codigoUnidade, descricao, dataLimite);
                     alertasCriados.add(alerta);
-                    
-                } else if ("INTERMEDIARIA".equalsIgnoreCase(tipoUnidade)) {
+
+                } else if (TipoUnidade.INTERMEDIARIA.equals(tipoUnidade)) {
                     String descricao = String.format(
                             "Início do processo '%s' em unidade(s) subordinada(s). " +
                             "Aguarde a disponibilização dos mapas para validação até %s.",
                             nomeProcesso,
                             formatarData(dataLimite)
                     );
-                    
-                    Alerta alerta = criarAlerta(processo, "PROCESSO_INICIADO_INTERMEDIARIA", codigoUnidade, descricao, dataLimite);
+
+                    Alerta alerta = criarAlerta(processo, TipoAlerta.PROCESSO_INICIADO_INTERMEDIARIA, codigoUnidade, descricao, dataLimite);
                     alertasCriados.add(alerta);
-                    
-                } else if ("INTEROPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
+
+                } else if (TipoUnidade.INTEROPERACIONAL.equals(tipoUnidade)) {
                     String descOperacional = String.format(
                             "Início do processo '%s'. Preencha as atividades e conhecimentos até %s.",
                             nomeProcesso,
                             formatarData(dataLimite)
                     );
                     log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_OP: {}", descOperacional);
-                    Alerta alertaOperacional = criarAlerta(processo, "PROCESSO_INICIADO_INTEROPERACIONAL_OP", codigoUnidade, descOperacional, dataLimite);
+                    Alerta alertaOperacional = criarAlerta(processo, TipoAlerta.PROCESSO_INICIADO_INTEROPERACIONAL_OP, codigoUnidade, descOperacional, dataLimite);
                     alertasCriados.add(alertaOperacional);
-                    
+
                     String descIntermediaria = String.format(
                             "Início do processo '%s' em unidade(s) subordinada(s). " +
                             "Aguarde a disponibilização dos mapas para validação até %s.",
@@ -158,60 +160,60 @@ public class AlertaServiceImpl implements AlertaService {
                             formatarData(dataLimite)
                     );
                     log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_INT: {}", descIntermediaria);
-                    Alerta alertaIntermediaria = criarAlerta(processo, "PROCESSO_INICIADO_INTEROPERACIONAL_INT", codigoUnidade, descIntermediaria, dataLimite);
+                    Alerta alertaIntermediaria = criarAlerta(processo, TipoAlerta.PROCESSO_INICIADO_INTEROPERACIONAL_INT, codigoUnidade, descIntermediaria, dataLimite);
                     alertasCriados.add(alertaIntermediaria);
-                    
+
                 } else {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
                 }
-                
+
             } catch (Exception e) {
                 log.error("Erro ao criar alerta para a unidade {}: {}", codigoUnidade, e.getMessage(), e);
             }
         }
-        
+
         log.info("Foram criados {} alertas para o processo {}", alertasCriados.size(), processo.getCodigo());
         return alertasCriados;
     }
-    
+
     @Override
     @Transactional
     public Alerta criarAlertaCadastroDisponibilizado(
             Processo processo,
             Long codigoUnidadeOrigem,
             Long codigoUnidadeDestino) {
-        
+
         Unidade unidadeOrigem = repositorioUnidade.findById(codigoUnidadeOrigem)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Unidade de origem não encontrada: " + codigoUnidadeOrigem));
-        
+
         String descricao = String.format(
                 "Cadastro disponibilizado pela unidade %s no processo '%s'. " +
                 "Realize a análise do cadastro.",
                 unidadeOrigem.getSigla(),
                 processo.getDescricao()
         );
-        
-        return criarAlerta(processo, "CADASTRO_DISPONIBILIZADO", codigoUnidadeDestino, descricao, null);
+
+        return criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codigoUnidadeDestino, descricao, null);
     }
-    
+
     @Override
     @Transactional
     public Alerta criarAlertaCadastroDevolvido(
             Processo processo,
             Long codigoUnidadeDestino,
             String motivo) {
-        
+
         String descricao = String.format(
                 "Cadastro devolvido no processo '%s'. Motivo: %s. " +
                 "Realize os ajustes necessários e disponibilize novamente.",
                 processo.getDescricao(),
                 motivo
         );
-        
-        return criarAlerta(processo, "CADASTRO_DEVOLVIDO", codigoUnidadeDestino, descricao, null);
+
+        return criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codigoUnidadeDestino, descricao, null);
     }
-    
+
     private void criarAlertaUsuario(Alerta alerta, String usuarioTitulo, Long codigoUnidade) {
         try {
             sgc.comum.modelo.Usuario usuario = usuarioRepo.findById(usuarioTitulo)
@@ -244,7 +246,7 @@ public class AlertaServiceImpl implements AlertaService {
             log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), usuarioTitulo, e.getMessage(), e);
         }
     }
-    
+
     private String formatarData(LocalDate data) {
         if (data == null) {
             return "data não definida";

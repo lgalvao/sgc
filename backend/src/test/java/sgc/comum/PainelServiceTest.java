@@ -10,10 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
+
+import sgc.processo.enums.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -78,12 +81,14 @@ class PainelServiceTest {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
         processo1.setDescricao("Processo 1");
-        processo1.setSituacao("ATIVO");
+        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
         Processo processo2 = new Processo();
         processo2.setCodigo(2L);
         processo2.setDescricao("Processo 2");
-        processo2.setSituacao("INATIVO");
+        processo2.setSituacao(SituacaoProcesso.FINALIZADO);
+        processo2.setTipo(TipoProcesso.MAPEAMENTO);
 
         when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
@@ -101,12 +106,14 @@ class PainelServiceTest {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
         processo1.setDescricao("Processo 1");
-        processo1.setSituacao("CRIADO");
+        processo1.setSituacao(SituacaoProcesso.CRIADO);
+        processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
         Processo processo2 = new Processo();
         processo2.setCodigo(2L);
         processo2.setDescricao("Processo 2");
-        processo2.setSituacao("ATIVO");
+        processo2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo2.setTipo(TipoProcesso.MAPEAMENTO);
 
         when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
@@ -125,12 +132,14 @@ class PainelServiceTest {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
         processo1.setDescricao("Processo 1");
-        processo1.setSituacao("ATIVO");
+        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
         Processo processo2 = new Processo();
         processo2.setCodigo(2L);
         processo2.setDescricao("Processo 2");
-        processo2.setSituacao("ATIVO");
+        processo2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo2.setTipo(TipoProcesso.MAPEAMENTO);
 
         UnidadeProcesso unidadeProcesso1 = new UnidadeProcesso();
         unidadeProcesso1.setCodigo(10L);
@@ -159,7 +168,8 @@ class PainelServiceTest {
             Processo processo = new Processo();
             processo.setCodigo((long) (i + 1));
             processo.setDescricao("Processo " + (i + 1));
-            processo.setSituacao("ATIVO");
+            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
             processos[i] = processo;
         }
 
@@ -181,7 +191,8 @@ class PainelServiceTest {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
         processo1.setDescricao("Processo 1");
-        processo1.setSituacao("ATIVO");
+        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
         when(processoRepo.findAll()).thenReturn(List.of(processo1));
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());

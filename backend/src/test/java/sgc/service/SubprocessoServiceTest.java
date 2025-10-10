@@ -20,6 +20,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.modelo.Usuario;
@@ -120,10 +121,17 @@ public class SubprocessoServiceTest {
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
             Subprocesso sp = inv.getArgument(0);
-            SubprocessoDto dto = new SubprocessoDto();
-            dto.setCodigo(sp.getCodigo());
-            dto.setSituacaoId(sp.getSituacaoId());
-            return dto;
+            return new SubprocessoDto(
+                sp.getCodigo(),
+                sp.getProcesso() != null ? sp.getProcesso().getCodigo() : null,
+                sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null,
+                sp.getMapa() != null ? sp.getMapa().getCodigo() : null,
+                sp.getDataLimiteEtapa1(),
+                sp.getDataFimEtapa1(),
+                sp.getDataLimiteEtapa2(),
+                sp.getDataFimEtapa2(),
+                sp.getSituacao()
+            );
         });
     }
 
@@ -148,7 +156,7 @@ public class SubprocessoServiceTest {
         sp.setCodigo(spId);
         sp.setUnidade(unidade);
         sp.setMapa(mapa);
-        sp.setSituacaoId("EM_ANDAMENTO");
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(LocalDate.of(2025, 12, 31));
 
         Movimentacao mov = mock(Movimentacao.class);
@@ -181,7 +189,7 @@ public class SubprocessoServiceTest {
         assertNotNull(dto);
         assertNotNull(dto.unidade());
         assertEquals(unidade.getCodigo(), dto.unidade().codigo());
-        assertEquals("EM_ANDAMENTO", dto.situacao());
+        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name(), dto.situacao());
         assertNotNull(dto.movimentacoes());
         assertEquals(1, dto.movimentacoes().size());
         assertEquals(movDto.codigo(), dto.movimentacoes().getFirst().codigo());
@@ -217,7 +225,7 @@ public class SubprocessoServiceTest {
     @Test
     void aceitarCadastro_deveNotificarESalvarAlerta() {
         setupBasico();
-        when(subprocessoMock.getSituacaoId()).thenReturn("CADASTRO_DISPONIBILIZADO");
+        when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
         subprocessoService.aceitarCadastro(1L, "Observações de teste", "analista_teste");
 
@@ -239,7 +247,7 @@ public class SubprocessoServiceTest {
     @Test
     void aceitarRevisaoCadastro_deveNotificarESalvarAlerta() {
         setupBasico();
-        when(subprocessoMock.getSituacaoId()).thenReturn("REVISAO_CADASTRO_DISPONIBILIZADA");
+        when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
         subprocessoService.aceitarRevisaoCadastro(1L, "Obs teste", "analista_teste");
 
@@ -336,7 +344,7 @@ public class SubprocessoServiceTest {
     @Test
     void salvarAjustesMapa_deveLimparEVincularNovamente() {
         setupBasico();
-        when(subprocessoMock.getSituacaoId()).thenReturn("MAPA_DISPONIBILIZADO");
+        when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         List<CompetenciaAtividade> existingLinks = List.of(mock(CompetenciaAtividade.class));
         when(competenciaAtividadeRepo.findByCompetenciaCodigo(anyLong())).thenReturn(existingLinks);
 
@@ -350,14 +358,14 @@ public class SubprocessoServiceTest {
 
         verify(competenciaAtividadeRepo).deleteAll(existingLinks);
         verify(competenciaAtividadeRepo).save(any(CompetenciaAtividade.class));
-        verify(subprocessoMock).setSituacaoId("MAPA_AJUSTADO");
+        verify(subprocessoMock).setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
         verify(repositorioSubprocesso).save(subprocessoMock);
     }
 
     @Test
     void salvarAjustesMapa_deveLancarExcecao_quandoSituacaoInvalida() {
         setupBasico();
-        when(subprocessoMock.getSituacaoId()).thenReturn("SITUACAO_INVALIDA");
+        when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.NAO_INICIADO);
 
         assertThrows(IllegalStateException.class, () -> subprocessoService.salvarAjustesMapa(1L, new ArrayList<>(), "user_teste"));
     }
@@ -370,7 +378,7 @@ public class SubprocessoServiceTest {
         mapaDestino.setCodigo(100L);
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(1L);
-        spDestino.setSituacaoId("CADASTRO_EM_ELABORACAO");
+        spDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         spDestino.setMapa(mapaDestino);
         spDestino.setUnidade(unidadeDestino);
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(spDestino));
@@ -423,7 +431,7 @@ public class SubprocessoServiceTest {
     void importarAtividades_deveLancarExcecao_quandoSituacaoDestinoInvalida() {
         Subprocesso spDestino = new Subprocesso();
         spDestino.setCodigo(1L);
-        spDestino.setSituacaoId("OUTRA_SITUACAO");
+        spDestino.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(spDestino));
 
         // Mock para o subprocesso de origem para evitar o NaoEncontrado

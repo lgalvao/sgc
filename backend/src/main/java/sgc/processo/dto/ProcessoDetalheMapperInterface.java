@@ -40,7 +40,7 @@ public interface ProcessoDetalheMapperInterface {
     @Mapping(target = "nome", source = "unidade.nome")
     @Mapping(target = "sigla", source = "unidade.sigla")
     @Mapping(target = "unidadeSuperiorCodigo", source = "unidade.unidadeSuperior.codigo")
-    @Mapping(target = "situacaoSubprocesso", source = "situacaoId")
+    @Mapping(target = "situacaoSubprocesso", source = "situacao")
     @Mapping(target = "dataLimite", source = "dataLimiteEtapa1")
     @Mapping(target = "filhos", ignore = true)
     ProcessoDetalheDto.UnidadeParticipanteDTO subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso);

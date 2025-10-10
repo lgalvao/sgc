@@ -9,7 +9,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T09:00:46-0300",
+    date = "2025-10-10T13:02:30-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -21,19 +21,19 @@ public class SubprocessoMapperImpl implements SubprocessoMapper {
             return null;
         }
 
-        SubprocessoDto subprocessoDto = new SubprocessoDto();
+        SubprocessoDto.SubprocessoDtoBuilder subprocessoDto = SubprocessoDto.builder();
 
-        subprocessoDto.setProcessoCodigo( subprocessoProcessoCodigo( subprocesso ) );
-        subprocessoDto.setUnidadeCodigo( subprocessoUnidadeCodigo( subprocesso ) );
-        subprocessoDto.setMapaCodigo( subprocessoMapaCodigo( subprocesso ) );
-        subprocessoDto.setCodigo( subprocesso.getCodigo() );
-        subprocessoDto.setDataLimiteEtapa1( subprocesso.getDataLimiteEtapa1() );
-        subprocessoDto.setDataFimEtapa1( subprocesso.getDataFimEtapa1() );
-        subprocessoDto.setDataLimiteEtapa2( subprocesso.getDataLimiteEtapa2() );
-        subprocessoDto.setDataFimEtapa2( subprocesso.getDataFimEtapa2() );
-        subprocessoDto.setSituacaoId( subprocesso.getSituacaoId() );
+        subprocessoDto.processoCodigo( subprocessoProcessoCodigo( subprocesso ) );
+        subprocessoDto.unidadeCodigo( subprocessoUnidadeCodigo( subprocesso ) );
+        subprocessoDto.mapaCodigo( subprocessoMapaCodigo( subprocesso ) );
+        subprocessoDto.codigo( subprocesso.getCodigo() );
+        subprocessoDto.dataLimiteEtapa1( subprocesso.getDataLimiteEtapa1() );
+        subprocessoDto.dataFimEtapa1( subprocesso.getDataFimEtapa1() );
+        subprocessoDto.dataLimiteEtapa2( subprocesso.getDataLimiteEtapa2() );
+        subprocessoDto.dataFimEtapa2( subprocesso.getDataFimEtapa2() );
+        subprocessoDto.situacao( subprocesso.getSituacao() );
 
-        return subprocessoDto;
+        return subprocessoDto.build();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SubprocessoMapperImpl implements SubprocessoMapper {
         subprocesso.setDataFimEtapa1( dto.getDataFimEtapa1() );
         subprocesso.setDataLimiteEtapa2( dto.getDataLimiteEtapa2() );
         subprocesso.setDataFimEtapa2( dto.getDataFimEtapa2() );
-        subprocesso.setSituacaoId( dto.getSituacaoId() );
+        subprocesso.setSituacao( dto.getSituacao() );
 
         subprocesso.setProcesso( dto.getProcessoCodigo() != null ? new sgc.processo.modelo.Processo() {{ setCodigo(dto.getProcessoCodigo()); }} : null );
         subprocesso.setUnidade( dto.getUnidadeCodigo() != null ? new sgc.unidade.modelo.Unidade() {{ setCodigo(dto.getUnidadeCodigo()); }} : null );

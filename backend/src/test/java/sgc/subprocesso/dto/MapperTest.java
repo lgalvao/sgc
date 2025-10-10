@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.modelo.Movimentacao;
@@ -42,7 +43,7 @@ class MapperTest {
         entity.setDataFimEtapa1(LocalDateTime.now());
         entity.setDataLimiteEtapa2(LocalDate.now().plusDays(10));
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
-        entity.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        entity.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
         SubprocessoDto dto = mapper.toDTO(entity);
 
@@ -51,23 +52,24 @@ class MapperTest {
         assertEquals(100L, dto.getProcessoCodigo());
         assertEquals(200L, dto.getUnidadeCodigo());
         assertEquals(300L, dto.getMapaCodigo());
-        assertEquals("CADASTRO_DISPONIBILIZADO", dto.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
 
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
         SubprocessoMapper mapper = Mappers.getMapper(SubprocessoMapper.class);
 
-        SubprocessoDto dto = new SubprocessoDto();
-        dto.setCodigo(1L);
-        dto.setProcessoCodigo(100L);
-        dto.setUnidadeCodigo(200L);
-        dto.setMapaCodigo(300L);
-        dto.setDataLimiteEtapa1(LocalDate.now());
-        dto.setDataFimEtapa1(LocalDateTime.now());
-        dto.setDataLimiteEtapa2(LocalDate.now().plusDays(10));
-        dto.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
-        dto.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        SubprocessoDto dto = new SubprocessoDto(
+            1L,
+            100L,
+            200L,
+            300L,
+            LocalDate.now(),
+            LocalDateTime.now(),
+            LocalDate.now().plusDays(10),
+            LocalDateTime.now().plusHours(1),
+            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
+        );
 
         Subprocesso entity = mapper.toEntity(dto);
 
@@ -80,7 +82,7 @@ class MapperTest {
         assertEquals(200L, entity.getUnidade().getCodigo());
         assertNotNull(entity.getMapa());
         assertEquals(300L, entity.getMapa().getCodigo());
-        assertEquals("CADASTRO_DISPONIBILIZADO", entity.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, entity.getSituacao());
     }
 
     @Test

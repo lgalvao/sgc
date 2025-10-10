@@ -15,6 +15,7 @@ import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.analise.modelo.AnaliseValidacao;
 import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
@@ -26,6 +27,8 @@ import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
+
+import sgc.analise.enums.TipoAcaoAnalise;
 
 import java.util.Optional;
 
@@ -80,22 +83,29 @@ public class SubprocessoServiceActionsTest {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         subprocesso.setUnidade(unidadeSubordinada);
-        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         subprocesso.setProcesso(new Processo());
         subprocesso.getProcesso().setDescricao("Processo Teste");
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
             Subprocesso sp = inv.getArgument(0);
-            SubprocessoDto dto = SubprocessoDto.builder().build();
-            dto.setCodigo(sp.getCodigo());
-            dto.setSituacaoId(sp.getSituacaoId());
-            return dto;
+            return new SubprocessoDto(
+                sp.getCodigo(),
+                sp.getProcesso() != null ? sp.getProcesso().getCodigo() : null,
+                sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null,
+                sp.getMapa() != null ? sp.getMapa().getCodigo() : null,
+                sp.getDataLimiteEtapa1(),
+                sp.getDataFimEtapa1(),
+                sp.getDataLimiteEtapa2(),
+                sp.getDataFimEtapa2(),
+                sp.getSituacao()
+            );
         });
     }
 
     @Test
     void aceitarCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -103,11 +113,11 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("CADASTRO_DISPONIBILIZADO", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, result.getSituacao());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        assertEquals("ACEITE", analiseCaptor.getValue().getAcao());
+        assertEquals(TipoAcaoAnalise.ACEITE, analiseCaptor.getValue().getAcao());
         assertEquals("Observações", analiseCaptor.getValue().getObservacoes());
         assertEquals(usuarioTitulo, analiseCaptor.getValue().getAnalistaUsuarioTitulo());
 
@@ -129,7 +139,7 @@ public class SubprocessoServiceActionsTest {
 
     @Test
     void aceitarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacaoId("OUTRA_SITUACAO");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo));
     }
@@ -137,14 +147,14 @@ public class SubprocessoServiceActionsTest {
     @Test
     void aceitarCadastro_deveLancarExcecao_quandoUnidadeSuperiorNaoEncontrada() {
         unidadeSubordinada.setUnidadeSuperior(null);
-        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
     void homologarCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
-        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -152,7 +162,7 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.homologarCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("CADASTRO_HOMOLOGADO", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, result.getSituacao());
 
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
@@ -171,14 +181,14 @@ public class SubprocessoServiceActionsTest {
 
     @Test
     void homologarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacaoId("OUTRA_SITUACAO");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         assertThrows(IllegalStateException.class, () -> subprocessoService.homologarCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
     void aceitarRevisaoCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacaoId("REVISAO_CADASTRO_DISPONIBILIZADA");
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -186,11 +196,11 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("REVISAO_CADASTRO_DISPONIBILIZADA", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, result.getSituacao());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        assertEquals("ACEITE_REVISAO", analiseCaptor.getValue().getAcao());
+        assertEquals(TipoAcaoAnalise.ACEITE_REVISAO, analiseCaptor.getValue().getAcao());
         assertEquals("Observações", analiseCaptor.getValue().getObservacoes());
         assertEquals(usuarioTitulo, analiseCaptor.getValue().getAnalistaUsuarioTitulo());
 
@@ -212,14 +222,14 @@ public class SubprocessoServiceActionsTest {
 
     @Test
     void aceitarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacaoId("OUTRA_SITUACAO");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
     void homologarRevisaoCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
-        subprocesso.setSituacaoId("REVISAO_CADASTRO_DISPONIBILIZADA");
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -227,7 +237,7 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("REVISAO_CADASTRO_HOMOLOGADA", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, result.getSituacao());
 
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
@@ -246,14 +256,14 @@ public class SubprocessoServiceActionsTest {
 
     @Test
     void homologarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacaoId("OUTRA_SITUACAO");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         assertThrows(IllegalStateException.class, () -> subprocessoService.homologarRevisaoCadastro(1L, "Observações", usuarioTitulo));
     }
 
     @Test
     void devolverCadastro_deveMudarSituacaoESalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -262,7 +272,7 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.devolverCadastro(1L, "Motivo Teste", "Observações", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("CADASTRO_EM_ELABORACAO", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, result.getSituacao());
         assertNull(subprocesso.getDataFimEtapa1());
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
@@ -281,7 +291,7 @@ public class SubprocessoServiceActionsTest {
 
     @Test
     void devolverValidacao_deveMudarSituacaoESalvarAnalise_quandoValido() {
-        subprocesso.setSituacaoId("MAPA_VALIDADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
         unidadeSuperior.setUnidadeSuperior(new Unidade());
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(analiseValidacaoRepo.save(any(AnaliseValidacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -291,7 +301,7 @@ public class SubprocessoServiceActionsTest {
         SubprocessoDto result = subprocessoService.devolverValidacao(1L, "Justificativa Teste", usuarioTitulo);
 
         assertNotNull(result);
-        assertEquals("MAPA_DISPONIBILIZADO", result.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.MAPA_DISPONIBILIZADO, result.getSituacao());
         assertNull(subprocesso.getDataFimEtapa2());
 
         ArgumentCaptor<AnaliseValidacao> analiseCaptor = ArgumentCaptor.forClass(AnaliseValidacao.class);

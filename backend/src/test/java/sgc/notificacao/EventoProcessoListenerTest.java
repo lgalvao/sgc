@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaService;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -62,7 +63,7 @@ class EventoProcessoListenerTest {
         processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Teste de Processo");
-        processo.setTipo("REVISAO");
+        processo.setTipo(TipoProcesso.REVISAO);
 
         Unidade unidadeOperacional = new Unidade();
         unidadeOperacional.setCodigo(100L);

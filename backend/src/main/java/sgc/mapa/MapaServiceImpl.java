@@ -10,6 +10,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -149,8 +150,8 @@ public class MapaServiceImpl implements MapaService {
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        String situacao = subprocesso.getSituacaoId();
-        if (!"CADASTRO_HOMOLOGADO".equals(situacao) && !"MAPA_CRIADO".equals(situacao)) {
+        SituacaoSubprocesso situacao = subprocesso.getSituacao();
+        if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
             throw new IllegalStateException("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
         }
 
@@ -164,8 +165,8 @@ public class MapaServiceImpl implements MapaService {
 
         MapaCompletoDto mapaDto = salvarMapaCompleto(idMapa, request, usuarioTitulo);
 
-        if (eraVazio && temNovasCompetencias && "CADASTRO_HOMOLOGADO".equals(situacao)) {
-            subprocesso.setSituacaoId("MAPA_CRIADO");
+        if (eraVazio && temNovasCompetencias && situacao == SituacaoSubprocesso.CADASTRO_HOMOLOGADO) {
+            subprocesso.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);
             repositorioSubprocesso.save(subprocesso);
             log.info("Situação do subprocesso {} alterada para MAPA_CRIADO", idSubprocesso);
         }

@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -36,6 +38,10 @@ import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
 import jakarta.persistence.EntityManager;
+import sgc.processo.enums.TipoProcesso;
+import sgc.unidade.enums.SituacaoUnidade;
+import sgc.unidade.enums.TipoUnidade;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -104,7 +110,7 @@ class ProcessoMapeamentoIntTest {
         when(sgrhService.buscarUnidadePorCodigo(anyLong())).thenAnswer(i -> {
             Long id = i.getArgument(0);
             Unidade u = unidadeRepo.findById(id).orElseThrow();
-            return Optional.of(new UnidadeDto(u.getCodigo(), u.getNome(), u.getSigla(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null, u.getTipo()));
+            return Optional.of(new UnidadeDto(u.getCodigo(), u.getNome(), u.getSigla(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null, u.getTipo().name()));
         });
         when(sgrhService.buscarResponsavelUnidade(anyLong()))
                 .thenAnswer(i -> Optional.of(new ResponsavelDto(i.getArgument(0), "T000000", "Titular Fulano", null, null)));
@@ -113,14 +119,14 @@ class ProcessoMapeamentoIntTest {
                 .thenReturn(Optional.of(new UsuarioDto("T000000", "Fulano de Tal", "fulano@tre.jus.br", "12345", "Analista")));
         doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
-        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", null, "INTERMEDIARIA", "ATIVA", null));
-        unidadeOperacional = unidadeRepo.save(new Unidade("Unidade Operacional", "UOP", null, "OPERACIONAL", "ATIVA", unidadeIntermediaria));
-        unidadeInteroperacional = unidadeRepo.save(new Unidade("Unidade Interoperacional", "UINTER", null, "INTEROPERACIONAL", "ATIVA", unidadeIntermediaria));
+        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", null, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
+        unidadeOperacional = unidadeRepo.save(new Unidade("Unidade Operacional", "UOP", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
+        unidadeInteroperacional = unidadeRepo.save(new Unidade("Unidade Interoperacional", "UINTER", null, TipoUnidade.INTEROPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
 
         processo = new Processo();
         processo.setDescricao("Processo de Mapeamento Teste");
-        processo.setTipo("MAPEAMENTO");
-        processo.setSituacao("CRIADO");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataLimite(LocalDate.now().plusDays(30));
         processo = processoRepo.save(processo);
     }
@@ -144,7 +150,7 @@ class ProcessoMapeamentoIntTest {
         entityManager.clear();
 
         Processo processoIniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
-        assertThat(processoIniciado.getSituacao()).isEqualTo("EM_ANDAMENTO");
+        assertThat(processoIniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
         List<UnidadeProcesso> snapshots = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
         assertThat(snapshots).hasSize(3);
@@ -155,7 +161,7 @@ class ProcessoMapeamentoIntTest {
 
         subprocessos.forEach(sp -> {
             assertThat(sp.getMapa()).isNotNull();
-            assertThat(sp.getSituacaoId()).isEqualTo("PENDENTE");
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         });
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.findAll().stream()

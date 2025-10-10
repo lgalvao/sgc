@@ -1,13 +1,13 @@
 package sgc.processo.modelo;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.modelo.EntidadeBase;
+import sgc.processo.enums.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,9 +31,11 @@ public class Processo extends EntidadeBase {
     @Column(name = "descricao")
     private String descricao;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20)
-    private String situacao;
+    private SituacaoProcesso situacao;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
-    private String tipo;
+    private TipoProcesso tipo;
 }

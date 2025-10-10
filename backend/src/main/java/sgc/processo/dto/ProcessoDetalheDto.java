@@ -1,5 +1,8 @@
 package sgc.processo.dto;
 
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,7 +12,7 @@ public record ProcessoDetalheDto(
     Long codigo,
     String descricao,
     String tipo,
-    String situacao,
+    SituacaoProcesso situacao,
     LocalDate dataLimite,
     LocalDateTime dataCriacao,
     LocalDateTime dataFinalizacao,
@@ -20,7 +23,7 @@ public record ProcessoDetalheDto(
         Long codigo,
         String descricao,
         String tipo,
-        String situacao,
+        SituacaoProcesso situacao,
         LocalDate dataLimite,
         LocalDateTime dataCriacao,
         LocalDateTime dataFinalizacao,
@@ -43,7 +46,7 @@ public record ProcessoDetalheDto(
         String nome,
         String sigla,
         Long unidadeSuperiorCodigo,
-        String situacaoSubprocesso,
+        SituacaoSubprocesso situacaoSubprocesso,
         LocalDate dataLimite,
         List<UnidadeParticipanteDTO> filhos
     ) {
@@ -52,7 +55,7 @@ public record ProcessoDetalheDto(
             String nome,
             String sigla,
             Long unidadeSuperiorCodigo,
-            String situacaoSubprocesso,
+            SituacaoSubprocesso situacaoSubprocesso,
             LocalDate dataLimite,
             List<UnidadeParticipanteDTO> filhos
         ) {

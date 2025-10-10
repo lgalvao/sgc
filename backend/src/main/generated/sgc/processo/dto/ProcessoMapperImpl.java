@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T09:00:46-0300",
+    date = "2025-10-10T13:02:30-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component
@@ -25,7 +27,7 @@ public class ProcessoMapperImpl implements ProcessoMapper {
         LocalDateTime dataFinalizacao = null;
         LocalDate dataLimite = null;
         String descricao = null;
-        String situacao = null;
+        SituacaoProcesso situacao = null;
         String tipo = null;
 
         codigo = processo.getCodigo();
@@ -34,7 +36,9 @@ public class ProcessoMapperImpl implements ProcessoMapper {
         dataLimite = processo.getDataLimite();
         descricao = processo.getDescricao();
         situacao = processo.getSituacao();
-        tipo = processo.getTipo();
+        if ( processo.getTipo() != null ) {
+            tipo = processo.getTipo().name();
+        }
 
         ProcessoDto processoDto = new ProcessoDto( codigo, dataCriacao, dataFinalizacao, dataLimite, descricao, situacao, tipo );
 
@@ -55,7 +59,9 @@ public class ProcessoMapperImpl implements ProcessoMapper {
         processo.setDataLimite( processoDTO.dataLimite() );
         processo.setDescricao( processoDTO.descricao() );
         processo.setSituacao( processoDTO.situacao() );
-        processo.setTipo( processoDTO.tipo() );
+        if ( processoDTO.tipo() != null ) {
+            processo.setTipo( Enum.valueOf( TipoProcesso.class, processoDTO.tipo() ) );
+        }
 
         return processo;
     }

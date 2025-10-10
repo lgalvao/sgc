@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.enums.TipoAlerta;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;
@@ -217,7 +218,7 @@ class AlertaServiceImplTest {
 
         // Apenas chama o método. O teste passa se nenhuma exceção for lançada.
         assertDoesNotThrow(() -> {
-            alertaService.criarAlerta(processo, "TESTE", unidadeDestinoCodigo, "Descrição", null);
+            alertaService.criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeDestinoCodigo, "Descrição", null);
         });
 
         // Verifica que o alerta principal foi salvo, mas nenhum AlertaUsuario foi criado

@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.comum.enums.SituacaoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ class ProcessoResumoDtoTest {
         var dto = new ProcessoResumoDto(
             1L,
             "Test Description",
-            "ATIVO",
+            SituacaoProcesso.EM_ANDAMENTO,
             "TIPO_A",
             limitDate,
             now,
@@ -25,7 +26,7 @@ class ProcessoResumoDtoTest {
 
         assertEquals(1L, dto.codigo());
         assertEquals("Test Description", dto.descricao());
-        assertEquals("ATIVO", dto.situacao());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.situacao());
         assertEquals("TIPO_A", dto.tipo());
         assertEquals(limitDate, dto.dataLimite());
         assertEquals(now, dto.dataCriacao());

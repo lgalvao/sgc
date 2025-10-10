@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.CopiaMapaService;
@@ -16,6 +18,7 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.dto.*;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
@@ -29,6 +32,8 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
+import sgc.unidade.enums.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,9 +78,9 @@ public class ProcessoService {
 
         Processo processo = new Processo();
         processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
+        processo.setTipo(TipoProcesso.valueOf(requisicao.tipo()));
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataCriacao(LocalDateTime.now());
 
         Processo processoSalvo = processoRepo.save(processo);
@@ -91,12 +96,12 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (!"CRIADO".equalsIgnoreCase(processo.getSituacao())) {
+        if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
         processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
+        processo.setTipo(TipoProcesso.valueOf(requisicao.tipo()));
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
         Processo processoAtualizado = processoRepo.save(processo);
@@ -110,7 +115,7 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (!"CRIADO".equalsIgnoreCase(processo.getSituacao())) {
+        if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
@@ -152,7 +157,7 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (!"CRIADO".equalsIgnoreCase(processo.getSituacao())) {
+        if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
@@ -169,22 +174,22 @@ public class ProcessoService {
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
 
-            if ("OPERACIONAL".equals(unidade.getTipo()) || "INTEROPERACIONAL".equals(unidade.getTipo())) {
+            if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
                 Mapa mapa = mapaRepo.save(new Mapa());
 
-                Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, "PENDENTE", processo.getDataLimite());
+                Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
                 Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
                 movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
             }
         }
 
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         Processo processoSalvo = processoRepo.save(processo);
 
         publicadorDeEventos.publishEvent(new ProcessoIniciadoEvento(
                 processoSalvo.getCodigo(),
-                processoSalvo.getTipo(),
+                processoSalvo.getTipo().name(),
                 LocalDateTime.now(),
                 codigosUnidades
         ));
@@ -198,7 +203,7 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (!"CRIADO".equalsIgnoreCase(processo.getSituacao())) {
+        if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
@@ -222,18 +227,18 @@ public class ProcessoService {
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
 
-            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaNovo, "PENDENTE", processo.getDataLimite());
+            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
             Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
             movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
         }
 
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         Processo processoSalvo = processoRepo.save(processo);
 
         publicadorDeEventos.publishEvent(new ProcessoIniciadoEvento(
                 processoSalvo.getCodigo(),
-                processoSalvo.getTipo(),
+                processoSalvo.getTipo().name(),
                 LocalDateTime.now(),
                 codigosUnidades
         ));
@@ -249,14 +254,14 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (!"EM_ANDAMENTO".equalsIgnoreCase(processo.getSituacao())) {
+        if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
             throw new IllegalStateException("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
         }
 
         validarTodosSubprocessosHomologados(processo);
         tornarMapasVigentes(processo);
 
-        processo.setSituacao("FINALIZADO");
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setDataFinalizacao(LocalDateTime.now());
         processo = processoRepo.save(processo);
 
@@ -309,10 +314,10 @@ public class ProcessoService {
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processo.getCodigo());
 
         List<String> pendentes = subprocessos.stream()
-            .filter(sp -> !"MAPA_HOMOLOGADO".equalsIgnoreCase(sp.getSituacaoId()))
+            .filter(sp -> sp.getSituacao() != SituacaoSubprocesso.MAPA_HOMOLOGADO)
             .map(sp -> String.format("%s (Situação: %s)",
                 sp.getUnidade() != null ? sp.getUnidade().getSigla() : "Subprocesso " + sp.getCodigo(),
-                sp.getSituacaoId()))
+                sp.getSituacao()))
             .toList();
 
         if (!pendentes.isEmpty()) {
@@ -368,7 +373,7 @@ public class ProcessoService {
                     .filter(e -> !e.isBlank())
                     .orElseThrow(() -> new IllegalStateException("Usuário titular sem e-mail."));
 
-                String mensagem = criarMensagemPersonalizada(unidade.getTipo());
+                String mensagem = criarMensagemPersonalizada(unidade.getTipo().name());
                 String html = notificacaoTemplateEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
                     unidade.getSigla(), processo.getDescricao(), mensagem);
 

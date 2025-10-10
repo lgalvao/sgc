@@ -24,6 +24,8 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
+import sgc.processo.enums.TipoProcesso;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import sgc.comum.enums.SituacaoProcesso;
 
 /**
  * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
@@ -80,7 +83,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
-        var requisicao = new CriarProcessoReq("Processo de teste", "MAPEAMENTO", LocalDate.now().plusDays(10), List.of(1L, 2L));
+        var requisicao = new CriarProcessoReq("Processo de teste", TipoProcesso.MAPEAMENTO.name(), LocalDate.now().plusDays(10), List.of(1L, 2L));
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
@@ -102,7 +105,7 @@ public class ProcessoServiceTest {
 
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
+            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo().name());
         });
 
         ProcessoDto dto = processoService.criar(requisicao);
@@ -110,15 +113,15 @@ public class ProcessoServiceTest {
         assertThat(dto).isNotNull();
         assertThat(dto.codigo()).isEqualTo(123L);
         assertThat(dto.descricao()).isEqualTo("Processo de teste");
-        assertThat(dto.tipo()).isEqualTo("MAPEAMENTO");
-        assertThat(dto.situacao()).isEqualTo("CRIADO");
+        assertThat(dto.tipo()).isEqualTo(TipoProcesso.MAPEAMENTO.name());
+        assertThat(dto.situacao()).isEqualTo(SituacaoProcesso.CRIADO);
 
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoCriadoEvento.class));
     }
 
     @Test
     public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
-        var requisicao = new CriarProcessoReq("   ", "MAPEAMENTO", null, List.of(1L));
+        var requisicao = new CriarProcessoReq("   ", TipoProcesso.MAPEAMENTO.name(), null, List.of(1L));
 
         assertThatThrownBy(() -> processoService.criar(requisicao))
                 .isInstanceOf(ConstraintViolationException.class);

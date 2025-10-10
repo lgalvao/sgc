@@ -197,8 +197,7 @@ public class SubprocessoControleTest {
     @Test
     void aceitarCadastro_DadosValidos_RealizaAceite() throws Exception {
         AceitarCadastroReq request = new AceitarCadastroReq("Observações");
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.aceitarCadastro(eq(1L), eq("Observações"), any(String.class)))
                 .thenReturn(resultado);
@@ -215,8 +214,7 @@ public class SubprocessoControleTest {
     @Test
     void homologarCadastro_DadosValidos_RealizaHomologacao() throws Exception {
         HomologarCadastroReq request = new HomologarCadastroReq("Observações");
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.homologarCadastro(eq(1L), eq("Observações"), any(String.class)))
                 .thenReturn(resultado);
@@ -233,8 +231,7 @@ public class SubprocessoControleTest {
     @Test
     void disponibilizarMapa_DadosValidos_RealizaDisponibilizacao() throws Exception {
         DisponibilizarMapaReq request = new DisponibilizarMapaReq("Observações", LocalDate.now().plusDays(10));
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.disponibilizarMapa(eq(1L), eq("Observações"), any(LocalDate.class), any(String.class)))
                 .thenReturn(resultado);
@@ -251,8 +248,7 @@ public class SubprocessoControleTest {
     @Test
     void apresentarSugestoes_DadosValidos_RealizaAcao() throws Exception {
         ApresentarSugestoesReq request = new ApresentarSugestoesReq("Sugestões para melhoria");
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.apresentarSugestoes(eq(1L), eq("Sugestões para melhoria"), any(String.class)))
                 .thenReturn(resultado);
@@ -268,8 +264,7 @@ public class SubprocessoControleTest {
 
     @Test
     void validarMapa_Sucesso_RealizaValidacao() throws Exception {
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.validarMapa(eq(1L), any(String.class))).thenReturn(resultado);
 
@@ -311,8 +306,7 @@ public class SubprocessoControleTest {
     @Test
     void devolverValidacao_DadosValidos_RealizaDevolucao() throws Exception {
         DevolverValidacaoReq request = new DevolverValidacaoReq("Justificativa para devolução");
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.devolverValidacao(eq(1L), eq("Justificativa para devolução"), any(String.class)))
                 .thenReturn(resultado);
@@ -328,8 +322,7 @@ public class SubprocessoControleTest {
 
     @Test
     void aceitarValidacao_Sucesso_RealizaAceite() throws Exception {
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.aceitarValidacao(eq(1L), any(String.class))).thenReturn(resultado);
 
@@ -342,8 +335,7 @@ public class SubprocessoControleTest {
 
     @Test
     void homologarValidacao_Sucesso_RealizaHomologacao() throws Exception {
-        SubprocessoDto resultado = new SubprocessoDto();
-        resultado.setCodigo(1L);
+        SubprocessoDto resultado = new SubprocessoDto(1L, null, null, null, null, null, null, null, null);
 
         when(subprocessoService.homologarValidacao(eq(1L), any(String.class))).thenReturn(resultado);
 
@@ -369,10 +361,7 @@ public class SubprocessoControleTest {
 
     @Test
     void criarSubprocesso_Sucesso_RetornaCriado() throws Exception {
-        SubprocessoDto dto = new SubprocessoDto();
-        dto.setProcessoCodigo(1L);
-        dto.setUnidadeCodigo(1L);
-        dto.setMapaCodigo(1L);
+        SubprocessoDto dto = new SubprocessoDto(null, 1L, 1L, 1L, null, null, null, null, null);
 
         sgc.subprocesso.modelo.Subprocesso entity = new sgc.subprocesso.modelo.Subprocesso();
         entity.setCodigo(1L);
@@ -392,8 +381,7 @@ public class SubprocessoControleTest {
 
     @Test
     void atualizarSubprocesso_SubprocessoNaoEncontrado_RetornaNotFound() throws Exception {
-        SubprocessoDto dto = new SubprocessoDto();
-        dto.setProcessoCodigo(1L);
+        SubprocessoDto dto = new SubprocessoDto(null, 1L, null, null, null, null, null, null, null);
 
         when(subprocessoRepo.findById(1L)).thenReturn(java.util.Optional.empty());
 
@@ -407,10 +395,7 @@ public class SubprocessoControleTest {
 
     @Test
     void atualizarSubprocesso_SubprocessoEncontrado_RealizaAtualizacao() throws Exception {
-        SubprocessoDto dto = new SubprocessoDto();
-        dto.setProcessoCodigo(1L);
-        dto.setUnidadeCodigo(1L);
-        dto.setMapaCodigo(1L);
+        SubprocessoDto dto = new SubprocessoDto(null, 1L, 1L, 1L, null, null, null, null, null);
 
         sgc.subprocesso.modelo.Subprocesso entity = new sgc.subprocesso.modelo.Subprocesso();
         entity.setCodigo(1L);

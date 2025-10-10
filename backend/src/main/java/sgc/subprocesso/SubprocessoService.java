@@ -9,6 +9,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.analise.enums.TipoAcaoAnalise;
 import sgc.analise.modelo.AnaliseValidacao;
 import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.atividade.dto.AtividadeMapper;
@@ -18,6 +19,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.dto.ConhecimentoDto;
@@ -131,7 +133,7 @@ public class SubprocessoService {
         return new SubprocessoDetalheDto(
             unidadeDto,
             responsavelDto,
-            sp.getSituacaoId(),
+            sp.getSituacao().name(),
             localizacaoAtual,
             prazoEtapaAtual,
             movimentacoesDto,
@@ -205,7 +207,7 @@ public class SubprocessoService {
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
 
-        sp.setSituacaoId("CADASTRO_DISPONIBILIZADO");
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -236,7 +238,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        sp.setSituacaoId("REVISAO_CADASTRO_DISPONIBILIZADA");
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -267,7 +269,7 @@ public class SubprocessoService {
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
 
-        sp.setSituacaoId("MAPA_DISPONIBILIZADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         sp.setDataLimiteEtapa2(dataLimiteEtapa2);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
@@ -286,7 +288,7 @@ public class SubprocessoService {
         if (sp.getMapa() != null) {
             sp.getMapa().setSugestoes(sugestoes);
         }
-        sp.setSituacaoId("MAPA_COM_SUGESTOES");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -302,7 +304,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        sp.setSituacaoId("MAPA_VALIDADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -347,7 +349,7 @@ public class SubprocessoService {
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), unidadeDevolucao, "Devolução da validação do mapa de competências para ajustes"));
 
-        sp.setSituacaoId("MAPA_DISPONIBILIZADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         sp.setDataFimEtapa2(null);
         repositorioSubprocesso.save(sp);
 
@@ -378,7 +380,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        sp.setSituacaoId("MAPA_HOMOLOGADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
 
         return subprocessoMapper.toDTO(sp);
@@ -425,10 +427,10 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_HOMOLOGADA".equals(sp.getSituacaoId()) &&
-            !"MAPA_DISPONIBILIZADO".equals(sp.getSituacaoId()) &&
-            !"MAPA_AJUSTADO".equals(sp.getSituacaoId())) {
-             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacaoId());
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
+            sp.getSituacao() != SituacaoSubprocesso.MAPA_DISPONIBILIZADO &&
+            sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
+             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacao());
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
@@ -451,7 +453,7 @@ public class SubprocessoService {
             }
         }
 
-        sp.setSituacaoId("MAPA_AJUSTADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
         repositorioSubprocesso.save(sp);
 
         return subprocessoMapper.toDTO(sp);
@@ -462,7 +464,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        sp.setSituacaoId("MAPA_AJUSTADO");
+        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
         repositorioSubprocesso.save(sp);
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Submissão do mapa ajustado"));
@@ -607,7 +609,7 @@ public class SubprocessoService {
         Unidade unidadeDevolucao = sp.getUnidade();
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), unidadeDevolucao, "Devolução do cadastro de atividades para ajustes: " + motivo));
-        sp.setSituacaoId("CADASTRO_EM_ELABORACAO");
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         repositorioSubprocesso.save(sp);
 
@@ -637,14 +639,14 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"CADASTRO_DISPONIBILIZADO".equals(sp.getSituacaoId())) {
+        if (sp.getSituacao() != SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO) {
             throw new IllegalStateException("Ação de aceite só pode ser executada em cadastros disponibilizados.");
         }
 
         AnaliseCadastro analise = new AnaliseCadastro();
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao("ACEITE");
+        analise.setAcao(TipoAcaoAnalise.ACEITE);
         analise.setAnalistaUsuarioTitulo(usuario);
         analise.setObservacoes(observacoes);
         repositorioAnaliseCadastro.save(analise);
@@ -694,14 +696,14 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"CADASTRO_DISPONIBILIZADO".equals(sp.getSituacaoId())) {
+        if (sp.getSituacao() != SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
         Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
         // A homologação é uma ação final do ADMIN (SEDOC), a movimentação termina na própria unidade de origem.
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Cadastro de atividades e conhecimentos homologado"));
-        sp.setSituacaoId("CADASTRO_HOMOLOGADO");
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
 
         log.info("Subprocesso {} homologado com sucesso.", idSubprocesso);
@@ -714,14 +716,14 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_DISPONIBILIZADA".equals(sp.getSituacaoId())) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
         AnaliseCadastro analise = new AnaliseCadastro();
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao("DEVOLUCAO_REVISAO");
+        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
         analise.setMotivo(motivo);
         analise.setObservacoes(observacoes);
         analise.setAnalistaUsuarioTitulo(usuario);
@@ -729,7 +731,7 @@ public class SubprocessoService {
 
         Unidade unidadeDevolucao = sp.getUnidade();
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeDevolucao.getUnidadeSuperior(), unidadeDevolucao, "Devolução da revisão do cadastro para ajustes: " + motivo));
-        sp.setSituacaoId("REVISAO_CADASTRO_EM_ANDAMENTO");
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         repositorioSubprocesso.save(sp);
 
@@ -741,14 +743,14 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_DISPONIBILIZADA".equals(sp.getSituacaoId())) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
         AnaliseCadastro analise = new AnaliseCadastro();
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao("ACEITE_REVISAO");
+        analise.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
         analise.setObservacoes(observacoes);
         analise.setAnalistaUsuarioTitulo(usuario);
         repositorioAnaliseCadastro.save(analise);
@@ -793,13 +795,13 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (!"REVISAO_CADASTRO_DISPONIBILIZADA".equals(sp.getSituacaoId())) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
         Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Revisão do cadastro de atividades e conhecimentos homologada"));
-        sp.setSituacaoId("REVISAO_CADASTRO_HOMOLOGADA");
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         repositorioSubprocesso.save(sp);
 
         log.info("Revisão do subprocesso {} homologada com sucesso.", idSubprocesso);
@@ -812,7 +814,7 @@ public class SubprocessoService {
         Subprocesso spDestino = repositorioSubprocesso.findById(idSubprocessoDestino)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: " + idSubprocessoDestino));
 
-        if (!"CADASTRO_EM_ELABORACAO".equals(spDestino.getSituacaoId())) {
+        if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
             throw new IllegalStateException("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
         }
 

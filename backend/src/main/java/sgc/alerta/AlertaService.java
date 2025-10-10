@@ -1,5 +1,6 @@
 package sgc.alerta;
 
+import sgc.alerta.enums.TipoAlerta;
 import sgc.alerta.modelo.Alerta;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -27,7 +28,7 @@ public interface AlertaService {
      */
     Alerta criarAlerta(
         Processo processo,
-        String tipoAlerta,
+        TipoAlerta tipoAlerta,
         Long unidadeDestinoCodigo,
         String descricao,
         LocalDate dataLimite
@@ -41,6 +42,7 @@ public interface AlertaService {
      * - INTEROPERACIONAL: Cria 2 alertas (operacional + intermediária)
      * 
      * @param processo Processo iniciado
+     * @param codigosUnidades Lista de códigos das unidades
      * @param subprocessos Lista de subprocessos criados
      * @return Lista de alertas criados
      */

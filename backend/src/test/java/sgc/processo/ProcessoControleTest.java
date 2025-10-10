@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.processo.dto.*;
 import sgc.processo.modelo.ErroProcesso;
@@ -51,7 +52,7 @@ public class ProcessoControleTest {
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
         var req = new CriarProcessoReq("Novo Processo", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Novo Processo", "CRIADO", "MAPEAMENTO");
+        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Novo Processo", SituacaoProcesso.CRIADO, "MAPEAMENTO");
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
@@ -80,7 +81,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Teste", "CRIADO", "MAPEAMENTO");
+        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Teste", SituacaoProcesso.CRIADO, "MAPEAMENTO");
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -105,7 +106,7 @@ public class ProcessoControleTest {
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
         var req = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Atualizado", "CRIADO", "REVISAO");
+        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Atualizado", SituacaoProcesso.CRIADO, "REVISAO");
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
@@ -171,7 +172,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = new ProcessoDetalheDto(1L, "Processo Detalhado", "CRIADO", "MAPEAMENTO", null, LocalDateTime.now(), null, Collections.emptyList(), Collections.emptyList());
+        var dto = new ProcessoDetalheDto(1L, "Processo Detalhado", "MAPEAMENTO", SituacaoProcesso.CRIADO, null, LocalDateTime.now(), null, Collections.emptyList(), Collections.emptyList());
 
         when(processoService.obterDetalhes(eq(1L), eq("ADMIN"), isNull())).thenReturn(dto);
 
@@ -201,7 +202,7 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo Iniciado", "EM_ANDAMENTO", "MAPEAMENTO");
+        var dto = new ProcessoDto(1L, null, null, null, "Processo Iniciado", SituacaoProcesso.EM_ANDAMENTO, "MAPEAMENTO");
 
         when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
 
@@ -216,7 +217,7 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo de Revisão Iniciado", "EM_ANDAMENTO", "REVISAO");
+        var dto = new ProcessoDto(1L, null, null, null, "Processo de Revisão Iniciado", SituacaoProcesso.EM_ANDAMENTO, "REVISAO");
 
         when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
 
@@ -241,7 +242,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo Finalizado", "FINALIZADO", "MAPEAMENTO");
+        var dto = new ProcessoDto(1L, null, null, null, "Processo Finalizado", SituacaoProcesso.FINALIZADO, "MAPEAMENTO");
 
         when(processoService.finalizar(1L)).thenReturn(dto);
 

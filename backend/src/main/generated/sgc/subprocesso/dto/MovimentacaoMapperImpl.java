@@ -8,7 +8,7 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T09:00:46-0300",
+    date = "2025-10-10T13:02:29-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
 )
 @Component

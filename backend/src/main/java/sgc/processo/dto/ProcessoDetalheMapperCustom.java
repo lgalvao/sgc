@@ -63,7 +63,7 @@ public class ProcessoDetalheMapperCustom {
                         unit.nome(),
                         unit.sigla(),
                         unit.unidadeSuperiorCodigo(),
-                        sp.getSituacaoId(), // Novo valor para situacaoSubprocesso
+                        sp.getSituacao(), // Novo valor para situacaoSubprocesso
                         sp.getDataLimiteEtapa1(), // Novo valor para dataLimite
                         unit.filhos()
                     );

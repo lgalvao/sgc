@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.comum.enums.SituacaoSubprocesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -186,11 +187,11 @@ class SubprocessoDtoTest {
         List<MovimentacaoDto> movimentacoes = List.of();
         List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = List.of();
 
-        SubprocessoDetalheDto dto = new SubprocessoDetalheDto(unidade, responsavel, "SITUACAO", "Localizacao", prazo, movimentacoes, elementos);
+        SubprocessoDetalheDto dto = new SubprocessoDetalheDto(unidade, responsavel, SituacaoSubprocesso.NAO_INICIADO.name(), "Localizacao", prazo, movimentacoes, elementos);
 
         assertEquals(unidade, dto.unidade());
         assertEquals(responsavel, dto.responsavel());
-        assertEquals("SITUACAO", dto.situacao());
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO.name(), dto.situacao());
         assertEquals("Localizacao", dto.localizacaoAtual());
         assertEquals(prazo, dto.prazoEtapaAtual());
         assertEquals(movimentacoes, dto.movimentacoes());
@@ -227,21 +228,21 @@ class SubprocessoDtoTest {
     }
 
     @Test
-    void SubprocessoDto_Builder_Test() {
+    void SubprocessoDto_RecordConstructorAndAccessors() {
         LocalDate dataLimite = LocalDate.now().plusDays(10);
         LocalDateTime dataFim = LocalDateTime.now();
 
-        SubprocessoDto dto = SubprocessoDto.builder()
-            .codigo(1L)
-            .processoCodigo(2L)
-            .unidadeCodigo(3L)
-            .mapaCodigo(4L)
-            .dataLimiteEtapa1(dataLimite)
-            .dataFimEtapa1(dataFim)
-            .dataLimiteEtapa2(dataLimite.plusDays(1))
-            .dataFimEtapa2(dataFim.plusHours(1))
-            .situacaoId("TESTE")
-            .build();
+        SubprocessoDto dto = new SubprocessoDto(
+            1L,
+            2L,
+            3L,
+            4L,
+            dataLimite,
+            dataFim,
+            dataLimite.plusDays(1),
+            dataFim.plusHours(1),
+            SituacaoSubprocesso.NAO_INICIADO
+        );
 
         assertEquals(1L, dto.getCodigo());
         assertEquals(2L, dto.getProcessoCodigo());
@@ -251,7 +252,7 @@ class SubprocessoDtoTest {
         assertEquals(dataFim, dto.getDataFimEtapa1());
         assertEquals(dataLimite.plusDays(1), dto.getDataLimiteEtapa2());
         assertEquals(dataFim.plusHours(1), dto.getDataFimEtapa2());
-        assertEquals("TESTE", dto.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO, dto.getSituacao());
     }
 
     @Test

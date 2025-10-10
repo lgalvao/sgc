@@ -1,6 +1,12 @@
 package sgc.processo.modelo;
 
 import org.junit.jupiter.api.Test;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.processo.enums.TipoProcesso;
+import sgc.unidade.enums.TipoUnidade;
+
+import sgc.processo.enums.TipoProcesso;
+import sgc.unidade.enums.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,19 +23,19 @@ class ModeloTest {
         processo.setDataFinalizacao(LocalDateTime.now());
         processo.setDataLimite(LocalDate.now().plusDays(30));
         processo.setDescricao("Descrição do Processo");
-        processo.setSituacao("CRIADO");
-        processo.setTipo("MAPEAMENTO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         assertEquals(1L, processo.getCodigo());
         assertNotNull(processo.getDataCriacao());
         assertNotNull(processo.getDataFinalizacao());
         assertEquals(LocalDate.now().plusDays(30), processo.getDataLimite());
         assertEquals("Descrição do Processo", processo.getDescricao());
-        assertEquals("CRIADO", processo.getSituacao());
-        assertEquals("MAPEAMENTO", processo.getTipo());
+        assertEquals(SituacaoProcesso.CRIADO, processo.getSituacao());
+        assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
 
         Processo processo2 = new Processo(LocalDateTime.now(), LocalDateTime.now(),
-                LocalDate.now().plusDays(30), "Descricao", "Situacao", "Tipo");
+                LocalDate.now().plusDays(30), "Descricao", SituacaoProcesso.CRIADO, TipoProcesso.MAPEAMENTO);
         assertNotNull(processo2);
     }
 
@@ -42,7 +48,7 @@ class ModeloTest {
         unidadeProcesso.setNome("Unidade Teste");
         unidadeProcesso.setSigla("UT");
         unidadeProcesso.setTitularTitulo("Titular Teste");
-        unidadeProcesso.setTipo("OPERACIONAL");
+        unidadeProcesso.setTipo(TipoUnidade.OPERACIONAL);
         unidadeProcesso.setSituacao("PENDENTE");
         unidadeProcesso.setUnidadeSuperiorCodigo(100L);
 
@@ -51,12 +57,12 @@ class ModeloTest {
         assertEquals("Unidade Teste", unidadeProcesso.getNome());
         assertEquals("UT", unidadeProcesso.getSigla());
         assertEquals("Titular Teste", unidadeProcesso.getTitularTitulo());
-        assertEquals("OPERACIONAL", unidadeProcesso.getTipo());
+        assertEquals(TipoUnidade.OPERACIONAL, unidadeProcesso.getTipo());
         assertEquals("PENDENTE", unidadeProcesso.getSituacao());
         assertEquals(100L, unidadeProcesso.getUnidadeSuperiorCodigo());
 
         UnidadeProcesso unidadeProcesso2 = new UnidadeProcesso(10L, 20L, "Nome", "Sigla",
-                "Titular", "Tipo", "Situacao", 100L);
+                "Titular", TipoUnidade.OPERACIONAL, "Situacao", 100L);
         assertNotNull(unidadeProcesso2);
     }
 

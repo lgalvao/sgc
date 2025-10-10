@@ -10,6 +10,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -137,7 +138,7 @@ class MapaServiceImplTest {
     @Test
     void salvarMapaSubprocesso_deveAtualizarSituacao_quandoPrimeiraEdicao() {
         SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of(new CompetenciaMapaDto(1L, "Comp 1", List.of(1L))));
-        subprocesso.setSituacaoId("CADASTRO_HOMOLOGADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
         when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
@@ -148,17 +149,17 @@ class MapaServiceImplTest {
 
         mapaServico.salvarMapaSubprocesso(100L, request, "user");
 
-        assertThat(subprocesso.getSituacaoId()).isEqualTo("MAPA_CRIADO");
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
     }
 
     @Test
     void salvarMapaSubprocesso_deveLancarErro_quandoSituacaoInvalida() {
         SalvarMapaRequest request = new SalvarMapaRequest("Obs", Collections.emptyList());
-        subprocesso.setSituacaoId("INVALIDA");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
         assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, "user"))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: INVALIDA");
+                .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: NAO_INICIADO");
     }
 }

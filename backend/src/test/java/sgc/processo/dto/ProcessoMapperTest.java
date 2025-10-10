@@ -2,7 +2,10 @@ package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
+
+import sgc.processo.enums.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,8 +25,8 @@ class ProcessoMapperTest {
         processo.setDataFinalizacao(LocalDateTime.now().plusDays(1));
         processo.setDataLimite(LocalDate.now().plusDays(5));
         processo.setDescricao("Test Description");
-        processo.setSituacao("ATIVO");
-        processo.setTipo("TIPO_A");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         // Map to DTO
         ProcessoDto dto = mapper.toDTO(processo);
@@ -31,8 +34,8 @@ class ProcessoMapperTest {
         // Verify mapping
         assertEquals(1L, dto.codigo());
         assertEquals("Test Description", dto.descricao());
-        assertEquals("ATIVO", dto.situacao());
-        assertEquals("TIPO_A", dto.tipo());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.situacao());
+        assertEquals(TipoProcesso.MAPEAMENTO.name(), dto.tipo());
         assertNotNull(dto.dataCriacao());
         assertNotNull(dto.dataFinalizacao());
         assertNotNull(dto.dataLimite());
@@ -42,7 +45,7 @@ class ProcessoMapperTest {
     void testToEntity() {
         // Create a ProcessoDto
         ProcessoDto dto = new ProcessoDto(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), 
-                                         LocalDate.now().plusDays(5), "Test Description", "ATIVO", "TIPO_A");
+                                         LocalDate.now().plusDays(5), "Test Description", SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO.name());
 
         // Map to entity
         Processo processo = mapper.toEntity(dto);
@@ -50,8 +53,8 @@ class ProcessoMapperTest {
         // Verify mapping
         assertNotNull(processo);
         assertEquals("Test Description", processo.getDescricao());
-        assertEquals("ATIVO", processo.getSituacao());
-        assertEquals("TIPO_A", processo.getTipo());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, processo.getSituacao());
+        assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
         assertNotNull(processo.getDataCriacao());
         assertNotNull(processo.getDataFinalizacao());
         assertNotNull(processo.getDataLimite());

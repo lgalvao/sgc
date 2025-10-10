@@ -1,21 +1,17 @@
 package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import sgc.comum.enums.SituacaoSubprocesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * DTO para Subprocesso usado nas APIs.
- */
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SubprocessoDto {
     private Long codigo;
 
@@ -28,5 +24,6 @@ public class SubprocessoDto {
     private LocalDateTime dataFimEtapa1;
     private LocalDate dataLimiteEtapa2;
     private LocalDateTime dataFimEtapa2;
-    private String situacaoId;
+    private SituacaoSubprocesso situacao;
 }
+

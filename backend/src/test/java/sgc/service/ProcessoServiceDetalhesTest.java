@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
@@ -25,6 +27,8 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
+import sgc.processo.enums.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,8 +95,8 @@ public class ProcessoServiceDetalhesTest {
 
         when(p.getCodigo()).thenReturn(1L);
         when(p.getDescricao()).thenReturn("Proc Teste");
-        when(p.getTipo()).thenReturn("MAPEAMENTO");
-        when(p.getSituacao()).thenReturn("EM_ANDAMENTO");
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getDataCriacao()).thenReturn(dataCriacao);
         when(p.getDataLimite()).thenReturn(dataLimite);
         when(p.getDataFinalizacao()).thenReturn(null);
@@ -112,16 +116,16 @@ public class ProcessoServiceDetalhesTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         sp.setUnidade(unidade);
-        sp.setSituacaoId("PENDENTE");
+        sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(LocalDate.now().plusDays(5));
 
         ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO(
-                10L, "Diretoria X", "DX", null, "PENDENTE", LocalDate.now().plusDays(7), new ArrayList<>());
-        ProcessoResumoDto processoResumoDTO = new ProcessoResumoDto(100L, null, "PENDENTE", null,
+                10L, "Diretoria X", "DX", null, SituacaoSubprocesso.NAO_INICIADO, LocalDate.now().plusDays(7), new ArrayList<>());
+        ProcessoResumoDto processoResumoDTO = new ProcessoResumoDto(100L, null, SituacaoProcesso.CRIADO, null,
                 LocalDate.now().plusDays(5), null, 10L, "Diretoria X");
 
         ProcessoDetalheDto processoDetalheDTO = new ProcessoDetalheDto(
-                1L, "Proc Teste", "MAPEAMENTO", "EM_ANDAMENTO",
+                1L, "Proc Teste", "MAPEAMENTO", SituacaoProcesso.EM_ANDAMENTO,
                 dataLimite, dataCriacao, null,
                 List.of(unidadeParticipanteDTO),
                 List.of(processoResumoDTO));

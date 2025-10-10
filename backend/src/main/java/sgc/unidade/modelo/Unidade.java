@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.comum.modelo.Usuario;
+import sgc.unidade.enums.SituacaoUnidade;
+import sgc.unidade.enums.TipoUnidade;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
@@ -25,11 +27,13 @@ public class Unidade extends EntidadeBase {
     @JoinColumn(name = "titular_titulo")
     private Usuario titular;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
-    private String tipo;
+    private TipoUnidade tipo;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20)
-    private String situacao;
+    private SituacaoUnidade situacao;
 
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")

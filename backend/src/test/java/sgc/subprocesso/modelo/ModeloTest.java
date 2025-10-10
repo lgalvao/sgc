@@ -1,6 +1,7 @@
 package sgc.subprocesso.modelo;
 
 import org.junit.jupiter.api.Test;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
 import sgc.unidade.modelo.Unidade;
@@ -33,7 +34,7 @@ class ModeloTest {
         subprocesso.setDataFimEtapa1(LocalDateTime.now());
         subprocesso.setDataLimiteEtapa2(LocalDate.now());
         subprocesso.setDataFimEtapa2(LocalDateTime.now());
-        subprocesso.setSituacaoId("SITUACAO");
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         
         assertEquals(1L, subprocesso.getCodigo());
         assertEquals(processo, subprocesso.getProcesso());
@@ -43,7 +44,7 @@ class ModeloTest {
         assertNotNull(subprocesso.getDataFimEtapa1());
         assertNotNull(subprocesso.getDataLimiteEtapa2());
         assertNotNull(subprocesso.getDataFimEtapa2());
-        assertEquals("SITUACAO", subprocesso.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO, subprocesso.getSituacao());
     }
 
     @Test
@@ -58,13 +59,13 @@ class ModeloTest {
         mapa.setCodigo(1L);
         
         Subprocesso subprocesso = new Subprocesso(
-            processo, unidade, mapa, "CADASTRO_EM_ELABORACAO", LocalDate.now()
+            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDate.now()
         );
         
         assertEquals(processo, subprocesso.getProcesso());
         assertEquals(unidade, subprocesso.getUnidade());
         assertEquals(mapa, subprocesso.getMapa());
-        assertEquals("CADASTRO_EM_ELABORACAO", subprocesso.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
     }
 
@@ -116,21 +117,6 @@ class ModeloTest {
         assertEquals(unidadeDestino, movimentacao.getUnidadeDestino());
         assertEquals("Descrição de movimentação", movimentacao.getDescricao());
         assertNotNull(movimentacao.getDataHora());
-    }
-
-    @Test
-    void SituacaoSubprocesso_GettersAndSetters() {
-        SituacaoSubprocesso situacao = new SituacaoSubprocesso();
-        
-        situacao.setId("ID");
-        situacao.setDescricao("Descrição");
-        
-        assertEquals("ID", situacao.getId());
-        assertEquals("Descrição", situacao.getDescricao());
-        
-        SituacaoSubprocesso situacao2 = new SituacaoSubprocesso("ID2", "Descrição2");
-        assertEquals("ID2", situacao2.getId());
-        assertEquals("Descrição2", situacao2.getDescricao());
     }
 
     @Test

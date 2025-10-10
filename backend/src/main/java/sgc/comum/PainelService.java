@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaDto;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -58,7 +59,7 @@ public class PainelService {
         List<Processo> processosFiltrados = new ArrayList<>();
         for (Processo processo : todosOsProcessos) {
             if ("ADMIN".equalsIgnoreCase(perfil)) {
-                if (!"CRIADO".equalsIgnoreCase(paraMaiusculasNulo(processo.getSituacao()))) {
+                if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
                     continue;
                 }
             }
@@ -90,14 +91,14 @@ public class PainelService {
                         processo.getCodigo(),
                         processo.getDescricao(),
                         processo.getSituacao(),
-                        processo.getTipo(),
+                        processo.getTipo().name(),
                         processo.getDataLimite(),
                         processo.getDataCriacao(),
                         unidadeCodigo,
                         unidadeNome
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         // Paginação em memória
         int total = listaDeDtos.size();
@@ -165,9 +166,5 @@ public class PainelService {
         }
 
         return new PageImpl<>(conteudoDaPagina, pageable, total);
-    }
-
-    private String paraMaiusculasNulo(String s) {
-        return s == null ? null : s.toUpperCase();
     }
 }

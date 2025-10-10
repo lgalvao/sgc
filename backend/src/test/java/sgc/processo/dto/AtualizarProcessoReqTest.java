@@ -11,12 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class AtualizarProcessoReqTest {
     @Test
     void testAtualizarProcessoReqConstructorAndGettersSetters() {
-        // Create test data
         List<Long> unidades = new ArrayList<>();
         unidades.add(1L);
         unidades.add(2L);
 
-        // Test constructor with parameters
         AtualizarProcessoReq req = new AtualizarProcessoReq(
             1L,
             "Test Description",
@@ -25,7 +23,6 @@ class AtualizarProcessoReqTest {
             unidades
         );
 
-        // Test getters
         assertEquals(1L, req.codigo());
         assertEquals("Test Description", req.descricao());
         assertEquals("TIPO_A", req.tipo());
@@ -34,7 +31,6 @@ class AtualizarProcessoReqTest {
         assertEquals(Long.valueOf(1L), req.unidades().get(0));
         assertEquals(Long.valueOf(2L), req.unidades().get(1));
 
-        // Test setters (records are immutable, so we create a new instance)
         req = new AtualizarProcessoReq(
             2L,
             "New Description",

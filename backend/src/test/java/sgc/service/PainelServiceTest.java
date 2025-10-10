@@ -9,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.comum.PainelService;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcesso;
@@ -38,16 +40,16 @@ public class PainelServiceTest {
         Processo p1 = new Processo();
         p1.setCodigo(1L);
         p1.setDescricao("P1");
-        p1.setSituacao("CRIADO");
-        p1.setTipo("MAPEAMENTO");
+        p1.setSituacao(SituacaoProcesso.CRIADO);
+        p1.setTipo(TipoProcesso.MAPEAMENTO);
         p1.setDataCriacao(LocalDateTime.now());
         p1.setDataLimite(LocalDate.now());
 
         Processo p2 = new Processo();
         p2.setCodigo(2L);
         p2.setDescricao("P2");
-        p2.setSituacao("FINALIZADO");
-        p2.setTipo("MAPEAMENTO");
+        p2.setSituacao(SituacaoProcesso.FINALIZADO);
+        p2.setTipo(TipoProcesso.MAPEAMENTO);
         p2.setDataCriacao(LocalDateTime.now());
         p2.setDataLimite(LocalDate.now());
 
@@ -75,12 +77,14 @@ public class PainelServiceTest {
         Processo p1 = new Processo();
         p1.setCodigo(1L);
         p1.setDescricao("P1");
-        p1.setSituacao("CRIADO");
+        p1.setSituacao(SituacaoProcesso.CRIADO);
+        p1.setTipo(TipoProcesso.MAPEAMENTO);
 
         Processo p2 = new Processo();
         p2.setCodigo(2L);
         p2.setDescricao("P2");
-        p2.setSituacao("EM_ANDAMENTO");
+        p2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        p2.setTipo(TipoProcesso.MAPEAMENTO);
 
         UnidadeProcesso up1 = new UnidadeProcesso();
         up1.setCodigo(10L);

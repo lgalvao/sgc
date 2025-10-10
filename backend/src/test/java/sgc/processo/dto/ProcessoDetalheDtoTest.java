@@ -1,6 +1,8 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,14 +18,14 @@ class ProcessoDetalheDtoTest {
     void testProcessoDetalheDtoConstructorAndAccessors() {
         var now = LocalDateTime.now();
         var limitDate = LocalDate.now();
-        var subprocessoResumo = new ProcessoResumoDto(1L, "Subprocess 1", "ATIVO", "TIPO_A", limitDate, now, 1L, "Unidade Teste");
-        var unidade = new ProcessoDetalheDto.UnidadeParticipanteDTO(1L, "Test Unit", "TU", 10L, "ATIVO", limitDate, new ArrayList<>());
+        var subprocessoResumo = new ProcessoResumoDto(1L, "Subprocess 1", SituacaoProcesso.EM_ANDAMENTO, "TIPO_A", limitDate, now, 1L, "Unidade Teste");
+        var unidade = new ProcessoDetalheDto.UnidadeParticipanteDTO(1L, "Test Unit", "TU", 10L, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, limitDate, new ArrayList<>());
 
         var dto = new ProcessoDetalheDto(
             1L,
             "Test Description",
             "TIPO_A",
-            "ATIVO",
+            SituacaoProcesso.EM_ANDAMENTO,
             limitDate,
             now,
             now,
@@ -34,7 +36,7 @@ class ProcessoDetalheDtoTest {
         assertEquals(1L, dto.codigo());
         assertEquals("Test Description", dto.descricao());
         assertEquals("TIPO_A", dto.tipo());
-        assertEquals("ATIVO", dto.situacao());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.situacao());
         assertEquals(limitDate, dto.dataLimite());
         assertEquals(now, dto.dataCriacao());
         assertEquals(now, dto.dataFinalizacao());
@@ -45,14 +47,14 @@ class ProcessoDetalheDtoTest {
     @Test
     void testUnidadeParticipanteDTOConstructorAndAccessors() {
         var limitDate = LocalDate.now();
-        var filho = new ProcessoDetalheDto.UnidadeParticipanteDTO(2L, "Filho Unit", "FU", 1L, "PENDENTE", limitDate, Collections.emptyList());
-        var dto = new ProcessoDetalheDto.UnidadeParticipanteDTO(1L, "Test Unit", "TU", 10L, "ATIVO", limitDate, List.of(filho));
+        var filho = new ProcessoDetalheDto.UnidadeParticipanteDTO(2L, "Filho Unit", "FU", 1L, SituacaoSubprocesso.NAO_INICIADO, limitDate, Collections.emptyList());
+        var dto = new ProcessoDetalheDto.UnidadeParticipanteDTO(1L, "Test Unit", "TU", 10L, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, limitDate, List.of(filho));
 
         assertEquals(1L, dto.unidadeCodigo());
         assertEquals("Test Unit", dto.nome());
         assertEquals("TU", dto.sigla());
         assertEquals(10L, dto.unidadeSuperiorCodigo());
-        assertEquals("ATIVO", dto.situacaoSubprocesso());
+        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, dto.situacaoSubprocesso());
         assertEquals(limitDate, dto.dataLimite());
         assertNotNull(dto.filhos());
         assertEquals(1, dto.filhos().size());
@@ -61,7 +63,7 @@ class ProcessoDetalheDtoTest {
 
     @Test
     void testDtoWithNullListsIsInitialized() {
-        var dto = new ProcessoDetalheDto(1L, "Desc", "Tipo", "Sit", null, null, null, null, null);
+        var dto = new ProcessoDetalheDto(1L, "Desc", "Tipo", SituacaoProcesso.CRIADO, null, null, null, null, null);
         assertNotNull(dto.unidades());
         assertTrue(dto.unidades().isEmpty());
         assertNotNull(dto.resumoSubprocessos());

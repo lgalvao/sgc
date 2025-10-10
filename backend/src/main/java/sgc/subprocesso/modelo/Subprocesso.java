@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
@@ -45,17 +46,18 @@ public class Subprocesso extends EntidadeBase {
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "situacao_id", length = 50)
-    private String situacaoId;
+    private SituacaoSubprocesso situacao;
 
     /**
      * Construtor de conveniência para criar um novo subprocesso no início de um processo.
      */
-    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, String situacaoId, LocalDate dataLimiteEtapa1) {
+    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDate dataLimiteEtapa1) {
         this.processo = processo;
         this.unidade = unidade;
         this.mapa = mapa;
-        this.situacaoId = situacaoId;
+        this.situacao = situacao;
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
     }
 }

@@ -16,6 +16,8 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.unidade.enums.TipoUnidade;
+import sgc.processo.enums.TipoProcesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -119,30 +121,31 @@ public class EventoProcessoListener {
 
             String assunto;
             String corpoHtml;
-            String tipoUnidade = unidade.tipo();
+            TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidade.tipo());
+            TipoProcesso tipoProcesso = processo.getTipo();
 
-            if ("OPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
+            if (TipoUnidade.OPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
                 corpoHtml = notificacaoTemplateEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
-                        processo.getTipo(),
+                        tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-            } else if ("INTERMEDIARIA".equalsIgnoreCase(tipoUnidade)) {
+            } else if (TipoUnidade.INTERMEDIARIA.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado em Unidades Subordinadas - " + processo.getDescricao();
                 corpoHtml = criarEmailParaUnidadeIntermediaria(
                         unidade.nome(),
                         processo.getDescricao(),
-                        processo.getTipo(),
+                        tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-            } else if ("INTEROPERACIONAL".equalsIgnoreCase(tipoUnidade)) {
+            } else if (TipoUnidade.INTEROPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
                 corpoHtml = criarEmailParaUnidadeInteroperacional(
                         unidade.nome(),
                         processo.getDescricao(),
-                        processo.getTipo(),
+                        tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
                 );
             } else {

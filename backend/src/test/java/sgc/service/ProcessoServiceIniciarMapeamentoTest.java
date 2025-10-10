@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.enums.SituacaoProcesso;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
@@ -26,6 +27,8 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
+import sgc.processo.enums.TipoProcesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -89,8 +92,8 @@ public class ProcessoServiceIniciarMapeamentoTest {
 
         Processo processo = new Processo();
         processo.setCodigo(idProcesso);
-        processo.setSituacao("CRIADO");
-        processo.setTipo("MAPEAMENTO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(idUnidade);
@@ -120,7 +123,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         when(processoRepo.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo());
+            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo().name());
         });
 
         // Execução
@@ -129,7 +132,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         // Asserções
         assertThat(dto).isNotNull();
         assertThat(dto.codigo()).isEqualTo(idProcesso);
-        assertThat(dto.situacao()).isEqualToIgnoringCase("EM_ANDAMENTO");
+        assertThat(dto.situacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
         // Verificar saves e publicação de evento
         verify(unidadeProcessoRepo, times(1)).save(any(UnidadeProcesso.class));
@@ -142,7 +145,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         Long idProcesso = 11L;
         Processo processo = new Processo();
         processo.setCodigo(idProcesso);
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         when(processoRepo.findById(idProcesso)).thenReturn(Optional.of(processo));
 

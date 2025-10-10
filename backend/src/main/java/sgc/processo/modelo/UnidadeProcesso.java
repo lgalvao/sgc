@@ -3,11 +3,14 @@ package sgc.processo.modelo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
+import sgc.unidade.enums.TipoUnidade;
 
 @Entity
 @Table(name = "UNIDADE_PROCESSO", schema = "sgc")
@@ -31,13 +34,12 @@ public class UnidadeProcesso extends EntidadeBase {
     @Column(name = "titular_titulo", length = 12)
     private String titularTitulo;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
-    private String tipo;
+    private TipoUnidade tipo;
 
     @Column(name = "situacao", length = 20)
     private String situacao;
 
     @Column(name = "unidade_superior_codigo")
-    private Long unidadeSuperiorCodigo;
-
-}
+    private Long unidadeSuperiorCodigo;}

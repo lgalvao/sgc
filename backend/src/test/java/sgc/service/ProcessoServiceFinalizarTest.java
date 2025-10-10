@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
@@ -57,7 +59,7 @@ public class ProcessoServiceFinalizarTest {
         processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo de Teste");
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
@@ -66,12 +68,12 @@ public class ProcessoServiceFinalizarTest {
         subprocessoHomologado = new Subprocesso();
         subprocessoHomologado.setCodigo(100L);
         subprocessoHomologado.setUnidade(unidade);
-        subprocessoHomologado.setSituacaoId("MAPA_HOMOLOGADO");
+        subprocessoHomologado.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
 
         subprocessoPendente = new Subprocesso();
         subprocessoPendente.setCodigo(101L);
         subprocessoPendente.setUnidade(unidade);
-        subprocessoPendente.setSituacaoId("MAPA_VALIDADO");
+        subprocessoPendente.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
     }
 
     @Test
@@ -97,7 +99,7 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
-        when(processoMapper.toDTO(any(Processo.class))).thenReturn(new ProcessoDto(1L, null, null, null, null, null, null));
+        when(processoMapper.toDTO(any(Processo.class))).thenReturn(new ProcessoDto(1L, null, null, null, null, SituacaoProcesso.FINALIZADO, null));
 
         processoService.finalizar(1L);
 

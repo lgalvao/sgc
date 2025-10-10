@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sgc.analise.enums.TipoAcaoAnalise;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.subprocesso.modelo.Subprocesso;
 
@@ -30,8 +31,9 @@ public class AnaliseCadastro extends EntidadeBase {
     @Column(name = "unidade_sigla", length = 20)
     private String unidadeSigla;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "acao", length = 20)
-    private String acao;
+    private TipoAcaoAnalise acao;
 
     @Column(name = "motivo", length = 500)
     private String motivo;

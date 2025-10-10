@@ -1,5 +1,7 @@
 package sgc.processo.dto;
 
+import sgc.comum.enums.SituacaoProcesso;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -9,6 +11,6 @@ public record ProcessoDto(
     LocalDateTime dataFinalizacao,
     LocalDate dataLimite,
     String descricao,
-    String situacao,
+    SituacaoProcesso situacao,
     String tipo
 ) {}

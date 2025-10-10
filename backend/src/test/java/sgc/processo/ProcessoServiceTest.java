@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.CopiaMapaService;
@@ -29,6 +31,9 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
+import sgc.processo.enums.TipoProcesso;
+import sgc.unidade.enums.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -116,10 +121,10 @@ public class ProcessoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo de Teste");
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataCriacao(LocalDateTime.now());
 
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo de Teste", null, null);
+        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo de Teste", SituacaoProcesso.CRIADO, null);
 
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(dto);
@@ -172,9 +177,9 @@ public class ProcessoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Original");
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
 
-        var dto = new ProcessoDto(1L, null, null, null, "Processo Atualizado", null, null);
+        var dto = new ProcessoDto(1L, null, null, null, "Processo Atualizado", SituacaoProcesso.CRIADO, null);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
@@ -205,7 +210,7 @@ public class ProcessoServiceTest {
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -219,7 +224,7 @@ public class ProcessoServiceTest {
     void apagar_ProcessoExisteRemoveComSucesso() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -242,7 +247,7 @@ public class ProcessoServiceTest {
     void apagar_ProcessoNaoCriado_LancaIllegalStateException() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -363,14 +368,14 @@ public class ProcessoServiceTest {
     void iniciarProcessoMapeamento_Valido_IniciaComSucesso() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDataLimite(LocalDate.now().plusDays(30));
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setNome("Unidade Teste");
-        unidade.setSigla("UT");
-        unidade.setTipo("OPERACIONAL");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -384,20 +389,20 @@ public class ProcessoServiceTest {
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), null, null, null, null, null, null);
+            return new ProcessoDto(p.getCodigo(), null, null, null, null, p.getSituacao(), null);
         });
 
         ProcessoDto resultado = processoService.iniciarProcessoMapeamento(1L, List.of(1L));
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.codigo());
-        verify(processoRepo).save(argThat(p -> "EM_ANDAMENTO".equals(p.getSituacao())));
+        verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
         verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
 
         ArgumentCaptor<Subprocesso> subprocessoCaptor = ArgumentCaptor.forClass(Subprocesso.class);
         verify(subprocessoRepo).save(subprocessoCaptor.capture());
         Subprocesso subprocessoSalvo = subprocessoCaptor.getValue();
-        assertEquals("PENDENTE", subprocessoSalvo.getSituacaoId());
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO, subprocessoSalvo.getSituacao());
     }
 
     @Test
@@ -414,7 +419,7 @@ public class ProcessoServiceTest {
     void iniciarProcessoMapeamento_SemUnidades_LancaIllegalArgumentException() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
 
@@ -428,7 +433,7 @@ public class ProcessoServiceTest {
     void iniciarProcessoMapeamento_UnidadeEmProcessoAtivo_LancaErroProcesso() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("CRIADO");
+        processo.setSituacao(SituacaoProcesso.CRIADO);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(List.of(1L));
@@ -443,14 +448,14 @@ public class ProcessoServiceTest {
     void finalizar_ProcessoValido_FinalizaComSucesso() {
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setSituacao("EM_ANDAMENTO");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(10L);
-        subprocesso.setSituacaoId("MAPA_HOMOLOGADO");
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         subprocesso.setMapa(mapa); // Adiciona o mapa necessário
         
         Unidade unidade = new Unidade();
@@ -463,14 +468,14 @@ public class ProcessoServiceTest {
         when(processoRepo.save(any(Processo.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), null, null, null, null, null, null);
+            return new ProcessoDto(p.getCodigo(), null, null, null, null, p.getSituacao(), null);
         });
 
         ProcessoDto resultado = processoService.finalizar(1L);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.codigo());
-        verify(processoRepo).save(argThat(p -> "FINALIZADO".equals(p.getSituacao())));
+        verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.FINALIZADO));
         verify(publicadorDeEventos).publishEvent(any(ProcessoFinalizadoEvento.class));
     }
 
@@ -488,11 +493,11 @@ public class ProcessoServiceTest {
         void finalizar_SemSubprocessosHomologados_LancaErroProcesso() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("EM_ANDAMENTO");
+            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
     
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(10L);
-            subprocesso.setSituacaoId("PENDENTE"); // não homologado
+            subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // não homologado
             
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
@@ -514,12 +519,13 @@ public class ProcessoServiceTest {
         void iniciarProcessoRevisao_Valido_IniciaComSucesso() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("CRIADO");
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
             processo.setDataLimite(LocalDate.now().plusDays(30));
     
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
-            unidade.setTipo("OPERACIONAL");
+            unidade.setTipo(TipoUnidade.OPERACIONAL);
     
             sgc.mapa.modelo.UnidadeMapa unidadeMapa = new sgc.mapa.modelo.UnidadeMapa(1L);
             unidadeMapa.setMapaVigenteCodigo(100L);
@@ -538,7 +544,7 @@ public class ProcessoServiceTest {
     
             processoService.iniciarProcessoRevisao(1L, List.of(1L));
     
-            verify(processoRepo).save(argThat(p -> "EM_ANDAMENTO".equals(p.getSituacao())));
+            verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
             verify(servicoDeCopiaDeMapa).copiarMapaParaUnidade(100L, 1L);
             verify(subprocessoRepo).save(any(Subprocesso.class));
             verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
@@ -548,7 +554,7 @@ public class ProcessoServiceTest {
         void iniciarProcessoRevisao_ProcessoNaoCriado_LancaIllegalStateException() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("EM_ANDAMENTO");
+            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
     
@@ -562,7 +568,7 @@ public class ProcessoServiceTest {
         void iniciarProcessoRevisao_SemUnidades_LancaIllegalArgumentException() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("CRIADO");
+            processo.setSituacao(SituacaoProcesso.CRIADO);
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
     
@@ -576,7 +582,7 @@ public class ProcessoServiceTest {
         void iniciarProcessoRevisao_UnidadeSemMapaVigente_LancaErroProcesso() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("CRIADO");
+            processo.setSituacao(SituacaoProcesso.CRIADO);
     
             Unidade unidade = new Unidade();
             unidade.setCodigo(1L);
@@ -598,7 +604,7 @@ public class ProcessoServiceTest {
         void iniciarProcessoRevisao_UnidadeNaoEncontrada_LancaErroEntidadeNaoEncontrada() {
             Processo processo = new Processo();
             processo.setCodigo(1L);
-            processo.setSituacao("CRIADO");
+            processo.setSituacao(SituacaoProcesso.CRIADO);
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(999L))).thenReturn(Collections.emptyList());
@@ -611,4 +617,3 @@ public class ProcessoServiceTest {
             assertEquals("Unidade com código 999 não foi encontrada ao validar mapas vigentes.", exception.getMessage());
         }
     }
-    

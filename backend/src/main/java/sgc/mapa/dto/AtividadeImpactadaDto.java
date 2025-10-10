@@ -1,5 +1,7 @@
 package sgc.mapa.dto;
 
+import sgc.mapa.enums.TipoImpactoAtividade;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
 public record AtividadeImpactadaDto(
     Long codigo,
     String descricao,
-    String tipoImpacto,  // INSERIDA, REMOVIDA, ALTERADA
+    TipoImpactoAtividade tipoImpacto,  // INSERIDA, REMOVIDA, ALTERADA
     String descricaoAnterior,  // Para ALTERADA (null para outros tipos)
     List<String> competenciasVinculadas  // Nomes das competências vinculadas
 ) {}
