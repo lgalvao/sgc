@@ -41,26 +41,14 @@ public class ProcessoControle {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarProcessoReq requisicao) {
-        try {
-            ProcessoDto atualizado = processoService.atualizar(id, requisicao);
-            return ResponseEntity.ok(atualizado);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException ex) {
-            return ResponseEntity.badRequest().build();
-        }
+        ProcessoDto atualizado = processoService.atualizar(id, requisicao);
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        try {
-            processoService.apagar(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException ex) {
-            return ResponseEntity.badRequest().build();
-        }
+        processoService.apagar(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -74,14 +62,8 @@ public class ProcessoControle {
             @PathVariable Long id,
             @RequestParam(name = "perfil") String perfil,
             @RequestParam(name = "unidade", required = false) Long unidade) {
-        try {
-            ProcessoDetalheDto detalhes = processoService.obterDetalhes(id, perfil, unidade);
-            return ResponseEntity.ok(detalhes);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (ErroDominioAccessoNegado ex) {
-            return ResponseEntity.status(403).build();
-        }
+        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id, perfil, unidade);
+        return ResponseEntity.ok(detalhes);
     }
 
     /**
@@ -94,18 +76,14 @@ public class ProcessoControle {
             @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
             @RequestBody(required = false) List<Long> unidades) {
 
-        try {
-            ProcessoDto resultado;
-            if ("REVISAO".equalsIgnoreCase(tipo)) {
-                resultado = processoService.iniciarProcessoRevisao(id, unidades);
-            } else {
-                // por padrão, inicia mapeamento
-                resultado = processoService.iniciarProcessoMapeamento(id, unidades);
-            }
-            return ResponseEntity.ok(resultado);
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            return ResponseEntity.badRequest().build();
+        ProcessoDto resultado;
+        if ("REVISAO".equalsIgnoreCase(tipo)) {
+            resultado = processoService.iniciarProcessoRevisao(id, unidades);
+        } else {
+            // por padrão, inicia mapeamento
+            resultado = processoService.iniciarProcessoMapeamento(id, unidades);
         }
+        return ResponseEntity.ok(resultado);
     }
 
     /**
@@ -120,20 +98,7 @@ public class ProcessoControle {
      */
     @PostMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        try {
-            ProcessoDto finalizado = processoService.finalizar(id);
-            return ResponseEntity.ok(finalizado);
-        } catch (IllegalArgumentException ex) {
-            // Processo não encontrado
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException ex) {
-            // Processo em situação inválida para finalizar
-            return ResponseEntity.badRequest()
-                    .body(Map.of("erro", ex.getMessage()));
-        } catch (ErroProcesso ex) {
-            // Validação de negócio falhou (ex: subprocessos não homologados)
-            return ResponseEntity.status(422) // Entidade não processável
-                    .body(Map.of("erro", ex.getMessage()));
-        }
+        ProcessoDto finalizado = processoService.finalizar(id);
+        return ResponseEntity.ok(finalizado);
     }
 }

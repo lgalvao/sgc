@@ -1,4 +1,4 @@
-package sgc.integracao.processo;
+package sgc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -57,7 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class ProcessoMapeamentoIntTest {
+class CDU04IntegrationTest {
     @TestConfiguration
     static class TestSecurityConfig {
         @Bean
@@ -109,8 +109,13 @@ class ProcessoMapeamentoIntTest {
         when(sgrhService.buscarUnidadePorCodigo(anyLong())).thenAnswer(i -> {
             Long id = i.getArgument(0);
             Unidade u = unidadeRepo.findById(id).orElseThrow();
-            return Optional.of(new UnidadeDto(u.getCodigo(), u.getNome(), u.getSigla(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null, u.getTipo().name()));
+            return Optional.of(new UnidadeDto(u.getCodigo(),
+                    u.getNome(),
+                    u.getSigla(),
+                    u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null,
+                    u.getTipo().name()));
         });
+
         when(sgrhService.buscarResponsavelUnidade(anyLong()))
                 .thenAnswer(i -> Optional.of(new ResponsavelDto(i.getArgument(0),
                         "T000000",
@@ -125,6 +130,7 @@ class ProcessoMapeamentoIntTest {
                         "fulano@tre.jus.br",
                         "12345",
                         "Analista")));
+
         doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária",
@@ -153,6 +159,7 @@ class ProcessoMapeamentoIntTest {
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataLimite(LocalDate.now().plusDays(30));
+
         processo = processoRepo.save(processo);
     }
 
@@ -166,7 +173,8 @@ class ProcessoMapeamentoIntTest {
                 unidadeInteroperacional.getCodigo()
         );
 
-        mockMvc.perform(post("/api/processos/{id}/iniciar", processo.getCodigo())
+        Long codProcesso = processo.getCodigo();
+        mockMvc.perform(post("/api/processos/{id}/iniciar", codProcesso)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(codigosUnidades)))
                 .andExpect(status().isOk());
@@ -174,13 +182,13 @@ class ProcessoMapeamentoIntTest {
         entityManager.flush();
         entityManager.clear();
 
-        Processo processoIniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        Processo processoIniciado = processoRepo.findById(codProcesso).orElseThrow();
         assertThat(processoIniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
-        List<UnidadeProcesso> snapshots = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
+        List<UnidadeProcesso> snapshots = unidadeProcessoRepo.findByProcessoCodigo(codProcesso);
         assertThat(snapshots).hasSize(3);
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
         assertThat(subprocessos).hasSize(2);
         assertThat(subprocessos).extracting(s -> s.getUnidade().getSigla()).containsExactlyInAnyOrder("UOP", "UINTER");
 
@@ -190,8 +198,9 @@ class ProcessoMapeamentoIntTest {
         });
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.findAll().stream()
-                .filter(m -> m.getSubprocesso().getProcesso().getCodigo().equals(processo.getCodigo()))
+                .filter(m -> m.getSubprocesso().getProcesso().getCodigo().equals(codProcesso))
                 .collect(Collectors.toList());
+
         assertThat(movimentacoes).hasSize(2);
         movimentacoes.forEach(m -> {
             assertThat(m.getDescricao()).isEqualTo("Processo iniciado");
@@ -200,10 +209,12 @@ class ProcessoMapeamentoIntTest {
         });
 
         List<Alerta> alertas = alertaRepo.findAll().stream()
-                .filter(a -> a.getProcesso().getCodigo().equals(processo.getCodigo()))
+                .filter(a -> a.getProcesso().getCodigo().equals(codProcesso))
                 .collect(Collectors.toList());
+
         assertThat(alertas).hasSize(4);
         assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeOperacional.getCodigo()))).hasSize(1);
-        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo()) && a.getDescricao().contains("Início do processo") && !a.getDescricao().contains("subordinada"))).hasSize(1);
+        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo())
+                && a.getDescricao().contains("Início do processo") && !a.getDescricao().contains("subordinada"))).hasSize(1);
     }
 }

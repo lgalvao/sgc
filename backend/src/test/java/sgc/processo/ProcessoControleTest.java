@@ -14,6 +14,7 @@ import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.processo.dto.*;
 import sgc.processo.modelo.ErroProcesso;
+import sgc.comum.erros.GlobalExceptionHandler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,7 +45,9 @@ public class ProcessoControleTest {
     @BeforeEach
     void setUp() {
         ProcessoControle controle = new ProcessoControle(processoService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controle).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controle)
+                .setControllerAdvice(new GlobalExceptionHandler()) // Register the global exception handler
+                .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
@@ -126,7 +129,7 @@ public class ProcessoControleTest {
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
         var req = new AtualizarProcessoReq(999L, "Teste", "MAPEAMENTO", null, List.of(1L));
 
-        doThrow(new IllegalArgumentException()).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
         mockMvc.perform(put("/api/processos/999")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -156,7 +159,7 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new IllegalArgumentException()).when(processoService).apagar(999L);
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).apagar(999L);
 
         mockMvc.perform(delete("/api/processos/999"))
                 .andExpect(status().isNotFound());
@@ -186,7 +189,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new IllegalArgumentException()).when(processoService).obterDetalhes(eq(999L), eq("ADMIN"), isNull());
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).obterDetalhes(eq(999L), eq("ADMIN"), isNull());
 
         mockMvc.perform(get("/api/processos/999/detalhes?perfil=ADMIN"))
                 .andExpect(status().isNotFound());
@@ -255,7 +258,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new IllegalArgumentException()).when(processoService).finalizar(999L);
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).finalizar(999L);
 
         mockMvc.perform(post("/api/processos/999/finalizar"))
                 .andExpect(status().isNotFound());
