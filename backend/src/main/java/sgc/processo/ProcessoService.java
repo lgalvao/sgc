@@ -211,12 +211,14 @@ public class ProcessoService {
             throw new IllegalArgumentException("A lista de unidades é obrigatória para iniciar o processo de revisão.");
         }
 
+        validarUnidadesComMapasVigentes(codigosUnidades);
         validarUnidadesNaoEmProcessosAtivos(codigosUnidades);
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
 
+            // Para revisão, um novo mapa é criado para a unidade, não copiado.
             Mapa mapaNovo = mapaRepo.save(new Mapa());
 
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);

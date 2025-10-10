@@ -95,10 +95,43 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Iniciar o processo de revisão
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf()))
+        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(processoId))
                 .andExpect(jsonPath("$.situacao").value("EM_ANDAMENTO"));
+    }
+
+    @Test
+    void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
+        // 1. Criar uma unidade e um processo sem associar um mapa vigente
+        Unidade unidadeSemMapa = new Unidade();
+        unidadeSemMapa.setNome("Unidade Sem Mapa");
+        unidadeSemMapa.setSigla("USM");
+        unidadeRepo.save(unidadeSemMapa);
+
+        List<Long> unidades = new ArrayList<>();
+        unidades.add(unidadeSemMapa.getCodigo());
+        CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
+                "Processo de Revisão para Unidade Sem Mapa",
+                unidades,
+                LocalDate.now().plusDays(30)
+        );
+
+        MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+
+        // 2. Tentar iniciar o processo de revisão (deve falhar)
+        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(unidades)))
+                .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
     }
 
     @Test
@@ -127,11 +160,15 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // Inicia o processo a primeira vez
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf()))
+        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf()))
+        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isBadRequest()); // Espera-se um erro de negócio
     }
 }
