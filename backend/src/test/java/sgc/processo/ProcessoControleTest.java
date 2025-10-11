@@ -270,7 +270,7 @@ public class ProcessoControleTest {
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Processo em estado inválido"));
+                .andExpect(jsonPath("$.message").value("Ocorreu um erro de estado na aplicação. Contate o suporte."));
     }
 
     @Test

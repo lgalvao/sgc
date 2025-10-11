@@ -123,7 +123,7 @@ public class CDU03IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].defaultMessage").value("Preencha a descrição")); // Mensagem de validação
+                .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição")); // Mensagem de validação
     }
 
     @Test
@@ -138,7 +138,7 @@ public class CDU03IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].defaultMessage").value("Pelo menos uma unidade participante deve ser incluída."));
+                .andExpect(jsonPath("$.subErrors[0].message").value("Pelo menos uma unidade participante deve ser incluída."));
     }
 
     // Teste para edição de processo (requer um processo existente)
