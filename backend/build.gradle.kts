@@ -34,6 +34,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
 
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
