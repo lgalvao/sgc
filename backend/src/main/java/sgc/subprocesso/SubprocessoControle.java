@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.dtos.RespostaDto;
 import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.modelo.Usuario;
 import sgc.mapa.ImpactoMapaService;
@@ -117,7 +118,7 @@ public class SubprocessoControle {
         try {
             var payload = subprocessoService.obterCadastro(id);
             return ResponseEntity.ok(payload);
-        } catch (ErroEntidadeNaoEncontrada e) {
+        } catch (ErroDominioNaoEncontrado e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno");
