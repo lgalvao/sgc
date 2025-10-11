@@ -19,7 +19,7 @@ Este pacote implementa a integração do SGC com o SGRH (Sistema de Gestão de R
 - Cache configurado
 
 ⚠️ **Dados MOCK Ativos**
-- Todos os Metodos do `SgrhServiceImpl` retornam dados MOCK
+- Todos os Metodos do `SgrhService` retornam dados MOCK
 - A estrutura está pronta para conectar ao Oracle
 - Marcadores `// TODO: Conectar ao banco SGRH real` indicam onde substituir
 
@@ -43,8 +43,7 @@ sgc/sgrh/
 │   ├── ResponsavelDto.java
 │   └── PerfilDto.java
 └── service/            # Serviços de negócio
-    ├── SgrhService.java
-    └── SgrhServiceImpl.java
+    └── SgrhService.java
 ```
 
 ## Configuração
@@ -148,7 +147,7 @@ Confirme que as views existem:
 
 ### Passo 3: Descomentar Código Real
 
-No `SgrhServiceImpl.java`, substitua cada Metodo MOCK:
+No `SgrhService.java`, substitua cada Metodo MOCK:
 
 **ANTES (MOCK):**
 ```java

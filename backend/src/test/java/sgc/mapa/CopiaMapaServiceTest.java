@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CopiaMapaServiceImplTest {
+class CopiaMapaServiceTest {
     @Mock
     private MapaRepo repositorioMapa;
 
@@ -39,7 +39,7 @@ class CopiaMapaServiceImplTest {
     private UnidadeRepo repositorioUnidade;
 
     @InjectMocks
-    private CopiaMapaServiceImpl copiaMapaService;
+    private CopiaMapaService copiaMapaService;
 
     private Mapa mapaFonte;
     private Unidade unidadeDestino;

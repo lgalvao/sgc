@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 
 @Nested
 @ExtendWith(MockitoExtension.class)
-class AlertaServiceImplTest {
+class AlertaServiceTest {
     @Mock
     private AlertaRepo repositorioAlerta;
 
@@ -45,7 +45,7 @@ class AlertaServiceImplTest {
     private SgrhService servicoSgrh;
 
     @InjectMocks
-    private AlertaServiceImpl alertaService;
+    private AlertaService alertaService;
 
     private Processo processo;
     private Subprocesso subprocesso;

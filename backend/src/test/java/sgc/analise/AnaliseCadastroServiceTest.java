@@ -1,9 +1,11 @@
-package sgc.service;
+package sgc.analise;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import sgc.analise.AnaliseCadastroServiceImpl;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -16,20 +18,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para {@link AnaliseCadastroServiceImpl}.
+ * Testes unitários para {@link AnaliseCadastroService}.
  * Cobrem criar, listar e remover análises de cadastro.
  */
-public class AnaliseCadastroServiceImplTest {
-    private AnaliseCadastroRepo analiseCadastroRepo;
-    private SubprocessoRepo subprocessoRepo;
-    private AnaliseCadastroServiceImpl service;
+@ExtendWith(MockitoExtension.class)
+public class AnaliseCadastroServiceTest {
 
-    @BeforeEach
-    void setup() {
-        analiseCadastroRepo = mock(AnaliseCadastroRepo.class);
-        subprocessoRepo = mock(SubprocessoRepo.class);
-        service = new AnaliseCadastroServiceImpl(analiseCadastroRepo, subprocessoRepo);
-    }
+    @Mock
+    private AnaliseCadastroRepo analiseCadastroRepo;
+
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+
+    @InjectMocks
+    private AnaliseCadastroService service;
 
     @Test
     void criarAnalise_persisteAnaliseQuandoSubprocessoExiste() {

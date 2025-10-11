@@ -1,9 +1,11 @@
-package sgc.service;
+package sgc.analise;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import sgc.analise.AnaliseValidacaoServiceImpl;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.modelo.AnaliseValidacao;
 import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -16,20 +18,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para {@link AnaliseValidacaoServiceImpl}.
+ * Testes unitários para {@link AnaliseValidacaoService}.
  * Cobrem criar, listar e remover análises de validação.
  */
-public class AnaliseValidacaoServiceImplTest {
-    private AnaliseValidacaoRepo analiseValidacaoRepo;
-    private SubprocessoRepo subprocessoRepo;
-    private AnaliseValidacaoServiceImpl service;
+@ExtendWith(MockitoExtension.class)
+public class AnaliseValidacaoServiceTest {
 
-    @BeforeEach
-    void setup() {
-        analiseValidacaoRepo = mock(AnaliseValidacaoRepo.class);
-        subprocessoRepo = mock(SubprocessoRepo.class);
-        service = new AnaliseValidacaoServiceImpl(analiseValidacaoRepo, subprocessoRepo);
-    }
+    @Mock
+    private AnaliseValidacaoRepo analiseValidacaoRepo;
+
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+
+    @InjectMocks
+    private AnaliseValidacaoService service;
 
     @Test
     void criarAnalise_persisteAnaliseQuandoSubprocessoExiste() {

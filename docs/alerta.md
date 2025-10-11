@@ -35,7 +35,7 @@ sequenceDiagram
 
 ## Componentes Principais
 
-### `AlertaService` (e `AlertaServiceImpl`)
+### `AlertaService`
 
 O serviço central do pacote, responsável por toda a lógica de negócio da criação de alertas.
 
@@ -45,7 +45,7 @@ O serviço central do pacote, responsável por toda a lógica de negócio da cri
     2.  Identificar a unidade de destino.
     3.  Chamar o `SgrhService` para encontrar os usuários (titular e substituto) responsáveis por aquela unidade.
     4.  Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
-- **Customização**: A implementação em `AlertaServiceImpl` contém a lógica que diferencia as mensagens de alerta com base no tipo de unidade (Operacional, Intermediária, etc.), garantindo que a comunicação seja relevante para o destinatário.
+- **Customização**: A classe `AlertaService` contém a lógica que diferencia as mensagens de alerta com base no tipo de unidade (Operacional, Intermediária, etc.), garantindo que a comunicação seja relevante para o destinatário.
 
 ### `modelo/`
 

@@ -15,12 +15,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class SgrhServiceImplTest {
+class SgrhServiceTest {
     private SgrhService sgrhService;
 
     @BeforeEach
     void setUp() {
-        sgrhService = new SgrhServiceImpl();
+        sgrhService = new SgrhService();
     }
 
     @Test
