@@ -198,7 +198,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Foi fornecido um argumento ilegal. Contate o suporte."));
+                    .andExpect(jsonPath("$.message").value("A requisição contém um argumento inválido ou malformado."));
 
             verify(analiseCadastroService, times(1)).criarAnalise(1L, "Análise inválida");
         }
@@ -360,7 +360,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Foi fornecido um argumento ilegal. Contate o suporte."));
+                    .andExpect(jsonPath("$.message").value("A requisição contém um argumento inválido ou malformado."));
 
             verify(analiseValidacaoService, times(1)).criarAnalise(1L, "Análise inválida");
         }

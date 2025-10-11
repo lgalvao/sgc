@@ -4,8 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.enums.SituacaoProcesso;
@@ -133,35 +132,10 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @processoSeguranca.checarAcesso(authentication, #idProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long idProcesso) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        // Assumindo que o `Usuario` está no contexto de segurança.
-        // Em um cenário real, o objeto pode ser um UserDetails customizado.
-        // Aqui, vamos buscar o usuário para obter seu perfil e unidade.
-        // Este trecho pode precisar de ajuste dependendo da implementação de UserDetails.
-        UsuarioDto usuarioLogado = sgrhService.buscarUsuarioPorTitulo(username)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado: " + username));
-
-        // Busca o perfil do usuário para obter a unidade. Assume-se que o usuário tem um perfil principal.
-        List<sgc.sgrh.dto.PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
-        Long idUnidadeUsuario = perfis.stream()
-            .findFirst()
-            .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
-            .orElseThrow(() -> new ErroDominioAccessoNegado("Usuário não possui unidade associada."));
-
         Processo processo = processoRepo.findById(idProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + idProcesso));
-
-        // Lógica de autorização baseada no perfil do usuário autenticado
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"))) {
-            boolean unidadeDoUsuarioParticipa = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(idProcesso, idUnidadeUsuario);
-            if (!unidadeDoUsuarioParticipa) {
-                throw new ErroDominioAccessoNegado("Acesso negado. Sua unidade não participa deste processo.");
-            }
-        } else if (authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-            throw new ErroDominioAccessoNegado("Acesso negado. Perfil sem permissão para ver detalhes do processo.");
-        }
 
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);

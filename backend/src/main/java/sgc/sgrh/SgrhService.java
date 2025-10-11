@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
  * e perfis nas views do Oracle SGRH.
  */
 @Service
-@Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
