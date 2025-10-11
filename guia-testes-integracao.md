@@ -58,6 +58,7 @@ Este guia fornece recomendações e um passo a passo para a criação de testes 
   - **Status HTTP:** Para erros que são tratados pelo `Controller` e retornam um status HTTP específico (como 404 Not Found), você pode usar `mockMvc` e esperar o status correspondente.
   - **Exceções de Serviço:** Para erros que ocorrem na camada de serviço e não são tratados de forma específica no `Controller` (resultando em um erro 500 Internal Server Error), uma abordagem mais robusta é testar diretamente a camada de serviço. Injete o `Service` no seu teste e use `assertThrows` para verificar se a exceção esperada (ex: `ErroDominioNaoEncontrado`) é lançada. Isso torna o teste mais preciso e menos acoplado à implementação do `Controller`.
 - **Funcionalidade Existente:** Antes de adicionar novas funcionalidades, pesquise exaustivamente no código-fonte para garantir que algo semelhante ainda não exista. Reutilizar ou estender a lógica existente é preferível a criar duplicatas.
+- **Verifique a Especificação:** Não assuma que uma funcionalidade existente com nome parecido faz exatamente o que você precisa. Sempre verifique a especificação do caso de uso (CDU) para garantir que todos os detalhes da implementação (alertas, notificações, mudanças de estado) estão corretos.
 
 ## 6. Tópicos Avançados
 

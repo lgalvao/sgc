@@ -32,6 +32,7 @@ import sgc.notificacao.NotificacaoService;
 import sgc.notificacao.modelo.Notificacao;
 import sgc.notificacao.modelo.NotificacaoRepo;
 import sgc.processo.eventos.SubprocessoDisponibilizadoEvento;
+import sgc.processo.eventos.SubprocessoRevisaoDisponibilizadaEvento;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -255,9 +256,25 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void disponibilizarRevisao(Long idSubprocesso) {
+    public void disponibilizarRevisao(Long idSubprocesso, Usuario usuario) {
+        log.info("Iniciando disponibilização da revisão do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTitulo());
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
+
+        // Authorization Check
+        if (!sp.getUnidade().getTitular().equals(usuario)) {
+            throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
+        }
+
+        // Validation Check
+        if (!obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
+            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
+        }
+
+        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
+            log.warn("Validação falhou: subprocesso {} não possui mapa associado", idSubprocesso);
+            throw new IllegalStateException("Subprocesso sem mapa associado");
+        }
 
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
@@ -268,17 +285,28 @@ public class SubprocessoService {
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização da revisão do cadastro de atividades"));
         repositorioAnaliseCadastro.deleteBySubprocessoCodigo(sp.getCodigo());
 
-        Notificacao n = new Notificacao();
-        n.setSubprocesso(sp);
-        n.setDataHora(java.time.LocalDateTime.now());
-        n.setUnidadeOrigem(sp.getUnidade());
-        n.setUnidadeDestino(unidadeSuperior);
-        n.setConteudo("Revisão do cadastro de atividades da unidade %s disponibilizada para análise".formatted(sp.getUnidade() != null ? sp.getUnidade().getSigla() : ""));
-        repositorioNotificacao.save(n);
-
-        if (notificacaoService != null && unidadeSuperior != null) {
-            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), "Revisão do cadastro disponibilizada", "Revisão do cadastro de atividades disponibilizada para análise");
+        // Notification
+        if (notificacaoService != null && unidadeSuperior != null && sp.getUnidade() != null) {
+            String assunto = "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: " + sp.getUnidade().getSigla();
+            String corpo = "Prezado(a) responsável pela " + unidadeSuperior.getSigla() + ",\n" +
+                         "A unidade " + sp.getUnidade().getSigla() + " concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n" +
+                         "A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).";
+            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
         }
+
+        // Alert
+        if (sp.getUnidade() != null && unidadeSuperior != null) {
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Cadastro de atividades e conhecimentos da unidade " + sp.getUnidade().getSigla() + " disponibilizado para análise");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade());
+            alerta.setUnidadeDestino(unidadeSuperior);
+            repositorioAlerta.save(alerta);
+        }
+
+        publicadorDeEventos.publishEvent(new SubprocessoRevisaoDisponibilizadaEvento(sp.getCodigo()));
+        log.info("Disponibilização da revisão do cadastro concluída com sucesso para subprocesso {}", idSubprocesso);
     }
 
     @Transactional

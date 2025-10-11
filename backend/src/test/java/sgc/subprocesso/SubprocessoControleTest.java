@@ -121,12 +121,12 @@ public class SubprocessoControleTest {
     void disponibilizarRevisao_SubprocessoNaoEncontrado_RetornaNotFound() throws Exception {
         when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
         doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso não encontrado"))
-                .when(subprocessoService).disponibilizarRevisao(1L);
+                .when(subprocessoService).disponibilizarRevisao(eq(1L), any(Usuario.class));
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao"))
                 .andExpect(status().isNotFound());
 
-        verify(subprocessoService).disponibilizarRevisao(1L);
+        verify(subprocessoService).disponibilizarRevisao(eq(1L), any(Usuario.class));
     }
 
     @Test
@@ -148,13 +148,14 @@ public class SubprocessoControleTest {
     @Test
     void disponibilizarRevisao_Sucesso_RetornaOk() throws Exception {
         when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
+        doNothing().when(subprocessoService).disponibilizarRevisao(eq(1L), any(Usuario.class));
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Revisão do cadastro de atividades disponibilizada"));
+                .andExpect(jsonPath("$.message").value("Revisão do cadastro de atividades disponibilizada"));
 
         verify(subprocessoService).obterAtividadesSemConhecimento(1L);
-        verify(subprocessoService).disponibilizarRevisao(1L);
+        verify(subprocessoService).disponibilizarRevisao(eq(1L), any(Usuario.class));
     }
 
     @Test

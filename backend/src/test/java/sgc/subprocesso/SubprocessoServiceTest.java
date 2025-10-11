@@ -288,10 +288,15 @@ public class SubprocessoServiceTest {
     @Test
     void disponibilizarRevisao_deveExecutarComSucesso_quandoSubprocessoValido() {
         Long id = 1L;
-        Subprocesso subprocesso = criarSubprocessoMock(id);
+        Usuario chefe = new Usuario();
+        chefe.setTitulo("chefe");
+        Subprocesso subprocesso = criarSubprocessoComMapaEChefe(id, chefe);
+        subprocesso.setProcesso(criarProcessoMock());
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
+        doReturn(Collections.emptyList()).when(subprocessoService).obterAtividadesSemConhecimento(id);
 
-        subprocessoService.disponibilizarRevisao(id);
+
+        subprocessoService.disponibilizarRevisao(id, chefe);
 
         verify(repositorioSubprocesso, times(1)).save(subprocesso);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, subprocesso.getSituacao());
