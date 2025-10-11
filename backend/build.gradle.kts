@@ -1,11 +1,13 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.github.spotbugs") version "6.0.21"
 }
 
 java {
@@ -316,6 +318,13 @@ tasks.withType<JavaCompile> {
 
 tasks.named("build") {
     outputs.cacheIf { true }
+}
+
+tasks.withType<SpotBugsTask> {
+    reports.create("html") {
+        required.set(true)
+        outputLocation.set(project.layout.buildDirectory.file("reports/spotbugs/${name}.html").get().asFile)
+    }
 }
 
 tasks.register("agentTest") {
