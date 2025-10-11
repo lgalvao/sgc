@@ -216,11 +216,11 @@ public class SubprocessoServiceTest {
     void obterCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
 
-        ErroDominioNaoEncontrado exception = assertThrows(
-                ErroDominioNaoEncontrado.class,
+        var exception = assertThrows(
+                sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
                 () -> subprocessoService.obterCadastro(1L)
         );
-        assertTrue(exception.getMessage().contains("Subprocesso não encontrado"));
+        assertTrue(exception.getMessage().contains("Subprocesso com ID 1 não encontrado."));
     }
 
     @Test
