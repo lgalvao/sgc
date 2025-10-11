@@ -105,7 +105,7 @@ class AnaliseControleTest {
 
             mockMvc.perform(get("/api/subprocessos/99/analises-cadastro"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado. Contate o suporte."));
+                .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado (RuntimeException). Contate o suporte."));
 
             verify(analiseCadastroService, times(1)).listarPorSubprocesso(99L);
         }
@@ -198,7 +198,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Parâmetro inválido"));
+                    .andExpect(jsonPath("$.message").value("Foi fornecido um argumento ilegal. Contate o suporte."));
 
             verify(analiseCadastroService, times(1)).criarAnalise(1L, "Análise inválida");
         }
@@ -214,7 +214,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado. Contate o suporte."));
+                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado (RuntimeException). Contate o suporte."));
 
             verify(analiseCadastroService, times(1)).criarAnalise(99L, "Análise de cadastro");
         }
@@ -283,7 +283,7 @@ class AnaliseControleTest {
 
             mockMvc.perform(get("/api/subprocessos/99/analises-validacao"))
                     .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado. Contate o suporte."));
+                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado (RuntimeException). Contate o suporte."));
 
             verify(analiseValidacaoService, times(1)).listarPorSubprocesso(99L);
         }
@@ -360,7 +360,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Parâmetro inválido"));
+                    .andExpect(jsonPath("$.message").value("Foi fornecido um argumento ilegal. Contate o suporte."));
 
             verify(analiseValidacaoService, times(1)).criarAnalise(1L, "Análise inválida");
         }
@@ -376,7 +376,7 @@ class AnaliseControleTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado. Contate o suporte."));
+                    .andExpect(jsonPath("$.message").value("Ocorreu um erro inesperado (RuntimeException). Contate o suporte."));
 
             verify(analiseValidacaoService, times(1)).criarAnalise(99L, "Análise de validação");
         }

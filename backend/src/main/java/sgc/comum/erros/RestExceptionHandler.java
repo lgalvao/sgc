@@ -2,23 +2,25 @@ package sgc.comum.erros;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.validation.FieldError;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import sgc.processo.modelo.ErroProcesso;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
-public class RestExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final PolicyFactory SANITIZER_POLICY = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
 
@@ -29,127 +31,91 @@ public class RestExceptionHandler {
         return SANITIZER_POLICY.sanitize(untrustedHtml);
     }
 
+    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        return new ResponseEntity<>(apiError, HttpStatus.valueOf(apiError.getStatus()));
+    }
+
+
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String error = "Requisição JSON malformada";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error));
+    }
+
+
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.warn("Erro de validação de argumento de método: {}", ex.getMessage());
+        String message = "A requisição contém dados de entrada inválidos.";
+        var subErrors = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> new ApiSubError(
+                error.getObjectName(),
+                error.getField(),
+                error.getRejectedValue(),
+                sanitize(error.getDefaultMessage())))
+            .collect(Collectors.toList());
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, subErrors));
+    }
+
     @ExceptionHandler(ErroValidacao.class)
-    public ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
+    protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-        body.put("error", "Unprocessable Entity");
-        body.put("message", sanitize(ex.getMessage()));
-        if (ex.getDetails() != null) {
-            body.put("details", ex.getDetails());
-        }
-        return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
+        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage())));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         log.error("Erro de constraint de banco de dados: {}", ex.getMessage(), ex);
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", "A requisição contém dados inválidos.");
-        body.put("errors", ex.getConstraintViolations().stream()
-                .map(violation -> {
-                    Map<String, String> error = new HashMap<>();
-                    error.put("field", violation.getPropertyPath().toString());
-                    error.put("defaultMessage", sanitize(violation.getMessage()));
-                    return error;
-                })
-                .toList());
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        String message = "A requisição contém dados inválidos.";
+        var subErrors = ex.getConstraintViolations().stream()
+            .map(violation -> new ApiSubError(
+                violation.getRootBeanClass().getSimpleName(),
+                violation.getPropertyPath().toString(),
+                violation.getInvalidValue(),
+                sanitize(violation.getMessage())))
+            .collect(Collectors.toList());
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
     @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
-    public ResponseEntity<Object> handleErroEntidadeNaoEncontrada(ErroEntidadeNaoEncontrada ex) {
+    protected ResponseEntity<Object> handleErroEntidadeNaoEncontrada(ErroEntidadeNaoEncontrada ex) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Not Found");
-        body.put("message", sanitize(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, sanitize(ex.getMessage())));
     }
 
     @ExceptionHandler(ErroDominioAccessoNegado.class)
-    public ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
+    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
         log.warn("Acesso negado: {}", ex.getMessage());
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.FORBIDDEN.value());
-        body.put("error", "Forbidden");
-        body.put("message", sanitize(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, sanitize(ex.getMessage())));
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
+    protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         log.error("Estado ilegal da aplicação: {}", ex.getMessage(), ex);
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", sanitize(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        String message = "Ocorreu um erro de estado na aplicação. Contate o suporte.";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    protected ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Argumento ilegal fornecido: {}", ex.getMessage(), ex);
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", sanitize(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        String message = "Foi fornecido um argumento ilegal. Contate o suporte.";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message));
     }
 
     @ExceptionHandler(ErroProcesso.class)
-    public ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
+    protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
         log.error("Erro de negócio no processo: {}", ex.getMessage(), ex);
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-        body.put("error", "Unprocessable Entity");
-        body.put("message", sanitize(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        log.warn("Erro de validação de argumento de método: {}", ex.getMessage());
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", "A requisição contém dados de entrada inválidos.");
-        body.put("errors", ex.getBindingResult().getAllErrors().stream()
-            .map(error -> {
-                Map<String, String> errorDetails = new HashMap<>();
-                if (error instanceof FieldError) {
-                    errorDetails.put("field", ((FieldError) error).getField());
-                } else {
-                    errorDetails.put("object", error.getObjectName());
-                }
-                errorDetails.put("defaultMessage", sanitize(error.getDefaultMessage()));
-                return errorDetails;
-            })
-            .toList());
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGenericException(Exception ex) {
+    protected ResponseEntity<Object> handleGenericException(Exception ex) {
         log.error("Erro inesperado na aplicação: {}", ex.getMessage(), ex);
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", "Internal Server Error");
-        body.put("message", "Ocorreu um erro inesperado. Contate o suporte.");
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        String message = String.format(
+            "Ocorreu um erro inesperado (%s). Contate o suporte.",
+            ex.getClass().getSimpleName()
+        );
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message));
     }
 }
