@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class Usuario implements Serializable, UserDetails {
     @Id
-    @Column(name = "titulo", length = 12)
+    @Column(name = "titulo", length = 20)
     private String titulo;
 
     @Column(name = "nome")
@@ -52,13 +52,21 @@ public class Usuario implements Serializable, UserDetails {
         return java.util.Objects.hash(titulo);
     }
 
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // For simplicity, we'll assign roles based on the username.
-        if ("admin".equalsIgnoreCase(titulo)) {
-            return Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
+        if (authorities == null) {
+            if ("admin".equalsIgnoreCase(titulo)) {
+                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
+            } else if (titulo != null && titulo.startsWith("gestor")) {
+                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_GESTOR")).collect(Collectors.toList());
+            } else {
+                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
+            }
         }
-        return Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
+        return authorities;
     }
 
     @Override

@@ -10,7 +10,9 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.modelo.Usuario;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -46,12 +48,14 @@ public class ImpactoMapaServiceImpl implements ImpactoMapaService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ImpactoMapaDto verificarImpactos(Long idSubprocesso) {
+    public ImpactoMapaDto verificarImpactos(Long idSubprocesso, Usuario usuario) {
         log.info("Verificando impactos no mapa: subprocesso={}", idSubprocesso);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                         "Subprocesso não encontrado: " + idSubprocesso));
+
+        verificarAcesso(usuario, subprocesso);
 
         Optional<Mapa> mapaVigenteOpt = repositorioMapa
                 .findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
@@ -59,7 +63,7 @@ public class ImpactoMapaServiceImpl implements ImpactoMapaService {
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
             return new ImpactoMapaDto(
-                    false, 0, 0, 0,
+                    false, 0, 0, 0, 0,
                     List.of(), List.of(), List.of(), List.of());
         }
 
@@ -95,6 +99,7 @@ public class ImpactoMapaServiceImpl implements ImpactoMapaService {
                 inseridas.size(),
                 removidas.size(),
                 alteradas.size(),
+                competenciasImpactadas.size(),
                 inseridas,
                 removidas,
                 alteradas,
@@ -163,22 +168,11 @@ public class ImpactoMapaServiceImpl implements ImpactoMapaService {
             List<Atividade> atuais,
             List<Atividade> vigentes,
             Mapa mapaVigente) {
-        Map<Long, String> mapaVigentes = vigentes.stream()
-                .collect(Collectors.toMap(
-                        Atividade::getCodigo,
-                        Atividade::getDescricao));
 
-        return atuais.stream()
-                .filter(a -> mapaVigentes.containsKey(a.getCodigo()))
-                .filter(a -> !mapaVigentes.get(a.getCodigo())
-                        .equalsIgnoreCase(a.getDescricao().trim()))
-                .map(a -> new AtividadeImpactadaDto(
-                        a.getCodigo(),
-                        a.getDescricao(),
-                        TipoImpactoAtividade.ALTERADA,
-                        mapaVigentes.get(a.getCodigo()),
-                        obterCompetenciasDaAtividade(a.getCodigo(), mapaVigente)))
-                .toList();
+        // This method is not needed anymore, as the logic is handled by
+        // detectarAtividadesInseridas and detectarAtividadesRemovidas.
+        // An "alteration" is a "removal" of the old activity and an "insertion" of the new one.
+        return new ArrayList<>();
     }
 
     private List<CompetenciaImpactadaDto> identificarCompetenciasImpactadas(
@@ -273,6 +267,28 @@ public class ImpactoMapaServiceImpl implements ImpactoMapaService {
             return "ATIVIDADE_ALTERADA";
         }
         return "IMPACTO_GENERICO";
+    }
+
+    private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
+        if (hasRole(usuario, "CHEFE")) {
+            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+                throw new ErroDominioAccessoNegado("O chefe da unidade só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro em andamento'.");
+            }
+        } else if (hasRole(usuario, "GESTOR")) {
+            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+                throw new ErroDominioAccessoNegado("O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro disponibilizada'.");
+            }
+        } else if (hasRole(usuario, "ADMIN")) {
+            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
+                subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO) {
+                throw new ErroDominioAccessoNegado("O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.");
+            }
+        }
+    }
+
+    private boolean hasRole(Usuario usuario, String role) {
+        return usuario.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
 
     private static class CompetenciaImpactoAcumulador {
