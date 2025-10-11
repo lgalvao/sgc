@@ -164,7 +164,7 @@ public class ProcessoControleTest {
         mockMvc.perform(put("/api/processos/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -188,7 +188,7 @@ public class ProcessoControleTest {
         doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
 
         mockMvc.perform(delete("/api/processos/1"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -308,8 +308,8 @@ public class ProcessoControleTest {
         doThrow(new IllegalStateException("Processo em estado inválido")).when(processoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Ocorreu um erro de estado na aplicação. Contate o suporte."));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("A operação não pode ser executada no estado atual do recurso."));
     }
 
     @Test

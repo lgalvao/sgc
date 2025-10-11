@@ -169,6 +169,6 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
-                .andExpect(status().isBadRequest()); // Espera-se um erro de negócio
+                .andExpect(status().isConflict()); // Espera-se um erro de negócio
     }
 }

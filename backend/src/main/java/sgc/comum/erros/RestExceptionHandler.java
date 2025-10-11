@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
 import sgc.processo.modelo.ErroProcesso;
 
 import java.util.stream.Collectors;
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final PolicyFactory SANITIZER_POLICY = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
+    private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
-    private String sanitize(String untrustedHtml) {
-        if (untrustedHtml == null) {
+    private String sanitize(String untrustedText) {
+        if (untrustedText == null) {
             return null;
         }
-        return SANITIZER_POLICY.sanitize(untrustedHtml);
+        return SANITIZER_POLICY.sanitize(untrustedText);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
@@ -92,14 +92,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         log.error("Estado ilegal da aplicação: {}", ex.getMessage(), ex);
-        String message = "Ocorreu um erro de estado na aplicação. Contate o suporte.";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message));
+        String message = "A operação não pode ser executada no estado atual do recurso.";
+        return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, message));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Argumento ilegal fornecido: {}", ex.getMessage(), ex);
-        String message = "Foi fornecido um argumento ilegal. Contate o suporte.";
+        String message = "A requisição contém um argumento inválido ou malformado.";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message));
     }
 
