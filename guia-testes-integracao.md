@@ -66,6 +66,10 @@ Este guia fornece recomendações e um passo a passo para a criação de testes 
 
 Às vezes, `@WithMockUser` não é suficiente, especialmente quando a lógica de negócios depende do objeto `Usuario` real (por exemplo, ao verificar se um usuário é o titular de uma unidade). Nesses casos, o `@AuthenticationPrincipal` no seu controlador retornará `null`.
 
+Uma abordagem comum é usar `@WithUserDetails`, que carrega um `UserDetails` a partir de um `UserDetailsService`. No entanto, isso pode levar a problemas com a ordem de execução dos testes. O `TestExecutionListener` do Spring que processa `@WithUserDetails` é executado *antes* do `@BeforeEach` do JUnit. Se você cria os usuários de teste no `@BeforeEach`, o `UserDetailsService` não os encontrará no banco de dados, e o teste falhará com um `UsernameNotFoundException`.
+
+A solução mais robusta, e a prática recomendada neste projeto, é criar uma anotação de teste personalizada que configura um `SecurityContext` com um objeto `Usuario` real. A fábrica de contexto associada é responsável por encontrar ou criar o usuário no banco de dados no momento certo, resolvendo o problema da ordem de execução.
+
 Para resolver isso, você pode criar uma anotação de teste personalizada que configura um `SecurityContext` com um objeto `Usuario` real.
 
 1.  **Crie a anotação:**

@@ -1,5 +1,6 @@
 package sgc.mapa;
 
+import sgc.comum.modelo.Usuario;
 import sgc.mapa.dto.ImpactoMapaDto;
 
 /**
@@ -20,7 +21,8 @@ public interface ImpactoMapaService {
      * - Competências impactadas pelas mudanças
      * 
      * @param subprocessoId Código do subprocesso a verificar
+     * @param usuario O usuário autenticado que está realizando a operação.
      * @return ImpactoMapaDto com análise completa dos impactos
      */
-    ImpactoMapaDto verificarImpactos(Long subprocessoId);
+    ImpactoMapaDto verificarImpactos(Long subprocessoId, Usuario usuario);
 }

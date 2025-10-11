@@ -324,12 +324,14 @@ public class SubprocessoControle {
      * GET /api/subprocessos/{id}/impactos-mapa
      */
     @GetMapping("/{id}/impactos-mapa")
-    public ResponseEntity<?> verificarImpactos(@PathVariable Long id) {
+    public ResponseEntity<?> verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         try {
-            ImpactoMapaDto impactos = impactoMapaService.verificarImpactos(id);
+            ImpactoMapaDto impactos = impactoMapaService.verificarImpactos(id, usuario);
             return ResponseEntity.ok(impactos);
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
+        } catch (ErroDominioAccessoNegado e) {
+            return ResponseEntity.status(403).body(new RespostaDto(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
         }
