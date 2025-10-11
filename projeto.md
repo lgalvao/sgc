@@ -81,7 +81,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 - ✅ Muda situação para 'EM_ANDAMENTO'.
 - ✅ Cria snapshot, subprocessos e mapas vazios.
 - ✅ **Listener de eventos (`ProcessoEventListener`) processa `EventoProcessoIniciado` para criar alertas e enviar e-mails automaticamente.**
-- ✅ **Criação de alertas diferenciados por tipo de unidade (`AlertaServiceImpl`).**
+- ✅ **Criação de alertas diferenciados por tipo de unidade (`AlertaService`).**
 - ✅ **Envio de e-mails reais através do `EmailNotificationService`.**
 - ✅ Validação de unidades já participantes de processo ativo.
 **Backend - Pendente:**
@@ -163,7 +163,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 **Status Backend:** ✅ Implementado
 **Backend - Implementado:**
 
-- ✅ **Serviço `ImpactoMapaServiceImpl` implementado, realizando a comparação completa entre mapas.**
+- ✅ **Serviço `ImpactoMapaService` implementado, realizando a comparação completa entre mapas.**
 - ✅ Detecta atividades inseridas, removidas e alteradas e identifica competências impactadas.
 - ✅ **Endpoint `GET /api/subprocessos/{id}/impactos-mapa` funcional.**
 
@@ -201,7 +201,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 **Status Backend:** ✅ Implementado
 **Backend - Implementado:**
 
-- ✅ **Serviço de alto nível `MapaServiceImpl` para gerenciar o mapa como um agregado.**
+- ✅ **Serviço de alto nível `MapaService` para gerenciar o mapa como um agregado.**
 - ✅ **Endpoint `PUT /api/subprocessos/{id}/mapa` que utiliza `salvarMapaDoSubprocesso` para operações atômicas.**
 - ✅ Lógica de transição de situação para 'MAPA_CRIADO' implementada.
 
@@ -295,7 +295,7 @@ O Sistema de Gestão de Competências (SGC) encontra-se em um estágio avançado
 
 **Status:** ✅ Implementado e Integrado
 
-- ✅ `AlertaServiceImpl` e entidades criadas.
+- ✅ `AlertaService` e entidades criadas.
 - ✅ **`ProcessoEventListener` e outros serviços criam alertas automaticamente nos fluxos de processo.**
 
 ---

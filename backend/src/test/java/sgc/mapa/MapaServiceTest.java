@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MapaServiceImplTest {
+class MapaServiceTest {
     @Mock
     private MapaRepo repositorioMapa;
 
@@ -48,7 +48,7 @@ class MapaServiceImplTest {
     private sgc.atividade.modelo.AtividadeRepo atividadeRepo;
 
     @InjectMocks
-    private MapaServiceImpl mapaServico;
+    private MapaService mapaServico;
 
     private Mapa mapa;
     private Subprocesso subprocesso;

@@ -51,19 +51,19 @@ sequenceDiagram
 
 ## Componentes Principais
 
-### `MapaService` (e `MapaServiceImpl`)
+### `MapaService`
 
 É o serviço principal, responsável pela orquestração das operações de leitura e escrita do agregado do mapa.
 - **`salvarMapaSubprocesso()`**: Método transacional que salva um mapa completo. Ele lida com a lógica de `diff` para saber o que precisa ser inserido, atualizado ou excluído (competências e seus vínculos), garantindo a consistência dos dados.
 - **`obterMapaCompleto()`**: Monta e retorna o `MapaCompletoDto`, um objeto rico que contém o mapa e toda a sua árvore de dependências (competências e atividades vinculadas) para ser consumido pelo frontend.
 - **`validarMapaCompleto()`**: Aplica regras de negócio para garantir a integridade de um mapa, como verificar se existem atividades ou competências órfãs (não vinculadas).
 
-### `CopiaMapaService` (e `CopiaMapaServiceImpl`)
+### `CopiaMapaService`
 
 Serviço com a responsabilidade única e bem definida de clonar mapas.
 - **`copiarMapaParaUnidade()`**: Realiza uma cópia profunda de um mapa existente, incluindo todas as suas atividades e conhecimentos. Esta funcionalidade é essencial para o fluxo de "Iniciar Processo de Revisão", onde o mapa vigente de uma unidade serve como ponto de partida.
 
-### `ImpactoMapaService` (e `ImpactoMapaServiceImpl`)
+### `ImpactoMapaService`
 
 Implementa a lógica de negócio do CDU-12 (Verificar Impactos no Mapa).
 - **`verificarImpactos()`**: Compara um mapa em revisão (de um subprocesso) com o mapa vigente da unidade e produz um `ImpactoMapaDto`. Este DTO detalha:

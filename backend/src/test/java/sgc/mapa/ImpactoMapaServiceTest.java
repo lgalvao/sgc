@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @ExtendWith(MockitoExtension.class)
-class ImpactoMapaServiceImplTest {
+class ImpactoMapaServiceTest {
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
 
@@ -47,7 +47,7 @@ class ImpactoMapaServiceImplTest {
     private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 
     @InjectMocks
-    private ImpactoMapaServiceImpl impactoMapaServico;
+    private ImpactoMapaService impactoMapaServico;
 
     private Subprocesso subprocesso;
     @Mock

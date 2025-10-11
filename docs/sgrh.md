@@ -10,7 +10,7 @@ Este pacote é fundamental para o funcionamento de quase todos os outros módulo
 
 Atualmente, o pacote `sgrh` está implementado com **dados mock (falsos)**. Isso significa que ele não se conecta a um banco de dados real, mas sim retorna dados estáticos e pré-definidos diretamente do código.
 
-- **`SgrhServiceImpl.java`**: Contém a implementação que gera os dados mock.
+- **`SgrhService.java`**: Contém a implementação que gera os dados mock.
 - **Propósito do Mock**: Permitir o desenvolvimento e teste do restante da aplicação sem a necessidade de uma conexão ativa com o sistema de RH, que pode não estar disponível ou ser instável no ambiente de desenvolvimento.
 - **Pronto para o Real**: A arquitetura do pacote (entidades, repositórios, DTOs e configuração de datasource) já está preparada para a conexão com um banco de dados Oracle real. O `README.md` do pacote contém instruções detalhadas para realizar a migração.
 
@@ -23,28 +23,22 @@ sequenceDiagram
     participant AlertaService
     participant ProcessoService
     participant SgrhService as "SGRH (Interface)"
-    participant SgrhServiceImpl as "SGRH (Implementação Mock)"
+    participant SgrhService as "SGRH (Implementação Mock)"
 
     AlertaService->>+SgrhService: buscarResponsavelUnidade(unidadeId)
-    SgrhService-->>+SgrhServiceImpl: buscarResponsavelUnidade(unidadeId)
-    SgrhServiceImpl->>SgrhServiceImpl: Gera DTO de responsável mock
-    SgrhServiceImpl-->>-AlertaService: Retorna Optional<ResponsavelDto>
+    SgrhService->>SgrhService: Gera DTO de responsável mock
+    SgrhService-->>-AlertaService: Retorna Optional<ResponsavelDto>
 
     ProcessoService->>+SgrhService: buscarUnidadePorCodigo(unidadeId)
-    SgrhService-->>+SgrhServiceImpl: buscarUnidadePorCodigo(unidadeId)
-    SgrhServiceImpl->>SgrhServiceImpl: Gera DTO de unidade mock
-    SgrhServiceImpl-->>-ProcessoService: Retorna Optional<UnidadeDto>
+    SgrhService->>SgrhService: Gera DTO de unidade mock
+    SgrhService-->>-ProcessoService: Retorna Optional<UnidadeDto>
 ```
 
 ## Componentes Principais
 
-### `SgrhService.java` (Interface)
+### `SgrhService.java` (Serviço Mock)
 
-Define o contrato de serviço, ou seja, todos os métodos que o restante da aplicação pode usar para consultar dados de RH. Exemplos: `buscarUsuarioPorTitulo()`, `buscarUnidadePorCodigo()`, `buscarResponsavelUnidade()`.
-
-### `SgrhServiceImpl.java` (Implementação Mock)
-
-A implementação atual da interface `SgrhService`.
+Define o contrato e a implementação do serviço.
 - **Dados Estáticos**: Contém métodos privados (ex: `criarUnidadesMock()`) que criam e retornam listas e objetos fixos.
 - **Logs de Alerta**: Cada método registra um log com o prefixo `MOCK SGRH:` para deixar claro no console que os dados não são reais.
 - **Cache**: Utiliza o cache do Spring (`@Cacheable`) para evitar a regeneração dos dados mock a cada chamada, simulando o comportamento de cache que seria desejável em uma implementação real.

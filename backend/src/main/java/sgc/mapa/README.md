@@ -23,7 +23,7 @@ Este pacote vai muito além de um simples CRUD. Ele orquestra operações de neg
 
 Este pacote se destaca pela sua arquitetura orientada a serviços, onde cada serviço tem uma responsabilidade de negócio bem definida.
 
-#### 3. `MapaService.java` (e `MapaServiceImpl.java`)
+#### 3. `MapaService.java`
 **Localização:** `backend/src/main/java/sgc/mapa/`
 - **Descrição:** O principal serviço para a manipulação de mapas.
 - **Funcionalidades Chave:**
@@ -31,13 +31,13 @@ Este pacote se destaca pela sua arquitetura orientada a serviços, onde cada ser
   - `salvarMapaCompleto(...)`: Executa o salvamento **atômico** de um mapa. Esta operação transacional garante que o mapa, suas competências e os vínculos com atividades sejam salvos de forma consistente.
   - `validarMapaCompleto(...)`: Aplica regras de negócio para garantir que um mapa está íntegro antes de ser disponibilizado (ex: verifica se não há competências ou atividades órfãs).
 
-#### 4. `CopiaMapaService.java` (e `CopiaMapaServiceImpl.java`)
+#### 4. `CopiaMapaService.java`
 **Localização:** `backend/src/main/java/sgc/mapa/`
 - **Descrição:** Serviço especializado na clonagem de mapas.
 - **Funcionalidade Chave:**
   - `copiarMapaParaUnidade(...)`: Cria uma cópia exata de um mapa existente (incluindo suas competências e atividades) e a associa a uma nova unidade.
 
-#### 5. `ImpactoMapaService.java` (e `ImpactoMapaServiceImpl.java`)
+#### 5. `ImpactoMapaService.java`
 **Localização:** `backend/src/main/java/sgc/mapa/`
 - **Descrição:** Implementa o Caso de Uso CDU-12, que é a análise de impacto.
 - **Funcionalidade Chave:**

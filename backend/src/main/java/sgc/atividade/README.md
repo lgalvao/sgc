@@ -46,17 +46,13 @@ Este pacote tem uma dupla responsabilidade: gerenciar as **Atividades** do siste
   - `subprocesso`: O subprocesso ao qual a análise está associada.
   - `observacoes`: Texto com as observações da análise.
 
-#### 6. `AnaliseCadastroService.java` (Interface)
-**Localização:** `backend/src/main/java/sgc/atividade/AnaliseCadastroService.java`
-- **Descrição:** Define o contrato para os serviços que gerenciam `AnaliseCadastro`.
-- **Métodos:**
+#### 6. `AnaliseCadastroService.java`
+**Localização:** `backend/src/main/java/sgc/analise/AnaliseCadastroService.java`
+- **Descrição:** Serviço que gerencia a lógica de negócio para `AnaliseCadastro`.
+- **Métodos Principais:**
   - `listarPorSubprocesso(...)`: Lista todas as análises de um subprocesso.
   - `criarAnalise(...)`: Cria uma nova análise para um subprocesso.
   - `removerPorSubprocesso(...)`: Remove todas as análises de um subprocesso.
-
-#### 7. `AnaliseCadastroServiceImpl.java` (Implementação)
-**Localização:** `backend/src/main/java/sgc/atividade/AnaliseCadastroServiceImpl.java`
-- **Descrição:** Implementação concreta da interface `AnaliseCadastroService`.
 
 ## Como Usar
 
