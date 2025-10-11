@@ -156,7 +156,7 @@ class CDU10IntegrationTest {
 
             // Act & Assert
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
 
             // Assert that the state has not changed
             Subprocesso subprocessoNaoAlterado = subprocessoRepo.findById(subprocessoRevisao.getCodigo()).orElseThrow();

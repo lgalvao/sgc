@@ -270,7 +270,8 @@ public class ProcessoControleTest {
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.erro").value("Processo em estado inválido"));
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Processo em estado inválido"));
     }
 
     @Test
@@ -279,6 +280,7 @@ public class ProcessoControleTest {
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.erro").value("Subprocessos não homologados"));
+                .andExpect(jsonPath("$.error").value("Unprocessable Entity"))
+                .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
     }
 }
