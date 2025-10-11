@@ -65,7 +65,7 @@ public class AnaliseCadastroServiceImplTest {
         a2.setCodigo(102L);
 
         when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(new Subprocesso()));
-        when(analiseCadastroRepo.findBySubprocessoCodigo(spId)).thenReturn(List.of(a1, a2));
+        when(analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spId)).thenReturn(List.of(a1, a2));
 
         List<AnaliseCadastro> lista = service.listarPorSubprocesso(spId);
         assertThat(lista).hasSize(2).extracting(AnaliseCadastro::getCodigo).containsExactlyInAnyOrder(101L, 102L);

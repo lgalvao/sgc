@@ -72,6 +72,22 @@ public class SubprocessoControle {
         }
     }
 
+    /**
+     * CDU-13 Item 7 - Visualizar histórico de análise de cadastro
+     * GET /api/subprocessos/{id}/historico-cadastro
+     */
+    @GetMapping("/{id}/historico-cadastro")
+    public ResponseEntity<?> obterHistoricoCadastro(@PathVariable Long id) {
+        try {
+            var historico = subprocessoService.getHistoricoAnaliseCadastro(id);
+            return ResponseEntity.ok(historico);
+        } catch (ErroDominioNaoEncontrado e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
+        }
+    }
+
     @PostMapping("/{id}/disponibilizar")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
         @PathVariable("id") Long subprocessoId,
@@ -180,13 +196,14 @@ public class SubprocessoControle {
     @PostMapping("/{id}/devolver-cadastro")
     public ResponseEntity<?> devolverCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody DevolverCadastroReq request) {
+            @Valid @RequestBody DevolverCadastroReq request,
+            @AuthenticationPrincipal Usuario usuario) {
         try {
             SubprocessoDto resultado = subprocessoService.devolverCadastro(
                 id,
                 request.motivo(),
                 request.observacoes(),
-                "USUARIO_ATUAL" // TODO: extrair do token JWT
+                usuario.getTitulo()
             );
             return ResponseEntity.ok(resultado);
         } catch (ErroEntidadeNaoEncontrada e) {
@@ -205,12 +222,13 @@ public class SubprocessoControle {
     @PostMapping("/{id}/aceitar-cadastro")
     public ResponseEntity<?> aceitarCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody AceitarCadastroReq request) {
+            @Valid @RequestBody AceitarCadastroReq request,
+            @AuthenticationPrincipal Usuario usuario) {
         try {
             SubprocessoDto resultado = subprocessoService.aceitarCadastro(
                 id,
                 request.observacoes(),
-                "USUARIO_ATUAL" // TODO: extrair do token JWT
+                usuario.getTitulo()
             );
             return ResponseEntity.ok(resultado);
         } catch (ErroEntidadeNaoEncontrada e) {
@@ -229,12 +247,13 @@ public class SubprocessoControle {
     @PostMapping("/{id}/homologar-cadastro")
     public ResponseEntity<?> homologarCadastro(
             @PathVariable Long id,
-            @Valid @RequestBody HomologarCadastroReq request) {
+            @Valid @RequestBody HomologarCadastroReq request,
+            @AuthenticationPrincipal Usuario usuario) {
         try {
             SubprocessoDto resultado = subprocessoService.homologarCadastro(
                 id,
                 request.observacoes(),
-                "USUARIO_ATUAL" // TODO: extrair do token JWT
+                usuario.getTitulo()
             );
             return ResponseEntity.ok(resultado);
         } catch (ErroEntidadeNaoEncontrada e) {

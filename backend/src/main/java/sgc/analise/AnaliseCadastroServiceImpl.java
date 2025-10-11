@@ -29,7 +29,7 @@ public class AnaliseCadastroServiceImpl implements AnaliseCadastroService {
         if (subprocessoRepo.findById(subprocessoCodigo).isEmpty()) {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(subprocessoCodigo));
         }
-        return analiseCadastroRepo.findBySubprocessoCodigo(subprocessoCodigo);
+        return analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoCodigo);
     }
 
     @Override

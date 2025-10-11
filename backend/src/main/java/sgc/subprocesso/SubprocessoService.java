@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.analise.dto.AnaliseCadastroDto;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.analise.enums.TipoAcaoAnalise;
@@ -39,6 +40,7 @@ import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,7 @@ public class SubprocessoService {
     private final NotificacaoService notificacaoService;
     private final ApplicationEventPublisher publicadorDeEventos;
     private final AlertaRepo repositorioAlerta;
+    private final UnidadeRepo unidadeRepo;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
@@ -649,11 +652,19 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
+        // Corrigido para registrar a análise de acordo com a especificação
         AnaliseCadastro analise = new AnaliseCadastro();
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setObservacoes(motivo + (observacoes != null && !observacoes.isEmpty() ? " - " + observacoes : ""));
+        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO);
+        analise.setMotivo(motivo);
+        analise.setObservacoes(observacoes);
+        analise.setAnalistaUsuarioTitulo(usuario);
+        if (sp.getUnidade() != null && sp.getUnidade().getUnidadeSuperior() != null) {
+            analise.setUnidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla());
+        }
         repositorioAnaliseCadastro.save(analise);
+
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
@@ -665,6 +676,26 @@ public class SubprocessoService {
         notificarDevolucaoCadastro(sp, unidadeDevolucao, motivo);
 
         return subprocessoMapper.toDTO(sp);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AnaliseCadastroDto> getHistoricoAnaliseCadastro(Long subprocessoId) {
+        if (!repositorioSubprocesso.existsById(subprocessoId)) {
+            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + subprocessoId);
+        }
+        List<AnaliseCadastro> analises = repositorioAnaliseCadastro.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
+        return analises.stream()
+            .map(this::mapearParaAnaliseCadastroDto)
+            .collect(Collectors.toList());
+    }
+
+    private AnaliseCadastroDto mapearParaAnaliseCadastroDto(AnaliseCadastro analise) {
+        return new AnaliseCadastroDto(
+            analise.getDataHora(),
+            analise.getUnidadeSigla(),
+            analise.getAcao() != null ? analise.getAcao().name() : null,
+            analise.getObservacoes()
+        );
     }
 
     private void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
@@ -698,6 +729,9 @@ public class SubprocessoService {
         analise.setAcao(TipoAcaoAnalise.ACEITE);
         analise.setAnalistaUsuarioTitulo(usuario);
         analise.setObservacoes(observacoes);
+        if (sp.getUnidade() != null && sp.getUnidade().getUnidadeSuperior() != null) {
+            analise.setUnidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla());
+        }
         repositorioAnaliseCadastro.save(analise);
 
         Unidade unidadeOrigem = sp.getUnidade();
@@ -721,18 +755,21 @@ public class SubprocessoService {
         String siglaUnidadeOrigem = sp.getUnidade().getSigla();
         String nomeProcesso = sp.getProcesso().getDescricao();
 
-        // 1. Enviar E-mail
-        String assunto = "SGC: Cadastro da unidade " + siglaUnidadeOrigem + " aceito e aguardando homologação";
+        // 1. Enviar E-mail (CDU-13 Item 10.7)
+        String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem + " submetido para análise";
         String corpo = String.format(
-            "O cadastro de atividades e conhecimentos da unidade %s, referente ao processo '%s', foi aceito e está disponível para homologação.",
+            "Prezado(a) responsável pela %s,\n" +
+            "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.\n" +
+            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+            unidadeDestino.getSigla(),
             siglaUnidadeOrigem,
             nomeProcesso
         );
         notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
 
-        // 2. Criar Alerta
+        // 2. Criar Alerta (CDU-13 Item 10.8)
         Alerta alerta = new Alerta();
-        alerta.setDescricao("Cadastro da unidade " + siglaUnidadeOrigem + " aguardando homologação");
+        alerta.setDescricao("Cadastro de atividades e conhecimentos da unidade " + siglaUnidadeOrigem + " submetido para análise");
         alerta.setProcesso(sp.getProcesso());
         alerta.setDataHora(java.time.LocalDateTime.now());
         alerta.setUnidadeOrigem(sp.getUnidade());
@@ -749,9 +786,11 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
-        Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
-        // A homologação é uma ação final do ADMIN (SEDOC), a movimentação termina na própria unidade de origem.
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Cadastro de atividades e conhecimentos homologado"));
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+            .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+
+        // A homologação é uma ação final do ADMIN (SEDOC), a movimentação é registrada na própria unidade.
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
         sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
 
