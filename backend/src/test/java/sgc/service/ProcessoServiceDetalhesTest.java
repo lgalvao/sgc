@@ -119,16 +119,31 @@ public class ProcessoServiceDetalhesTest {
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         sp.setDataLimiteEtapa1(LocalDate.now().plusDays(5));
 
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO(
-                10L, "Diretoria X", "DX", null, SituacaoSubprocesso.NAO_INICIADO, LocalDate.now().plusDays(7), new ArrayList<>());
-        ProcessoResumoDto processoResumoDTO = new ProcessoResumoDto(100L, null, SituacaoProcesso.CRIADO, null,
-                LocalDate.now().plusDays(5), null, 10L, "Diretoria X");
+        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
+            .unidadeCodigo(10L)
+            .nome("Diretoria X")
+            .sigla("DX")
+            .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
+            .dataLimite(LocalDate.now().plusDays(7))
+            .build();
+        ProcessoResumoDto processoResumoDTO = ProcessoResumoDto.builder()
+            .codigo(100L)
+            .situacao(SituacaoProcesso.CRIADO)
+            .dataLimite(LocalDate.now().plusDays(5))
+            .unidadeCodigo(10L)
+            .unidadeNome("Diretoria X")
+            .build();
 
-        ProcessoDetalheDto processoDetalheDTO = new ProcessoDetalheDto(
-                1L, "Proc Teste", "MAPEAMENTO", SituacaoProcesso.EM_ANDAMENTO,
-                dataLimite, dataCriacao, null,
-                List.of(unidadeParticipanteDTO),
-                List.of(processoResumoDTO));
+        ProcessoDetalheDto processoDetalheDTO = ProcessoDetalheDto.builder()
+            .codigo(1L)
+            .descricao("Proc Teste")
+            .tipo("MAPEAMENTO")
+            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+            .dataLimite(dataLimite)
+            .dataCriacao(dataCriacao)
+            .unidades(List.of(unidadeParticipanteDTO))
+            .resumoSubprocessos(List.of(processoResumoDTO))
+            .build();
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up));
@@ -140,12 +155,12 @@ public class ProcessoServiceDetalhesTest {
         ProcessoDetalheDto dto = servico.obterDetalhes(1L, "ADMIN", null);
 
         assertNotNull(dto);
-        assertEquals(p.getCodigo(), dto.codigo());
-        assertNotNull(dto.unidades());
-        assertTrue(dto.unidades().stream().anyMatch(u -> "DX".equals(u.sigla())));
-        assertNotNull(dto.resumoSubprocessos());
+        assertEquals(p.getCodigo(), dto.getCodigo());
+        assertNotNull(dto.getUnidades());
+        assertTrue(dto.getUnidades().stream().anyMatch(u -> "DX".equals(u.getSigla())));
+        assertNotNull(dto.getResumoSubprocessos());
         assertTrue(
-                dto.resumoSubprocessos().stream().anyMatch(s -> s.codigo() != null && s.situacao() != null));
+                dto.getResumoSubprocessos().stream().anyMatch(s -> s.getCodigo() != null && s.getSituacao() != null));
     }
 
     @Test

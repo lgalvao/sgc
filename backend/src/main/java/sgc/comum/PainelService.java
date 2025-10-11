@@ -87,18 +87,18 @@ public class PainelService {
                         unidadeNome = up.getNome();
                     }
 
-                    return new ProcessoResumoDto(
-                        processo.getCodigo(),
-                        processo.getDescricao(),
-                        processo.getSituacao(),
-                        processo.getTipo().name(),
-                        processo.getDataLimite(),
-                        processo.getDataCriacao(),
-                        unidadeCodigo,
-                        unidadeNome
-                    );
+                    return ProcessoResumoDto.builder()
+                        .codigo(processo.getCodigo())
+                        .descricao(processo.getDescricao())
+                        .situacao(processo.getSituacao())
+                        .tipo(processo.getTipo().name())
+                        .dataLimite(processo.getDataLimite())
+                        .dataCriacao(processo.getDataCriacao())
+                        .unidadeCodigo(unidadeCodigo)
+                        .unidadeNome(unidadeNome)
+                        .build();
                 })
-                .toList();
+                .collect(Collectors.toList());
 
         // Paginação em memória
         int total = listaDeDtos.size();

@@ -10,27 +10,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProcessoResumoDtoTest {
     @Test
-    void testProcessoResumoDtoConstructorAndAccessors() {
+    void testProcessoResumoDtoBuilderAndAccessors() {
         var now = LocalDateTime.now();
         var limitDate = LocalDate.now();
-        var dto = new ProcessoResumoDto(
-            1L,
-            "Test Description",
-            SituacaoProcesso.EM_ANDAMENTO,
-            "TIPO_A",
-            limitDate,
-            now,
-            10L,
-            "Test Unit"
-        );
+        var dto = ProcessoResumoDto.builder()
+            .codigo(1L)
+            .descricao("Test Description")
+            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+            .tipo("TIPO_A")
+            .dataLimite(limitDate)
+            .dataCriacao(now)
+            .unidadeCodigo(10L)
+            .unidadeNome("Test Unit")
+            .build();
 
-        assertEquals(1L, dto.codigo());
-        assertEquals("Test Description", dto.descricao());
-        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.situacao());
-        assertEquals("TIPO_A", dto.tipo());
-        assertEquals(limitDate, dto.dataLimite());
-        assertEquals(now, dto.dataCriacao());
-        assertEquals(10L, dto.unidadeCodigo());
-        assertEquals("Test Unit", dto.unidadeNome());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals("Test Description", dto.getDescricao());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.getSituacao());
+        assertEquals("TIPO_A", dto.getTipo());
+        assertEquals(limitDate, dto.getDataLimite());
+        assertEquals(now, dto.getDataCriacao());
+        assertEquals(10L, dto.getUnidadeCodigo());
+        assertEquals("Test Unit", dto.getUnidadeNome());
     }
 }

@@ -1,17 +1,22 @@
 package sgc.processo.dto;
 
+import lombok.*;
 import sgc.comum.enums.SituacaoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record ProcessoResumoDto(
-    Long codigo,
-    String descricao,
-    SituacaoProcesso situacao,
-    String tipo,
-    LocalDate dataLimite,
-    LocalDateTime dataCriacao,
-    Long unidadeCodigo,
-    String unidadeNome
-) {}
+@Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ProcessoResumoDto {
+    private Long codigo;
+    private String descricao;
+    private SituacaoProcesso situacao;
+    private String tipo;
+    private LocalDate dataLimite;
+    private LocalDateTime dataCriacao;
+    private Long unidadeCodigo;
+    private String unidadeNome;
+}

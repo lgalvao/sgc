@@ -105,16 +105,24 @@ public class ProcessoServiceTest {
 
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo().name());
+            return ProcessoDto.builder()
+                .codigo(p.getCodigo())
+                .dataCriacao(p.getDataCriacao())
+                .dataFinalizacao(p.getDataFinalizacao())
+                .dataLimite(p.getDataLimite())
+                .descricao(p.getDescricao())
+                .situacao(p.getSituacao())
+                .tipo(p.getTipo().name())
+                .build();
         });
 
         ProcessoDto dto = processoService.criar(requisicao);
 
         assertThat(dto).isNotNull();
-        assertThat(dto.codigo()).isEqualTo(123L);
-        assertThat(dto.descricao()).isEqualTo("Processo de teste");
-        assertThat(dto.tipo()).isEqualTo(TipoProcesso.MAPEAMENTO.name());
-        assertThat(dto.situacao()).isEqualTo(SituacaoProcesso.CRIADO);
+        assertThat(dto.getCodigo()).isEqualTo(123L);
+        assertThat(dto.getDescricao()).isEqualTo("Processo de teste");
+        assertThat(dto.getTipo()).isEqualTo(TipoProcesso.MAPEAMENTO.name());
+        assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.CRIADO);
 
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoCriadoEvento.class));
     }

@@ -101,6 +101,6 @@ public class PainelServiceTest {
         Page<ProcessoResumoDto> page = painelService.listarProcessos("ADMIN", null, pageable);
 
         assertEquals(1, page.getTotalElements());
-        assertEquals(1L, page.getContent().getFirst().codigo());
+        assertEquals(1L, page.getContent().getFirst().getCodigo());
     }
 }
