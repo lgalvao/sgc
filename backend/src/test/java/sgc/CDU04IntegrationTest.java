@@ -116,13 +116,17 @@ class CDU04IntegrationTest {
                     u.getTipo().name()));
         });
 
-        when(sgrhService.buscarResponsavelUnidade(anyLong()))
-                .thenAnswer(i -> Optional.of(new ResponsavelDto(i.getArgument(0),
-                        "T000000",
-                        "Titular Fulano",
-                        null,
-                        null))
-                );
+        when(sgrhService.buscarResponsavelUnidade(anyLong())).thenAnswer(
+            i -> Optional.of(
+                new ResponsavelDto(
+                    i.getArgument(0),
+                    "T000000",
+                    "Titular Fulano",
+                    null,
+                    null
+                )
+            )
+        );
 
         when(sgrhService.buscarUsuarioPorTitulo(anyString()))
                 .thenReturn(Optional.of(new UsuarioDto("T000000",
@@ -174,10 +178,11 @@ class CDU04IntegrationTest {
         );
 
         Long codProcesso = processo.getCodigo();
-        mockMvc.perform(post("/api/processos/{id}/iniciar", codProcesso)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(codigosUnidades)))
-                .andExpect(status().isOk());
+        mockMvc.perform(
+            post("/api/processos/{id}/iniciar", codProcesso)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(codigosUnidades))
+        ).andExpect(status().isOk());
 
         entityManager.flush();
         entityManager.clear();
@@ -214,7 +219,9 @@ class CDU04IntegrationTest {
 
         assertThat(alertas).hasSize(4);
         assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeOperacional.getCodigo()))).hasSize(1);
-        assertThat(alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo())
-                && a.getDescricao().contains("Início do processo") && !a.getDescricao().contains("subordinada"))).hasSize(1);
+        assertThat(
+            alertas.stream().filter(a -> a.getUnidadeDestino().getCodigo().equals(unidadeInteroperacional.getCodigo())
+                && a.getDescricao().contains("Início do processo") && !a.getDescricao().contains("subordinada"))
+        ).hasSize(1);
     }
 }

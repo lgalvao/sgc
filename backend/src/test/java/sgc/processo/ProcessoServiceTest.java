@@ -445,127 +445,136 @@ public class ProcessoServiceTest {
     }
 
     @Test
-        void finalizar_SemSubprocessosHomologados_LancaErroProcesso() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-    
-            Subprocesso subprocesso = new Subprocesso();
-            subprocesso.setCodigo(10L);
-            subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // não homologado
-            
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
-            unidade.setSigla("UT");
-            subprocesso.setUnidade(unidade);
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocesso));
-    
-            var exception = assertThrows(ErroProcesso.class,
-                () -> processoService.finalizar(1L));
-            
-            assertTrue(exception.getMessage().contains("Não é possível encerrar o processo"));
-        }
-    
-        // Testes para iniciarProcessoRevisao
-    
-        @Test
-        void iniciarProcessoRevisao_Valido_IniciaComSucesso() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.CRIADO);
-            processo.setTipo(TipoProcesso.REVISAO);
-            processo.setDataLimite(LocalDate.now().plusDays(30));
-    
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
-            unidade.setTipo(TipoUnidade.OPERACIONAL);
-    
-            Mapa mapaNovo = new Mapa();
-            mapaNovo.setCodigo(200L);
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
-            when(unidadeMapaRepo.findCodigosUnidadesComMapaVigente(List.of(1L))).thenReturn(List.of(1L));
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-            when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
-            when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
-            when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-            when(processoConversor.toDTO(processo)).thenReturn(ProcessoDto.builder().build());
+    void finalizar_SemSubprocessosHomologados_LancaErroProcesso() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            processoService.iniciarProcessoRevisao(1L, List.of(1L));
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // não homologado
 
-            verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
-            verify(mapaRepo).save(any(Mapa.class));
-            verify(subprocessoRepo).save(any(Subprocesso.class));
-            verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
-        }
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("UT");
+        subprocesso.setUnidade(unidade);
 
-        @Test
-        void iniciarProcessoRevisao_ProcessoNaoCriado_LancaIllegalStateException() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-    
-            var exception = assertThrows(IllegalStateException.class,
-                () -> processoService.iniciarProcessoRevisao(1L, List.of(1L)));
-    
-            assertEquals("Apenas processos na situação 'CRIADO' podem ser iniciados.", exception.getMessage());
-        }
-    
-        @Test
-        void iniciarProcessoRevisao_SemUnidades_LancaIllegalArgumentException() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.CRIADO);
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-    
-            var exception = assertThrows(IllegalArgumentException.class,
-                () -> processoService.iniciarProcessoRevisao(1L, Collections.emptyList()));
-    
-            assertEquals("A lista de unidades é obrigatória para iniciar o processo de revisão.", exception.getMessage());
-        }
-    
-        @Test
-        void iniciarProcessoRevisao_UnidadeSemMapaVigente_LancaErroProcesso() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.CRIADO);
-    
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(1L);
-            unidade.setSigla("UT");
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
-            when(unidadeMapaRepo.findCodigosUnidadesComMapaVigente(List.of(1L))).thenReturn(Collections.emptyList());
-            when(unidadeRepo.findSiglasByCodigos(List.of(1L))).thenReturn(List.of("UT"));
-    
-    
-            var exception = assertThrows(ErroProcesso.class,
-                () -> processoService.iniciarProcessoRevisao(1L, List.of(1L)));
-    
-            assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: UT", exception.getMessage());
-        }
-    
-        @Test
-        void iniciarProcessoRevisao_UnidadeNaoEncontrada_LancaErroEntidadeNaoEncontrada() {
-            Processo processo = new Processo();
-            processo.setCodigo(1L);
-            processo.setSituacao(SituacaoProcesso.CRIADO);
-    
-            when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-            when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(999L))).thenReturn(Collections.emptyList());
-            when(unidadeMapaRepo.findByUnidadeCodigoIn(List.of(999L))).thenReturn(Collections.emptyList());
-            when(unidadeRepo.findAllById(List.of(999L))).thenReturn(Collections.emptyList());
-    
-            var exception = assertThrows(ErroProcesso.class,
-                () -> processoService.iniciarProcessoRevisao(1L, List.of(999L)));
-    
-            assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: ", exception.getMessage());
-        }
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocesso));
+
+        var exception = assertThrows(
+            ErroProcesso.class,
+            () -> processoService.finalizar(1L)
+        );
+
+        assertTrue(exception.getMessage().contains("Não é possível encerrar o processo"));
     }
+    
+    // Testes para iniciarProcessoRevisao
+
+    @Test
+    void iniciarProcessoRevisao_Valido_IniciaComSucesso() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.REVISAO);
+        processo.setDataLimite(LocalDate.now().plusDays(30));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Mapa mapaNovo = new Mapa();
+        mapaNovo.setCodigo(200L);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
+        when(unidadeMapaRepo.findCodigosUnidadesComMapaVigente(List.of(1L))).thenReturn(List.of(1L));
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+        when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
+        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(processoRepo.save(any(Processo.class))).thenReturn(processo);
+        when(processoConversor.toDTO(processo)).thenReturn(ProcessoDto.builder().build());
+
+        processoService.iniciarProcessoRevisao(1L, List.of(1L));
+
+        verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
+        verify(mapaRepo).save(any(Mapa.class));
+        verify(subprocessoRepo).save(any(Subprocesso.class));
+        verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
+    }
+
+    @Test
+    void iniciarProcessoRevisao_ProcessoNaoCriado_LancaIllegalStateException() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+
+        var exception = assertThrows(
+            IllegalStateException.class,
+            () -> processoService.iniciarProcessoRevisao(1L, List.of(1L))
+        );
+
+        assertEquals("Apenas processos na situação 'CRIADO' podem ser iniciados.", exception.getMessage());
+    }
+    
+    @Test
+    void iniciarProcessoRevisao_SemUnidades_LancaIllegalArgumentException() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+
+        var exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> processoService.iniciarProcessoRevisao(1L, Collections.emptyList())
+        );
+
+        assertEquals("A lista de unidades é obrigatória para iniciar o processo de revisão.", exception.getMessage());
+    }
+    
+    @Test
+    void iniciarProcessoRevisao_UnidadeSemMapaVigente_LancaErroProcesso() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("UT");
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
+        when(unidadeMapaRepo.findCodigosUnidadesComMapaVigente(List.of(1L))).thenReturn(Collections.emptyList());
+        when(unidadeRepo.findSiglasByCodigos(List.of(1L))).thenReturn(List.of("UT"));
+
+        var exception = assertThrows(
+            ErroProcesso.class,
+            () -> processoService.iniciarProcessoRevisao(1L, List.of(1L))
+        );
+
+        assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: UT", exception.getMessage());
+    }
+    
+    @Test
+    void iniciarProcessoRevisao_UnidadeNaoEncontrada_LancaErroEntidadeNaoEncontrada() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(999L))).thenReturn(Collections.emptyList());
+        when(unidadeMapaRepo.findByUnidadeCodigoIn(List.of(999L))).thenReturn(Collections.emptyList());
+        when(unidadeRepo.findAllById(List.of(999L))).thenReturn(Collections.emptyList());
+
+        var exception = assertThrows(
+            ErroProcesso.class,
+            () -> processoService.iniciarProcessoRevisao(1L, List.of(999L))
+        );
+
+        assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: ", exception.getMessage());
+    }
+}
