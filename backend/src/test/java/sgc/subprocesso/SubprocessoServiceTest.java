@@ -99,6 +99,9 @@ public class SubprocessoServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
 
+    @Mock
+    private sgc.unidade.modelo.UnidadeRepo unidadeRepo;
+
     @InjectMocks
     private SubprocessoService subprocessoService;
 
@@ -118,6 +121,7 @@ public class SubprocessoServiceTest {
             notificacaoService,
             publicadorDeEventos,
             repositorioAlerta,
+            unidadeRepo,
             atividadeMapper,
             conhecimentoMapper,
             movimentacaoMapper,
@@ -618,6 +622,11 @@ public class SubprocessoServiceTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
+
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
         SubprocessoDto result = subprocessoService.homologarCadastro(id, "observacoes", "usuario");

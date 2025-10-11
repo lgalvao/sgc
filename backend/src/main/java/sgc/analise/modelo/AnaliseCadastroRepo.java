@@ -20,10 +20,10 @@ public interface AnaliseCadastroRepo extends JpaRepository<AnaliseCadastro, Long
     void deleteBySubprocessoCodigo(Long subprocessoCodigo);
 
     /**
-     * Recupera análises vinculadas a um subprocesso.
+     * Recupera análises vinculadas a um subprocesso, ordenadas da mais recente para a mais antiga.
      *
      * @param subprocessoCodigo id do subprocesso
      * @return lista de AnaliseCadastro
      */
-    List<AnaliseCadastro> findBySubprocessoCodigo(Long subprocessoCodigo);
+    List<AnaliseCadastro> findBySubprocessoCodigoOrderByDataHoraDesc(Long subprocessoCodigo);
 }

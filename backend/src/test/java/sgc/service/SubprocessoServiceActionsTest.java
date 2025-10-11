@@ -59,6 +59,9 @@ public class SubprocessoServiceActionsTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
 
+    @Mock
+    private sgc.unidade.modelo.UnidadeRepo unidadeRepo;
+
     @InjectMocks
     private SubprocessoService subprocessoService;
 
@@ -155,6 +158,9 @@ public class SubprocessoServiceActionsTest {
     @Test
     void homologarCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
         when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -167,8 +173,8 @@ public class SubprocessoServiceActionsTest {
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
         assertEquals("Cadastro de atividades e conhecimentos homologado", movCaptor.getValue().getDescricao());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeOrigem());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
+        assertEquals(sedoc, movCaptor.getValue().getUnidadeOrigem());
+        assertEquals(sedoc, movCaptor.getValue().getUnidadeDestino());
 
         verify(subprocessoRepo, times(1)).save(subprocesso);
     }
@@ -277,8 +283,10 @@ public class SubprocessoServiceActionsTest {
 
         ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
         verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        assertTrue(analiseCaptor.getValue().getObservacoes().contains("Motivo Teste"));
-        assertTrue(analiseCaptor.getValue().getObservacoes().contains("Observações"));
+        AnaliseCadastro analiseSalva = analiseCaptor.getValue();
+        assertEquals(TipoAcaoAnalise.DEVOLUCAO, analiseSalva.getAcao());
+        assertEquals("Motivo Teste", analiseSalva.getMotivo());
+        assertEquals("Observações", analiseSalva.getObservacoes());
 
         ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
         verify(movimentacaoRepo, times(1)).save(movCaptor.capture());

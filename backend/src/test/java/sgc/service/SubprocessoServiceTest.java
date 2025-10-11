@@ -235,12 +235,12 @@ public class SubprocessoServiceTest {
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
         verify(notificacaoService).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
-        assertEquals("SGC: Cadastro da unidade UN aceito e aguardando homologação", assuntoCaptor.getValue());
-        assertTrue(corpoCaptor.getValue().contains("foi aceito e está disponível para homologação"));
+        assertEquals("SGC: Cadastro de atividades e conhecimentos da UN submetido para análise", assuntoCaptor.getValue());
+        assertTrue(corpoCaptor.getValue().contains("foi submetido para análise por essa unidade"));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta).save(alertaCaptor.capture());
-        assertEquals("Cadastro da unidade UN aguardando homologação", alertaCaptor.getValue().getDescricao());
+        assertEquals("Cadastro de atividades e conhecimentos da unidade UN submetido para análise", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeSuperiorMock, alertaCaptor.getValue().getUnidadeDestino());
     }
 
