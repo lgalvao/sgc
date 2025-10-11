@@ -319,8 +319,8 @@ public class ProcessoService {
 
         if (!pendentes.isEmpty()) {
             String mensagem = String.format(
-                "Não é possível encerrar o processo. Unidades pendentes de homologação:\n- %s",
-                String.join("\n- ", pendentes)
+                "Não é possível encerrar o processo. Unidades pendentes de homologação:%n- %s",
+                String.join("%n- ", pendentes)
             );
             log.warn("Validação de finalização falhou: {} subprocessos não homologados.", pendentes.size());
             throw new ErroProcesso(mensagem);

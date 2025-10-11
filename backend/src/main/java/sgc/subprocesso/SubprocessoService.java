@@ -758,8 +758,8 @@ public class SubprocessoService {
         // 1. Enviar E-mail (CDU-13 Item 10.7)
         String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem + " submetido para análise";
         String corpo = String.format(
-            "Prezado(a) responsável pela %s,\n" +
-            "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.\n" +
+            "Prezado(a) responsável pela %s,%n" +
+            "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.%n" +
             "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
             unidadeDestino.getSigla(),
             siglaUnidadeOrigem,
