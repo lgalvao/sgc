@@ -84,7 +84,7 @@ public class SubprocessoControle {
      * POST /api/subprocessos/{id}/disponibilizar-revisao
      */
     @PostMapping("/{id}/disponibilizar-revisao")
-    public ResponseEntity<?> disponibilizarRevisao(@PathVariable Long id) {
+    public ResponseEntity<?> disponibilizarRevisao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         try {
             var faltando = subprocessoService.obterAtividadesSemConhecimento(id);
             if (faltando != null && !faltando.isEmpty()) {
@@ -94,13 +94,16 @@ public class SubprocessoControle {
                 return ResponseEntity.badRequest().body(Map.of("atividadesSemConhecimento", lista));
             }
 
-            subprocessoService.disponibilizarRevisao(id);
-            return ResponseEntity.ok("Revisão do cadastro de atividades disponibilizada");
+            subprocessoService.disponibilizarRevisao(id, usuario);
+            return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
         } catch (ErroEntidadeNaoEncontrada e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
+        } catch (ErroDominioAccessoNegado e) {
+            return ResponseEntity.status(403).body(new RespostaDto(e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno");
         }
     }
