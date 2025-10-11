@@ -37,7 +37,7 @@ class EventoProcessoListenerTest {
     private AlertaService alertaService;
 
     @Mock
-    private NotificacaoEmailService servicoNotificacaoEmail;
+    private NotificacaoServico notificacaoServico;
 
     @Mock
     private NotificacaoTemplateEmailService notificacaoTemplateEmailService;
@@ -103,12 +103,12 @@ class EventoProcessoListenerTest {
 
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional.getUnidade().getCodigo()), List.of(subprocessoOperacional));
 
-        verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
+        verify(notificacaoServico, times(1)).enviarEmailHtml(
                 eq("titular@test.com"),
                 anyString(),
                 contains("Email Operacional")
         );
-        verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
+        verify(notificacaoServico, times(1)).enviarEmailHtml(
                 eq("substituto@test.com"),
                 anyString(),
                 contains("Email Operacional")
@@ -123,7 +123,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -135,7 +135,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -158,7 +158,7 @@ class EventoProcessoListenerTest {
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList(), anyList());
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(servicoNotificacaoEmail, times(1)).enviarEmailHtml(
+        verify(notificacaoServico, times(1)).enviarEmailHtml(
                 eq("titular@test.com"),
                 assuntoCaptor.capture(),
                 corpoCaptor.capture()
@@ -166,7 +166,7 @@ class EventoProcessoListenerTest {
 
         assertEquals("Processo Iniciado em Unidades Subordinadas - Teste de Processo", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("Email Intermediaria"));
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(eq("substituto@test.com"), anyString(), anyString());
+        verify(notificacaoServico, never()).enviarEmailHtml(eq("substituto@test.com"), anyString(), anyString());
     }
 
     @Test
@@ -187,7 +187,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(servicoNotificacaoEmail).enviarEmailHtml(eq("titular@test.com"), assuntoCaptor.capture(), contains("Email Interoperacional"));
+        verify(notificacaoServico).enviarEmailHtml(eq("titular@test.com"), assuntoCaptor.capture(), contains("Email Interoperacional"));
         assertEquals("Processo Iniciado - Teste de Processo", assuntoCaptor.getValue());
     }
 
@@ -201,7 +201,7 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -214,7 +214,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(sgrhService, never()).buscarUnidadePorCodigo(any());
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -228,7 +228,7 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -246,6 +246,6 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(servicoNotificacaoEmail, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
     }
 }

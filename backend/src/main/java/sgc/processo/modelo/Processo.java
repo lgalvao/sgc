@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 public class Processo extends EntidadeBase {
 
     public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDate dataLimite) {
+        super();
         this.descricao = descricao;
         this.tipo = tipo;
         this.situacao = situacao;

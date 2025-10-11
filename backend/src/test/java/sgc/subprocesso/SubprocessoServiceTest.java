@@ -23,7 +23,7 @@ import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
-import sgc.notificacao.NotificacaoService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.modelo.NotificacaoRepo;
 import sgc.subprocesso.dto.MovimentacaoMapper;
 import sgc.subprocesso.dto.SubprocessoCadastroDto;
@@ -79,7 +79,7 @@ public class SubprocessoServiceTest {
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @Mock
-    private NotificacaoService notificacaoService;
+    private NotificacaoServico notificacaoServico;
 
     @Mock
     private ApplicationEventPublisher publicadorDeEventos;
@@ -118,7 +118,7 @@ public class SubprocessoServiceTest {
             repositorioNotificacao,
             competenciaRepo,
             competenciaAtividadeRepo,
-            notificacaoService,
+            notificacaoServico,
             publicadorDeEventos,
             repositorioAlerta,
             unidadeRepo,

@@ -19,6 +19,7 @@ import sgc.unidade.enums.TipoUnidade;
 public class Unidade extends EntidadeBase {
 
     public Unidade(String nome, String sigla) {
+        super();
         this.nome = nome;
         this.sigla = sigla;
         this.situacao = SituacaoUnidade.ATIVA;

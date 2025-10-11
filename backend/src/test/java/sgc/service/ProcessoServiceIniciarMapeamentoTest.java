@@ -9,7 +9,7 @@ import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.ProcessoDetalheMapperCustom;
@@ -60,7 +60,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoEmailService servicoNotificacaoEmail = mock(NotificacaoEmailService.class);
+        NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
         NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
@@ -76,7 +76,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                servicoNotificacaoEmail,
+                notificacaoServico,
                 notificacaoTemplateEmailService,
                 sgrhService,
                 processoMapper,

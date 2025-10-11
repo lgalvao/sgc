@@ -47,6 +47,9 @@ public class ProcessoServiceFinalizarTest {
     @Mock
     private ProcessoMapper processoMapper;
 
+    @Mock
+    private sgc.sgrh.SgrhService sgrhService;
+
     @InjectMocks
     private ProcessoService processoService;
 
@@ -99,6 +102,8 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
+        when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Collections.emptyMap());
+        when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Collections.emptyMap());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
         processoService.finalizar(1L);
