@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<suppressions>
+    <suppress ruleset="Error Prone" rule="AvoidDuplicateLiterals"/>
+    <suppress ruleset="Error Prone" rule="TestClassWithoutTestCases"/>
+    <suppress ruleset="Error Prone" rule="DetachedTestCase"/>
+</suppressions>

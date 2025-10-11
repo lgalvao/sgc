@@ -8,6 +8,11 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.0.21"
+    checkstyle
+    pmd
+    id("org.owasp.dependencycheck") version "12.1.0"
+    jacoco
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 java {
@@ -321,12 +326,73 @@ tasks.named("build") {
 }
 
 tasks.withType<SpotBugsTask> {
-    enabled = false
+    enabled = true
     reports.create("html") {
         required.set(true)
         outputLocation.set(project.layout.buildDirectory.file("reports/spotbugs/${name}.html").get().asFile)
     }
 }
+
+checkstyle {
+    toolVersion = "10.12.4"
+}
+
+pmd {
+    toolVersion = "7.16.0"
+    rulesMinimumPriority = 5
+    ruleSets = listOf("category/java/errorprone.xml")
+    suppressions.set(resources.text.fromFile("config/pmd/suppressions.xml"))
+}
+
+tasks.withType<org.gradle.api.plugins.quality.Pmd> {
+    reports {
+        xml.required.set(true)
+        html.required.set(false)
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "your-project-key")
+        property("sonar.host.url", "http://localhost:9000")
+    }
+}
+
+tasks.dependencyCheckAnalyze {
+    enabled = false
+}
+
+tasks.spotbugsMain {
+    enabled = false
+}
+
+tasks.spotbugsTest {
+    enabled = false
+}
+
+tasks.checkstyleMain {
+    enabled = false
+}
+
+tasks.pmdMain {
+    enabled = false
+}
+
+tasks.pmdTest {
+    enabled = false
+}
+
 
 tasks.register("agentTest") {
     group = "verification"
