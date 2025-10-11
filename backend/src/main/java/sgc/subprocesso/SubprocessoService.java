@@ -150,7 +150,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public SubprocessoCadastroDto obterCadastro(Long idSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
+                .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada("Subprocesso com código " + idSubprocesso + " não encontrado."));
 
         List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividadesComConhecimentos = new ArrayList<>();
         if (sp.getMapa() != null && sp.getMapa().getCodigo() != null) {

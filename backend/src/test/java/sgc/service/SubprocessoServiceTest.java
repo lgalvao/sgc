@@ -23,6 +23,7 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.modelo.Usuario;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -220,6 +221,17 @@ public class SubprocessoServiceTest {
 
         Long unidadeUsuario = 99L;
         assertThrows(ErroDominioAccessoNegado.class, () -> subprocessoService.obterDetalhes(spId, "GESTOR", unidadeUsuario));
+    }
+
+    @Test
+    void obterCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
+        when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                sgc.comum.erros.ErroEntidadeNaoEncontrada.class,
+                () -> subprocessoService.obterCadastro(1L)
+        );
+        assertTrue(exception.getMessage().contains("Subprocesso com código 1 não encontrado."));
     }
 
     @Test
