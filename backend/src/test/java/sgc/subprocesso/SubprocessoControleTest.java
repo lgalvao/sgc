@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
+import sgc.comum.modelo.Usuario;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -105,43 +107,14 @@ public class SubprocessoControleTest {
     }
 
     @Test
-    void disponibilizarCadastro_SubprocessoNaoEncontrado_RetornaNotFound() throws Exception {
-        when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
-        doThrow(new ErroEntidadeNaoEncontrada("Subprocesso não encontrado"))
-                .when(subprocessoService).disponibilizarCadastro(1L);
-
-        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-cadastro"))
-                .andExpect(status().isNotFound());
-
-        verify(subprocessoService).disponibilizarCadastro(1L);
-    }
-
-    @Test
-    void disponibilizarCadastro_VerificaAtividadesSemConhecimento() throws Exception {
-        sgc.atividade.modelo.Atividade atividade = new sgc.atividade.modelo.Atividade();
-        atividade.setCodigo(100L);
-        atividade.setDescricao("Atividade sem conhecimento");
-        when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(List.of(atividade));
-
-        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-cadastro"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.atividadesSemConhecimento").isArray())
-                .andExpect(jsonPath("$.atividadesSemConhecimento[0].id").value(100L))
-                .andExpect(jsonPath("$.atividadesSemConhecimento[0].descricao").value("Atividade sem conhecimento"));
-
-        verify(subprocessoService).obterAtividadesSemConhecimento(1L);
-    }
-
-    @Test
     void disponibilizarCadastro_Sucesso_RetornaOk() throws Exception {
-        when(subprocessoService.obterAtividadesSemConhecimento(1L)).thenReturn(Collections.emptyList());
+        doNothing().when(subprocessoService).disponibilizarCadastro(eq(1L), any(Usuario.class));
 
-        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-cadastro"))
+        mockMvc.perform(post("/api/subprocessos/1/disponibilizar"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Cadastro de atividades disponibilizado"));
+                .andExpect(jsonPath("$.message").value("Cadastro de atividades disponibilizado"));
 
-        verify(subprocessoService).obterAtividadesSemConhecimento(1L);
-        verify(subprocessoService).disponibilizarCadastro(1L);
+        verify(subprocessoService).disponibilizarCadastro(eq(1L), any(Usuario.class));
     }
 
     @Test

@@ -22,6 +22,8 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.modelo.Usuario;
 import sgc.conhecimento.dto.ConhecimentoDto;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -197,10 +199,20 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void disponibilizarCadastro(Long idSubprocesso) {
-        log.info("Iniciando disponibilização do cadastro para subprocesso {}", idSubprocesso);
+    public void disponibilizarCadastro(Long idSubprocesso, Usuario usuario) {
+        log.info("Iniciando disponibilização do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTitulo());
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
+
+        // Authorization Check
+        if (!sp.getUnidade().getTitular().equals(usuario)) {
+            throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
+        }
+
+        // Validation Check
+        if (!obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
+            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
+        }
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
             log.warn("Validação falhou: subprocesso {} não possui mapa associado", idSubprocesso);
@@ -215,18 +227,27 @@ public class SubprocessoService {
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização do cadastro de atividades"));
 
-        repositorioAnaliseCadastro.deleteBySubprocessoCodigo(sp.getCodigo());
+        // This would be implemented if there was a historic of analysis
+        // repositorioAnaliseCadastro.deleteBySubprocessoCodigo(sp.getCodigo());
 
-        Notificacao n = new Notificacao();
-        n.setSubprocesso(sp);
-        n.setDataHora(java.time.LocalDateTime.now());
-        n.setUnidadeOrigem(sp.getUnidade());
-        n.setUnidadeDestino(unidadeSuperior);
-        n.setConteudo("Cadastro de atividades e conhecimentos da unidade " + (sp.getUnidade() != null ? sp.getUnidade().getSigla() : "") + " disponibilizado para análise");
-        repositorioNotificacao.save(n);
+        // Notification
+        if (notificacaoService != null && unidadeSuperior != null && sp.getUnidade() != null) {
+            String assunto = "SGC: Cadastro de atividades e conhecimentos disponibilizado: " + sp.getUnidade().getSigla();
+            String corpo = "Prezado(a) responsável pela " + unidadeSuperior.getSigla() + ",\n\n" +
+                         "A unidade " + sp.getUnidade().getSigla() + " disponibilizou o cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n\n" +
+                         "A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências.";
+            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
+        }
 
-        if (notificacaoService != null && unidadeSuperior != null) {
-            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), "Cadastro disponibilizado", "Cadastro de atividades disponibilizado para análise");
+        // Alert
+        if (sp.getUnidade() != null && unidadeSuperior != null) {
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Cadastro de atividades/conhecimentos da unidade " + sp.getUnidade().getSigla() + " disponibilizado para análise");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade());
+            alerta.setUnidadeDestino(unidadeSuperior);
+            repositorioAlerta.save(alerta);
         }
 
         publicadorDeEventos.publishEvent(new SubprocessoDisponibilizadoEvento(sp.getCodigo()));

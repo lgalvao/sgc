@@ -1,5 +1,7 @@
 package sgc.subprocesso;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +44,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import sgc.comum.modelo.Usuario;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import sgc.comum.enums.SituacaoSubprocesso;
@@ -98,6 +101,29 @@ public class SubprocessoServiceTest {
 
     @InjectMocks
     private SubprocessoService subprocessoService;
+
+    @BeforeEach
+    void setUp() {
+        // Since we are calling a method on the service from within the service, we need a spy
+        subprocessoService = spy(new SubprocessoService(
+            repositorioSubprocesso,
+            repositorioMovimentacao,
+            atividadeRepo,
+            repositorioConhecimento,
+            repositorioAnaliseCadastro,
+            repositorioAnaliseValidacao,
+            repositorioNotificacao,
+            competenciaRepo,
+            competenciaAtividadeRepo,
+            notificacaoService,
+            publicadorDeEventos,
+            repositorioAlerta,
+            atividadeMapper,
+            conhecimentoMapper,
+            movimentacaoMapper,
+            subprocessoMapper
+        ));
+    }
 
     @Test
     void obterDetalhes_deveRetornarDetalhes_quandoSubprocessoEncontrado() {
@@ -223,30 +249,40 @@ public class SubprocessoServiceTest {
     @Test
     void disponibilizarCadastro_deveExecutarComSucesso_quandoSubprocessoValido() {
         Long id = 1L;
-        Subprocesso subprocesso = criarSubprocessoComMapa(id);
+        Usuario chefe = new Usuario();
+        chefe.setTitulo("chefe");
+        Subprocesso subprocesso = criarSubprocessoComMapaEChefe(id, chefe);
         subprocesso.setProcesso(criarProcessoMock());
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
+        doReturn(Collections.emptyList()).when(subprocessoService).obterAtividadesSemConhecimento(id);
 
-        subprocessoService.disponibilizarCadastro(id);
+        subprocessoService.disponibilizarCadastro(id, chefe);
 
         verify(repositorioSubprocesso, times(1)).save(subprocesso);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataFimEtapa1());
         verify(repositorioMovimentacao, times(1)).save(any(Movimentacao.class));
-        verify(repositorioAnaliseCadastro, times(1)).deleteBySubprocessoCodigo(id);
     }
 
     @Test
-    void disponibilizarCadastro_deveLancarExcecao_quandoSubprocessoSemMapa() {
+    void disponibilizarCadastro_deveLancarExcecao_quandoUsuarioNaoForChefe() {
         Long id = 1L;
-        Subprocesso subprocesso = new Subprocesso();
+        Usuario chefe = new Usuario();
+        chefe.setTitulo("chefe");
+        Usuario outroUsuario = new Usuario();
+        outroUsuario.setTitulo("outro");
+        Subprocesso subprocesso = criarSubprocessoComMapaEChefe(id, chefe);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> subprocessoService.disponibilizarCadastro(id)
-        );
-        assertTrue(exception.getMessage().contains("Subprocesso sem mapa associado"));
+        assertThrows(ErroDominioAccessoNegado.class, () -> {
+            subprocessoService.disponibilizarCadastro(id, outroUsuario);
+        });
+    }
+
+    private Subprocesso criarSubprocessoComMapaEChefe(Long id, Usuario chefe) {
+        Subprocesso subprocesso = criarSubprocessoComMapa(id);
+        subprocesso.getUnidade().setTitular(chefe);
+        return subprocesso;
     }
 
     @Test

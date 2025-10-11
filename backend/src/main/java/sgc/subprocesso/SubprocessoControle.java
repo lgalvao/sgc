@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.dtos.RespostaDto;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.modelo.Usuario;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.MapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -69,30 +71,13 @@ public class SubprocessoControle {
         }
     }
 
-    /**
-     * POST /api/subprocessos/{id}/disponibilizar-cadastro
-     */
-    @PostMapping("/{id}/disponibilizar-cadastro")
-    public ResponseEntity<?> disponibilizarCadastro(@PathVariable Long id) {
-        try {
-            // validar atividades sem conhecimento
-            var faltando = subprocessoService.obterAtividadesSemConhecimento(id);
-            if (faltando != null && !faltando.isEmpty()) {
-                var lista = faltando.stream()
-                        .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
-                        .toList();
-                return ResponseEntity.badRequest().body(Map.of("atividadesSemConhecimento", lista));
-            }
-
-            subprocessoService.disponibilizarCadastro(id);
-            return ResponseEntity.ok("Cadastro de atividades disponibilizado");
-        } catch (ErroEntidadeNaoEncontrada e) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Erro interno");
-        }
+    @PostMapping("/{id}/disponibilizar")
+    public ResponseEntity<RespostaDto> disponibilizarCadastro(
+        @PathVariable("id") Long subprocessoId,
+        @AuthenticationPrincipal Usuario usuario
+    ) {
+        subprocessoService.disponibilizarCadastro(subprocessoId, usuario);
+        return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }
 
     /**
