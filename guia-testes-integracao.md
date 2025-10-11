@@ -57,6 +57,68 @@ Este guia fornece recomendações e um passo a passo para a criação de testes 
 - **Testando Cenários de Erro:**
   - **Status HTTP:** Para erros que são tratados pelo `Controller` e retornam um status HTTP específico (como 404 Not Found), você pode usar `mockMvc` e esperar o status correspondente.
   - **Exceções de Serviço:** Para erros que ocorrem na camada de serviço e não são tratados de forma específica no `Controller` (resultando em um erro 500 Internal Server Error), uma abordagem mais robusta é testar diretamente a camada de serviço. Injete o `Service` no seu teste e use `assertThrows` para verificar se a exceção esperada (ex: `ErroDominioNaoEncontrado`) é lançada. Isso torna o teste mais preciso e menos acoplado à implementação do `Controller`.
+- **Funcionalidade Existente:** Antes de adicionar novas funcionalidades, pesquise exaustivamente no código-fonte para garantir que algo semelhante ainda não exista. Reutilizar ou estender a lógica existente é preferível a criar duplicatas.
+
+## 6. Tópicos Avançados
+
+### Testando com Usuários Específicos
+
+Às vezes, `@WithMockUser` não é suficiente, especialmente quando a lógica de negócios depende do objeto `Usuario` real (por exemplo, ao verificar se um usuário é o titular de uma unidade). Nesses casos, o `@AuthenticationPrincipal` no seu controlador retornará `null`.
+
+Para resolver isso, você pode criar uma anotação de teste personalizada que configura um `SecurityContext` com um objeto `Usuario` real.
+
+1.  **Crie a anotação:**
+
+    ```java
+    @Retention(RetentionPolicy.RUNTIME)
+    @WithSecurityContext(factory = WithMockChefeSecurityContextFactory.class)
+    public @interface WithMockChefe {
+        String value() default "chefe";
+    }
+    ```
+
+2.  **Crie a fábrica de contexto:** Esta fábrica encontrará o usuário no banco de dados (ou o criará se não existir) e o definirá como o principal de segurança.
+
+    ```java
+    public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
+
+        @Autowired
+        private UsuarioRepo usuarioRepo;
+
+        @Override
+        public SecurityContext createSecurityContext(WithMockChefe annotation) {
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            Usuario usuario = usuarioRepo.findByTitulo(annotation.value())
+                .orElseGet(() -> {
+                    Usuario newUser = new Usuario();
+                    newUser.setTitulo(annotation.value());
+                    return usuarioRepo.save(newUser);
+                });
+
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+            context.setAuthentication(token);
+            return context;
+        }
+    }
+    ```
+    *Observação: A entidade `Usuario` deve implementar `UserDetails`.*
+
+3.  **Use no seu teste:** Substitua `@WithMockUser` pela sua nova anotação. Não se esqueça de importar a fábrica no seu teste com `@Import`.
+
+    ```java
+    @SpringBootTest
+    @WithMockChefe // ou @WithMockChefe("outro_usuario")
+    @Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class})
+    public class SeuIntegrationTest { ... }
+    ```
+
+### Executando um Único Arquivo de Teste
+
+Para acelerar o ciclo de desenvolvimento, você pode executar apenas o arquivo de teste em que está trabalhando em vez de toda a suíte de testes. Use o seguinte comando, substituindo `NomeDoSeuTeste`:
+
+```bash
+cd /app && ./gradlew :backend:test --tests sgc.NomeDoSeuTeste
+```
 
 ## Exemplo de Esqueleto de Teste
 

@@ -5,9 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import sgc.unidade.modelo.Unidade;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "USUARIO", schema = "sgc")
@@ -15,7 +21,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario implements Serializable {
+public class Usuario implements Serializable, UserDetails {
     @Id
     @Column(name = "titulo", length = 12)
     private String titulo;
@@ -44,5 +50,44 @@ public class Usuario implements Serializable {
     @Override
     public int hashCode() {
         return java.util.Objects.hash(titulo);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // For simplicity, we'll assign roles based on the username.
+        if ("admin".equalsIgnoreCase(titulo)) {
+            return Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
+        }
+        return Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return null; // Not used
+    }
+
+    @Override
+    public String getUsername() {
+        return titulo;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
