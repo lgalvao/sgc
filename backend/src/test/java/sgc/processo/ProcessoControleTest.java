@@ -55,7 +55,13 @@ public class ProcessoControleTest {
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
         var req = new CriarProcessoReq("Novo Processo", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Novo Processo", SituacaoProcesso.CRIADO, "MAPEAMENTO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .dataCriacao(LocalDateTime.now())
+            .descricao("Novo Processo")
+            .situacao(SituacaoProcesso.CRIADO)
+            .tipo("MAPEAMENTO")
+            .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
@@ -84,7 +90,13 @@ public class ProcessoControleTest {
 
     @Test
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Teste", SituacaoProcesso.CRIADO, "MAPEAMENTO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .dataCriacao(LocalDateTime.now())
+            .descricao("Processo Teste")
+            .situacao(SituacaoProcesso.CRIADO)
+            .tipo("MAPEAMENTO")
+            .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -109,7 +121,13 @@ public class ProcessoControleTest {
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
         var req = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
-        var dto = new ProcessoDto(1L, LocalDateTime.now(), null, null, "Processo Atualizado", SituacaoProcesso.CRIADO, "REVISAO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .dataCriacao(LocalDateTime.now())
+            .descricao("Processo Atualizado")
+            .situacao(SituacaoProcesso.CRIADO)
+            .tipo("REVISAO")
+            .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
@@ -175,7 +193,13 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
-        var dto = new ProcessoDetalheDto(1L, "Processo Detalhado", "MAPEAMENTO", SituacaoProcesso.CRIADO, null, LocalDateTime.now(), null, Collections.emptyList(), Collections.emptyList());
+        var dto = ProcessoDetalheDto.builder()
+            .codigo(1L)
+            .descricao("Processo Detalhado")
+            .tipo("MAPEAMENTO")
+            .situacao(SituacaoProcesso.CRIADO)
+            .dataCriacao(LocalDateTime.now())
+            .build();
 
         when(processoService.obterDetalhes(eq(1L), eq("ADMIN"), isNull())).thenReturn(dto);
 
@@ -205,7 +229,12 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo Iniciado", SituacaoProcesso.EM_ANDAMENTO, "MAPEAMENTO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .descricao("Processo Iniciado")
+            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+            .tipo("MAPEAMENTO")
+            .build();
 
         when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
 
@@ -220,7 +249,12 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo de Revisão Iniciado", SituacaoProcesso.EM_ANDAMENTO, "REVISAO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .descricao("Processo de Revisão Iniciado")
+            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+            .tipo("REVISAO")
+            .build();
 
         when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
 
@@ -245,7 +279,12 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
-        var dto = new ProcessoDto(1L, null, null, null, "Processo Finalizado", SituacaoProcesso.FINALIZADO, "MAPEAMENTO");
+        var dto = ProcessoDto.builder()
+            .codigo(1L)
+            .descricao("Processo Finalizado")
+            .situacao(SituacaoProcesso.FINALIZADO)
+            .tipo("MAPEAMENTO")
+            .build();
 
         when(processoService.finalizar(1L)).thenReturn(dto);
 

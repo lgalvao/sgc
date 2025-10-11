@@ -28,7 +28,7 @@ public class ProcessoControle {
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
         ProcessoDto criado = processoService.criar(requisicao);
-        URI uri = URI.create("/api/processos/%d".formatted(criado.codigo()));
+        URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
     }
 

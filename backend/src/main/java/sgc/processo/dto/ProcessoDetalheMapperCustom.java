@@ -44,8 +44,8 @@ public class ProcessoDetalheMapperCustom {
             for (UnidadeProcesso up : unidadesProcesso) {
                 ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
                 unidades.add(unit);
-                if (unit.sigla() != null) {
-                    unidadesBySigla.put(unit.sigla(), unit);
+                if (unit.getSigla() != null) {
+                    unidadesBySigla.put(unit.getSigla(), unit);
                 }
             }
         }
@@ -57,23 +57,23 @@ public class ProcessoDetalheMapperCustom {
 
                 if (sigla != null && unidadesBySigla.containsKey(sigla)) {
                     // Atualiza a unidade existente com informações do subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDTO unit = unidadesBySigla.get(sigla);
-                    unit = new ProcessoDetalheDto.UnidadeParticipanteDTO(
-                        unit.unidadeCodigo(),
-                        unit.nome(),
-                        unit.sigla(),
-                        unit.unidadeSuperiorCodigo(),
-                        sp.getSituacao(), // Novo valor para situacaoSubprocesso
-                        sp.getDataLimiteEtapa1(), // Novo valor para dataLimite
-                        unit.filhos()
-                    );
-                    unidadesBySigla.put(unit.sigla(), unit); // Atualizar no mapa
+                    ProcessoDetalheDto.UnidadeParticipanteDTO existingUnit = unidadesBySigla.get(sigla);
+                    ProcessoDetalheDto.UnidadeParticipanteDTO updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
+                        .unidadeCodigo(existingUnit.getUnidadeCodigo())
+                        .nome(existingUnit.getNome())
+                        .sigla(existingUnit.getSigla())
+                        .unidadeSuperiorCodigo(existingUnit.getUnidadeSuperiorCodigo())
+                        .situacaoSubprocesso(sp.getSituacao()) // Novo valor
+                        .dataLimite(sp.getDataLimiteEtapa1())   // Novo valor
+                        .filhos(existingUnit.getFilhos())
+                        .build();
+                    unidadesBySigla.put(sigla, updatedUnit); // Atualizar no mapa
                 } else {
                     // Cria uma nova unidade participante baseada no subprocesso
                     ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
-                    unidades.add(unit);
-                    if (unit.sigla() != null) {
-                        unidadesBySigla.put(unit.sigla(), unit);
+                    unidades.add(unit); // Adiciona na lista principal, mas não no mapa para evitar processamento duplo
+                    if (unit.getSigla() != null) {
+                        unidadesBySigla.put(unit.getSigla(), unit);
                     }
                 }
             }
@@ -91,16 +91,16 @@ public class ProcessoDetalheMapperCustom {
             }
         }
 
-        return new ProcessoDetalheDto(
-            dto.codigo(),
-            dto.descricao(),
-            dto.tipo(),
-            dto.situacao(),
-            dto.dataLimite(),
-            dto.dataCriacao(),
-            dto.dataFinalizacao(),
-            unidades, // Lista de unidades atualizada
-            resumoSubprocessos // Lista de subprocessos atualizada
-        );
+        return ProcessoDetalheDto.builder()
+            .codigo(dto.getCodigo())
+            .descricao(dto.getDescricao())
+            .tipo(dto.getTipo())
+            .situacao(dto.getSituacao())
+            .dataLimite(dto.getDataLimite())
+            .dataCriacao(dto.getDataCriacao())
+            .dataFinalizacao(dto.getDataFinalizacao())
+            .unidades(unidades)
+            .resumoSubprocessos(resumoSubprocessos)
+            .build();
     }
 }

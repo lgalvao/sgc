@@ -99,7 +99,7 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
-        when(processoMapper.toDTO(any(Processo.class))).thenReturn(new ProcessoDto(1L, null, null, null, null, SituacaoProcesso.FINALIZADO, null));
+        when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
         processoService.finalizar(1L);
 

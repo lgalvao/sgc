@@ -58,8 +58,17 @@ class ProcessoDetalheMapperCustomTest {
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDate.of(2025, 10, 31));
 
-        var baseDto = new ProcessoDetalheDto(1L, "Processo Teste", "TIPO", SituacaoProcesso.CRIADO, null, null, null, new java.util.ArrayList<>(), new java.util.ArrayList<>());
-        var unidadeDto = new ProcessoDetalheDto.UnidadeParticipanteDTO(10L, "Unidade A", "UNID-A", null, null, null, new java.util.ArrayList<>());
+        var baseDto = ProcessoDetalheDto.builder()
+            .codigo(1L)
+            .descricao("Processo Teste")
+            .tipo("TIPO")
+            .situacao(SituacaoProcesso.CRIADO)
+            .build();
+        var unidadeDto = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
+            .unidadeCodigo(10L)
+            .nome("Unidade A")
+            .sigla("UNID-A")
+            .build();
 
 
         when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
@@ -68,10 +77,10 @@ class ProcessoDetalheMapperCustomTest {
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, List.of(unidadeProcesso), List.of(subprocesso));
 
         assertNotNull(resultDto);
-        assertEquals(1, resultDto.unidades().size());
-        ProcessoDetalheDto.UnidadeParticipanteDTO resultUnidade = resultDto.unidades().getFirst();
-        assertEquals(subprocesso.getSituacao(), resultUnidade.situacaoSubprocesso());
-        assertEquals(subprocesso.getDataLimiteEtapa1(), resultUnidade.dataLimite());
+        assertEquals(1, resultDto.getUnidades().size());
+        ProcessoDetalheDto.UnidadeParticipanteDTO resultUnidade = resultDto.getUnidades().getFirst();
+        assertEquals(subprocesso.getSituacao(), resultUnidade.getSituacaoSubprocesso());
+        assertEquals(subprocesso.getDataLimiteEtapa1(), resultUnidade.getDataLimite());
         verify(processoDetalheMapperInterface, never()).subprocessoToUnidadeParticipanteDTO(any());
     }
 
@@ -87,8 +96,14 @@ class ProcessoDetalheMapperCustomTest {
 
         Subprocesso subprocesso = new Subprocesso(processo, unidadeSub, null, SituacaoSubprocesso.NAO_INICIADO, LocalDate.of(2025, 11, 30));
 
-        var baseDto = new ProcessoDetalheDto(1L, null, null, null, null, null, null, new java.util.ArrayList<>(), new java.util.ArrayList<>());
-        var unidadeDtoSub = new ProcessoDetalheDto.UnidadeParticipanteDTO(20L, "Unidade B", "UNID-B", null, SituacaoSubprocesso.NAO_INICIADO, LocalDate.of(2025, 11, 30), new java.util.ArrayList<>());
+        var baseDto = ProcessoDetalheDto.builder().codigo(1L).build();
+        var unidadeDtoSub = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
+            .unidadeCodigo(20L)
+            .nome("Unidade B")
+            .sigla("UNID-B")
+            .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
+            .dataLimite(LocalDate.of(2025, 11, 30))
+            .build();
 
         when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
         when(processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(subprocesso)).thenReturn(unidadeDtoSub);
@@ -96,8 +111,8 @@ class ProcessoDetalheMapperCustomTest {
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, Collections.emptyList(), List.of(subprocesso));
 
         assertNotNull(resultDto);
-        assertEquals(1, resultDto.unidades().size());
-        assertEquals("UNID-B", resultDto.unidades().getFirst().sigla());
+        assertEquals(1, resultDto.getUnidades().size());
+        assertEquals("UNID-B", resultDto.getUnidades().getFirst().getSigla());
         verify(processoDetalheMapperInterface, times(1)).subprocessoToUnidadeParticipanteDTO(subprocesso);
         verify(processoDetalheMapperInterface, never()).unidadeProcessoToUnidadeParticipanteDTO(any());
     }

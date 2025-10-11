@@ -123,7 +123,15 @@ public class ProcessoServiceIniciarMapeamentoTest {
         when(processoRepo.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
         when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
-            return new ProcessoDto(p.getCodigo(), p.getDataCriacao(), p.getDataFinalizacao(), p.getDataLimite(), p.getDescricao(), p.getSituacao(), p.getTipo().name());
+            return ProcessoDto.builder()
+                .codigo(p.getCodigo())
+                .dataCriacao(p.getDataCriacao())
+                .dataFinalizacao(p.getDataFinalizacao())
+                .dataLimite(p.getDataLimite())
+                .descricao(p.getDescricao())
+                .situacao(p.getSituacao())
+                .tipo(p.getTipo().name())
+                .build();
         });
 
         // Execução
@@ -131,8 +139,8 @@ public class ProcessoServiceIniciarMapeamentoTest {
 
         // Asserções
         assertThat(dto).isNotNull();
-        assertThat(dto.codigo()).isEqualTo(idProcesso);
-        assertThat(dto.situacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+        assertThat(dto.getCodigo()).isEqualTo(idProcesso);
+        assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
         // Verificar saves e publicação de evento
         verify(unidadeProcessoRepo, times(1)).save(any(UnidadeProcesso.class));

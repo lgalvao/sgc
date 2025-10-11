@@ -32,20 +32,27 @@ class ProcessoMapperTest {
         ProcessoDto dto = mapper.toDTO(processo);
 
         // Verify mapping
-        assertEquals(1L, dto.codigo());
-        assertEquals("Test Description", dto.descricao());
-        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.situacao());
-        assertEquals(TipoProcesso.MAPEAMENTO.name(), dto.tipo());
-        assertNotNull(dto.dataCriacao());
-        assertNotNull(dto.dataFinalizacao());
-        assertNotNull(dto.dataLimite());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals("Test Description", dto.getDescricao());
+        assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.getSituacao());
+        assertEquals(TipoProcesso.MAPEAMENTO.name(), dto.getTipo());
+        assertNotNull(dto.getDataCriacao());
+        assertNotNull(dto.getDataFinalizacao());
+        assertNotNull(dto.getDataLimite());
     }
 
     @Test
     void testToEntity() {
         // Create a ProcessoDto
-        ProcessoDto dto = new ProcessoDto(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), 
-                                         LocalDate.now().plusDays(5), "Test Description", SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO.name());
+        ProcessoDto dto = ProcessoDto.builder()
+            .codigo(1L)
+            .dataCriacao(LocalDateTime.now())
+            .dataFinalizacao(LocalDateTime.now().plusDays(1))
+            .dataLimite(LocalDate.now().plusDays(5))
+            .descricao("Test Description")
+            .situacao(SituacaoProcesso.EM_ANDAMENTO)
+            .tipo(TipoProcesso.MAPEAMENTO.name())
+            .build();
 
         // Map to entity
         Processo processo = mapper.toEntity(dto);

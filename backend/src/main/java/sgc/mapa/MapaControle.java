@@ -54,10 +54,10 @@ public class MapaControle {
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
         return repositorioMapa.findById(id)
                 .map(existente -> {
-                    existente.setDataHoraDisponibilizado(mapaDto.dataHoraDisponibilizado());
-                    existente.setObservacoesDisponibilizacao(mapaDto.observacoesDisponibilizacao());
-                    existente.setSugestoesApresentadas(mapaDto.sugestoesApresentadas());
-                    existente.setDataHoraHomologado(mapaDto.dataHoraHomologado());
+                    existente.setDataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado());
+                    existente.setObservacoesDisponibilizacao(mapaDto.getObservacoesDisponibilizacao());
+                    existente.setSugestoesApresentadas(mapaDto.getSugestoesApresentadas());
+                    existente.setDataHoraHomologado(mapaDto.getDataHoraHomologado());
                     var atualizado = repositorioMapa.save(existente);
                     return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
                 })
