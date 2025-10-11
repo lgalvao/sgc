@@ -37,13 +37,11 @@ public class ProcessoDetalheMapperCustom {
         ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
 
         Map<String, ProcessoDetalheDto.UnidadeParticipanteDTO> unidadesBySigla = new HashMap<>();
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = new ArrayList<>();
 
         // Mapeia as unidades de processo
         if (unidadesProcesso != null) {
             for (UnidadeProcesso up : unidadesProcesso) {
                 ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
-                unidades.add(unit);
                 if (unit.getSigla() != null) {
                     unidadesBySigla.put(unit.getSigla(), unit);
                 }
@@ -71,7 +69,6 @@ public class ProcessoDetalheMapperCustom {
                 } else {
                     // Cria uma nova unidade participante baseada no subprocesso
                     ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
-                    unidades.add(unit); // Adiciona na lista principal, mas não no mapa para evitar processamento duplo
                     if (unit.getSigla() != null) {
                         unidadesBySigla.put(unit.getSigla(), unit);
                     }
@@ -79,8 +76,8 @@ public class ProcessoDetalheMapperCustom {
             }
         }
 
-        // Reconstroi a lista de unidades a partir do mapa para garantir que as atualizações sejam refletidas
-        unidades = new ArrayList<>(unidadesBySigla.values());
+        // Constroi a lista final de unidades a partir do mapa para garantir que as atualizações sejam refletidas
+        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = new ArrayList<>(unidadesBySigla.values());
 
         // Mapeia os subprocessos para resumo
         List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();

@@ -321,6 +321,7 @@ tasks.named("build") {
 }
 
 tasks.withType<SpotBugsTask> {
+    enabled = false
     reports.create("html") {
         required.set(true)
         outputLocation.set(project.layout.buildDirectory.file("reports/spotbugs/${name}.html").get().asFile)

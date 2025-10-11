@@ -23,6 +23,14 @@ public class Alerta extends EntidadeBase {
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
 
+    public Processo getProcesso() {
+        return (this.processo == null) ? null : new Processo(this.processo);
+    }
+
+    public void setProcesso(Processo processo) {
+        this.processo = (processo == null) ? null : new Processo(processo);
+    }
+
     @Column(name = "data_hora")
     private LocalDateTime dataHora;
 

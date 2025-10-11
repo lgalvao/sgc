@@ -27,6 +27,22 @@ public class Processo extends EntidadeBase {
         this.dataLimite = dataLimite;
         this.dataCriacao = LocalDateTime.now();
     }
+
+    /**
+     * Construtor de cópia.
+     */
+    public Processo(Processo outro) {
+        super(outro);
+        if (outro == null) {
+            return;
+        }
+        this.descricao = outro.descricao;
+        this.tipo = outro.tipo;
+        this.situacao = outro.situacao;
+        this.dataLimite = outro.dataLimite;
+        this.dataCriacao = outro.dataCriacao;
+        this.dataFinalizacao = outro.dataFinalizacao;
+    }
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 
