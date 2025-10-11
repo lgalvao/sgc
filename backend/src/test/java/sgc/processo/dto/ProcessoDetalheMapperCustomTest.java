@@ -25,11 +25,11 @@ class ProcessoDetalheMapperCustomTest {
     @Mock
     private ProcessoDetalheMapperInterface processoDetalheMapperInterface;
 
-    private ProcessoDetalheMapperCustom customMapper;
+    private ProcessoDetalheMapperCustomizado customMapper;
 
     @BeforeEach
     void setUp() {
-        customMapper = new ProcessoDetalheMapperCustom(processoDetalheMapperInterface);
+        customMapper = new ProcessoDetalheMapperCustomizado(processoDetalheMapperInterface);
     }
 
     @Test

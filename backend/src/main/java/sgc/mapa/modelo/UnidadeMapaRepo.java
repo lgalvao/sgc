@@ -52,4 +52,7 @@ public interface UnidadeMapaRepo extends JpaRepository<UnidadeMapa, Long> {
             ORDER BY um.dataVigencia DESC
             """)
     Optional<UnidadeMapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
+
+    @Query("SELECT um.unidadeCodigo FROM UnidadeMapa um WHERE um.unidadeCodigo IN :codigos AND um.mapaVigenteCodigo IS NOT NULL")
+    List<Long> findCodigosUnidadesComMapaVigente(@Param("codigos") List<Long> codigosUnidades);
 }

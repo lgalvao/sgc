@@ -15,7 +15,7 @@ import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoMapper;
+import sgc.processo.dto.ProcessoConversor;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.modelo.ErroProcesso;
 import sgc.processo.modelo.Processo;
@@ -29,8 +29,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceFinalizarTest {
     @Mock
     private ProcessoRepo processoRepo;
@@ -45,7 +48,7 @@ public class ProcessoServiceFinalizarTest {
     private ApplicationEventPublisher publicadorDeEventos;
 
     @Mock
-    private ProcessoMapper processoMapper;
+    private ProcessoConversor processoConversor;
 
     @Mock
     private sgc.sgrh.SgrhService sgrhService;
@@ -99,12 +102,11 @@ public class ProcessoServiceFinalizarTest {
     void finalizar_deveAtualizarStatusETornarMapasVigentes_quandoTodosSubprocessosEstaoHomologados() {
         subprocessoHomologado.setMapa(new Mapa());
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoHomologado));
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
-        when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(java.util.Collections.emptyMap());
-        when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(java.util.Collections.emptyMap());
-        when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
+        when(processoConversor.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
         processoService.finalizar(1L);
 

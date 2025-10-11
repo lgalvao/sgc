@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ProcessoMapperTest {
-    private final ProcessoMapper mapper = Mappers.getMapper(ProcessoMapper.class);
+    private final ProcessoConversor mapper = Mappers.getMapper(ProcessoConversor.class);
 
     @Test
     void testToDTO() {

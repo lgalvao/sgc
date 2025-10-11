@@ -201,29 +201,29 @@ public class ProcessoControleTest {
             .dataCriacao(LocalDateTime.now())
             .build();
 
-        when(processoService.obterDetalhes(eq(1L), eq("ADMIN"), isNull())).thenReturn(dto);
+        when(processoService.obterDetalhes(eq(1L))).thenReturn(dto);
 
-        mockMvc.perform(get("/api/processos/1/detalhes?perfil=ADMIN"))
+        mockMvc.perform(get("/api/processos/1/detalhes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L))
                 .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
-        verify(processoService).obterDetalhes(eq(1L), eq("ADMIN"), isNull());
+        verify(processoService).obterDetalhes(eq(1L));
     }
 
     @Test
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).obterDetalhes(eq(999L), eq("ADMIN"), isNull());
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).obterDetalhes(eq(999L));
 
-        mockMvc.perform(get("/api/processos/999/detalhes?perfil=ADMIN"))
+        mockMvc.perform(get("/api/processos/999/detalhes"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void obterDetalhes_AcessoNegado_RetornaForbidden() throws Exception {
-        doThrow(new ErroDominioAccessoNegado("Acesso negado")).when(processoService).obterDetalhes(eq(1L), eq("INVALIDO"), isNull());
+        doThrow(new ErroDominioAccessoNegado("Acesso negado")).when(processoService).obterDetalhes(eq(1L));
 
-        mockMvc.perform(get("/api/processos/1/detalhes?perfil=INVALIDO"))
+        mockMvc.perform(get("/api/processos/1/detalhes"))
                 .andExpect(status().isForbidden());
     }
 

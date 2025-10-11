@@ -11,9 +11,9 @@ import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheMapperCustom;
+import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoMapper;
+import sgc.processo.dto.ProcessoConversor;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -42,7 +42,7 @@ public class ProcessoServiceTest {
     private ProcessoRepo processoRepo;
     private UnidadeRepo unidadeRepo;
     private ApplicationEventPublisher publicadorDeEventos;
-    private ProcessoMapper processoMapper;
+    private ProcessoConversor processoConversor;
 
     private ProcessoService processoService;
 
@@ -60,8 +60,8 @@ public class ProcessoServiceTest {
         NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
         NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
-        processoMapper = mock(ProcessoMapper.class);
-        ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
+        processoConversor = mock(ProcessoConversor.class);
+        ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
 
         processoService = new ProcessoService(
                 processoRepo,
@@ -76,8 +76,8 @@ public class ProcessoServiceTest {
                 notificacaoServico,
                 notificacaoTemplateEmailService,
                 sgrhService,
-                processoMapper,
-                processoDetalheMapperCustom
+                processoConversor,
+                processoDetalheMapperCustomizado
         );
     }
 
@@ -103,7 +103,7 @@ public class ProcessoServiceTest {
             return p;
         });
 
-        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+        when(processoConversor.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             return ProcessoDto.builder()
                 .codigo(p.getCodigo())
