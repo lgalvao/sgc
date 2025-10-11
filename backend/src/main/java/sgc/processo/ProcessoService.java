@@ -4,6 +4,8 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.enums.SituacaoProcesso;
@@ -58,8 +60,8 @@ public class ProcessoService {
     private final NotificacaoServico notificacaoServico;
     private final NotificacaoTemplateEmailService notificacaoTemplateEmailService;
     private final SgrhService sgrhService;
-    private final ProcessoMapper processoMapper;
-    private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    private final ProcessoConversor processoConversor;
+    private final ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado;
 
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
@@ -90,7 +92,7 @@ public class ProcessoService {
         publicadorDeEventos.publishEvent(new ProcessoCriadoEvento(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
-        return processoMapper.toDTO(processoSalvo);
+        return processoConversor.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -109,7 +111,7 @@ public class ProcessoService {
         Processo processoAtualizado = processoRepo.save(processo);
         log.info("Processo {} atualizado com sucesso.", id);
 
-        return processoMapper.toDTO(processoAtualizado);
+        return processoConversor.toDTO(processoAtualizado);
     }
 
     @Transactional
@@ -127,38 +129,44 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long id) {
-        return processoRepo.findById(id).map(processoMapper::toDTO);
+        return processoRepo.findById(id).map(processoConversor::toDTO);
     }
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto obterDetalhes(Long idProcesso, String perfilString, Long idUnidadeUsuario) {
-        if (perfilString == null || perfilString.isBlank()) {
-            throw new ErroDominioAccessoNegado("Perfil inválido para acesso aos detalhes do processo.");
-        }
+    public ProcessoDetalheDto obterDetalhes(Long idProcesso) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        // Assumindo que o `Usuario` está no contexto de segurança.
+        // Em um cenário real, o objeto pode ser um UserDetails customizado.
+        // Aqui, vamos buscar o usuário para obter seu perfil e unidade.
+        // Este trecho pode precisar de ajuste dependendo da implementação de UserDetails.
+        UsuarioDto usuarioLogado = sgrhService.buscarUsuarioPorTitulo(username)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário não encontrado: " + username));
 
-        Perfil perfil;
-        try {
-            perfil = Perfil.valueOf(perfilString.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ErroDominioAccessoNegado("Perfil inválido para acesso aos detalhes do processo.");
-        }
+        // Busca o perfil do usuário para obter a unidade. Assume-se que o usuário tem um perfil principal.
+        List<sgc.sgrh.dto.PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        Long idUnidadeUsuario = perfis.stream()
+            .findFirst()
+            .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
+            .orElseThrow(() -> new ErroDominioAccessoNegado("Usuário não possui unidade associada."));
 
         Processo processo = processoRepo.findById(idProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + idProcesso));
 
-        if (perfil == Perfil.GESTOR) {
+        // Lógica de autorização baseada no perfil do usuário autenticado
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"))) {
             boolean unidadeDoUsuarioParticipa = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(idProcesso, idUnidadeUsuario);
             if (!unidadeDoUsuarioParticipa) {
                 throw new ErroDominioAccessoNegado("Acesso negado. Sua unidade não participa deste processo.");
             }
-        } else if (perfil != Perfil.ADMIN) {
+        } else if (authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             throw new ErroDominioAccessoNegado("Acesso negado. Perfil sem permissão para ver detalhes do processo.");
         }
 
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);
 
-        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
+        return processoDetalheMapperCustomizado.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
     }
 
     @Transactional
@@ -194,7 +202,7 @@ public class ProcessoService {
         ));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", id, codigosUnidades.size());
-        return processoMapper.toDTO(processoSalvo);
+        return processoConversor.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -231,7 +239,7 @@ public class ProcessoService {
         ));
 
         log.info("Processo de revisão {} iniciado para {} unidades.", id, codigosUnidades.size());
-        return processoMapper.toDTO(processoSalvo);
+        return processoConversor.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -253,7 +261,7 @@ public class ProcessoService {
         publicadorDeEventos.publishEvent(new ProcessoFinalizadoEvento(this, processo.getCodigo()));
 
         log.info("Processo finalizado com sucesso: código={}", id);
-        return processoMapper.toDTO(processo);
+        return processoConversor.toDTO(processo);
     }
 
     private void validarUnidadesNaoEmProcessosAtivos(List<Long> codigosUnidades) {
@@ -264,20 +272,16 @@ public class ProcessoService {
     }
 
     private void validarUnidadesComMapasVigentes(List<Long> codigosUnidades) {
-        List<UnidadeMapa> unidadesComMapa = unidadeMapaRepo.findByUnidadeCodigoIn(codigosUnidades);
-        List<Long> codigosUnidadesComMapa = unidadesComMapa.stream()
-            .filter(um -> um.getMapaVigenteCodigo() != null)
-            .map(UnidadeMapa::getUnidadeCodigo)
-            .toList();
+        // Busca todos os mapas vigentes para as unidades em uma única consulta.
+        List<Long> unidadesComMapaVigente = unidadeMapaRepo.findCodigosUnidadesComMapaVigente(codigosUnidades);
 
-        if (codigosUnidadesComMapa.size() != codigosUnidades.size()) {
+        if (unidadesComMapaVigente.size() < codigosUnidades.size()) {
             List<Long> unidadesSemMapa = codigosUnidades.stream()
-                .filter(c -> !codigosUnidadesComMapa.contains(c))
+                .filter(c -> !unidadesComMapaVigente.contains(c))
                 .toList();
 
-            List<String> siglasUnidadesSemMapa = unidadeRepo.findAllById(unidadesSemMapa).stream()
-                .map(Unidade::getSigla)
-                .toList();
+            // Busca as siglas das unidades sem mapa em uma única consulta.
+            List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
 
             throw new ErroProcesso(String.format(
                 "As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: %s",
@@ -346,7 +350,12 @@ public class ProcessoService {
 
     private void enviarNotificacoesDeFinalizacao(Processo processo) {
         log.info("Enviando notificações de finalização para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+
+        if (subprocessos.isEmpty()) {
+            log.info("Nenhuma unidade para notificar na finalização do processo {}", processo.getCodigo());
+            return;
+        }
 
         List<Long> codigosUnidades = subprocessos.stream()
             .map(sp -> sp.getUnidade().getCodigo())
@@ -355,6 +364,7 @@ public class ProcessoService {
         Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(codigosUnidades);
         List<String> titulos = responsaveis.values().stream()
             .map(ResponsavelDto::titularTitulo)
+            .distinct()
             .toList();
 
         Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(titulos);
@@ -362,17 +372,17 @@ public class ProcessoService {
         for (Subprocesso subprocesso : subprocessos) {
             try {
                 Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
-                    .orElseThrow(() -> new IllegalStateException("Subprocesso sem unidade."));
+                    .orElseThrow(() -> new IllegalStateException("Subprocesso sem unidade associada."));
 
                 ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
-                    .orElseThrow(() -> new IllegalStateException("Unidade sem responsável."));
+                    .orElseThrow(() -> new IllegalStateException("Não foi possível encontrar o responsável pela unidade " + unidade.getSigla()));
 
                 UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.titularTitulo()))
-                    .orElseThrow(() -> new IllegalStateException("Responsável sem dados de usuário."));
+                    .orElseThrow(() -> new IllegalStateException("Não foi possível encontrar os dados do usuário " + responsavel.titularTitulo()));
 
                 String emailTitular = Optional.ofNullable(titular.email())
                     .filter(e -> !e.isBlank())
-                    .orElseThrow(() -> new IllegalStateException("Usuário titular sem e-mail."));
+                    .orElseThrow(() -> new IllegalStateException("Usuário titular " + titular.nome() + " sem e-mail cadastrado."));
 
                 String mensagem = criarMensagemPersonalizada(unidade.getTipo().name());
                 String html = notificacaoTemplateEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
@@ -382,7 +392,14 @@ public class ProcessoService {
                 log.debug("E-mail de finalização enviado para a unidade {} ({})", unidade.getSigla(), emailTitular);
 
             } catch (Exception ex) {
-                log.error("Falha ao enviar notificação de finalização para subprocesso {}: {}", subprocesso.getCodigo(), ex.getMessage(), ex);
+                log.error(
+                    "Falha ao enviar notificação de finalização para unidade {} (subprocesso {}) no processo {}: {}",
+                    Optional.ofNullable(subprocesso.getUnidade()).map(Unidade::getSigla).orElse("N/A"),
+                    subprocesso.getCodigo(),
+                    processo.getCodigo(),
+                    ex.getMessage(),
+                    ex
+                );
             }
         }
     }

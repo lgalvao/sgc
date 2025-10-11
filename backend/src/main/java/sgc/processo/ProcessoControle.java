@@ -58,11 +58,8 @@ public class ProcessoControle {
      * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
      */
     @GetMapping("/{id}/detalhes")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(
-            @PathVariable Long id,
-            @RequestParam(name = "perfil") String perfil,
-            @RequestParam(name = "unidade", required = false) Long unidade) {
-        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id, perfil, unidade);
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id) {
+        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id);
         return ResponseEntity.ok(detalhes);
     }
 
