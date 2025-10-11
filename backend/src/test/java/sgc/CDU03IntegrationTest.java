@@ -25,7 +25,7 @@ import sgc.processo.enums.TipoProcesso;
 
 import sgc.processo.ProcessoControle; // Importar ProcessoControle
 
-import sgc.comum.erros.GlobalExceptionHandler;
+import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.ProcessoControle;
 import sgc.processo.ProcessoService; // Importar ProcessoService
 
@@ -73,7 +73,7 @@ public class CDU03IntegrationTest {
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService)) // Passar ProcessoService
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new RestExceptionHandler())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .alwaysDo(print())
                 .build();

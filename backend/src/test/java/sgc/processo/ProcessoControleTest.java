@@ -14,7 +14,7 @@ import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.processo.dto.*;
 import sgc.processo.modelo.ErroProcesso;
-import sgc.comum.erros.GlobalExceptionHandler;
+import sgc.comum.erros.RestExceptionHandler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class ProcessoControleTest {
     void setUp() {
         ProcessoControle controle = new ProcessoControle(processoService);
         mockMvc = MockMvcBuilders.standaloneSetup(controle)
-                .setControllerAdvice(new GlobalExceptionHandler()) // Register the global exception handler
+                .setControllerAdvice(new RestExceptionHandler()) // Register the global exception handler
                 .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());

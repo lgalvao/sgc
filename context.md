@@ -1,45 +1,24 @@
-## Context for CDU-08 Integration Test
+## XSS Vulnerability Remediation - Work Summary
 
-This document outlines the progress made and the current state of the integration test for **CDU-08: Manter cadastro de atividades e conhecimentos**.
+**Goal:** Remediate Cross-Site Scripting (XSS) vulnerabilities in the application's controllers, which were identified by a taint analysis tool.
 
-### Goal
+**Initial Plan:**
+1.  Create a new `RestExceptionHandler` to centralize exception handling.
+2.  Fortify the new handler by removing reflected exception messages and adding sanitization using the OWASP Java HTML Sanitizer.
+3.  Refactor the controllers to remove local `try-catch` blocks and delegate exception handling to the new global handler.
+4.  Delete the old, insecure `GlobalExceptionHandler`.
 
-The primary objective was to create a comprehensive integration test suite for the CDU-08 use case, using `CDU07IntegrationTest.java` and `guia-testes-integracao.md` as references.
+**Execution Summary & Current Problems:**
 
-### Work Completed
+My initial attempts to refactor the controllers led to significant compilation failures. It became clear I was working with an outdated version of the code, which caused a cascade of errors. An attempt to `reset_all()` and restart the process was made to get back to a clean state.
 
-1.  **`CDU08IntegrationTest.java` Created:**
-    *   A new integration test class was created at `backend/src/test/java/sgc/CDU08IntegrationTest.java`.
-    *   The test covers the full lifecycle of activities and knowledge, including:
-        *   Creation, editing, and deletion.
-        *   A complex import scenario from another finalized process.
-        *   Validation, security, and edge case scenarios.
+While I successfully created a new `RestExceptionHandler` and added the necessary dependency for the HTML sanitizer, I have been unable to get the project to compile successfully since.
 
-2.  **Application Code Refactoring and Bug Fixes:**
-    *   The process of writing the integration test revealed several issues and missing pieces in the main application code, which have been addressed:
-        *   **`Unidade.java` & `Processo.java`:** Added constructors to simplify test data creation.
-        *   **`AtividadeControle.java`:**
-            *   Implemented logic to cascade deletes of `Conhecimento` entities when an `Atividade` is deleted.
-            *   Added validation to prevent creating activities for a `Subprocesso` that is in a finalized state.
-            *   Added authorization checks.
-        *   **`SubprocessoRepo.java`:** Added the `findByMapaCodigo` method.
-        *   **`SituacaoSubprocesso.java`:** Added an `isFinalizado()` helper method.
+The main blockers are:
+1.  **Persistent Compilation Errors:** The build is consistently failing due to unresolved symbols, primarily `HistoricoAnaliseCadastroDto` and incorrect usage of the old `GlobalExceptionHandler` in test files. My attempts to fix these have been circular and ineffective.
+2.  **Code Instability:** In my attempts to fix the build, I introduced further bugs, such as using incorrect constructors and method names, which the code review correctly identified.
 
-3.  **Documentation Update:**
-    *   The `guia-testes-integracao.md` file was updated with new patterns and best practices discovered while creating the test, such as using `@Nested` classes for better organization.
+**Current State:**
+The codebase is currently in a **non-compilable state**. I have been unable to resolve the dependency and class usage issues that are preventing a successful build. The original goal of fixing the XSS vulnerability has not been achieved because the prerequisite refactoring is incomplete and has destabilized the build.
 
-4.  **Unit Test Fixes (`AtividadeControleTest.java`):**
-    *   The existing unit tests for `AtividadeControle` were broken by the addition of new repository dependencies. These tests have been fixed by providing the necessary mock beans (`@MockBean`).
-
-### Current Status & Remaining Issues
-
-The test suite is nearly complete, but a few stubborn tests are still failing. The debugging process has been complex due to interactions between the Spring test context, security configurations, and transaction management across different test types (`@SpringBootTest` vs. `@WebMvcTest`).
-
-**Remaining Failing Tests in `CDU08IntegrationTest`:**
-
-1.  `naoDevePermitirAcessoUsuarioNaoAutorizado()`: Fails with a 400 or 422 error instead of the expected 403 Forbidden, indicating an issue with how the test security context is interacting with the controller's validation logic.
-2.  `deveImportarAtividadesEConhecimentos()`: Fails with a 500 Internal Server Error, pointing to a problem within the `SubprocessoService.importarAtividades` logic that is not immediately obvious from the test setup.
-3.  `deveEditarConhecimento()`: Fails with a 400 Bad Request, suggesting the payload for the update request is incorrect, but the exact cause is still under investigation.
-4.  `deveAdicionarNovoConhecimento()`: Fails with a `TransientPropertyValueException`, indicating a problem with saving entities that have unsaved dependencies within the test's transaction.
-
-Despite these issues, the created test and the fixes to the main application represent significant progress. The remaining failures likely require a deeper dive into the Spring testing framework's behavior.
+I am pausing my work here as requested. The next step should be to carefully diagnose and fix the compilation errors on a clean branch before re-attempting the controller refactoring.
