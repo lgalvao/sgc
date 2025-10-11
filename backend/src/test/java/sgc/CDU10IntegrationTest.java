@@ -30,7 +30,7 @@ import sgc.atividade.modelo.Atividade;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.subprocesso.modelo.Movimentacao;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgc.notificacao.NotificacaoEmailService;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -72,7 +72,7 @@ class CDU10IntegrationTest {
     @Autowired private MovimentacaoRepo movimentacaoRepo;
     @Autowired private AlertaRepo alertaRepo;
 
-    @MockBean
+    @MockitoBean
     private NotificacaoEmailService notificacaoService;
 
     // Test data
