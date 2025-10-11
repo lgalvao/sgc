@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NotificacaoEmailServiceTest {
+class NotificacaoServicoImplTest {
     @Mock
     private JavaMailSender enviadorDeEmail;
 
@@ -31,15 +31,15 @@ class NotificacaoEmailServiceTest {
     private NotificacaoRepo repositorioNotificacao;
 
     @InjectMocks
-    private NotificacaoEmailService servicoNotificacaoEmail;
+    private NotificacaoServicoImpl notificacaoServico;
 
     private MimeMessage mimeMessageReal;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(servicoNotificacaoEmail, "remetente", "test@sender.com");
-        ReflectionTestUtils.setField(servicoNotificacaoEmail, "nomeRemetente", "Test Sender");
-        ReflectionTestUtils.setField(servicoNotificacaoEmail, "prefixoAssunto", "[SGC]");
+        ReflectionTestUtils.setField(notificacaoServico, "remetente", "test@sender.com");
+        ReflectionTestUtils.setField(notificacaoServico, "nomeRemetente", "Test Sender");
+        ReflectionTestUtils.setField(notificacaoServico, "prefixoAssunto", "[SGC]");
 
         JavaMailSenderImpl senderReal = new JavaMailSenderImpl();
         mimeMessageReal = senderReal.createMimeMessage();
@@ -55,7 +55,7 @@ class NotificacaoEmailServiceTest {
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
-        servicoNotificacaoEmail.enviarEmailHtml(para, assunto, corpoHtml);
+        notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
         ArgumentCaptor<MimeMessage> captorMimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
         verify(enviadorDeEmail).send(captorMimeMessage.capture());
@@ -81,7 +81,7 @@ class NotificacaoEmailServiceTest {
         String assunto = "Test Subject";
         String corpoHtml = "<h1>Test Body</h1>";
 
-        servicoNotificacaoEmail.enviarEmailHtml(para, assunto, corpoHtml);
+        notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
         verify(enviadorDeEmail, never()).createMimeMessage();
         verify(enviadorDeEmail, never()).send(any(MimeMessage.class));

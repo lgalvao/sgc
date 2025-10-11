@@ -31,7 +31,7 @@ import sgc.conhecimento.modelo.Conhecimento;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.subprocesso.modelo.Movimentacao;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,7 +73,7 @@ class CDU10IntegrationTest {
     @Autowired private AlertaRepo alertaRepo;
 
     @MockitoBean
-    private NotificacaoEmailService notificacaoService;
+    private NotificacaoServico notificacaoServico;
 
     // Test data
     private Unidade unidadeChefe;
@@ -144,7 +144,7 @@ class CDU10IntegrationTest {
             String corpoEsperado = "Prezado(a) responsável pela US,\n" +
                                    "A unidade UT concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo Processo de Revisão.\n" +
                                    "A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).";
-            verify(notificacaoService).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
+            verify(notificacaoServico).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
         }
 
         @Test

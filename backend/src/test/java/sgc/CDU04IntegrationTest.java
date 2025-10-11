@@ -22,7 +22,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.comum.enums.SituacaoProcesso;
 import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -99,7 +99,7 @@ class CDU04IntegrationTest {
     private SgrhService sgrhService;
 
     @MockitoBean
-    private NotificacaoEmailService notificacaoEmailService;
+    private NotificacaoServico notificacaoServico;
 
     private Processo processo;
     private Unidade unidadeIntermediaria, unidadeOperacional, unidadeInteroperacional;
@@ -131,7 +131,7 @@ class CDU04IntegrationTest {
                         "12345",
                         "Analista")));
 
-        doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
+        doNothing().when(notificacaoServico).enviarEmailHtml(anyString(), anyString(), anyString());
 
         unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária",
                 "UINT",

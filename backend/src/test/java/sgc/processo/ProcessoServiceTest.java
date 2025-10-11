@@ -14,7 +14,7 @@ import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.ProcessoCriadoEvento;
@@ -80,7 +80,7 @@ public class ProcessoServiceTest {
     private org.springframework.context.ApplicationEventPublisher publicadorDeEventos;
 
     @Mock
-    private NotificacaoEmailService servicoNotificacaoEmail;
+    private NotificacaoServico notificacaoServico;
 
     @Mock
     private NotificacaoTemplateEmailService notificacaoTemplateEmailService;
@@ -108,7 +108,7 @@ public class ProcessoServiceTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                servicoNotificacaoEmail,
+                notificacaoServico,
                 notificacaoTemplateEmailService,
                 sgrhService,
                 processoMapper,
@@ -312,7 +312,7 @@ public class ProcessoServiceTest {
         var exception = assertThrows(ErroDominioAccessoNegado.class,
             () -> processoService.obterDetalhes(1L, "INVALIDO", null));
         
-        assertEquals("Acesso negado. Perfil sem permissão para ver detalhes do processo.", exception.getMessage());
+        assertEquals("Perfil inválido para acesso aos detalhes do processo.", exception.getMessage());
     }
 
     @Test
@@ -553,7 +553,7 @@ public class ProcessoServiceTest {
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
-            when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+            when(unidadeMapaRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(unidadeMapa));
             when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
             when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
             when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -608,14 +608,14 @@ public class ProcessoServiceTest {
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
-            when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.empty());
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
+            when(unidadeMapaRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(Collections.emptyList());
+            when(unidadeRepo.findAllById(List.of(1L))).thenReturn(List.of(unidade));
     
     
             var exception = assertThrows(ErroProcesso.class,
                 () -> processoService.iniciarProcessoRevisao(1L, List.of(1L)));
     
-            assertEquals("A unidade UT não possui mapa vigente e não pode participar de um processo de revisão.", exception.getMessage());
+            assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: UT", exception.getMessage());
         }
     
         @Test
@@ -626,12 +626,12 @@ public class ProcessoServiceTest {
     
             when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
             when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(999L))).thenReturn(Collections.emptyList());
-            // A validação agora verifica a existência da unidade primeiro
-            when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
+            when(unidadeMapaRepo.findByUnidadeCodigoIn(List.of(999L))).thenReturn(Collections.emptyList());
+            when(unidadeRepo.findAllById(List.of(999L))).thenReturn(Collections.emptyList());
     
-            var exception = assertThrows(ErroEntidadeNaoEncontrada.class,
+            var exception = assertThrows(ErroProcesso.class,
                 () -> processoService.iniciarProcessoRevisao(1L, List.of(999L)));
     
-            assertEquals("Unidade com código 999 não foi encontrada ao validar mapas vigentes.", exception.getMessage());
+            assertEquals("As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: ", exception.getMessage());
         }
     }

@@ -112,10 +112,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
         log.error("Erro inesperado na aplicação: {}", ex.getMessage(), ex);
-        String message = String.format(
-            "Ocorreu um erro inesperado (%s). Contate o suporte.",
-            ex.getClass().getSimpleName()
-        );
+        String message = "Ocorreu um erro inesperado. Contate o suporte.";
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message));
     }
 }

@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 @Primary
 @RequiredArgsConstructor
 @Slf4j
-public class NotificacaoEmailService implements NotificacaoService {
+public class NotificacaoServicoImpl implements NotificacaoServico {
     private final JavaMailSender enviadorDeEmail;
     private final NotificacaoRepo repositorioNotificacao;
 

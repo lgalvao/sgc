@@ -15,7 +15,7 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoTemplateEmailService;
 import sgc.processo.dto.*;
 import sgc.processo.enums.TipoProcesso;
@@ -33,11 +33,13 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
+import sgc.comum.enums.Perfil;
 import sgc.unidade.enums.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -53,7 +55,7 @@ public class ProcessoService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ApplicationEventPublisher publicadorDeEventos;
-    private final NotificacaoEmailService servicoNotificacaoEmail;
+    private final NotificacaoServico notificacaoServico;
     private final NotificacaoTemplateEmailService notificacaoTemplateEmailService;
     private final SgrhService sgrhService;
     private final ProcessoMapper processoMapper;
@@ -129,20 +131,27 @@ public class ProcessoService {
     }
 
     @Transactional(readOnly = true)
-    public ProcessoDetalheDto obterDetalhes(Long idProcesso, String perfil, Long idUnidadeUsuario) {
-        if (perfil == null || perfil.isBlank()) {
+    public ProcessoDetalheDto obterDetalhes(Long idProcesso, String perfilString, Long idUnidadeUsuario) {
+        if (perfilString == null || perfilString.isBlank()) {
+            throw new ErroDominioAccessoNegado("Perfil inválido para acesso aos detalhes do processo.");
+        }
+
+        Perfil perfil;
+        try {
+            perfil = Perfil.valueOf(perfilString.toUpperCase());
+        } catch (IllegalArgumentException e) {
             throw new ErroDominioAccessoNegado("Perfil inválido para acesso aos detalhes do processo.");
         }
 
         Processo processo = processoRepo.findById(idProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + idProcesso));
 
-        if ("GESTOR".equalsIgnoreCase(perfil)) {
+        if (perfil == Perfil.GESTOR) {
             boolean unidadeDoUsuarioParticipa = subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(idProcesso, idUnidadeUsuario);
             if (!unidadeDoUsuarioParticipa) {
                 throw new ErroDominioAccessoNegado("Acesso negado. Sua unidade não participa deste processo.");
             }
-        } else if (!"ADMIN".equalsIgnoreCase(perfil)) {
+        } else if (perfil != Perfil.ADMIN) {
             throw new ErroDominioAccessoNegado("Acesso negado. Perfil sem permissão para ver detalhes do processo.");
         }
 
@@ -171,17 +180,7 @@ public class ProcessoService {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
 
-            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
-            unidadeProcessoRepo.save(unidadeProcesso);
-
-            if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
-                Mapa mapa = mapaRepo.save(new Mapa());
-
-                Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
-                Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-
-                movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
-            }
+            criarSubprocessoParaMapeamento(processo, unidade);
         }
 
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -218,16 +217,7 @@ public class ProcessoService {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
 
-            // Para revisão, um novo mapa é criado para a unidade, não copiado.
-            Mapa mapaNovo = mapaRepo.save(new Mapa());
-
-            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
-            unidadeProcessoRepo.save(unidadeProcesso);
-
-            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
-            Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-
-            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
+            criarSubprocessoParaRevisao(processo, unidade);
         }
 
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -251,11 +241,7 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(id)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
 
-        if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
-            throw new IllegalStateException("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
-        }
-
-        validarTodosSubprocessosHomologados(processo);
+        validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);
 
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
@@ -278,18 +264,25 @@ public class ProcessoService {
     }
 
     private void validarUnidadesComMapasVigentes(List<Long> codigosUnidades) {
-        for (Long codigoUnidade : codigosUnidades) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com código " + codigoUnidade + " não foi encontrada ao validar mapas vigentes."));
+        List<UnidadeMapa> unidadesComMapa = unidadeMapaRepo.findByUnidadeCodigoIn(codigosUnidades);
+        List<Long> codigosUnidadesComMapa = unidadesComMapa.stream()
+            .filter(um -> um.getMapaVigenteCodigo() != null)
+            .map(UnidadeMapa::getUnidadeCodigo)
+            .toList();
 
-            boolean hasMapaVigente = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
-                .map(UnidadeMapa::getMapaVigenteCodigo).isPresent();
+        if (codigosUnidadesComMapa.size() != codigosUnidades.size()) {
+            List<Long> unidadesSemMapa = codigosUnidades.stream()
+                .filter(c -> !codigosUnidadesComMapa.contains(c))
+                .toList();
 
-            if (!hasMapaVigente) {
-                throw new ErroProcesso(String.format(
-                    "A unidade %s não possui mapa vigente e não pode participar de um processo de revisão.", unidade.getSigla()
-                ));
-            }
+            List<String> siglasUnidadesSemMapa = unidadeRepo.findAllById(unidadesSemMapa).stream()
+                .map(Unidade::getSigla)
+                .toList();
+
+            throw new ErroProcesso(String.format(
+                "As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: %s",
+                String.join(", ", siglasUnidadesSemMapa)
+            ));
         }
     }
 
@@ -355,15 +348,26 @@ public class ProcessoService {
         log.info("Enviando notificações de finalização para o processo {}", processo.getCodigo());
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processo.getCodigo());
 
+        List<Long> codigosUnidades = subprocessos.stream()
+            .map(sp -> sp.getUnidade().getCodigo())
+            .toList();
+
+        Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(codigosUnidades);
+        List<String> titulos = responsaveis.values().stream()
+            .map(ResponsavelDto::titularTitulo)
+            .toList();
+
+        Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(titulos);
+
         for (Subprocesso subprocesso : subprocessos) {
             try {
                 Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
                     .orElseThrow(() -> new IllegalStateException("Subprocesso sem unidade."));
 
-                ResponsavelDto responsavel = sgrhService.buscarResponsavelUnidade(unidade.getCodigo())
+                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
                     .orElseThrow(() -> new IllegalStateException("Unidade sem responsável."));
 
-                UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavel.titularTitulo())
+                UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.titularTitulo()))
                     .orElseThrow(() -> new IllegalStateException("Responsável sem dados de usuário."));
 
                 String emailTitular = Optional.ofNullable(titular.email())
@@ -374,7 +378,7 @@ public class ProcessoService {
                 String html = notificacaoTemplateEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
                     unidade.getSigla(), processo.getDescricao(), mensagem);
 
-                servicoNotificacaoEmail.enviarEmailHtml(emailTitular, "SGC: Conclusão do Processo " + processo.getDescricao(), html);
+                notificacaoServico.enviarEmailHtml(emailTitular, "SGC: Conclusão do Processo " + processo.getDescricao(), html);
                 log.debug("E-mail de finalização enviado para a unidade {} ({})", unidade.getSigla(), emailTitular);
 
             } catch (Exception ex) {
@@ -390,5 +394,39 @@ public class ProcessoService {
             case "INTEROPERACIONAL" -> "Seu mapa de competências e os mapas das unidades subordinadas estão agora vigentes e podem ser visualizados através do sistema.";
             default -> "O mapa de competências da unidade está agora vigente.";
         };
+    }
+
+    private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {
+        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
+        unidadeProcessoRepo.save(unidadeProcesso);
+
+        if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
+            Mapa mapa = mapaRepo.save(new Mapa());
+
+            Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
+            Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+
+            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
+        }
+    }
+
+    private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
+        // Para revisão, um novo mapa é criado para a unidade, não copiado.
+        Mapa mapaNovo = mapaRepo.save(new Mapa());
+
+        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
+        unidadeProcessoRepo.save(unidadeProcesso);
+
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
+        Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
+
+        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
+    }
+
+    private void validarFinalizacaoProcesso(Processo processo) {
+        if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
+            throw new IllegalStateException("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
+        }
+        validarTodosSubprocessosHomologados(processo);
     }
 }

@@ -17,7 +17,7 @@ import sgc.analise.modelo.AnaliseValidacao;
 import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.notificacao.NotificacaoService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
@@ -51,7 +51,7 @@ public class SubprocessoServiceActionsTest {
     private AnaliseValidacaoRepo analiseValidacaoRepo;
 
     @Mock
-    private NotificacaoService notificacaoService;
+    private NotificacaoServico notificacaoServico;
 
     @Mock
     private AlertaRepo alertaRepo;
@@ -130,7 +130,7 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 
@@ -216,7 +216,7 @@ public class SubprocessoServiceActionsTest {
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
         assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 
@@ -293,7 +293,7 @@ public class SubprocessoServiceActionsTest {
         assertTrue(movCaptor.getValue().getDescricao().contains("Devolução do cadastro de atividades"));
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
         verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 
@@ -321,7 +321,7 @@ public class SubprocessoServiceActionsTest {
         assertEquals("Devolução da validação do mapa de competências para ajustes", movCaptor.getValue().getDescricao());
         assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
 
-        verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
         verify(alertaRepo, times(1)).save(any(Alerta.class));
     }
 }

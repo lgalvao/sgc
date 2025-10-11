@@ -54,6 +54,7 @@ public class Subprocesso extends EntidadeBase {
      * Construtor de conveniência para criar um novo subprocesso no início de um processo.
      */
     public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDate dataLimiteEtapa1) {
+        super();
         this.processo = processo;
         this.unidade = unidade;
         this.mapa = mapa;

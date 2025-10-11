@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
-@Cacheable("sgrh")
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
@@ -185,6 +184,51 @@ public class SgrhService {
                 "João Silva (Titular)",
                 "98765432109",
                 "Maria Santos (Substituto)"));
+    }
+
+    /**
+     * Busca responsáveis (titular e substituto) de uma lista de unidades.
+     *
+     * @param unidadesCodigos Lista de códigos de unidade
+     * @return Mapa de código da unidade para dados do responsável
+     */
+    @Cacheable(value = "sgrh-responsabilidades", key = "'bulk-unidades-' + #unidadesCodigos")
+    public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
+        log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
+        return unidadesCodigos.stream()
+            .collect(Collectors.toMap(
+                codigo -> codigo,
+                codigo -> new ResponsavelDto(
+                    codigo,
+                    "titular" + codigo,
+                    "Titular da Unidade " + codigo,
+                    "substituto" + codigo,
+                    "Substituto da Unidade " + codigo
+                )
+            ));
+    }
+
+    /**
+     * Busca uma lista de usuários por seus títulos (CPFs).
+     *
+     * @param titulos Lista de títulos (CPFs)
+     * @return Mapa de título para dados do usuário
+     */
+    @Cacheable(value = "sgrh-usuarios", key = "'bulk-titulos-' + #titulos")
+    public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
+        log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
+        return titulos.stream()
+            .collect(Collectors.toMap(
+                titulo -> titulo,
+                titulo -> new UsuarioDto(
+                    titulo,
+                    "Usuário Mock " + titulo,
+                    titulo + "@tre-pe.jus.br",
+                    "MAT" + titulo.substring(0, Math.min(6, titulo.length())),
+                    "Analista Judiciário"
+                ),
+                (u1, u2) -> u1 // Em caso de duplicatas
+            ));
     }
 
     /**

@@ -31,7 +31,7 @@ import sgc.conhecimento.modelo.Conhecimento;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.subprocesso.modelo.Movimentacao;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoServico;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
@@ -71,7 +71,7 @@ class CDU09IntegrationTest {
     @Autowired private AlertaRepo alertaRepo;
 
     @MockitoBean
-    private NotificacaoEmailService notificacaoService;
+    private NotificacaoServico notificacaoServico;
 
     // Test data
     private Unidade unidadeChefe;
@@ -138,7 +138,7 @@ class CDU09IntegrationTest {
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             // Assert Notificação
-            verify(notificacaoService).enviarEmail(anyString(), anyString(), anyString());
+            verify(notificacaoServico).enviarEmail(anyString(), anyString(), anyString());
         }
 
         @Test

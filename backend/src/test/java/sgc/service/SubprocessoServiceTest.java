@@ -28,7 +28,7 @@ import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
-import sgc.notificacao.NotificacaoService;
+import sgc.notificacao.NotificacaoServico;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.dto.*;
@@ -76,7 +76,7 @@ public class SubprocessoServiceTest {
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @Mock
-    private NotificacaoService notificacaoService;
+    private NotificacaoServico notificacaoServico;
 
     @Mock
     private AlertaRepo repositorioAlerta;
@@ -234,7 +234,7 @@ public class SubprocessoServiceTest {
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoService).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
+        verify(notificacaoServico).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
         assertEquals("SGC: Cadastro de atividades e conhecimentos da UN submetido para análise", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("foi submetido para análise por essa unidade"));
 
@@ -256,7 +256,7 @@ public class SubprocessoServiceTest {
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoService).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
+        verify(notificacaoServico).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
         assertEquals("SGC: Revisão de cadastro da UN aceita e aguardando homologação", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("foi aceita e está disponível para homologação"));
 
@@ -279,7 +279,7 @@ public class SubprocessoServiceTest {
         ArgumentCaptor<String> siglaCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoService, times(2)).enviarEmail(siglaCaptor.capture(), assuntoCaptor.capture(), corpoCaptor.capture());
+        verify(notificacaoServico, times(2)).enviarEmail(siglaCaptor.capture(), assuntoCaptor.capture(), corpoCaptor.capture());
 
         List<String> siglas = siglaCaptor.getAllValues();
         List<String> assuntos = assuntoCaptor.getAllValues();

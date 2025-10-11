@@ -41,6 +41,7 @@ public class Movimentacao extends EntidadeBase {
      * A data e hora são preenchidas automaticamente.
      */
     public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao) {
+        super();
         this.subprocesso = subprocesso;
         this.unidadeOrigem = unidadeOrigem;
         this.unidadeDestino = unidadeDestino;
