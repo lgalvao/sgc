@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
@@ -31,6 +33,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MapaServiceTest {
     @Mock
     private MapaRepo repositorioMapa;
@@ -77,7 +80,7 @@ class MapaServiceTest {
     @Test
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
         when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
+        when(repositorioSubprocesso.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
         when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
         when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 

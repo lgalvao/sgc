@@ -10,6 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import sgc.comum.modelo.Usuario;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
@@ -50,7 +56,19 @@ public class MapaControleTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(mapaControle).build();
+        Usuario usuario = new Usuario();
+        usuario.setTitulo("test-user");
+
+        HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(mapaControle)
+                .setCustomArgumentResolvers(authenticationPrincipalResolver)
+                .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(auth);
+
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
