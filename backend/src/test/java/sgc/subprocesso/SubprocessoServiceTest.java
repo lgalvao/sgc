@@ -331,9 +331,11 @@ public class SubprocessoServiceTest {
         subprocesso.setMapa(new Mapa());
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
+        when(unidadeRepo.findBySigla(anyString())).thenReturn(Optional.of(new Unidade()));
 
-        subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), usuario.getTitulo());
+        subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), usuario);
 
         verify(repositorioSubprocesso, times(1)).save(subprocesso);
     }
@@ -343,11 +345,12 @@ public class SubprocessoServiceTest {
         Long id = 1L;
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), usuario.getTitulo())
+                () -> subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), usuario)
         );
         assertTrue(exception.getMessage().contains("Subprocesso sem mapa associado"));
     }
@@ -558,6 +561,9 @@ public class SubprocessoServiceTest {
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
+        Unidade sedoc = new Unidade();
+        sedoc.setSigla("SEDOC");
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
 
         SubmeterMapaAjustadoReq request = new SubmeterMapaAjustadoReq("Observações", LocalDate.now().plusDays(1));
 

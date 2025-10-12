@@ -3,6 +3,7 @@ package sgc.subprocesso;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -228,16 +229,18 @@ public class SubprocessoControle {
     
     @PostMapping("/{id}/disponibilizar-mapa")
     @Transactional
-    public SubprocessoDto disponibilizarMapa(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RespostaDto> disponibilizarMapa(
             @PathVariable Long id,
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.disponibilizarMapa(
+        subprocessoService.disponibilizarMapa(
             id,
             request.observacoes(),
             request.dataLimiteEtapa2(),
-            usuario.getTitulo()
+            usuario
         );
+        return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado com sucesso."));
     }
     
     @PostMapping("/{id}/apresentar-sugestoes")

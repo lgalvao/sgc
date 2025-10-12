@@ -48,6 +48,14 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
      * @return O número de competências associadas.
      */
     long countByAtividadeCodigo(Long atividadeCodigo);
+
+    /**
+     * Conta o número de atividades associadas a uma competência.
+     *
+     * @param competenciaCodigo O código da competência.
+     * @return O número de atividades associadas.
+     */
+    long countByCompetenciaCodigo(Long competenciaCodigo);
     
     /**
      * Remove todos os vínculos de uma competência.

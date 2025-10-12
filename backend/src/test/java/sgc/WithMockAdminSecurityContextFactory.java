@@ -1,30 +1,27 @@
 package sgc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import sgc.comum.modelo.Usuario;
-import sgc.comum.modelo.UsuarioRepo;
+
+import java.util.Collections;
 
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
-
     @Override
-    public SecurityContext createSecurityContext(WithMockAdmin annotation) {
+    public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Usuario usuario = usuarioRepo.findByTitulo(annotation.value())
-            .orElseGet(() -> {
-                Usuario newUser = new Usuario();
-                newUser.setTitulo(annotation.value());
-                return usuarioRepo.save(newUser);
-            });
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-        context.setAuthentication(token);
+        Usuario principal = new Usuario();
+        principal.setTitulo("admin");
+        principal.setNome("Admin User");
+
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+        context.setAuthentication(auth);
         return context;
     }
 }

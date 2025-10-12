@@ -39,6 +39,7 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,6 +87,9 @@ public class SubprocessoServiceTest {
 
     @Mock
     private AlertaRepo repositorioAlerta;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @Mock
     private AtividadeMapper atividadeMapper;
@@ -287,10 +291,18 @@ public class SubprocessoServiceTest {
         setupBasico();
         LocalDate dataLimite = LocalDate.of(2025, 10, 31);
         String dataLimiteFormatada = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        when(subprocessoMock.getMapa()).thenReturn(mock(Mapa.class));
+        Mapa mapa = mock(Mapa.class);
+        when(subprocessoMock.getMapa()).thenReturn(mapa);
         when(subprocessoMock.getDataLimiteEtapa2()).thenReturn(dataLimite);
+        when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
 
-        subprocessoService.disponibilizarMapa(1L, "obs", dataLimite, "user");
+        Unidade sedoc = mock(Unidade.class);
+        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+
+        when(competenciaRepo.findByMapaCodigo(any())).thenReturn(new ArrayList<>());
+        when(atividadeRepo.findByMapaCodigo(any())).thenReturn(new ArrayList<>());
+
+        subprocessoService.disponibilizarMapa(1L, "obs", dataLimite, this.usuario);
 
         ArgumentCaptor<String> siglaCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
@@ -303,19 +315,18 @@ public class SubprocessoServiceTest {
 
         // Email 1 (para a própria unidade)
         assertEquals("UN", siglas.getFirst());
-        assertEquals("SGC: Mapa de Competências da sua unidade disponibilizado para validação", assuntos.getFirst());
-        assertTrue(corpos.getFirst().contains("O mapa de competências da sua unidade (UN) foi disponibilizado para validação"));
+        assertTrue(assuntos.getFirst().contains("Mapa de Competências da unidade UN disponibilizado para validação"));
+        assertTrue(corpos.getFirst().contains("O mapa de competências da sua unidade, referente ao processo 'Processo de Teste', foi disponibilizado para validação."));
         assertTrue(corpos.getFirst().contains(dataLimiteFormatada));
 
         // Email 2 (para a unidade superior)
         assertEquals(SUP, siglas.get(1));
-        assertEquals("SGC: Mapa de Competências da unidade UN disponibilizado para validação", assuntos.get(1));
-        assertTrue(corpos.get(1).contains("O mapa de competências da unidade UN foi disponibilizado para validação"));
-        assertTrue(corpos.get(1).contains("Acompanhe o processo no sistema."));
+        assertTrue(assuntos.get(1).contains("Mapa de Competências da unidade UN disponibilizado para validação"));
+        assertTrue(corpos.get(1).contains("O mapa de competências da unidade UN, referente ao processo 'Processo de Teste', foi disponibilizado para validação."));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta).save(alertaCaptor.capture());
-        assertEquals("Seu mapa de competências está disponível para validação (Processo: Processo de Teste)", alertaCaptor.getValue().getDescricao());
+        assertEquals("Mapa de competências da unidade UN disponibilizado para análise", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeMock, alertaCaptor.getValue().getUnidadeDestino());
     }
 
