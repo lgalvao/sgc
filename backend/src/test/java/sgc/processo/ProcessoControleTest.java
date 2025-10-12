@@ -206,7 +206,7 @@ public class ProcessoControleTest {
         var dto = ProcessoDetalheDto.builder()
             .codigo(1L)
             .descricao("Processo Detalhado")
-            .tipo("MAPEAMENTO")
+            .tipo(MAPEAMENTO)
             .situacao(SituacaoProcesso.CRIADO)
             .dataCriacao(LocalDateTime.now())
             .build();
@@ -215,7 +215,7 @@ public class ProcessoControleTest {
 
         mockMvc.perform(get("/api/processos/1/detalhes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L))
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
                 .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
 
         verify(processoService).obterDetalhes(eq(1L));
@@ -243,7 +243,7 @@ public class ProcessoControleTest {
             .codigo(1L)
             .descricao("Processo Iniciado")
             .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo("MAPEAMENTO")
+            .tipo(MAPEAMENTO)
             .build();
 
         when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
@@ -252,7 +252,7 @@ public class ProcessoControleTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L));
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
 
         verify(processoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
     }
@@ -293,14 +293,14 @@ public class ProcessoControleTest {
             .codigo(1L)
             .descricao("Processo Finalizado")
             .situacao(SituacaoProcesso.FINALIZADO)
-            .tipo("MAPEAMENTO")
+            .tipo(MAPEAMENTO)
             .build();
 
         when(processoService.finalizar(1L)).thenReturn(dto);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L));
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
 
         verify(processoService).finalizar(1L);
     }

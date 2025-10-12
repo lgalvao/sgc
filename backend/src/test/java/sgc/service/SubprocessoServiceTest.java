@@ -97,6 +97,7 @@ public class SubprocessoServiceTest {
     @InjectMocks
     private SubprocessoService subprocessoService;
 
+    private static final String SUP = "SUP";
     private Unidade unidadeMock;
     private Unidade unidadeSuperiorMock;
     private Subprocesso subprocessoMock;
@@ -107,7 +108,7 @@ public class SubprocessoServiceTest {
         when(processoMock.getDescricao()).thenReturn("Processo de Teste");
 
         unidadeSuperiorMock = mock(Unidade.class);
-        when(unidadeSuperiorMock.getSigla()).thenReturn("SUP");
+        when(unidadeSuperiorMock.getSigla()).thenReturn(SUP);
 
         unidadeMock = mock(Unidade.class);
         when(unidadeMock.getCodigo()).thenReturn(10L);
@@ -236,7 +237,7 @@ public class SubprocessoServiceTest {
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoServico).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
+        verify(notificacaoServico).enviarEmail(eq(SUP), assuntoCaptor.capture(), corpoCaptor.capture());
         assertEquals("SGC: Cadastro de atividades e conhecimentos da UN submetido para análise", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("foi submetido para análise por essa unidade"));
 
@@ -258,7 +259,7 @@ public class SubprocessoServiceTest {
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoServico).enviarEmail(eq("SUP"), assuntoCaptor.capture(), corpoCaptor.capture());
+        verify(notificacaoServico).enviarEmail(eq(SUP), assuntoCaptor.capture(), corpoCaptor.capture());
         assertEquals("SGC: Revisão de cadastro da UN aceita e aguardando homologação", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("foi aceita e está disponível para homologação"));
 
@@ -294,7 +295,7 @@ public class SubprocessoServiceTest {
         assertTrue(corpos.getFirst().contains(dataLimiteFormatada));
 
         // Email 2 (para a unidade superior)
-        assertEquals("SUP", siglas.get(1));
+        assertEquals(SUP, siglas.get(1));
         assertEquals("SGC: Mapa de Competências da unidade UN disponibilizado para validação", assuntos.get(1));
         assertTrue(corpos.get(1).contains("O mapa de competências da unidade UN foi disponibilizado para validação"));
         assertTrue(corpos.get(1).contains("Acompanhe o processo no sistema."));
