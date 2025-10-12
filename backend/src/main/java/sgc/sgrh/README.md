@@ -1,57 +1,35 @@
-# Integração com SGRH (Sistema de Gestão de RH)
+# Módulo de Integração com SGRH
 
 ## Visão Geral
-
-Este pacote implementa a integração do SGC com o SGRH (Sistema de Gestão de RH) para consultar:
+Este pacote implementa a camada de integração do SGC com o SGRH (Sistema de Gestão de RH) para consultar dados essenciais, como:
 - Dados dos servidores (usuários)
-- Estrutura organizacional (unidades)
-- Responsabilidades (titulares e substitutos)
-- Perfis por unidade
+- Estrutura organizacional (unidades e sua hierarquia)
+- Responsabilidades (titulares e substitutos de unidades)
+- Perfis de acesso por unidade
 
 ## Status da Implementação
+✅ **Estrutura Completa Criada**: A arquitetura está pronta, incluindo entidades, repositórios, DTOs, serviço com cache e configuração para um datasource separado.
 
-✅ **Estrutura Completa Criada**
-- Entidades JPA para views Oracle
-- Repositories read-only
-- DTOs para transferência de dados
-- Service com interface e implementação
-- Configuração de datasource separado
-- Cache configurado
-
-⚠️ **Dados MOCK Ativos**
-- Todos os Metodos do `SgrhService` retornam dados MOCK
-- A estrutura está pronta para conectar ao Oracle
-- Marcadores `// TODO: Conectar ao banco SGRH real` indicam onde substituir
+⚠️ **Dados MOCK Ativos**: Atualmente, todos os métodos do `SgrhService` retornam dados **simulados (mock)**. A estrutura está pronta para ser conectada ao banco de dados Oracle real. Marcadores `// TODO:` no código indicam onde a lógica de acesso ao banco de dados deve ser implementada.
 
 ## Estrutura de Pacotes
-
 ```
 sgc/sgrh/
-├── entity/              # Entidades JPA (views Oracle)
+├── modelo/              # Entidades JPA (mapeando views Oracle) e Repositories
 │   ├── VwUsuario.java
+│   ├── VwUsuarioRepo.java
 │   ├── VwUnidade.java
-│   ├── VwResponsabilidade.java
-│   └── VwUsuarioPerfilUnidade.java
-├── repository/          # Repositories read-only
-│   ├── VwUsuarioRepository.java
-│   ├── VwUnidadeRepository.java
-│   ├── VwResponsabilidadeRepository.java
-│   └── VwUsuarioPerfilUnidadeRepository.java
-├── dto/                 # DTOs de transferência
+│   ├── VwUnidadeRepo.java
+│   └── ...
+├── dto/                 # DTOs para transferência de dados
 │   ├── UsuarioDto.java
 │   ├── UnidadeDto.java
-│   ├── ResponsavelDto.java
-│   └── PerfilDto.java
-└── service/            # Serviços de negócio
-    └── SgrhService.java
+│   └── ...
+└── SgrhService.java     # Serviço que abstrai o acesso aos dados (atualmente com MOCK)
 ```
 
 ## Configuração
-
-### 1. Variáveis de Ambiente
-
-Configure no `application.yml` ou via variáveis de ambiente:
-
+Para conectar ao banco de dados real, configure as seguintes variáveis no `application.yml` ou como variáveis de ambiente:
 ```yaml
 spring:
   sgrh:
@@ -61,202 +39,83 @@ spring:
       password: ${SGRH_DB_PASSWORD:}
 ```
 
-## Uso
-
-### Injetar o Service
-
+## Como Usar
+Injete o `SgrhService` em qualquer outro serviço que precise de dados de RH. O cache (`@Cacheable`) já está configurado para otimizar consultas repetidas.
 ```java
 @Service
 @RequiredArgsConstructor
-public class MinhaClasse {
+public class MeuServico {
     private final SgrhService sgrhService;
     
-    public void meuMetodo() {
-        // Buscar usuário
-        Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo("12345678901");
+    public void executarAcao(String tituloUsuario, Long idUnidade) {
+        // Buscar usuário por título
+        Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo(tituloUsuario);
         
-        // Buscar perfis
-        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario("12345678901");
+        // Buscar responsável da unidade
+        Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(idUnidade);
         
-        // Buscar unidades
-        List<UnidadeDto> unidades = sgrhService.buscarUnidadesAtivas();
-        
-        // Árvore hierárquica
-        List<UnidadeDto> arvore = sgrhService.construirArvoreHierarquica();
-    }
-}
-```
-
-### Metodos Disponíveis
-
-#### Usuários
-- `buscarUsuarioPorTitulo(String titulo)` - Busca por CPF
-- `buscarUsuarioPorEmail(String email)` - Busca por email
-- `buscarUsuariosAtivos()` - Lista todos ativos
-
-#### Unidades
-- `buscarUnidadePorCodigo(Long codigo)` - Busca por código
-- `buscarUnidadesAtivas()` - Lista todas ativas
-- `buscarSubunidades(Long codigoPai)` - Lista filhos de uma unidade
-- `construirArvoreHierarquica()` - Monta árvore completa
-
-#### Responsabilidades
-- `buscarResponsavelUnidade(Long unidadeCodigo)` - Busca titular/substituto
-- `buscarUnidadesOndeEhResponsavel(String titulo)` - Lista unidades do servidor
-
-#### Perfis
-- `buscarPerfisUsuario(String titulo)` - Lista perfis com unidades
-- `usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo)` - Verifica perfil
-- `buscarUnidadesPorPerfil(String titulo, String perfil)` - Lista unidades por perfil
-
-## Integração com AuthService
-
-O `AuthService` já foi atualizado para usar o `SgrhService`:
-
-```java
-@Service
-@RequiredArgsConstructor
-public class AuthService {
-    private final SgrhService sgrhService;
-    
-    private List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        // Busca perfis via SGRH
-        List<sgc.sgrh.dto.PerfilDto> perfisSgrh = sgrhService.buscarPerfisUsuario(titulo);
-        // Converte para DTO do seguranca...
+        // Construir a árvore hierárquica de unidades
+        List<UnidadeDto> arvoreUnidades = sgrhService.construirArvoreHierarquica();
     }
 }
 ```
 
 ## Migração de MOCK para Real
+1.  **Configurar Conexão Oracle**: Forneça as credenciais do banco de dados SGRH (URL, usuário, senha).
+2.  **Verificar Views no Oracle**: Confirme que as views mapeadas pelas entidades no pacote `modelo` existem no schema do SGRH (ex: `SGRH.VW_USUARIO`).
+3.  **Implementar Métodos no Serviço**: No `SgrhService.java`, substitua a lógica de mock pela chamada ao respectivo repositório.
 
-### Passo 1: Configurar Conexão Oracle
-
-```properties
-SGRH_DB_URL=jdbc:oracle:thin:@//servidor-oracle:1521/SGRH
-SGRH_DB_USERNAME=usuario_leitura
-SGRH_DB_PASSWORD=senha_segura
-```
-
-### Passo 2: Verificar Views no Oracle
-
-Confirme que as views existem:
-- `SGRH.VW_USUARIO`
-- `SGRH.VW_UNIDADE`
-- `SGRH.VW_RESPONSABILIDADE`
-- `SGRH.VW_USUARIO_PERFIL_UNIDADE`
-
-### Passo 3: Descomentar Código Real
-
-No `SgrhService.java`, substitua cada Metodo MOCK:
-
-**ANTES (MOCK):**
+**Exemplo de substituição:**
 ```java
+// ANTES (MOCK):
 public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-    // TODO: Conectar ao banco SGRH real
     log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
-    return Optional.of(new UsuarioDto(...)); // dados fake
+    return Optional.of(new UsuarioDto(...)); // Dados simulados
 }
-```
 
-**DEPOIS (REAL):**
-```java
+// DEPOIS (REAL):
 public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
     log.debug("Buscando usuário por título no SGRH: {}", titulo);
-    return usuarioRepository.findByTitulo(titulo)
-        .map(u -> new UsuarioDto(
-            u.getTitulo(),
-            u.getNome(),
-            u.getEmail(),
-            u.getMatricula(),
-            u.getCargo()
-        ));
+    return vwUsuarioRepo.findById(titulo) // Supondo que VwUsuarioRepo se chame vwUsuarioRepo
+        .map(vwUsuario -> new UsuarioDto(...)); // Mapeamento da entidade para DTO
 }
 ```
-
-### Passo 4: Testar Conexão
-
-```java
-@SpringBootTest
-class SgrhServiceIntegrationTest {
-    
-    @Autowired
-    private SgrhService sgrhService;
-    
-    @Test
-    void testBuscarUsuario() {
-        Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo("12345678901");
-        assertThat(usuario).isPresent();
-    }
-}
-```
-
-## Troubleshooting
-
-### Erro de Conexão Oracle
-
-```
-Caused by: java.sql.SQLException: Listener refused the connection
-```
-
-**Solução**: Verificar URL, porta e SID/Service Name do Oracle.
-
-### Erro de Permissão
-
-```
-ORA-00942: table or view does not exist
-```
-
-**Solução**: Garantir que o usuário tem `SELECT` nas views do schema SGRH.
-
-### Cache não Funciona
-
-**Solução**: Verificar se `@EnableCaching` está ativo na configuração principal.
-
-### Performance Lenta
-
-**Solução**: 
-- Aumentar pool de conexões no `application.yml`
-- Ajustar tempos de cache
-- Criar índices nas views Oracle
-
-## Logs
-
-Para debug, habilite logs do SGRH:
-
-```yaml
-logging:
-  level:
-    sgc.sgrh: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-```
+4.  **Testar Conexão**: Crie testes de integração (`@SpringBootTest`) para validar a conexão e o retorno de dados do banco real.
 
 ## Segurança
+⚠️ **IMPORTANTE**: A integração com o SGRH deve ser **somente leitura (read-only)**.
+- O usuário do banco de dados deve ter apenas permissão de `SELECT`.
+- As transações no `SgrhService` devem ser marcadas como `readOnly = true`.
+- Nunca permita operações de `INSERT`, `UPDATE` ou `DELETE` através deste pacote.
 
-⚠️ **IMPORTANTE**:
-- Datasource SGRH é **READ-ONLY**
-- Pool de conexões limitado a 5
-- Timeout de 30 segundos
-- Todas transações são read-only
-- NUNCA permitir INSERT/UPDATE/DELETE
+## Diagrama de Integração
+```mermaid
+graph LR
+    subgraph "Aplicação SGC"
+        A(Outros Serviços)
+    end
 
-## Próximos Passos
+    subgraph "Módulo SGRH (Facade)"
+        B(SgrhService)
+        C{Cache}
+        D(DataSource SGRH)
+    end
 
-1. ✅ Estrutura criada
-2. ⏳ Conectar ao Oracle SGRH real
-3. ⏳ Remover dados MOCK
-4. ⏳ Adicionar testes de integração
-5. ⏳ Monitorar performance
-6. ⏳ Documentar mapeamento de campos das views
+    subgraph "Fonte de Dados Externa"
+        E(Banco de Dados Oracle)
+        F(Dados Mock)
+    end
 
-## Contatos
+    A -- Consulta --> B
+    B -- Acessa/Popula --> C
+    B -- Usa --> D
+    D -- Conecta a --> E
 
-Para dúvidas sobre as views Oracle do SGRH, contatar:
-- Equipe de RH
-- DBA responsável pelo Oracle
+    B -- Atualmente usa --> F
+
+    style F fill:#ffe6e6,stroke:#c33
+    style E fill:#d4edda,stroke:#155724
+```
 
 ---
-
-**Data de Criação**: 2025-01-06  
-**Última Atualização**: 2025-01-06  
-**Status**: ✅ Estrutura Completa | ⚠️ Usando MOCK
+**Status Atual**: ✅ Estrutura Completa | ⚠️ Usando MOCK
