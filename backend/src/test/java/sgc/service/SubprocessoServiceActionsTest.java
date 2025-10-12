@@ -1,328 +1,262 @@
 package sgc.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.SgcTest;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
-import sgc.analise.modelo.AnaliseValidacao;
-import sgc.analise.modelo.AnaliseValidacaoRepo;
 import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.processo.enums.TipoProcesso;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.modelo.Usuario;
+import sgc.mapa.ImpactoMapaService;
+import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.modelo.Mapa;
 import sgc.notificacao.NotificacaoServico;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
-import sgc.subprocesso.dto.SubprocessoMapper;
 import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
-import sgc.analise.enums.TipoAcaoAnalise;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
+@SgcTest
+@DisplayName("Testes de Ações do SubprocessoService")
 public class SubprocessoServiceActionsTest {
-    private static final String OBSERVACOES = "Observações";
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
 
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
+    private static final String OBSERVACOES = "Observações de teste";
 
-    @Mock
-    private AnaliseCadastroRepo analiseCadastroRepo;
-
-    @Mock
-    private AnaliseValidacaoRepo analiseValidacaoRepo;
-
-    @Mock
-    private NotificacaoServico notificacaoServico;
-
-    @Mock
-    private AlertaRepo alertaRepo;
-
-    @Mock
-    private SubprocessoMapper subprocessoMapper;
-
-    @Mock
-    private sgc.unidade.modelo.UnidadeRepo unidadeRepo;
-
-    @InjectMocks
+    @Autowired
     private SubprocessoService subprocessoService;
 
-    private Subprocesso subprocesso;
-    private Unidade unidadeSubordinada;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private AnaliseCadastroRepo analiseCadastroRepo;
+
+    @Autowired
+    private AlertaRepo alertaRepo;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @MockitoBean
+    private NotificacaoServico notificacaoServico;
+
+    @MockitoBean
+    private ApplicationEventPublisher eventPublisher;
+
+    @MockitoBean
+    private ImpactoMapaService impactoMapaService;
+
+    private Unidade unidade;
     private Unidade unidadeSuperior;
-    private static final String usuarioTitulo = "USUARIO_TESTE";
+    private Usuario chefe;
+    private Usuario usuario;
 
     @BeforeEach
     void setUp() {
-        unidadeSubordinada = new Unidade();
-        unidadeSubordinada.setCodigo(10L);
-        unidadeSubordinada.setSigla("UNID_SUB");
-        unidadeSubordinada.setNome("Unidade Subordinada");
+        unidadeSuperior = new Unidade("Unidade Superior", "US");
+        unidadeRepo.save(unidadeSuperior);
 
-        unidadeSuperior = new Unidade();
-        unidadeSuperior.setCodigo(20L);
-        unidadeSuperior.setSigla("UNID_SUP");
-        unidadeSuperior.setNome("Unidade Superior");
-        unidadeSubordinada.setUnidadeSuperior(unidadeSuperior);
+        unidade = new Unidade("Unidade Teste", "UT");
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidadeRepo.save(unidade);
 
-        subprocesso = new Subprocesso();
-        subprocesso.setCodigo(1L);
-        subprocesso.setUnidade(unidadeSubordinada);
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        subprocesso.setProcesso(new Processo());
-        subprocesso.getProcesso().setDescricao("Processo Teste");
+        chefe = new Usuario();
+        chefe.setTitulo("chefe_ut");
+        unidade.setTitular(chefe);
+        unidadeRepo.save(unidade);
 
-        when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenAnswer(inv -> {
-            Subprocesso sp = inv.getArgument(0);
-            return new SubprocessoDto(
-                sp.getCodigo(),
-                sp.getProcesso() != null ? sp.getProcesso().getCodigo() : null,
-                sp.getUnidade() != null ? sp.getUnidade().getCodigo() : null,
-                sp.getMapa() != null ? sp.getMapa().getCodigo() : null,
-                sp.getDataLimiteEtapa1(),
-                sp.getDataFimEtapa1(),
-                sp.getDataLimiteEtapa2(),
-                sp.getDataFimEtapa2(),
-                sp.getSituacao()
-            );
-        });
+        usuario = new Usuario();
+        usuario.setTitulo(chefe.getTitulo());
+        usuario.setUnidade(unidade);
     }
 
-    @Test
-    void aceitarCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        SubprocessoDto result = subprocessoService.aceitarCadastro(1L, OBSERVACOES, usuarioTitulo);
-
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, result.getSituacao());
-
-        ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
-        verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        assertEquals(TipoAcaoAnalise.ACEITE, analiseCaptor.getValue().getAcao());
-        assertEquals(OBSERVACOES, analiseCaptor.getValue().getObservacoes());
-        assertEquals(usuarioTitulo, analiseCaptor.getValue().getAnalistaUsuarioTitulo());
-
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertEquals("Cadastro de atividades e conhecimentos aceito", movCaptor.getValue().getDescricao());
-        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
-
-        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
-        verify(alertaRepo, times(1)).save(any(Alerta.class));
+    private Processo criarProcesso(TipoProcesso tipo) {
+        Processo processo = new Processo();
+        processo.setTipo(tipo);
+        processo.setDescricao("Processo de Teste");
+        entityManager.persist(processo);
+        return processo;
     }
 
-    @Test
-    void aceitarCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.aceitarCadastro(1L, OBSERVACOES, usuarioTitulo));
+    private Subprocesso criarSubprocesso(Processo processo, SituacaoSubprocesso situacao) {
+        Mapa mapa = new Mapa();
+        entityManager.persist(mapa);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(situacao);
+        subprocesso.setMapa(mapa);
+        subprocessoRepo.save(subprocesso);
+        return subprocesso;
     }
 
-    @Test
-    void aceitarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarCadastro(1L, OBSERVACOES, usuarioTitulo));
+    @Nested
+    @DisplayName("Testes para aceitarCadastro")
+    class AceitarCadastroTest {
+        @Test
+        @Transactional
+        void deveAceitarCadastroComSucesso() {
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+
+            SubprocessoDto result = subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
+
+            assertNotNull(result);
+            Optional<AnaliseCadastro> analise = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            assertTrue(analise.isPresent());
+            assertEquals(OBSERVACOES, analise.get().getObservacoes());
+
+            List<Movimentacao> movimentacoes = entityManager.createQuery("SELECT m FROM Movimentacao m WHERE m.subprocesso.codigo = :spId", Movimentacao.class)
+                .setParameter("spId", subprocesso.getCodigo())
+                .getResultList();
+            assertEquals(1, movimentacoes.size());
+            assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.get(0).getDescricao());
+
+            List<Alerta> alertas = alertaRepo.findAll();
+            assertEquals(1, alertas.size());
+            assertTrue(alertas.get(0).getDescricao().contains("submetido para análise"));
+
+            verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        }
     }
 
-    @Test
-    void aceitarCadastro_deveLancarExcecao_quandoUnidadeSuperiorNaoEncontrada() {
-        unidadeSubordinada.setUnidadeSuperior(null);
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarCadastro(1L, OBSERVACOES, usuarioTitulo));
+    @Nested
+    @DisplayName("Testes para homologarCadastro")
+    class HomologarCadastroTest {
+        @Test
+        @Transactional
+        void deveHomologarCadastroComSucesso() {
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+
+            Unidade sedoc = new Unidade("SEDOC", "SEDOC");
+            unidadeRepo.save(sedoc);
+
+            SubprocessoDto result = subprocessoService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
+
+            assertNotNull(result);
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
+        }
     }
 
-    @Test
-    void homologarCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
+    @Nested
+    @DisplayName("Testes para aceitarRevisaoCadastro")
+    class AceitarRevisaoCadastroTest {
+        @Test
+        @Transactional
+        void deveAceitarRevisaoComSucesso() {
+            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        SubprocessoDto result = subprocessoService.homologarCadastro(1L, OBSERVACOES, usuarioTitulo);
+            SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, result.getSituacao());
+            assertNotNull(result);
+            Optional<AnaliseCadastro> analise = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            assertTrue(analise.isPresent());
+            assertEquals(OBSERVACOES, analise.get().getObservacoes());
 
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertEquals("Cadastro de atividades e conhecimentos homologado", movCaptor.getValue().getDescricao());
-        assertEquals(sedoc, movCaptor.getValue().getUnidadeOrigem());
-        assertEquals(sedoc, movCaptor.getValue().getUnidadeDestino());
+            List<Movimentacao> movimentacoes = entityManager.createQuery("SELECT m FROM Movimentacao m WHERE m.subprocesso.codigo = :spId", Movimentacao.class)
+                .setParameter("spId", subprocesso.getCodigo())
+                .getResultList();
+            assertEquals(1, movimentacoes.size());
+            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.get(0).getDescricao());
 
-        verify(subprocessoRepo, times(1)).save(subprocesso);
+            verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+        }
+
+        @Test
+        void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
+        }
+
+        @Test
+        @Transactional
+        void deveLancarExcecaoSeSituacaoIncorreta() {
+            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(1L, OBSERVACOES, usuario));
+        }
     }
 
-    @Test
-    void homologarCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.homologarCadastro(1L, OBSERVACOES, usuarioTitulo));
+    @Nested
+    @DisplayName("Testes para homologarRevisaoCadastro")
+    class HomologarRevisaoCadastroTest {
+        @Test
+        @Transactional
+        void deveHomologarRevisaoComSucessoSemImpactos() {
+            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class)))
+                .thenReturn(new ImpactoMapaDto(false, 0,0,0, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+
+
+            SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
+
+            assertNotNull(result);
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            assertEquals(SituacaoSubprocesso.MAPA_HOMOLOGADO, spAtualizado.getSituacao());
+        }
+
+        @Test
+        void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
+        }
+
+        @Test
+        @Transactional
+        void deveLancarExcecaoSeSituacaoIncorreta_homologar() {
+            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThrows(IllegalStateException.class, () -> subprocessoService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
+        }
     }
 
-    @Test
-    void homologarCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        assertThrows(IllegalStateException.class, () -> subprocessoService.homologarCadastro(1L, OBSERVACOES, usuarioTitulo));
-    }
+    @Nested
+    @DisplayName("Testes para devolverCadastro")
+    class DevolverCadastroTest {
+        @Test
+        @Transactional
+        void deveDevolverCadastroComSucesso() {
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-    @Test
-    void aceitarRevisaoCadastro_deveSalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
+            SubprocessoDto result = subprocessoService.devolverCadastro(subprocesso.getCodigo(), "Motivo Teste", OBSERVACOES, usuario);
 
-        SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo);
-
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, result.getSituacao());
-
-        ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
-        verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        assertEquals(TipoAcaoAnalise.ACEITE_REVISAO, analiseCaptor.getValue().getAcao());
-        assertEquals(OBSERVACOES, analiseCaptor.getValue().getObservacoes());
-        assertEquals(usuarioTitulo, analiseCaptor.getValue().getAnalistaUsuarioTitulo());
-
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movCaptor.getValue().getDescricao());
-        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeOrigem());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
-
-        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
-        verify(alertaRepo, times(1)).save(any(Alerta.class));
-    }
-
-    @Test
-    void aceitarRevisaoCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.aceitarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo));
-    }
-
-    @Test
-    void aceitarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo));
-    }
-
-    @Test
-    void homologarRevisaoCadastro_deveMudarSituacaoESalvarMovimentacao_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo);
-
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, result.getSituacao());
-
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertEquals("Revisão do cadastro de atividades e conhecimentos homologada", movCaptor.getValue().getDescricao());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeOrigem());
-        assertEquals(unidadeSuperior, movCaptor.getValue().getUnidadeDestino());
-
-        verify(subprocessoRepo, times(1)).save(subprocesso);
-    }
-
-    @Test
-    void homologarRevisaoCadastro_deveLancarExcecao_quandoSubprocessoNaoEncontrado() {
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.homologarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo));
-    }
-
-    @Test
-    void homologarRevisaoCadastro_deveLancarExcecao_quandoSituacaoInvalida() {
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        assertThrows(IllegalStateException.class, () -> subprocessoService.homologarRevisaoCadastro(1L, OBSERVACOES, usuarioTitulo));
-    }
-
-    @Test
-    void devolverCadastro_deveMudarSituacaoESalvarAnaliseEMovimentacao_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(analiseCadastroRepo.save(any(AnaliseCadastro.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        SubprocessoDto result = subprocessoService.devolverCadastro(1L, "Motivo Teste", OBSERVACOES, usuarioTitulo);
-
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, result.getSituacao());
-        assertNull(subprocesso.getDataFimEtapa1());
-
-        ArgumentCaptor<AnaliseCadastro> analiseCaptor = ArgumentCaptor.forClass(AnaliseCadastro.class);
-        verify(analiseCadastroRepo, times(1)).save(analiseCaptor.capture());
-        AnaliseCadastro analiseSalva = analiseCaptor.getValue();
-        assertEquals(TipoAcaoAnalise.DEVOLUCAO, analiseSalva.getAcao());
-        assertEquals("Motivo Teste", analiseSalva.getMotivo());
-        assertEquals(OBSERVACOES, analiseSalva.getObservacoes());
-
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertTrue(movCaptor.getValue().getDescricao().contains("Devolução do cadastro de atividades"));
-        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
-
-        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
-        verify(alertaRepo, times(1)).save(any(Alerta.class));
-    }
-
-    @Test
-    void devolverValidacao_deveMudarSituacaoESalvarAnalise_quandoValido() {
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
-        unidadeSuperior.setUnidadeSuperior(new Unidade());
-        when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-        when(analiseValidacaoRepo.save(any(AnaliseValidacao.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        SubprocessoDto result = subprocessoService.devolverValidacao(1L, "Justificativa Teste", usuarioTitulo);
-
-        assertNotNull(result);
-        assertEquals(SituacaoSubprocesso.MAPA_DISPONIBILIZADO, result.getSituacao());
-        assertNull(subprocesso.getDataFimEtapa2());
-
-        ArgumentCaptor<AnaliseValidacao> analiseCaptor = ArgumentCaptor.forClass(AnaliseValidacao.class);
-        verify(analiseValidacaoRepo, times(1)).save(analiseCaptor.capture());
-        assertEquals("Justificativa Teste", analiseCaptor.getValue().getObservacoes());
-
-        ArgumentCaptor<Movimentacao> movCaptor = ArgumentCaptor.forClass(Movimentacao.class);
-        verify(movimentacaoRepo, times(1)).save(movCaptor.capture());
-        assertEquals("Devolução da validação do mapa de competências para ajustes", movCaptor.getValue().getDescricao());
-        assertEquals(unidadeSubordinada, movCaptor.getValue().getUnidadeDestino());
-
-        verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
-        verify(alertaRepo, times(1)).save(any(Alerta.class));
+            assertNotNull(result);
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
+            assertNull(spAtualizado.getDataFimEtapa1());
+        }
     }
 }

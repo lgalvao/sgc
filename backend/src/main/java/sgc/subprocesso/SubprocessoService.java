@@ -25,6 +25,7 @@ import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.modelo.Usuario;
+import sgc.mapa.ImpactoMapaService;
 import sgc.conhecimento.dto.ConhecimentoDto;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -71,6 +72,7 @@ public class SubprocessoService {
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
+    private final ImpactoMapaService impactoMapaService;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long id, String perfil, Long unidadeUsuario) {
@@ -648,7 +650,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto devolverCadastro(Long idSubprocesso, String motivo, String observacoes, String usuario) {
+    public SubprocessoDto devolverCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -659,9 +661,9 @@ public class SubprocessoService {
         analise.setAcao(TipoAcaoAnalise.DEVOLUCAO);
         analise.setMotivo(motivo);
         analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario);
-        if (sp.getUnidade() != null && sp.getUnidade().getUnidadeSuperior() != null) {
-            analise.setUnidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla());
+        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
+        if (usuario.getUnidade() != null) {
+            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
         }
         repositorioAnaliseCadastro.save(analise);
 
@@ -800,7 +802,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto devolverRevisaoCadastro(Long idSubprocesso, String motivo, String observacoes, String usuario) {
+    public SubprocessoDto devolverRevisaoCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
@@ -814,20 +816,56 @@ public class SubprocessoService {
         analise.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
         analise.setMotivo(motivo);
         analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario);
+        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
+        if (usuario.getUnidade() != null) {
+            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
+        }
         repositorioAnaliseCadastro.save(analise);
 
-        Unidade unidadeDevolucao = sp.getUnidade();
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeDevolucao.getUnidadeSuperior(), unidadeDevolucao, "Devolução da revisão do cadastro para ajustes: " + motivo));
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
-        sp.setDataFimEtapa1(null);
+        Unidade unidadeAnalise = usuario.getUnidade();
+        Unidade unidadeDestino = sp.getUnidade(); // A devolução é para a unidade do subprocesso
+
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Devolução do cadastro de atividades e conhecimentos para ajustes"));
+
+        if (unidadeDestino.equals(sp.getUnidade())) {
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            sp.setDataFimEtapa1(null);
+        }
         repositorioSubprocesso.save(sp);
+
+        notificarDevolucaoRevisaoCadastro(sp, unidadeAnalise, unidadeDestino);
 
         return subprocessoMapper.toDTO(sp);
     }
 
+    private void notificarDevolucaoRevisaoCadastro(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
+        String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+
+        // CDU-14 Item 10.9: Notificação por e-mail
+        String assunto = String.format("SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes", siglaUnidadeSubprocesso);
+        String corpo = String.format(
+            "Prezado(a) responsável pela %s,%n" +
+            "O cadastro de atividades e conhecimentos da %s no processo %s foi devolvido para ajustes.%n" +
+            "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
+            unidadeDevolucao.getSigla(),
+            siglaUnidadeSubprocesso,
+            descricaoProcesso
+        );
+        notificacaoServico.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
+
+        // CDU-14 Item 10.10: Alerta interno
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Cadastro de atividades e conhecimentos da unidade %s devolvido para ajustes", siglaUnidadeSubprocesso));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(unidadeAnalise);
+        alerta.setUnidadeDestino(unidadeDevolucao);
+        repositorioAlerta.save(alerta);
+    }
+
     @Transactional
-    public SubprocessoDto aceitarRevisaoCadastro(Long idSubprocesso, String observacoes, String usuario) {
+    public SubprocessoDto aceitarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
@@ -840,7 +878,10 @@ public class SubprocessoService {
         analise.setDataHora(java.time.LocalDateTime.now());
         analise.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
         analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario);
+        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
+        if (usuario.getUnidade() != null) {
+            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
+        }
         repositorioAnaliseCadastro.save(analise);
 
         Unidade unidadeOrigem = sp.getUnidade();
@@ -856,21 +897,25 @@ public class SubprocessoService {
     private void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
         if (unidadeDestino == null || sp.getUnidade() == null) return;
 
-        String siglaUnidadeOrigem = sp.getUnidade().getSigla();
-        String nomeProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidadeSuperior = unidadeDestino.getSigla();
 
-        // 1. Enviar E-mail
-        String assunto = "SGC: Revisão de cadastro da " + siglaUnidadeOrigem + " aceita e aguardando homologação";
+        // CDU-14 Item 11.7: Notificação por e-mail
+        String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidadeSubprocesso);
         String corpo = String.format(
-            "A revisão do cadastro de atividades e conhecimentos da unidade %s, referente ao processo '%s', foi aceita e está disponível para homologação.",
-            siglaUnidadeOrigem,
-            nomeProcesso
+            "Prezado(a) responsável pela %s,%n" +
+            "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
+            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+            siglaUnidadeSuperior,
+            siglaUnidadeSubprocesso,
+            descricaoProcesso
         );
-        notificacaoServico.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+        notificacaoServico.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
 
-        // 2. Criar Alerta
+        // CDU-14 Item 11.8: Alerta interno
         Alerta alerta = new Alerta();
-        alerta.setDescricao("Revisão de cadastro da unidade " + siglaUnidadeOrigem + " aguardando homologação");
+        alerta.setDescricao(String.format("Revisão do cadastro de atividades e conhecimentos da unidade %s submetida para análise", siglaUnidadeSubprocesso));
         alerta.setProcesso(sp.getProcesso());
         alerta.setDataHora(java.time.LocalDateTime.now());
         alerta.setUnidadeOrigem(sp.getUnidade());
@@ -879,7 +924,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto homologarRevisaoCadastro(Long idSubprocesso, String observacoes, String usuario) {
+    public SubprocessoDto homologarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
@@ -887,12 +932,23 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        Unidade unidadeOrigemMovimentacao = sp.getUnidade().getUnidadeSuperior();
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigemMovimentacao, unidadeOrigemMovimentacao, "Revisão do cadastro de atividades e conhecimentos homologada"));
-        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-        repositorioSubprocesso.save(sp);
+        var impactos = impactoMapaService.verificarImpactos(idSubprocesso, usuario);
 
-        log.info("Revisão do subprocesso {} homologada com sucesso.", idSubprocesso);
+        if (!impactos.temImpactos()) {
+            // CDU-14 Item 12.2: Sem impactos
+            sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            log.info("Revisão do subprocesso {} homologada sem impactos. Situação alterada para MAPA_HOMOLOGADO.", idSubprocesso);
+        } else {
+            // CDU-14 Item 12.3: Com impactos
+            Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+
+            repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            log.info("Revisão do subprocesso {} homologada com impactos. Situação alterada para REVISAO_CADASTRO_HOMOLOGADA.", idSubprocesso);
+        }
+
+        repositorioSubprocesso.save(sp);
 
         return subprocessoMapper.toDTO(sp);
     }
