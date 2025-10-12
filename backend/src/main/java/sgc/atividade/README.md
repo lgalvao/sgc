@@ -1,63 +1,59 @@
-# Módulo de Atividade e Análise - SGC
+# Módulo de Atividade - SGC
 
 ## Visão Geral
-Este pacote tem uma dupla responsabilidade: gerenciar as **Atividades** do sistema e as **Análises de Cadastro**.
+Este pacote é responsável por gerenciar as **Atividades** do sistema. Uma `Atividade` representa uma tarefa ou ação específica que é cadastrada no contexto de um `Mapa` de competências.
 
-1.  **Atividades**: Representam tarefas ou ações que podem ser associadas a outros contextos, como um mapa de competências. O pacote fornece um `AtividadeController` para realizar operações CRUD (Criar, Ler, Atualizar, Excluir) sobre as atividades.
-2.  **Análise de Cadastro**: Refere-se a um registro de análise, geralmente com observações, vinculado a um `Subprocesso`. Isso é usado para documentar a revisão de cadastros ou outras etapas de um processo.
+O módulo fornece a estrutura de dados (`Atividade.java`), o repositório para acesso ao banco de dados (`AtividadeRepo.java`) e o controlador REST (`AtividadeControle.java`) para expor as operações CRUD (Criar, Ler, Atualizar, Excluir) via API.
 
 ## Arquivos Principais
 
-### Gestão de Atividades
-
-#### 1. `Atividade.java`
-**Localização:** `backend/src/main/java/sgc/atividade/Atividade.java`
-- **Descrição:** Entidade JPA que representa uma atividade. Mapeia a tabela `TB_ATIVIDADE`.
+### 1. `Atividade.java`
+**Localização:** `backend/src/main/java/sgc/atividade/modelo/Atividade.java`
+- **Descrição:** Entidade JPA que representa uma atividade. Mapeia a tabela `ATIVIDADE` no banco de dados.
 - **Campos Importantes:**
   - `descricao`: O texto que descreve a atividade.
-  - `mapa`: Associação com a entidade `Mapa`.
+  - `mapa`: A associação com a entidade `Mapa` à qual a atividade pertence.
 
-#### 2. `AtividadeController.java`
-**Localização:** `backend/src/main/java/sgc/atividade/AtividadeController.java`
-- **Descrição:** Controlador REST que expõe endpoints para gerenciar `Atividade`.
-- **Endpoints:**
-  - `GET /api/atividades`: Lista todas as atividades.
-  - `GET /api/atividades/{id}`: Obtém uma atividade por ID.
+### 2. `AtividadeControle.java`
+**Localização:** `backend/src/main/java/sgc/atividade/AtividadeControle.java`
+- **Descrição:** Controlador REST que expõe endpoints para gerenciar a entidade `Atividade`.
+- **Endpoints Principais:**
+  - `GET /api/atividades`: Lista todas as atividades cadastradas.
+  - `GET /api/atividades/{id}`: Obtém os detalhes de uma atividade específica por seu ID.
   - `POST /api/atividades`: Cria uma nova atividade.
   - `PUT /api/atividades/{id}`: Atualiza uma atividade existente.
   - `DELETE /api/atividades/{id}`: Exclui uma atividade.
 
-#### 3. `AtividadeDTO.java` e `AtividadeMapper.java`
-**Localização:** `backend/src/main/java/sgc/atividade/`
-- **Descrição:**
-  - `AtividadeDTO`: Data Transfer Object para `Atividade`, usado para a comunicação via API.
-  - `AtividadeMapper`: Utilitário para converter entre a entidade `Atividade` e `AtividadeDTO`.
+### 3. `AtividadeRepo.java`
+**Localização:** `backend/src/main/java/sgc/atividade/modelo/AtividadeRepo.java`
+- **Descrição:** Interface Spring Data JPA que fornece os métodos padrão para acesso e manipulação dos dados da entidade `Atividade`.
 
-#### 4. `AtividadeRepository.java`
-**Localização:** `backend/src/main/java/sgc/atividade/AtividadeRepository.java`
-- **Descrição:** Interface Spring Data JPA para acesso aos dados da entidade `Atividade`.
+### 4. DTOs e Mappers (`dto/`)
+**Localização:** `backend/src/main/java/sgc/atividade/dto/`
+- **Descrição:** O pacote `dto` contém os Data Transfer Objects (DTOs) utilizados para a comunicação via API, como `AtividadeDto` e `ImportarAtividadesRequest`. Isso desacopla a representação da API da estrutura interna da entidade `Atividade`.
 
-### Gestão de Análise de Cadastro
+## Diagrama de Componentes
+```mermaid
+graph TD
+    subgraph "Usuário"
+        A[Usuário via API]
+    end
 
-#### 5. `AnaliseCadastro.java`
-**Localização:** `backend/src/main/java/sgc/atividade/AnaliseCadastro.java`
-- **Descrição:** Entidade JPA para um registro de análise vinculado a um `Subprocesso`. Mapeia a tabela `TB_ANALISE_CADASTRO`.
-- **Campos Importantes:**
-  - `subprocesso`: O subprocesso ao qual a análise está associada.
-  - `observacoes`: Texto com as observações da análise.
+    subgraph "Módulo Atividade"
+        B(AtividadeControle)
+        C[AtividadeRepo]
+        D(Atividade)
+        E(AtividadeDto)
+    end
 
-#### 6. `AnaliseCadastroService.java`
-**Localização:** `backend/src/main/java/sgc/analise/AnaliseCadastroService.java`
-- **Descrição:** Serviço que gerencia a lógica de negócio para `AnaliseCadastro`.
-- **Métodos Principais:**
-  - `listarPorSubprocesso(...)`: Lista todas as análises de um subprocesso.
-  - `criarAnalise(...)`: Cria uma nova análise para um subprocesso.
-  - `removerPorSubprocesso(...)`: Remove todas as análises de um subprocesso.
+    A -- Requisição HTTP com DTO --> B
+    B -- Usa --> C
+    C -- Gerencia --> D
+    B -- Converte para/de --> E
+```
 
 ## Como Usar
-
-### Gerenciando Atividades
-Interaja com os endpoints do `AtividadeController` através de um cliente HTTP.
+Para gerenciar atividades, interaja com os endpoints expostos pelo `AtividadeControle` utilizando um cliente HTTP.
 
 **Exemplo: Criar uma nova atividade**
 ```http
@@ -65,28 +61,11 @@ POST /api/atividades
 Content-Type: application/json
 
 {
-  "descricao": "Revisar documentação do projeto X",
-  "mapaId": 1
-}
-```
-
-### Gerenciando Análises de Cadastro
-Injete `AnaliseCadastroService` em outros serviços para gerenciar análises programaticamente.
-
-**Exemplo:**
-```java
-@Service
-public class MeuServico {
-
-    @Autowired
-    private AnaliseCadastroService analiseCadastroService;
-
-    public void registrarAnalise(Long subprocessoId, String minhasObservacoes) {
-        analiseCadastroService.criarAnalise(subprocessoId, minhasObservacoes);
-    }
+  "descricao": "Elaborar o relatório de progresso do projeto.",
+  "mapaId": 123
 }
 ```
 
 ## Notas Importantes
-- **Separação de Responsabilidades**: Embora no mesmo pacote, `Atividade` e `AnaliseCadastro` servem a propósitos distintos. A primeira é um recurso genérico, enquanto a segunda é específica para o fluxo de processos.
-- **Uso de DTOs**: O `AtividadeController` utiliza DTOs (`AtividadeDTO`) para a comunicação com o frontend, o que é uma boa prática para desacoplar a API da estrutura do banco de dados.
+- **Relacionamento com Mapa**: Cada `Atividade` está diretamente associada a um `Mapa`, indicando que as atividades são definidas dentro do contexto de um mapa de competências específico.
+- **Uso de DTOs**: A comunicação com o frontend é feita através de DTOs, uma prática que aumenta a segurança e a flexibilidade da API, evitando a exposição direta das entidades JPA.
