@@ -57,12 +57,6 @@ public class SubprocessoServiceTest {
     private static final String USUARIO = "usuario";
     private static final String SUPER = "SUPER";
     private static final String UNIDADE_SUPERIOR = "Unidade Superior";
-    private static final String UN = "UN";
-    private static final String UNIDADE = "Unidade";
-    private static final String OBSERVACOES = "observacoes";
-    private static final String USUARIO = "usuario";
-    private static final String SUPER = "SUPER";
-    private static final String UNIDADE_SUPERIOR = "Unidade Superior";
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
 

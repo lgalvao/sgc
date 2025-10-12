@@ -307,15 +307,15 @@ public class ProcessoServiceTest {
 
         var detalhes = ProcessoDetalheDto.builder().codigo(1L).build();
 
-        // when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        // when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(Collections.emptyList());
-        // when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        // when(processoDetalheMapperCustomizado.toDetailDTO(any(), any(), any())).thenReturn(detalhes);
+        when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
+        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(Collections.emptyList());
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+        when(processoDetalheMapperCustomizado.toDetailDTO(any(), any(), any())).thenReturn(detalhes);
 
-        // ProcessoDetalheDto resultado = processoService.obterDetalhes(1L);
+        ProcessoDetalheDto resultado = processoService.obterDetalhes(1L);
 
-        // assertNotNull(resultado);
-        // assertEquals(1L, resultado.getCodigo());
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getCodigo());
     }
 
     @Test

@@ -10,6 +10,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SubprocessoDtoTest {
+    private static final String OBSERVACOES = "Observações";
+    private static final String COMPETENCIA = "Competência";
+    private static final String ATIVIDADE = "Atividade";
+    private static final String JUSTIFICATIVA = "Justificativa";
+    private static final String UNIDADE = "Unidade";
+    private static final String SIGLA = "SIGLA";
+    private static final String NOME = "Nome";
+
     @Test
     void AceitarCadastroReq_RecordConstructorAndGetters() {
         AceitarCadastroReq req = new AceitarCadastroReq("Observações de aceite");
@@ -125,10 +133,10 @@ class SubprocessoDtoTest {
     @Test
     void MapaAjusteDto_RecordConstructorAndGetters() {
         List<CompetenciaAjusteDto> competencias = List.of(new CompetenciaAjusteDto(1L, "Competência", List.of()));
-        MapaAjusteDto dto = new MapaAjusteDto(1L, "Unidade", competencias, "Justificativa");
+        MapaAjusteDto dto = new MapaAjusteDto(1L, UNIDADE, competencias, "Justificativa");
 
         assertEquals(1L, dto.mapaId());
-        assertEquals("Unidade", dto.unidadeNome());
+        assertEquals(UNIDADE, dto.unidadeNome());
         assertEquals(competencias, dto.competencias());
         assertEquals("Justificativa", dto.justificativaDevolucao());
     }
@@ -144,7 +152,7 @@ class SubprocessoDtoTest {
                 "Unidade Origem",
                 2L,
                 "SIGLA_DESTINO",
-                "Unidade Destino",
+                UNIDADE,
                 "Descrição"
         );
 
@@ -155,7 +163,7 @@ class SubprocessoDtoTest {
         assertEquals("Unidade Origem", dto.unidadeOrigemNome());
         assertEquals(2L, dto.unidadeDestinoCodigo());
         assertEquals("SIGLA_DESTINO", dto.unidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
+        assertEquals(UNIDADE, dto.unidadeDestinoNome());
         assertEquals("Descrição", dto.descricao());
     }
 
@@ -172,17 +180,17 @@ class SubprocessoDtoTest {
         List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividades = List.of(
                 new SubprocessoCadastroDto.AtividadeCadastroDTO(1L, "Atividade", List.of())
         );
-        SubprocessoCadastroDto dto = new SubprocessoCadastroDto(1L, "SIGLA", atividades);
+        SubprocessoCadastroDto dto = new SubprocessoCadastroDto(1L, SIGLA, atividades);
 
         assertEquals(1L, dto.subprocessoId());
-        assertEquals("SIGLA", dto.unidadeSigla());
+        assertEquals(SIGLA, dto.unidadeSigla());
         assertEquals(atividades, dto.atividades());
     }
 
     @Test
     void SubprocessoDetalheDto_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, "SIGLA", "Nome");
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, "Nome", "Tipo", "Ramal", "email@exemplo.com");
+        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, SIGLA, NOME);
+        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, NOME, "Tipo", "Ramal", "email@exemplo.com");
         LocalDate prazo = LocalDate.now();
         List<MovimentacaoDto> movimentacoes = List.of();
         List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = List.of();
@@ -200,19 +208,19 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoDetalheDto_UnidadeDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, "SIGLA", "Nome");
+        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, SIGLA, NOME);
 
         assertEquals(1L, unidade.codigo());
-        assertEquals("SIGLA", unidade.sigla());
-        assertEquals("Nome", unidade.nome());
+        assertEquals(SIGLA, unidade.sigla());
+        assertEquals(NOME, unidade.nome());
     }
 
     @Test
     void SubprocessoDetalheDto_ResponsavelDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, "Nome", "Tipo", "Ramal", "email@exemplo.com");
+        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, NOME, "Tipo", "Ramal", "email@exemplo.com");
 
         assertEquals(1L, responsavel.id());
-        assertEquals("Nome", responsavel.nome());
+        assertEquals(NOME, responsavel.nome());
         assertEquals("Tipo", responsavel.tipoResponsabilidade());
         assertEquals("Ramal", responsavel.ramal());
         assertEquals("email@exemplo.com", responsavel.email());
@@ -257,10 +265,10 @@ class SubprocessoDtoTest {
 
     @Test
     void SugestoesDto_RecordConstructorAndGetters() {
-        SugestoesDto dto = new SugestoesDto("Sugestões", true, "Unidade");
+        SugestoesDto dto = new SugestoesDto("Sugestões", true, UNIDADE);
 
         assertEquals("Sugestões", dto.sugestoes());
         assertTrue(dto.sugestoesApresentadas());
-        assertEquals("Unidade", dto.unidadeNome());
+        assertEquals(UNIDADE, dto.unidadeNome());
     }
 }

@@ -52,8 +52,6 @@ public class ProcessoServiceDetalhesTest {
     private SubprocessoRepo subprocessoRepo;
     private ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado;
 
-    private ProcessoService servico;
-
     @BeforeEach
     public void setup() {
         processoRepo = mock(ProcessoRepo.class);
@@ -71,7 +69,7 @@ public class ProcessoServiceDetalhesTest {
         ProcessoConversor processoConversor = mock(ProcessoConversor.class);
         processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
 
-        servico = new ProcessoService(
+        new ProcessoService(
                 processoRepo,
                 unidadeRepo,
                 unidadeProcessoRepo,

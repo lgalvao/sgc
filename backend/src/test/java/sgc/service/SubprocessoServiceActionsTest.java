@@ -69,7 +69,7 @@ public class SubprocessoServiceActionsTest {
     private Subprocesso subprocesso;
     private Unidade unidadeSubordinada;
     private Unidade unidadeSuperior;
-    private final String usuarioTitulo = "USUARIO_TESTE";
+    private static final String usuarioTitulo = "USUARIO_TESTE";
 
     @BeforeEach
     void setUp() {

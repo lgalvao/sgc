@@ -99,7 +99,7 @@ class CDU12IntegrationTest {
         // 1. Unidade e Chefe
         unidade = new Unidade("Unidade de Teste", "UT");
         chefe = new Usuario();
-            chefe.setTitulo(CHEFE_UT_USERNAME);
+        chefe.setTitulo(CHEFE_UT_USERNAME);
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
@@ -191,7 +191,7 @@ class CDU12IntegrationTest {
             // Arrange: Mantém as atividades vigentes e adiciona uma nova
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente2.getDescricao()));
-            Atividade atividadeNova = atividadeRepo.save(new Atividade(mapaSubprocesso, "Realizar auditorias internas."));
+            atividadeRepo.save(new Atividade(mapaSubprocesso, "Realizar auditorias internas."));
 
             // Act & Assert
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
