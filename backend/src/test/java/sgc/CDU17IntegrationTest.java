@@ -54,6 +54,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @org.springframework.context.annotation.Import(TestSecurityConfig.class)
 class CDU17IntegrationTest {
 
+    private static final String API_URL = "/api/subprocessos/{id}/disponibilizar-mapa";
+    private static final String OBS_LITERAL = "Obs";
+    private static final String SEDOC_LITERAL = "SEDOC";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -75,7 +79,7 @@ class CDU17IntegrationTest {
 
     // Dados de Teste
     private Processo processo;
-    private Unidade sedoc, unidade, unidadeSuperior;
+    private Unidade unidade, unidadeSuperior;
     private Subprocesso subprocesso;
     private Mapa mapa;
     private Atividade atividade;
@@ -96,7 +100,7 @@ class CDU17IntegrationTest {
         unidadeRepo.deleteAll();
 
         // Criar Unidades
-        sedoc = unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
+        unidadeRepo.save(new Unidade(SEDOC_LITERAL, SEDOC_LITERAL));
         unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "US"));
         unidade = new Unidade("Unidade de Teste", "UT");
         unidade.setUnidadeSuperior(unidadeSuperior);
@@ -146,7 +150,7 @@ class CDU17IntegrationTest {
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
 
             // Act & Assert
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -165,7 +169,7 @@ class CDU17IntegrationTest {
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             Movimentacao mov = movimentacoes.get(0);
-            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(SEDOC_LITERAL);
             assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(mov.getDescricao()).isEqualTo("Disponibilização do mapa de competências para validação");
 
@@ -174,7 +178,7 @@ class CDU17IntegrationTest {
             assertThat(alertaOpt).isPresent();
             Alerta alerta = alertaOpt.get();
             assertThat(alerta.getDescricao()).isEqualTo("Mapa de competências da unidade " + unidade.getSigla() + " disponibilizado para análise");
-            assertThat(alerta.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+            assertThat(alerta.getUnidadeOrigem().getSigla()).isEqualTo(SEDOC_LITERAL);
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
 
             // Verificar Limpeza do Histórico
@@ -195,9 +199,9 @@ class CDU17IntegrationTest {
             var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
 
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -211,9 +215,9 @@ class CDU17IntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
 
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -224,16 +228,27 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
-            // Arrange: Não associar a atividade a nenhuma competência
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+            // Arrange: Associar a competência do setup a uma atividade dummy para isolar a falha.
+            Atividade dummyActivity = atividadeRepo.save(new Atividade(mapa, "Dummy Activity"));
+            var id = new CompetenciaAtividade.Id(dummyActivity.getCodigo(), competencia.getCodigo());
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, dummyActivity));
+            // A 'atividade' principal (criada no setUp) permanece não associada.
 
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+
+            String responseBody = mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.details.atividadesNaoAssociadas").isNotEmpty());
+                    .andReturn().getResponse().getContentAsString();
+
+            // Assert: Desserializar a resposta e verificar os detalhes do erro
+            sgc.comum.erros.ApiError apiError = objectMapper.readValue(responseBody, sgc.comum.erros.ApiError.class);
+            assertThat(apiError.getDetails()).isNotNull();
+            @SuppressWarnings("unchecked")
+            List<String> atividades = (List<String>) apiError.getDetails().get("atividadesNaoAssociadas");
+            assertThat(atividades).isNotNull().contains(atividade.getDescricao());
         }
 
         @Test
@@ -245,9 +260,9 @@ class CDU17IntegrationTest {
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
             competenciaRepo.save(new Competencia(mapa, "Competência Solta"));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
 
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))

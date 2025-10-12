@@ -84,6 +84,7 @@ public class CDU16IntegrationTest {
                 .apply(springSecurity())
                 .build();
 
+        unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
         Unidade unidade = new Unidade("Test Unit", "TU");
         unidadeRepo.save(unidade);
         Usuario chefe = new Usuario();

@@ -13,15 +13,19 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiError {
 
-    private final int status;
-    private final String message;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private final LocalDateTime timestamp;
+    private int status;
+    private String message;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime timestamp;
     private List<ApiSubError> subErrors;
     private Map<String, ?> details;
 
-    public ApiError(HttpStatus status, String message) {
+    private ApiError() {
         this.timestamp = LocalDateTime.now();
+    }
+
+    public ApiError(HttpStatus status, String message) {
+        this();
         this.status = status.value();
         this.message = message;
     }

@@ -93,6 +93,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, sanitize(ex.getMessage())));
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    protected ResponseEntity<Object> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        log.warn("Acesso negado via Spring Security: {}", ex.getMessage());
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Acesso negado.");
+        return buildResponseEntity(apiError);
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         log.error("Estado ilegal da aplicação: {}", ex.getMessage(), ex);

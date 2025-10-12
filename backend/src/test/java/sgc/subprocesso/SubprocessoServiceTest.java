@@ -49,6 +49,7 @@ import sgc.comum.enums.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 public class SubprocessoServiceTest {
+    private static final String SEDOC_LITERAL = "SEDOC";
     private static final String UN = "UN";
     private static final String UNIDADE = "Unidade";
     private static final String OBSERVACOES = "observacoes";
@@ -562,8 +563,8 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
         Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        sedoc.setSigla(SEDOC_LITERAL);
+        when(unidadeRepo.findBySigla(SEDOC_LITERAL)).thenReturn(Optional.of(sedoc));
 
         SubmeterMapaAjustadoReq request = new SubmeterMapaAjustadoReq("Observações", LocalDate.now().plusDays(1));
 
@@ -648,8 +649,8 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
         Unidade sedoc = new Unidade();
-        sedoc.setSigla("SEDOC");
-        when(unidadeRepo.findBySigla("SEDOC")).thenReturn(Optional.of(sedoc));
+        sedoc.setSigla(SEDOC_LITERAL);
+        when(unidadeRepo.findBySigla(SEDOC_LITERAL)).thenReturn(Optional.of(sedoc));
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
