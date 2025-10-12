@@ -11,7 +11,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.SgcTest;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseCadastro;
@@ -21,6 +20,7 @@ import sgc.processo.enums.TipoProcesso;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.comum.modelo.Usuario;
+import sgc.comum.modelo.UsuarioRepo;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
@@ -42,7 +42,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SgcTest
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 @DisplayName("Testes de Ações do SubprocessoService")
 public class SubprocessoServiceActionsTest {
 
@@ -56,6 +58,9 @@ public class SubprocessoServiceActionsTest {
 
     @Autowired
     private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     @Autowired
     private AnaliseCadastroRepo analiseCadastroRepo;
@@ -91,12 +96,14 @@ public class SubprocessoServiceActionsTest {
 
         chefe = new Usuario();
         chefe.setTitulo("chefe_ut");
+        usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
         usuario = new Usuario();
-        usuario.setTitulo(chefe.getTitulo());
+        usuario.setTitulo("user_test");
         usuario.setUnidade(unidade);
+        usuarioRepo.save(usuario);
     }
 
     private Processo criarProcesso(TipoProcesso tipo) {
@@ -126,7 +133,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveAceitarCadastroComSucesso() {
-            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
             SubprocessoDto result = subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
@@ -156,7 +163,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveHomologarCadastroComSucesso() {
-            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
             Unidade sedoc = new Unidade("SEDOC", "SEDOC");
@@ -176,7 +183,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveAceitarRevisaoComSucesso() {
-            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
             SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
@@ -203,9 +210,9 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveLancarExcecaoSeSituacaoIncorreta() {
-            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
-            criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(1L, OBSERVACOES, usuario));
+            Processo processo = criarProcesso(TipoProcesso.REVISAO);
+            Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
         }
     }
 
@@ -215,7 +222,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveHomologarRevisaoComSucessoSemImpactos() {
-            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class)))
                 .thenReturn(new ImpactoMapaDto(false, 0,0,0, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
@@ -236,7 +243,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveLancarExcecaoSeSituacaoIncorreta_homologar() {
-            Processo processo = criarProcesso(TipoProcesso.REVISAO_MAPEAMENTO);
+            Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             assertThrows(IllegalStateException.class, () -> subprocessoService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
         }
@@ -248,7 +255,7 @@ public class SubprocessoServiceActionsTest {
         @Test
         @Transactional
         void deveDevolverCadastroComSucesso() {
-            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO_COMPETENCIAS);
+            Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
             SubprocessoDto result = subprocessoService.devolverCadastro(subprocesso.getCodigo(), "Motivo Teste", OBSERVACOES, usuario);

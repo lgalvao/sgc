@@ -91,13 +91,16 @@ public class CDU13IntegrationTest {
         titular.setNome("Chefe da Unidade");
         usuarioRepo.save(titular);
 
-        Usuario gestorSuperior = new Usuario();
-        gestorSuperior.setTitulo("gestor");
-        gestorSuperior.setNome("Gestor Superior");
-        usuarioRepo.save(gestorSuperior);
-
         unidadeSuperior = new Unidade("Unidade Superior", "UO_SUP");
-        unidadeSuperior.setTitular(gestorSuperior);
+        unidadeRepo.save(unidadeSuperior);
+
+        Usuario gestorDaUnidade = new Usuario();
+        gestorDaUnidade.setTitulo("gestor_unidade");
+        gestorDaUnidade.setNome("Gestor da Unidade");
+        gestorDaUnidade.setUnidade(unidadeSuperior);
+        usuarioRepo.save(gestorDaUnidade);
+
+        unidadeSuperior.setTitular(gestorDaUnidade);
         unidadeRepo.save(unidadeSuperior);
 
         unidade = new Unidade("Unidade de Teste", "UO_TESTE");
