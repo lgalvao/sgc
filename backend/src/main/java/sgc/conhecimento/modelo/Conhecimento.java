@@ -21,4 +21,9 @@ public class Conhecimento extends EntidadeBase {
 
     @Column(name = "descricao")
     private String descricao;
+
+    public Conhecimento(String descricao, Atividade atividade) {
+        this.descricao = descricao;
+        this.atividade = atividade;
+    }
 }
