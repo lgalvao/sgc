@@ -7,38 +7,25 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
 
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
 
-    @Autowired
-    private UnidadeRepo unidadeRepo;
+    private final UsuarioRepo usuarioRepo;
 
     @Autowired
-    private UsuarioRepo usuarioRepo;
+    public WithMockGestorSecurityContextFactory(UsuarioRepo usuarioRepo) {
+        this.usuarioRepo = usuarioRepo;
+    }
 
     @Override
-    @Transactional
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        // Garante que a unidade de teste exista.
-        Unidade unidade = unidadeRepo.findBySigla("UT")
-            .orElseGet(() -> unidadeRepo.save(new Unidade("Unidade de Teste", "UT")));
-
-        Usuario principal = new Usuario();
-        principal.setTitulo(customUser.value());
-        principal.setNome("Gestor da " + unidade.getSigla());
-        principal.setUnidade(unidade);
-        unidade.setTitular(principal);
-        usuarioRepo.save(principal);
-        unidadeRepo.save(unidade);
-
+        Usuario principal = usuarioRepo.findById(customUser.value())
+            .orElseGet(() -> usuarioRepo.save(new Usuario(customUser.value(), "Gestor User", "gestor@example.com", null, null, null)));
 
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());

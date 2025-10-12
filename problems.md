@@ -1,30 +1,32 @@
-# Problemas Encontrados Durante a Implementação da CDU-17
+# Test Failure Analysis and Lessons Learned
 
-Este documento detalha os problemas encontrados e o progresso feito na implementação do Caso de Uso 17 (CDU-17).
+This document outlines the unresolved test failures and the debugging steps taken. While several underlying issues were fixed (such as transient property exceptions due to non-persistent test users), three core test failures remain.
 
-## Progresso Realizado
+## 1. Security Test Failure in CDU17
 
-A lógica de negócio para a disponibilização do mapa de competências foi implementada conforme o plano, incluindo:
-- Adição de verificações de autorização (`@PreAuthorize`) e pré-condições de estado do subprocesso.
-- Implementação de validações para garantir a associação completa entre atividades e competências.
-- Correção da lógica de persistência para salvar observações e criar a movimentação correta (origem SEDOC).
-- Refinamento das notificações por e-mail e alertas para corresponderem às especificações do CDU.
-- Implementação da limpeza de dados históricos (sugestões e análises de validação anteriores).
-- Padronização da resposta da API para retornar `ResponseEntity<RespostaDto>`.
-- Criação de uma suíte de testes de integração (`CDU17IntegrationTest.java`) para cobrir os cenários de sucesso e falha.
+- **Test:** `sgc.CDU17IntegrationTest$Falha.disponibilizarMapa_semPermissao_retornaForbidden()`
+- **Problem:** The test consistently fails, expecting an HTTP 403 (Forbidden) but receiving a 200 (OK) or 500 (Internal Server Error). This indicates that the `@PreAuthorize("hasRole('ADMIN')")` annotation on the controller endpoint is not being enforced during the test run.
+- **Investigation & Fixes Attempted:**
+    1.  Identified that the default test security configuration was overly permissive (`.anyRequest().permitAll()`).
+    2.  Created a `TestSecurityConfig` with `@EnableMethodSecurity` to enable method-level security annotations.
+    3.  Explicitly imported this configuration into the test class using `@Import(TestSecurityConfig.class)`.
+- **Lesson Learned/Hypothesis:** The issue is likely a subtle misconfiguration in the Spring test slice. The `@SpringBootTest` context may not be picking up the `@EnableMethodSecurity` annotation as expected, or another configuration is overriding it. The security context factories (`WithMock...Factory`) were also refactored to provide persisted entities, which solved the initial `TransientPropertyValueException` but did not resolve this authorization failure.
 
-## Problemas Atuais nos Testes
+## 2. JSON Path Assertion Failure in CDU17
 
-Apesar do progresso na implementação da funcionalidade, os testes de integração estão falhando, impedindo a conclusão da tarefa. Os problemas são os seguintes:
+- **Test:** `sgc.CDU17IntegrationTest$Falha.disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest()`
+- **Problem:** The test fails with a `No results for path: $['details']['atividadesNaoAssociadas']` error.
+- **Investigation & Fixes Attempted:**
+    1.  Modified the `RestExceptionHandler` to include a `details` map in the `ApiError` response object for `ErroValidacao` exceptions.
+    2.  Added a `print()` statement to the MockMvc call, which confirmed the JSON response body is correct and contains the expected path and data: `{"status":422,"message":"...","details":{"atividadesNaoAssociadas":["Atividade de Teste"]}}`.
+    3.  Switched the assertion from `jsonPath(...).exists()` to `jsonPath(...).isNotEmpty()`.
+- **Lesson Learned/Hypothesis:** Since the response body is correct, the failure lies within the `jsonPath` assertion itself. This could be a dependency conflict or a known issue with the specific versions of Jayway JsonPath, Spring Test, or AssertJ used in the project. A more robust solution would be to deserialize the JSON response into an `ApiError` object and use standard AssertJ assertions on its fields, avoiding the fragility of path-based string matching.
 
-1.  **`TransientObjectException` em Testes de Segurança:**
-    - **Erro:** `org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing : sgc.comum.modelo.Usuario`
-    - **Causa Provável:** Ocorre no método `setUp` do teste `disponibilizarMapa_semPermissao_retornaForbidden`. A factory `WithMockGestorSecurityContextFactory` cria um `Usuario` e o associa a uma `Unidade`. No `@BeforeEach` do teste, a tentativa de `unidadeRepo.deleteAll()` falha porque a `Unidade` tem uma referência a um `Usuario` (o `titular`) que não foi salvo e não faz parte do ciclo de vida do Hibernate no momento da limpeza.
-    - **Tentativas de Correção:** Adicionei `usuarioRepo.deleteAll()` antes de `unidadeRepo.deleteAll()` para garantir a ordem correta de limpeza, mas o erro persiste. A próxima etapa seria usar `@DirtiesContext` para forçar a recriação do contexto Spring a cada teste, garantindo um isolamento completo.
+## 3. State Conflict in CDU16
 
-2.  **Falhas de Asserção em Respostas de Erro de Validação:**
-    - **Erro:** `AssertionError: Status expected:<400> but was:<422>` (corrigido) e subsequentemente `No results for path: $['...']`.
-    - **Causa Provável:** Os testes que verificam a falha de validação (e.g., atividade sem competência) esperavam um status HTTP 400 (Bad Request). A correção para esperar 422 (Unprocessable Entity) foi feita, mas a estrutura do corpo do JSON de erro não corresponde à asserção do teste. A `ErroValidacao` é lançada corretamente, mas o `RestExceptionHandler` parece serializá-la de uma forma que não inclui o campo `subErrors` ou coloca os detalhes em um local diferente do esperado pelo `jsonPath`.
-    - **Próximos Passos:** A próxima etapa seria inspecionar `RestExceptionHandler.java` para entender como a `ErroValidacao` é convertida em JSON e ajustar a asserção `jsonPath` no teste para corresponder à estrutura real da resposta.
-
-Devido a esses bloqueios nos testes, a implementação não pode ser validada e submetida com segurança. As alterações no código-fonte da aplicação foram mantidas para análise futura.
+- **Test:** `sgc.cdu16.CDU16IntegrationTest.submeterMapaAjustado_deveMudarSituacao()`
+- **Problem:** The test fails with an HTTP 409 (Conflict), which is mapped from an `IllegalStateException`.
+- **Investigation & Fixes Attempted:**
+    1.  Reviewed `cdu-16.md` and `cdu-17.md` to understand the expected state transitions.
+    2.  Modified the test to explicitly set the subprocess state to `MAPA_AJUSTADO` before making the request, which should be a valid precondition.
+- **Lesson Learned/Hypothesis:** The state transition logic is more complex than just the `SituacaoSubprocesso` enum. The `IllegalStateException` is likely being thrown because another precondition is not being met in the test setup. The `submeterMapaAjustado` service method contains a validation loop to ensure all activities are associated with at least one competency. The test that fails does not create any activities or competencies, which may be an invalid setup for this specific state transition, even if it seems logical. The test setup needs to be more comprehensive to reflect a valid state for submission.
