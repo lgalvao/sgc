@@ -27,6 +27,7 @@ import sgc.comum.modelo.Usuario;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.notificacao.NotificacaoServico;
 import sgc.processo.modelo.Processo;
@@ -37,6 +38,7 @@ import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -80,6 +82,9 @@ public class SubprocessoServiceTest {
     private NotificacaoServico notificacaoServico;
 
     @Mock
+    private ApplicationEventPublisher publicadorDeEventos;
+
+    @Mock
     private AlertaRepo repositorioAlerta;
 
     @Mock
@@ -94,6 +99,9 @@ public class SubprocessoServiceTest {
     @Mock
     private SubprocessoMapper subprocessoMapper;
 
+    @Mock
+    private ImpactoMapaService impactoMapaService;
+
     @InjectMocks
     private SubprocessoService subprocessoService;
 
@@ -101,6 +109,7 @@ public class SubprocessoServiceTest {
     private Unidade unidadeMock;
     private Unidade unidadeSuperiorMock;
     private Subprocesso subprocessoMock;
+    private Usuario usuario;
 
     @BeforeEach
     void setupBasico() {
@@ -119,6 +128,10 @@ public class SubprocessoServiceTest {
         when(subprocessoMock.getCodigo()).thenReturn(1L);
         when(subprocessoMock.getUnidade()).thenReturn(unidadeMock);
         when(subprocessoMock.getProcesso()).thenReturn(processoMock);
+
+        usuario = new Usuario();
+        usuario.setTitulo("analista_teste");
+        usuario.setUnidade(unidadeSuperiorMock);
 
         when(repositorioSubprocesso.findById(1L)).thenReturn(Optional.of(subprocessoMock));
 
@@ -252,7 +265,7 @@ public class SubprocessoServiceTest {
         setupBasico();
         when(subprocessoMock.getSituacao()).thenReturn(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-        subprocessoService.aceitarRevisaoCadastro(1L, "Obs teste", "analista_teste");
+        subprocessoService.aceitarRevisaoCadastro(1L, "Obs teste", usuario);
 
         verify(repositorioAnaliseCadastro).save(any(AnaliseCadastro.class));
         verify(repositorioMovimentacao).save(any(Movimentacao.class));
@@ -260,12 +273,12 @@ public class SubprocessoServiceTest {
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
         verify(notificacaoServico).enviarEmail(eq(SUP), assuntoCaptor.capture(), corpoCaptor.capture());
-        assertEquals("SGC: Revisão de cadastro da UN aceita e aguardando homologação", assuntoCaptor.getValue());
-        assertTrue(corpoCaptor.getValue().contains("foi aceita e está disponível para homologação"));
+        assertEquals("SGC: Revisão do cadastro de atividades e conhecimentos da UN submetido para análise", assuntoCaptor.getValue());
+        assertTrue(corpoCaptor.getValue().contains("A revisão do cadastro de atividades e conhecimentos da UN no processo Processo de Teste foi submetida para análise por essa unidade."));
 
         ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
         verify(repositorioAlerta).save(alertaCaptor.capture());
-        assertEquals("Revisão de cadastro da unidade UN aguardando homologação", alertaCaptor.getValue().getDescricao());
+        assertEquals("Revisão do cadastro de atividades e conhecimentos da unidade UN submetida para análise", alertaCaptor.getValue().getDescricao());
         assertEquals(unidadeSuperiorMock, alertaCaptor.getValue().getUnidadeDestino());
     }
 

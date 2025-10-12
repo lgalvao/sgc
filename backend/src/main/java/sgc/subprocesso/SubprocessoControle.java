@@ -141,7 +141,7 @@ public class SubprocessoControle {
             id,
             request.motivo(),
             request.observacoes(),
-            usuario.getTitulo()
+            usuario
         );
     }
 
@@ -178,7 +178,7 @@ public class SubprocessoControle {
             id,
             request.motivo(),
             request.observacoes(),
-            usuario.getTitulo()
+            usuario
         );
     }
 
@@ -190,7 +190,7 @@ public class SubprocessoControle {
         return subprocessoService.aceitarRevisaoCadastro(
             id,
             request.observacoes(),
-            usuario.getTitulo()
+            usuario
         );
     }
 
@@ -202,7 +202,7 @@ public class SubprocessoControle {
         return subprocessoService.homologarRevisaoCadastro(
             id,
             request.observacoes(),
-            usuario.getTitulo()
+            usuario
         );
     }
 
