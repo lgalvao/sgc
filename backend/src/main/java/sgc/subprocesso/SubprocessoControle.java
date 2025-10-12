@@ -15,6 +15,7 @@ import sgc.mapa.MapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.dto.*;
@@ -215,6 +216,11 @@ public class SubprocessoControle {
     @GetMapping("/{id}/mapa")
     public MapaCompletoDto obterMapa(@PathVariable Long id) {
         return mapaService.obterMapaSubprocesso(id);
+    }
+
+    @GetMapping("/{id}/mapa-visualizacao")
+    public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("id") Long subprocessoId) {
+        return mapaService.obterMapaParaVisualizacao(subprocessoId);
     }
     
     @PutMapping("/{id}/mapa")

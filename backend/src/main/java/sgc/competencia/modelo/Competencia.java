@@ -21,4 +21,9 @@ public class Competencia extends EntidadeBase {
 
     @Column(name = "descricao")
     private String descricao;
+
+    public Competencia(String descricao, Mapa mapa) {
+        this.descricao = descricao;
+        this.mapa = mapa;
+    }
 }
