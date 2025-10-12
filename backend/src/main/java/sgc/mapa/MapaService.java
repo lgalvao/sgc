@@ -247,20 +247,32 @@ public class MapaService {
         log.debug("Mapa {} validado com sucesso", idMapa);
     }
 
-    private void atualizarVinculosAtividades(Long idCompetencia, List<Long> idsAtividades) {
-        repositorioCompetenciaAtividade.deleteByCompetenciaCodigo(idCompetencia);
+    private void atualizarVinculosAtividades(Long idCompetencia, List<Long> novosIdsAtividades) {
+        List<CompetenciaAtividade> vinculosAtuais = repositorioCompetenciaAtividade.findByCompetenciaCodigo(idCompetencia);
+        Set<Long> idsAtuais = vinculosAtuais.stream()
+            .map(v -> v.getId().getAtividadeCodigo())
+            .collect(Collectors.toSet());
 
-        for (Long idAtividade : idsAtividades) {
-            if (!atividadeRepo.existsById(idAtividade)) {
-                log.warn("Tentativa de vincular atividade inexistente: {}", idAtividade);
-                continue;
-            }
-            CompetenciaAtividade vinculo = new CompetenciaAtividade();
-            CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
-            vinculo.setId(id);
-            repositorioCompetenciaAtividade.save(vinculo);
-        }
-        log.debug("Atualizados {} vínculos para competência {}", idsAtividades.size(), idCompetencia);
+        Set<Long> novosIds = new HashSet<>(novosIdsAtividades);
+
+        // Remover os que não estão na nova lista
+        vinculosAtuais.stream()
+            .filter(v -> !novosIds.contains(v.getId().getAtividadeCodigo()))
+            .forEach(repositorioCompetenciaAtividade::delete);
+
+        // Adicionar os que não estão na lista atual
+        Competencia competencia = repositorioCompetencia.findById(idCompetencia).orElseThrow();
+        novosIds.stream()
+            .filter(id -> !idsAtuais.contains(id))
+            .forEach(idAtividade -> {
+                atividadeRepo.findById(idAtividade).ifPresent(atividade -> {
+                    CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
+                    CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
+                    repositorioCompetenciaAtividade.save(vinculo);
+                });
+            });
+
+        log.debug("Atualizados {} vínculos para competência {}", novosIdsAtividades.size(), idCompetencia);
     }
 
     private void validarIntegridadeMapa(Long idMapa) {
@@ -281,10 +293,8 @@ public class MapaService {
     }
 
     private Long buscarSubprocessoDoMapa(Long idMapa) {
-        return repositorioSubprocesso.findAll().stream()
-                .filter(s -> s.getMapa() != null && s.getMapa().getCodigo().equals(idMapa))
-                .map(Subprocesso::getCodigo)
-                .findFirst()
-                .orElse(null);
+        return repositorioSubprocesso.findByMapaCodigo(idMapa)
+            .map(Subprocesso::getCodigo)
+            .orElse(null);
     }
 }

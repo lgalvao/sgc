@@ -36,4 +36,10 @@ public class CompetenciaAtividade implements Serializable {
     @ManyToOne
     @JoinColumn(name = "competencia_codigo", insertable = false, updatable = false)
     private Competencia competencia;
+
+    public CompetenciaAtividade(Id id, Competencia competencia, Atividade atividade) {
+        this.id = id;
+        this.competencia = competencia;
+        this.atividade = atividade;
+    }
 }

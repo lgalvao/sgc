@@ -3,8 +3,10 @@ package sgc.mapa;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.modelo.Usuario;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
@@ -95,11 +97,11 @@ public class MapaControle {
     @Transactional
     public ResponseEntity<MapaCompletoDto> salvarCompleto(
             @PathVariable Long id,
-            @RequestBody @Valid SalvarMapaRequest request
+            @RequestBody @Valid SalvarMapaRequest request,
+            @AuthenticationPrincipal Usuario usuario
     ) {
         try {
-            String usuarioTitulo = "USUARIO_ATUAL";
-            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuarioTitulo);
+            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTitulo());
             return ResponseEntity.ok(mapa);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
