@@ -29,6 +29,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProcessoControle.class)
 public class ProcessoControleTest {
+    private static final String NOVO_PROCESSO = "Novo Processo";
+    private static final String MAPEAMENTO = "MAPEAMENTO";
+    private static final String API_PROCESSOS = "/api/processos";
+    private static final String API_PROCESSOS_1 = "/api/processos/1";
+    private static final String API_PROCESSOS_999 = "/api/processos/999";
+    private static final String CODIGO_JSON_PATH = "$.codigo";
+    private static final String DESCRICAO_JSON_PATH = "$.descricao";
+    private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
+    private static final String PROCESSO_NAO_ENCONTRADO = "Processo não encontrado";
+    private static final String REVISAO = "REVISAO";
     @MockitoBean
     private ProcessoService processoService;
 
@@ -54,35 +64,35 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        var req = new CriarProcessoReq("Novo Processo", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
         var dto = ProcessoDto.builder()
             .codigo(1L)
             .dataCriacao(LocalDateTime.now())
-            .descricao("Novo Processo")
+            .descricao(NOVO_PROCESSO)
             .situacao(SituacaoProcesso.CRIADO)
-            .tipo("MAPEAMENTO")
+            .tipo(MAPEAMENTO)
             .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(post("/api/processos")
+        mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/processos/1"))
-                .andExpect(jsonPath("$.codigo").value(1L))
-                .andExpect(jsonPath("$.descricao").value("Novo Processo"));
+                .andExpect(header().string("Location", API_PROCESSOS_1))
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(NOVO_PROCESSO));
 
         verify(processoService).criar(criarCaptor.capture());
         CriarProcessoReq capturado = criarCaptor.getValue();
-        assertEquals("Novo Processo", capturado.descricao());
+        assertEquals(NOVO_PROCESSO, capturado.descricao());
     }
 
     @Test
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        var req = new CriarProcessoReq("", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq("", MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
 
-        mockMvc.perform(post("/api/processos")
+        mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
@@ -95,15 +105,15 @@ public class ProcessoControleTest {
             .dataCriacao(LocalDateTime.now())
             .descricao("Processo Teste")
             .situacao(SituacaoProcesso.CRIADO)
-            .tipo("MAPEAMENTO")
+            .tipo(MAPEAMENTO)
             .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
-        mockMvc.perform(get("/api/processos/1"))
+        mockMvc.perform(get(API_PROCESSOS_1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L))
-                .andExpect(jsonPath("$.descricao").value("Processo Teste"));
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH).value("Processo Teste"));
 
         verify(processoService).obterPorId(1L);
     }
@@ -112,7 +122,7 @@ public class ProcessoControleTest {
     void obterPorId_ProcessoNaoExiste_RetornaNotFound() throws Exception {
         when(processoService.obterPorId(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/processos/999"))
+        mockMvc.perform(get(API_PROCESSOS_999))
                 .andExpect(status().isNotFound());
 
         verify(processoService).obterPorId(999L);
@@ -120,36 +130,36 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        var req = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
+        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDate.now().plusDays(45), List.of(1L));
         var dto = ProcessoDto.builder()
             .codigo(1L)
             .dataCriacao(LocalDateTime.now())
-            .descricao("Processo Atualizado")
+            .descricao(PROCESSO_ATUALIZADO)
             .situacao(SituacaoProcesso.CRIADO)
-            .tipo("REVISAO")
+            .tipo(REVISAO)
             .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(put("/api/processos/1")
+        mockMvc.perform(put(API_PROCESSOS_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L))
-                .andExpect(jsonPath("$.descricao").value("Processo Atualizado"));
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH).value(PROCESSO_ATUALIZADO));
 
         verify(processoService).atualizar(eq(1L), atualizarCaptor.capture());
         AtualizarProcessoReq capturado = atualizarCaptor.getValue();
-        assertEquals("Processo Atualizado", capturado.descricao());
+        assertEquals(PROCESSO_ATUALIZADO, capturado.descricao());
     }
 
     @Test
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        var req = new AtualizarProcessoReq(999L, "Teste", "MAPEAMENTO", null, List.of(1L));
+        var req = new AtualizarProcessoReq(999L, "Teste", MAPEAMENTO, null, List.of(1L));
 
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put("/api/processos/999")
+        mockMvc.perform(put(API_PROCESSOS_999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound());
@@ -157,11 +167,11 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        var req = new AtualizarProcessoReq(1L, "Teste", "MAPEAMENTO", null, List.of(1L));
+        var req = new AtualizarProcessoReq(1L, "Teste", MAPEAMENTO, null, List.of(1L));
 
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put("/api/processos/1")
+        mockMvc.perform(put(API_PROCESSOS_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict());
@@ -169,7 +179,7 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoExiste_RetornaNoContent() throws Exception {
-        mockMvc.perform(delete("/api/processos/1"))
+        mockMvc.perform(delete(API_PROCESSOS_1))
                 .andExpect(status().isNoContent());
 
         verify(processoService).apagar(1L);
@@ -177,9 +187,9 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).apagar(999L);
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
 
-        mockMvc.perform(delete("/api/processos/999"))
+        mockMvc.perform(delete(API_PROCESSOS_999))
                 .andExpect(status().isNotFound());
     }
 
@@ -187,7 +197,7 @@ public class ProcessoControleTest {
     void excluir_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
         doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
 
-        mockMvc.perform(delete("/api/processos/1"))
+        mockMvc.perform(delete(API_PROCESSOS_1))
                 .andExpect(status().isConflict());
     }
 
@@ -213,7 +223,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).obterDetalhes(eq(999L));
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).obterDetalhes(eq(999L));
 
         mockMvc.perform(get("/api/processos/999/detalhes"))
                 .andExpect(status().isNotFound());
@@ -253,16 +263,16 @@ public class ProcessoControleTest {
             .codigo(1L)
             .descricao("Processo de Revisão Iniciado")
             .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo("REVISAO")
+            .tipo(REVISAO)
             .build();
 
         when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
 
-        mockMvc.perform(post("/api/processos/1/iniciar?tipo=REVISAO")
+        mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar?tipo=REVISAO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(1L));
+                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
 
         verify(processoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
     }
@@ -297,9 +307,9 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Processo não encontrado")).when(processoService).finalizar(999L);
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).finalizar(999L);
 
-        mockMvc.perform(post("/api/processos/999/finalizar"))
+        mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar"))
                 .andExpect(status().isNotFound());
     }
 

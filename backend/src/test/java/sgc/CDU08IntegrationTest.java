@@ -49,6 +49,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-08: Manter Cadastro de Atividades e Conhecimentos")
 class CDU08IntegrationTest {
 
+    private static final String API_ATIVIDADES = "/api/atividades";
+    private static final String API_CONHECIMENTOS = "/api/conhecimentos";
+    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
+    private static final String API_CONHECIMENTOS_ID = "/api/conhecimentos/{id}";
+    private static final String DESCRICAO_JSON_PATH = "$.descricao";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -117,11 +123,11 @@ class CDU08IntegrationTest {
         void deveAdicionarNovaAtividade() throws Exception {
             String novaAtividadeJson = String.format("{\"descricao\": \"Nova Atividade de Teste\", \"mapaCodigo\": %d}", mapaMapeamento.getCodigo());
 
-            mockMvc.perform(post("/api/atividades")
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(novaAtividadeJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.descricao", is("Nova Atividade de Teste")));
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Nova Atividade de Teste")));
 
             List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaMapeamento.getCodigo());
             assertThat(atividades).hasSize(1);
@@ -134,11 +140,11 @@ class CDU08IntegrationTest {
             Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Conhecimento"));
             String novoConhecimentoJson = String.format("{\"descricao\": \"Novo Conhecimento de Teste\", \"atividadeCodigo\": %d}", atividade.getCodigo());
 
-            mockMvc.perform(post("/api/conhecimentos")
+            mockMvc.perform(post(API_CONHECIMENTOS)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(novoConhecimentoJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.descricao", is("Novo Conhecimento de Teste")));
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Novo Conhecimento de Teste")));
 
             List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
             assertThat(conhecimentos).hasSize(1);
@@ -156,11 +162,11 @@ class CDU08IntegrationTest {
             Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade Original"));
             String atividadeEditadaJson = "{\"descricao\": \"Atividade Editada\"}";
 
-            mockMvc.perform(put("/api/atividades/{id}", atividade.getCodigo())
+            mockMvc.perform(put(API_ATIVIDADES_ID, atividade.getCodigo())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(atividadeEditadaJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.descricao", is("Atividade Editada")));
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Atividade Editada")));
 
             Atividade atividadeDoBanco = atividadeRepo.findById(atividade.getCodigo()).orElseThrow();
             assertThat(atividadeDoBanco.getDescricao()).isEqualTo("Atividade Editada");
@@ -176,11 +182,11 @@ class CDU08IntegrationTest {
                 atividade.getCodigo()
             );
 
-            mockMvc.perform(put("/api/conhecimentos/{id}", conhecimento.getCodigo())
+            mockMvc.perform(put(API_CONHECIMENTOS_ID, conhecimento.getCodigo())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(conhecimentoEditadoJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.descricao", is("Conhecimento Editado")));
+                .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Conhecimento Editado")));
 
             Conhecimento conhecimentoDoBanco = conhecimentoRepo.findById(conhecimento.getCodigo()).orElseThrow();
             assertThat(conhecimentoDoBanco.getDescricao()).isEqualTo("Conhecimento Editado");
@@ -197,7 +203,7 @@ class CDU08IntegrationTest {
             Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Remoção de Conhecimento"));
             Conhecimento conhecimento = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento a ser Removido"));
 
-            mockMvc.perform(delete("/api/conhecimentos/{id}", conhecimento.getCodigo()))
+            mockMvc.perform(delete(API_CONHECIMENTOS_ID, conhecimento.getCodigo()))
                 .andExpect(status().isNoContent());
 
             assertThat(conhecimentoRepo.findById(conhecimento.getCodigo())).isEmpty();
@@ -210,7 +216,7 @@ class CDU08IntegrationTest {
             Conhecimento conhecimento1 = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento 1"));
             Conhecimento conhecimento2 = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento 2"));
 
-            mockMvc.perform(delete("/api/atividades/{id}", atividade.getCodigo()))
+            mockMvc.perform(delete(API_ATIVIDADES_ID, atividade.getCodigo()))
                 .andExpect(status().isNoContent());
 
             assertThat(atividadeRepo.findById(atividade.getCodigo())).isEmpty();
@@ -291,7 +297,7 @@ class CDU08IntegrationTest {
 
             String novaAtividadeJson = "{\"descricao\": \"Atividade Inválida\"}";
 
-            mockMvc.perform(post("/api/atividades")
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(novaAtividadeJson))
                 .andExpect(status().isUnprocessableEntity());
@@ -302,7 +308,7 @@ class CDU08IntegrationTest {
         void naoDeveAdicionarAtividadeComDescricaoVazia() throws Exception {
             String novaAtividadeJson = "{\"descricao\": \"\"}";
 
-            mockMvc.perform(post("/api/atividades")
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(novaAtividadeJson))
                 .andExpect(status().isBadRequest());
@@ -318,7 +324,7 @@ class CDU08IntegrationTest {
 
             String novaAtividadeJson = String.format("{\"descricao\": \"Atividade Nao Autorizada\", \"mapaCodigo\": %d}", mapaMapeamento.getCodigo());
 
-            mockMvc.perform(post("/api/atividades")
+            mockMvc.perform(post(API_ATIVIDADES)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(novaAtividadeJson))
                 .andExpect(status().isForbidden());

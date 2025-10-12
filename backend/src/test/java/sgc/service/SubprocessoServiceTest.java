@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -100,6 +101,7 @@ public class SubprocessoServiceTest {
     private Unidade unidadeSuperiorMock;
     private Subprocesso subprocessoMock;
 
+    @BeforeEach
     void setupBasico() {
         Processo processoMock = mock(Processo.class);
         when(processoMock.getDescricao()).thenReturn("Processo de Teste");

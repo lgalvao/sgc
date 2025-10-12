@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ProcessoMapperTest {
+    private static final String TEST_DESCRIPTION = "Test Description";
     private final ProcessoConversor mapper = Mappers.getMapper(ProcessoConversor.class);
 
     @Test
@@ -24,7 +25,7 @@ class ProcessoMapperTest {
         processo.setDataCriacao(LocalDateTime.now());
         processo.setDataFinalizacao(LocalDateTime.now().plusDays(1));
         processo.setDataLimite(LocalDate.now().plusDays(5));
-        processo.setDescricao("Test Description");
+        processo.setDescricao(TEST_DESCRIPTION);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -33,7 +34,7 @@ class ProcessoMapperTest {
 
         // Verify mapping
         assertEquals(1L, dto.getCodigo());
-        assertEquals("Test Description", dto.getDescricao());
+        assertEquals(TEST_DESCRIPTION, dto.getDescricao());
         assertEquals(SituacaoProcesso.EM_ANDAMENTO, dto.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO.name(), dto.getTipo());
         assertNotNull(dto.getDataCriacao());
@@ -49,7 +50,7 @@ class ProcessoMapperTest {
             .dataCriacao(LocalDateTime.now())
             .dataFinalizacao(LocalDateTime.now().plusDays(1))
             .dataLimite(LocalDate.now().plusDays(5))
-            .descricao("Test Description")
+            .descricao(TEST_DESCRIPTION)
             .situacao(SituacaoProcesso.EM_ANDAMENTO)
             .tipo(TipoProcesso.MAPEAMENTO.name())
             .build();
@@ -59,7 +60,7 @@ class ProcessoMapperTest {
 
         // Verify mapping
         assertNotNull(processo);
-        assertEquals("Test Description", processo.getDescricao());
+        assertEquals(TEST_DESCRIPTION, processo.getDescricao());
         assertEquals(SituacaoProcesso.EM_ANDAMENTO, processo.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
         assertNotNull(processo.getDataCriacao());

@@ -340,8 +340,14 @@ checkstyle {
 pmd {
     toolVersion = "7.16.0"
     rulesMinimumPriority = 5
+}
+
+tasks.withType<org.gradle.api.plugins.quality.Pmd> {
     ruleSets = listOf("category/java/errorprone.xml")
-    suppressions.set(resources.text.fromFile("config/pmd/suppressions.xml"))
+    reports {
+        xml.required.set(true)
+        html.required.set(false)
+    }
 }
 
 tasks.withType<org.gradle.api.plugins.quality.Pmd> {
@@ -378,7 +384,7 @@ tasks.spotbugsMain {
 }
 
 tasks.spotbugsTest {
-    enabled = false
+    enabled = true
 }
 
 tasks.checkstyleMain {
@@ -390,7 +396,7 @@ tasks.pmdMain {
 }
 
 tasks.pmdTest {
-    enabled = false
+    enabled = true
 }
 
 

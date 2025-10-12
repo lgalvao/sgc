@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AtividadeMapperTest {
 
+    private static final String TEST_DESCRIPTION = "Test Description";
     private final AtividadeMapper mapper = Mappers.getMapper(AtividadeMapper.class);
 
     @Test
@@ -16,7 +17,7 @@ class AtividadeMapperTest {
         // Create an Atividade entity
         Atividade atividade = new Atividade();
         atividade.setCodigo(1L);
-        atividade.setDescricao("Test Description");
+        atividade.setDescricao(TEST_DESCRIPTION);
         
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -28,20 +29,20 @@ class AtividadeMapperTest {
         // Verify mapping
         assertEquals(1L, dto.codigo());
         assertEquals(100L, dto.mapaCodigo());
-        assertEquals("Test Description", dto.descricao());
+        assertEquals(TEST_DESCRIPTION, dto.descricao());
     }
 
     @Test
     void testToEntity() {
         // Create an AtividadeDto
-        AtividadeDto dto = new AtividadeDto(1L, 100L, "Test Description");
+        AtividadeDto dto = new AtividadeDto(1L, 100L, TEST_DESCRIPTION);
 
         // Map to entity
         Atividade atividade = mapper.toEntity(dto);
 
         // Verify mapping
         assertNotNull(atividade);
-        assertEquals("Test Description", atividade.getDescricao());
+        assertEquals(TEST_DESCRIPTION, atividade.getDescricao());
         assertNotNull(atividade.getMapa());
         assertEquals(100L, atividade.getMapa().getCodigo());
     }

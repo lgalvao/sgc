@@ -27,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CompetenciaAtividadeControle.class)
 class CompetenciaAtividadeControleTest {
+    private static final String API_COMPETENCIA_ATIVIDADES = "/api/competencia-atividades";
+    private static final String TESTUSER = "testuser";
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,7 +60,7 @@ class CompetenciaAtividadeControleTest {
 
         when(repositorioCompetenciaAtividade.findAll()).thenReturn(Collections.singletonList(vinculo));
 
-        mockMvc.perform(get("/api/competencia-atividades").with(user("testuser")))
+        mockMvc.perform(get(API_COMPETENCIA_ATIVIDADES).with(user(TESTUSER)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id.atividadeCodigo").value(1L))
@@ -81,7 +83,7 @@ class CompetenciaAtividadeControleTest {
 
         when(repositorioCompetenciaAtividade.findAll()).thenReturn(Collections.singletonList(vinculo));
 
-        mockMvc.perform(get("/api/competencia-atividades/por-atividade/1").with(user("testuser")))
+        mockMvc.perform(get(API_COMPETENCIA_ATIVIDADES + "/por-atividade/1").with(user(TESTUSER)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id.atividadeCodigo").value(1L));
@@ -98,8 +100,8 @@ class CompetenciaAtividadeControleTest {
         when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(false);
         when(repositorioCompetenciaAtividade.save(any())).thenReturn(new CompetenciaAtividade());
 
-        mockMvc.perform(post("/api/competencia-atividades")
-                .with(user("testuser")).with(csrf())
+        mockMvc.perform(post(API_COMPETENCIA_ATIVIDADES)
+                .with(user(TESTUSER)).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
@@ -114,8 +116,8 @@ class CompetenciaAtividadeControleTest {
         when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
         when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(new Competencia()));
 
-        mockMvc.perform(post("/api/competencia-atividades")
-                        .with(user("testuser")).with(csrf())
+        mockMvc.perform(post(API_COMPETENCIA_ATIVIDADES)
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -130,8 +132,8 @@ class CompetenciaAtividadeControleTest {
         when(atividadeRepo.findById(1L)).thenReturn(Optional.of(new Atividade()));
         when(repositorioCompetencia.findById(99L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/api/competencia-atividades")
-                        .with(user("testuser")).with(csrf())
+        mockMvc.perform(post(API_COMPETENCIA_ATIVIDADES)
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -147,8 +149,8 @@ class CompetenciaAtividadeControleTest {
         when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(new Competencia()));
         when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(true);
 
-        mockMvc.perform(post("/api/competencia-atividades")
-                .with(user("testuser")).with(csrf())
+        mockMvc.perform(post(API_COMPETENCIA_ATIVIDADES)
+                .with(user(TESTUSER)).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
@@ -159,8 +161,8 @@ class CompetenciaAtividadeControleTest {
         when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(true);
         doNothing().when(repositorioCompetenciaAtividade).deleteById(any());
 
-        mockMvc.perform(delete("/api/competencia-atividades?idAtividade=1&idCompetencia=1")
-                .with(user("testuser")).with(csrf()))
+        mockMvc.perform(delete(API_COMPETENCIA_ATIVIDADES + "?idAtividade=1&idCompetencia=1")
+                .with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -168,8 +170,8 @@ class CompetenciaAtividadeControleTest {
     void desvincular_quandoNaoEncontrado_deveRetornarNotFound() throws Exception {
         when(repositorioCompetenciaAtividade.existsById(any())).thenReturn(false);
 
-        mockMvc.perform(delete("/api/competencia-atividades?idAtividade=1&idCompetencia=1")
-                .with(user("testuser")).with(csrf()))
+        mockMvc.perform(delete(API_COMPETENCIA_ATIVIDADES + "?idAtividade=1&idCompetencia=1")
+                .with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

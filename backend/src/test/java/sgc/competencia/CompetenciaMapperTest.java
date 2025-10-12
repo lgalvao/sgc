@@ -10,13 +10,14 @@ import sgc.mapa.modelo.Mapa;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompetenciaMapperTest {
+    private static final String DESCRICAO_TESTE = "Descrição Teste";
     private final CompetenciaMapper mapper = Mappers.getMapper(CompetenciaMapper.class);
 
     @Test
     void toDTO_comMapa_deveMapearCorretamente() {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
-        Competencia competencia = new Competencia(mapa, "Descrição Teste");
+        Competencia competencia = new Competencia(mapa, DESCRICAO_TESTE);
         competencia.setCodigo(10L);
 
         CompetenciaDto dto = mapper.toDTO(competencia);
@@ -24,12 +25,12 @@ class CompetenciaMapperTest {
         assertNotNull(dto);
         assertEquals(10L, dto.codigo());
         assertEquals(1L, dto.mapaCodigo());
-        assertEquals("Descrição Teste", dto.descricao());
+        assertEquals(DESCRICAO_TESTE, dto.descricao());
     }
 
     @Test
     void toDTO_semMapa_deveMapearCorretamente() {
-        Competencia competencia = new Competencia(null, "Descrição Teste");
+        Competencia competencia = new Competencia(null, DESCRICAO_TESTE);
         competencia.setCodigo(10L);
 
         CompetenciaDto dto = mapper.toDTO(competencia);
@@ -37,12 +38,12 @@ class CompetenciaMapperTest {
         assertNotNull(dto);
         assertEquals(10L, dto.codigo());
         assertNull(dto.mapaCodigo());
-        assertEquals("Descrição Teste", dto.descricao());
+        assertEquals(DESCRICAO_TESTE, dto.descricao());
     }
 
     @Test
     void toEntity_comMapaCodigo_deveMapearCorretamente() {
-        CompetenciaDto dto = new CompetenciaDto(10L, 1L, "Descrição Teste");
+        CompetenciaDto dto = new CompetenciaDto(10L, 1L, DESCRICAO_TESTE);
 
         Competencia competencia = mapper.toEntity(dto);
 
@@ -50,19 +51,19 @@ class CompetenciaMapperTest {
         assertEquals(10L, competencia.getCodigo());
         assertNotNull(competencia.getMapa());
         assertEquals(1L, competencia.getMapa().getCodigo());
-        assertEquals("Descrição Teste", competencia.getDescricao());
+        assertEquals(DESCRICAO_TESTE, competencia.getDescricao());
     }
 
     @Test
     void toEntity_semMapaCodigo_deveMapearCorretamente() {
-        CompetenciaDto dto = new CompetenciaDto(10L, null, "Descrição Teste");
+        CompetenciaDto dto = new CompetenciaDto(10L, null, DESCRICAO_TESTE);
 
         Competencia competencia = mapper.toEntity(dto);
 
         assertNotNull(competencia);
         assertEquals(10L, competencia.getCodigo());
         assertNull(competencia.getMapa());
-        assertEquals("Descrição Teste", competencia.getDescricao());
+        assertEquals(DESCRICAO_TESTE, competencia.getDescricao());
     }
 
     @Test

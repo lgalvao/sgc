@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfig.class)
 @Transactional
 public class CDU05IntegrationTest {
+    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{id}/iniciar?tipo=REVISAO";
 
     @Autowired
     private MockMvc mockMvc;
@@ -95,7 +96,7 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Iniciar o processo de revisão
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isOk())
@@ -128,7 +129,7 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Tentar iniciar o processo de revisão (deve falhar)
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
@@ -136,7 +137,7 @@ public class CDU05IntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", 999L).with(csrf())) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())) // ID que não existe
                 .andExpect(status().isNotFound());
     }
 
@@ -160,13 +161,13 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // Inicia o processo a primeira vez
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(post("/api/processos/{id}/iniciar?tipo=REVISAO", processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isConflict()); // Espera-se um erro de negócio

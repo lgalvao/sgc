@@ -31,6 +31,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
+    private static final String COMPETENCIA_AFETADA = "Competência Afetada";
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
 
@@ -99,7 +100,7 @@ class ImpactoMapaServiceTest {
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(20L);
-        competencia.setDescricao("Competência Afetada");
+        competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
         CompetenciaAtividade vinculo = new CompetenciaAtividade();
@@ -126,7 +127,7 @@ class ImpactoMapaServiceTest {
         assertThat(result.atividadesRemovidas()).hasSize(1);
         assertThat(result.atividadesRemovidas().getFirst().descricao()).isEqualTo("Atividade Antiga");
         assertThat(result.competenciasImpactadas()).hasSize(1);
-        assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo("Competência Afetada");
+        assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo(COMPETENCIA_AFETADA);
     }
 
     @Test
@@ -213,7 +214,7 @@ class ImpactoMapaServiceTest {
 
         Competencia competencia = new Competencia();
         competencia.setCodigo(20L);
-        competencia.setDescricao("Competência Afetada");
+        competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
         CompetenciaAtividade vinculo = new CompetenciaAtividade();
@@ -241,6 +242,6 @@ class ImpactoMapaServiceTest {
         assertThat(result.atividadesInseridas().getFirst().descricao()).isEqualTo("Descrição Nova");
         assertThat(result.atividadesRemovidas().getFirst().descricao()).isEqualTo("Descrição Antiga");
         assertThat(result.competenciasImpactadas()).hasSize(1);
-        assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo("Competência Afetada");
+        assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo(COMPETENCIA_AFETADA);
     }
 }

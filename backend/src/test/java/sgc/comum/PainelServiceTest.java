@@ -30,6 +30,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do PainelService")
 class PainelServiceTest {
+    private static final String PROCESSO_1 = "Processo 1";
+    private static final String USUARIO = "USUARIO";
     @Mock
     private ProcessoRepo processoRepo;
 
@@ -80,7 +82,7 @@ class PainelServiceTest {
     void deveRetornarTodosOsProcessosQuandoPerfilNaoForAdminEUnidadeNaoInformada() {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
-        processo1.setDescricao("Processo 1");
+        processo1.setDescricao(PROCESSO_1);
         processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -94,7 +96,7 @@ class PainelServiceTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
 
         Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarProcessos("USUARIO", null, pageable);
+        var result = painelService.listarProcessos(USUARIO, null, pageable);
 
         assertEquals(2, result.getTotalElements());
         verify(processoRepo, times(1)).findAll();
@@ -105,7 +107,7 @@ class PainelServiceTest {
     void deveRetornarApenasProcessosComSituacaoCriadoQuandoPerfilForAdmin() {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
-        processo1.setDescricao("Processo 1");
+        processo1.setDescricao(PROCESSO_1);
         processo1.setSituacao(SituacaoProcesso.CRIADO);
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -131,7 +133,7 @@ class PainelServiceTest {
     void deveFiltrarProcessosPorUnidadeQuandoCodigoUnidadeInformado() {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
-        processo1.setDescricao("Processo 1");
+        processo1.setDescricao(PROCESSO_1);
         processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -150,7 +152,7 @@ class PainelServiceTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(2L)).thenReturn(Collections.emptyList());
 
         Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarProcessos("USUARIO", 10L, pageable);
+        var result = painelService.listarProcessos(USUARIO, 10L, pageable);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(1L, result.getContent().getFirst().getCodigo());
@@ -190,7 +192,7 @@ class PainelServiceTest {
     void deveRetornarPaginaVaziaQuandoIndiceInicialMaiorQueTotal() {
         Processo processo1 = new Processo();
         processo1.setCodigo(1L);
-        processo1.setDescricao("Processo 1");
+        processo1.setDescricao(PROCESSO_1);
         processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
 
@@ -198,7 +200,7 @@ class PainelServiceTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
 
         Pageable pageable = PageRequest.of(10, 5); // Página muito alta
-        var result = painelService.listarProcessos("USUARIO", null, pageable);
+        var result = painelService.listarProcessos(USUARIO, null, pageable);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(0, result.getContent().size());

@@ -59,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class CDU04IntegrationTest {
     @TestConfiguration
+    @SuppressWarnings("PMD.TestClassWithoutTestCases")
     static class TestSecurityConfig {
         @Bean
         SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {

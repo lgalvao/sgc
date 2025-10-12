@@ -51,6 +51,18 @@ import sgc.comum.enums.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 public class SubprocessoServiceTest {
+    private static final String UN = "UN";
+    private static final String UNIDADE = "Unidade";
+    private static final String OBSERVACOES = "observacoes";
+    private static final String USUARIO = "usuario";
+    private static final String SUPER = "SUPER";
+    private static final String UNIDADE_SUPERIOR = "Unidade Superior";
+    private static final String UN = "UN";
+    private static final String UNIDADE = "Unidade";
+    private static final String OBSERVACOES = "observacoes";
+    private static final String USUARIO = "usuario";
+    private static final String SUPER = "SUPER";
+    private static final String UNIDADE_SUPERIOR = "Unidade Superior";
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
 
@@ -316,10 +328,10 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setMapa(new Mapa());
         subprocesso.setProcesso(criarProcessoMock());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
-        subprocessoService.disponibilizarMapa(id, "observacoes", LocalDate.now(), "usuario");
+        subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), USUARIO);
 
         verify(repositorioSubprocesso, times(1)).save(subprocesso);
     }
@@ -333,7 +345,7 @@ public class SubprocessoServiceTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> subprocessoService.disponibilizarMapa(id, "observacoes", LocalDate.now(), "usuario")
+                () -> subprocessoService.disponibilizarMapa(id, OBSERVACOES, LocalDate.now(), USUARIO)
         );
         assertTrue(exception.getMessage().contains("Subprocesso sem mapa associado"));
     }
@@ -345,12 +357,12 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setMapa(new Mapa());
         subprocesso.setProcesso(criarProcessoMock());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
-        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.apresentarSugestoes(id, "sugestoes", "usuario");
+        SubprocessoDto result = subprocessoService.apresentarSugestoes(id, "sugestoes", USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_COM_SUGESTOES, subprocesso.getSituacao());
@@ -365,12 +377,12 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setMapa(new Mapa());
         subprocesso.setProcesso(criarProcessoMock());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
-        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.validarMapa(id, "usuario");
+        SubprocessoDto result = subprocessoService.validarMapa(id, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_VALIDADO, subprocesso.getSituacao());
@@ -386,7 +398,7 @@ public class SubprocessoServiceTest {
         subprocesso.setMapa(new Mapa());
         subprocesso.setMapa(new Mapa());
         subprocesso.getMapa().setSugestoes("sugestoes");
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
         SugestoesDto result = subprocessoService.obterSugestoes(id);
@@ -394,7 +406,7 @@ public class SubprocessoServiceTest {
         assertNotNull(result);
         assertEquals("sugestoes", result.sugestoes());
         assertTrue(result.sugestoesApresentadas());
-        assertEquals("Unidade", result.unidadeNome());
+        assertEquals(UNIDADE, result.unidadeNome());
     }
 
     @Test
@@ -420,12 +432,12 @@ public class SubprocessoServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
-        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.devolverValidacao(id, "justificativa", "usuario");
+        SubprocessoDto result = subprocessoService.devolverValidacao(id, "justificativa", USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_DISPONIBILIZADO, subprocesso.getSituacao());
@@ -440,15 +452,15 @@ public class SubprocessoServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
-        Unidade unidadeSuperior = criarUnidadeMock(20L, "SUPER", "Unidade Superior");
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        Unidade unidadeSuperior = criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR);
         Unidade unidadeSuperSuperior = criarUnidadeMock(30L, "SSUPER", "Unidade Super Superior");
         unidadeSuperior.setUnidadeSuperior(unidadeSuperSuperior);
         subprocesso.getUnidade().setUnidadeSuperior(unidadeSuperior);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.aceitarValidacao(id, "usuario");
+        SubprocessoDto result = subprocessoService.aceitarValidacao(id, USUARIO);
 
         assertNotNull(result);
         verify(repositorioAnaliseValidacao, times(1)).save(any(AnaliseValidacao.class));
@@ -464,7 +476,7 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.homologarValidacao(id, "usuario");
+        SubprocessoDto result = subprocessoService.homologarValidacao(id, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_HOMOLOGADO, subprocesso.getSituacao());
@@ -478,7 +490,7 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setMapa(new Mapa());
         subprocesso.setMapa(new Mapa());
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
         MapaAjusteDto result = subprocessoService.obterMapaParaAjuste(id);
@@ -511,7 +523,7 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.salvarAjustesMapa(id, new ArrayList<>(), "usuario");
+        SubprocessoDto result = subprocessoService.salvarAjustesMapa(id, new ArrayList<>(), USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO, subprocesso.getSituacao());
@@ -528,7 +540,7 @@ public class SubprocessoServiceTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> subprocessoService.salvarAjustesMapa(id, new ArrayList<>(), "usuario")
+                () -> subprocessoService.salvarAjustesMapa(id, new ArrayList<>(), USUARIO)
         );
         assertTrue(exception.getMessage().contains("Ajustes no mapa só podem ser feitos em estados específicos"));
     }
@@ -538,12 +550,12 @@ public class SubprocessoServiceTest {
         Long id = 1L;
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
-        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
+        subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.submeterMapaAjustado(id, "usuario");
+        SubprocessoDto result = subprocessoService.submeterMapaAjustado(id, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO, subprocesso.getSituacao());
@@ -558,14 +570,14 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        Unidade unidadeSuperior = criarUnidadeMock(20L, "SUPER", "Unidade Superior");
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        Unidade unidadeSuperior = criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR);
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.devolverCadastro(id, "motivo", "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.devolverCadastro(id, "motivo", OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
@@ -581,14 +593,14 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        Unidade unidadeSuperior = criarUnidadeMock(20L, "SUPER", "Unidade Superior");
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        Unidade unidadeSuperior = criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR);
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.aceitarCadastro(id, "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.aceitarCadastro(id, OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         verify(repositorioAnaliseCadastro, times(1)).save(any(AnaliseCadastro.class));
@@ -605,7 +617,7 @@ public class SubprocessoServiceTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> subprocessoService.aceitarCadastro(id, "observacoes", "usuario")
+                () -> subprocessoService.aceitarCadastro(id, OBSERVACOES, USUARIO)
         );
         assertTrue(exception.getMessage().contains("Ação de aceite só pode ser executada em cadastros disponibilizados"));
     }
@@ -617,8 +629,8 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        Unidade unidadeSuperior = criarUnidadeMock(20L, "SUPER", "Unidade Superior");
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        Unidade unidadeSuperior = criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR);
         unidade.setUnidadeSuperior(unidadeSuperior);
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
@@ -629,7 +641,7 @@ public class SubprocessoServiceTest {
 
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.homologarCadastro(id, "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.homologarCadastro(id, OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_HOMOLOGADO, subprocesso.getSituacao());
@@ -643,13 +655,13 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        unidade.setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.devolverRevisaoCadastro(id, "motivo", "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.devolverRevisaoCadastro(id, "motivo", OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
@@ -665,13 +677,13 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        unidade.setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(id, "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(id, OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         verify(repositorioAnaliseCadastro, times(1)).save(any(AnaliseCadastro.class));
@@ -685,13 +697,13 @@ public class SubprocessoServiceTest {
         subprocesso.setCodigo(id);
         subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        Unidade unidade = criarUnidadeMock(10L, "UNI", "Unidade");
-        unidade.setUnidadeSuperior(criarUnidadeMock(20L, "SUPER", "Unidade Superior"));
+        Unidade unidade = criarUnidadeMock(10L, UN, UNIDADE);
+        unidade.setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         subprocesso.setUnidade(unidade);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(id, "observacoes", "usuario");
+        SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(id, OBSERVACOES, USUARIO);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, subprocesso.getSituacao());
@@ -709,7 +721,7 @@ public class SubprocessoServiceTest {
     private Subprocesso criarSubprocessoMock(Long id) {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
-        subprocesso.setUnidade(criarUnidadeMock(10L, "UNI", "Unidade"));
+        subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO); // Set a default situation
         return subprocesso;
     }
