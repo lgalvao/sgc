@@ -60,7 +60,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroValidacao.class)
     protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage())));
+        ApiError apiError = new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage()));
+        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+            apiError.setDetails(ex.getDetails());
+        }
+        return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

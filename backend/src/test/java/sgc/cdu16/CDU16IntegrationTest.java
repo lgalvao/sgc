@@ -111,6 +111,9 @@ public class CDU16IntegrationTest {
     @WithMockChefe
     @DisplayName("Deve submeter o mapa ajustado e alterar a situação para MAPA_DISPONIBILIZADO")
     void submeterMapaAjustado_deveMudarSituacao() throws Exception {
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+        subprocessoRepo.save(subprocesso);
+
         SubmeterMapaAjustadoReq request = new SubmeterMapaAjustadoReq("Observações de teste", LocalDate.now().plusDays(10));
 
         mockMvc.perform(post("/api/subprocessos/{id}/submeter-mapa-ajustado", subprocesso.getCodigo())

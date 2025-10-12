@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
+@org.springframework.context.annotation.Import(TestSecurityConfig.class)
 class CDU17IntegrationTest {
 
     @Autowired
@@ -190,6 +191,10 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
+            // Arrange: Associar atividade e competência para passar na validação de negócio
+            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
+
             DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
@@ -226,8 +231,9 @@ class CDU17IntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
+                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.atividadesNaoAssociadas").exists());
+                    .andExpect(jsonPath("$.details.atividadesNaoAssociadas").isNotEmpty());
         }
 
         @Test
@@ -246,7 +252,7 @@ class CDU17IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.competenciasNaoAssociadas").exists());
+                    .andExpect(jsonPath("$.details.competenciasNaoAssociadas").exists());
         }
     }
 }
