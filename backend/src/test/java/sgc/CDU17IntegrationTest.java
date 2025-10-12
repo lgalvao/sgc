@@ -1,0 +1,252 @@
+package sgc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.analise.modelo.AnaliseValidacao;
+import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.processo.enums.TipoProcesso;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
+import sgc.subprocesso.dto.DisponibilizarMapaReq;
+import sgc.subprocesso.modelo.Movimentacao;
+import sgc.subprocesso.modelo.MovimentacaoRepo;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+@DisplayName("CDU-17: Disponibilizar Mapa de Competências")
+class CDU17IntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    // Repositórios
+    @Autowired private ProcessoRepo processoRepo;
+    @Autowired private SubprocessoRepo subprocessoRepo;
+    @Autowired private UnidadeRepo unidadeRepo;
+    @Autowired private MapaRepo mapaRepo;
+    @Autowired private AtividadeRepo atividadeRepo;
+    @Autowired private CompetenciaRepo competenciaRepo;
+    @Autowired private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired private MovimentacaoRepo movimentacaoRepo;
+    @Autowired private AlertaRepo alertaRepo;
+    @Autowired private AnaliseValidacaoRepo analiseValidacaoRepo;
+    @Autowired private sgc.comum.modelo.UsuarioRepo usuarioRepo;
+
+    // Dados de Teste
+    private Processo processo;
+    private Unidade sedoc, unidade, unidadeSuperior;
+    private Subprocesso subprocesso;
+    private Mapa mapa;
+    private Atividade atividade;
+    private Competencia competencia;
+
+    @BeforeEach
+    void setUp() {
+        // Limpar dados antes de cada teste
+        movimentacaoRepo.deleteAll();
+        alertaRepo.deleteAll();
+        competenciaAtividadeRepo.deleteAll();
+        atividadeRepo.deleteAll();
+        competenciaRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        mapaRepo.deleteAll();
+        processoRepo.deleteAll();
+        usuarioRepo.deleteAll();
+        unidadeRepo.deleteAll();
+
+        // Criar Unidades
+        sedoc = unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
+        unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "US"));
+        unidade = new Unidade("Unidade de Teste", "UT");
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade = unidadeRepo.save(unidade);
+
+        // Criar Processo e Mapa
+        processo = new Processo();
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDescricao("Processo de Teste");
+        processo.setSituacao(sgc.comum.enums.SituacaoProcesso.EM_ANDAMENTO);
+        processo = processoRepo.save(processo);
+        mapa = mapaRepo.save(new Mapa());
+
+        // Criar Subprocesso
+        subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA); // Estado inicial válido
+        subprocesso = subprocessoRepo.save(subprocesso);
+
+        // Criar Atividade e Competência
+        atividade = atividadeRepo.save(new Atividade(mapa, "Atividade de Teste"));
+        competencia = competenciaRepo.save(new Competencia(mapa, "Competência de Teste"));
+    }
+
+    @Nested
+    @DisplayName("Testes de Sucesso")
+    class Sucesso {
+
+        @Test
+        @DisplayName("Deve disponibilizar mapa com sucesso quando todos os dados estão corretos")
+        @WithMockAdmin
+        void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
+            // Arrange: Associar atividade e competência
+            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
+
+            // Arrange: Adicionar uma análise de validação antiga para testar a limpeza
+            AnaliseValidacao analiseAntiga = new AnaliseValidacao();
+            analiseAntiga.setSubprocesso(subprocesso);
+            analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
+            analiseValidacaoRepo.save(analiseAntiga);
+
+            LocalDate dataLimite = LocalDate.now().plusDays(10);
+            String observacoes = "Observações de teste para o mapa.";
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
+
+            // Act & Assert
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado com sucesso."));
+
+            // Verificar o estado final no banco de dados
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+            assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite);
+
+            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).get();
+            assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
+
+            // Verificar Movimentação
+            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            assertThat(movimentacoes).hasSize(1);
+            Movimentacao mov = movimentacoes.get(0);
+            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+            assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
+            assertThat(mov.getDescricao()).isEqualTo("Disponibilização do mapa de competências para validação");
+
+            // Verificar Alerta
+            Optional<Alerta> alertaOpt = alertaRepo.findAll().stream().findFirst();
+            assertThat(alertaOpt).isPresent();
+            Alerta alerta = alertaOpt.get();
+            assertThat(alerta.getDescricao()).isEqualTo("Mapa de competências da unidade " + unidade.getSigla() + " disponibilizado para análise");
+            assertThat(alerta.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+            assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
+
+            // Verificar Limpeza do Histórico
+            List<AnaliseValidacao> analisesRestantes = analiseValidacaoRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
+            assertThat(analisesRestantes).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes de Falha")
+    class Falha {
+
+        @Test
+        @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
+        @WithMockGestor
+        void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("Não deve disponibilizar mapa se subprocesso não está no estado correto")
+        @WithMockAdmin
+        void disponibilizarMapa_comEstadoInvalido_retornaConflict() throws Exception {
+            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(subprocesso);
+
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isConflict()); // IllegalStateException é mapeado para 409
+        }
+
+        @Test
+        @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
+        @WithMockAdmin
+        void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
+            // Arrange: Não associar a atividade a nenhuma competência
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.atividadesNaoAssociadas").exists());
+        }
+
+        @Test
+        @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
+        @WithMockAdmin
+        void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
+            // Arrange: Associar a atividade, mas deixar uma competência solta
+            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
+            competenciaRepo.save(new Competencia(mapa, "Competência Solta"));
+
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq("Obs", LocalDate.now().plusDays(10));
+
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.competenciasNaoAssociadas").exists());
+        }
+    }
+}

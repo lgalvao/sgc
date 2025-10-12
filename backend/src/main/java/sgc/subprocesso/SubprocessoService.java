@@ -315,12 +315,30 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto disponibilizarMapa(Long idSubprocesso, String observacoes, java.time.LocalDate dataLimiteEtapa2, String usuarioTitulo) {
+    public void disponibilizarMapa(Long idSubprocesso, String observacoes, java.time.LocalDate dataLimiteEtapa2, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
+        // Pré-condição: Ação só pode ser executada por ADMIN em subprocessos com situações específicas.
+        final SituacaoSubprocesso situacaoAtual = sp.getSituacao();
+        if (situacaoAtual != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA && situacaoAtual != SituacaoSubprocesso.MAPA_AJUSTADO) {
+            throw new IllegalStateException("O mapa de competências só pode ser disponibilizado a partir dos estados 'Revisão de Cadastro Homologada' ou 'Mapa Ajustado'. Estado atual: " + situacaoAtual);
+        }
+
         if (sp.getMapa() == null) {
             throw new IllegalStateException("Subprocesso sem mapa associado");
+        }
+
+        // Validações da Lógica de Negócio
+        validarAssociacoesMapa(sp.getMapa().getCodigo());
+
+        // Limpeza de Dados Históricos
+        sp.getMapa().setSugestoes(null); // Limpa sugestões anteriores
+        repositorioAnaliseValidacao.deleteBySubprocesso_Codigo(idSubprocesso);
+
+        // Persistência de Dados
+        if (observacoes != null && !observacoes.isBlank()) {
+            sp.getMapa().setSugestoes(observacoes);
         }
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
@@ -328,10 +346,11 @@ public class SubprocessoService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
-        notificarDisponibilizacaoMapa(sp);
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
 
-        return subprocessoMapper.toDTO(sp);
+        notificarDisponibilizacaoMapa(sp);
     }
 
     @Transactional
@@ -546,36 +565,38 @@ public class SubprocessoService {
         String siglaUnidade = unidade.getSigla();
         String dataLimite = sp.getDataLimiteEtapa2().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        // Item 17: E-mail para a própria unidade
-        String assuntoUnidade = "SGC: Mapa de Competências da sua unidade disponibilizado para validação";
+        // E-mail para a unidade do subprocesso (Item 10.11 do CDU)
+        String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoUnidade = String.format(
-            "O mapa de competências da sua unidade (%s) foi disponibilizado para validação no processo '%s'. O prazo para conclusão desta etapa é %s.",
-            siglaUnidade,
-            nomeProcesso,
-            dataLimite
-        );
+            "Prezado(a) Chefe da unidade %s,%n%n" +
+            "O mapa de competências da sua unidade, referente ao processo '%s', foi disponibilizado para validação.%n" +
+            "O prazo para conclusão desta etapa é %s.%n%n" +
+            "Acesse o SGC para realizar a validação.",
+            siglaUnidade, nomeProcesso, dataLimite);
         notificacaoServico.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
-        // Item 18: E-mail para as unidades superiores
-        String assuntoSuperior = "SGC: Mapa de Competências da unidade " + siglaUnidade + " disponibilizado para validação";
+        // E-mail para as unidades superiores (Item 10.12 do CDU)
+        String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoSuperior = String.format(
-            "O mapa de competências da unidade %s foi disponibilizado para validação no processo '%s'. O prazo para conclusão desta etapa é %s. Acompanhe o processo no sistema.",
-            siglaUnidade,
-            nomeProcesso,
-            dataLimite
-        );
+            "Prezado(a) Chefe,%n%n" +
+            "O mapa de competências da unidade %s, referente ao processo '%s', foi disponibilizado para validação.%n" +
+            "O prazo para conclusão desta etapa é %s.%n%n" +
+            "Acompanhe o processo no SGC.",
+            siglaUnidade, nomeProcesso, dataLimite);
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
             notificacaoServico.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
             superior = superior.getUnidadeSuperior();
         }
 
-        // Item 16: Alerta para a própria unidade
+        // Alerta (Item 10.10 do CDU)
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
         Alerta alerta = new Alerta();
-        alerta.setDescricao(String.format("Seu mapa de competências está disponível para validação (Processo: %s)", nomeProcesso));
+        alerta.setDescricao(String.format("Mapa de competências da unidade %s disponibilizado para análise", siglaUnidade));
         alerta.setProcesso(sp.getProcesso());
         alerta.setDataHora(java.time.LocalDateTime.now());
-        alerta.setUnidadeOrigem(null); // Origem é o sistema
+        alerta.setUnidadeOrigem(sedoc);
         alerta.setUnidadeDestino(unidade);
         repositorioAlerta.save(alerta);
     }
@@ -1018,5 +1039,33 @@ public class SubprocessoService {
         repositorioMovimentacao.save(new Movimentacao(spDestino, spDestino.getUnidade(), spDestino.getUnidade(), descricaoMovimentacao));
 
         log.info("Atividades importadas com sucesso do subprocesso {} para {}", idSubprocessoOrigem, idSubprocessoDestino);
+    }
+
+    private void validarAssociacoesMapa(Long mapaId) {
+        // 1. Verificar se todas as competências estão associadas a pelo menos uma atividade
+        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapaId);
+        List<String> competenciasSemAssociacao = new ArrayList<>();
+        for (Competencia competencia : competencias) {
+            if (competenciaAtividadeRepo.countByCompetenciaCodigo(competencia.getCodigo()) == 0) {
+                competenciasSemAssociacao.add(competencia.getDescricao());
+            }
+        }
+
+        if (!competenciasSemAssociacao.isEmpty()) {
+            throw new ErroValidacao("Existem competências que não foram associadas a nenhuma atividade.", java.util.Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
+        }
+
+        // 2. Verificar se todas as atividades estão associadas a pelo menos uma competência
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
+        List<String> atividadesSemAssociacao = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (competenciaAtividadeRepo.countByAtividadeCodigo(atividade.getCodigo()) == 0) {
+                atividadesSemAssociacao.add(atividade.getDescricao());
+            }
+        }
+
+        if (!atividadesSemAssociacao.isEmpty()) {
+            throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.", java.util.Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
+        }
     }
 }
