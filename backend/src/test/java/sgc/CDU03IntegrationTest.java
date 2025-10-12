@@ -48,7 +48,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WithMockUser(username = "admin", roles = {"ADMIN"})
 public class CDU03IntegrationTest {
+    private static final String API_PROCESSOS = "/api/processos";
+    private static final String API_PROCESSOS_ID = "/api/processos/{id}";
     @TestConfiguration
+    @SuppressWarnings("PMD.TestClassWithoutTestCases")
     static class TestSecurityConfig {
         @Bean
         SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
@@ -98,7 +101,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(30)
         );
 
-        mockMvc.perform(post("/api/processos")
+        mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
@@ -119,7 +122,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(30)
         );
 
-        mockMvc.perform(post("/api/processos")
+        mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -134,7 +137,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(30)
         );
 
-        mockMvc.perform(post("/api/processos")
+        mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -153,7 +156,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(20)
         );
 
-        MvcResult result = mockMvc.perform(post("/api/processos")
+        MvcResult result = mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
                 .andExpect(status().isCreated())
@@ -174,7 +177,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(40) // Nova data limite
         );
 
-        mockMvc.perform(put("/api/processos/{id}", processoId)
+        mockMvc.perform(put(API_PROCESSOS_ID, processoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
@@ -194,7 +197,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(30)
         );
 
-        mockMvc.perform(put("/api/processos/{id}", 999L) // ID que não existe
+        mockMvc.perform(put(API_PROCESSOS_ID, 999L) // ID que não existe
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
@@ -212,7 +215,7 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(20)
         );
 
-        MvcResult result = mockMvc.perform(post("/api/processos")
+        MvcResult result = mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
                 .andExpect(status().isCreated())
@@ -221,17 +224,17 @@ public class CDU03IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Remover o processo
-        mockMvc.perform(delete("/api/processos/{id}", processoId))
+        mockMvc.perform(delete(API_PROCESSOS_ID, processoId))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
 
         // 3. Tentar buscar o processo removido para confirmar que não existe mais
-        mockMvc.perform(get("/api/processos/{id}", processoId))
+        mockMvc.perform(get(API_PROCESSOS_ID, processoId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(delete("/api/processos/{id}", 999L)) // ID que não existe
+        mockMvc.perform(delete(API_PROCESSOS_ID, 999L)) // ID que não existe
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
     }
 }

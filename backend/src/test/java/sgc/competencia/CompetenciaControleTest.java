@@ -25,6 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CompetenciaControle.class)
 class CompetenciaControleTest {
+    private static final String TEST_DESC = "Test Desc";
+    private static final String TESTUSER = "testuser";
+    private static final String API_COMPETENCIAS_1 = "/api/competencias/1";
     @Autowired
     private MockMvc mockMvc;
 
@@ -41,38 +44,38 @@ class CompetenciaControleTest {
     void listarCompetencias_deveRetornarListaDeCompetencias() throws Exception {
         Competencia competencia = new Competencia();
         competencia.setCodigo(1L);
-        competencia.setDescricao("Test Desc");
+        competencia.setDescricao(TEST_DESC);
 
-        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, "Test Desc");
+        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, TEST_DESC);
 
         when(competenciaRepo.findAll()).thenReturn(Collections.singletonList(competencia));
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/competencias").with(user("testuser")))
+        mockMvc.perform(get("/api/competencias").with(user(TESTUSER)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].codigo").value(1L))
-                .andExpect(jsonPath("$[0].descricao").value("Test Desc"));
+                .andExpect(jsonPath("$[0].descricao").value(TEST_DESC));
     }
 
     @Test
     void obterCompetencia_quandoEncontrada_deveRetornarCompetencia() throws Exception {
         Competencia competencia = new Competencia();
         competencia.setCodigo(1L);
-        competencia.setDescricao("Test Desc");
+        competencia.setDescricao(TEST_DESC);
 
-        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, "Test Desc");
+        CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, TEST_DESC);
 
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/competencias/1").with(user("testuser")))
+        mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.codigo").value(1L))
-                .andExpect(jsonPath("$.descricao").value("Test Desc"));
+                .andExpect(jsonPath("$.descricao").value(TEST_DESC));
     }
 
     @Test
@@ -80,7 +83,7 @@ class CompetenciaControleTest {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(get("/api/competencias/1").with(user("testuser")))
+        mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isNotFound());
     }
 
@@ -103,11 +106,11 @@ class CompetenciaControleTest {
 
         // When & Then
         mockMvc.perform(post("/api/competencias")
-                        .with(user("testuser")).with(csrf())
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/competencias/1"))
+                .andExpect(header().string("Location", API_COMPETENCIAS_1))
                 .andExpect(jsonPath("$.codigo").value(1L))
                 .andExpect(jsonPath("$.descricao").value("Nova Competencia"));
     }
@@ -118,7 +121,7 @@ class CompetenciaControleTest {
 
         // When & Then
         mockMvc.perform(post("/api/competencias")
-                        .with(user("testuser")).with(csrf())
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
@@ -143,8 +146,8 @@ class CompetenciaControleTest {
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(updatedDto);
 
         // When & Then
-        mockMvc.perform(put("/api/competencias/1")
-                        .with(user("testuser")).with(csrf())
+        mockMvc.perform(put(API_COMPETENCIAS_1)
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -158,8 +161,8 @@ class CompetenciaControleTest {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(new Competencia()));
 
         // When & Then
-        mockMvc.perform(put("/api/competencias/1")
-                        .with(user("testuser")).with(csrf())
+        mockMvc.perform(put(API_COMPETENCIAS_1)
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
@@ -171,8 +174,8 @@ class CompetenciaControleTest {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(put("/api/competencias/1")
-                        .with(user("testuser")).with(csrf())
+        mockMvc.perform(put(API_COMPETENCIAS_1)
+                        .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
@@ -186,7 +189,7 @@ class CompetenciaControleTest {
         doNothing().when(competenciaRepo).deleteById(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/competencias/1").with(user("testuser")).with(csrf()))
+        mockMvc.perform(delete(API_COMPETENCIAS_1).with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -195,7 +198,7 @@ class CompetenciaControleTest {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(delete("/api/competencias/1").with(user("testuser")).with(csrf()))
+        mockMvc.perform(delete(API_COMPETENCIAS_1).with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConhecimentoMapperTest {
+    private static final String TEST_DESCRIPTION = "Test Description";
 
     @Mock
     private AtividadeRepo atividadeRepo;
@@ -29,7 +30,7 @@ class ConhecimentoMapperTest {
         // Create a Conhecimento entity
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setCodigo(1L);
-        conhecimento.setDescricao("Test Description");
+        conhecimento.setDescricao(TEST_DESCRIPTION);
         
         Atividade atividade = new Atividade();
         atividade.setCodigo(100L);
@@ -41,13 +42,13 @@ class ConhecimentoMapperTest {
         // Verify mapping
         assertEquals(1L, dto.codigo());
         assertEquals(100L, dto.atividadeCodigo());
-        assertEquals("Test Description", dto.descricao());
+        assertEquals(TEST_DESCRIPTION, dto.descricao());
     }
 
     @Test
     void testToEntity() {
         // Create a ConhecimentoDto
-        ConhecimentoDto dto = new ConhecimentoDto(1L, 100L, "Test Description");
+        ConhecimentoDto dto = new ConhecimentoDto(1L, 100L, TEST_DESCRIPTION);
         Atividade atividade = new Atividade();
         atividade.setCodigo(100L);
         when(atividadeRepo.findById(100L)).thenReturn(Optional.of(atividade));
@@ -57,7 +58,7 @@ class ConhecimentoMapperTest {
 
         // Verify mapping
         assertNotNull(conhecimento);
-        assertEquals("Test Description", conhecimento.getDescricao());
+        assertEquals(TEST_DESCRIPTION, conhecimento.getDescricao());
         assertNotNull(conhecimento.getAtividade());
         assertEquals(100L, conhecimento.getAtividade().getCodigo());
     }

@@ -30,6 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser
 class ConhecimentoControleTest {
+    private static final String CONHECIMENTO_TESTE = "Conhecimento Teste";
+    private static final String API_CONHECIMENTOS = "/api/conhecimentos";
+    private static final String API_CONHECIMENTOS_1 = "/api/conhecimentos/1";
+    private static final String API_CONHECIMENTOS_99 = "/api/conhecimentos/99";
+    private static final String NOVO_CONHECIMENTO = "Novo Conhecimento";
+    private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
     @Autowired
     private MockMvc mockMvc;
 
@@ -51,18 +57,18 @@ class ConhecimentoControleTest {
         void deveRetornarListaDeConhecimentos() throws Exception {
             var conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
-            conhecimento.setDescricao("Conhecimento Teste");
+            conhecimento.setDescricao(CONHECIMENTO_TESTE);
 
-            var conhecimentoDto = new ConhecimentoDto(1L, 10L, "Conhecimento Teste");
+            var conhecimentoDto = new ConhecimentoDto(1L, 10L, CONHECIMENTO_TESTE);
 
             when(conhecimentoRepo.findAll()).thenReturn(List.of(conhecimento));
             when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
 
-            mockMvc.perform(get("/api/conhecimentos"))
+            mockMvc.perform(get(API_CONHECIMENTOS))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$[0].codigo").value(1L))
-                    .andExpect(jsonPath("$[0].descricao").value("Conhecimento Teste"));
+                    .andExpect(jsonPath("$[0].descricao").value(CONHECIMENTO_TESTE));
         }
 
         @Test
@@ -70,7 +76,7 @@ class ConhecimentoControleTest {
         void deveRetornarListaVazia() throws Exception {
             when(conhecimentoRepo.findAll()).thenReturn(Collections.emptyList());
 
-            mockMvc.perform(get("/api/conhecimentos"))
+            mockMvc.perform(get(API_CONHECIMENTOS))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isEmpty());
@@ -86,12 +92,12 @@ class ConhecimentoControleTest {
         void deveRetornarConhecimentoPorId() throws Exception {
             var conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
-            var conhecimentoDto = new ConhecimentoDto(1L, 10L, "Conhecimento Teste");
+            var conhecimentoDto = new ConhecimentoDto(1L, 10L, CONHECIMENTO_TESTE);
 
             when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
             when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
 
-            mockMvc.perform(get("/api/conhecimentos/1"))
+            mockMvc.perform(get(API_CONHECIMENTOS_1))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1L));
         }
@@ -101,7 +107,7 @@ class ConhecimentoControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             when(conhecimentoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(get("/api/conhecimentos/99"))
+            mockMvc.perform(get(API_CONHECIMENTOS_99))
                     .andExpect(status().isNotFound());
         }
     }
@@ -113,27 +119,27 @@ class ConhecimentoControleTest {
         @Test
         @DisplayName("Deve criar um conhecimento e retornar 201 Created")
         void deveCriarConhecimento() throws Exception {
-            var conhecimentoDto = new ConhecimentoDto(null, 10L, "Novo Conhecimento");
+            var conhecimentoDto = new ConhecimentoDto(null, 10L, NOVO_CONHECIMENTO);
             var conhecimento = new Conhecimento();
             conhecimento.setCodigo(1L);
-            conhecimento.setDescricao("Novo Conhecimento");
+            conhecimento.setDescricao(NOVO_CONHECIMENTO);
             var atividade = new Atividade();
             atividade.setCodigo(10L);
             conhecimento.setAtividade(atividade);
 
-            var conhecimentoSalvoDto = new ConhecimentoDto(1L, 10L, "Novo Conhecimento");
+            var conhecimentoSalvoDto = new ConhecimentoDto(1L, 10L, NOVO_CONHECIMENTO);
 
             when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(conhecimento);
             when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimento);
             when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoSalvoDto);
 
-            mockMvc.perform(post("/api/conhecimentos").with(csrf())
+            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", "/api/conhecimentos/1"))
+                    .andExpect(header().string("Location", API_CONHECIMENTOS_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
-                    .andExpect(jsonPath("$.descricao").value("Novo Conhecimento"))
+                    .andExpect(jsonPath("$.descricao").value(NOVO_CONHECIMENTO))
                     .andExpect(jsonPath("$.atividadeCodigo").value(10L));
         }
 
@@ -142,7 +148,7 @@ class ConhecimentoControleTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var conhecimentoDto = new ConhecimentoDto(null, null, ""); // atividadeCodigo nulo e descrição vazia
 
-            mockMvc.perform(post("/api/conhecimentos").with(csrf())
+            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isBadRequest());
@@ -160,29 +166,29 @@ class ConhecimentoControleTest {
             conhecimentoExistente.setCodigo(1L);
             conhecimentoExistente.setDescricao("Descrição Antiga");
 
-            var conhecimentoDto = new ConhecimentoDto(1L, 10L, "Descrição Atualizada");
+            var conhecimentoDto = new ConhecimentoDto(1L, 10L, DESCRICAO_ATUALIZADA);
             var entidadeParaAtualizar = new Conhecimento();
-            entidadeParaAtualizar.setDescricao("Descrição Atualizada");
+            entidadeParaAtualizar.setDescricao(DESCRICAO_ATUALIZADA);
             var atividade = new Atividade();
             atividade.setCodigo(10L);
             entidadeParaAtualizar.setAtividade(atividade);
 
             var conhecimentoAtualizado = new Conhecimento();
             conhecimentoAtualizado.setCodigo(1L);
-            conhecimentoAtualizado.setDescricao("Descrição Atualizada");
+            conhecimentoAtualizado.setDescricao(DESCRICAO_ATUALIZADA);
 
-            var conhecimentoAtualizadoDto = new ConhecimentoDto(1L, 10L, "Descrição Atualizada");
+            var conhecimentoAtualizadoDto = new ConhecimentoDto(1L, 10L, DESCRICAO_ATUALIZADA);
 
             when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimentoExistente));
             when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(entidadeParaAtualizar);
             when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimentoAtualizado);
             when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoAtualizadoDto);
 
-            mockMvc.perform(put("/api/conhecimentos/1").with(csrf())
+            mockMvc.perform(put(API_CONHECIMENTOS_1).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.descricao").value("Descrição Atualizada"));
+                    .andExpect(jsonPath("$.descricao").value(DESCRICAO_ATUALIZADA));
         }
 
         @Test
@@ -192,7 +198,7 @@ class ConhecimentoControleTest {
 
             when(conhecimentoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(put("/api/conhecimentos/99").with(csrf())
+            mockMvc.perform(put(API_CONHECIMENTOS_99).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(conhecimentoDto)))
                     .andExpect(status().isNotFound());
@@ -212,7 +218,7 @@ class ConhecimentoControleTest {
             when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
             doNothing().when(conhecimentoRepo).deleteById(1L);
 
-            mockMvc.perform(delete("/api/conhecimentos/1").with(csrf()))
+            mockMvc.perform(delete(API_CONHECIMENTOS_1).with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(conhecimentoRepo, times(1)).deleteById(1L);
@@ -223,7 +229,7 @@ class ConhecimentoControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             when(conhecimentoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(delete("/api/conhecimentos/99").with(csrf()))
+            mockMvc.perform(delete(API_CONHECIMENTOS_99).with(csrf()))
                     .andExpect(status().isNotFound());
         }
     }

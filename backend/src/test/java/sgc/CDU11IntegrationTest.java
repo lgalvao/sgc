@@ -43,6 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 class CDU11IntegrationTest {
+    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{id}/cadastro";
+    private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
+    private static final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     private MockMvc mockMvc;
@@ -107,10 +110,10 @@ class CDU11IntegrationTest {
         @WithMockUser(username = "chefe_ut", roles = {"CHEFE"})
         @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocessoId", is(subprocesso.getCodigo().intValue())))
-                .andExpect(jsonPath("$.unidadeSigla", is("UT")))
+                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")))
                 .andExpect(jsonPath("$.atividades", hasSize(2)))
                 // Valida a primeira atividade e seu conhecimento
                 .andExpect(jsonPath("$.atividades[0].descricao", is("Analisar documentação")))
@@ -124,30 +127,30 @@ class CDU11IntegrationTest {
         }
 
         @Test
-        @WithMockUser(username = "admin", roles = {"ADMIN"})
+        @WithMockUser(username = "admin", roles = {ADMIN_ROLE})
         @DisplayName("Deve permitir que ADMIN visualize o cadastro de qualquer unidade")
         void devePermitirAdminVisualizarCadastro() throws Exception {
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidadeSigla", is("UT")));
+                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
 
         @Test
         @WithMockUser(username = "gestor", roles = {"GESTOR"})
         @DisplayName("Deve permitir que GESTOR visualize o cadastro de qualquer unidade")
         void devePermitirGestorVisualizarCadastro() throws Exception {
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidadeSigla", is("UT")));
+                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
 
         @Test
         @WithMockUser(username = "servidor", roles = {"SERVIDOR"})
         @DisplayName("Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade")
         void devePermitirServidorVisualizarCadastro() throws Exception {
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocesso.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidadeSigla", is("UT")));
+                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
     }
 
@@ -156,15 +159,15 @@ class CDU11IntegrationTest {
     class CasosDeBorda {
 
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(roles = ADMIN_ROLE)
         @DisplayName("Deve retornar 404 Not Found para um subprocesso inexistente")
         void deveRetornarNotFound_QuandoSubprocessoNaoExiste() throws Exception {
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", 9999L))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, 9999L))
                 .andExpect(status().isNotFound());
         }
 
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(roles = ADMIN_ROLE)
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
             // Arrange
@@ -173,14 +176,14 @@ class CDU11IntegrationTest {
             subprocessoRepo.save(subprocessoSemAtividades);
 
             // Act & Assert
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocessoSemAtividades.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocessoId", is(subprocessoSemAtividades.getCodigo().intValue())))
                 .andExpect(jsonPath("$.atividades", hasSize(0)));
         }
 
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(roles = ADMIN_ROLE)
         @DisplayName("Deve retornar uma atividade com a lista de conhecimentos vazia")
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
             // Arrange
@@ -191,7 +194,7 @@ class CDU11IntegrationTest {
             atividadeRepo.save(atividadeSemConhecimento);
 
             // Act & Assert
-            mockMvc.perform(get("/api/subprocessos/{id}/cadastro", subprocessoAtividadeSemConhecimento.getCodigo()))
+            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocessoId", is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
                 .andExpect(jsonPath("$.atividades", hasSize(1)))

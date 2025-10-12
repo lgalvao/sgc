@@ -31,6 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser
 @AutoConfigureMockMvc
 class AtividadeControleTest {
+    private static final String ATIVIDADE_TESTE = "Atividade Teste";
+    private static final String API_ATIVIDADES = "/api/atividades";
+    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
+    private static final String API_ATIVIDADES_1 = "/api/atividades/1";
+    private static final String API_ATIVIDADES_99 = "/api/atividades/99";
+    private static final String NOVA_ATIVIDADE = "Nova Atividade";
+    private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
     @Autowired
     private MockMvc mockMvc;
 
@@ -60,18 +67,18 @@ class AtividadeControleTest {
         void deveRetornarListaDeAtividades() throws Exception {
             var atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setDescricao("Atividade Teste");
+            atividade.setDescricao(ATIVIDADE_TESTE);
 
-            var atividadeDto = new AtividadeDto(1L, null, "Atividade Teste");
+            var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
             when(atividadeRepo.findAll()).thenReturn(List.of(atividade));
             when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
 
-            mockMvc.perform(get("/api/atividades"))
+            mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$[0].codigo").value(1L))
-                    .andExpect(jsonPath("$[0].descricao").value("Atividade Teste"));
+                    .andExpect(jsonPath("$[0].descricao").value(ATIVIDADE_TESTE));
         }
 
         @Test
@@ -79,7 +86,7 @@ class AtividadeControleTest {
         void deveRetornarListaVazia() throws Exception {
             when(atividadeRepo.findAll()).thenReturn(Collections.emptyList());
 
-            mockMvc.perform(get("/api/atividades"))
+            mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isEmpty());
@@ -95,12 +102,12 @@ class AtividadeControleTest {
         void deveRetornarAtividadePorId() throws Exception {
             var atividade = new Atividade();
             atividade.setCodigo(1L);
-            var atividadeDto = new AtividadeDto(1L, null, "Atividade Teste");
+            var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
             when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
 
-            mockMvc.perform(get("/api/atividades/1"))
+            mockMvc.perform(get(API_ATIVIDADES_1))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1L));
         }
@@ -110,7 +117,7 @@ class AtividadeControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(get("/api/atividades/99"))
+            mockMvc.perform(get(API_ATIVIDADES_99))
                     .andExpect(status().isNotFound());
         }
     }
@@ -122,10 +129,10 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve criar uma atividade e retornar 201 Created")
         void deveCriarAtividade() throws Exception {
-            var atividadeDto = new AtividadeDto(null, 10L, "Nova Atividade");
+            var atividadeDto = new AtividadeDto(null, 10L, NOVA_ATIVIDADE);
             var atividade = new Atividade();
             atividade.setCodigo(1L);
-            atividade.setDescricao("Nova Atividade");
+            atividade.setDescricao(NOVA_ATIVIDADE);
             var mapa = new Mapa();
             mapa.setCodigo(10L);
             atividade.setMapa(mapa);
@@ -138,7 +145,7 @@ class AtividadeControleTest {
             subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocesso.setUnidade(unidade);
 
-            var atividadeSalvaDto = new AtividadeDto(1L, 10L, "Nova Atividade");
+            var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);
 
             when(usuarioRepo.findByTitulo("chefe")).thenReturn(Optional.of(chefe));
             when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(subprocesso));
@@ -146,14 +153,14 @@ class AtividadeControleTest {
             when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividade);
             when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeSalvaDto);
 
-            mockMvc.perform(post("/api/atividades").with(csrf())
+            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
                             .with(user("chefe")))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", "/api/atividades/1"))
+                    .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
-                    .andExpect(jsonPath("$.descricao").value("Nova Atividade"))
+                    .andExpect(jsonPath("$.descricao").value(NOVA_ATIVIDADE))
                     .andExpect(jsonPath("$.mapaCodigo").value(10L));
         }
 
@@ -162,7 +169,7 @@ class AtividadeControleTest {
         void deveRetornarBadRequestParaDtoInvalido() throws Exception {
             var atividadeDto = new AtividadeDto(null, null, ""); // Descrição vazia
 
-            mockMvc.perform(post("/api/atividades").with(csrf())
+            mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
                             .with(user("user")))
@@ -180,26 +187,26 @@ class AtividadeControleTest {
             atividadeExistente.setCodigo(1L);
             atividadeExistente.setDescricao("Descrição Antiga");
 
-            var atividadeDto = new AtividadeDto(1L, null, "Descrição Atualizada");
+            var atividadeDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
             var entidadeParaAtualizar = new Atividade();
-            entidadeParaAtualizar.setDescricao("Descrição Atualizada");
+            entidadeParaAtualizar.setDescricao(DESCRICAO_ATUALIZADA);
 
             var atividadeAtualizada = new Atividade();
             atividadeAtualizada.setCodigo(1L);
-            atividadeAtualizada.setDescricao("Descrição Atualizada");
+            atividadeAtualizada.setDescricao(DESCRICAO_ATUALIZADA);
 
-            var atividadeAtualizadaDto = new AtividadeDto(1L, null, "Descrição Atualizada");
+            var atividadeAtualizadaDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
 
             when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividadeExistente));
             when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(entidadeParaAtualizar);
             when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividadeAtualizada);
             when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeAtualizadaDto);
 
-            mockMvc.perform(put("/api/atividades/1").with(csrf())
+            mockMvc.perform(put(API_ATIVIDADES_1).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.descricao").value("Descrição Atualizada"));
+                    .andExpect(jsonPath("$.descricao").value(DESCRICAO_ATUALIZADA));
         }
 
         @Test
@@ -209,7 +216,7 @@ class AtividadeControleTest {
 
             when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(put("/api/atividades/99").with(csrf())
+            mockMvc.perform(put(API_ATIVIDADES_99).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
@@ -230,7 +237,7 @@ class AtividadeControleTest {
             when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(Collections.emptyList());
             doNothing().when(atividadeRepo).delete(any(Atividade.class));
 
-            mockMvc.perform(delete("/api/atividades/1").with(csrf()))
+            mockMvc.perform(delete(API_ATIVIDADES_1).with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(atividadeRepo, times(1)).delete(any(Atividade.class));
@@ -241,7 +248,7 @@ class AtividadeControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
 
-            mockMvc.perform(delete("/api/atividades/99").with(csrf()))
+            mockMvc.perform(delete(API_ATIVIDADES_99).with(csrf()))
                     .andExpect(status().isNotFound());
         }
     }

@@ -20,11 +20,11 @@ class SubprocessoDtoTest {
     @Test
     void AnaliseValidacaoDto_RecordConstructorAndGetters() {
         LocalDateTime now = LocalDateTime.now();
-        AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, "Observações");
+        AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, OBSERVACOES);
 
         assertEquals(1L, dto.id());
         assertEquals(now, dto.dataHora());
-        assertEquals("Observações", dto.observacoes());
+        assertEquals(OBSERVACOES, dto.observacoes());
     }
 
     @Test
@@ -43,53 +43,53 @@ class SubprocessoDtoTest {
 
     @Test
     void AtividadeAjusteDto_RecordConstructorAndGetters() {
-        List<ConhecimentoAjusteDto> conhecimentos = List.of(new ConhecimentoAjusteDto(1L, "Conhecimento", true));
-        AtividadeAjusteDto dto = new AtividadeAjusteDto(1L, "Atividade", conhecimentos);
+        List<ConhecimentoAjusteDto> conhecimentos = List.of(new ConhecimentoAjusteDto(1L, COMPETENCIA, true));
+        AtividadeAjusteDto dto = new AtividadeAjusteDto(1L, ATIVIDADE, conhecimentos);
 
         assertEquals(1L, dto.atividadeId());
-        assertEquals("Atividade", dto.nome());
+        assertEquals(ATIVIDADE, dto.nome());
         assertEquals(conhecimentos, dto.conhecimentos());
     }
 
     @Test
     void CompetenciaAjusteDto_RecordConstructorAndGetters() {
-        List<AtividadeAjusteDto> atividades = List.of(new AtividadeAjusteDto(1L, "Atividade", List.of()));
-        CompetenciaAjusteDto dto = new CompetenciaAjusteDto(1L, "Competência", atividades);
+        List<AtividadeAjusteDto> atividades = List.of(new AtividadeAjusteDto(1L, ATIVIDADE, List.of()));
+        CompetenciaAjusteDto dto = new CompetenciaAjusteDto(1L, COMPETENCIA, atividades);
 
         assertEquals(1L, dto.competenciaId());
-        assertEquals("Competência", dto.nome());
+        assertEquals(COMPETENCIA, dto.nome());
         assertEquals(atividades, dto.atividades());
     }
 
     @Test
     void ConhecimentoAjusteDto_RecordConstructorAndGetters() {
-        ConhecimentoAjusteDto dto = new ConhecimentoAjusteDto(1L, "Conhecimento", true);
+        ConhecimentoAjusteDto dto = new ConhecimentoAjusteDto(1L, COMPETENCIA, true);
 
         assertEquals(1L, dto.conhecimentoId());
-        assertEquals("Conhecimento", dto.nome());
+        assertEquals(COMPETENCIA, dto.nome());
         assertTrue(dto.incluido());
     }
 
     @Test
     void DevolverCadastroReq_RecordConstructorAndGetters() {
-        DevolverCadastroReq req = new DevolverCadastroReq("Motivo", "Observações");
+        DevolverCadastroReq req = new DevolverCadastroReq("Motivo", OBSERVACOES);
 
         assertEquals("Motivo", req.motivo());
-        assertEquals("Observações", req.observacoes());
+        assertEquals(OBSERVACOES, req.observacoes());
     }
 
     @Test
     void DevolverCadastroReq_InvalidMotivo_ThrowsException() {
         // Test will be handled by validation framework during actual usage
-        DevolverCadastroReq req = new DevolverCadastroReq("", "Observações");
+        DevolverCadastroReq req = new DevolverCadastroReq("", OBSERVACOES);
         assertEquals("", req.motivo());
     }
 
     @Test
     void DevolverValidacaoReq_RecordConstructorAndGetters() {
-        DevolverValidacaoReq req = new DevolverValidacaoReq("Justificativa");
+        DevolverValidacaoReq req = new DevolverValidacaoReq(JUSTIFICATIVA);
 
-        assertEquals("Justificativa", req.justificativa());
+        assertEquals(JUSTIFICATIVA, req.justificativa());
     }
 
     @Test
@@ -102,16 +102,16 @@ class SubprocessoDtoTest {
     @Test
     void DisponibilizarMapaReq_RecordConstructorAndGetters() {
         LocalDate dataLimite = LocalDate.now().plusDays(10);
-        DisponibilizarMapaReq req = new DisponibilizarMapaReq("Observações", dataLimite);
+        DisponibilizarMapaReq req = new DisponibilizarMapaReq(OBSERVACOES, dataLimite);
 
-        assertEquals("Observações", req.observacoes());
+        assertEquals(OBSERVACOES, req.observacoes());
         assertEquals(dataLimite, req.dataLimiteEtapa2());
     }
 
     @Test
     void DisponibilizarMapaReq_InvalidDataLimite_ThrowsException() {
         // Test will be handled by validation framework during actual usage
-        DisponibilizarMapaReq req = new DisponibilizarMapaReq("Observações", null);
+        DisponibilizarMapaReq req = new DisponibilizarMapaReq(OBSERVACOES, null);
         assertNull(req.dataLimiteEtapa2());
     }
 

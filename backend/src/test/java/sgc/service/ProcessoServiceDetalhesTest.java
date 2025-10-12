@@ -46,6 +46,7 @@ import static org.mockito.Mockito.when;
  * Testes unitários para ProcessoService.obterDetalhes(...).
  */
 public class ProcessoServiceDetalhesTest {
+    private static final String DIRETORIA_X = "Diretoria X";
     private ProcessoRepo processoRepo;
     private UnidadeProcessoRepo unidadeProcessoRepo;
     private SubprocessoRepo subprocessoRepo;
@@ -103,7 +104,7 @@ public class ProcessoServiceDetalhesTest {
 
         UnidadeProcesso up = new UnidadeProcesso();
         up.setCodigo(10L);
-        up.setNome("Diretoria X");
+        up.setNome(DIRETORIA_X);
         up.setSigla("DX");
         up.setSituacao("PENDENTE");
         up.setUnidadeSuperiorCodigo(null);
@@ -111,7 +112,7 @@ public class ProcessoServiceDetalhesTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("DX");
-        unidade.setNome("Diretoria X");
+        unidade.setNome(DIRETORIA_X);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -121,7 +122,7 @@ public class ProcessoServiceDetalhesTest {
 
         ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
             .unidadeCodigo(10L)
-            .nome("Diretoria X")
+            .nome(DIRETORIA_X)
             .sigla("DX")
             .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
             .dataLimite(LocalDate.now().plusDays(7))
@@ -131,7 +132,7 @@ public class ProcessoServiceDetalhesTest {
             .situacao(SituacaoProcesso.CRIADO)
             .dataLimite(LocalDate.now().plusDays(5))
             .unidadeCodigo(10L)
-            .unidadeNome("Diretoria X")
+            .unidadeNome(DIRETORIA_X)
             .build();
 
         ProcessoDetalheDto processoDetalheDTO = ProcessoDetalheDto.builder()

@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SgrhServiceTest {
+    private static final String TITULO = "12345678901";
     private SgrhService sgrhService;
 
     @BeforeEach
@@ -25,11 +26,10 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarUsuarioPorTitulo() {
-        String titulo = "12345678901";
-        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(titulo);
+        Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO);
 
         assertTrue(result.isPresent());
-        assertEquals(titulo, result.get().titulo());
+        assertEquals(TITULO, result.get().titulo());
         assertTrue(result.get().nome().contains("Usuário Mock"));
     }
 
@@ -52,7 +52,7 @@ class SgrhServiceTest {
         assertEquals(3, result.size());
         
         UsuarioDto primeiro = result.getFirst();
-        assertEquals("12345678901", primeiro.titulo());
+        assertEquals(TITULO, primeiro.titulo());
         assertEquals("joao.silva@tre-pe.jus.br", primeiro.email());
     }
 
@@ -104,14 +104,13 @@ class SgrhServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().unidadeCodigo());
-        assertEquals("12345678901", result.get().titularTitulo());
+        assertEquals(TITULO, result.get().titularTitulo());
         assertEquals("98765432109", result.get().substitutoTitulo());
     }
 
     @Test
     void testBuscarUnidadesOndeEhResponsavel() {
-        String titulo = "12345678901";
-        List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel(titulo);
+        List<Long> result = sgrhService.buscarUnidadesOndeEhResponsavel(TITULO);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -120,32 +119,29 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarPerfisUsuario() {
-        String titulo = "12345678901";
-        List<PerfilDto> result = sgrhService.buscarPerfisUsuario(titulo);
+        List<PerfilDto> result = sgrhService.buscarPerfisUsuario(TITULO);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
         // Check if it contains expected profile
-        assertTrue(result.stream().anyMatch(p -> p.usuarioTitulo().equals(titulo)));
+        assertTrue(result.stream().anyMatch(p -> p.usuarioTitulo().equals(TITULO)));
     }
 
     @Test
     void testUsuarioTemPerfil() {
-        boolean result = sgrhService.usuarioTemPerfil("12345678901", "ADMIN", 1L);
+        boolean result = sgrhService.usuarioTemPerfil(TITULO, "ADMIN", 1L);
         assertTrue(result); // According to the mock implementation
 
-        boolean result2 = sgrhService.usuarioTemPerfil("12345678901", "GESTOR", 1L);
+        boolean result2 = sgrhService.usuarioTemPerfil(TITULO, "GESTOR", 1L);
         assertFalse(result2); // According to the mock implementation
     }
 
     @Test
     void testBuscarUnidadesPorPerfil() {
-        String titulo = "12345678901";
-        
-        List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(titulo, "ADMIN");
+        List<Long> adminUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "ADMIN");
         assertTrue(adminUnits.contains(1L));
         
-        List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(titulo, "GESTOR");
+        List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "GESTOR");
         assertTrue(gestorUnits.contains(2L) || gestorUnits.contains(3L));
     }
 }

@@ -52,6 +52,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceTest {
+    private static final String PROCESSO_DE_TESTE = "Processo de Teste";
+    private static final String MAPEAMENTO = "MAPEAMENTO";
+    private static final String PROCESSO_NAO_ENCONTRADO_999 = "Processo não encontrado: 999";
+    private static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
+    private static final String REVISAO = "REVISAO";
     @Mock
     private ProcessoRepo processoRepo;
 
@@ -119,18 +124,18 @@ public class ProcessoServiceTest {
     @Test
     void criar_ProcessoValido_CriaComSucesso() {
         var dataLimite = LocalDate.now().plusDays(30);
-        var requisicao = new CriarProcessoReq("Processo de Teste", "MAPEAMENTO", dataLimite, List.of(1L));
+        var requisicao = new CriarProcessoReq(PROCESSO_DE_TESTE, MAPEAMENTO, dataLimite, List.of(1L));
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setDescricao("Processo de Teste");
+        processo.setDescricao(PROCESSO_DE_TESTE);
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataCriacao(LocalDateTime.now());
 
         var dto = ProcessoDto.builder()
             .codigo(1L)
             .dataCriacao(LocalDateTime.now())
-            .descricao("Processo de Teste")
+            .descricao(PROCESSO_DE_TESTE)
             .situacao(SituacaoProcesso.CRIADO)
             .build();
 
@@ -141,14 +146,14 @@ public class ProcessoServiceTest {
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getCodigo());
-        assertEquals("Processo de Teste", resultado.getDescricao());
+        assertEquals(PROCESSO_DE_TESTE, resultado.getDescricao());
         verify(processoRepo).save(any(Processo.class));
         verify(publicadorDeEventos).publishEvent(any(ProcessoCriadoEvento.class));
     }
 
     @Test
     void criar_SemDescricao_LancaConstraintViolationException() {
-        var requisicao = new CriarProcessoReq("", "MAPEAMENTO", LocalDate.now().plusDays(30), List.of(1L));
+        var requisicao = new CriarProcessoReq("", MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
 
         var exception = assertThrows(jakarta.validation.ConstraintViolationException.class,
             () -> processoService.criar(requisicao));
@@ -158,7 +163,7 @@ public class ProcessoServiceTest {
 
     @Test
     void criar_SemUnidades_LancaConstraintViolationException() {
-        var requisicao = new CriarProcessoReq("Processo de Teste", "MAPEAMENTO", LocalDate.now().plusDays(30), Collections.emptyList());
+        var requisicao = new CriarProcessoReq(PROCESSO_DE_TESTE, MAPEAMENTO, LocalDate.now().plusDays(30), Collections.emptyList());
 
         var exception = assertThrows(jakarta.validation.ConstraintViolationException.class,
             () -> processoService.criar(requisicao));
@@ -168,7 +173,7 @@ public class ProcessoServiceTest {
 
     @Test
     void criar_TipoRevisaoComUnidadeNaoEncontrada_LancaErroEntidadeNaoEncontrada() {
-        var requisicao = new CriarProcessoReq("Processo de Teste", "REVISAO", LocalDate.now().plusDays(30), List.of(999L));
+        var requisicao = new CriarProcessoReq(PROCESSO_DE_TESTE, REVISAO, LocalDate.now().plusDays(30), List.of(999L));
 
         when(unidadeRepo.findById(999L)).thenReturn(Optional.empty());
 
@@ -180,7 +185,7 @@ public class ProcessoServiceTest {
 
     @Test
     void atualizar_ProcessoExisteAtualizaComSucesso() {
-        var requisicao = new AtualizarProcessoReq(1L, "Processo Atualizado", "REVISAO", LocalDate.now().plusDays(45), List.of(1L));
+        var requisicao = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDate.now().plusDays(45), List.of(1L));
 
         Processo processo = new Processo();
         processo.setCodigo(1L);
@@ -189,7 +194,7 @@ public class ProcessoServiceTest {
 
         var dto = ProcessoDto.builder()
             .codigo(1L)
-            .descricao("Processo Atualizado")
+            .descricao(PROCESSO_ATUALIZADO)
             .situacao(SituacaoProcesso.CRIADO)
             .build();
 
@@ -200,7 +205,7 @@ public class ProcessoServiceTest {
         ProcessoDto resultado = processoService.atualizar(1L, requisicao);
 
         assertNotNull(resultado);
-        assertEquals("Processo Atualizado", resultado.getDescricao());
+        assertEquals(PROCESSO_ATUALIZADO, resultado.getDescricao());
         verify(processoRepo).save(any(Processo.class));
     }
 
@@ -213,7 +218,7 @@ public class ProcessoServiceTest {
         var exception = assertThrows(ErroEntidadeNaoEncontrada.class,
             () -> processoService.atualizar(999L, requisicao));
         
-        assertEquals("Processo não encontrado: 999", exception.getMessage());
+        assertEquals(PROCESSO_NAO_ENCONTRADO_999, exception.getMessage());
     }
 
     @Test
@@ -252,7 +257,7 @@ public class ProcessoServiceTest {
         var exception = assertThrows(ErroEntidadeNaoEncontrada.class,
             () -> processoService.apagar(999L));
         
-        assertEquals("Processo não encontrado: 999", exception.getMessage());
+        assertEquals(PROCESSO_NAO_ENCONTRADO_999, exception.getMessage());
     }
 
     @Test
@@ -441,7 +446,7 @@ public class ProcessoServiceTest {
         var exception = assertThrows(ErroEntidadeNaoEncontrada.class,
             () -> processoService.finalizar(999L));
         
-        assertEquals("Processo não encontrado: 999", exception.getMessage());
+        assertEquals(PROCESSO_NAO_ENCONTRADO_999, exception.getMessage());
     }
 
     @Test

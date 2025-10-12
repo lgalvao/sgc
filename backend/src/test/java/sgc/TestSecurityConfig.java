@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 @TestConfiguration
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestSecurityConfig {
 
     @Bean
