@@ -36,7 +36,11 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import sgc.comum.modelo.Usuario;
 import static org.junit.jupiter.api.Assertions.*;
@@ -548,15 +552,19 @@ public class SubprocessoServiceTest {
         Long id = 1L;
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(id);
+        subprocesso.setMapa(new Mapa());
+        subprocesso.setProcesso(criarProcessoMock());
         subprocesso.setUnidade(criarUnidadeMock(10L, UN, UNIDADE));
         subprocesso.getUnidade().setUnidadeSuperior(criarUnidadeMock(20L, SUPER, UNIDADE_SUPERIOR));
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.submeterMapaAjustado(id, usuario.getTitulo());
+        SubmeterMapaAjustadoReq request = new SubmeterMapaAjustadoReq("Observações", LocalDate.now().plusDays(1));
+
+        SubprocessoDto result = subprocessoService.submeterMapaAjustado(id, request, usuario.getTitulo());
 
         assertNotNull(result);
-        assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO, subprocesso.getSituacao());
+        assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_DISPONIBILIZADO, subprocesso.getSituacao());
         verify(repositorioSubprocesso, times(1)).save(subprocesso);
         verify(repositorioMovimentacao, times(1)).save(any(Movimentacao.class));
     }

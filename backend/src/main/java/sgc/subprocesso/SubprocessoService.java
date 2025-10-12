@@ -514,14 +514,26 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto submeterMapaAjustado(Long idSubprocesso, String usuarioTitulo) {
+    public SubprocessoDto submeterMapaAjustado(Long idSubprocesso, SubmeterMapaAjustadoReq request, String usuarioTitulo) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
+        // Validação: Verificar se todas as atividades estão associadas
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo());
+        for (Atividade atividade : atividades) {
+            long count = competenciaAtividadeRepo.countByAtividadeCodigo(atividade.getCodigo());
+            if (count == 0) {
+                throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.");
+            }
+        }
+
+        sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        sp.setDataLimiteEtapa2(request.dataLimiteEtapa2());
+        sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Submissão do mapa ajustado"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
+        notificarDisponibilizacaoMapa(sp);
 
         return subprocessoMapper.toDTO(sp);
     }

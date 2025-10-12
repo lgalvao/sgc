@@ -324,9 +324,10 @@ public class SubprocessoControle {
     @Transactional
     public SubprocessoDto submeterMapaAjustado(
         @PathVariable Long id,
+        @RequestBody @Valid SubmeterMapaAjustadoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoService.submeterMapaAjustado(id, usuario.getTitulo());
+        return subprocessoService.submeterMapaAjustado(id, request, usuario.getTitulo());
     }
 
     @PostMapping("/{id}/importar-atividades")

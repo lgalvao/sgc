@@ -40,6 +40,14 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
      */
     @Query("SELECT CASE WHEN COUNT(ca) > 0 THEN true ELSE false END FROM CompetenciaAtividade ca WHERE ca.id.atividadeCodigo = :atividadeCodigo")
     boolean existsByAtividadeCodigo(@Param("atividadeCodigo") Long atividadeCodigo);
+
+    /**
+     * Conta o número de competências associadas a uma atividade.
+     *
+     * @param atividadeCodigo O código da atividade.
+     * @return O número de competências associadas.
+     */
+    long countByAtividadeCodigo(Long atividadeCodigo);
     
     /**
      * Remove todos os vínculos de uma competência.
