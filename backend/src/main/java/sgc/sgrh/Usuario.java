@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.unidade.modelo.Unidade;
 
 import java.io.Serializable;
@@ -55,16 +56,33 @@ public class Usuario implements Serializable, UserDetails {
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
+    public Collection<? extends GrantedAuthority> determineAuthorities(AdministradorRepo administradorRepo) {
+        if (administradorRepo != null && administradorRepo.existsByUsuario(this)) {
+            this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
+        } else if (unidade != null && this.equals(unidade.getTitular())) {
+            switch (unidade.getTipo()) {
+                case INTERMEDIARIA:
+                    this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_GESTOR")).collect(Collectors.toList());
+                    break;
+                case OPERACIONAL:
+                case INTEROPERACIONAL:
+                    this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
+                    break;
+                default:
+                    this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
+                    break;
+            }
+        } else {
+            this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_SERVIDOR")).collect(Collectors.toList());
+        }
+        return authorities;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (authorities == null) {
-            if ("admin".equalsIgnoreCase(titulo)) {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
-            } else if (titulo != null && titulo.startsWith("gestor")) {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_GESTOR")).collect(Collectors.toList());
-            } else {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
-            }
+            // Esta chamada é para compatibilidade. A lógica principal está em determineAuthorities.
+            return determineAuthorities(null);
         }
         return authorities;
     }

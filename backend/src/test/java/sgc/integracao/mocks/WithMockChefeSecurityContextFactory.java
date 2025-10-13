@@ -5,6 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 
@@ -12,6 +13,9 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private AdministradorRepo administradorRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
@@ -23,7 +27,7 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
                 return usuarioRepo.save(newUser);
             });
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.determineAuthorities(administradorRepo));
         context.setAuthentication(token);
         return context;
     }
