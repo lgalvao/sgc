@@ -6,8 +6,6 @@ Este pacote gerencia as **Competências** e sua associação com **Atividades**.
 ## Arquitetura e Componentes
 
 - **`CompetenciaControle.java`**: Controller REST que expõe endpoints para as operações CRUD de competências e para o gerenciamento dos vínculos com atividades.
-- **`CompetenciaService.java`**: Contém a lógica de negócio para o gerenciamento de competências (criar, ler, atualizar, excluir).
-- **`CompetenciaAtividadeService.java`**: Serviço dedicado a gerenciar o vínculo entre `Competencia` e `Atividade`.
 - **`dto/`**:
   - **`CompetenciaDto.java`**: DTO para representar a entidade `Competencia` na API.
   - **`CompetenciaMapper.java`**: Interface MapStruct para a conversão entre a entidade `Competencia` e seus DTOs.
@@ -26,8 +24,6 @@ graph TD
 
     subgraph "Módulo Competência"
         CompetenciaControle(CompetenciaControle)
-        CompetenciaService(CompetenciaService)
-        CompetenciaAtividadeService(CompetenciaAtividadeService)
         CompetenciaMapper(CompetenciaMapper)
 
         subgraph "Camada de Dados"
@@ -40,12 +36,9 @@ graph TD
 
     UsuarioAPI -- Requisição HTTP --> CompetenciaControle
 
-    CompetenciaControle -- Chama --> CompetenciaService
-    CompetenciaControle -- Chama --> CompetenciaAtividadeService
+    CompetenciaControle -- Usa --> CompetenciaRepo
+    CompetenciaControle -- Usa --> CompetenciaAtividadeRepo
     CompetenciaControle -- Usa --> CompetenciaMapper
-
-    CompetenciaService -- Usa --> CompetenciaRepo
-    CompetenciaAtividadeService -- Usa --> CompetenciaAtividadeRepo
 
     CompetenciaRepo -- Gerencia --> Competencia
     CompetenciaAtividadeRepo -- Gerencia --> CompetenciaAtividade
@@ -81,5 +74,4 @@ Content-Type: application/json
 ```
 
 ## Notas Importantes
-- **Separação de Serviços**: A lógica de negócio é dividida entre `CompetenciaService` (para o ciclo de vida da competência em si) and `CompetenciaAtividadeService` (para gerenciar o relacionamento), promovendo a coesão.
 - **DTOs e Mappers**: O uso de DTOs e MapStruct desacopla a API da persistência, seguindo as melhores práticas de design de API.

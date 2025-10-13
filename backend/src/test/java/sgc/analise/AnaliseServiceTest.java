@@ -25,8 +25,6 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes para AnaliseService")
 class AnaliseServiceTest {
 
-    private static final String OBSERVACAO_TESTE = "Observação";
-
     @Mock
     private AnaliseRepo analiseRepo;
 
@@ -101,11 +99,11 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(1L, OBSERVACAO_TESTE, TipoAnalise.CADASTRO, null, null, null, null);
+            Analise resultado = service.criarAnalise(1L, "Observação", TipoAnalise.CADASTRO, null, null, null, null);
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBSERVACAO_TESTE, resultado.getObservacoes());
+            assertEquals("Observação", resultado.getObservacoes());
             assertEquals(TipoAnalise.CADASTRO, resultado.getTipo());
             verify(analiseRepo).save(any(Analise.class));
         }
@@ -116,11 +114,11 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(1L, OBSERVACAO_TESTE, TipoAnalise.VALIDACAO, null, null, null, null);
+            Analise resultado = service.criarAnalise(1L, "Observação", TipoAnalise.VALIDACAO, null, null, null, null);
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBSERVACAO_TESTE, resultado.getObservacoes());
+            assertEquals("Observação", resultado.getObservacoes());
             assertEquals(TipoAnalise.VALIDACAO, resultado.getTipo());
             verify(analiseRepo).save(any(Analise.class));
         }

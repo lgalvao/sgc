@@ -6,7 +6,6 @@ Este pacote gerencia a entidade `Atividade`, que representa uma tarefa ou atribu
 ## Arquitetura e Componentes
 
 - **`AtividadeControle.java`**: Controller REST que expõe os endpoints para as operações CRUD (Criar, Ler, Atualizar, Excluir) da entidade `Atividade`.
-- **`AtividadeService.java`**: Contém a lógica de negócio para o gerenciamento de atividades. É responsável por validar os dados, interagir com o repositório e orquestrar as operações.
 - **`dto/`**:
   - **`AtividadeDto.java`**: DTO padrão para representar a entidade `Atividade` na API.
   - **`AtividadeMapper.java`**: Interface MapStruct para a conversão entre a entidade `Atividade` e seus DTOs.
@@ -23,7 +22,6 @@ graph TD
 
     subgraph "Módulo Atividade"
         AtividadeControle(AtividadeControle)
-        AtividadeService(AtividadeService)
         AtividadeMapper(AtividadeMapper)
 
         subgraph "Camada de Dados"
@@ -37,16 +35,14 @@ graph TD
     end
 
     UsuarioAPI -- Requisição HTTP --> AtividadeControle
-    AtividadeControle -- Chama --> AtividadeService
     AtividadeControle -- Usa --> AtividadeMapper
-
-    AtividadeService -- Usa --> AtividadeRepo
-    AtividadeService -- Interage com --> MapaService
+    AtividadeControle -- Interage com --> MapaService
+    AtividadeMapper -- Usa --> AtividadeRepo
     AtividadeRepo -- Gerencia --> Atividade
 ```
 
 ## Como Usar
-Para gerenciar atividades, interaja com os endpoints expostos pelo `AtividadeControle`. A lógica de negócio mais complexa, como validações ou interações com outros módulos, é encapsulada no `AtividadeService`.
+Para gerenciar atividades, interaja com os endpoints expostos pelo `AtividadeControle`.
 
 **Exemplo: Criar uma nova atividade**
 ```http

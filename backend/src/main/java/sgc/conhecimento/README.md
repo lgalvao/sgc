@@ -6,7 +6,6 @@ Este pacote gerencia a entidade `Conhecimento`, que representa uma habilidade ou
 ## Arquitetura e Componentes
 
 - **`ConhecimentoControle.java`**: Controller REST que expõe os endpoints para as operações CRUD da entidade `Conhecimento`.
-- **`ConhecimentoService.java`**: Contém a lógica de negócio para o gerenciamento de conhecimentos.
 - **`dto/`**:
   - **`ConhecimentoDto.java`**: DTO padrão para representar a entidade `Conhecimento` na API.
   - **`ConhecimentoMapper.java`**: Interface MapStruct para a conversão entre a entidade `Conhecimento` e seus DTOs.
@@ -23,7 +22,6 @@ graph TD
 
     subgraph "Módulo Conhecimento"
         ConhecimentoControle(ConhecimentoControle)
-        ConhecimentoService(ConhecimentoService)
         ConhecimentoMapper(ConhecimentoMapper)
 
         subgraph "Camada de Dados"
@@ -37,11 +35,8 @@ graph TD
     end
 
     UsuarioAPI -- Requisição HTTP --> ConhecimentoControle
-    ConhecimentoControle -- Chama --> ConhecimentoService
     ConhecimentoControle -- Usa --> ConhecimentoMapper
-
-    ConhecimentoService -- Usa --> ConhecimentoRepo
-    ConhecimentoService -- Interage com --> AtividadeService
+    ConhecimentoMapper -- Interage com --> AtividadeService
     ConhecimentoRepo -- Gerencia --> Conhecimento
 ```
 

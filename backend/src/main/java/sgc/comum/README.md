@@ -12,6 +12,7 @@ O pacote `comum` é um pilar da aplicação, contendo classes, configurações e
 - **`erros/`**: Define a hierarquia de exceções customizadas e o handler global.
   - **`RestExceptionHandler.java`**: `@ControllerAdvice` que captura exceções e as traduz em respostas HTTP padronizadas no formato `ErroApi`.
   - **Exceções Notáveis**: `ErroDominioNaoEncontrado` (404), `ErroDominioAccessoNegado` (403), `ErroServicoExterno` (502).
+- **`enums/`**: Contém enums globais como `SituacaoProcesso` e `SituacaoSubprocesso`.
 - **`modelo/`**: Contém entidades de base compartilhadas.
   - **`EntidadeBase.java`**: Superclasse (`@MappedSuperclass`) que fornece um campo de ID padronizado (`codigo`).
   - **`Administrador.java`**: Entidade que representa um administrador do sistema.
@@ -33,6 +34,7 @@ graph TD
         Erros(erros)
         Modelo(modelo)
         Painel(Painel)
+        Enums(enums)
     end
 
     subgraph "Spring Framework"
