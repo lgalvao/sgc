@@ -153,6 +153,7 @@ class CDU11IntegrationTest {
         }
 
         @Test
+        @WithMockGestor
         @DisplayName("Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade")
         void devePermitirServidorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))

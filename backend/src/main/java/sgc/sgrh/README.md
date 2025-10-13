@@ -1,121 +1,59 @@
-# Módulo de Integração com SGRH
+# Módulo de Usuário e Integração SGRH - SGC
 
 ## Visão Geral
-Este pacote implementa a camada de integração do SGC com o SGRH (Sistema de Gestão de RH) para consultar dados essenciais, como:
-- Dados dos servidores (usuários)
-- Estrutura organizacional (unidades e sua hierarquia)
-- Responsabilidades (titulares e substitutos de unidades)
-- Perfis de acesso por unidade
+Este pacote tem uma dupla responsabilidade:
+1.  **Modelo de Usuário SGC**: Define as entidades `Usuario` e `Perfil` da própria aplicação SGC.
+2.  **Integração com SGRH**: Atua como uma camada de integração (facade) com o sistema de RH (SGRH) para consultar dados de servidores, unidades e suas hierarquias.
 
-## Status da Implementação
-✅ **Estrutura Completa Criada**: A arquitetura está pronta, incluindo entidades, repositórios, DTOs, serviço com cache e configuração para um datasource separado.
+Atualmente, a integração com o SGRH utiliza **dados simulados (mock)**, mas a estrutura está pronta para ser conectada a um banco de dados Oracle real.
 
-⚠️ **Dados MOCK Ativos**: Atualmente, todos os métodos do `SgrhService` retornam dados **simulados (mock)**. A estrutura está pronta para ser conectada ao banco de dados Oracle real. Marcadores `// TODO:` no código indicam onde a lógica de acesso ao banco de dados deve ser implementada.
+## Arquitetura e Componentes
 
-## Estrutura de Pacotes
-```
-sgc/sgrh/
-├── modelo/              # Entidades JPA (mapeando views Oracle) e Repositories
-│   ├── VwUsuario.java
-│   ├── VwUsuarioRepo.java
-│   ├── VwUnidade.java
-│   ├── VwUnidadeRepo.java
-│   └── ...
-├── dto/                 # DTOs para transferência de dados
-│   ├── UsuarioDto.java
-│   ├── UnidadeDto.java
-│   └── ...
-└── SgrhService.java     # Serviço que abstrai o acesso aos dados (atualmente com MOCK)
-```
-
-## Configuração
-Para conectar ao banco de dados real, configure as seguintes variáveis no `application.yml` ou como variáveis de ambiente:
-```yaml
-spring:
-  sgrh:
-    datasource:
-      url: ${SGRH_DB_URL:jdbc:oracle:thin:@//localhost:1521/SGRH}
-      username: ${SGRH_DB_USERNAME:sgrh_reader}
-      password: ${SGRH_DB_PASSWORD:}
-```
-
-## Como Usar
-Injete o `SgrhService` em qualquer outro serviço que precise de dados de RH. O cache (`@Cacheable`) já está configurado para otimizar consultas repetidas.
-```java
-@Service
-@RequiredArgsConstructor
-public class MeuServico {
-    private final SgrhService sgrhService;
-    
-    public void executarAcao(String tituloUsuario, Long idUnidade) {
-        // Buscar usuário por título
-        Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo(tituloUsuario);
-        
-        // Buscar responsável da unidade
-        Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(idUnidade);
-        
-        // Construir a árvore hierárquica de unidades
-        List<UnidadeDto> arvoreUnidades = sgrhService.construirArvoreHierarquica();
-    }
-}
-```
-
-## Migração de MOCK para Real
-1.  **Configurar Conexão Oracle**: Forneça as credenciais do banco de dados SGRH (URL, usuário, senha).
-2.  **Verificar Views no Oracle**: Confirme que as views mapeadas pelas entidades no pacote `modelo` existem no schema do SGRH (ex: `SGRH.VW_USUARIO`).
-3.  **Implementar Métodos no Serviço**: No `SgrhService.java`, substitua a lógica de mock pela chamada ao respectivo repositório.
-
-**Exemplo de substituição:**
-```java
-// ANTES (MOCK):
-public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-    log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
-    return Optional.of(new UsuarioDto(...)); // Dados simulados
-}
-
-// DEPOIS (REAL):
-public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-    log.debug("Buscando usuário por título no SGRH: {}", titulo);
-    return vwUsuarioRepo.findById(titulo) // Supondo que VwUsuarioRepo se chame vwUsuarioRepo
-        .map(vwUsuario -> new UsuarioDto(...)); // Mapeamento da entidade para DTO
-}
-```
-4.  **Testar Conexão**: Crie testes de integração (`@SpringBootTest`) para validar a conexão e o retorno de dados do banco real.
-
-## Segurança
-⚠️ **IMPORTANTE**: A integração com o SGRH deve ser **somente leitura (read-only)**.
-- O usuário do banco de dados deve ter apenas permissão de `SELECT`.
-- As transações no `SgrhService` devem ser marcadas como `readOnly = true`.
-- Nunca permita operações de `INSERT`, `UPDATE` ou `DELETE` através deste pacote.
+- **`Usuario.java` / `UsuarioRepo.java`**: A entidade `Usuario` principal do SGC e seu repositório.
+- **`Perfil.java`**: Entidade que representa um perfil de acesso no SGC.
+- **`SgrhService.java`**: O serviço que abstrai o acesso aos dados do SGRH. Atualmente, retorna dados mockados e utiliza cache (`@Cacheable`) para otimizar consultas.
+- **`dto/`**: Contém DTOs para a transferência de dados, como `UsuarioDto`, `UnidadeDto`, `ResponsavelDto` e `PerfilDto`.
+- **`modelo/`**: Contém as entidades JPA que mapeiam as *views* do banco de dados Oracle do SGRH, e seus respectivos repositórios.
+  - **Entidades Notáveis**: `VwUsuario`, `VwUnidade`, `VwResponsabilidade`, `VwUsuarioPerfilUnidade`.
+  - **Repositórios Notáveis**: `VwUsuarioRepo`, `VwUnidadeRepo`, etc.
 
 ## Diagrama de Integração
 ```mermaid
-graph LR
+graph TD
     subgraph "Aplicação SGC"
+        direction LR
         A(Outros Serviços)
+        U(Usuario)
+        P(Perfil)
     end
 
     subgraph "Módulo SGRH (Facade)"
         B(SgrhService)
         C{Cache}
-        D(DataSource SGRH)
     end
 
     subgraph "Fonte de Dados Externa"
-        E(Banco de Dados Oracle)
+        E(Oracle SGRH)
         F(Dados Mock)
     end
 
-    A -- Consulta --> B
-    B -- Acessa/Popula --> C
-    B -- Usa --> D
-    D -- Conecta a --> E
+    A -- Usa --> B
+    A -- Usa --> U
+    A -- Usa --> P
 
+    B -- Acessa/Popula --> C
     B -- Atualmente usa --> F
+    B -- Deveria usar --> E
 
     style F fill:#ffe6e6,stroke:#c33
     style E fill:#d4edda,stroke:#155724
 ```
 
----
-**Status Atual**: ✅ Estrutura Completa | ⚠️ Usando MOCK
+## Migração de Mock para Real
+1.  **Configurar Conexão Oracle**: Preencha as credenciais do banco de dados SGRH no `application.properties`.
+2.  **Verificar Views**: Confirme que as views mapeadas em `modelo/` existem no schema do SGRH.
+3.  **Implementar Serviços**: No `SgrhService.java`, substitua a lógica de mock pelas chamadas aos repositórios (`Vw*Repo`).
+4.  **Testar**: Crie testes de integração para validar a conexão real.
+
+## Segurança
+A integração com o SGRH deve ser **somente leitura**. O usuário do banco de dados deve ter apenas permissão de `SELECT`, e as transações no `SgrhService` devem ser marcadas como `readOnly = true`.

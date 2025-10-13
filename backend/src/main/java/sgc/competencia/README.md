@@ -1,89 +1,60 @@
-# Módulo de Competências - SGC
+# Módulo de Competência - SGC
 
 ## Visão Geral
-Este pacote é responsável por gerenciar as **Competências** e sua associação com **Atividades**. Ele permite não apenas o gerenciamento CRUD (Criar, Ler, Atualizar, Excluir) de competências, mas também o gerenciamento dos vínculos que conectam uma competência a uma ou mais atividades.
+Este pacote gerencia as **Competências** e sua associação com **Atividades**. Ele centraliza a lógica de negócio, os endpoints da API e a persistência de dados para as competências e seus relacionamentos.
 
-O módulo está estruturado com controladores distintos para cada responsabilidade, entidades no pacote `modelo` e DTOs para a comunicação via API.
+## Arquitetura e Componentes
 
-## Arquivos Principais
-
-### Gestão de Competências
-
-#### 1. `Competencia.java`
-**Localização:** `backend/src/main/java/sgc/competencia/modelo/Competencia.java`
-- **Descrição:** Entidade JPA que representa uma competência. Mapeia a tabela `COMPETENCIA`.
-- **Campos Importantes:**
-  - `descricao`: O texto que descreve a competência.
-  - `mapa`: Associação com a entidade `Mapa` à qual a competência pertence.
-
-#### 2. `CompetenciaControle.java`
-**Localização:** `backend/src/main/java/sgc/competencia/CompetenciaControle.java`
-- **Descrição:** Controlador REST que expõe endpoints para as operações CRUD da entidade `Competencia`.
-- **Endpoints Principais:**
-  - `GET /api/competencias`: Lista todas as competências.
-  - `POST /api/competencias`: Cria uma nova competência.
-  - `PUT /api/competencias/{id}`: Atualiza uma competência existente.
-  - `DELETE /api/competencias/{id}`: Exclui uma competência.
-
-#### 3. `CompetenciaRepo.java`
-**Localização:** `backend/src/main/java/sgc/competencia/modelo/CompetenciaRepo.java`
-- **Descrição:** Interface Spring Data JPA para acesso aos dados da entidade `Competencia`.
-
-### Gestão do Vínculo Competência-Atividade
-
-#### 4. `CompetenciaAtividade.java`
-**Localização:** `backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividade.java`
-- **Descrição:** Entidade que representa a tabela de associação entre `Competencia` and `Atividade`. Utiliza uma chave primária composta (`@EmbeddedId`) para o mapeamento.
-- **Relacionamentos:**
-  - `ManyToOne` com `Competencia`.
-  - `ManyToOne` com `Atividade`.
-
-#### 5. `CompetenciaAtividadeControle.java`
-**Localização:** `backend/src/main/java/sgc/competencia/CompetenciaAtividadeControle.java`
-- **Descrição:** Controlador REST dedicado a gerenciar o vínculo entre `Competencia` e `Atividade`.
-- **Endpoints Principais:**
-  - `POST /api/competencia-atividades`: Cria um novo vínculo entre uma competência e uma atividade.
-  - `DELETE /api/competencia-atividades`: Remove um vínculo existente.
-
-#### 6. `CompetenciaAtividadeRepo.java`
-**Localização:** `backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividadeRepo.java`
-- **Descrição:** Interface Spring Data JPA para acesso aos dados da entidade de associação `CompetenciaAtividade`.
-
-### DTOs e Mappers (`dto/`)
-**Localização:** `backend/src/main/java/sgc/competencia/dto/`
-- **Descrição:** O pacote `dto` contém os Data Transfer Objects (DTOs) para a comunicação via API, como `CompetenciaDto`. Isso desacopla a representação da API da estrutura interna das entidades.
+- **`CompetenciaControle.java`**: Controller REST que expõe endpoints para as operações CRUD de competências e para o gerenciamento dos vínculos com atividades.
+- **`CompetenciaService.java`**: Contém a lógica de negócio para o gerenciamento de competências (criar, ler, atualizar, excluir).
+- **`CompetenciaAtividadeService.java`**: Serviço dedicado a gerenciar o vínculo entre `Competencia` e `Atividade`.
+- **`dto/`**:
+  - **`CompetenciaDto.java`**: DTO para representar a entidade `Competencia` na API.
+  - **`CompetenciaMapper.java`**: Interface MapStruct para a conversão entre a entidade `Competencia` e seus DTOs.
+- **`modelo/`**:
+  - **`Competencia.java`**: Entidade JPA que representa uma competência.
+  - **`CompetenciaAtividade.java`**: Entidade de associação que representa o vínculo entre `Competencia` e `Atividade`.
+  - **`CompetenciaRepo.java`**: Repositório para a entidade `Competencia`.
+  - **`CompetenciaAtividadeRepo.java`**: Repositório para a entidade de associação `CompetenciaAtividade`.
 
 ## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário"
-        U[Usuário via API]
+    subgraph "Cliente"
+        UsuarioAPI(Usuário via API)
     end
 
     subgraph "Módulo Competência"
-        CC(CompetenciaControle)
-        CAC(CompetenciaAtividadeControle)
+        CompetenciaControle(CompetenciaControle)
+        CompetenciaService(CompetenciaService)
+        CompetenciaAtividadeService(CompetenciaAtividadeService)
+        CompetenciaMapper(CompetenciaMapper)
 
-        CR[CompetenciaRepo]
-        CAR[CompetenciaAtividadeRepo]
-
-        C_E(Competencia)
-        CA_E(CompetenciaAtividade)
+        subgraph "Camada de Dados"
+            CompetenciaRepo(CompetenciaRepo)
+            CompetenciaAtividadeRepo(CompetenciaAtividadeRepo)
+            Competencia(Competencia)
+            CompetenciaAtividade(CompetenciaAtividade)
+        end
     end
 
-    U -- CRUD --> CC
-    CC -- Usa --> CR
-    CR -- Gerencia --> C_E
+    UsuarioAPI -- Requisição HTTP --> CompetenciaControle
 
-    U -- Criar/Remover Vínculo --> CAC
-    CAC -- Usa --> CAR
-    CAR -- Gerencia --> CA_E
+    CompetenciaControle -- Chama --> CompetenciaService
+    CompetenciaControle -- Chama --> CompetenciaAtividadeService
+    CompetenciaControle -- Usa --> CompetenciaMapper
+
+    CompetenciaService -- Usa --> CompetenciaRepo
+    CompetenciaAtividadeService -- Usa --> CompetenciaAtividadeRepo
+
+    CompetenciaRepo -- Gerencia --> Competencia
+    CompetenciaAtividadeRepo -- Gerencia --> CompetenciaAtividade
 ```
 
 ## Como Usar
 
 ### Gerenciando Competências
-Interaja com os endpoints do `CompetenciaControle` através de um cliente HTTP.
+Interaja com os endpoints do `CompetenciaControle` para criar, ler, atualizar e excluir competências.
 
 **Exemplo: Criar uma nova competência**
 ```http
@@ -91,25 +62,24 @@ POST /api/competencias
 Content-Type: application/json
 
 {
-  "descricao": "Capacidade de Análise Crítica",
-  "mapaId": 42
+  "mapaId": 1,
+  "descricao": "Pensamento Crítico"
 }
 ```
 
 ### Vinculando Competência e Atividade
-Interaja com os endpoints do `CompetenciaAtividadeControle`.
+A API para vincular e desvincular competências de atividades também é exposta através do `CompetenciaControle`.
 
-**Exemplo: Vincular uma competência a uma atividade**
+**Exemplo: Vincular competência a uma atividade**
 ```http
-POST /api/competencia-atividades
+POST /api/competencias/{id}/atividades
 Content-Type: application/json
 
 {
-  "competenciaId": 10,
-  "atividadeId": 25
+  "atividadeId": 15
 }
 ```
 
 ## Notas Importantes
-- **Chave Primária Composta**: A entidade `CompetenciaAtividade` usa uma classe aninhada `Id` como chave primária composta (`@EmbeddedId`), uma abordagem padrão para gerenciar tabelas de associação muitos-para-muitos em JPA.
-- **Desacoplamento**: A separação dos controladores (`CompetenciaControle` e `CompetenciaAtividadeControle`) mantém as responsabilidades bem definidas: um para o recurso principal (`Competencia`) e outro para o seu relacionamento com `Atividade`.
+- **Separação de Serviços**: A lógica de negócio é dividida entre `CompetenciaService` (para o ciclo de vida da competência em si) and `CompetenciaAtividadeService` (para gerenciar o relacionamento), promovendo a coesão.
+- **DTOs e Mappers**: O uso de DTOs e MapStruct desacopla a API da persistência, seguindo as melhores práticas de design de API.

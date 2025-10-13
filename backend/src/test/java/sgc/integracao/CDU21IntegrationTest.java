@@ -102,10 +102,10 @@ class CDU21IntegrationTest {
 
         // 5. Create Subprocesses and Maps
         Mapa mapa1 = mapaRepo.save(new Mapa());
-        Subprocesso sp1 = subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         Mapa mapa2 = mapaRepo.save(new Mapa());
-        Subprocesso sp2 = subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         // 6. Create UnidadeProcesso snapshots
         unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), titularIntermediaria.getTitulo(), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));

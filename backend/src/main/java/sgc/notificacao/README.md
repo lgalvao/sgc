@@ -1,38 +1,21 @@
 # Módulo de Notificação por E-mail - SGC
 
 ## Visão Geral
-Este pacote é responsável pelo envio de notificações por e-mail para os usuários do sistema. Ele é projetado para ser robusto e assíncrono, garantindo que as falhas no envio de e-mail não interrompam os fluxos de negócio principais da aplicação.
+Este pacote é responsável pelo envio de notificações por e-mail. Ele é projetado para ser robusto e assíncrono, garantindo que falhas no envio de e-mail não interrompam os fluxos de negócio principais. A arquitetura é orientada a eventos, reagindo a eventos de domínio (como `ProcessoIniciadoEvento`) para acionar o envio das notificações.
 
-A arquitetura é orientada a eventos, utilizando um `EventoProcessoListener` para reagir a eventos de domínio (como `ProcessoIniciadoEvento`) e acionar o envio das notificações correspondentes.
+## Arquitetura e Componentes
 
-## Arquivos e Componentes Principais
-
-### 1. `NotificacaoServico` (Interface) e `NotificacaoServicoImpl` (Implementação)
-- **Localização:** `backend/src/main/java/sgc/notificacao/`
-- **Descrição:**
-  - `NotificacaoServico`: Define o contrato para o envio de e-mails.
-  - `NotificacaoServicoImpl`: A implementação principal (`@Primary`) que realiza o trabalho.
-- **Funcionalidades Chave da Implementação:**
-  - **Persistência:** Antes de tentar o envio, uma entidade `Notificacao` é salva no banco de dados para fins de auditoria.
-  - **Envio Assíncrono:** O envio de e-mail é executado em um pool de threads separado (`@Async`), evitando o bloqueio da thread principal da aplicação.
-  - **Retentativas:** Em caso de falha, o sistema tenta reenviar o e-mail automaticamente (até 3 tentativas com tempo de espera crescente).
-  - **Validação:** Verifica se o formato do e-mail do destinatário é válido antes do envio.
-
-### 2. `NotificacaoTemplateEmailService.java`
-- **Localização:** `backend/src/main/java/sgc/notificacao/NotificacaoTemplateEmailService.java`
-- **Descrição:** Um serviço utilitário dedicado a criar o conteúdo HTML dos e-mails. Cada método corresponde a um evento de negócio específico (ex: `criarEmailDeProcessoIniciado`, `criarEmailDeCadastroDevolvido`), garantindo que todas as notificações tenham um formato padronizado e informativo.
-
-### 3. `EventoProcessoListener.java`
-- **Localização:** `backend/src/main/java/sgc/notificacao/EventoProcessoListener.java`
-- **Descrição:** Um listener de eventos do Spring (`@EventListener`) que escuta por eventos de domínio publicados pelo `ProcessoServico`. Ao capturar um evento, ele orquestra a criação do e-mail (usando `NotificacaoTemplateEmailService`) e o envia (usando `NotificacaoServico`).
-
-### 4. `Notificacao.java` (Entidade)
-- **Localização:** `backend/src/main/java/sgc/notificacao/modelo/Notificacao.java`
-- **Descrição:** Entidade JPA que representa um registro de notificação no banco de dados. Armazena informações sobre o destinatário, o conteúdo e o momento em que a notificação foi gerada.
-
-### 5. `EmailDto.java` (DTO)
-- **Localização:** `backend/src/main/java/sgc/notificacao/dto/EmailDto.java`
-- **Descrição:** Um `record` Java simples usado para transportar os dados do e-mail (destinatário, assunto, corpo, se é HTML) entre os componentes do módulo.
+- **`NotificacaoService.java`**: A implementação principal que realiza o envio de e-mails.
+  - **Persistência**: Salva uma entidade `Notificacao` antes de tentar o envio.
+  - **Envio Assíncrono**: Executa o envio em um pool de threads separado (`@Async`).
+  - **Retentativas**: Tenta reenviar o e-mail em caso de falha.
+- **`NotificacaoModeloEmailService.java`**: Serviço utilitário dedicado a criar o conteúdo HTML dos e-mails a partir de templates.
+- **`EventoProcessoListener.java`**: Listener de eventos do Spring (`@EventListener`) que escuta eventos de domínio (ex: `ProcessoIniciadoEvento`), orquestra a criação do e-mail e o envia.
+- **`modelo/`**:
+  - **`Notificacao.java`**: Entidade JPA que representa um registro de notificação.
+  - **`NotificacaoRepo.java`**: Repositório para a entidade `Notificacao`.
+- **`dto/`**:
+  - **`EmailDto.java`**: `record` para transportar os dados do e-mail.
 
 ## Diagrama de Sequência (Orientado a Eventos)
 ```mermaid
@@ -40,30 +23,30 @@ sequenceDiagram
     participant PS as ProcessoService
     participant EP as ApplicationEventPublisher
     participant EL as EventoProcessoListener
-    participant TS as NotificacaoTemplateEmailService
-    participant NS as NotificacaoServico
+    participant MS as NotificacaoModeloEmailService
+    participant NS as NotificacaoService
 
     PS->>EP: publica(new ProcessoIniciadoEvento(...))
     EP-->>EL: notifica(evento)
-    EL->>TS: criarEmailDeProcessoIniciado(evento.dados)
-    TS-->>EL: retorna corpoHtml
+    EL->>MS: criarEmailDeProcessoIniciado(evento.dados)
+    MS-->>EL: retorna corpoHtml
     EL->>NS: enviarEmailHtml(destinatario, assunto, corpoHtml)
     activate NS
     Note right of NS: Envio assíncrono com retentativas
     deactivate NS
 ```
 
-## Fluxo de Notificação (Orientado a Eventos)
+## Fluxo de Notificação
 
-1.  **Ação de Negócio**: Um serviço, como o `ProcessoServico`, executa uma operação importante (ex: iniciar um processo).
-2.  **Publicação do Evento**: Ao final da operação, o `ProcessoServico` publica um evento de domínio (ex: `new ProcessoIniciadoEvento(this, ...)`).
+1.  **Ação de Negócio**: Um serviço (ex: `ProcessoService`) executa uma operação.
+2.  **Publicação do Evento**: O serviço publica um evento de domínio.
 3.  **Captura do Evento**: O `EventoProcessoListener` captura o evento.
-4.  **Criação do Template**: O listener chama o `NotificacaoTemplateEmailService` para gerar o corpo do e-mail em HTML com os dados do evento.
-5.  **Envio do E-mail**: O listener chama `NotificacaoServico.enviarEmailHtml()`.
-6.  **Processamento Assíncrono**: `NotificacaoServicoImpl` persiste a notificação e inicia o processo de envio assíncrono com retentativas.
+4.  **Criação do Template**: O listener chama o `NotificacaoModeloEmailService` para gerar o corpo do e-mail.
+5.  **Envio do E-mail**: O listener chama `NotificacaoService.enviarEmailHtml()`.
+6.  **Processamento Assíncrono**: `NotificacaoService` persiste a notificação e inicia o envio assíncrono.
 
 ## Como Usar
-Na maioria dos casos, o envio de notificações é automático e baseado em eventos. Para enviar um e-mail manualmente, injete `NotificacaoServico`.
+O envio de notificações é majoritariamente automático e baseado em eventos. Para envios manuais, injete `NotificacaoService`.
 
 **Exemplo:**
 ```java
@@ -76,5 +59,5 @@ public void notificarManualmente(String email, String mensagem) {
 ```
 
 ## Notas Importantes
-- **Desacoplamento**: A arquitetura orientada a eventos desacopla fortemente o módulo de notificação dos módulos de negócio. O `ProcessoServico` não precisa saber como os e-mails são enviados; ele apenas anuncia que algo aconteceu.
-- **Robustez**: O tratamento de erros, a persistência e o envio assíncrono tornam o sistema de notificações resiliente a falhas na infraestrutura de e-mail.
+- **Desacoplamento**: A arquitetura orientada a eventos desacopla o módulo de notificação dos módulos de negócio.
+- **Robustez**: O tratamento de erros, a persistência e o envio assíncrono tornam o sistema resiliente.

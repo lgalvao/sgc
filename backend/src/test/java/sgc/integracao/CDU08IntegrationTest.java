@@ -40,11 +40,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static sgc.atividade.AtividadeControleTest.API_ATIVIDADES;
-import static sgc.processo.ProcessoControleTest.DESCRICAO_JSON_PATH;
 
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
@@ -54,6 +54,12 @@ import static sgc.processo.ProcessoControleTest.DESCRICAO_JSON_PATH;
 @Transactional
 @DisplayName("CDU-08: Manter Cadastro de Atividades e Conhecimentos")
 class CDU08IntegrationTest {
+
+    private static final String API_ATIVIDADES = "/api/atividades";
+    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
+    private static final String API_CONHECIMENTOS = "/api/conhecimentos";
+    private static final String API_CONHECIMENTOS_ID = "/api/conhecimentos/{id}";
+    private static final String DESCRICAO_JSON_PATH = "$.descricao";
 
     @Autowired
     private MockMvc mockMvc;
