@@ -10,3 +10,4 @@ backend/src/main/resources/static/
 backend/build/
 backend/out/
 *.log!/backend/src/main/generated/
+/backend/src/main/generated/
