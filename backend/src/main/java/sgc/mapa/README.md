@@ -22,10 +22,10 @@ Este pacote se destaca pela sua arquitetura orientada a serviços, onde cada ser
 
 - **`CopiaMapaService.java`**: Serviço especializado na clonagem de mapas. Sua principal função é `copiarMapaParaUnidade(...)`, que cria uma cópia exata de um mapa existente e a associa a uma nova unidade.
 
-- **`ImpactoMapaService.java`**: Implementa a análise de impacto (CDU-12). Sua função `verificarImpactos(...)` compara o mapa atual de uma unidade com uma nova versão e identifica todas as diferenças (atividades adicionadas, removidas, alteradas) e as competências afetadas.
+- **`ImpactoMapaService.java`**: Implementa a análise de impacto (CDU-12). Sua função `verificarImpactos(...)` compara o mapa atual de uma unidade com uma nova versão e identifica todas as diferenças. **Nota:** Este serviço é invocado pelo `SubprocessoService`, não diretamente pelo `MapaControle`.
 
 ### 3. Controlador REST
-- **`MapaControle.java`**: Expõe os endpoints da API para interagir com os serviços do módulo de mapa, orquestrando as chamadas para `MapaService`, `ImpactoMapaService`, etc.
+- **`MapaControle.java`**: Expõe os endpoints da API para interagir com o `MapaService`, focando nas operações de obter e salvar o mapa completo.
 
 ### 4. DTOs (Data Transfer Objects) (`dto/`)
 **Localização:** `backend/src/main/java/sgc/mapa/dto/`
@@ -40,24 +40,25 @@ Este pacote se destaca pela sua arquitetura orientada a serviços, onde cada ser
 ### Salvando um Mapa
 1.  O frontend envia uma requisição complexa (`SalvarMapaRequestDto`) para o `MapaControle`.
 2.  O controller invoca `MapaService.salvarMapaCompleto()`.
-3.  Dentro de uma única transação (`@Transactional`), o serviço executa uma sequência de operações (atualiza mapa, exclui/atualiza/cria competências, recria vínculos) para garantir a consistência dos dados. Se qualquer etapa falhar, a transação inteira é revertida.
+3.  Dentro de uma única transação (`@Transactional`), o serviço executa uma sequência de operações para garantir a consistência dos dados. Se qualquer etapa falhar, a transação inteira é revertida.
 
-### Verificando o Impacto de Mudanças
-1.  Uma requisição para o endpoint de impacto invoca `ImpactoMapaService.verificarImpactos()`.
-2.  O serviço carrega o mapa vigente da unidade e o cadastro de atividades do subprocesso em análise.
-3.  Ele compara as duas versões e monta o `ImpactoMapaDto` com as diferenças detalhadas.
+### Verificando o Impacto de Mudanças (Via Módulo `subprocesso`)
+1.  Uma requisição para um endpoint em `SubprocessoControle` invoca `ImpactoMapaService.verificarImpactos()`.
+2.  O serviço carrega o mapa vigente e o novo cadastro de atividades.
+3.  Ele compara as duas versões e monta o `ImpactoMapaDto` com as diferenças.
 4.  O DTO resultante é retornado para ser exibido ao usuário.
 
 ## Notas Importantes
-- **Complexidade de Negócio**: Este pacote encapsula uma lógica de negócio significativa. A separação em múltiplos serviços é uma prática de design que mantém o código organizado e coeso.
-- **Transacionalidade**: A natureza atômica da operação de salvamento (`salvarMapaCompleto`) é crucial para a integridade dos dados e é um pilar da arquitetura deste pacote.
-- **DTOs Ricos**: O uso de DTOs complexos e específicos para cada operação é fundamental para gerenciar a complexidade das interações com este módulo.
+- **Complexidade de Negócio**: Este pacote encapsula uma lógica de negócio significativa. A separação em múltiplos serviços com responsabilidades únicas é uma prática de design chave.
+- **Transacionalidade**: A natureza atômica da operação de salvamento (`salvarMapaCompleto`) é crucial para a integridade dos dados.
+- **Invocação Indireta**: Serviços como `ImpactoMapaService` e `CopiaMapaService` são utilizados por outros módulos (`subprocesso`, `processo`), não sendo expostos diretamente na API do `mapa`.
 
 ## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário/Sistema"
-        A[Cliente API]
+    subgraph "Outros Módulos"
+        PS(ProcessoService)
+        SPS(SubprocessoService)
     end
 
     subgraph "Módulo Mapa"
@@ -66,19 +67,15 @@ graph TD
         IS(ImpactoMapaService)
         CS(CopiaMapaService)
         MR[MapaRepo]
-        M(Mapa)
     end
 
-    A -- Requisições HTTP --> MC
     MC -- Orquestra --> MS
-    MC -- Orquestra --> IS
-    MC -- Orquestra --> CS
+    PS -- Usa --> CS
+    SPS -- Usa --> IS
 
     MS -- Usa --> MR
     IS -- Usa --> MR
     CS -- Usa --> MR
-
-    MR -- Gerencia --> M
 
     style MS fill:#cce5ff,stroke:#0066cc
     style IS fill:#d4edda,stroke:#155724

@@ -31,8 +31,14 @@ graph TD
         CM(comum)
     end
 
+    subgraph "Auditoria e Análise"
+        AN(analise)
+    end
+
     P -- Cria e gerencia --> SP
     SP -- Trabalha em --> M
+    SP -- É revisado por --> AN
+
     M -- Composto por --> A
     M -- Composto por --> C
     C -- Associado a --> A
@@ -44,9 +50,11 @@ graph TD
     P -- Usa dados de --> U
     SP -- Usa dados de --> U
     AL -- Usa dados de --> U
+    AN -- Associada a --> U
 
     U -- Populado por --> S
     AL -- Usa --> S
+    AN -- Realizada por --> S
 
     CM -- Suporte para Todos --> P
     CM -- Suporte para Todos --> SP
@@ -54,6 +62,7 @@ graph TD
     CM -- Suporte para Todos --> AL
     CM -- Suporte para Todos --> N
     CM -- Suporte para Todos --> S
+    CM -- Suporte para Todos --> AN
 ```
 
 ## Arquitetura e Módulos Principais
@@ -92,21 +101,27 @@ O backend está organizado nos seguintes pacotes principais, localizados em `src
   - `SubprocessoService.java`: Funciona como uma **state machine**, gerenciando as transições de estado de cada tarefa (ex: de `PENDENTE_CADASTRO` para `CADASTRO_DISPONIBILIZADO`).
   - `Movimentacao.java`: Entidade que cria uma trilha de auditoria imutável para cada ação no subprocesso.
 
-### 6. `mapa`
+### 6. `analise`
+- **Responsabilidade:** Gerencia o processo de revisão e validação dos subprocessos.
+- **Componentes Notáveis:**
+  - `AnaliseService.java`: Orquestra as análises de cadastro e validação, registrando o histórico de ações.
+  - `Analise.java`: Entidade que representa uma única etapa de análise (ex: uma devolução para ajuste).
+
+### 7. `mapa`
 - **Responsabilidade:** Gerencia o artefato "Mapa de Competências".
 - **Componentes Notáveis:**
   - `MapaService.java`: Orquestra operações complexas e transacionais de salvamento do mapa.
   - `ImpactoMapaService.java`: Analisa as diferenças entre versões de um mapa.
   - `CopiaMapaService.java`: Clona mapas existentes.
 
-### 7. `atividade`, `conhecimento`, `competencia`
+### 8. `atividade`, `conhecimento`, `competencia`
 - **Responsabilidade:** Gerenciam as entidades de base que compõem um mapa.
 - **Componentes Notáveis:**
   - `Atividade.java`: Uma tarefa ou atribuição.
   - `Conhecimento.java`: Uma habilidade necessária para uma atividade.
   - `Competencia.java`: Um agrupamento de conhecimentos e atividades.
 
-### 8. `alerta` e `notificacao`
+### 9. `alerta` e `notificacao`
 - **Responsabilidade:** Módulos reativos que lidam com a comunicação com o usuário.
 - **Componentes Notáveis:**
   - `EventoProcessoListener`: "Escuta" os eventos publicados pelo `ProcessoService`.

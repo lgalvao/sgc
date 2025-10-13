@@ -1,35 +1,28 @@
-# Módulo de Integração com SGRH
+# Módulo de Integração SGRH e Modelo de Usuário
 
 ## Visão Geral
-Este pacote implementa a camada de integração do SGC com o SGRH (Sistema de Gestão de RH) para consultar dados essenciais, como:
-- Dados dos servidores (usuários)
-- Estrutura organizacional (unidades e sua hierarquia)
-- Responsabilidades (titulares e substitutos de unidades)
-- Perfis de acesso por unidade
+Este pacote possui uma **responsabilidade dupla** e é fundamental para o funcionamento do SGC:
+
+1.  **Modelo de Domínio Interno**: Define as entidades principais de segurança e usuário da aplicação, como `Usuario` e `Perfil`, que são persistidas no banco de dados do próprio SGC.
+2.  **Fachada de Integração (Facade)**: Atua como uma camada de abstração para consultar dados de um sistema de RH externo (SGRH). Estes dados (como a estrutura organizacional e os responsáveis por unidades) são complementares e não são armazenados diretamente no SGC.
 
 ## Status da Implementação
-✅ **Estrutura Completa Criada**: A arquitetura está pronta, incluindo entidades, repositórios, DTOs, serviço com cache e configuração para um datasource separado.
-
-⚠️ **Dados MOCK Ativos**: Atualmente, todos os métodos do `SgrhService` retornam dados **simulados (mock)**. A estrutura está pronta para ser conectada ao banco de dados Oracle real. Marcadores `// TODO:` no código indicam onde a lógica de acesso ao banco de dados deve ser implementada.
+- ✅ **Modelo de Domínio Interno**: O modelo de `Usuario` e `Perfil` está completo e funcional.
+- ⚠️ **Fachada com Dados MOCK**: O `SgrhService` está totalmente implementado com **dados simulados (mock)**. Ele está pronto para ser conectado a uma fonte de dados real (como um banco de dados Oracle), mas atualmente não realiza chamadas externas. Marcadores `// TODO:` no código indicam onde a lógica de acesso real deve ser implementada.
 
 ## Estrutura de Pacotes
 ```
 sgc/sgrh/
-├── modelo/              # Entidades JPA (mapeando views Oracle) e Repositories
-│   ├── VwUsuario.java
-│   ├── VwUsuarioRepo.java
-│   ├── VwUnidade.java
-│   ├── VwUnidadeRepo.java
-│   └── ...
-├── dto/                 # DTOs para transferência de dados
-│   ├── UsuarioDto.java
-│   ├── UnidadeDto.java
-│   └── ...
-└── SgrhService.java     # Serviço que abstrai o acesso aos dados (atualmente com MOCK)
+├── modelo/              # Contém DTOs para a comunicação com a fachada
+│   ├── dto/
+├── Usuario.java         # A entidade JPA principal para usuários no SGC
+├── Perfil.java          # A entidade para perfis de acesso
+├── UsuarioRepo.java     # Repositório para a entidade Usuario
+└── SgrhService.java     # Serviço que atua como fachada (atualmente com MOCK)
 ```
 
-## Configuração
-Para conectar ao banco de dados real, configure as seguintes variáveis no `application.yml` ou como variáveis de ambiente:
+## Configuração para Conexão Real
+Para conectar o `SgrhService` a uma fonte de dados real (ex: Oracle), configure as variáveis no `application.yml`:
 ```yaml
 spring:
   sgrh:
@@ -40,82 +33,62 @@ spring:
 ```
 
 ## Como Usar
-Injete o `SgrhService` em qualquer outro serviço que precise de dados de RH. O cache (`@Cacheable`) já está configurado para otimizar consultas repetidas.
+- **Para autenticação e autorização**, o Spring Security interage com `Usuario` e `UsuarioRepo`.
+- **Para obter dados de RH (unidades, responsáveis)**, outros serviços devem injetar e usar o `SgrhService`.
+
 ```java
 @Service
 @RequiredArgsConstructor
 public class MeuServico {
     private final SgrhService sgrhService;
+    private final UsuarioRepo usuarioRepo;
     
     public void executarAcao(String tituloUsuario, Long idUnidade) {
-        // Buscar usuário por título
-        Optional<UsuarioDto> usuario = sgrhService.buscarUsuarioPorTitulo(tituloUsuario);
-        
-        // Buscar responsável da unidade
+        // Obter o usuário interno do SGC
+        Optional<Usuario> usuarioInterno = usuarioRepo.findByTitulo(tituloUsuario);
+
+        // Obter dados externos (atualmente mockados) do SGRH
         Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(idUnidade);
-        
-        // Construir a árvore hierárquica de unidades
-        List<UnidadeDto> arvoreUnidades = sgrhService.construirArvoreHierarquica();
     }
 }
 ```
 
-## Migração de MOCK para Real
-1.  **Configurar Conexão Oracle**: Forneça as credenciais do banco de dados SGRH (URL, usuário, senha).
-2.  **Verificar Views no Oracle**: Confirme que as views mapeadas pelas entidades no pacote `modelo` existem no schema do SGRH (ex: `SGRH.VW_USUARIO`).
-3.  **Implementar Métodos no Serviço**: No `SgrhService.java`, substitua a lógica de mock pela chamada ao respectivo repositório.
+## Migração de MOCK para Real no `SgrhService`
+1.  **Configurar Conexão**: Forneça as credenciais da fonte de dados externa.
+2.  **Implementar Métodos no Serviço**: No `SgrhService.java`, substitua a lógica de mock pelas chamadas reais (ex: usando `JdbcTemplate`, um cliente REST, ou repositórios que mapeiem views externas).
 
-**Exemplo de substituição:**
-```java
-// ANTES (MOCK):
-public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-    log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
-    return Optional.of(new UsuarioDto(...)); // Dados simulados
-}
-
-// DEPOIS (REAL):
-public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-    log.debug("Buscando usuário por título no SGRH: {}", titulo);
-    return vwUsuarioRepo.findById(titulo) // Supondo que VwUsuarioRepo se chame vwUsuarioRepo
-        .map(vwUsuario -> new UsuarioDto(...)); // Mapeamento da entidade para DTO
-}
-```
-4.  **Testar Conexão**: Crie testes de integração (`@SpringBootTest`) para validar a conexão e o retorno de dados do banco real.
-
-## Segurança
-⚠️ **IMPORTANTE**: A integração com o SGRH deve ser **somente leitura (read-only)**.
-- O usuário do banco de dados deve ter apenas permissão de `SELECT`.
-- As transações no `SgrhService` devem ser marcadas como `readOnly = true`.
-- Nunca permita operações de `INSERT`, `UPDATE` ou `DELETE` através deste pacote.
-
-## Diagrama de Integração
+## Diagrama de Arquitetura
 ```mermaid
-graph LR
+graph TD
     subgraph "Aplicação SGC"
-        A(Outros Serviços)
+        U(Usuario)
+        UR[UsuarioRepo]
+        OS(Outros Serviços)
     end
 
-    subgraph "Módulo SGRH (Facade)"
-        B(SgrhService)
+    subgraph "Módulo SGRH (Híbrido)"
+        SS(SgrhService)
         C{Cache}
-        D(DataSource SGRH)
     end
 
-    subgraph "Fonte de Dados Externa"
-        E(Banco de Dados Oracle)
-        F(Dados Mock)
+    subgraph "Fontes de Dados"
+        DB_SGC[Banco de Dados SGC]
+        DB_SGRH_EXT[Fonte Externa SGRH]
+        MOCK[Dados Mock]
     end
 
-    A -- Consulta --> B
-    B -- Acessa/Popula --> C
-    B -- Usa --> D
-    D -- Conecta a --> E
+    OS -- Usa --> UR
+    UR -- Gerencia --> U
+    U -- Persistido em --> DB_SGC
 
-    B -- Atualmente usa --> F
+    OS -- Consulta --> SS
+    SS -- Acessa/Popula --> C
+    SS -- Atualmente usa --> MOCK
+    SS -- Deveria usar --> DB_SGRH_EXT
 
-    style F fill:#ffe6e6,stroke:#c33
-    style E fill:#d4edda,stroke:#155724
+    style MOCK fill:#ffe6e6,stroke:#c33
+    style DB_SGRH_EXT fill:#d4edda,stroke:#155724
 ```
 
 ---
-**Status Atual**: ✅ Estrutura Completa | ⚠️ Usando MOCK
+**Status Atual**: ✅ Modelo Interno OK | ⚠️ Fachada Externa com MOCK

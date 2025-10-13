@@ -16,13 +16,13 @@ O módulo fornece a estrutura de dados (`Atividade.java`), o repositório para a
 
 ### 2. `AtividadeControle.java`
 **Localização:** `backend/src/main/java/sgc/atividade/AtividadeControle.java`
-- **Descrição:** Controlador REST que expõe endpoints para gerenciar a entidade `Atividade`.
+- **Descrição:** Controlador REST que expõe endpoints para gerenciar a entidade `Atividade`. Este controlador contém a lógica de negócio para validação e orquestração das operações, interagindo diretamente com os repositórios.
 - **Endpoints Principais:**
   - `GET /api/atividades`: Lista todas as atividades cadastradas.
   - `GET /api/atividades/{id}`: Obtém os detalhes de uma atividade específica por seu ID.
-  - `POST /api/atividades`: Cria uma nova atividade.
+  - `POST /api/atividades`: Cria uma nova atividade, validando o estado do subprocesso e as permissões do usuário.
   - `PUT /api/atividades/{id}`: Atualiza uma atividade existente.
-  - `DELETE /api/atividades/{id}`: Exclui uma atividade.
+  - `DELETE /api/atividades/{id}`: Exclui uma atividade e seus conhecimentos associados (deleção em cascata na camada de aplicação).
 
 ### 3. `AtividadeRepo.java`
 **Localização:** `backend/src/main/java/sgc/atividade/modelo/AtividadeRepo.java`
@@ -30,7 +30,7 @@ O módulo fornece a estrutura de dados (`Atividade.java`), o repositório para a
 
 ### 4. DTOs e Mappers (`dto/`)
 **Localização:** `backend/src/main/java/sgc/atividade/dto/`
-- **Descrição:** O pacote `dto` contém os Data Transfer Objects (DTOs) utilizados para a comunicação via API, como `AtividadeDto` e `ImportarAtividadesRequest`. Isso desacopla a representação da API da estrutura interna da entidade `Atividade`.
+- **Descrição:** O pacote `dto` contém os Data Transfer Objects (DTOs) utilizados para a comunicação via API, como `AtividadeDto`. Isso desacopla a representação da API da estrutura interna da entidade `Atividade`.
 
 ## Diagrama de Componentes
 ```mermaid
@@ -46,8 +46,17 @@ graph TD
         E(AtividadeDto)
     end
 
+    subgraph "Outros Módulos"
+        F[ConhecimentoRepo]
+        G[SubprocessoRepo]
+        H[UsuarioRepo]
+    end
+
     A -- Requisição HTTP com DTO --> B
     B -- Usa --> C
+    B -- Também usa --> F
+    B -- Também usa --> G
+    B -- Também usa --> H
     C -- Gerencia --> D
     B -- Converte para/de --> E
 ```

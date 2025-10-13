@@ -8,7 +8,6 @@ O pacote `comum` é um pilar fundamental da aplicação, contendo classes, confi
 ### 1. Entidades Comuns (`modelo/`)
 **Localização:** `backend/src/main/java/sgc/comum/modelo/`
 - **`EntidadeBase.java`**: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) autoincrementado para a maioria das entidades do sistema, padronizando a definição de chaves primárias.
-- **`Usuario.java`**: Entidade que representa um usuário do sistema, com informações como nome, e-mail e a unidade organizacional à qual pertence.
 - **`Administrador.java`**: Entidade que representa um administrador do sistema, com permissões elevadas.
 - **`Parametro.java`**: Entidade para armazenar parâmetros de configuração do sistema no banco de dados, permitindo ajustes dinâmicos sem a necessidade de reimplantar a aplicação.
 
@@ -24,7 +23,6 @@ graph LR
         C(modelo)
         D(erros)
         E(config)
-        F(enums)
     end
 
     A -- Usa --> C
@@ -40,7 +38,6 @@ graph LR
     style C fill:#e6f3ff,stroke:#36c
     style D fill:#ffe6e6,stroke:#c33
     style E fill:#f0f0f0,stroke:#555
-    style F fill:#fff5e6,stroke:#d90
 ```
 
 ### 2. Sub-pacotes
@@ -60,10 +57,6 @@ graph LR
   - `ErroEntidadeNaoEncontrada`: Lançada quando uma busca por uma entidade no banco de dados não retorna resultados (resulta em HTTP 404).
   - `ErroAcessoNegado`: Lançada quando um usuário tenta executar uma ação para a qual não tem permissão (resulta em HTTP 403).
   - `ErroServicoExterno`: Para erros de comunicação com serviços externos (resulta em HTTP 502).
-
-#### `enums/`
-**Localização:** `backend/src/main/java/sgc/comum/enums/`
-- **Descrição:** Contém enumerações de uso global na aplicação, como `SituacaoProcesso` e `SituacaoSubprocesso`.
 
 ### 3. Funcionalidade de Painel
 - **`PainelControle.java` e `PainelService.java`**: Componentes que servem para alimentar um painel de controle (dashboard) com dados agregados e estatísticas do sistema, oferecendo uma visão geral do estado dos processos e outras métricas importantes.
