@@ -479,14 +479,19 @@ public class ProcessoServiceTest {
         unidade.setCodigo(1L);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        Mapa mapaNovo = new Mapa();
-        mapaNovo.setCodigo(200L);
+        sgc.mapa.modelo.UnidadeMapa unidadeMapa = new sgc.mapa.modelo.UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(1L);
+        unidadeMapa.setMapaVigenteCodigo(100L);
+
+        Mapa mapaCopiado = new Mapa();
+        mapaCopiado.setCodigo(200L);
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(unidadeProcessoRepo.findUnidadesInProcessosAtivos(List.of(1L))).thenReturn(Collections.emptyList());
         when(unidadeMapaRepo.findCodigosUnidadesComMapaVigente(List.of(1L))).thenReturn(List.of(1L));
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-        when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+        when(servicoDeCopiaDeMapa.copiarMapaParaUnidade(100L, 1L)).thenReturn(mapaCopiado);
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(processoMapper.toDTO(processo)).thenReturn(ProcessoDto.builder().build());
@@ -494,7 +499,8 @@ public class ProcessoServiceTest {
         processoService.iniciarProcessoRevisao(1L, List.of(1L));
 
         verify(processoRepo).save(argThat(p -> p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO));
-        verify(mapaRepo).save(any(Mapa.class));
+        verify(servicoDeCopiaDeMapa).copiarMapaParaUnidade(100L, 1L);
+        verify(mapaRepo, never()).save(any(Mapa.class));
         verify(subprocessoRepo).save(any(Subprocesso.class));
         verify(publicadorDeEventos).publishEvent(any(ProcessoIniciadoEvento.class));
     }
