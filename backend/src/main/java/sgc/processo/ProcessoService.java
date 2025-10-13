@@ -403,13 +403,17 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
-        // Para revisão, um novo mapa é criado para a unidade, não copiado.
-        Mapa mapaNovo = mapaRepo.save(new Mapa());
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
+            .orElseThrow(() -> new IllegalStateException("Configuração de mapa vigente não encontrada para a unidade: " + unidade.getSigla()));
+
+        Long idMapaVigente = unidadeMapa.getMapaVigenteCodigo();
+
+        Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(idMapaVigente, unidade.getCodigo());
 
         UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
         unidadeProcessoRepo.save(unidadeProcesso);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
+        Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
         movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
