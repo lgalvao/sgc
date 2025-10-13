@@ -1,7 +1,0 @@
-description = "Alinhamento de especificações com protótipo"
-
-prompt = """
-    Leia @/README.md e @regras/regras-perfis.md e @regras/regras-endpoints.md. Analise as especificações em
-    @reqs/cdu-{{args}}.md e verifique o que falta no projeto para concluir a implementação atender a essas
-    especificações, e o que está diferente do especificado e precisa de ajustes.
-"""
