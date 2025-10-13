@@ -28,7 +28,7 @@ class SubprocessoDtoTest {
     @Test
     void AnaliseValidacaoDto_RecordConstructorAndGetters() {
         LocalDateTime now = LocalDateTime.now();
-        AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, OBSERVACOES);
+        AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, OBSERVACOES, null, null);
 
         assertEquals(1L, dto.id());
         assertEquals(now, dto.dataHora());

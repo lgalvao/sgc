@@ -8,9 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +59,16 @@ class CDU08IntegrationTest {
     private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
     private static final String API_CONHECIMENTOS_ID = "/api/conhecimentos/{id}";
     private static final String DESCRICAO_JSON_PATH = "$.descricao";
+
+    @TestConfiguration
+    static class TestSecurityConfig {
+        @Bean
+        SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
+            http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable);
+            return http.build();
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;

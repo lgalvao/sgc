@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sgc.analise.enums.TipoAcaoAnalise;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.subprocesso.modelo.Subprocesso;
 
@@ -26,4 +27,11 @@ public class AnaliseValidacao extends EntidadeBase {
 
     @Column(name = "observacoes", length = 500)
     private String observacoes;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "acao")
+    private TipoAcaoAnalise acao;
+
+    @Column(name = "unidade_sigla", length = 30)
+    private String unidadeSigla;
 }

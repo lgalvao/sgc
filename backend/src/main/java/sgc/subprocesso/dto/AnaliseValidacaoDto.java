@@ -8,5 +8,7 @@ import java.time.LocalDateTime;
 public record AnaliseValidacaoDto(
     Long id,
     LocalDateTime dataHora,
-    String observacoes
+    String observacoes,
+    String acao,
+    String unidadeSigla
 ) {}

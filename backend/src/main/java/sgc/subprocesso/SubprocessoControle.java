@@ -288,14 +288,14 @@ public class SubprocessoControle {
         return subprocessoService.devolverValidacao(
             id,
             request.justificativa(),
-            usuario.getTitulo()
+            usuario
         );
     }
 
     @PostMapping("/{id}/aceitar-validacao")
     @Transactional
     public SubprocessoDto aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.aceitarValidacao(id, usuario.getTitulo());
+        return subprocessoService.aceitarValidacao(id, usuario);
     }
 
     @PostMapping("/{id}/homologar-validacao")
