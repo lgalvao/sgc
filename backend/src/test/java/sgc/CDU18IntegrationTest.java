@@ -31,7 +31,6 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-18: Visualizar Mapa de Competências")
-class CDU18VisualizarMapaIT {
+class CDU18IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

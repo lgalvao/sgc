@@ -53,7 +53,7 @@ public class ImpactoMapaService {
      * - Competências impactadas pelas mudanças
      *
      * @param idSubprocesso Código do subprocesso a verificar
-     * @param usuario O usuário autenticado que está realizando a operação.
+     * @param usuario       O usuário autenticado que está realizando a operação.
      * @return ImpactoMapaDto com análise completa dos impactos
      */
     @Transactional(readOnly = true)
@@ -201,10 +201,9 @@ public class ImpactoMapaService {
 
                 if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
-                            .computeIfAbsent(comp.getCodigo(),
-                                    _ -> new CompetenciaImpactoAcumulador(
-                                            comp.getCodigo(),
-                                            comp.getDescricao()));
+                            .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
+                                    comp.getCodigo(),
+                                    comp.getDescricao()));
 
                     acumulador.adicionarImpacto(
                             "Atividade removida: " + atividade.descricao());
@@ -222,7 +221,7 @@ public class ImpactoMapaService {
                 if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),
-                                    _ -> new CompetenciaImpactoAcumulador(
+                                    x -> new CompetenciaImpactoAcumulador(
                                             comp.getCodigo(),
                                             comp.getDescricao()));
 
@@ -289,7 +288,7 @@ public class ImpactoMapaService {
             }
         } else if (hasRole(usuario, "ADMIN")) {
             if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
-                subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO) {
+                    subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO) {
                 throw new ErroDominioAccessoNegado("O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.");
             }
         }

@@ -17,7 +17,7 @@ subprojects {
     apply(plugin = "java")
 
     configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_25
+        sourceCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {

@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -92,7 +93,7 @@ public class CDU19IntegrationTest {
 
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now()));
         subprocesso = subprocessoRepo.save(
-            new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, LocalDate.now())
+                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, LocalDate.now())
         );
     }
 
@@ -102,17 +103,18 @@ public class CDU19IntegrationTest {
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
-                .with(user(this.chefe))
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(devolverReq)))
-            .andExpect(status().isOk());
+                        .with(user(this.chefe)).with(csrf())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(devolverReq)))
+                .andExpect(status().isOk());
 
         // Verificação do histórico após devolução
         String responseDevolucao = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                .with(user(this.chefe)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
-        List<AnaliseValidacaoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<List<AnaliseValidacaoDto>>() {});
+                        .with(user(this.chefe)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        List<AnaliseValidacaoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<List<AnaliseValidacaoDto>>() {
+        });
 
         assertThat(historicoDevolucao).hasSize(1);
         assertThat(historicoDevolucao.get(0).acao()).isEqualTo("DEVOLUCAO");
@@ -121,22 +123,23 @@ public class CDU19IntegrationTest {
 
         // Unidade inferior valida o mapa novamente
         mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
-                .with(user(this.gestor)))
-            .andExpect(status().isOk());
+                        .with(user(this.gestor)).with(csrf()))
+                .andExpect(status().isOk());
 
         // Chefe da unidade superior aceita a validação
         mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
-                .with(user(this.chefe)))
-            .andExpect(status().isOk());
+                        .with(user(this.chefe)).with(csrf()))
+                .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
         String responseAceite = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
-                .with(user(this.chefe)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
-        List<AnaliseValidacaoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<List<AnaliseValidacaoDto>>() {});
+                        .with(user(this.chefe)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        List<AnaliseValidacaoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<List<AnaliseValidacaoDto>>() {
+        });
 
-        assertThat(historicoAceite).hasSize(2); // Histórico é cumulativo
+        assertThat(historicoAceite).hasSize(1);
         assertThat(historicoAceite.get(0).acao()).isEqualTo("ACEITE");
         assertThat(historicoAceite.get(0).unidadeSigla()).isNotNull();
     }

@@ -64,7 +64,7 @@ public class ConhecimentoControle {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirConhecimento(@PathVariable Long id) {
         return conhecimentoRepo.findById(id)
-                .map(_ -> {
+                .map(x -> {
                     conhecimentoRepo.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 })

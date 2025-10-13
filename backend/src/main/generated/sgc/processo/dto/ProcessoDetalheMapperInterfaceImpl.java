@@ -2,11 +2,9 @@ package sgc.processo.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 import sgc.comum.enums.SituacaoProcesso;
-import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
@@ -15,8 +13,8 @@ import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T13:02:29-0300",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
+    date = "2025-10-13T09:15:51-0300",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component
 public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapperInterface {
@@ -27,30 +25,19 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        Long codigo = null;
-        String descricao = null;
-        String tipo = null;
-        SituacaoProcesso situacao = null;
-        LocalDate dataLimite = null;
-        LocalDateTime dataCriacao = null;
-        LocalDateTime dataFinalizacao = null;
+        ProcessoDetalheDto.ProcessoDetalheDtoBuilder processoDetalheDto = ProcessoDetalheDto.builder();
 
-        codigo = processo.getCodigo();
-        descricao = processo.getDescricao();
+        processoDetalheDto.codigo( processo.getCodigo() );
+        processoDetalheDto.descricao( processo.getDescricao() );
         if ( processo.getTipo() != null ) {
-            tipo = processo.getTipo().name();
+            processoDetalheDto.tipo( processo.getTipo().name() );
         }
-        situacao = processo.getSituacao();
-        dataLimite = processo.getDataLimite();
-        dataCriacao = processo.getDataCriacao();
-        dataFinalizacao = processo.getDataFinalizacao();
+        processoDetalheDto.situacao( processo.getSituacao() );
+        processoDetalheDto.dataLimite( processo.getDataLimite() );
+        processoDetalheDto.dataCriacao( processo.getDataCriacao() );
+        processoDetalheDto.dataFinalizacao( processo.getDataFinalizacao() );
 
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = null;
-        List<ProcessoResumoDto> resumoSubprocessos = null;
-
-        ProcessoDetalheDto processoDetalheDto = new ProcessoDetalheDto( codigo, descricao, tipo, situacao, dataLimite, dataCriacao, dataFinalizacao, unidades, resumoSubprocessos );
-
-        return processoDetalheDto;
+        return processoDetalheDto.build();
     }
 
     @Override
@@ -59,23 +46,14 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        Long unidadeCodigo = null;
-        String nome = null;
-        String sigla = null;
-        Long unidadeSuperiorCodigo = null;
+        ProcessoDetalheDto.UnidadeParticipanteDTO.UnidadeParticipanteDTOBuilder unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDTO.builder();
 
-        unidadeCodigo = unidadeProcesso.getUnidadeCodigo();
-        nome = unidadeProcesso.getNome();
-        sigla = unidadeProcesso.getSigla();
-        unidadeSuperiorCodigo = unidadeProcesso.getUnidadeSuperiorCodigo();
+        unidadeParticipanteDTO.unidadeCodigo( unidadeProcesso.getUnidadeCodigo() );
+        unidadeParticipanteDTO.nome( unidadeProcesso.getNome() );
+        unidadeParticipanteDTO.sigla( unidadeProcesso.getSigla() );
+        unidadeParticipanteDTO.unidadeSuperiorCodigo( unidadeProcesso.getUnidadeSuperiorCodigo() );
 
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
-        SituacaoSubprocesso situacaoSubprocesso = null;
-        LocalDate dataLimite = null;
-
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
-
-        return unidadeParticipanteDTO;
+        return unidadeParticipanteDTO.build();
     }
 
     @Override
@@ -84,30 +62,21 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        Long codigo = null;
-        String descricao = null;
-        SituacaoProcesso situacao = null;
-        String tipo = null;
-        LocalDate dataLimite = null;
-        LocalDateTime dataCriacao = null;
-        Long unidadeCodigo = null;
-        String unidadeNome = null;
+        ProcessoResumoDto.ProcessoResumoDtoBuilder processoResumoDto = ProcessoResumoDto.builder();
 
-        codigo = subprocessoProcessoCodigo( subprocesso );
-        descricao = subprocessoProcessoDescricao( subprocesso );
-        situacao = subprocessoProcessoSituacao( subprocesso );
-        TipoProcesso tipo1 = subprocessoProcessoTipo( subprocesso );
-        if ( tipo1 != null ) {
-            tipo = tipo1.name();
+        processoResumoDto.codigo( subprocessoProcessoCodigo( subprocesso ) );
+        processoResumoDto.descricao( subprocessoProcessoDescricao( subprocesso ) );
+        processoResumoDto.situacao( subprocessoProcessoSituacao( subprocesso ) );
+        TipoProcesso tipo = subprocessoProcessoTipo( subprocesso );
+        if ( tipo != null ) {
+            processoResumoDto.tipo( tipo.name() );
         }
-        dataLimite = subprocessoProcessoDataLimite( subprocesso );
-        dataCriacao = subprocessoProcessoDataCriacao( subprocesso );
-        unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
-        unidadeNome = subprocessoUnidadeNome( subprocesso );
+        processoResumoDto.dataLimite( subprocessoProcessoDataLimite( subprocesso ) );
+        processoResumoDto.dataCriacao( subprocessoProcessoDataCriacao( subprocesso ) );
+        processoResumoDto.unidadeCodigo( subprocessoUnidadeCodigo( subprocesso ) );
+        processoResumoDto.unidadeNome( subprocessoUnidadeNome( subprocesso ) );
 
-        ProcessoResumoDto processoResumoDto = new ProcessoResumoDto( codigo, descricao, situacao, tipo, dataLimite, dataCriacao, unidadeCodigo, unidadeNome );
-
-        return processoResumoDto;
+        return processoResumoDto.build();
     }
 
     @Override
@@ -116,25 +85,16 @@ public class ProcessoDetalheMapperInterfaceImpl implements ProcessoDetalheMapper
             return null;
         }
 
-        Long unidadeCodigo = null;
-        String nome = null;
-        String sigla = null;
-        Long unidadeSuperiorCodigo = null;
-        SituacaoSubprocesso situacaoSubprocesso = null;
-        LocalDate dataLimite = null;
+        ProcessoDetalheDto.UnidadeParticipanteDTO.UnidadeParticipanteDTOBuilder unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDTO.builder();
 
-        unidadeCodigo = subprocessoUnidadeCodigo( subprocesso );
-        nome = subprocessoUnidadeNome( subprocesso );
-        sigla = subprocessoUnidadeSigla( subprocesso );
-        unidadeSuperiorCodigo = subprocessoUnidadeUnidadeSuperiorCodigo( subprocesso );
-        situacaoSubprocesso = subprocesso.getSituacao();
-        dataLimite = subprocesso.getDataLimiteEtapa1();
+        unidadeParticipanteDTO.unidadeCodigo( subprocessoUnidadeCodigo( subprocesso ) );
+        unidadeParticipanteDTO.nome( subprocessoUnidadeNome( subprocesso ) );
+        unidadeParticipanteDTO.sigla( subprocessoUnidadeSigla( subprocesso ) );
+        unidadeParticipanteDTO.unidadeSuperiorCodigo( subprocessoUnidadeUnidadeSuperiorCodigo( subprocesso ) );
+        unidadeParticipanteDTO.situacaoSubprocesso( subprocesso.getSituacao() );
+        unidadeParticipanteDTO.dataLimite( subprocesso.getDataLimiteEtapa1() );
 
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> filhos = null;
-
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = new ProcessoDetalheDto.UnidadeParticipanteDTO( unidadeCodigo, nome, sigla, unidadeSuperiorCodigo, situacaoSubprocesso, dataLimite, filhos );
-
-        return unidadeParticipanteDTO;
+        return unidadeParticipanteDTO.build();
     }
 
     private Long subprocessoProcessoCodigo(Subprocesso subprocesso) {

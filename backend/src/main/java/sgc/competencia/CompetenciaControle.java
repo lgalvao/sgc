@@ -69,7 +69,7 @@ public class CompetenciaControle {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirCompetencia(@PathVariable Long id) {
         return competenciaRepo.findById(id)
-                .map(_ -> {
+                .map(x -> {
                     competenciaRepo.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 })

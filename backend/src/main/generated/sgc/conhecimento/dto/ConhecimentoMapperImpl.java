@@ -7,11 +7,11 @@ import sgc.conhecimento.modelo.Conhecimento;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-10T13:02:29-0300",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 25 (Amazon.com Inc.)"
+    date = "2025-10-13T09:15:50-0300",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component
-public class ConhecimentoMapperImpl implements ConhecimentoMapper {
+public class ConhecimentoMapperImpl extends ConhecimentoMapper {
 
     @Override
     public ConhecimentoDto toDTO(Conhecimento conhecimento) {

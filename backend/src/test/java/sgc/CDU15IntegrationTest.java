@@ -15,7 +15,6 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.enums.SituacaoSubprocesso;
 import sgc.processo.enums.TipoProcesso;
-import sgc.WithMockGestor;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
@@ -27,7 +26,6 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-15: Manter Mapa de Competências")
-class CDU15ManterMapaIntegrationTest {
+class CDU15IntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{id}/mapa";
 

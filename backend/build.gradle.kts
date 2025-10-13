@@ -83,8 +83,7 @@ tasks.withType<Test> {
         "-Xshare:off",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
-        "-XX:+EnableDynamicAgentLoading",
-        "--enable-preview"
+        "-XX:+EnableDynamicAgentLoading"
     )
 
     val byteBuddyAgentFile =
@@ -317,7 +316,6 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
-        compilerArgs.add("--enable-preview")
     }
 }
 

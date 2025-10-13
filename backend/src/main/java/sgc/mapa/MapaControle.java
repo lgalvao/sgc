@@ -69,7 +69,7 @@ public class MapaControle {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         return repositorioMapa.findById(id)
-                .map(_ -> {
+                .map(x -> {
                     repositorioMapa.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 }).orElseGet(() -> ResponseEntity.notFound().build());

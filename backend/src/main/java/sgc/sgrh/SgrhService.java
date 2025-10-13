@@ -137,7 +137,7 @@ public class SgrhService {
         for (UnidadeDto unidade : todasUnidades.values()) {
             if (unidade.codigoPai() != null) {
                 subunidadesPorPai
-                        .computeIfAbsent(unidade.codigoPai(), _ -> new ArrayList<>())
+                        .computeIfAbsent(unidade.codigoPai(), x -> new ArrayList<>())
                         .add(unidade);
             }
         }

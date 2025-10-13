@@ -1,0 +1,1 @@
+package sgc.comum.erros;
