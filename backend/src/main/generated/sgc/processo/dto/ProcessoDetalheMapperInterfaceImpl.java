@@ -4,16 +4,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.processo.enums.TipoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-13T09:15:51-0300",
+    date = "2025-10-13T10:00:59-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component

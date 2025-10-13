@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaService;
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -51,7 +51,7 @@ class EventoProcessoListenerTest {
     private NotificacaoServico notificacaoServico;
 
     @Mock
-    private NotificacaoTemplateEmailService notificacaoTemplateEmailService;
+    private NotificacaoModeloEmailService notificacaoModeloEmailService;
 
     @Mock
     private SgrhService sgrhService;
@@ -107,7 +107,7 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarUsuarioPorTitulo(T123)).thenReturn(Optional.of(titular));
         when(sgrhService.buscarUsuarioPorTitulo(S456)).thenReturn(Optional.of(substituto));
 
-        when(notificacaoTemplateEmailService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
+        when(notificacaoModeloEmailService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Operacional</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -161,7 +161,7 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
         when(sgrhService.buscarUsuarioPorTitulo(T123)).thenReturn(Optional.of(titular));
-        when(notificacaoTemplateEmailService.criarTemplateBase(anyString(), anyString()))
+        when(notificacaoModeloEmailService.criarTemplateBase(anyString(), anyString()))
                 .thenReturn("<html><body>Email Intermediaria</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -192,7 +192,7 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
         when(sgrhService.buscarUsuarioPorTitulo(T123)).thenReturn(Optional.of(titular));
-        when(notificacaoTemplateEmailService.criarTemplateBase(anyString(), anyString()))
+        when(notificacaoModeloEmailService.criarTemplateBase(anyString(), anyString()))
                 .thenReturn("<html><body>Email Interoperacional</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);

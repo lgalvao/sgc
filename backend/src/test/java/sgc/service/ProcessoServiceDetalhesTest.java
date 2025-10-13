@@ -4,14 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoServico;
-import sgc.notificacao.NotificacaoTemplateEmailService;
+import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
@@ -28,15 +27,13 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -64,7 +61,7 @@ public class ProcessoServiceDetalhesTest {
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         ApplicationEventPublisher publicadorDeEventos = mock(ApplicationEventPublisher.class);
         NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
-        NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
+        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         ProcessoConversor processoConversor = mock(ProcessoConversor.class);
         processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
@@ -80,7 +77,7 @@ public class ProcessoServiceDetalhesTest {
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
                 notificacaoServico,
-                notificacaoTemplateEmailService,
+                notificacaoModeloEmailService,
                 sgrhService,
                 processoConversor,
                 processoDetalheMapperCustomizado);

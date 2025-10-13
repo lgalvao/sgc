@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.comum.modelo.Usuario;
-import sgc.unidade.enums.SituacaoUnidade;
-import sgc.unidade.enums.TipoUnidade;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")

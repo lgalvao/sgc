@@ -20,7 +20,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.modelo.Usuario;

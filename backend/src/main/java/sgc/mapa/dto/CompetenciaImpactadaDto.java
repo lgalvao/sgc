@@ -1,6 +1,6 @@
 package sgc.mapa.dto;
 
-import sgc.mapa.enums.TipoImpactoCompetencia;
+import sgc.mapa.modelo.TipoImpactoCompetencia;
 
 import java.util.List;
 

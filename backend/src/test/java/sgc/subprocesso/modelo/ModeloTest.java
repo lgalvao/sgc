@@ -1,7 +1,7 @@
 package sgc.subprocesso.modelo;
 
 import org.junit.jupiter.api.Test;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
 import sgc.unidade.modelo.Unidade;

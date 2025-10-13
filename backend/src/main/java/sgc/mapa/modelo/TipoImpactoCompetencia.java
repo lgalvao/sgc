@@ -1,4 +1,4 @@
-package sgc.mapa.enums;
+package sgc.mapa.modelo;
 
 public enum TipoImpactoCompetencia {
     NOVA_ATIVIDADE,

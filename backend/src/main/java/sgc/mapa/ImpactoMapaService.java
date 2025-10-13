@@ -12,12 +12,13 @@ import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.modelo.Usuario;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.enums.TipoImpactoAtividade;
-import sgc.mapa.enums.TipoImpactoCompetencia;
+import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.modelo.TipoImpactoCompetencia;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -279,16 +280,16 @@ public class ImpactoMapaService {
 
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
         if (hasRole(usuario, "CHEFE")) {
-            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
                 throw new ErroDominioAccessoNegado("O chefe da unidade só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro em andamento'.");
             }
         } else if (hasRole(usuario, "GESTOR")) {
-            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
                 throw new ErroDominioAccessoNegado("O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro disponibilizada'.");
             }
         } else if (hasRole(usuario, "ADMIN")) {
-            if (subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
-                    subprocesso.getSituacao() != sgc.comum.enums.SituacaoSubprocesso.MAPA_AJUSTADO) {
+            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
+                    subprocesso.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
                 throw new ErroDominioAccessoNegado("O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.");
             }
         }

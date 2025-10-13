@@ -3,7 +3,7 @@ package sgc.processo.modelo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 
 
 

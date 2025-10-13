@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.processo.dto.*;
 import sgc.processo.modelo.ErroProcesso;
@@ -18,7 +18,6 @@ import sgc.comum.erros.RestExceptionHandler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

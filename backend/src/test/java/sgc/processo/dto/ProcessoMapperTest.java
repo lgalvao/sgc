@@ -2,10 +2,10 @@ package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

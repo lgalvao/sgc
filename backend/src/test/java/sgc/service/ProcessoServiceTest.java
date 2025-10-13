@@ -8,7 +8,7 @@ import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoServico;
-import sgc.notificacao.NotificacaoTemplateEmailService;
+import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
@@ -24,7 +24,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 
 /**
  * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
@@ -58,7 +58,7 @@ public class ProcessoServiceTest {
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
-        NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
+        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoConversor = mock(ProcessoConversor.class);
         ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
@@ -74,7 +74,7 @@ public class ProcessoServiceTest {
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
                 notificacaoServico,
-                notificacaoTemplateEmailService,
+                notificacaoModeloEmailService,
                 sgrhService,
                 processoConversor,
                 processoDetalheMapperCustomizado

@@ -16,8 +16,8 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.enums.TipoUnidade;
-import sgc.processo.enums.TipoProcesso;
+import sgc.unidade.modelo.TipoUnidade;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import java.util.Optional;
 public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
     private final NotificacaoServico notificacaoServico;
-    private final NotificacaoTemplateEmailService notificacaoTemplateEmailService;
+    private final NotificacaoModeloEmailService notificacaoModeloEmailService;
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo subprocessoRepo;
@@ -126,7 +126,7 @@ public class EventoProcessoListener {
 
             if (TipoUnidade.OPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
-                corpoHtml = notificacaoTemplateEmailService.criarEmailDeProcessoIniciado(
+                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -219,7 +219,7 @@ public class EventoProcessoListener {
                         """,
                 tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
 
-        return notificacaoTemplateEmailService.criarTemplateBase(
+        return notificacaoModeloEmailService.criarTemplateBase(
                 "Processo Iniciado em Unidades Subordinadas", conteudo);
     }
 
@@ -262,7 +262,7 @@ public class EventoProcessoListener {
                         """,
                 tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
 
-        return notificacaoTemplateEmailService.criarTemplateBase(
+        return notificacaoModeloEmailService.criarTemplateBase(
                 "Processo Iniciado - Unidade Interoperacional", conteudo);
     }
 }

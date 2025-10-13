@@ -6,16 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.comum.erros.ErroDominioAccessoNegado;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoServico;
-import sgc.notificacao.NotificacaoTemplateEmailService;
+import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
@@ -32,8 +31,8 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import sgc.processo.enums.TipoProcesso;
-import sgc.unidade.enums.TipoUnidade;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.unidade.modelo.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,7 +87,7 @@ public class ProcessoServiceTest {
     private NotificacaoServico notificacaoServico;
 
     @Mock
-    private NotificacaoTemplateEmailService notificacaoTemplateEmailService;
+    private NotificacaoModeloEmailService notificacaoModeloEmailService;
 
     @Mock
     private SgrhService sgrhService;
@@ -114,7 +113,7 @@ public class ProcessoServiceTest {
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
                 notificacaoServico,
-                notificacaoTemplateEmailService,
+                notificacaoModeloEmailService,
                 sgrhService,
                 processoConversor,
                 processoDetalheMapperCustomizado

@@ -2,12 +2,12 @@ package sgc.processo.dto;
 
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
-import sgc.processo.enums.TipoProcesso;
 import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.TipoProcesso;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-13T09:15:50-0300",
+    date = "2025-10-13T10:00:59-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Amazon.com Inc.)"
 )
 @Component

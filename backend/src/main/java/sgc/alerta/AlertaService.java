@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.enums.TipoAlerta;
+import sgc.alerta.modelo.TipoAlerta;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;
@@ -14,7 +14,7 @@ import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.enums.TipoUnidade;
+import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 

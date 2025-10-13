@@ -1,4 +1,4 @@
-package sgc.processo.enums;
+package sgc.processo.modelo;
 
 public enum TipoProcesso {
     MAPEAMENTO,

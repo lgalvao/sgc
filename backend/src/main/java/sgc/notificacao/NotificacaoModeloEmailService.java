@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  * Cada método cria um template específico para um caso de uso do sistema.
  */
 @Service
-public class NotificacaoTemplateEmailService {
+public class NotificacaoModeloEmailService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     /**

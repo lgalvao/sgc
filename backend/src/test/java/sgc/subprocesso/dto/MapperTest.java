@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
 import sgc.subprocesso.modelo.Movimentacao;

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.analise.enums.TipoAcaoAnalise;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.subprocesso.modelo.Subprocesso;
 

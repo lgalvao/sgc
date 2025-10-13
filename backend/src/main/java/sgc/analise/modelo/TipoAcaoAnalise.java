@@ -1,4 +1,4 @@
-package sgc.analise.enums;
+package sgc.analise.modelo;
 
 public enum TipoAcaoAnalise {
     ACEITE,

@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.processo.enums.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

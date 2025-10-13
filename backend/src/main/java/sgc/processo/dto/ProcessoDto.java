@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

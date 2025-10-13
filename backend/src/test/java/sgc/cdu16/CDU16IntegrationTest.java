@@ -19,12 +19,12 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("CDU-16 - Ajustar mapa de competências")
+@DisplayName("CDU-16: Ajustar mapa de competências")
 public class CDU16IntegrationTest {
 
     @Autowired

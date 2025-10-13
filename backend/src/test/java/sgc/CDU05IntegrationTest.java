@@ -18,7 +18,7 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 

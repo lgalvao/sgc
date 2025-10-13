@@ -22,8 +22,9 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.processo.enums.TipoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.Processo;
@@ -110,7 +111,7 @@ class CDU17IntegrationTest {
         processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDescricao("Processo de Teste");
-        processo.setSituacao(sgc.comum.enums.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
         mapa = mapaRepo.save(new Mapa());
 

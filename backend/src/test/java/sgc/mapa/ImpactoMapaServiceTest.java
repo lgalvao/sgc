@@ -12,6 +12,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
@@ -62,7 +63,7 @@ class ImpactoMapaServiceTest {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_CHEFE"));
         lenient().doReturn(authorities).when(usuario).getAuthorities();

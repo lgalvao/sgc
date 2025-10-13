@@ -1,12 +1,8 @@
 package sgc.processo.modelo;
 
 import org.junit.jupiter.api.Test;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.processo.enums.TipoProcesso;
-import sgc.unidade.enums.TipoUnidade;
-
-import sgc.processo.enums.TipoProcesso;
-import sgc.unidade.enums.TipoUnidade;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.unidade.modelo.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

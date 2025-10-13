@@ -9,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.processo.enums.TipoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -36,7 +35,6 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.comum.modelo.UsuarioRepo;
 import sgc.comum.modelo.Usuario;
 import sgc.atividade.modelo.Atividade;
-import sgc.conhecimento.modelo.Conhecimento;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,8 +43,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.springframework.security.test.context.support.WithUserDetails;
 
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc

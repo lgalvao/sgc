@@ -1,13 +1,11 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.comum.enums.SituacaoProcesso;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

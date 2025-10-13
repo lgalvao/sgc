@@ -1,4 +1,4 @@
-package sgc.alerta.enums;
+package sgc.alerta.modelo;
 
 public enum TipoAlerta {
     PROCESSO_INICIADO_OPERACIONAL,

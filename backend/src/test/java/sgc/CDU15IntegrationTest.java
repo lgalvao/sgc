@@ -13,8 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.enums.SituacaoSubprocesso;
-import sgc.processo.enums.TipoProcesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
@@ -77,7 +78,7 @@ class CDU15IntegrationTest {
         processo.setDescricao("Processo Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDataCriacao(java.time.LocalDateTime.now());
-        processo.setSituacao(sgc.comum.enums.SituacaoProcesso.EM_ANDAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
         Mapa mapa = mapaRepo.save(new Mapa());

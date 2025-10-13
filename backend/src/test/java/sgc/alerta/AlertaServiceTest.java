@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.enums.TipoAlerta;
+import sgc.alerta.modelo.TipoAlerta;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;

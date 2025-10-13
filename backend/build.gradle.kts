@@ -1,18 +1,14 @@
+// import com.github.spotbugs.snom.SpotBugsHtmlReport
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.0.21"
-    checkstyle
     pmd
-    id("org.owasp.dependencycheck") version "12.1.0"
-    jacoco
-    id("org.sonarqube") version "5.1.0.4882"
 }
 
 java {
@@ -41,8 +37,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
-
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -323,58 +318,17 @@ tasks.named("build") {
     outputs.cacheIf { true }
 }
 
-tasks.withType<SpotBugsTask> {
-    enabled = true
-    reports.create("html") {
-        required.set(true)
-        outputLocation.set(project.layout.buildDirectory.file("reports/spotbugs/${name}.html").get().asFile)
-    }
-}
-
-checkstyle {
-    toolVersion = "10.12.4"
-}
-
 pmd {
     toolVersion = "7.16.0"
     rulesMinimumPriority = 5
 }
 
-tasks.withType<org.gradle.api.plugins.quality.Pmd> {
+tasks.withType<Pmd> {
     ruleSets = listOf("category/java/errorprone.xml")
     reports {
         xml.required.set(true)
         html.required.set(false)
     }
-}
-
-tasks.withType<org.gradle.api.plugins.quality.Pmd> {
-    reports {
-        xml.required.set(true)
-        html.required.set(false)
-    }
-}
-
-jacoco {
-    toolVersion = "0.8.13"
-}
-
-tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-}
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "your-project-key")
-        property("sonar.host.url", "http://localhost:9000")
-    }
-}
-
-tasks.dependencyCheckAnalyze {
-    enabled = false
 }
 
 tasks.spotbugsMain {
@@ -385,10 +339,6 @@ tasks.spotbugsTest {
     enabled = true
 }
 
-tasks.checkstyleMain {
-    enabled = false
-}
-
 tasks.pmdMain {
     enabled = false
 }
@@ -397,66 +347,8 @@ tasks.pmdTest {
     enabled = true
 }
 
-
 tasks.register("agentTest") {
     group = "verification"
     description = "Run tests with agent-optimized output"
     dependsOn("test")
-}
-
-tasks.register<Test>("testClass") {
-    group = "verification"
-    description = "Run a single test class: ./gradlew testClass -PtestClass=YourTestClass"
-
-    useJUnitPlatform()
-    filter {
-        val className = project.findProperty("testClass") as? String
-        if (className != null) {
-            includeTestsMatching("*$className")
-        }
-    }
-
-    testLogging {
-        events = setOf(
-            TestLogEvent.FAILED,
-            TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED,
-            TestLogEvent.STANDARD_OUT,
-            TestLogEvent.STANDARD_ERROR
-        )
-        exceptionFormat = TestExceptionFormat.FULL
-        showStackTraces = true
-        showExceptions = true
-        showCauses = true
-        showStandardStreams = true
-    }
-}
-
-tasks.register<Test>("testMethod") {
-    group = "verification"
-    description = "Run a single test method: ./gradlew testMethod -PtestClass=YourTestClass -PtestMethod=yourMethod"
-
-    useJUnitPlatform()
-    filter {
-        val className = project.findProperty("testClass") as? String
-        val methodName = project.findProperty("testMethod") as? String
-        if (className != null && methodName != null) {
-            includeTestsMatching("*$className*$methodName*")
-        }
-    }
-
-    testLogging {
-        events = setOf(
-            TestLogEvent.FAILED,
-            TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED,
-            TestLogEvent.STANDARD_OUT,
-            TestLogEvent.STANDARD_ERROR
-        )
-        exceptionFormat = TestExceptionFormat.FULL
-        showStackTraces = true
-        showExceptions = true
-        showCauses = true
-        showStandardStreams = true
-    }
 }

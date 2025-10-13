@@ -1,4 +1,4 @@
-package sgc.unidade.enums;
+package sgc.unidade.modelo;
 
 public enum SituacaoUnidade {
     ATIVA,

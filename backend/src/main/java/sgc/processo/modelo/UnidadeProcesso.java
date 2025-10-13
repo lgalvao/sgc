@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.unidade.enums.TipoUnidade;
+import sgc.unidade.modelo.TipoUnidade;
 
 @Entity
 @Table(name = "UNIDADE_PROCESSO", schema = "sgc")

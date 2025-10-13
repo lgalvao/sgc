@@ -4,13 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoServico;
-import sgc.notificacao.NotificacaoTemplateEmailService;
+import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
 import sgc.processo.dto.ProcessoDto;
@@ -28,7 +28,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
-        NotificacaoTemplateEmailService notificacaoTemplateEmailService = mock(NotificacaoTemplateEmailService.class);
+        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
         processoConversor = mock(ProcessoConversor.class);
         ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
@@ -77,7 +77,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
                 notificacaoServico,
-                notificacaoTemplateEmailService,
+                notificacaoModeloEmailService,
                 sgrhService,
                 processoConversor,
                 processoDetalheMapperCustomizado

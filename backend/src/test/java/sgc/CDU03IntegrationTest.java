@@ -2,6 +2,7 @@ package sgc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,37 +20,32 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.enums.TipoProcesso;
-
-import sgc.processo.ProcessoControle; // Importar ProcessoControle
-
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.ProcessoControle;
-import sgc.processo.ProcessoService; // Importar ProcessoService
+import sgc.processo.ProcessoService;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("CDU-03: Manter processo")
 @WithMockUser(username = "admin", roles = {"ADMIN"})
 public class CDU03IntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{id}";
+
     @TestConfiguration
     @SuppressWarnings("PMD.TestClassWithoutTestCases")
     static class TestSecurityConfig {

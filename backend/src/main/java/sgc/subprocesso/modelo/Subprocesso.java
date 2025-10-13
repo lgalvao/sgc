@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.comum.enums.SituacaoSubprocesso;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;

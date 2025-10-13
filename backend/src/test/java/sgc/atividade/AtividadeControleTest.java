@@ -15,6 +15,7 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 
 import java.util.Collections;
@@ -142,7 +143,7 @@ class AtividadeControleTest {
             var unidade = new sgc.unidade.modelo.Unidade();
             unidade.setTitular(chefe);
             var subprocesso = new sgc.subprocesso.modelo.Subprocesso();
-            subprocesso.setSituacao(sgc.comum.enums.SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocesso.setUnidade(unidade);
 
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);

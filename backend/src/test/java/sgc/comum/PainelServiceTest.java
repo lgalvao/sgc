@@ -10,13 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.comum.enums.SituacaoProcesso;
+import sgc.comum.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
 
-import sgc.processo.enums.TipoProcesso;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
