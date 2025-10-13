@@ -446,8 +446,16 @@ public class SubprocessoService {
         analise.setUnidadeSigla(usuario.getUnidade().getSigla());
         repositorioAnaliseValidacao.save(analise);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior(), "Mapa de competências validado"));
-        notificarAceite(sp);
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
+
+        if (proximaUnidade == null) {
+            sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            repositorioSubprocesso.save(sp);
+        } else {
+            repositorioMovimentacao.save(new Movimentacao(sp, unidadeSuperior, proximaUnidade, "Mapa de competências validado"));
+            notificarAceite(sp);
+        }
 
         return subprocessoMapper.toDTO(sp);
     }
