@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,18 +60,35 @@ public class CDU19IntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
+    private Usuario gestor;
+    private Usuario chefe;
 
     @BeforeEach
     void setUp() {
-        Unidade unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "UNISUP"));
+        Unidade unidadeSuperiorSuperior = unidadeRepo.save(new Unidade("Unidade Superior Superior", "UNISUPSUP"));
+        Unidade unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
+        unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
+        unidadeRepo.save(unidadeSuperior);
+
         Unidade unidade = new Unidade("Unidade Subprocesso", "UNISUB");
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidadeRepo.save(unidade);
 
-        Usuario chefe = new Usuario();
-        chefe.setTitulo("chefe");
-        chefe.setUnidade(unidadeSuperior);
-        usuarioRepo.save(chefe);
+        this.chefe = usuarioRepo.findByTitulo("chefe").orElse(new Usuario());
+        this.chefe.setTitulo("chefe");
+        this.chefe.setUnidade(unidadeSuperior);
+        usuarioRepo.save(this.chefe);
+
+        this.gestor = new Usuario();
+        this.gestor.setTitulo("gestor_unidade");
+        this.gestor.setUnidade(unidade);
+        usuarioRepo.save(this.gestor);
+
+        // Define os titulares das unidades
+        unidade.setTitular(this.gestor);
+        unidadeRepo.save(unidade);
+        unidadeSuperior.setTitular(this.chefe);
+        unidadeRepo.save(unidadeSuperior);
 
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now()));
         subprocesso = subprocessoRepo.save(
@@ -80,18 +97,19 @@ public class CDU19IntegrationTest {
     }
 
     @Test
-    @WithMockChefe
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+                .with(user(this.chefe))
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(devolverReq)))
             .andExpect(status().isOk());
 
         // Verificação do histórico após devolução
-        String responseDevolucao = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo()))
+        String responseDevolucao = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                .with(user(this.chefe)))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         List<AnaliseValidacaoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<List<AnaliseValidacaoDto>>() {});
@@ -101,15 +119,19 @@ public class CDU19IntegrationTest {
         assertThat(historicoDevolucao.get(0).unidadeSigla()).isNotNull();
         assertThat(historicoDevolucao.get(0).observacoes()).isEqualTo("Justificativa da devolução");
 
-        // Novo aceite do mapa
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
-        subprocessoRepo.save(subprocesso);
+        // Unidade inferior valida o mapa novamente
+        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                .with(user(this.gestor)))
+            .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo()))
+        // Chefe da unidade superior aceita a validação
+        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+                .with(user(this.chefe)))
             .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
-        String responseAceite = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo()))
+        String responseAceite = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                .with(user(this.chefe)))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         List<AnaliseValidacaoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<List<AnaliseValidacaoDto>>() {});
