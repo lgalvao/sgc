@@ -15,10 +15,15 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.conhecimento.dto.ConhecimentoDto;
+import sgc.conhecimento.dto.ConhecimentoMapper;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,16 +59,19 @@ class AtividadeControleTest {
     private AtividadeMapper atividadeMapper;
 
     @MockitoBean
-    private sgc.conhecimento.modelo.ConhecimentoRepo conhecimentoRepo;
+    private ConhecimentoRepo conhecimentoRepo;
 
     @MockitoBean
-    private sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
+    private ConhecimentoMapper conhecimentoMapper;
+
+    @MockitoBean
+    private SubprocessoRepo subprocessoRepo;
 
     @MockitoBean
     private UsuarioRepo usuarioRepo;
 
     @Nested
-    @DisplayName("Testes para listar atividades")
+    @DisplayName("Testes para CRUD de Atividades")
     class ListarAtividades {
         @Test
         @DisplayName("Deve retornar lista de atividades com status 200 OK")
@@ -253,6 +261,96 @@ class AtividadeControleTest {
 
             mockMvc.perform(delete(API_ATIVIDADES_99).with(csrf()))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes para CRUD de Conhecimentos aninhados")
+    class ConhecimentoEndpoints {
+
+        private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
+        private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{id}";
+        private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
+        private static final String NOVO_CONHECIMENTO = "Novo Conhecimento";
+
+        @Test
+        @DisplayName("Deve listar conhecimentos de uma atividade")
+        void deveListarConhecimentos() throws Exception {
+            var conhecimento = new Conhecimento();
+            conhecimento.setCodigo(1L);
+            var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Conhecimento Teste");
+
+            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(conhecimento));
+            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
+
+            mockMvc.perform(get(API_CONHECIMENTOS))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @DisplayName("Deve criar um conhecimento para uma atividade")
+        void deveCriarConhecimento() throws Exception {
+            var atividade = new Atividade();
+            atividade.setCodigo(1L);
+            var conhecimentoDto = new ConhecimentoDto(null, 1L, NOVO_CONHECIMENTO);
+            var conhecimento = new Conhecimento(NOVO_CONHECIMENTO, atividade);
+            var conhecimentoSalvo = new Conhecimento(NOVO_CONHECIMENTO, atividade);
+            conhecimentoSalvo.setCodigo(1L);
+            var conhecimentoSalvoDto = new ConhecimentoDto(1L, 1L, NOVO_CONHECIMENTO);
+
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(conhecimento);
+            when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimentoSalvo);
+            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoSalvoDto);
+
+            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", API_CONHECIMENTOS_1))
+                .andExpect(jsonPath("$.codigo").value(1L));
+        }
+
+        @Test
+        @DisplayName("Deve atualizar um conhecimento")
+        void deveAtualizarConhecimento() throws Exception {
+            var atividade = new Atividade();
+            atividade.setCodigo(1L);
+            var conhecimentoExistente = new Conhecimento("Antigo", atividade);
+            conhecimentoExistente.setCodigo(1L);
+
+            var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Atualizado");
+            var conhecimentoParaAtualizar = new Conhecimento("Atualizado", atividade);
+
+            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimentoExistente));
+            when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(conhecimentoParaAtualizar);
+            when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimentoExistente);
+            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
+
+            mockMvc.perform(put(API_CONHECIMENTOS_1).with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Atualizado"));
+        }
+
+        @Test
+        @DisplayName("Deve excluir um conhecimento")
+        void deveExcluirConhecimento() throws Exception {
+            var atividade = new Atividade();
+            atividade.setCodigo(1L);
+            var conhecimento = new Conhecimento();
+            conhecimento.setCodigo(1L);
+            conhecimento.setAtividade(atividade);
+
+            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
+            doNothing().when(conhecimentoRepo).delete(any(Conhecimento.class));
+
+            mockMvc.perform(delete(API_CONHECIMENTOS_1).with(csrf()))
+                .andExpect(status().isNoContent());
+
+            verify(conhecimentoRepo, times(1)).delete(conhecimento);
         }
     }
 }
