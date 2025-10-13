@@ -15,7 +15,9 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 
 import java.util.Collections;
@@ -58,7 +60,7 @@ class AtividadeControleTest {
     private sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
 
     @MockitoBean
-    private sgc.comum.modelo.UsuarioRepo usuarioRepo;
+    private UsuarioRepo usuarioRepo;
 
     @Nested
     @DisplayName("Testes para listar atividades")
@@ -138,7 +140,7 @@ class AtividadeControleTest {
             mapa.setCodigo(10L);
             atividade.setMapa(mapa);
 
-            var chefe = new sgc.comum.modelo.Usuario();
+            var chefe = new Usuario();
             chefe.setTitulo("chefe");
             var unidade = new sgc.unidade.modelo.Unidade();
             unidade.setTitular(chefe);

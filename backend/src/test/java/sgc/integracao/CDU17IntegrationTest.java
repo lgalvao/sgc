@@ -22,8 +22,9 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.modelo.SituacaoProcesso;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.processo.SituacaoProcesso;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
@@ -89,7 +90,7 @@ class CDU17IntegrationTest {
     @Autowired
     private AnaliseValidacaoRepo analiseValidacaoRepo;
     @Autowired
-    private sgc.comum.modelo.UsuarioRepo usuarioRepo;
+    private UsuarioRepo usuarioRepo;
 
     private Unidade unidade;
     private Subprocesso subprocesso;

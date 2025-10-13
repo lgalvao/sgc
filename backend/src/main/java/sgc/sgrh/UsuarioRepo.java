@@ -1,4 +1,4 @@
-package sgc.comum.modelo;
+package sgc.sgrh;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

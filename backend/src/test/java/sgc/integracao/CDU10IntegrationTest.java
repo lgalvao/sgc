@@ -13,8 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.modelo.SituacaoProcesso;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.processo.SituacaoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
@@ -28,7 +29,7 @@ import sgc.unidade.modelo.UnidadeRepo;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.comum.modelo.UsuarioRepo;
+import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -91,7 +92,7 @@ class CDU10IntegrationTest {
 
         unidadeChefe = new Unidade("Unidade Teste", "UT");
         unidadeChefe.setUnidadeSuperior(unidadeSuperior);
-        var chefe = new sgc.comum.modelo.Usuario();
+        var chefe = new Usuario();
         chefe.setTitulo("chefe");
         chefe = usuarioRepo.save(chefe);
         unidadeChefe.setTitular(chefe);
@@ -177,7 +178,7 @@ class CDU10IntegrationTest {
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             // Arrange: create another user
-            var outroChefe = new sgc.comum.modelo.Usuario();
+            var outroChefe = new Usuario();
             outroChefe.setTitulo("outro_chefe");
             usuarioRepo.save(outroChefe);
 

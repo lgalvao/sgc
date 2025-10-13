@@ -20,8 +20,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.modelo.SituacaoProcesso;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.processo.SituacaoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -91,7 +93,7 @@ class CDU08IntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
-    private sgc.comum.modelo.UsuarioRepo usuarioRepo;
+    private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocessoMapeamento;
     private Mapa mapaMapeamento;
@@ -99,7 +101,7 @@ class CDU08IntegrationTest {
     @BeforeEach
     void setUp() {
         // Common data
-        var chefe = new sgc.comum.modelo.Usuario();
+        var chefe = new Usuario();
         chefe.setTitulo("chefe");
         chefe = usuarioRepo.save(chefe);
         // Test data
@@ -324,7 +326,7 @@ class CDU08IntegrationTest {
         @WithMockUser(username = "outro", roles = {"GESTOR"})
         @DisplayName("Não deve permitir acesso a usuário não autorizado")
         void naoDevePermitirAcessoUsuarioNaoAutorizado() throws Exception {
-            var outroUsuario = new sgc.comum.modelo.Usuario();
+            var outroUsuario = new Usuario();
             outroUsuario.setTitulo("outro");
             usuarioRepo.save(outroUsuario);
 

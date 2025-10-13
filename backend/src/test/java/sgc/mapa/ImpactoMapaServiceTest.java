@@ -12,13 +12,13 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.comum.modelo.Usuario;
+import sgc.sgrh.Usuario;
 import sgc.unidade.modelo.Unidade;
 
 import java.util.List;

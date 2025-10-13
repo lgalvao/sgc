@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.comum.PainelService;
-import sgc.comum.modelo.SituacaoProcesso;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;

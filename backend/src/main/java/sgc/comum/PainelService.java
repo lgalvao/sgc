@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaDto;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.comum.modelo.SituacaoProcesso;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;

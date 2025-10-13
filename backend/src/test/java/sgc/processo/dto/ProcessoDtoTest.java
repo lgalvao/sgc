@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.comum.modelo.SituacaoProcesso;
+import sgc.processo.SituacaoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

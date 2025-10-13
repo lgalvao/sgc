@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.comum.modelo.Usuario;
+import sgc.sgrh.Usuario;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")

@@ -2,7 +2,7 @@ package sgc.alerta.modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
-import sgc.comum.modelo.Usuario;
+import sgc.sgrh.Usuario;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

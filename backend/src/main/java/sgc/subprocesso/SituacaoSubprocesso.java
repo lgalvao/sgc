@@ -1,4 +1,4 @@
-package sgc.comum.modelo;
+package sgc.subprocesso;
 
 public enum SituacaoSubprocesso {
     NAO_INICIADO,

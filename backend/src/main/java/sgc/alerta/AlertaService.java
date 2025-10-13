@@ -11,6 +11,8 @@ import sgc.alerta.modelo.AlertaUsuario;
 import sgc.alerta.modelo.AlertaUsuarioRepo;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.SgrhService;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -38,7 +40,7 @@ public class AlertaService {
     private final AlertaUsuarioRepo repositorioAlertaUsuario;
     private final UnidadeRepo repositorioUnidade;
     private final SgrhService servicoSgrh;
-    private final sgc.comum.modelo.UsuarioRepo usuarioRepo;
+    private final UsuarioRepo usuarioRepo;
 
     /**
      * Cria um alerta para uma unidade específica.
@@ -251,18 +253,18 @@ public class AlertaService {
 
     private void criarAlertaUsuario(Alerta alerta, String usuarioTitulo, Long codigoUnidade) {
         try {
-            sgc.comum.modelo.Usuario usuario = usuarioRepo.findById(usuarioTitulo)
+            Usuario usuario = usuarioRepo.findById(usuarioTitulo)
                     .orElseGet(() -> {
                         log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH...", usuarioTitulo);
                         return servicoSgrh.buscarUsuarioPorTitulo(usuarioTitulo)
                                 .map(usuarioDto -> {
-                                    sgc.comum.modelo.Usuario novoUsuario = new sgc.comum.modelo.Usuario();
+                                    Usuario novoUsuario = new Usuario();
                                     novoUsuario.setTitulo(usuarioDto.titulo());
                                     novoUsuario.setNome(usuarioDto.nome());
                                     novoUsuario.setEmail(usuarioDto.email());
                                     novoUsuario.setRamal(null);
                                     repositorioUnidade.findById(codigoUnidade).ifPresent(novoUsuario::setUnidade);
-                                    sgc.comum.modelo.Usuario savedUsuario = usuarioRepo.save(novoUsuario);
+                                    Usuario savedUsuario = usuarioRepo.save(novoUsuario);
                                     return usuarioRepo.findById(savedUsuario.getTitulo()).orElseThrow(); // Re-fetch to ensure it's fully managed
                                 })
                                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado no SGRH: " + usuarioTitulo));

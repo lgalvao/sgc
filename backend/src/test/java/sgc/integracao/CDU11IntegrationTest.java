@@ -13,8 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.modelo.SituacaoProcesso;
-import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.processo.SituacaoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -26,7 +27,7 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.comum.modelo.UsuarioRepo;
+import sgc.sgrh.UsuarioRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.conhecimento.modelo.Conhecimento;
 
@@ -71,7 +72,7 @@ class CDU11IntegrationTest {
     void setUp() {
         // Unidade e Chefe
         unidade = new Unidade("Unidade Teste", "UT");
-        var chefe = new sgc.comum.modelo.Usuario();
+        var chefe = new Usuario();
         chefe.setTitulo("chefe_ut");
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);

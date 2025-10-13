@@ -42,10 +42,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import sgc.comum.modelo.Usuario;
+import sgc.sgrh.Usuario;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import sgc.comum.modelo.SituacaoSubprocesso;
 
 @ExtendWith(MockitoExtension.class)
 public class SubprocessoServiceTest {

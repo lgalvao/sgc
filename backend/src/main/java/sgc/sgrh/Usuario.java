@@ -1,4 +1,4 @@
-package sgc.comum.modelo;
+package sgc.sgrh;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

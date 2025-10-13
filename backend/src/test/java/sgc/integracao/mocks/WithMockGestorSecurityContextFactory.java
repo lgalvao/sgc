@@ -7,8 +7,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.comum.modelo.Usuario;
-import sgc.comum.modelo.UsuarioRepo;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
 
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {

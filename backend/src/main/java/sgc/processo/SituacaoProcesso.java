@@ -1,4 +1,4 @@
-package sgc.comum.modelo;
+package sgc.processo;
 
 public enum SituacaoProcesso {
     CRIADO,

@@ -14,7 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class EntidadeBase implements Serializable {
-
     /**
      * Construtor de cópia.
      *
