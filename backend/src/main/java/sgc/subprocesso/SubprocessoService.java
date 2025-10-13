@@ -408,7 +408,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto devolverValidacao(Long idSubprocesso, String justificativa, String usuarioTitulo) {
+    public SubprocessoDto devolverValidacao(Long idSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -416,6 +416,8 @@ public class SubprocessoService {
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
         analise.setObservacoes(justificativa);
+        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO);
+        analise.setUnidadeSigla(usuario.getUnidade().getSigla());
         repositorioAnaliseValidacao.save(analise);
 
         Unidade unidadeDevolucao = sp.getUnidade();
@@ -432,7 +434,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto aceitarValidacao(Long idSubprocesso, String usuarioTitulo) {
+    public SubprocessoDto aceitarValidacao(Long idSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -440,6 +442,8 @@ public class SubprocessoService {
         analise.setSubprocesso(sp);
         analise.setDataHora(java.time.LocalDateTime.now());
         analise.setObservacoes("Aceite da validação");
+        analise.setAcao(TipoAcaoAnalise.ACEITE);
+        analise.setUnidadeSigla(usuario.getUnidade().getSigla());
         repositorioAnaliseValidacao.save(analise);
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior(), "Mapa de competências validado"));
@@ -678,7 +682,9 @@ public class SubprocessoService {
         return new AnaliseValidacaoDto(
                 analise.getCodigo(),
                 analise.getDataHora(),
-                analise.getObservacoes()
+                analise.getObservacoes(),
+                analise.getAcao() != null ? analise.getAcao().name() : null,
+                analise.getUnidadeSigla()
         );
     }
 

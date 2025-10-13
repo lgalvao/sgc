@@ -443,7 +443,7 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.devolverValidacao(id, "justificativa", usuario.getTitulo());
+        SubprocessoDto result = subprocessoService.devolverValidacao(id, "justificativa", usuario);
 
         assertNotNull(result);
         assertEquals(sgc.comum.enums.SituacaoSubprocesso.MAPA_DISPONIBILIZADO, subprocesso.getSituacao());
@@ -466,7 +466,7 @@ public class SubprocessoServiceTest {
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
         when(subprocessoMapper.toDTO(any(Subprocesso.class))).thenReturn(SubprocessoDto.builder().build());
 
-        SubprocessoDto result = subprocessoService.aceitarValidacao(id, usuario.getTitulo());
+        SubprocessoDto result = subprocessoService.aceitarValidacao(id, usuario);
 
         assertNotNull(result);
         verify(repositorioAnaliseValidacao, times(1)).save(any(AnaliseValidacao.class));
