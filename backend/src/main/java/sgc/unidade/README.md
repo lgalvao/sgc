@@ -22,8 +22,8 @@ Este pacote é, em grande parte, um módulo de modelo de dados. Ele não contém
 ### 2. Repositório
 - **`UnidadeRepo.java`**: A interface Spring Data JPA para fornecer acesso aos dados da entidade `Unidade`. É utilizada por vários serviços em toda a aplicação para carregar informações sobre a estrutura organizacional.
 
-### 3. Enums (`enums/`)
-- **`TipoUnidade.java`** e **`SituacaoUnidade.java`**: Enumerações que definem os tipos e as situações possíveis para uma `Unidade`, garantindo consistência dos dados.
+### 3. Enums (no pacote `modelo/`)
+- **`TipoUnidade.java`** e **`SituacaoUnidade.java`**: Enumerações que definem os tipos e as situações possíveis para uma `Unidade`, garantindo consistência dos dados. Elas estão localizadas junto com as entidades que as utilizam.
 
 ## Como as Entidades são Utilizadas
 As entidades deste pacote são fundamentais para o funcionamento de todo o sistema:

@@ -39,7 +39,7 @@ O sistema de alertas é projetado para garantir que os usuários relevantes seja
 **Localização:** `backend/src/main/java/sgc/alerta/AlertaControle.java`
 - **Descrição:** Controller REST que expõe os endpoints relacionados a alertas.
 - **Endpoints:**
-  - `PUT /api/alertas/{id}/marcar-como-lido`: Permite que o usuário autenticado marque um alerta específico como lido.
+  - `POST /api/alertas/{id}/marcar-como-lido`: Permite que o usuário autenticado marque um alerta específico como lido.
 
 ## Diagrama de Componentes
 ```mermaid
