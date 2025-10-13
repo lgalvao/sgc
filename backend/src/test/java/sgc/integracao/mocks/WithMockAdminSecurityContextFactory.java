@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 
@@ -14,10 +15,12 @@ import sgc.sgrh.UsuarioRepo;
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
 
     private final UsuarioRepo usuarioRepo;
+    private final AdministradorRepo administradorRepo;
 
     @Autowired
-    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo) {
+    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo, AdministradorRepo administradorRepo) {
         this.usuarioRepo = usuarioRepo;
+        this.administradorRepo = administradorRepo;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
 
 
         Authentication auth =
-                new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+                new UsernamePasswordAuthenticationToken(principal, "password", principal.determineAuthorities(administradorRepo));
         context.setAuthentication(auth);
         return context;
     }
