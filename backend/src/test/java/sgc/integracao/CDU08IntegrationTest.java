@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,12 +19,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.TipoProcesso;
@@ -39,7 +41,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,15 +93,8 @@ class CDU08IntegrationTest {
     @Autowired
     private sgc.comum.modelo.UsuarioRepo usuarioRepo;
 
-    // Test data
-    private Unidade unidadeChefe;
-    private Processo processoMapeamento;
     private Subprocesso subprocessoMapeamento;
     private Mapa mapaMapeamento;
-
-    private Processo processoRevisao;
-    private Subprocesso subprocessoRevisao;
-    private Mapa mapaRevisao;
 
     @BeforeEach
     void setUp() {
@@ -108,12 +102,13 @@ class CDU08IntegrationTest {
         var chefe = new sgc.comum.modelo.Usuario();
         chefe.setTitulo("chefe");
         chefe = usuarioRepo.save(chefe);
-        unidadeChefe = new Unidade("Unidade Teste", "UT");
+        // Test data
+        Unidade unidadeChefe = new Unidade("Unidade Teste", "UT");
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
 
         // Data for Mapeamento process
-        processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
         processoRepo.save(processoMapeamento);
 
         mapaMapeamento = mapaRepo.save(new Mapa());
@@ -121,11 +116,11 @@ class CDU08IntegrationTest {
         subprocessoRepo.save(subprocessoMapeamento);
 
         // Data for Revisão process
-        processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
-        mapaRevisao = mapaRepo.save(new Mapa());
-        subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapaRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
+        Mapa mapaRevisao = mapaRepo.save(new Mapa());
+        Subprocesso subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapaRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
     }
 
@@ -146,7 +141,7 @@ class CDU08IntegrationTest {
 
             List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaMapeamento.getCodigo());
             assertThat(atividades).hasSize(1);
-            assertThat(atividades.get(0).getDescricao()).isEqualTo("Nova Atividade de Teste");
+            assertThat(atividades.getFirst().getDescricao()).isEqualTo("Nova Atividade de Teste");
         }
 
         @Test
@@ -163,7 +158,7 @@ class CDU08IntegrationTest {
 
             List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
             assertThat(conhecimentos).hasSize(1);
-            assertThat(conhecimentos.get(0).getDescricao()).isEqualTo("Novo Conhecimento de Teste");
+            assertThat(conhecimentos.getFirst().getDescricao()).isEqualTo("Novo Conhecimento de Teste");
         }
     }
 
@@ -244,27 +239,23 @@ class CDU08IntegrationTest {
     @DisplayName("Testes de Importação")
     class Importacao {
 
-        private Processo processoFonte;
-        private Unidade unidadeFonte;
         private Mapa mapaFonte;
-        private Atividade atividadeFonte1;
-        private Atividade atividadeFonte2;
 
         @BeforeEach
         void setUp() {
-            unidadeFonte = unidadeRepo.save(new Unidade("Unidade Fonte", "UF"));
-            processoFonte = new Processo("Processo Fonte Finalizado", TipoProcesso.MAPEAMENTO, SituacaoProcesso.FINALIZADO, LocalDate.now().minusDays(10));
+            Unidade unidadeFonte = unidadeRepo.save(new Unidade("Unidade Fonte", "UF"));
+            Processo processoFonte = new Processo("Processo Fonte Finalizado", TipoProcesso.MAPEAMENTO, SituacaoProcesso.FINALIZADO, LocalDate.now().minusDays(10));
             processoRepo.save(processoFonte);
 
             mapaFonte = mapaRepo.save(new Mapa());
             Subprocesso subprocessoFonte = new Subprocesso(processoFonte, unidadeFonte, mapaFonte, SituacaoSubprocesso.MAPA_HOMOLOGADO, processoFonte.getDataLimite());
             subprocessoRepo.save(subprocessoFonte);
 
-            atividadeFonte1 = new Atividade(mapaFonte, "Atividade Fonte 1");
+            Atividade atividadeFonte1 = new Atividade(mapaFonte, "Atividade Fonte 1");
             atividadeRepo.save(atividadeFonte1);
             conhecimentoRepo.save(new Conhecimento(atividadeFonte1, "Conhecimento Fonte 1.1"));
 
-            atividadeFonte2 = new Atividade(mapaFonte, "Atividade Fonte 2");
+            Atividade atividadeFonte2 = new Atividade(mapaFonte, "Atividade Fonte 2");
             atividadeRepo.save(atividadeFonte2);
 
             // Add a pre-existing activity to the target map to test the non-import rule
@@ -296,7 +287,7 @@ class CDU08IntegrationTest {
             assertThat(atividadeImportada.getDescricao()).isEqualTo("Atividade Fonte 1");
             List<Conhecimento> conhecimentosImportados = conhecimentoRepo.findByAtividadeCodigo(atividadeImportada.getCodigo());
             assertThat(conhecimentosImportados).hasSize(1);
-            assertThat(conhecimentosImportados.get(0).getDescricao()).isEqualTo("Conhecimento Fonte 1.1");
+            assertThat(conhecimentosImportados.getFirst().getDescricao()).isEqualTo("Conhecimento Fonte 1.1");
         }
     }
 

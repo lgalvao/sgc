@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.modelo.SituacaoProcesso;
+import sgc.integracao.mocks.WithMockGestor;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;

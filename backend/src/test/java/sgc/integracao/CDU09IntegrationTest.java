@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +12,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -76,7 +80,6 @@ class CDU09IntegrationTest {
     // Test data
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
-    private Processo processoMapeamento;
     private Subprocesso subprocessoMapeamento;
 
     @BeforeEach
@@ -92,7 +95,7 @@ class CDU09IntegrationTest {
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
 
-        processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
         processoRepo.save(processoMapeamento);
 
         var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());
@@ -125,7 +128,7 @@ class CDU09IntegrationTest {
             // Assert Movimentacao
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            Movimentacao movimentacao = movimentacoes.get(0);
+            Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
             assertThat(movimentacao.getUnidadeOrigem()).isEqualTo(unidadeChefe);
             assertThat(movimentacao.getUnidadeDestino()).isEqualTo(unidadeSuperior);
@@ -133,7 +136,7 @@ class CDU09IntegrationTest {
             // Assert Alerta
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
-            var alerta = alertas.get(0);
+            var alerta = alertas.getFirst();
             assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades/conhecimentos da unidade UT disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 

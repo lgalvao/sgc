@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.ProcessoControle;
@@ -64,14 +63,11 @@ public class CDU03IntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private ProcessoService processoService; // Injetar ProcessoService
+    private ProcessoService processoService;
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService)) // Passar ProcessoService
+        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService))
                 .setControllerAdvice(new RestExceptionHandler())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .alwaysDo(print())
@@ -199,7 +195,6 @@ public class CDU03IntegrationTest {
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
     }
 
-    // Teste para remoção de processo
     @Test
     void testRemoverProcesso_sucesso() throws Exception {
         // 1. Criar um processo para ser removido
@@ -231,6 +226,6 @@ public class CDU03IntegrationTest {
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
         mockMvc.perform(delete(API_PROCESSOS_ID, 999L)) // ID que não existe
-                .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
+                .andExpect(status().isNotFound());
     }
 }

@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao.mocks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

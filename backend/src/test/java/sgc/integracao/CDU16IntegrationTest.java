@@ -1,4 +1,4 @@
-package sgc.cdu16;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,8 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.Sgc;
-import sgc.TestSecurityConfig;
-import sgc.WithMockChefe;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
@@ -22,6 +20,8 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.TipoProcesso;

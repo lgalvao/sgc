@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -18,6 +18,9 @@ import sgc.analise.modelo.AnaliseCadastro;
 import sgc.analise.modelo.AnaliseCadastroRepo;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.integracao.mocks.WithMockGestor;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
@@ -80,8 +83,6 @@ public class CDU13IntegrationTest {
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
-    private Unidade sedoc;
-    private Processo processo;
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -113,11 +114,11 @@ public class CDU13IntegrationTest {
         adminUser.setNome("Administrador");
         usuarioRepo.save(adminUser);
 
-        sedoc = new Unidade("Secretaria de Documentação", "SEDOC");
+        Unidade sedoc = new Unidade("Secretaria de Documentação", "SEDOC");
         sedoc.setTitular(adminUser);
         unidadeRepo.save(sedoc);
 
-        processo = new Processo();
+        Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDescricao("Processo de Teste");
@@ -141,7 +142,8 @@ public class CDU13IntegrationTest {
 
         @Test
         @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
-        @WithMockGestor // Simula um usuário com perfil de gestor
+        @WithMockGestor
+            // Simula um usuário com perfil de gestor
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             String motivoDevolucao = "Atividades incompletas";
@@ -167,7 +169,7 @@ public class CDU13IntegrationTest {
             // 2. Verificar se a análise foi registrada corretamente
             List<AnaliseCadastro> analises = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseCadastro analiseRegistrada = analises.get(0);
+            AnaliseCadastro analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
             assertThat(analiseRegistrada.getMotivo()).isEqualTo(motivoDevolucao);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
@@ -176,7 +178,7 @@ public class CDU13IntegrationTest {
             // 3. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de devolução
-            Movimentacao movimentacaoDevolucao = movimentacoes.get(0);
+            Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
             assertThat(movimentacaoDevolucao.getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
             assertThat(movimentacaoDevolucao.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacaoDevolucao.getDescricao()).contains(motivoDevolucao);
@@ -209,7 +211,7 @@ public class CDU13IntegrationTest {
             // 1. Verificar se a análise foi registrada corretamente
             List<AnaliseCadastro> analises = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseCadastro analiseRegistrada = analises.get(0);
+            AnaliseCadastro analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("gestor_unidade"); // From @WithMockGestor
@@ -217,7 +219,7 @@ public class CDU13IntegrationTest {
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de aceite
-            Movimentacao movimentacaoAceite = movimentacoes.get(0);
+            Movimentacao movimentacaoAceite = movimentacoes.getFirst();
             assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacaoAceite.getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
             assertThat(movimentacaoAceite.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos aceito");
@@ -230,7 +232,8 @@ public class CDU13IntegrationTest {
 
         @Test
         @DisplayName("Deve homologar cadastro, alterar situação e registrar movimentação da SEDOC")
-        @WithMockAdmin // Simula um usuário com perfil de ADMIN
+        @WithMockAdmin
+            // Simula um usuário com perfil de ADMIN
         void homologarCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             HomologarCadastroReq requestBody = new HomologarCadastroReq("Homologado via teste.");
@@ -253,7 +256,7 @@ public class CDU13IntegrationTest {
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2); // A inicial + a de homologação
-            Movimentacao movimentacaoHomologacao = movimentacoes.get(0);
+            Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();
             assertThat(movimentacaoHomologacao.getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
             assertThat(movimentacaoHomologacao.getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
             assertThat(movimentacaoHomologacao.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos homologado");
@@ -303,7 +306,7 @@ public class CDU13IntegrationTest {
             assertThat(historico).hasSize(2);
 
             // First item in list is the most recent (ACEITE)
-            AnaliseCadastroDto aceite = historico.get(0);
+            AnaliseCadastroDto aceite = historico.getFirst();
             assertThat(aceite.resultado()).isEqualTo(TipoAcaoAnalise.ACEITE.name());
             assertThat(aceite.observacoes()).isEqualTo(obsAceite);
             assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());

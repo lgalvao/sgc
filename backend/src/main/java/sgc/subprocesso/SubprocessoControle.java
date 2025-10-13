@@ -300,6 +300,7 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/homologar-validacao")
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public SubprocessoDto homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         return subprocessoService.homologarValidacao(id, usuario.getTitulo());
     }

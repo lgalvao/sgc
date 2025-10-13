@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +12,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -78,7 +82,6 @@ class CDU10IntegrationTest {
     // Test data
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
-    private Processo processoRevisao;
     private Subprocesso subprocessoRevisao;
 
     @BeforeEach
@@ -94,7 +97,7 @@ class CDU10IntegrationTest {
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
 
-        processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());
@@ -127,7 +130,7 @@ class CDU10IntegrationTest {
             // Assert Movimentacao
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoAtualizado.getCodigo());
             assertThat(movimentacoes).hasSize(1);
-            Movimentacao movimentacao = movimentacoes.get(0);
+            Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização da revisão do cadastro de atividades");
             assertThat(movimentacao.getUnidadeOrigem()).isEqualTo(unidadeChefe);
             assertThat(movimentacao.getUnidadeDestino()).isEqualTo(unidadeSuperior);
@@ -135,15 +138,16 @@ class CDU10IntegrationTest {
             // Assert Alerta
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
-            var alerta = alertas.get(0);
+            var alerta = alertas.getFirst();
             assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT disponibilizado para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             // Assert Notificação
             String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: UT";
-            String corpoEsperado = "Prezado(a) responsável pela US,\n" +
-                                   "A unidade UT concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo Processo de Revisão.\n" +
-                                   "A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).";
+            String corpoEsperado = """
+                    Prezado(a) responsável pela US,
+                    A unidade UT concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo Processo de Revisão.
+                    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).""";
             verify(notificacaoServico).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
         }
 

@@ -11,7 +11,6 @@ import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
 
 import java.net.URI;

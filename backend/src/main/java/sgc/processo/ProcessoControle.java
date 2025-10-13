@@ -4,16 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.modelo.ErroProcesso;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller REST para Processos.

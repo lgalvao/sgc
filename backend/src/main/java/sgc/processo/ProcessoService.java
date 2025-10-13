@@ -18,7 +18,6 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.processo.dto.*;
-import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
@@ -322,67 +321,73 @@ public class ProcessoService {
 
     private void enviarNotificacoesDeFinalizacao(Processo processo) {
         log.info("Enviando notificações de finalização para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+        List<UnidadeProcesso> unidadesParticipantes = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo());
 
-        if (subprocessos.isEmpty()) {
-            log.info("Nenhuma unidade para notificar na finalização do processo {}", processo.getCodigo());
+        if (unidadesParticipantes.isEmpty()) {
+            log.warn("Nenhuma unidade participante encontrada para notificar na finalização do processo {}", processo.getCodigo());
             return;
         }
 
-        List<Long> codigosUnidades = subprocessos.stream()
-            .map(sp -> sp.getUnidade().getCodigo())
-            .toList();
+        List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(UnidadeProcesso::getUnidadeCodigo).toList();
+        Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
+        Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(
+            responsaveis.values().stream().map(ResponsavelDto::titularTitulo).distinct().toList()
+        );
 
-        Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(codigosUnidades);
-        List<String> titulos = responsaveis.values().stream()
-            .map(ResponsavelDto::titularTitulo)
-            .distinct()
-            .toList();
-
-        Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(titulos);
-
-        for (Subprocesso subprocesso : subprocessos) {
+        for (UnidadeProcesso unidade : unidadesParticipantes) {
             try {
-                Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
-                    .orElseThrow(() -> new IllegalStateException("Subprocesso sem unidade associada."));
-
-                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
-                    .orElseThrow(() -> new IllegalStateException("Não foi possível encontrar o responsável pela unidade " + unidade.getSigla()));
+                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getUnidadeCodigo()))
+                    .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade " + unidade.getSigla()));
 
                 UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.titularTitulo()))
-                    .orElseThrow(() -> new IllegalStateException("Não foi possível encontrar os dados do usuário " + responsavel.titularTitulo()));
+                    .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: " + responsavel.titularTitulo()));
 
-                String emailTitular = Optional.ofNullable(titular.email())
-                    .filter(e -> !e.isBlank())
-                    .orElseThrow(() -> new IllegalStateException("Usuário titular " + titular.nome() + " sem e-mail cadastrado."));
+                String emailTitular = Optional.ofNullable(titular.email()).filter(e -> !e.isBlank())
+                    .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular " + titular.nome()));
 
-                String mensagem = criarMensagemPersonalizada(unidade.getTipo().name());
-                String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
-                    unidade.getSigla(), processo.getDescricao(), mensagem);
-
-                notificacaoServico.enviarEmailHtml(emailTitular, "SGC: Conclusão do Processo " + processo.getDescricao(), html);
-                log.debug("E-mail de finalização enviado para a unidade {} ({})", unidade.getSigla(), emailTitular);
+                if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
+                    enviarEmailUnidadeFinal(processo, unidade, emailTitular);
+                } else if (unidade.getTipo() == TipoUnidade.INTERMEDIARIA) {
+                    enviarEmailUnidadeIntermediaria(processo, unidade, emailTitular, unidadesParticipantes);
+                }
 
             } catch (Exception ex) {
-                log.error(
-                    "Falha ao enviar notificação de finalização para unidade {} (subprocesso {}) no processo {}: {}",
-                    Optional.ofNullable(subprocesso.getUnidade()).map(Unidade::getSigla).orElse("N/A"),
-                    subprocesso.getCodigo(),
-                    processo.getCodigo(),
-                    ex.getMessage(),
-                    ex
-                );
+                log.error("Falha ao preparar notificação para unidade {} no processo {}: {}", unidade.getSigla(), processo.getCodigo(), ex.getMessage(), ex);
             }
         }
     }
 
-    private String criarMensagemPersonalizada(String tipoUnidade) {
-        return switch (tipoUnidade) {
-            case "OPERACIONAL" -> "Seu mapa de competências está agora vigente e pode ser visualizado através do sistema.";
-            case "INTERMEDIARIA" -> "Os mapas de competências das unidades subordinadas a esta unidade estão agora vigentes e podem ser visualizados através do sistema.";
-            case "INTEROPERACIONAL" -> "Seu mapa de competências e os mapas das unidades subordinadas estão agora vigentes e podem ser visualizados através do sistema.";
-            default -> "O mapa de competências da unidade está agora vigente.";
-        };
+    private void enviarEmailUnidadeFinal(Processo processo, UnidadeProcesso unidade, String email) {
+        String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
+        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
+            unidade.getSigla(),
+            processo.getDescricao()
+        );
+        notificacaoServico.enviarEmailHtml(email, assunto, html);
+        log.info("E-mail de finalização (unidade final) enviado para {} ({})", unidade.getSigla(), email);
+    }
+
+    private void enviarEmailUnidadeIntermediaria(Processo processo, UnidadeProcesso unidadeIntermediaria, String email, List<UnidadeProcesso> todasUnidades) {
+        List<String> siglasSubordinadas = todasUnidades.stream()
+            .filter(u -> unidadeIntermediaria.getUnidadeCodigo().equals(u.getUnidadeSuperiorCodigo()))
+            .map(UnidadeProcesso::getSigla)
+            .sorted()
+            .toList();
+
+        if (siglasSubordinadas.isEmpty()) {
+            log.info("Nenhuma unidade subordinada encontrada para notificar a unidade intermediária {}", unidadeIntermediaria.getSigla());
+            return;
+        }
+
+        String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
+        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoUnidadesSubordinadas(
+            unidadeIntermediaria.getSigla(),
+            processo.getDescricao(),
+            siglasSubordinadas
+        );
+
+        notificacaoServico.enviarEmailHtml(email, assunto, html);
+        log.info("E-mail de finalização (unidade intermediária) enviado para {} ({})", unidadeIntermediaria.getSigla(), email);
     }
 
     private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {

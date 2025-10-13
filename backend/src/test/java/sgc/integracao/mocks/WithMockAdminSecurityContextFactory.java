@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao.mocks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,21 +11,22 @@ import sgc.comum.modelo.Usuario;
 import sgc.comum.modelo.UsuarioRepo;
 
 @Component
-public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
+public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
 
     private final UsuarioRepo usuarioRepo;
 
     @Autowired
-    public WithMockGestorSecurityContextFactory(UsuarioRepo usuarioRepo) {
+    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo) {
         this.usuarioRepo = usuarioRepo;
     }
 
     @Override
-    public SecurityContext createSecurityContext(WithMockGestor customUser) {
+    public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        Usuario principal = usuarioRepo.findById(customUser.value())
-            .orElseGet(() -> usuarioRepo.save(new Usuario(customUser.value(), "Gestor User", "gestor@example.com", null, null, null)));
+        Usuario principal = usuarioRepo.findById("admin")
+            .orElseGet(() -> usuarioRepo.save(new Usuario("admin", "Admin User", "admin@example.com", null, null, null)));
+
 
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());

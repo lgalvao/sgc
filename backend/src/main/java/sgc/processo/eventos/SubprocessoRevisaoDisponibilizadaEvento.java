@@ -1,5 +1,8 @@
 package sgc.processo.eventos;
 
+import lombok.Getter;
+
+@Getter
 public class SubprocessoRevisaoDisponibilizadaEvento {
 
     private final Long subprocessoId;
@@ -8,7 +11,4 @@ public class SubprocessoRevisaoDisponibilizadaEvento {
         this.subprocessoId = subprocessoId;
     }
 
-    public Long getSubprocessoId() {
-        return subprocessoId;
-    }
 }

@@ -270,13 +270,11 @@ public class MapaService {
         Competencia competencia = repositorioCompetencia.findById(idCompetencia).orElseThrow();
         novosIds.stream()
             .filter(id -> !idsAtuais.contains(id))
-            .forEach(idAtividade -> {
-                atividadeRepo.findById(idAtividade).ifPresent(atividade -> {
-                    CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
-                    CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
-                    repositorioCompetenciaAtividade.save(vinculo);
-                });
-            });
+            .forEach(idAtividade -> atividadeRepo.findById(idAtividade).ifPresent(atividade -> {
+                CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
+                CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
+                repositorioCompetenciaAtividade.save(vinculo);
+            }));
 
         log.debug("Atualizados {} vínculos para competência {}", novosIdsAtividades.size(), idCompetencia);
     }

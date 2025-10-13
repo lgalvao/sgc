@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
 import sgc.processo.modelo.TipoProcesso;
@@ -65,8 +66,6 @@ class CDU11IntegrationTest {
     private Unidade unidade;
     private Processo processo;
     private Subprocesso subprocesso;
-    private Atividade atividade1;
-    private Conhecimento conhecimento1;
 
     @BeforeEach
     void setUp() {
@@ -88,9 +87,9 @@ class CDU11IntegrationTest {
         subprocessoRepo.save(subprocesso);
 
         // Atividades e Conhecimentos
-        atividade1 = new Atividade(mapa, "Analisar documentação");
+        Atividade atividade1 = new Atividade(mapa, "Analisar documentação");
         atividadeRepo.save(atividade1);
-        conhecimento1 = new Conhecimento(atividade1, "Interpretação de textos técnicos");
+        Conhecimento conhecimento1 = new Conhecimento(atividade1, "Interpretação de textos técnicos");
         conhecimentoRepo.save(conhecimento1);
 
         Atividade atividade2 = new Atividade(mapa, "Elaborar relatórios");

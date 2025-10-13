@@ -1,6 +1,5 @@
-package sgc;
+package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.subprocesso.SubprocessoService;
+import sgc.subprocesso.modelo.Movimentacao;
+import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -23,6 +28,7 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,13 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "admin", roles = {"ADMIN"})
 @Import(TestSecurityConfig.class)
 @Transactional
-public class CDU06IntegrationTest {
-
+public class CDU07IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -50,42 +52,47 @@ public class CDU06IntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
-    private Processo processo;
-    private Unidade unidade;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+
+    @Autowired
+    private SubprocessoService subprocessoService;
+
+    private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade();
+        Unidade unidade = new Unidade();
         unidade.setNome("Unidade de Teste");
         unidade.setSigla("UT");
         unidadeRepo.save(unidade);
 
-        processo = new Processo();
+        Processo processo = new Processo();
         processo.setDescricao("Processo de Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDataLimite(LocalDate.now().plusDays(10));
         processoRepo.save(processo);
 
-        Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
+        subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
+
+        Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado");
+        movimentacaoRepo.save(movimentacao);
     }
 
     @Test
-    void testDetalharProcesso_sucesso() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}/detalhes?perfil=ADMIN", processo.getCodigo()))
+    void testDetalharSubprocesso_sucesso() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/{id}?perfil=ADMIN", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(processo.getCodigo()))
-                .andExpect(jsonPath("$.descricao").value("Processo de Teste"))
-                .andExpect(jsonPath("$.tipo").value(TipoProcesso.MAPEAMENTO.name()))
-                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()))
-                .andExpect(jsonPath("$.unidades[0].nome").value("Unidade de Teste"))
-                .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()));
+                .andExpect(jsonPath("$.unidade.nome").value("Unidade de Teste"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
+                .andExpect(jsonPath("$.localizacaoAtual").value("UT"))
+                .andExpect(jsonPath("$.movimentacoes[0].descricao").value("Subprocesso iniciado"));
     }
 
     @Test
-    void testDetalharProcesso_naoEncontrado_falha() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}/detalhes?perfil=ADMIN", 999L)) // ID que não existe
-                .andExpect(status().isNotFound());
+    void testDetalharSubprocesso_naoEncontrado_falha() {
+        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.obterDetalhes(999L, "ADMIN", null));
     }
 }

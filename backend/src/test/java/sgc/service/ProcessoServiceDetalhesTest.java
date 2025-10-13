@@ -150,14 +150,6 @@ public class ProcessoServiceDetalhesTest {
 
         // This test needs to be updated to mock the security context
         // For now, we'll just check that the method is called.
-        // ProcessoDetalheDto dto = servico.obterDetalhes(1L);
 
-        // assertNotNull(dto);
-        // assertEquals(p.getCodigo(), dto.getCodigo());
-        // assertNotNull(dto.getUnidades());
-        // assertTrue(dto.getUnidades().stream().anyMatch(u -> "DX".equals(u.getSigla())));
-        // assertNotNull(dto.getResumoSubprocessos());
-        // assertTrue(
-        //         dto.getResumoSubprocessos().stream().anyMatch(s -> s.getCodigo() != null && s.getSituacao() != null));
     }
 }

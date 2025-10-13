@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import java.util.List;
+
 /**
  * Serviço responsável por criar templates HTML para diferentes tipos de e-mail.
  * Cada método cria um template específico para um caso de uso do sistema.
@@ -247,36 +249,54 @@ public class NotificacaoModeloEmailService {
      */
     public String criarEmailDeProcessoFinalizadoPorUnidade(
             String siglaUnidade,
-            String nomeProcesso,
-            String mensagemPersonalizada) {
-        
+            String nomeProcesso) {
+
         String conteudo = String.format("""
-                        <p>Comunicamos a conclusão do processo <strong>%s</strong> para a sua unidade.</p>%n
-                        %n
-                        <div style="background-color: #f0fff0; padding: 15px; margin: 15px 0; border-left: 4px solid #00aa00;">%n
-                            <p style="margin: 5px 0;"><strong>Unidade:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Processo:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Status:</strong> Finalizado ✓</p>%n
-                        </div>%n
-                        %n
-                        <div style="background-color: #f0f8ff; padding: 15px; margin: 15px 0; border-left: 4px solid #0066cc;">%n
-                            <p style="margin: 5px 0;">%s</p>%n
-                        </div>%n
-                        %n
-                        <p>Já é possível visualizar os mapas de competências atualizados através do menu%n
-                           <strong>Minha Unidade</strong> do Sistema de Gestão de Competências.</p>%n
-                        %n
-                        <p style="margin-top: 20px;">%n
-                            <a href="https://sgc.tre-pe.jus.br"%n
-                               style="background-color: #00aa00; color: white; padding: 10px 20px;%n
-                                      text-decoration: none; border-radius: 5px; display: inline-block;">%n
-                                Acessar Sistema%n
-                            </a>%n
-                        </p>%n
+                        <p>Prezado(a) responsável pela %s,</p>
+                        <p>Comunicamos a conclusão do processo <strong>%s</strong> para a sua unidade.</p>
+                        <p>Já é possível visualizar o seu mapa de competências atualizado através do menu Minha Unidade do Sistema de Gestão de Competências.</p>
+                        <p style="margin-top: 20px;">
+                            <a href="https://sgc.tre-pe.jus.br"
+                               style="background-color: #00aa00; color: white; padding: 10px 20px;
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Acessar Sistema
+                            </a>
+                        </p>
                         """,
-            nomeProcesso, siglaUnidade, nomeProcesso, mensagemPersonalizada);
-        
+            siglaUnidade, nomeProcesso);
+
         return criarTemplateBase("SGC: Conclusão do processo " + nomeProcesso, conteudo);
+    }
+
+    /**
+     * Template para notificar finalização de processo para unidades intermediárias (CDU-21).
+     */
+    public String criarEmailDeProcessoFinalizadoUnidadesSubordinadas(
+            String siglaUnidade,
+            String nomeProcesso,
+            List<String> siglasUnidadesSubordinadas) {
+
+        String listaHtmlUnidades = "<ul>" +
+            siglasUnidadesSubordinadas.stream()
+                .map(sigla -> "<li>" + sigla + "</li>")
+                .reduce("", String::concat) + "</ul>";
+
+        String conteudo = String.format("""
+                        <p>Prezado(a) responsável pela %s,</p>
+                        <p>Comunicamos a conclusão do processo <strong>%s</strong> para as unidades:</p>
+                        %s
+                        <p>Já é possível visualizar os mapas de competências atualizados destas unidades através do menu Minha Unidade do Sistema de Gestão de Competências.</p>
+                        <p style="margin-top: 20px;">
+                            <a href="https://sgc.tre-pe.jus.br"
+                               style="background-color: #00aa00; color: white; padding: 10px 20px;
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Acessar Sistema
+                            </a>
+                        </p>
+                        """,
+            siglaUnidade, nomeProcesso, listaHtmlUnidades);
+
+        return criarTemplateBase("SGC: Conclusão do processo " + nomeProcesso + " em unidades subordinadas", conteudo);
     }
     
     public String criarTemplateBase(String titulo, String conteudo) {

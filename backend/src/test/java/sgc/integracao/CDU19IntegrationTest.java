@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -113,13 +113,13 @@ public class CDU19IntegrationTest {
                         .with(user(this.chefe)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<AnaliseValidacaoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<List<AnaliseValidacaoDto>>() {
+        List<AnaliseValidacaoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<>() {
         });
 
         assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.get(0).acao()).isEqualTo("DEVOLUCAO");
-        assertThat(historicoDevolucao.get(0).unidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.get(0).observacoes()).isEqualTo("Justificativa da devolução");
+        assertThat(historicoDevolucao.getFirst().acao()).isEqualTo("DEVOLUCAO");
+        assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
+        assertThat(historicoDevolucao.getFirst().observacoes()).isEqualTo("Justificativa da devolução");
 
         // Unidade inferior valida o mapa novamente
         mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
@@ -136,11 +136,11 @@ public class CDU19IntegrationTest {
                         .with(user(this.chefe)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        List<AnaliseValidacaoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<List<AnaliseValidacaoDto>>() {
+        List<AnaliseValidacaoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {
         });
 
         assertThat(historicoAceite).hasSize(1);
-        assertThat(historicoAceite.get(0).acao()).isEqualTo("ACEITE");
-        assertThat(historicoAceite.get(0).unidadeSigla()).isNotNull();
+        assertThat(historicoAceite.getFirst().acao()).isEqualTo("ACEITE");
+        assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
     }
 }

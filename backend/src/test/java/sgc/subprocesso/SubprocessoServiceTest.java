@@ -293,9 +293,7 @@ public class SubprocessoServiceTest {
         Subprocesso subprocesso = criarSubprocessoComMapaEChefe(id, chefe);
         when(repositorioSubprocesso.findById(id)).thenReturn(Optional.of(subprocesso));
 
-        assertThrows(ErroDominioAccessoNegado.class, () -> {
-            subprocessoService.disponibilizarCadastro(id, outroUsuario);
-        });
+        assertThrows(ErroDominioAccessoNegado.class, () -> subprocessoService.disponibilizarCadastro(id, outroUsuario));
     }
 
     private Subprocesso criarSubprocessoComMapaEChefe(Long id, Usuario chefe) {

@@ -20,6 +20,7 @@ import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.modelo.ErroProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.UnidadeProcessoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -40,6 +41,9 @@ public class ProcessoServiceFinalizarTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
+    @Mock
+    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     @Mock
     private UnidadeMapaRepo unidadeMapaRepo;
@@ -106,6 +110,7 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
+        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(List.of());
         when(processoConversor.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
         processoService.finalizar(1L);

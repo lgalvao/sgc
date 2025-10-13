@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -81,7 +80,6 @@ public class SubprocessoServiceActionsTest {
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
-    private Usuario chefe;
     private Usuario usuario;
 
     @BeforeEach
@@ -93,7 +91,7 @@ public class SubprocessoServiceActionsTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidadeRepo.save(unidade);
 
-        chefe = new Usuario();
+        Usuario chefe = new Usuario();
         chefe.setTitulo("chefe_ut");
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
@@ -146,11 +144,11 @@ public class SubprocessoServiceActionsTest {
                 .setParameter("spId", subprocesso.getCodigo())
                 .getResultList();
             assertEquals(1, movimentacoes.size());
-            assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.get(0).getDescricao());
+            assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().getDescricao());
 
             List<Alerta> alertas = alertaRepo.findAll();
             assertEquals(1, alertas.size());
-            assertTrue(alertas.get(0).getDescricao().contains("submetido para análise"));
+            assertTrue(alertas.getFirst().getDescricao().contains("submetido para análise"));
 
             verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         }
@@ -196,7 +194,7 @@ public class SubprocessoServiceActionsTest {
                 .setParameter("spId", subprocesso.getCodigo())
                 .getResultList();
             assertEquals(1, movimentacoes.size());
-            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.get(0).getDescricao());
+            assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().getDescricao());
 
             verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         }

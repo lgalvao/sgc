@@ -1,4 +1,4 @@
-package sgc;
+package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.comum.modelo.SituacaoProcesso;
 import sgc.comum.modelo.SituacaoSubprocesso;
+import sgc.integracao.mocks.*;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -76,13 +78,6 @@ class CDU12IntegrationTest {
     @Autowired private CompetenciaAtividadeRepo competenciaAtividadeRepo;
     @Autowired private UnidadeMapaRepo unidadeMapaRepo;
 
-    // Test data
-    private Unidade unidade;
-    private Usuario chefe;
-    private Usuario gestor;
-    private Usuario admin;
-    private Processo processoRevisao;
-    private Mapa mapaVigente;
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
     private Competencia competenciaVigente1;
@@ -93,32 +88,33 @@ class CDU12IntegrationTest {
     @BeforeEach
     void setUp() {
         // 1. Unidade e Chefe
-        unidade = new Unidade("Unidade de Teste", "UT");
-        chefe = new Usuario();
+        // Test data
+        Unidade unidade = new Unidade("Unidade de Teste", "UT");
+        Usuario chefe = new Usuario();
         chefe.setTitulo(CHEFE_UT_USERNAME);
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
-        gestor = new Usuario();
+        Usuario gestor = new Usuario();
         gestor.setTitulo("gestor_unidade");
         usuarioRepo.save(gestor);
 
-        admin = new Usuario();
+        Usuario admin = new Usuario();
         admin.setTitulo("admin");
         usuarioRepo.save(admin);
 
         // 2. Processo de Revisão
-        processoRevisao = new Processo(
-            "Processo de Revisão 2024",
-            TipoProcesso.REVISAO,
-            SituacaoProcesso.EM_ANDAMENTO,
-            LocalDate.now().plusMonths(3)
+        Processo processoRevisao = new Processo(
+                "Processo de Revisão 2024",
+                TipoProcesso.REVISAO,
+                SituacaoProcesso.EM_ANDAMENTO,
+                LocalDate.now().plusMonths(3)
         );
         processoRepo.save(processoRevisao);
 
         // 3. Mapa Vigente da Unidade
-        mapaVigente = new Mapa();
+        Mapa mapaVigente = new Mapa();
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaRepo.save(mapaVigente);
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo());
@@ -139,8 +135,8 @@ class CDU12IntegrationTest {
         // 5. Subprocesso de Revisão
         mapaSubprocesso = mapaRepo.save(new Mapa());
         subprocessoRevisao = new Subprocesso(
-            processoRevisao,
-            unidade,
+                processoRevisao,
+                unidade,
             mapaSubprocesso,
             SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
             processoRevisao.getDataLimite()

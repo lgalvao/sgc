@@ -220,7 +220,7 @@ public class SubprocessoService {
         }
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            log.warn("Validação falhou: subprocesso {} não possui mapa associado", idSubprocesso);
+            log.warn("Validação de subprocesso falhou: subprocesso {} não possui mapa associado", idSubprocesso);
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
 
@@ -276,7 +276,7 @@ public class SubprocessoService {
         }
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            log.warn("Validação falhou: subprocesso {} não possui mapa associado", idSubprocesso);
+            log.warn("Validação do mapa falhou: subprocesso {} não possui mapa associado", idSubprocesso);
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
 
@@ -1023,7 +1023,7 @@ public class SubprocessoService {
         List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(spDestino.getMapa().getCodigo())
             .stream()
             .map(Atividade::getDescricao)
-            .collect(Collectors.toList());
+            .toList();
 
         for (Atividade atividadeOrigem : atividadesOrigem) {
             if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
