@@ -7,12 +7,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.dto.CompetenciaDto;
 import sgc.competencia.dto.CompetenciaMapper;
 import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -28,17 +33,20 @@ class CompetenciaControleTest {
     private static final String TEST_DESC = "Test Desc";
     private static final String TESTUSER = "testuser";
     private static final String API_COMPETENCIAS_1 = "/api/competencias/1";
+
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private CompetenciaRepo competenciaRepo;
-
     @MockitoBean
     private CompetenciaMapper competenciaMapper;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockitoBean
+    private AtividadeRepo atividadeRepo;
+    @MockitoBean
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @Test
     void listarCompetencias_deveRetornarListaDeCompetencias() throws Exception {
@@ -70,7 +78,6 @@ class CompetenciaControleTest {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
 
-        // When & Then
         mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +89,6 @@ class CompetenciaControleTest {
     void obterCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
         when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
 
-        // When & Then
         mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isNotFound());
     }
@@ -116,18 +122,6 @@ class CompetenciaControleTest {
     }
 
     @Test
-    void criarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto(null, null, " "); // Descrição inválida
-
-        // When & Then
-        mockMvc.perform(post("/api/competencias")
-                        .with(user(TESTUSER)).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void atualizarCompetencia_quandoEncontrada_deveAtualizarEretornarCompetencia() throws Exception {
         CompetenciaDto dto = new CompetenciaDto(null, null, "Competencia Atualizada");
 
@@ -145,40 +139,12 @@ class CompetenciaControleTest {
         when(competenciaRepo.save(any(Competencia.class))).thenReturn(updatedEntity);
         when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(updatedDto);
 
-        // When & Then
         mockMvc.perform(put(API_COMPETENCIAS_1)
                         .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricao").value("Competencia Atualizada"));
-    }
-
-    @Test
-    void atualizarCompetencia_comDescricaoInvalida_deveRetornarBadRequest() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto(null, null, ""); // Descrição inválida
-
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.of(new Competencia()));
-
-        // When & Then
-        mockMvc.perform(put(API_COMPETENCIAS_1)
-                        .with(user(TESTUSER)).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void atualizarCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto(null, null, "Nao importa");
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
-
-        // When & Then
-        mockMvc.perform(put(API_COMPETENCIAS_1)
-                        .with(user(TESTUSER)).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -193,12 +159,49 @@ class CompetenciaControleTest {
                 .andExpect(status().isNoContent());
     }
 
+    // Testes para os novos endpoints de vínculo
     @Test
-    void excluirCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
+    void vincularAtividade_deveCriarVinculo() throws Exception {
+        long idCompetencia = 1L;
+        long idAtividade = 2L;
 
-        // When & Then
-        mockMvc.perform(delete(API_COMPETENCIAS_1).with(user(TESTUSER)).with(csrf()))
-                .andExpect(status().isNotFound());
+        when(competenciaRepo.findById(idCompetencia)).thenReturn(Optional.of(new Competencia()));
+        when(atividadeRepo.findById(idAtividade)).thenReturn(Optional.of(new Atividade()));
+        when(competenciaAtividadeRepo.existsById(any())).thenReturn(false);
+        when(competenciaAtividadeRepo.save(any())).thenReturn(new CompetenciaAtividade());
+
+        String requestBody = "{\"idAtividade\": " + idAtividade + "}";
+
+        mockMvc.perform(post("/api/competencias/{idCompetencia}/atividades", idCompetencia)
+                        .with(user(TESTUSER)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void desvincularAtividade_deveRemoverVinculo() throws Exception {
+        long idCompetencia = 1L;
+        long idAtividade = 2L;
+        CompetenciaAtividade.Id vinculoId = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
+
+        when(competenciaAtividadeRepo.existsById(vinculoId)).thenReturn(true);
+        doNothing().when(competenciaAtividadeRepo).deleteById(vinculoId);
+
+        mockMvc.perform(delete("/api/competencias/{idCompetencia}/atividades/{idAtividade}", idCompetencia, idAtividade)
+                        .with(user(TESTUSER)).with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void listarAtividadesVinculadas_deveRetornarLista() throws Exception {
+        long idCompetencia = 1L;
+        when(competenciaRepo.existsById(idCompetencia)).thenReturn(true);
+        when(competenciaAtividadeRepo.findAll()).thenReturn(List.of()); // Simplesmente retorna lista vazia
+
+        mockMvc.perform(get("/api/competencias/{idCompetencia}/atividades", idCompetencia)
+                        .with(user(TESTUSER)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }

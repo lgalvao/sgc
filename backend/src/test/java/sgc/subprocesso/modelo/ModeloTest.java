@@ -1,9 +1,9 @@
 package sgc.subprocesso.modelo;
 
 import org.junit.jupiter.api.Test;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
 import java.time.LocalDate;

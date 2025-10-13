@@ -7,24 +7,24 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.AnaliseCadastro;
-import sgc.analise.modelo.AnaliseCadastroRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.AnaliseRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
-import sgc.notificacao.NotificacaoServico;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.modelo.Movimentacao;
@@ -61,7 +61,7 @@ public class SubprocessoServiceActionsTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private AnaliseCadastroRepo analiseCadastroRepo;
+    private AnaliseRepo analiseRepo;
 
     @Autowired
     private AlertaRepo alertaRepo;
@@ -70,7 +70,7 @@ public class SubprocessoServiceActionsTest {
     private EntityManager entityManager;
 
     @MockitoBean
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     @MockitoBean
     private ApplicationEventPublisher eventPublisher;
@@ -133,10 +133,9 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            SubprocessoDto result = subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
+            subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
 
-            assertNotNull(result);
-            Optional<AnaliseCadastro> analise = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
             assertEquals(OBSERVACOES, analise.get().getObservacoes());
 
@@ -150,7 +149,7 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, alertas.size());
             assertTrue(alertas.getFirst().getDescricao().contains("submetido para análise"));
 
-            verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         }
     }
 
@@ -186,7 +185,7 @@ public class SubprocessoServiceActionsTest {
             SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             assertNotNull(result);
-            Optional<AnaliseCadastro> analise = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
+            Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
             assertEquals(OBSERVACOES, analise.get().getObservacoes());
 
@@ -196,7 +195,7 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, movimentacoes.size());
             assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().getDescricao());
 
-            verify(notificacaoServico, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
         }
 
         @Test

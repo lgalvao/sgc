@@ -6,32 +6,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.subprocesso.SituacaoSubprocesso;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoModeloEmailService;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
-import sgc.processo.modelo.ErroProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-
-import sgc.processo.modelo.TipoProcesso;
-import sgc.unidade.modelo.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,9 +37,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +75,7 @@ public class ProcessoServiceTest {
     private org.springframework.context.ApplicationEventPublisher publicadorDeEventos;
 
     @Mock
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     @Mock
     private NotificacaoModeloEmailService notificacaoModeloEmailService;
@@ -90,10 +84,10 @@ public class ProcessoServiceTest {
     private SgrhService sgrhService;
 
     @Mock
-    private ProcessoConversor processoConversor;
+    private ProcessoMapper processoMapper;
 
     @Mock
-    private ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado;
+    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     private ProcessoService processoService;
 
@@ -109,11 +103,11 @@ public class ProcessoServiceTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoServico,
+                notificacaoService,
                 notificacaoModeloEmailService,
                 sgrhService,
-                processoConversor,
-                processoDetalheMapperCustomizado
+                processoMapper,
+                processoDetalheMapperCustom
         );
     }
 
@@ -136,7 +130,7 @@ public class ProcessoServiceTest {
             .build();
 
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-        when(processoConversor.toDTO(any(Processo.class))).thenReturn(dto);
+        when(processoMapper.toDTO(any(Processo.class))).thenReturn(dto);
 
         ProcessoDto resultado = processoService.criar(requisicao);
 
@@ -196,7 +190,7 @@ public class ProcessoServiceTest {
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-        when(processoConversor.toDTO(any(Processo.class))).thenReturn(dto);
+        when(processoMapper.toDTO(any(Processo.class))).thenReturn(dto);
 
         ProcessoDto resultado = processoService.atualizar(1L, requisicao);
 
@@ -278,7 +272,7 @@ public class ProcessoServiceTest {
         var dto = ProcessoDto.builder().codigo(1L).build();
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(processoConversor.toDTO(processo)).thenReturn(dto);
+        when(processoMapper.toDTO(processo)).thenReturn(dto);
 
         var resultado = processoService.obterPorId(1L);
 
@@ -306,7 +300,7 @@ public class ProcessoServiceTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(Collections.emptyList());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        when(processoDetalheMapperCustomizado.toDetailDTO(any(), any(), any())).thenReturn(detalhes);
+        when(processoDetalheMapperCustom.toDetailDTO(any(), any(), any())).thenReturn(detalhes);
 
         ProcessoDetalheDto resultado = processoService.obterDetalhes(1L);
 
@@ -337,7 +331,7 @@ public class ProcessoServiceTest {
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-        when(processoConversor.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             return ProcessoDto.builder()
                 .codigo(p.getCodigo())
@@ -419,7 +413,7 @@ public class ProcessoServiceTest {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocesso));
         when(processoRepo.save(any(Processo.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(processoConversor.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             return ProcessoDto.builder()
                 .codigo(p.getCodigo())
@@ -495,7 +489,7 @@ public class ProcessoServiceTest {
         when(mapaRepo.save(any(Mapa.class))).thenReturn(mapaNovo);
         when(subprocessoRepo.save(any(Subprocesso.class))).thenAnswer(inv -> inv.getArgument(0));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-        when(processoConversor.toDTO(processo)).thenReturn(ProcessoDto.builder().build());
+        when(processoMapper.toDTO(processo)).thenReturn(ProcessoDto.builder().build());
 
         processoService.iniciarProcessoRevisao(1L, List.of(1L));
 

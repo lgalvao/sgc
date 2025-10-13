@@ -7,9 +7,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.RespostaDto;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.TipoAnalise;
+import sgc.atividade.modelo.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.Usuario;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.MapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -18,11 +19,10 @@ import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
+import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.analise.dto.AnaliseCadastroDto;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
-import sgc.atividade.modelo.Atividade;
 
 import java.net.URI;
 import java.util.List;
@@ -37,6 +37,8 @@ public class SubprocessoControle {
     private final MapaService mapaService;
     private final ImpactoMapaService impactoMapaService;
     private final SubprocessoMapper subprocessoMapper;
+    private final sgc.analise.AnaliseService analiseService;
+    private final sgc.analise.dto.AnaliseMapper analiseMapper;
 
     @GetMapping
     public List<SubprocessoDto> listar() {
@@ -54,8 +56,11 @@ public class SubprocessoControle {
     }
 
     @GetMapping("/{id}/historico-cadastro")
-    public List<AnaliseCadastroDto> obterHistoricoCadastro(@PathVariable Long id) {
-        return subprocessoService.getHistoricoAnaliseCadastro(id);
+    public List<sgc.analise.dto.AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long id) {
+        return analiseService.listarPorSubprocesso(id, TipoAnalise.CADASTRO)
+            .stream()
+            .map(analiseMapper::toAnaliseHistoricoDto)
+            .toList();
     }
 
     @PostMapping("/{id}/disponibilizar")
@@ -274,8 +279,11 @@ public class SubprocessoControle {
     }
 
     @GetMapping("/{id}/historico-validacao")
-    public List<AnaliseValidacaoDto> obterHistoricoValidacao(@PathVariable Long id) {
-        return subprocessoService.obterHistoricoValidacao(id);
+    public List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long id) {
+        return analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO)
+            .stream()
+            .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
+            .toList();
     }
 
     @PostMapping("/{id}/devolver-validacao")

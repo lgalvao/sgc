@@ -7,15 +7,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoModeloEmailService;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
@@ -24,14 +23,14 @@ import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-
-import sgc.unidade.modelo.TipoUnidade;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,11 +51,11 @@ public class ProcessoService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ApplicationEventPublisher publicadorDeEventos;
-    private final NotificacaoServico notificacaoServico;
+    private final NotificacaoService notificacaoService;
     private final NotificacaoModeloEmailService notificacaoModeloEmailService;
     private final SgrhService sgrhService;
-    private final ProcessoConversor processoConversor;
-    private final ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado;
+    private final ProcessoMapper processoMapper;
+    private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
@@ -87,7 +86,7 @@ public class ProcessoService {
         publicadorDeEventos.publishEvent(new ProcessoCriadoEvento(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
-        return processoConversor.toDTO(processoSalvo);
+        return processoMapper.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -106,7 +105,7 @@ public class ProcessoService {
         Processo processoAtualizado = processoRepo.save(processo);
         log.info("Processo {} atualizado com sucesso.", id);
 
-        return processoConversor.toDTO(processoAtualizado);
+        return processoMapper.toDTO(processoAtualizado);
     }
 
     @Transactional
@@ -124,7 +123,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long id) {
-        return processoRepo.findById(id).map(processoConversor::toDTO);
+        return processoRepo.findById(id).map(processoMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -136,7 +135,7 @@ public class ProcessoService {
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);
 
-        return processoDetalheMapperCustomizado.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
+        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
     }
 
     @Transactional
@@ -172,7 +171,7 @@ public class ProcessoService {
         ));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", id, codigosUnidades.size());
-        return processoConversor.toDTO(processoSalvo);
+        return processoMapper.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -209,7 +208,7 @@ public class ProcessoService {
         ));
 
         log.info("Processo de revisão {} iniciado para {} unidades.", id, codigosUnidades.size());
-        return processoConversor.toDTO(processoSalvo);
+        return processoMapper.toDTO(processoSalvo);
     }
 
     @Transactional
@@ -231,7 +230,7 @@ public class ProcessoService {
         publicadorDeEventos.publishEvent(new ProcessoFinalizadoEvento(this, processo.getCodigo()));
 
         log.info("Processo finalizado com sucesso: código={}", id);
-        return processoConversor.toDTO(processo);
+        return processoMapper.toDTO(processo);
     }
 
     private void validarUnidadesNaoEmProcessosAtivos(List<Long> codigosUnidades) {
@@ -362,7 +361,7 @@ public class ProcessoService {
             unidade.getSigla(),
             processo.getDescricao()
         );
-        notificacaoServico.enviarEmailHtml(email, assunto, html);
+        notificacaoService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização (unidade final) enviado para {} ({})", unidade.getSigla(), email);
     }
 
@@ -385,7 +384,7 @@ public class ProcessoService {
             siglasSubordinadas
         );
 
-        notificacaoServico.enviarEmailHtml(email, assunto, html);
+        notificacaoService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização (unidade intermediária) enviado para {} ({})", unidadeIntermediaria.getSigla(), email);
     }
 

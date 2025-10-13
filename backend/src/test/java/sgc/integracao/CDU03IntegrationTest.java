@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,21 +43,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("CDU-03: Manter processo")
-@WithMockUser(username = "admin", roles = {"ADMIN"})
+@WithMockAdmin
+@Import(TestSecurityConfig.class)
 public class CDU03IntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{id}";
-
-    @TestConfiguration
-    @SuppressWarnings("PMD.TestClassWithoutTestCases")
-    static class TestSecurityConfig {
-        @Bean
-        SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-            http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                    .csrf(AbstractHttpConfigurer::disable);
-            return http.build();
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;

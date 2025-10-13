@@ -11,12 +11,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -24,6 +24,8 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockUser(username = "admin", roles = {"ADMIN"})
+@WithMockAdmin
 @Import(TestSecurityConfig.class)
 @Transactional
 public class CDU06IntegrationTest {

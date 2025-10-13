@@ -19,18 +19,15 @@ As análises funcionam como uma trilha de auditoria, documentando o histórico d
   - `GET /api/subprocessos/{id}/analises-validacao`: Lista o histórico de análises de validação de um subprocesso.
   - `POST /api/subprocessos/{id}/analises-validacao`: Cria um novo registro de análise de validação.
 
-### 2. Serviços de Análise
-- **`AnaliseCadastroService.java`**: Classe de serviço que contém a lógica de negócio para operações com `AnaliseCadastro` (criar, listar, remover).
-- **`AnaliseValidacaoService.java`**: Classe de serviço que contém a lógica de negócio para operações com `AnaliseValidacao` (criar, listar, remover).
+### 2. Serviço de Análise
+- **`AnaliseService.java`**: Classe de serviço que contém a lógica de negócio para operações com `Analise` (criar, listar, remover).
 
-### 3. Entidades de Análise (`modelo/`)
+### 3. Entidade de Análise (`modelo/`)
 **Localização:** `backend/src/main/java/sgc/analise/modelo/`
-- **`AnaliseCadastro.java`**: Entidade JPA que representa um registro de análise sobre o cadastro de atividades e conhecimentos. Está vinculada a um `Subprocesso`.
-- **`AnaliseValidacao.java`**: Entidade JPA para um registro de análise sobre a validação de um mapa de competências. Também vinculada a um `Subprocesso`.
+- **`Analise.java`**: Entidade JPA que representa um registro de análise. Está vinculada a um `Subprocesso` e possui um campo `tipo` para diferenciar entre `CADASTRO` e `VALIDACAO`.
 
-### 4. Repositórios (`modelo/`)
-- **`AnaliseCadastroRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade `AnaliseCadastro`.
-- **`AnaliseValidacaoRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade `AnaliseValidacao`.
+### 4. Repositório (`modelo/`)
+- **`AnaliseRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade `Analise`.
 
 ## Diagrama de Componentes
 ```mermaid
@@ -41,12 +38,9 @@ graph TD
 
     subgraph "Módulo Análise"
         B(AnaliseControle)
-        C(AnaliseCadastroService)
-        D(AnaliseValidacaoService)
-        E[AnaliseCadastroRepo]
-        F[AnaliseValidacaoRepo]
-        G(AnaliseCadastro)
-        H(AnaliseValidacao)
+        C(AnaliseService)
+        E[AnaliseRepo]
+        G(Analise)
     end
 
     subgraph "Usuário"
@@ -54,16 +48,12 @@ graph TD
     end
 
     A -- Chama --> C
-    A -- Chama --> D
 
     U -- Requisição HTTP --> B
     B -- Chama --> C
-    B -- Chama --> D
 
     C -- Persiste com --> E
-    D -- Persiste com --> F
     E -- Gerencia --> G
-    F -- Gerencia --> H
 ```
 
 ## Como Usar
@@ -75,18 +65,18 @@ A criação de registros de análise é tipicamente orquestrada por serviços de
 // Em um serviço que gerencia o fluxo de trabalho
 
 @Autowired
-private AnaliseCadastroService analiseCadastroService;
+private AnaliseService analiseService;
 
 public void devolverCadastro(Long subprocessoId, String justificativa) {
     // ... lógica de negócio para alterar o estado do subprocesso ...
 
     // Cria um registro da análise que motivou a devolução
-    analiseCadastroService.criarAnalise(subprocessoId, justificativa);
+    analiseService.criarAnalise(subprocessoId, justificativa, TipoAnalise.CADASTRO);
 
     // ... notificar usuário, etc. ...
 }
 ```
 
 ## Notas Importantes
-- **Trilha de Auditoria**: As entidades de análise são um componente fundamental da trilha de auditoria do sistema, pois armazenam as justificativas para as decisões tomadas ao longo do fluxo de trabalho.
+- **Trilha de Auditoria**: A entidade de análise é um componente fundamental da trilha de auditoria do sistema, pois armazena as justificativas para as decisões tomadas ao longo do fluxo de trabalho.
 - **Vínculo com Subprocesso**: Todas as análises estão intrinsecamente ligadas a um `Subprocesso`, que fornece o contexto para a avaliação.

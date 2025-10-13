@@ -12,27 +12,27 @@ import java.util.Map;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiError {
+public class ErroApi {
 
     private int status;
     private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private final LocalDateTime timestamp;
-    private List<ApiSubError> subErrors;
+    private List<ErroSubApi> subErrors;
     @Setter
     private Map<String, ?> details;
 
-    private ApiError() {
+    private ErroApi() {
         this.timestamp = LocalDateTime.now();
     }
 
-    public ApiError(HttpStatus status, String message) {
+    public ErroApi(HttpStatus status, String message) {
         this();
         this.status = status.value();
         this.message = message;
     }
 
-    public ApiError(HttpStatus status, String message, List<ApiSubError> subErrors) {
+    public ErroApi(HttpStatus status, String message, List<ErroSubApi> subErrors) {
         this(status, message);
         this.subErrors = subErrors;
     }

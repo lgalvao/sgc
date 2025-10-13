@@ -8,28 +8,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockGestor;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.SituacaoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.Mapa;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.sgrh.UsuarioRepo;
-import sgc.atividade.modelo.Atividade;
-import sgc.conhecimento.modelo.Conhecimento;
 
 import java.time.LocalDate;
 
@@ -55,13 +57,20 @@ class CDU11IntegrationTest {
     private ObjectMapper objectMapper;
 
     // Repositories
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     // Test data
     private Unidade unidade;
@@ -106,99 +115,93 @@ class CDU11IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockUser(username = "chefe_ut", roles = {"CHEFE"})
+        @WithMockChefe("chefe_ut")
         @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subprocessoId", is(subprocesso.getCodigo().intValue())))
-                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")))
-                .andExpect(jsonPath("$.atividades", hasSize(2)))
-                // Valida a primeira atividade e seu conhecimento
-                .andExpect(jsonPath("$.atividades[0].descricao", is("Analisar documentação")))
-                .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(1)))
-                .andExpect(jsonPath("$.atividades[0].conhecimentos[0].descricao", is("Interpretação de textos técnicos")))
-                // Valida a segunda atividade e seus conhecimentos
-                .andExpect(jsonPath("$.atividades[1].descricao", is("Elaborar relatórios")))
-                .andExpect(jsonPath("$.atividades[1].conhecimentos", hasSize(2)))
-                .andExpect(jsonPath("$.atividades[1].conhecimentos[*].descricao",
-                    containsInAnyOrder("Escrita clara e concisa", "Uso de planilhas")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.subprocessoId", is(subprocesso.getCodigo().intValue())))
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")))
+                    .andExpect(jsonPath("$.atividades", hasSize(2)))
+                    // Valida a primeira atividade e seu conhecimento
+                    .andExpect(jsonPath("$.atividades[0].descricao", is("Analisar documentação")))
+                    .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(1)))
+                    .andExpect(jsonPath("$.atividades[0].conhecimentos[0].descricao", is("Interpretação de textos técnicos")))
+                    // Valida a segunda atividade e seus conhecimentos
+                    .andExpect(jsonPath("$.atividades[1].descricao", is("Elaborar relatórios")))
+                    .andExpect(jsonPath("$.atividades[1].conhecimentos", hasSize(2)))
+                    .andExpect(jsonPath("$.atividades[1].conhecimentos[*].descricao",
+                            containsInAnyOrder("Escrita clara e concisa", "Uso de planilhas")));
         }
 
         @Test
-        @WithMockUser(username = "admin", roles = {ADMIN_ROLE})
+        @WithMockAdmin
         @DisplayName("Deve permitir que ADMIN visualize o cadastro de qualquer unidade")
         void devePermitirAdminVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
 
         @Test
-        @WithMockUser(username = "gestor", roles = {"GESTOR"})
+        @WithMockGestor
         @DisplayName("Deve permitir que GESTOR visualize o cadastro de qualquer unidade")
         void devePermitirGestorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
 
         @Test
-        @WithMockUser(username = "servidor", roles = {"SERVIDOR"})
         @DisplayName("Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade")
         void devePermitirServidorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
         }
     }
 
     @Nested
     @DisplayName("Testes de Casos de Borda e Falhas")
     class CasosDeBorda {
-
         @Test
-        @WithMockUser(roles = ADMIN_ROLE)
+        @WithMockAdmin
         @DisplayName("Deve retornar 404 Not Found para um subprocesso inexistente")
         void deveRetornarNotFound_QuandoSubprocessoNaoExiste() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, 9999L))
-                .andExpect(status().isNotFound());
+                    .andExpect(status().isNotFound());
         }
 
         @Test
-        @WithMockUser(roles = ADMIN_ROLE)
+        @WithMockAdmin
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
-            // Arrange
             Subprocesso subprocessoSemAtividades = new Subprocesso(processo, unidade, new Mapa(), SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             mapaRepo.save(subprocessoSemAtividades.getMapa());
             subprocessoRepo.save(subprocessoSemAtividades);
 
-            // Act & Assert
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subprocessoId", is(subprocessoSemAtividades.getCodigo().intValue())))
-                .andExpect(jsonPath("$.atividades", hasSize(0)));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.subprocessoId", is(subprocessoSemAtividades.getCodigo().intValue())))
+                    .andExpect(jsonPath("$.atividades", hasSize(0)));
         }
 
         @Test
-        @WithMockUser(roles = ADMIN_ROLE)
+        @WithMockAdmin
         @DisplayName("Deve retornar uma atividade com a lista de conhecimentos vazia")
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
-            // Arrange
             Mapa mapaNovo = mapaRepo.save(new Mapa());
             Subprocesso subprocessoAtividadeSemConhecimento = new Subprocesso(processo, unidade, mapaNovo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite());
             subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
             Atividade atividadeSemConhecimento = new Atividade(mapaNovo, "Atividade sem conhecimento");
             atividadeRepo.save(atividadeSemConhecimento);
 
-            // Act & Assert
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoAtividadeSemConhecimento.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subprocessoId", is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
-                .andExpect(jsonPath("$.atividades", hasSize(1)))
-                .andExpect(jsonPath("$.atividades[0].descricao", is("Atividade sem conhecimento")))
-                .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(0)));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.subprocessoId", is(subprocessoAtividadeSemConhecimento.getCodigo().intValue())))
+                    .andExpect(jsonPath("$.atividades", hasSize(1)))
+                    .andExpect(jsonPath("$.atividades[0].descricao", is("Atividade sem conhecimento")))
+                    .andExpect(jsonPath("$.atividades[0].conhecimentos", hasSize(0)));
         }
     }
 }

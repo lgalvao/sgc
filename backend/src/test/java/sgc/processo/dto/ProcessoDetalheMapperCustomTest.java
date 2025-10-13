@@ -7,9 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 
@@ -25,11 +25,11 @@ class ProcessoDetalheMapperCustomTest {
     @Mock
     private ProcessoDetalheMapperInterface processoDetalheMapperInterface;
 
-    private ProcessoDetalheMapperCustomizado customMapper;
+    private ProcessoDetalheMapperCustom customMapper;
 
     @BeforeEach
     void setUp() {
-        customMapper = new ProcessoDetalheMapperCustomizado(processoDetalheMapperInterface);
+        customMapper = new ProcessoDetalheMapperCustom(processoDetalheMapperInterface);
     }
 
     @Test

@@ -12,25 +12,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.AnaliseValidacao;
-import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.notificacao.NotificacaoServico;
+import sgc.notificacao.NotificacaoService;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -38,7 +39,6 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -65,17 +65,25 @@ public class CDU20IntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
-    @Autowired private MovimentacaoRepo movimentacaoRepo;
-    @Autowired private AnaliseValidacaoRepo analiseValidacaoRepo;
-    @Autowired private AlertaRepo alertaRepo;
-    @Autowired private EntityManager entityManager;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private AnaliseRepo analiseRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private EntityManager entityManager;
 
     @MockitoBean
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     private Unidade unidadeSubordinada;
     private Unidade unidadeGestor;
@@ -160,10 +168,10 @@ public class CDU20IntegrationTest {
 
             // Act
             mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
 
             entityManager.flush();
             entityManager.clear();
@@ -175,9 +183,9 @@ public class CDU20IntegrationTest {
             assertThat(spAtualizado.getDataFimEtapa2()).isNull();
 
             // 2. Análise de Validação
-            List<AnaliseValidacao> analises = analiseValidacaoRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
+            List<Analise> analises = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseValidacao analise = analises.getFirst();
+            Analise analise = analises.getFirst();
             assertThat(analise.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
             assertThat(analise.getObservacoes()).isEqualTo(justificativa);
             assertThat(analise.getUnidadeSigla()).isEqualTo(unidadeGestor.getSigla());
@@ -195,7 +203,7 @@ public class CDU20IntegrationTest {
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeSubordinada.getSigla());
             assertThat(alerta.getDescricao()).contains("devolvido para ajustes");
 
-            verify(notificacaoServico).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
+            verify(notificacaoService).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
         }
     }
 
@@ -209,8 +217,8 @@ public class CDU20IntegrationTest {
         void gestorDeveAceitarValidacao() throws Exception {
             // Act
             mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
-                    .with(csrf()))
-                .andExpect(status().isOk());
+                            .with(csrf()))
+                    .andExpect(status().isOk());
 
             entityManager.flush();
             entityManager.clear();
@@ -221,9 +229,9 @@ public class CDU20IntegrationTest {
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
 
             // 2. Análise de Validação
-            List<AnaliseValidacao> analises = analiseValidacaoRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
+            List<Analise> analises = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseValidacao analise = analises.getFirst();
+            Analise analise = analises.getFirst();
             assertThat(analise.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(analise.getUnidadeSigla()).isEqualTo(unidadeGestor.getSigla());
 
@@ -240,7 +248,7 @@ public class CDU20IntegrationTest {
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
             assertThat(alerta.getDescricao()).contains("submetida para análise");
 
-            verify(notificacaoServico).enviarEmail(eq(unidadeAdmin.getSigla()), anyString(), anyString());
+            verify(notificacaoService).enviarEmail(eq(unidadeAdmin.getSigla()), anyString(), anyString());
         }
     }
 
@@ -257,8 +265,8 @@ public class CDU20IntegrationTest {
 
             // Act
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
-                    .with(csrf()))
-                .andExpect(status().isOk());
+                            .with(csrf()))
+                    .andExpect(status().isOk());
 
             entityManager.flush();
             entityManager.clear();
@@ -268,7 +276,7 @@ public class CDU20IntegrationTest {
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
 
             // Verificar que não há novas análises ou movimentações para a homologação simples
-            assertThat(analiseValidacaoRepo.count()).isZero();
+            assertThat(analiseRepo.count()).isZero();
 
             // A movimentação inicial, a do arrange e a da ação
             assertThat(movimentacaoRepo.count()).isEqualTo(2);
@@ -279,8 +287,8 @@ public class CDU20IntegrationTest {
         @WithMockGestor
         void gestorNaoPodeHomologar() throws Exception {
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
-                    .with(csrf()))
-                .andExpect(status().isForbidden());
+                            .with(csrf()))
+                    .andExpect(status().isForbidden());
         }
     }
 }

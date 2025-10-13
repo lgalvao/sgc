@@ -4,30 +4,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoModeloEmailService;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.ProcessoService;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
-import sgc.processo.dto.ProcessoConversor;
+import sgc.processo.dto.ProcessoDetalheMapperCustom;
+import sgc.processo.dto.ProcessoMapper;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-
-import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,7 +42,7 @@ public class ProcessoServiceDetalhesTest {
     private ProcessoRepo processoRepo;
     private UnidadeProcessoRepo unidadeProcessoRepo;
     private SubprocessoRepo subprocessoRepo;
-    private ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado;
+    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
     @BeforeEach
     public void setup() {
@@ -60,11 +55,11 @@ public class ProcessoServiceDetalhesTest {
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         ApplicationEventPublisher publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
+        NotificacaoService notificacaoService = mock(NotificacaoService.class);
         NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
-        ProcessoConversor processoConversor = mock(ProcessoConversor.class);
-        processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
+        ProcessoMapper processoMapper = mock(ProcessoMapper.class);
+        processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
 
         new ProcessoService(
                 processoRepo,
@@ -76,11 +71,11 @@ public class ProcessoServiceDetalhesTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoServico,
+                notificacaoService,
                 notificacaoModeloEmailService,
                 sgrhService,
-                processoConversor,
-                processoDetalheMapperCustomizado);
+                processoMapper,
+                processoDetalheMapperCustom);
     }
 
     @Test
@@ -145,7 +140,7 @@ public class ProcessoServiceDetalhesTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
-        Mockito.lenient().when(processoDetalheMapperCustomizado.toDetailDTO(eq(p), anyList(), anyList()))
+        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p), anyList(), anyList()))
                 .thenReturn(processoDetalheDTO);
 
         // This test needs to be updated to mock the security context

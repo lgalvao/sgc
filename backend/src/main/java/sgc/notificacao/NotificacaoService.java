@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 @Primary
 @RequiredArgsConstructor
 @Slf4j
-public class NotificacaoServicoImpl implements NotificacaoServico {
+public class NotificacaoService {
     private final JavaMailSender enviadorDeEmail;
     private final NotificacaoRepo repositorioNotificacao;
 
@@ -42,7 +42,6 @@ public class NotificacaoServicoImpl implements NotificacaoServico {
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
-    @Override
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpo, false));
@@ -149,9 +148,5 @@ public class NotificacaoServicoImpl implements NotificacaoServico {
             return false;
         }
         return PADRAO_EMAIL.matcher(email.trim()).matches();
-    }
-
-    public String getConfiguracao() {
-        return String.format("Remetente: %s <%s>, Prefixo: %s", nomeRemetente, remetente, prefixoAssunto);
     }
 }

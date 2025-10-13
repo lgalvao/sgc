@@ -15,7 +15,6 @@ import sgc.sgrh.Usuario;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Unidade extends EntidadeBase {
-
     public Unidade(String nome, String sigla) {
         super();
         this.nome = nome;

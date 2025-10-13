@@ -15,10 +15,10 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.mapa.modelo.Mapa;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.mapa.modelo.Mapa;
 
 import java.util.Collections;
 import java.util.List;

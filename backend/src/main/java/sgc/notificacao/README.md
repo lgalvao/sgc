@@ -68,14 +68,13 @@ Na maioria dos casos, o envio de notificações é automático e baseado em even
 **Exemplo:**
 ```java
 @Autowired
-private NotificacaoServico notificacaoServico;
+private NotificacaoService notificacaoService;
 
 public void notificarManualmente(String email, String mensagem) {
-    notificacaoServico.enviarEmail(email, "Aviso Manual do SGC", mensagem);
+    notificacaoService.enviarEmail(email, "Aviso Manual do SGC", mensagem);
 }
 ```
 
 ## Notas Importantes
 - **Desacoplamento**: A arquitetura orientada a eventos desacopla fortemente o módulo de notificação dos módulos de negócio. O `ProcessoServico` não precisa saber como os e-mails são enviados; ele apenas anuncia que algo aconteceu.
-- **Interface/Implementação**: Este módulo ainda utiliza o padrão de separação de interface e implementação (`NotificacaoServico` e `NotificacaoServicoImpl`), um padrão que foi removido de outros pacotes.
 - **Robustez**: O tratamento de erros, a persistência e o envio assíncrono tornam o sistema de notificações resiliente a falhas na infraestrutura de e-mail.

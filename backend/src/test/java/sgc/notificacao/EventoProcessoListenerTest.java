@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaService;
-import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -48,7 +48,7 @@ class EventoProcessoListenerTest {
     private AlertaService alertaService;
 
     @Mock
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     @Mock
     private NotificacaoModeloEmailService notificacaoModeloEmailService;
@@ -114,12 +114,12 @@ class EventoProcessoListenerTest {
 
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(processo, List.of(subprocessoOperacional.getUnidade().getCodigo()), List.of(subprocessoOperacional));
 
-        verify(notificacaoServico, times(1)).enviarEmailHtml(
+        verify(notificacaoService, times(1)).enviarEmailHtml(
                 eq(TITULAR_EMAIL),
                 anyString(),
                 contains("Email Operacional")
         );
-        verify(notificacaoServico, times(1)).enviarEmailHtml(
+        verify(notificacaoService, times(1)).enviarEmailHtml(
                 eq(SUBSTITUTO_EMAIL),
                 anyString(),
                 contains("Email Operacional")
@@ -134,7 +134,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -146,7 +146,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(alertaService, never()).criarAlertasProcessoIniciado(any(), anyList(), anyList());
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -169,7 +169,7 @@ class EventoProcessoListenerTest {
         verify(alertaService, times(1)).criarAlertasProcessoIniciado(any(), anyList(), anyList());
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> corpoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoServico, times(1)).enviarEmailHtml(
+        verify(notificacaoService, times(1)).enviarEmailHtml(
                 eq(TITULAR_EMAIL),
                 assuntoCaptor.capture(),
                 corpoCaptor.capture()
@@ -177,7 +177,7 @@ class EventoProcessoListenerTest {
 
         assertEquals("Processo Iniciado em Unidades Subordinadas - Teste de Processo", assuntoCaptor.getValue());
         assertTrue(corpoCaptor.getValue().contains("Email Intermediaria"));
-        verify(notificacaoServico, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
+        verify(notificacaoService, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
     }
 
     @Test
@@ -198,7 +198,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoServico).enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), contains("Email Interoperacional"));
+        verify(notificacaoService).enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), contains("Email Interoperacional"));
         assertEquals("Processo Iniciado - Teste de Processo", assuntoCaptor.getValue());
     }
 
@@ -212,7 +212,7 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -225,7 +225,7 @@ class EventoProcessoListenerTest {
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         verify(sgrhService, never()).buscarUnidadePorCodigo(any());
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -239,7 +239,7 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 
     @Test
@@ -257,6 +257,6 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(notificacaoServico, never()).enviarEmailHtml(any(), any(), any());
+        verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 }

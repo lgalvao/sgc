@@ -9,7 +9,6 @@ import sgc.subprocesso.modelo.Movimentacao;
  */
 @Mapper(componentModel = "spring")
 public interface MovimentacaoMapper {
-
     @Mapping(source = "unidadeOrigem.codigo", target = "unidadeOrigemCodigo")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigemSigla")
     @Mapping(source = "unidadeOrigem.nome", target = "unidadeOrigemNome")
@@ -17,5 +16,4 @@ public interface MovimentacaoMapper {
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestinoSigla")
     @Mapping(source = "unidadeDestino.nome", target = "unidadeDestinoNome")
     MovimentacaoDto toDTO(Movimentacao movimentacao);
-
 }

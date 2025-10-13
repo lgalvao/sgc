@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,18 +21,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.notificacao.NotificacaoServico;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -46,6 +43,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -57,17 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@DisplayName("CDU-04: Iniciar processo de mapeamento")
+@Import(TestSecurityConfig.class)
 class CDU04IntegrationTest {
-    @TestConfiguration
-    @SuppressWarnings("PMD.TestClassWithoutTestCases")
-    static class TestSecurityConfig {
-        @Bean
-        SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-            http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                    .csrf(AbstractHttpConfigurer::disable);
-            return http.build();
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -100,7 +91,7 @@ class CDU04IntegrationTest {
     private SgrhService sgrhService;
 
     @MockitoBean
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     private Processo processo;
     private Unidade unidadeIntermediaria, unidadeOperacional, unidadeInteroperacional;
@@ -136,7 +127,7 @@ class CDU04IntegrationTest {
                         "12345",
                         "Analista")));
 
-        doNothing().when(notificacaoServico).enviarEmailHtml(anyString(), anyString(), anyString());
+        doNothing().when(notificacaoService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária",
                 "UINT",
@@ -170,7 +161,7 @@ class CDU04IntegrationTest {
 
     @Test
     @DisplayName("CDU-04: Deve iniciar processo, criar subprocessos, alertas e movimentações corretamente")
-    @WithMockUser(roles = "ADMIN")
+    @WithMockAdmin
     void iniciarProcesso_ComUnidadesDiversas_DeveRealizarTodasAsAcoesCorretamente() throws Exception {
         List<Long> codigosUnidades = List.of(
                 unidadeIntermediaria.getCodigo(),

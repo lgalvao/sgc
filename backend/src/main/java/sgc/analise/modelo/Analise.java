@@ -11,12 +11,12 @@ import sgc.subprocesso.modelo.Subprocesso;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ANALISE_CADASTRO", schema = "sgc")
+@Table(name = "ANALISE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnaliseCadastro extends EntidadeBase {
+public class Analise extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
     private Subprocesso subprocesso;
@@ -24,19 +24,23 @@ public class AnaliseCadastro extends EntidadeBase {
     @Column(name = "data_hora")
     private LocalDateTime dataHora;
 
-    @Column(name = "analista_usuario_titulo", length = 50)
-    private String analistaUsuarioTitulo;
-
-    @Column(name = "unidade_sigla", length = 20)
-    private String unidadeSigla;
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acao", length = 20)
     private TipoAcaoAnalise acao;
 
+    @Column(name = "unidade_sigla", length = 30)
+    private String unidadeSigla;
+
+    @Column(name = "analista_usuario_titulo", length = 50)
+    private String analistaUsuarioTitulo;
+
     @Column(name = "motivo", length = 500)
     private String motivo;
 
-    @Column(name = "observacoes", length = 500)
-    private String observacoes;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", length = 20)
+    private TipoAnalise tipo;
 }

@@ -11,12 +11,7 @@ import org.springframework.data.domain.Pageable;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
-
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.modelo.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

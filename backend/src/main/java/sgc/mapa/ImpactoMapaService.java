@@ -12,15 +12,15 @@ import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.sgrh.Usuario;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.modelo.TipoImpactoAtividade;
-import sgc.mapa.modelo.TipoImpactoCompetencia;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
+import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.modelo.TipoImpactoCompetencia;
+import sgc.sgrh.Usuario;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
@@ -91,8 +91,10 @@ public class ImpactoMapaService {
 
         List<AtividadeImpactadaDto> inseridas = detectarAtividadesInseridas(atividadesAtuais,
                 atividadesVigentes);
+
         List<AtividadeImpactadaDto> removidas = detectarAtividadesRemovidas(atividadesAtuais,
                 atividadesVigentes, mapaVigente);
+
         List<AtividadeImpactadaDto> alteradas = detectarAtividadesAlteradas(atividadesAtuais,
                 atividadesVigentes, mapaVigente);
 
@@ -124,6 +126,7 @@ public class ImpactoMapaService {
         for (Competencia comp : competencias) {
             List<CompetenciaAtividade> vinculos = repositorioCompetenciaAtividade
                     .findByCompetenciaCodigo(comp.getCodigo());
+
             for (CompetenciaAtividade vinculo : vinculos) {
                 idsAtividades.add(vinculo.getId().getAtividadeCodigo());
             }
@@ -189,6 +192,7 @@ public class ImpactoMapaService {
             Mapa mapaVigente,
             List<AtividadeImpactadaDto> removidas,
             List<AtividadeImpactadaDto> alteradas) {
+
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
         for (AtividadeImpactadaDto atividade : removidas) {
@@ -252,8 +256,7 @@ public class ImpactoMapaService {
                     Competencia comp = repositorioCompetencia
                             .findById(ca.getId().getCompetenciaCodigo())
                             .orElse(null);
-                    if (comp != null && comp.getMapa().getCodigo()
-                            .equals(mapaVigente.getCodigo())) {
+                    if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                         return comp.getDescricao();
                     }
                     return null;
@@ -265,6 +268,7 @@ public class ImpactoMapaService {
     private String determinarTipoImpacto(Set<String> atividadesAfetadas) {
         boolean temRemovida = atividadesAfetadas.stream()
                 .anyMatch(desc -> desc.contains("removida"));
+
         boolean temAlterada = atividadesAfetadas.stream()
                 .anyMatch(desc -> desc.contains("alterada"));
 

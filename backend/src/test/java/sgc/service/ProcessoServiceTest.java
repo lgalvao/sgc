@@ -7,24 +7,24 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoServico;
 import sgc.notificacao.NotificacaoModeloEmailService;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.ProcessoService;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheMapperCustomizado;
+import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoConversor;
+import sgc.processo.dto.ProcessoMapper;
 import sgc.processo.eventos.ProcessoCriadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-
-import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,7 +33,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import sgc.processo.SituacaoProcesso;
 
 /**
  * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
@@ -42,7 +41,7 @@ public class ProcessoServiceTest {
     private ProcessoRepo processoRepo;
     private UnidadeRepo unidadeRepo;
     private ApplicationEventPublisher publicadorDeEventos;
-    private ProcessoConversor processoConversor;
+    private ProcessoMapper processoMapper;
 
     private ProcessoService processoService;
 
@@ -57,11 +56,11 @@ public class ProcessoServiceTest {
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoServico notificacaoServico = mock(NotificacaoServico.class);
+        NotificacaoService notificacaoService = mock(NotificacaoService.class);
         NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
         SgrhService sgrhService = mock(SgrhService.class);
-        processoConversor = mock(ProcessoConversor.class);
-        ProcessoDetalheMapperCustomizado processoDetalheMapperCustomizado = mock(ProcessoDetalheMapperCustomizado.class);
+        processoMapper = mock(ProcessoMapper.class);
+        ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
 
         processoService = new ProcessoService(
                 processoRepo,
@@ -73,11 +72,11 @@ public class ProcessoServiceTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoServico,
+                notificacaoService,
                 notificacaoModeloEmailService,
                 sgrhService,
-                processoConversor,
-                processoDetalheMapperCustomizado
+                processoMapper,
+                processoDetalheMapperCustom
         );
     }
 
@@ -103,7 +102,7 @@ public class ProcessoServiceTest {
             return p;
         });
 
-        when(processoConversor.toDTO(any(Processo.class))).thenAnswer(invocation -> {
+        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);
             return ProcessoDto.builder()
                 .codigo(p.getCodigo())

@@ -1,4 +1,4 @@
-package sgc.alerta;
+package sgc.alerta.dto;
 
 import java.time.LocalDateTime;
 

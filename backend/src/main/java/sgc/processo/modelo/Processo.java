@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.processo.SituacaoProcesso;
 import sgc.comum.modelo.EntidadeBase;
+import sgc.processo.SituacaoProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

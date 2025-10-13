@@ -3,15 +3,15 @@ package sgc.atividade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import sgc.sgrh.UsuarioRepo;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.net.URI;
 import java.util.List;

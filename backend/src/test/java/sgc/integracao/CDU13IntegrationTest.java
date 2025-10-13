@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,23 +14,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.analise.modelo.AnaliseCadastro;
-import sgc.analise.modelo.AnaliseCadastroRepo;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
+import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.dto.AceitarCadastroReq;
 import sgc.subprocesso.dto.DevolverCadastroReq;
-import com.fasterxml.jackson.core.type.TypeReference;
-import sgc.analise.dto.AnaliseCadastroDto;
 import sgc.subprocesso.dto.HomologarCadastroReq;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -76,7 +75,7 @@ public class CDU13IntegrationTest {
     private MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
-    private AnaliseCadastroRepo analiseCadastroRepo;
+    private AnaliseRepo analiseRepo;
 
     @Autowired
     private EntityManager entityManager;
@@ -166,10 +165,9 @@ public class CDU13IntegrationTest {
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             assertThat(subprocessoAtualizado.getDataFimEtapa1()).isNull();
 
-            // 2. Verificar se a análise foi registrada corretamente
-            List<AnaliseCadastro> analises = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseCadastro analiseRegistrada = analises.getFirst();
+            Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
             assertThat(analiseRegistrada.getMotivo()).isEqualTo(motivoDevolucao);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
@@ -209,9 +207,9 @@ public class CDU13IntegrationTest {
             entityManager.clear();
 
             // 1. Verificar se a análise foi registrada corretamente
-            List<AnaliseCadastro> analises = analiseCadastroRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
-            AnaliseCadastro analiseRegistrada = analises.getFirst();
+            Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("gestor_unidade"); // From @WithMockGestor
@@ -301,19 +299,19 @@ public class CDU13IntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             // Then
-            List<AnaliseCadastroDto> historico = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+            List<sgc.analise.dto.AnaliseHistoricoDto> historico = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
 
             assertThat(historico).hasSize(2);
 
             // First item in list is the most recent (ACEITE)
-            AnaliseCadastroDto aceite = historico.getFirst();
-            assertThat(aceite.resultado()).isEqualTo(TipoAcaoAnalise.ACEITE.name());
+            sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
+            assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(aceite.observacoes()).isEqualTo(obsAceite);
             assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // Second item is the oldest (DEVOLUCAO)
-            AnaliseCadastroDto devolucao = historico.get(1);
-            assertThat(devolucao.resultado()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO.name());
+            sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
+            assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
             assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
             assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }

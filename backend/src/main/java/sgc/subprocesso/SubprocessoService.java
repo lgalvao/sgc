@@ -7,12 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.dto.AnaliseCadastroDto;
-import sgc.analise.modelo.AnaliseCadastro;
-import sgc.analise.modelo.AnaliseCadastroRepo;
+import sgc.analise.AnaliseService;
+import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.analise.modelo.AnaliseValidacao;
-import sgc.analise.modelo.AnaliseValidacaoRepo;
+import sgc.analise.modelo.TipoAnalise;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
@@ -23,16 +21,15 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.Usuario;
-import sgc.mapa.ImpactoMapaService;
 import sgc.conhecimento.dto.ConhecimentoDto;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.notificacao.NotificacaoServico;
-import sgc.notificacao.modelo.NotificacaoRepo;
+import sgc.mapa.ImpactoMapaService;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.eventos.SubprocessoDisponibilizadoEvento;
 import sgc.processo.eventos.SubprocessoRevisaoDisponibilizadaEvento;
+import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -57,12 +54,9 @@ public class SubprocessoService {
     private final MovimentacaoRepo repositorioMovimentacao;
     private final AtividadeRepo atividadeRepo;
     private final ConhecimentoRepo repositorioConhecimento;
-    private final AnaliseCadastroRepo repositorioAnaliseCadastro;
-    private final AnaliseValidacaoRepo repositorioAnaliseValidacao;
-    private final NotificacaoRepo repositorioNotificacao;
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    private final NotificacaoServico notificacaoServico;
+    private final NotificacaoService notificacaoService;
     private final ApplicationEventPublisher publicadorDeEventos;
     private final AlertaRepo repositorioAlerta;
     private final UnidadeRepo unidadeRepo;
@@ -71,6 +65,7 @@ public class SubprocessoService {
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
     private final ImpactoMapaService impactoMapaService;
+    private final AnaliseService analiseService;
 
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long id, String perfil, Long unidadeUsuario) {
@@ -137,13 +132,13 @@ public class SubprocessoService {
         }
 
         return new SubprocessoDetalheDto(
-            unidadeDto,
-            responsavelDto,
-            sp.getSituacao().name(),
-            localizacaoAtual,
-            prazoEtapaAtual,
-            movimentacoesDto,
-            elementos
+                unidadeDto,
+                responsavelDto,
+                sp.getSituacao().name(),
+                localizacaoAtual,
+                prazoEtapaAtual,
+                movimentacoesDto,
+                elementos
         );
     }
 
@@ -231,16 +226,13 @@ public class SubprocessoService {
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização do cadastro de atividades"));
 
-        // This would be implemented if there was a historic of analysis
-        // repositorioAnaliseCadastro.deleteBySubprocessoCodigo(sp.getCodigo());
-
         // Notification
-        if (notificacaoServico != null && unidadeSuperior != null && sp.getUnidade() != null) {
+        if (notificacaoService != null && unidadeSuperior != null && sp.getUnidade() != null) {
             String assunto = "SGC: Cadastro de atividades e conhecimentos disponibilizado: " + sp.getUnidade().getSigla();
             String corpo = "Prezado(a) responsável pela " + unidadeSuperior.getSigla() + ",\n\n" +
-                         "A unidade " + sp.getUnidade().getSigla() + " disponibilizou o cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n\n" +
-                         "A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências.";
-            notificacaoServico.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
+                    "A unidade " + sp.getUnidade().getSigla() + " disponibilizou o cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n\n" +
+                    "A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências.";
+            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
         }
 
         // Alert
@@ -286,15 +278,15 @@ public class SubprocessoService {
         Unidade unidadeSuperior = sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização da revisão do cadastro de atividades"));
-        repositorioAnaliseCadastro.deleteBySubprocessoCodigo(sp.getCodigo());
+        analiseService.removerPorSubprocesso(sp.getCodigo());
 
         // Notification
-        if (notificacaoServico != null && unidadeSuperior != null && sp.getUnidade() != null) {
+        if (notificacaoService != null && unidadeSuperior != null && sp.getUnidade() != null) {
             String assunto = "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: " + sp.getUnidade().getSigla();
             String corpo = "Prezado(a) responsável pela " + unidadeSuperior.getSigla() + ",\n" +
-                         "A unidade " + sp.getUnidade().getSigla() + " concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n" +
-                         "A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).";
-            notificacaoServico.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
+                    "A unidade " + sp.getUnidade().getSigla() + " concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo " + sp.getProcesso().getDescricao() + ".\n" +
+                    "A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).";
+            notificacaoService.enviarEmail(unidadeSuperior.getSigla(), assunto, corpo);
         }
 
         // Alert
@@ -332,7 +324,7 @@ public class SubprocessoService {
 
         // Limpeza de Dados Históricos
         sp.getMapa().setSugestoes(null); // Limpa sugestões anteriores
-        repositorioAnaliseValidacao.deleteBySubprocesso_Codigo(idSubprocesso);
+        analiseService.removerPorSubprocesso(idSubprocesso);
 
         // Persistência de Dados
         if (observacoes != null && !observacoes.isBlank()) {
@@ -363,8 +355,7 @@ public class SubprocessoService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Apresentação de sugestões para o mapa de competências"));
-        repositorioAnaliseValidacao.deleteBySubprocesso_Codigo(sp.getCodigo());
+        analiseService.removerPorSubprocesso(sp.getCodigo());
         notificarSugestoes(sp);
 
         return subprocessoMapper.toDTO(sp);
@@ -380,7 +371,7 @@ public class SubprocessoService {
         repositorioSubprocesso.save(sp);
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Validação do mapa de competências"));
-        repositorioAnaliseValidacao.deleteBySubprocesso_Codigo(sp.getCodigo());
+        analiseService.removerPorSubprocesso(sp.getCodigo());
         notificarValidacao(sp);
 
         return subprocessoMapper.toDTO(sp);
@@ -397,26 +388,14 @@ public class SubprocessoService {
         return new SugestoesDto(sugestoes, sugestoesApresentadas, nomeUnidade);
     }
 
-    @Transactional(readOnly = true)
-    public List<AnaliseValidacaoDto> obterHistoricoValidacao(Long idSubprocesso) {
-        return repositorioAnaliseValidacao.findBySubprocesso_CodigoOrderByDataHoraDesc(idSubprocesso)
-                .stream()
-                .map(this::mapearParaAnaliseValidacaoDTO)
-                .collect(Collectors.toList());
-    }
+
 
     @Transactional
     public SubprocessoDto devolverValidacao(Long idSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        AnaliseValidacao analise = new AnaliseValidacao();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setObservacoes(justificativa);
-        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO);
-        analise.setUnidadeSigla(usuario.getUnidade().getSigla());
-        repositorioAnaliseValidacao.save(analise);
+        analiseService.criarAnalise(idSubprocesso, justificativa, TipoAnalise.VALIDACAO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), justificativa);
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
@@ -436,22 +415,20 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        AnaliseValidacao analise = new AnaliseValidacao();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setObservacoes("Aceite da validação");
-        analise.setAcao(TipoAcaoAnalise.ACEITE);
-        analise.setUnidadeSigla(usuario.getUnidade().getSigla());
-        repositorioAnaliseValidacao.save(analise);
+        analiseService.criarAnalise(idSubprocesso, "Aceite da validação", TipoAnalise.VALIDACAO, TipoAcaoAnalise.ACEITE, usuario.getUnidade().getSigla(), usuario.getTitulo(), null);
 
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
 
         if (proximaUnidade == null) {
             sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            sp.setDataFimEtapa3(java.time.LocalDateTime.now());
             repositorioSubprocesso.save(sp);
         } else {
             repositorioMovimentacao.save(new Movimentacao(sp, unidadeSuperior, proximaUnidade, "Mapa de competências validado"));
+            sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+            sp.setDataFimEtapa3(java.time.LocalDateTime.now());
+            repositorioSubprocesso.save(sp);
             notificarAceite(sp);
         }
 
@@ -481,8 +458,8 @@ public class SubprocessoService {
         Long idMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
 
-        String justificativa = repositorioAnaliseValidacao.findFirstBySubprocesso_CodigoOrderByDataHoraDesc(idSubprocesso)
-                .map(AnaliseValidacao::getObservacoes)
+        String justificativa = analiseService.listarPorSubprocesso(idSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
+                .map(Analise::getObservacoes)
                 .orElse(null);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(idMapa);
@@ -511,9 +488,9 @@ public class SubprocessoService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
-            sp.getSituacao() != SituacaoSubprocesso.MAPA_DISPONIBILIZADO &&
-            sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
-             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacao());
+                sp.getSituacao() != SituacaoSubprocesso.MAPA_DISPONIBILIZADO &&
+                sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
+            throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacao());
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
@@ -578,24 +555,24 @@ public class SubprocessoService {
         // E-mail para a unidade do subprocesso (Item 10.11 do CDU)
         String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoUnidade = String.format(
-            "Prezado(a) Chefe da unidade %s,%n%n" +
-            "O mapa de competências da sua unidade, referente ao processo '%s', foi disponibilizado para validação.%n" +
-            "O prazo para conclusão desta etapa é %s.%n%n" +
-            "Acesse o SGC para realizar a validação.",
-            siglaUnidade, nomeProcesso, dataLimite);
-        notificacaoServico.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
+                "Prezado(a) Chefe da unidade %s,%n%n" +
+                        "O mapa de competências da sua unidade, referente ao processo '%s', foi disponibilizado para validação.%n" +
+                        "O prazo para conclusão desta etapa é %s.%n%n" +
+                        "Acesse o SGC para realizar a validação.",
+                siglaUnidade, nomeProcesso, dataLimite);
+        notificacaoService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
         // E-mail para as unidades superiores (Item 10.12 do CDU)
         String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoSuperior = String.format(
-            "Prezado(a) Chefe,%n%n" +
-            "O mapa de competências da unidade %s, referente ao processo '%s', foi disponibilizado para validação.%n" +
-            "O prazo para conclusão desta etapa é %s.%n%n" +
-            "Acompanhe o processo no SGC.",
-            siglaUnidade, nomeProcesso, dataLimite);
+                "Prezado(a) Chefe,%n%n" +
+                        "O mapa de competências da unidade %s, referente ao processo '%s', foi disponibilizado para validação.%n" +
+                        "O prazo para conclusão desta etapa é %s.%n%n" +
+                        "Acompanhe o processo no SGC.",
+                siglaUnidade, nomeProcesso, dataLimite);
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            notificacaoServico.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
+            notificacaoService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
             superior = superior.getUnidadeSuperior();
         }
 
@@ -614,10 +591,10 @@ public class SubprocessoService {
     private void notificarSugestoes(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
-            notificacaoServico.enviarEmail(
-                unidadeSuperior.getSigla(),
-                "SGC: Sugestões apresentadas para o mapa de competências da " + sp.getUnidade().getSigla(),
-                "A unidade " + sp.getUnidade().getSigla() + " apresentou sugestões para o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessas sugestões já pode ser realizada no sistema."
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Sugestões apresentadas para o mapa de competências da " + sp.getUnidade().getSigla(),
+                    "A unidade " + sp.getUnidade().getSigla() + " apresentou sugestões para o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessas sugestões já pode ser realizada no sistema."
             );
 
             Alerta alerta = new Alerta();
@@ -633,10 +610,10 @@ public class SubprocessoService {
     private void notificarValidacao(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
-            notificacaoServico.enviarEmail(
-                unidadeSuperior.getSigla(),
-                "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
-                "A unidade " + sp.getUnidade().getSigla() + " validou o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessa validação já pode ser realizada no sistema."
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                    "A unidade " + sp.getUnidade().getSigla() + " validou o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessa validação já pode ser realizada no sistema."
             );
 
             Alerta alerta = new Alerta();
@@ -650,10 +627,10 @@ public class SubprocessoService {
     }
 
     private void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
-        notificacaoServico.enviarEmail(
-            unidadeDevolucao.getSigla(),
-            "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
-            "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvida para ajustes. Acompanhe o processo no sistema."
+        notificacaoService.enviarEmail(
+                unidadeDevolucao.getSigla(),
+                "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
+                "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvida para ajustes. Acompanhe o processo no sistema."
         );
 
         Alerta alerta = new Alerta();
@@ -668,10 +645,10 @@ public class SubprocessoService {
     private void notificarAceite(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior();
         if (unidadeSuperior != null) {
-            notificacaoServico.enviarEmail(
-                unidadeSuperior.getSigla(),
-                "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
-                "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi submetida para análise por essa unidade. A análise já pode ser realizada no sistema."
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                    "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi submetida para análise por essa unidade. A análise já pode ser realizada no sistema."
             );
 
             Alerta alerta = new Alerta();
@@ -684,33 +661,13 @@ public class SubprocessoService {
         }
     }
 
-    private AnaliseValidacaoDto mapearParaAnaliseValidacaoDTO(AnaliseValidacao analise) {
-        return new AnaliseValidacaoDto(
-                analise.getCodigo(),
-                analise.getDataHora(),
-                analise.getObservacoes(),
-                analise.getAcao() != null ? analise.getAcao().name() : null,
-                analise.getUnidadeSigla()
-        );
-    }
+
 
     @Transactional
     public SubprocessoDto devolverCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
-
-        // Corrigido para registrar a análise de acordo com a especificação
-        AnaliseCadastro analise = new AnaliseCadastro();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO);
-        analise.setMotivo(motivo);
-        analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
-        if (usuario.getUnidade() != null) {
-            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
-        }
-        repositorioAnaliseCadastro.save(analise);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), motivo);
 
 
         Unidade unidadeDevolucao = sp.getUnidade();
@@ -725,31 +682,13 @@ public class SubprocessoService {
         return subprocessoMapper.toDTO(sp);
     }
 
-    @Transactional(readOnly = true)
-    public List<AnaliseCadastroDto> getHistoricoAnaliseCadastro(Long subprocessoId) {
-        if (!repositorioSubprocesso.existsById(subprocessoId)) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + subprocessoId);
-        }
-        List<AnaliseCadastro> analises = repositorioAnaliseCadastro.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
-        return analises.stream()
-            .map(this::mapearParaAnaliseCadastroDto)
-            .collect(Collectors.toList());
-    }
 
-    private AnaliseCadastroDto mapearParaAnaliseCadastroDto(AnaliseCadastro analise) {
-        return new AnaliseCadastroDto(
-            analise.getDataHora(),
-            analise.getUnidadeSigla(),
-            analise.getAcao() != null ? analise.getAcao().name() : null,
-            analise.getObservacoes()
-        );
-    }
 
     private void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
-        notificacaoServico.enviarEmail(
-            unidadeDevolucao.getSigla(),
-            "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
-            "O cadastro de atividades da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvido para ajustes com o motivo: " + motivo + ". Acompanhe o processo no sistema."
+        notificacaoService.enviarEmail(
+                unidadeDevolucao.getSigla(),
+                "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
+                "O cadastro de atividades da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvido para ajustes com o motivo: " + motivo + ". Acompanhe o processo no sistema."
         );
 
         Alerta alerta = new Alerta();
@@ -764,22 +703,9 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto aceitarCadastro(Long idSubprocesso, String observacoes, String usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (sp.getSituacao() != SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO) {
-            throw new IllegalStateException("Ação de aceite só pode ser executada em cadastros disponibilizados.");
-        }
-
-        AnaliseCadastro analise = new AnaliseCadastro();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao(TipoAcaoAnalise.ACEITE);
-        analise.setAnalistaUsuarioTitulo(usuario);
-        analise.setObservacoes(observacoes);
-        if (sp.getUnidade() != null && sp.getUnidade().getUnidadeSuperior() != null) {
-            analise.setUnidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla());
-        }
-        repositorioAnaliseCadastro.save(analise);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE, sp.getUnidade().getUnidadeSuperior().getSigla(), usuario, null);
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
@@ -793,6 +719,10 @@ public class SubprocessoService {
         // Notificar unidade superior
         notificarAceiteCadastro(sp, unidadeDestino);
 
+        sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
+        sp.setDataFimEtapa2(java.time.LocalDateTime.now());
+        repositorioSubprocesso.save(sp);
+
         return subprocessoMapper.toDTO(sp);
     }
 
@@ -805,14 +735,14 @@ public class SubprocessoService {
         // 1. Enviar E-mail (CDU-13 Item 10.7)
         String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem + " submetido para análise";
         String corpo = String.format(
-            "Prezado(a) responsável pela %s,%n" +
-            "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.%n" +
-            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
-            unidadeDestino.getSigla(),
-            siglaUnidadeOrigem,
-            nomeProcesso
+                "Prezado(a) responsável pela %s,%n" +
+                        "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.%n" +
+                        "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+                unidadeDestino.getSigla(),
+                siglaUnidadeOrigem,
+                nomeProcesso
         );
-        notificacaoServico.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+        notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
 
         // 2. Criar Alerta (CDU-13 Item 10.8)
         Alerta alerta = new Alerta();
@@ -827,14 +757,14 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto homologarCadastro(Long idSubprocesso, String observacoes, String usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em cadastros disponibilizados.");
         }
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-            .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
         // A homologação é uma ação final do ADMIN (SEDOC), a movimentação é registrada na própria unidade.
         repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
@@ -849,23 +779,13 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto devolverRevisaoCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        AnaliseCadastro analise = new AnaliseCadastro();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
-        analise.setMotivo(motivo);
-        analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
-        if (usuario.getUnidade() != null) {
-            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
-        }
-        repositorioAnaliseCadastro.save(analise);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO_REVISAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), motivo);
 
         Unidade unidadeAnalise = usuario.getUnidade();
         Unidade unidadeDestino = sp.getUnidade(); // A devolução é para a unidade do subprocesso
@@ -890,14 +810,14 @@ public class SubprocessoService {
         // CDU-14 Item 10.9: Notificação por e-mail
         String assunto = String.format("SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes", siglaUnidadeSubprocesso);
         String corpo = String.format(
-            "Prezado(a) responsável pela %s,%n" +
-            "O cadastro de atividades e conhecimentos da %s no processo %s foi devolvido para ajustes.%n" +
-            "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
-            unidadeDevolucao.getSigla(),
-            siglaUnidadeSubprocesso,
-            descricaoProcesso
+                "Prezado(a) responsável pela %s,%n" +
+                        "O cadastro de atividades e conhecimentos da %s no processo %s foi devolvido para ajustes.%n" +
+                        "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
+                unidadeDevolucao.getSigla(),
+                siglaUnidadeSubprocesso,
+                descricaoProcesso
         );
-        notificacaoServico.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
+        notificacaoService.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
 
         // CDU-14 Item 10.10: Alerta interno
         Alerta alerta = new Alerta();
@@ -912,22 +832,13 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto aceitarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        AnaliseCadastro analise = new AnaliseCadastro();
-        analise.setSubprocesso(sp);
-        analise.setDataHora(java.time.LocalDateTime.now());
-        analise.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
-        analise.setObservacoes(observacoes);
-        analise.setAnalistaUsuarioTitulo(usuario.getTitulo());
-        if (usuario.getUnidade() != null) {
-            analise.setUnidadeSigla(usuario.getUnidade().getSigla());
-        }
-        repositorioAnaliseCadastro.save(analise);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE_REVISAO, sp.getUnidade().getUnidadeSuperior().getSigla(), usuario.getTitulo(), null);
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
@@ -949,14 +860,14 @@ public class SubprocessoService {
         // CDU-14 Item 11.7: Notificação por e-mail
         String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidadeSubprocesso);
         String corpo = String.format(
-            "Prezado(a) responsável pela %s,%n" +
-            "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
-            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
-            siglaUnidadeSuperior,
-            siglaUnidadeSubprocesso,
-            descricaoProcesso
+                "Prezado(a) responsável pela %s,%n" +
+                        "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
+                        "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+                siglaUnidadeSuperior,
+                siglaUnidadeSubprocesso,
+                descricaoProcesso
         );
-        notificacaoServico.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
+        notificacaoService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
 
         // CDU-14 Item 11.8: Alerta interno
         Alerta alerta = new Alerta();
@@ -971,7 +882,7 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoDto homologarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro disponibilizadas.");
@@ -986,7 +897,7 @@ public class SubprocessoService {
         } else {
             // CDU-14 Item 12.3: Com impactos
             Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+                    .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
             repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
@@ -1001,14 +912,14 @@ public class SubprocessoService {
     @Transactional
     public void importarAtividades(Long idSubprocessoDestino, Long idSubprocessoOrigem) {
         Subprocesso spDestino = repositorioSubprocesso.findById(idSubprocessoDestino)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: " + idSubprocessoDestino));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: " + idSubprocessoDestino));
 
         if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
             throw new IllegalStateException("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
         }
 
         Subprocesso spOrigem = repositorioSubprocesso.findById(idSubprocessoOrigem)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de origem não encontrado: " + idSubprocessoOrigem));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de origem não encontrado: " + idSubprocessoOrigem));
 
         if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
             throw new IllegalStateException("Subprocesso de origem ou destino não possui mapa associado.");
@@ -1020,9 +931,9 @@ public class SubprocessoService {
         }
 
         List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(spDestino.getMapa().getCodigo())
-            .stream()
-            .map(Atividade::getDescricao)
-            .toList();
+                .stream()
+                .map(Atividade::getDescricao)
+                .toList();
 
         for (Atividade atividadeOrigem : atividadesOrigem) {
             if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
@@ -1045,8 +956,8 @@ public class SubprocessoService {
         }
 
         String descricaoMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
-            spOrigem.getCodigo(),
-            spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
+                spOrigem.getCodigo(),
+                spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
 
         repositorioMovimentacao.save(new Movimentacao(spDestino, spDestino.getUnidade(), spDestino.getUnidade(), descricaoMovimentacao));
 

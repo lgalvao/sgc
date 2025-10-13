@@ -10,8 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.analise.modelo.AnaliseCadastro;
-import sgc.analise.modelo.AnaliseValidacao;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.analise.modelo.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import java.time.LocalDateTime;
@@ -54,10 +55,7 @@ class AnaliseControleTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private AnaliseCadastroService analiseCadastroService;
-
-    @MockitoBean
-    private AnaliseValidacaoService analiseValidacaoService;
+    private AnaliseService analiseService;
 
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
@@ -66,19 +64,19 @@ class AnaliseControleTest {
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro com status 200 OK")
         void deveRetornarListaDeAnalisesCadastro() throws Exception {
-            var analise1 = new AnaliseCadastro();
+            var analise1 = new Analise();
             analise1.setCodigo(1L);
             analise1.setObservacoes(OBSERVACAO_1);
             analise1.setDataHora(LocalDateTime.now());
 
-            var analise2 = new AnaliseCadastro();
+            var analise2 = new Analise();
             analise2.setCodigo(2L);
             analise2.setObservacoes(OBSERVACAO_2);
             analise2.setDataHora(LocalDateTime.now());
 
-            List<AnaliseCadastro> analises = Arrays.asList(analise1, analise2);
+            List<Analise> analises = Arrays.asList(analise1, analise2);
 
-            when(analiseCadastroService.listarPorSubprocesso(1L)).thenReturn(analises);
+            when(analiseService.listarPorSubprocesso(1L, TipoAnalise.CADASTRO)).thenReturn(analises);
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_CADASTRO))
                     .andExpect(status().isOk())
@@ -88,43 +86,43 @@ class AnaliseControleTest {
                     .andExpect(jsonPath("$[1].codigo").value(2L))
                     .andExpect(jsonPath("$[1].observacoes").value(OBSERVACAO_2));
 
-            verify(analiseCadastroService, times(1)).listarPorSubprocesso(1L);
+            verify(analiseService, times(1)).listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia de análises de cadastro com status 200 OK")
         void deveRetornarListaVaziaDeAnalisesCadastro() throws Exception {
-            when(analiseCadastroService.listarPorSubprocesso(1L)).thenReturn(Collections.emptyList());
+            when(analiseService.listarPorSubprocesso(1L, TipoAnalise.CADASTRO)).thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_CADASTRO))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(analiseCadastroService, times(1)).listarPorSubprocesso(1L);
+            verify(analiseService, times(1)).listarPorSubprocesso(1L, TipoAnalise.CADASTRO);
         }
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistente() throws Exception {
-            when(analiseCadastroService.listarPorSubprocesso(99L)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
                     .andExpect(status().isNotFound());
 
-            verify(analiseCadastroService, times(1)).listarPorSubprocesso(99L);
+            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado")
         void deveRetornarInternalServerErrorParaErroInesperado() throws Exception {
-            when(analiseCadastroService.listarPorSubprocesso(99L)).thenThrow(new RuntimeException(ERRO_INESPERADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO)).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseCadastroService, times(1)).listarPorSubprocesso(99L);
+            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
         }
     }
 
@@ -137,12 +135,12 @@ class AnaliseControleTest {
         void deveCriarAnaliseCadastro() throws Exception {
             var payload = Map.of(OBSERVACOES, NOVA_ANALISE_DE_CADASTRO);
 
-            var analise = new AnaliseCadastro();
+            var analise = new Analise();
             analise.setCodigo(1L);
             analise.setObservacoes(NOVA_ANALISE_DE_CADASTRO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseCadastroService.criarAnalise(1L, NOVA_ANALISE_DE_CADASTRO)).thenReturn(analise);
+            when(analiseService.criarAnalise(eq(1L), eq(NOVA_ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +150,7 @@ class AnaliseControleTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_CADASTRO));
 
-            verify(analiseCadastroService, times(1)).criarAnalise(1L, NOVA_ANALISE_DE_CADASTRO);
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(NOVA_ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -160,33 +158,33 @@ class AnaliseControleTest {
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
             var payload = Map.of(OBSERVACOES, "");
 
-            var analise = new AnaliseCadastro();
+            var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseCadastroService.criarAnalise(1L, "")).thenReturn(analise);
+            when(analiseService.criarAnalise(eq(1L), eq(""), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isCreated());
 
-            verify(analiseCadastroService, times(1)).criarAnalise(1L, "");
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(""), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
         @DisplayName("Deve criar uma análise de cadastro sem payload e retornar 201 Created")
         void deveCriarAnaliseCadastroSemPayload() throws Exception {
-            var analise = new AnaliseCadastro();
+            var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseCadastroService.criarAnalise(1L, "")).thenReturn(analise);
+            when(analiseService.criarAnalise(eq(1L), eq(""), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{}"))
                     .andExpect(status().isCreated());
 
-            verify(analiseCadastroService, times(1)).criarAnalise(1L, "");
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(""), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -194,14 +192,14 @@ class AnaliseControleTest {
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_CADASTRO);
 
-            when(analiseCadastroService.criarAnalise(99L, ANALISE_DE_CADASTRO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isNotFound());
 
-            verify(analiseCadastroService, times(1)).criarAnalise(99L, ANALISE_DE_CADASTRO);
+            verify(analiseService, times(1)).criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -209,7 +207,7 @@ class AnaliseControleTest {
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_INVALIDA);
 
-            when(analiseCadastroService.criarAnalise(1L, ANALISE_INVALIDA)).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
+            when(analiseService.criarAnalise(eq(1L), eq(ANALISE_INVALIDA), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -217,7 +215,7 @@ class AnaliseControleTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém um argumento inválido ou malformado."));
 
-            verify(analiseCadastroService, times(1)).criarAnalise(1L, ANALISE_INVALIDA);
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(ANALISE_INVALIDA), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -225,7 +223,7 @@ class AnaliseControleTest {
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_CADASTRO);
 
-            when(analiseCadastroService.criarAnalise(99L, ANALISE_DE_CADASTRO)).thenThrow(new RuntimeException(ERRO_INESPERADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -233,7 +231,7 @@ class AnaliseControleTest {
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseCadastroService, times(1)).criarAnalise(99L, ANALISE_DE_CADASTRO);
+            verify(analiseService, times(1)).criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull());
         }
     }
 
@@ -244,19 +242,19 @@ class AnaliseControleTest {
         @Test
         @DisplayName("Deve retornar lista de análises de validação com status 200 OK")
         void deveRetornarListaDeAnalisesValidacao() throws Exception {
-            var analise1 = new AnaliseValidacao();
+            var analise1 = new Analise();
             analise1.setCodigo(1L);
             analise1.setObservacoes(OBSERVACAO_1);
             analise1.setDataHora(LocalDateTime.now());
 
-            var analise2 = new AnaliseValidacao();
+            var analise2 = new Analise();
             analise2.setCodigo(2L);
             analise2.setObservacoes(OBSERVACAO_2);
             analise2.setDataHora(LocalDateTime.now());
 
-            List<AnaliseValidacao> analises = Arrays.asList(analise1, analise2);
+            List<Analise> analises = Arrays.asList(analise1, analise2);
 
-            when(analiseValidacaoService.listarPorSubprocesso(1L)).thenReturn(analises);
+            when(analiseService.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO)).thenReturn(analises);
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
                     .andExpect(status().isOk())
@@ -266,43 +264,43 @@ class AnaliseControleTest {
                     .andExpect(jsonPath("$[1].codigo").value(2L))
                     .andExpect(jsonPath("$[1].observacoes").value(OBSERVACAO_2));
 
-            verify(analiseValidacaoService, times(1)).listarPorSubprocesso(1L);
+            verify(analiseService, times(1)).listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
         }
 
         @Test
         @DisplayName("Deve retornar lista vazia de análises de validação com status 200 OK")
         void deveRetornarListaVaziaDeAnalisesValidacao() throws Exception {
-            when(analiseValidacaoService.listarPorSubprocesso(1L)).thenReturn(Collections.emptyList());
+            when(analiseService.listarPorSubprocesso(1L, TipoAnalise.VALIDACAO)).thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_SUBPROCESSOS_1_ANALISES_VALIDACAO))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(analiseValidacaoService, times(1)).listarPorSubprocesso(1L);
+            verify(analiseService, times(1)).listarPorSubprocesso(1L, TipoAnalise.VALIDACAO);
         }
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistenteValidacao() throws Exception {
-            when(analiseValidacaoService.listarPorSubprocesso(99L)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
                     .andExpect(status().isNotFound());
 
-            verify(analiseValidacaoService, times(1)).listarPorSubprocesso(99L);
+            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.VALIDACAO);
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado")
         void deveRetornarInternalServerErrorParaErroValidacaoInesperado() throws Exception {
-            when(analiseValidacaoService.listarPorSubprocesso(99L)).thenThrow(new RuntimeException(ERRO_INESPERADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO)).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseValidacaoService, times(1)).listarPorSubprocesso(99L);
+            verify(analiseService, times(1)).listarPorSubprocesso(99L, TipoAnalise.VALIDACAO);
         }
     }
 
@@ -315,12 +313,12 @@ class AnaliseControleTest {
         void deveCriarAnaliseValidacao() throws Exception {
             var payload = Map.of(OBSERVACOES, NOVA_ANALISE_DE_VALIDACAO);
 
-            var analise = new AnaliseValidacao();
+            var analise = new Analise();
             analise.setCodigo(1L);
             analise.setObservacoes(NOVA_ANALISE_DE_VALIDACAO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseValidacaoService.criarAnalise(1L, NOVA_ANALISE_DE_VALIDACAO)).thenReturn(analise);
+            when(analiseService.criarAnalise(eq(1L), eq(NOVA_ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -330,7 +328,7 @@ class AnaliseControleTest {
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_VALIDACAO));
 
-            verify(analiseValidacaoService, times(1)).criarAnalise(1L, NOVA_ANALISE_DE_VALIDACAO);
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(NOVA_ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -338,17 +336,17 @@ class AnaliseControleTest {
         void deveCriarAnaliseValidacaoComObservacoesVazias() throws Exception {
             var payload = Map.of(OBSERVACOES, "");
 
-            var analise = new AnaliseValidacao();
+            var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseValidacaoService.criarAnalise(1L, "")).thenReturn(analise);
+            when(analiseService.criarAnalise(eq(1L), eq(""), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isCreated());
 
-            verify(analiseValidacaoService, times(1)).criarAnalise(1L, "");
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(""), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -356,14 +354,14 @@ class AnaliseControleTest {
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacaoValidacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_VALIDACAO);
 
-            when(analiseValidacaoService.criarAnalise(99L, ANALISE_DE_VALIDACAO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(payload)))
                     .andExpect(status().isNotFound());
 
-            verify(analiseValidacaoService, times(1)).criarAnalise(99L, ANALISE_DE_VALIDACAO);
+            verify(analiseService, times(1)).criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -371,7 +369,7 @@ class AnaliseControleTest {
         void deveRetornarBadRequestParaParametroInvalidoValidacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_INVALIDA);
 
-            when(analiseValidacaoService.criarAnalise(1L, ANALISE_INVALIDA)).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
+            when(analiseService.criarAnalise(eq(1L), eq(ANALISE_INVALIDA), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -379,7 +377,7 @@ class AnaliseControleTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém um argumento inválido ou malformado."));
 
-            verify(analiseValidacaoService, times(1)).criarAnalise(1L, ANALISE_INVALIDA);
+            verify(analiseService, times(1)).criarAnalise(eq(1L), eq(ANALISE_INVALIDA), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
         }
 
         @Test
@@ -387,7 +385,7 @@ class AnaliseControleTest {
         void deveRetornarInternalServerErrorParaErroValidacaoInesperadoNaCriacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_VALIDACAO);
 
-            when(analiseValidacaoService.criarAnalise(99L, ANALISE_DE_VALIDACAO)).thenThrow(new RuntimeException(ERRO_INESPERADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -395,7 +393,7 @@ class AnaliseControleTest {
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseValidacaoService, times(1)).criarAnalise(99L, ANALISE_DE_VALIDACAO);
+            verify(analiseService, times(1)).criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
         }
     }
 }

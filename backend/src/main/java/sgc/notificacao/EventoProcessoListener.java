@@ -10,6 +10,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -17,7 +18,6 @@ import sgc.sgrh.dto.UsuarioDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.TipoUnidade;
-import sgc.processo.modelo.TipoProcesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
-    private final NotificacaoServico notificacaoServico;
+    private final NotificacaoService notificacaoService;
     private final NotificacaoModeloEmailService notificacaoModeloEmailService;
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
@@ -154,7 +154,7 @@ public class EventoProcessoListener {
                 return;
             }
 
-            notificacaoServico.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+            notificacaoService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
             log.info("E-mail enviado para a unidade {} ({}) - Destinatário: {} ({})",
                     unidade.sigla(), tipoUnidade, titular.nome(), titular.email());
 
@@ -173,7 +173,7 @@ public class EventoProcessoListener {
         try {
             UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
-                notificacaoServico.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
+                notificacaoService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {} - Destinatário: {} ({})",
                         nomeUnidade, substituto.nome(), substituto.email());
             }

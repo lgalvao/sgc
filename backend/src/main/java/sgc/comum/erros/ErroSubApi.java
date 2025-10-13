@@ -7,14 +7,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class ApiSubError {
+public class ErroSubApi {
     private String object;
     private String field;
     private Object rejectedValue;
     private String message;
-
-    ApiSubError(String object, String message) {
-        this.object = object;
-        this.message = message;
-    }
 }

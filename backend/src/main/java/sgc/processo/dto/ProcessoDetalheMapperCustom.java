@@ -16,11 +16,11 @@ import java.util.Map;
  * que não pode ser feita automaticamente pelo MapStruct.
  */
 @Component
-public class ProcessoDetalheMapperCustomizado {
+public class ProcessoDetalheMapperCustom {
 
     private final ProcessoDetalheMapperInterface processoDetalheMapperInterface;
 
-    public ProcessoDetalheMapperCustomizado(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
+    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
         this.processoDetalheMapperInterface = processoDetalheMapperInterface;
     }
 

@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
 import java.time.LocalDate;
@@ -45,6 +45,9 @@ public class Subprocesso extends EntidadeBase {
 
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
+
+    @Column(name = "data_fim_etapa3")
+    private LocalDateTime dataFimEtapa3;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao_id", length = 50)

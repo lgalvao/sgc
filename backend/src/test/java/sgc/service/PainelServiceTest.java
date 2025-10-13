@@ -11,11 +11,7 @@ import org.springframework.data.domain.Pageable;
 import sgc.comum.PainelService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

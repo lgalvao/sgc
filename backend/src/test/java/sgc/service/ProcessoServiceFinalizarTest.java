@@ -7,20 +7,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.ProcessoService;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoConversor;
+import sgc.processo.dto.ProcessoMapper;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
 import sgc.processo.modelo.ErroProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -30,8 +32,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -52,7 +52,7 @@ public class ProcessoServiceFinalizarTest {
     private ApplicationEventPublisher publicadorDeEventos;
 
     @Mock
-    private ProcessoConversor processoConversor;
+    private ProcessoMapper processoMapper;
 
     @Mock
     private sgc.sgrh.SgrhService sgrhService;
@@ -111,7 +111,7 @@ public class ProcessoServiceFinalizarTest {
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
         when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(List.of());
-        when(processoConversor.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
+        when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
         processoService.finalizar(1L);
 

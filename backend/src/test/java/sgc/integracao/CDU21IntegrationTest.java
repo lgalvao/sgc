@@ -15,25 +15,21 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoServico;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.notificacao.NotificacaoService;
+import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.SituacaoUnidade;
@@ -46,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -80,7 +75,7 @@ class CDU21IntegrationTest {
     private SgrhService sgrhService;
 
     @MockitoBean
-    private NotificacaoServico notificacaoServico;
+    private NotificacaoService notificacaoService;
 
     private Processo processo;
     private Unidade unidadeIntermediaria;
@@ -90,7 +85,7 @@ class CDU21IntegrationTest {
     @BeforeEach
     void setUp() {
         // 1. Setup Mocks
-        doNothing().when(notificacaoServico).enviarEmailHtml(anyString(), anyString(), anyString());
+        doNothing().when(notificacaoService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         // 2. Create Users
         Usuario titularIntermediaria = usuarioRepo.save(new Usuario("T01", "Titular Intermediaria", "titular.intermediaria@test.com", null, null, null));
@@ -163,7 +158,7 @@ class CDU21IntegrationTest {
         assertThat(um2.getMapaVigenteCodigo()).isEqualTo(sp2.getMapa().getCodigo());
 
         // Assert Notifications
-        verify(notificacaoServico, times(3)).enviarEmailHtml(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
+        verify(notificacaoService, times(3)).enviarEmailHtml(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
 
         List<String> allEmails = emailCaptor.getAllValues();
         List<String> allSubjects = subjectCaptor.getAllValues();

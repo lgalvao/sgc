@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
-
 import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDate;
@@ -15,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ProcessoMapperTest {
     private static final String TEST_DESCRIPTION = "Test Description";
-    private final ProcessoConversor mapper = Mappers.getMapper(ProcessoConversor.class);
+    private final ProcessoMapper mapper = Mappers.getMapper(ProcessoMapper.class);
 
     @Test
     void testToDTO() {

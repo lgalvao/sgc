@@ -11,9 +11,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.processo.dto.*;
-import sgc.processo.modelo.ErroProcesso;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.ProcessoDto;
+import sgc.processo.modelo.ErroProcesso;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

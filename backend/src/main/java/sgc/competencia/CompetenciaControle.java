@@ -1,22 +1,29 @@
 package sgc.competencia;
 
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.dto.CompetenciaDto;
 import sgc.competencia.dto.CompetenciaMapper;
 import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividade.Id;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.mapa.modelo.Mapa;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Controlador REST para gerenciar Competências usando DTOs.
- * Evita expor entidades JPA diretamente nas APIs.
+ * Controlador REST para gerenciar Competências e seus relacionamentos com Atividades.
  */
 @RestController
 @RequestMapping("/api/competencias")
@@ -24,20 +31,23 @@ import java.util.Optional;
 public class CompetenciaControle {
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaMapper competenciaMapper;
+    private final AtividadeRepo atividadeRepo;
+    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @GetMapping
     public List<CompetenciaDto> listarCompetencias() {
         return competenciaRepo.findAll()
                 .stream()
                 .map(competenciaMapper::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CompetenciaDto> obterCompetencia(@PathVariable Long id) {
-
-        Optional<Competencia> c = competenciaRepo.findById(id);
-        return c.map(competenciaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return competenciaRepo.findById(id)
+                .map(competenciaMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -74,5 +84,62 @@ public class CompetenciaControle {
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{idCompetencia}/atividades")
+    public ResponseEntity<List<CompetenciaAtividade>> listarAtividadesVinculadas(@PathVariable Long idCompetencia) {
+        if (!competenciaRepo.existsById(idCompetencia)) {
+            return ResponseEntity.notFound().build();
+        }
+        List<CompetenciaAtividade> lista = competenciaAtividadeRepo.findAll()
+                .stream()
+                .filter(ca -> ca.getId() != null && idCompetencia.equals(ca.getId().getCompetenciaCodigo()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lista);
+    }
+
+    @PostMapping("/{idCompetencia}/atividades")
+    public ResponseEntity<?> vincularAtividade(@PathVariable Long idCompetencia, @Valid @RequestBody CompetenciaControle.VinculoAtividadeReq requisicao) {
+        Long idAtividade = requisicao.getIdAtividade();
+
+        Optional<Competencia> maybeCompetencia = competenciaRepo.findById(idCompetencia);
+        if (maybeCompetencia.isEmpty()) {
+            return ResponseEntity.badRequest().body("Competência não encontrada: %d".formatted(idCompetencia));
+        }
+
+        Optional<Atividade> maybeAtividade = atividadeRepo.findById(idAtividade);
+        if (maybeAtividade.isEmpty()) {
+            return ResponseEntity.badRequest().body("Atividade não encontrada: %d".formatted(idAtividade));
+        }
+
+        Id id = new Id(idAtividade, idCompetencia);
+        if (competenciaAtividadeRepo.existsById(id)) {
+            return ResponseEntity.status(409).body("Vínculo já existe.");
+        }
+
+        CompetenciaAtividade vinculo = new CompetenciaAtividade();
+        vinculo.setId(id);
+        vinculo.setAtividade(maybeAtividade.get());
+        vinculo.setCompetencia(maybeCompetencia.get());
+
+        CompetenciaAtividade salvo = competenciaAtividadeRepo.save(vinculo);
+        URI uri = URI.create("/api/competencias/%d/atividades".formatted(idCompetencia));
+        return ResponseEntity.created(uri).body(salvo);
+    }
+
+    @DeleteMapping("/{idCompetencia}/atividades/{idAtividade}")
+    public ResponseEntity<?> desvincularAtividade(@PathVariable Long idCompetencia, @PathVariable Long idAtividade) {
+        Id id = new Id(idAtividade, idCompetencia);
+        if (!competenciaAtividadeRepo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        competenciaAtividadeRepo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Setter
+    @Getter
+    public static class VinculoAtividadeReq {
+        private Long idAtividade;
     }
 }

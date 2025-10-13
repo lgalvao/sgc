@@ -11,13 +11,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.modelo.Processo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -28,6 +28,8 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockUser(username = "admin", roles = {"ADMIN"})
+@WithMockAdmin
 @Import(TestSecurityConfig.class)
 @Transactional
 public class CDU07IntegrationTest {

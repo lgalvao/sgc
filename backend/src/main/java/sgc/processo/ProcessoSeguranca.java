@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import sgc.sgrh.SgrhService;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+
 import java.util.List;
 
 @Component

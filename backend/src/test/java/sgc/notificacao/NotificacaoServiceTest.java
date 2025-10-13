@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NotificacaoServicoImplTest {
+class NotificacaoServiceTest {
     @Mock
     private JavaMailSender enviadorDeEmail;
 
@@ -31,7 +31,7 @@ class NotificacaoServicoImplTest {
     private NotificacaoRepo repositorioNotificacao;
 
     @InjectMocks
-    private NotificacaoServicoImpl notificacaoServico;
+    private NotificacaoService notificacaoServico;
 
     private MimeMessage mimeMessageReal;
 
