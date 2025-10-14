@@ -51,31 +51,31 @@ class SubprocessoDtoTest {
 
     @Test
     void AtividadeAjusteDto_RecordConstructorAndGetters() {
-        List<ConhecimentoAjusteDto> conhecimentos = List.of(new ConhecimentoAjusteDto(1L, COMPETENCIA, true));
-        AtividadeAjusteDto dto = new AtividadeAjusteDto(1L, ATIVIDADE, conhecimentos);
+        List<ConhecimentoAjusteDto> conhecimentos = List.of(ConhecimentoAjusteDto.builder().conhecimentoId(1L).nome(COMPETENCIA).incluido(true).build());
+        AtividadeAjusteDto dto = AtividadeAjusteDto.builder().atividadeId(1L).nome(ATIVIDADE).conhecimentos(conhecimentos).build();
 
-        assertEquals(1L, dto.atividadeId());
-        assertEquals(ATIVIDADE, dto.nome());
-        assertEquals(conhecimentos, dto.conhecimentos());
+        assertEquals(1L, dto.getAtividadeId());
+        assertEquals(ATIVIDADE, dto.getNome());
+        assertEquals(conhecimentos, dto.getConhecimentos());
     }
 
     @Test
     void CompetenciaAjusteDto_RecordConstructorAndGetters() {
-        List<AtividadeAjusteDto> atividades = List.of(new AtividadeAjusteDto(1L, ATIVIDADE, List.of()));
-        CompetenciaAjusteDto dto = new CompetenciaAjusteDto(1L, COMPETENCIA, atividades);
+        List<AtividadeAjusteDto> atividades = List.of(AtividadeAjusteDto.builder().atividadeId(1L).nome(ATIVIDADE).conhecimentos(List.of()).build());
+        CompetenciaAjusteDto dto = CompetenciaAjusteDto.builder().competenciaId(1L).nome(COMPETENCIA).atividades(atividades).build();
 
-        assertEquals(1L, dto.competenciaId());
-        assertEquals(COMPETENCIA, dto.nome());
-        assertEquals(atividades, dto.atividades());
+        assertEquals(1L, dto.getCompetenciaId());
+        assertEquals(COMPETENCIA, dto.getNome());
+        assertEquals(atividades, dto.getAtividades());
     }
 
     @Test
     void ConhecimentoAjusteDto_RecordConstructorAndGetters() {
-        ConhecimentoAjusteDto dto = new ConhecimentoAjusteDto(1L, COMPETENCIA, true);
+        ConhecimentoAjusteDto dto = ConhecimentoAjusteDto.builder().conhecimentoId(1L).nome(COMPETENCIA).incluido(true).build();
 
-        assertEquals(1L, dto.conhecimentoId());
-        assertEquals(COMPETENCIA, dto.nome());
-        assertTrue(dto.incluido());
+        assertEquals(1L, dto.getConhecimentoId());
+        assertEquals(COMPETENCIA, dto.getNome());
+        assertTrue(dto.isIncluido());
     }
 
     @Test
@@ -132,13 +132,13 @@ class SubprocessoDtoTest {
 
     @Test
     void MapaAjusteDto_RecordConstructorAndGetters() {
-        List<CompetenciaAjusteDto> competencias = List.of(new CompetenciaAjusteDto(1L, "Competência", List.of()));
-        MapaAjusteDto dto = new MapaAjusteDto(1L, UNIDADE, competencias, "Justificativa");
+        List<CompetenciaAjusteDto> competencias = List.of(CompetenciaAjusteDto.builder().competenciaId(1L).nome("Competência").atividades(List.of()).build());
+        MapaAjusteDto dto = MapaAjusteDto.builder().mapaId(1L).unidadeNome(UNIDADE).competencias(competencias).justificativaDevolucao("Justificativa").build();
 
-        assertEquals(1L, dto.mapaId());
-        assertEquals(UNIDADE, dto.unidadeNome());
-        assertEquals(competencias, dto.competencias());
-        assertEquals("Justificativa", dto.justificativaDevolucao());
+        assertEquals(1L, dto.getMapaId());
+        assertEquals(UNIDADE, dto.getUnidadeNome());
+        assertEquals(competencias, dto.getCompetencias());
+        assertEquals("Justificativa", dto.getJustificativaDevolucao());
     }
 
     @Test
@@ -178,52 +178,60 @@ class SubprocessoDtoTest {
     @Test
     void SubprocessoCadastroDto_RecordConstructorAndAccessors() {
         List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividades = List.of(
-                new SubprocessoCadastroDto.AtividadeCadastroDTO(1L, "Atividade", List.of())
+                SubprocessoCadastroDto.AtividadeCadastroDTO.builder().id(1L).descricao("Atividade").conhecimentos(List.of()).build()
         );
-        SubprocessoCadastroDto dto = new SubprocessoCadastroDto(1L, SIGLA, atividades);
+        SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder().subprocessoId(1L).unidadeSigla(SIGLA).atividades(atividades).build();
 
-        assertEquals(1L, dto.subprocessoId());
-        assertEquals(SIGLA, dto.unidadeSigla());
-        assertEquals(atividades, dto.atividades());
+        assertEquals(1L, dto.getSubprocessoId());
+        assertEquals(SIGLA, dto.getUnidadeSigla());
+        assertEquals(atividades, dto.getAtividades());
     }
 
     @Test
     void SubprocessoDetalheDto_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, SIGLA, NOME);
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, NOME, "Tipo", "Ramal", "email@exemplo.com");
+        SubprocessoDetalheDto.UnidadeDTO unidade = SubprocessoDetalheDto.UnidadeDTO.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
+        SubprocessoDetalheDto.ResponsavelDTO responsavel = SubprocessoDetalheDto.ResponsavelDTO.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
         LocalDate prazo = LocalDate.now();
         List<MovimentacaoDto> movimentacoes = List.of();
         List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = List.of();
 
-        SubprocessoDetalheDto dto = new SubprocessoDetalheDto(unidade, responsavel, SituacaoSubprocesso.NAO_INICIADO.name(), "Localizacao", prazo, movimentacoes, elementos);
+        SubprocessoDetalheDto dto = SubprocessoDetalheDto.builder()
+            .unidade(unidade)
+            .responsavel(responsavel)
+            .situacao(SituacaoSubprocesso.NAO_INICIADO.name())
+            .localizacaoAtual("Localizacao")
+            .prazoEtapaAtual(prazo)
+            .movimentacoes(movimentacoes)
+            .elementosDoProcesso(elementos)
+            .build();
 
-        assertEquals(unidade, dto.unidade());
-        assertEquals(responsavel, dto.responsavel());
-        assertEquals(SituacaoSubprocesso.NAO_INICIADO.name(), dto.situacao());
-        assertEquals("Localizacao", dto.localizacaoAtual());
-        assertEquals(prazo, dto.prazoEtapaAtual());
-        assertEquals(movimentacoes, dto.movimentacoes());
-        assertEquals(elementos, dto.elementosDoProcesso());
+        assertEquals(unidade, dto.getUnidade());
+        assertEquals(responsavel, dto.getResponsavel());
+        assertEquals(SituacaoSubprocesso.NAO_INICIADO.name(), dto.getSituacao());
+        assertEquals("Localizacao", dto.getLocalizacaoAtual());
+        assertEquals(prazo, dto.getPrazoEtapaAtual());
+        assertEquals(movimentacoes, dto.getMovimentacoes());
+        assertEquals(elementos, dto.getElementosDoProcesso());
     }
 
     @Test
     void SubprocessoDetalheDto_UnidadeDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = new SubprocessoDetalheDto.UnidadeDTO(1L, SIGLA, NOME);
+        SubprocessoDetalheDto.UnidadeDTO unidade = SubprocessoDetalheDto.UnidadeDTO.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
 
-        assertEquals(1L, unidade.codigo());
-        assertEquals(SIGLA, unidade.sigla());
-        assertEquals(NOME, unidade.nome());
+        assertEquals(1L, unidade.getCodigo());
+        assertEquals(SIGLA, unidade.getSigla());
+        assertEquals(NOME, unidade.getNome());
     }
 
     @Test
     void SubprocessoDetalheDto_ResponsavelDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = new SubprocessoDetalheDto.ResponsavelDTO(1L, NOME, "Tipo", "Ramal", "email@exemplo.com");
+        SubprocessoDetalheDto.ResponsavelDTO responsavel = SubprocessoDetalheDto.ResponsavelDTO.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
 
-        assertEquals(1L, responsavel.id());
-        assertEquals(NOME, responsavel.nome());
-        assertEquals("Tipo", responsavel.tipoResponsabilidade());
-        assertEquals("Ramal", responsavel.ramal());
-        assertEquals("email@exemplo.com", responsavel.email());
+        assertEquals(1L, responsavel.getId());
+        assertEquals(NOME, responsavel.getNome());
+        assertEquals("Tipo", responsavel.getTipoResponsabilidade());
+        assertEquals("Ramal", responsavel.getRamal());
+        assertEquals("email@exemplo.com", responsavel.getEmail());
     }
 
     @Test
