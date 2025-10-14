@@ -1,30 +1,46 @@
 package sgc.subprocesso.dto;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
-@SpringJUnitConfig
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class MapperTest {
+
+    @InjectMocks
+    private SubprocessoMapperImpl subprocessoMapper;
+    @Mock
+    private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
+    private MapaRepo mapaRepo;
+
+    private MovimentacaoMapper movimentacaoMapper = Mappers.getMapper(MovimentacaoMapper.class);
+
     @Test
     void subprocessoMapper_MapsEntityToDtoCorrectly() {
-        SubprocessoMapper mapper = Mappers.getMapper(SubprocessoMapper.class);
-
         Processo processo = new Processo();
         processo.setCodigo(100L);
 
@@ -45,7 +61,7 @@ class MapperTest {
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
         entity.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-        SubprocessoDto dto = mapper.toDTO(entity);
+        SubprocessoDto dto = subprocessoMapper.toDTO(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getCodigo());
@@ -57,8 +73,6 @@ class MapperTest {
 
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
-        SubprocessoMapper mapper = Mappers.getMapper(SubprocessoMapper.class);
-
         SubprocessoDto dto = new SubprocessoDto(
             1L,
             100L,
@@ -71,11 +85,21 @@ class MapperTest {
             SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
         );
 
-        Subprocesso entity = mapper.toEntity(dto);
+        Processo processo = new Processo();
+        processo.setCodigo(100L);
+        when(processoRepo.findById(100L)).thenReturn(Optional.of(processo));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(200L);
+        when(unidadeRepo.findById(200L)).thenReturn(Optional.of(unidade));
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(300L);
+        when(mapaRepo.findById(300L)).thenReturn(Optional.of(mapa));
+
+        Subprocesso entity = subprocessoMapper.toEntity(dto);
 
         assertNotNull(entity);
-        // Note: The mapping expressions in the mapper create new Processo/Unidade/Mapa objects
-        // based on the code in the mapper, so we check that the objects are initialized
         assertNotNull(entity.getProcesso());
         assertEquals(100L, entity.getProcesso().getCodigo());
         assertNotNull(entity.getUnidade());
@@ -87,8 +111,6 @@ class MapperTest {
 
     @Test
     void movimentacaoMapper_MapsEntityToDtoCorrectly() {
-        MovimentacaoMapper mapper = Mappers.getMapper(MovimentacaoMapper.class);
-
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
 
@@ -110,7 +132,7 @@ class MapperTest {
         entity.setUnidadeDestino(unidadeDestino);
         entity.setDescricao("Descrição da movimentação");
 
-        MovimentacaoDto dto = mapper.toDTO(entity);
+        MovimentacaoDto dto = movimentacaoMapper.toDTO(entity);
 
         assertNotNull(dto);
         assertEquals(1L, dto.codigo());
