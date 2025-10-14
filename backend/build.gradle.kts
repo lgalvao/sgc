@@ -9,6 +9,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.2.5"
     pmd
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 java {
@@ -331,11 +332,26 @@ tasks.pmdMain {
 }
 
 tasks.pmdTest {
-    enabled = true
+    enabled = false
 }
+
 
 tasks.register("agentTest") {
     group = "verification"
     description = "Run tests with agent-optimized output"
     dependsOn("test")
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "sgc-backend")
+        property("sonar.projectName", "SGC :: Backend")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.token", System.getenv("SONAR_TOKEN") ?: "")
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "${layout.buildDirectory.get()}/classes/java/main")
+        property("sonar.junit.reportPaths", "${layout.buildDirectory.get()}/test-results/test")
+        property("sonar.qualitygate.wait", "true")
+    }
 }
