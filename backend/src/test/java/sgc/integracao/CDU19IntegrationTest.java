@@ -17,6 +17,7 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -74,14 +75,16 @@ public class CDU19IntegrationTest {
 
         // Criar usuários mockados para as unidades
         Usuario chefeMock = new Usuario();
-        chefeMock.setTitulo("chefe");
+        chefeMock.setTituloEleitoral(333333333333L);
+        chefeMock.setPerfis(java.util.Set.of(Perfil.CHEFE));
         chefeMock.setUnidade(unidadeSuperior);
         usuarioRepo.save(chefeMock);
         unidadeSuperior.setTitular(chefeMock);
         unidadeRepo.save(unidadeSuperior);
 
         Usuario gestorMock = new Usuario();
-        gestorMock.setTitulo("gestor_unidade");
+        gestorMock.setTituloEleitoral(222222222222L);
+        gestorMock.setPerfis(java.util.Set.of(Perfil.GESTOR));
         gestorMock.setUnidade(unidade);
         usuarioRepo.save(gestorMock);
         unidade.setTitular(gestorMock);

@@ -265,7 +265,7 @@ public class ProcessoService {
             unidade.getCodigo(), // Adicionado o código da unidade
             unidade.getNome(),
             unidade.getSigla(),
-            unidade.getTitular() != null ? unidade.getTitular().getTitulo() : null,
+            unidade.getTitular() != null ? String.valueOf(unidade.getTitular().getTituloEleitoral()) : null,
             unidade.getTipo(),
             "PENDENTE",
             unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null

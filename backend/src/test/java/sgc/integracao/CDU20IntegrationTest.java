@@ -29,6 +29,7 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -104,7 +105,8 @@ public class CDU20IntegrationTest {
 
         // Usuários
         Usuario admin = new Usuario();
-        admin.setTitulo("admin");
+        admin.setTituloEleitoral(111111111111L);
+        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
         admin.setNome("Admin");
         admin.setEmail("admin@test.com");
         admin.setUnidade(unidadeAdmin);
@@ -113,7 +115,8 @@ public class CDU20IntegrationTest {
         unidadeRepo.save(unidadeAdmin);
 
         Usuario gestor = new Usuario();
-        gestor.setTitulo("gestor_unidade");
+        gestor.setTituloEleitoral(222222222222L);
+        gestor.setPerfis(java.util.Set.of(Perfil.GESTOR));
         gestor.setNome("Gestor");
         gestor.setEmail("gestor@test.com");
         gestor.setUnidade(unidadeGestor);
@@ -122,7 +125,8 @@ public class CDU20IntegrationTest {
         unidadeRepo.save(unidadeGestor);
 
         Usuario chefeSubordinado = new Usuario();
-        chefeSubordinado.setTitulo("chefe_sub");
+        chefeSubordinado.setTituloEleitoral(333333333333L);
+        chefeSubordinado.setPerfis(java.util.Set.of(Perfil.CHEFE));
         chefeSubordinado.setNome("Chefe Sub");
         chefeSubordinado.setEmail("chefe@test.com");
         chefeSubordinado.setUnidade(unidadeSubordinada);

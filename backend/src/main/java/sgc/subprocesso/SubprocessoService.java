@@ -155,7 +155,7 @@ public class SubprocessoService {
 
     @Transactional
     public void disponibilizarCadastro(Long idSubprocesso, Usuario usuario) {
-        log.info("Iniciando disponibilização do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTitulo());
+        log.info("Iniciando disponibilização do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTituloEleitoral());
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -208,7 +208,7 @@ public class SubprocessoService {
 
     @Transactional
     public void disponibilizarRevisao(Long idSubprocesso, Usuario usuario) {
-        log.info("Iniciando disponibilização da revisão do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTitulo());
+        log.info("Iniciando disponibilização da revisão do cadastro para subprocesso {} pelo usuário {}", idSubprocesso, usuario.getTituloEleitoral());
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -300,7 +300,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto apresentarSugestoes(Long idSubprocesso, String sugestoes, String usuarioTitulo) {
+    public SubprocessoDto apresentarSugestoes(Long idSubprocesso, String sugestoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -318,7 +318,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto validarMapa(Long idSubprocesso, String usuarioTitulo) {
+    public SubprocessoDto validarMapa(Long idSubprocesso, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -348,7 +348,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        analiseService.criarAnalise(idSubprocesso, justificativa, TipoAnalise.VALIDACAO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), justificativa);
+        analiseService.criarAnalise(idSubprocesso, justificativa, TipoAnalise.VALIDACAO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), String.valueOf(usuario.getTituloEleitoral()), justificativa);
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
@@ -368,7 +368,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        analiseService.criarAnalise(idSubprocesso, "Aceite da validação", TipoAnalise.VALIDACAO, TipoAcaoAnalise.ACEITE, usuario.getUnidade().getSigla(), usuario.getTitulo(), null);
+        analiseService.criarAnalise(idSubprocesso, "Aceite da validação", TipoAnalise.VALIDACAO, TipoAcaoAnalise.ACEITE, usuario.getUnidade().getSigla(), String.valueOf(usuario.getTituloEleitoral()), null);
 
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
@@ -389,7 +389,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto homologarValidacao(Long idSubprocesso, String usuarioTitulo) {
+    public SubprocessoDto homologarValidacao(Long idSubprocesso, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -423,7 +423,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTitulo) {
+    public SubprocessoDto salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
@@ -460,7 +460,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto submeterMapaAjustado(Long idSubprocesso, SubmeterMapaAjustadoReq request, String usuarioTitulo) {
+    public SubprocessoDto submeterMapaAjustado(Long idSubprocesso, SubmeterMapaAjustadoReq request, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -607,7 +607,7 @@ public class SubprocessoService {
     public SubprocessoDto devolverCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
-        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), motivo);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO, usuario.getUnidade().getSigla(), String.valueOf(usuario.getTituloEleitoral()), motivo);
 
 
         Unidade unidadeDevolucao = sp.getUnidade();
@@ -641,11 +641,11 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto aceitarCadastro(Long idSubprocesso, String observacoes, String usuario) {
+    public SubprocessoDto aceitarCadastro(Long idSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE, sp.getUnidade().getUnidadeSuperior().getSigla(), usuario, null);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE, sp.getUnidade().getUnidadeSuperior().getSigla(), String.valueOf(usuarioTituloEleitoral), null);
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
@@ -695,7 +695,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public SubprocessoDto homologarCadastro(Long idSubprocesso, String observacoes, String usuario) {
+    public SubprocessoDto homologarCadastro(Long idSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
@@ -725,7 +725,7 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de devolução só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO_REVISAO, usuario.getUnidade().getSigla(), usuario.getTitulo(), motivo);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.DEVOLUCAO_REVISAO, usuario.getUnidade().getSigla(), String.valueOf(usuario.getTituloEleitoral()), motivo);
 
         Unidade unidadeAnalise = usuario.getUnidade();
         Unidade unidadeDestino = sp.getUnidade(); // A devolução é para a unidade do subprocesso
@@ -778,7 +778,7 @@ public class SubprocessoService {
             throw new IllegalStateException("Ação de aceite só pode ser executada em revisões de cadastro disponibilizadas.");
         }
 
-        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE_REVISAO, sp.getUnidade().getUnidadeSuperior().getSigla(), usuario.getTitulo(), null);
+        analiseService.criarAnalise(idSubprocesso, observacoes, TipoAnalise.CADASTRO, TipoAcaoAnalise.ACEITE_REVISAO, sp.getUnidade().getUnidadeSuperior().getSigla(), String.valueOf(usuario.getTituloEleitoral()), null);
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();

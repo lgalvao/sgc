@@ -102,12 +102,12 @@ public class MapaService {
      *
      * @param idMapa Código do mapa a ser atualizado
      * @param request Request com dados do mapa completo
-     * @param usuarioTitulo Título do usuário que está salvando (para auditoria)
+     * @param usuarioTituloEleitoral Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
      * @throws ErroEntidadeNaoEncontrada se o mapa não existir
      */
-    public MapaCompletoDto salvarMapaCompleto(Long idMapa, SalvarMapaRequest request, String usuarioTitulo) {
-        log.info("Salvando mapa completo: id={}, usuario={}", idMapa, usuarioTitulo);
+    public MapaCompletoDto salvarMapaCompleto(Long idMapa, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
+        log.info("Salvando mapa completo: id={}, usuario={}", idMapa, usuarioTituloEleitoral);
 
         Mapa mapa = repositorioMapa.findById(idMapa)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(idMapa)));
@@ -185,13 +185,13 @@ public class MapaService {
      *
      * @param idSubprocesso Código do subprocesso
      * @param request Request com dados do mapa completo
-     * @param usuarioTitulo Título do usuário que está salvando (para auditoria)
+     * @param usuarioTituloEleitoral Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou mapa não existir
      * @throws IllegalStateException se a situação do subprocesso não permitir a operação
      */
-    public MapaCompletoDto salvarMapaSubprocesso(Long idSubprocesso, SalvarMapaRequest request, String usuarioTitulo) {
-        log.info("Salvando mapa do subprocesso: idSubprocesso={}, usuario={}", idSubprocesso, usuarioTitulo);
+    public MapaCompletoDto salvarMapaSubprocesso(Long idSubprocesso, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
+        log.info("Salvando mapa do subprocesso: idSubprocesso={}, usuario={}", idSubprocesso, usuarioTituloEleitoral);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
@@ -209,7 +209,7 @@ public class MapaService {
         boolean eraVazio = repositorioCompetencia.findByMapaCodigo(idMapa).isEmpty();
         boolean temNovasCompetencias = !request.competencias().isEmpty();
 
-        MapaCompletoDto mapaDto = salvarMapaCompleto(idMapa, request, usuarioTitulo);
+        MapaCompletoDto mapaDto = salvarMapaCompleto(idMapa, request, usuarioTituloEleitoral);
 
         if (eraVazio && temNovasCompetencias && situacao == SituacaoSubprocesso.CADASTRO_HOMOLOGADO) {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPA_CRIADO);

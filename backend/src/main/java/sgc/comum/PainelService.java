@@ -134,7 +134,7 @@ public class PainelService {
         List<Alerta> alertasFiltrados = todosOsAlertas.stream()
                 .filter(alerta -> {
                     if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-                        return alerta.getUsuarioDestino() != null && usuarioTitulo.equalsIgnoreCase(alerta.getUsuarioDestino().getTitulo());
+                        return alerta.getUsuarioDestino() != null && usuarioTitulo.equalsIgnoreCase(String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()));
                     }
                     if (codigoUnidade != null) {
                         return alerta.getUnidadeDestino() != null && Objects.equals(alerta.getUnidadeDestino().getCodigo(), codigoUnidade);
@@ -150,7 +150,7 @@ public class PainelService {
             alerta.getDataHora(),
             alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
             alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
-            alerta.getUsuarioDestino() != null ? alerta.getUsuarioDestino().getTitulo() : null
+            alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null
         )).collect(Collectors.toList());
 
         int total = listaDeDtos.size();

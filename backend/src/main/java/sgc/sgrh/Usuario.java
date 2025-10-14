@@ -1,7 +1,6 @@
 package sgc.sgrh;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,11 +19,10 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Usuario implements Serializable, UserDetails {
     @Id
-    @Column(name = "titulo", length = 20)
-    private String titulo;
+    @Column(name = "titulo_eleitoral")
+    private Long tituloEleitoral;
 
     @Column(name = "nome")
     private String nome;
@@ -39,34 +37,31 @@ public class Usuario implements Serializable, UserDetails {
     @JoinColumn(name = "unidade_codigo")
     private Unidade unidade;
 
+    @ElementCollection(targetClass = Perfil.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "USUARIO_PERFIL", joinColumns = @JoinColumn(name = "usuario_titulo_eleitoral"), schema = "sgc")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "perfil")
+    private java.util.Set<Perfil> perfis = new java.util.HashSet<>();
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
-        return java.util.Objects.equals(titulo, usuario.titulo);
+        return java.util.Objects.equals(tituloEleitoral, usuario.tituloEleitoral);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(titulo);
+        return java.util.Objects.hash(tituloEleitoral);
     }
-
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (authorities == null) {
-            if ("admin".equalsIgnoreCase(titulo)) {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_ADMIN")).collect(Collectors.toList());
-            } else if (titulo != null && titulo.startsWith("gestor")) {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_GESTOR")).collect(Collectors.toList());
-            } else {
-                this.authorities = Stream.of(new SimpleGrantedAuthority("ROLE_CHEFE")).collect(Collectors.toList());
-            }
-        }
-        return authorities;
+        return perfis.stream()
+                .map(Perfil::toGrantedAuthority)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -76,7 +71,15 @@ public class Usuario implements Serializable, UserDetails {
 
     @Override
     public String getUsername() {
-        return titulo;
+        return String.valueOf(tituloEleitoral);
     }
 
+    public Usuario(Long tituloEleitoral, String nome, String email, String ramal, Unidade unidade, Collection<Perfil> perfis) {
+        this.tituloEleitoral = tituloEleitoral;
+        this.nome = nome;
+        this.email = email;
+        this.ramal = ramal;
+        this.unidade = unidade;
+        this.perfis = new java.util.HashSet<>(perfis);
+    }
 }

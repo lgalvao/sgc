@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SgrhServiceTest {
-    private static final String TITULO = "12345678901";
+    private static final String TITULO = "123456789012";
     private SgrhService sgrhService;
 
     @BeforeEach
@@ -105,7 +105,7 @@ class SgrhServiceTest {
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().unidadeCodigo());
         assertEquals(TITULO, result.get().titularTitulo());
-        assertEquals("98765432109", result.get().substitutoTitulo());
+        assertEquals("987654321098", result.get().substitutoTitulo());
     }
 
     @Test

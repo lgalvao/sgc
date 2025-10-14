@@ -120,7 +120,7 @@ public class SubprocessoControle {
         return subprocessoService.aceitarCadastro(
             id,
             request.observacoes(),
-            usuario.getTitulo()
+            usuario.getTituloEleitoral()
         );
     }
 
@@ -132,7 +132,7 @@ public class SubprocessoControle {
         return subprocessoService.homologarCadastro(
             id,
             request.observacoes(),
-            usuario.getTitulo()
+            usuario.getTituloEleitoral()
         );
     }
 
@@ -195,7 +195,7 @@ public class SubprocessoControle {
         @RequestBody @Valid SalvarMapaRequest request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return mapaService.salvarMapaSubprocesso(id, request, usuario.getTitulo());
+        return mapaService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
     }
     
     @PostMapping("/{id}/disponibilizar-mapa")
@@ -223,14 +223,14 @@ public class SubprocessoControle {
         return subprocessoService.apresentarSugestoes(
             id,
             request.sugestoes(),
-            usuario.getTitulo()
+            usuario.getTituloEleitoral()
         );
     }
     
     @PostMapping("/{id}/validar-mapa")
     @Transactional
     public SubprocessoDto validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.validarMapa(id, usuario.getTitulo());
+        return subprocessoService.validarMapa(id, usuario.getTituloEleitoral());
     }
 
     @GetMapping("/{id}/sugestoes")
@@ -270,7 +270,7 @@ public class SubprocessoControle {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public SubprocessoDto homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.homologarValidacao(id, usuario.getTitulo());
+        return subprocessoService.homologarValidacao(id, usuario.getTituloEleitoral());
     }
 
     @DeleteMapping("/{id}")
@@ -298,7 +298,7 @@ public class SubprocessoControle {
         return subprocessoService.salvarAjustesMapa(
             id,
             request.competencias(),
-            usuario.getTitulo()
+            usuario.getTituloEleitoral()
         );
     }
 
@@ -309,7 +309,7 @@ public class SubprocessoControle {
         @RequestBody @Valid SubmeterMapaAjustadoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoService.submeterMapaAjustado(id, request, usuario.getTitulo());
+        return subprocessoService.submeterMapaAjustado(id, request, usuario.getTituloEleitoral());
     }
 
     @PostMapping("/{id}/importar-atividades")

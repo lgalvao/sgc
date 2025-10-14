@@ -26,6 +26,7 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -78,7 +79,8 @@ class CDU11IntegrationTest {
         // Unidade e Chefe
         unidade = new Unidade("Unidade Teste", "UT");
         var chefe = new Usuario();
-        chefe.setTitulo("chefe_ut");
+        chefe.setTituloEleitoral(111122223333L);
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
@@ -111,7 +113,7 @@ class CDU11IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockChefe("chefe_ut")
+        @WithMockChefe("111122223333")
         @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))

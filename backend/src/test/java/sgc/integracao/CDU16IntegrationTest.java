@@ -23,6 +23,7 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -73,7 +74,8 @@ public class CDU16IntegrationTest {
     @BeforeEach
     void setUp() {
         var admin = new Usuario();
-        admin.setTitulo("admin");
+        admin.setTituloEleitoral(111111111111L);
+        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
         usuarioRepo.save(admin);
 
         unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));

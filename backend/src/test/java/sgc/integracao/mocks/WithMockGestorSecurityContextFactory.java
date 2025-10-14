@@ -7,8 +7,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
+
+import java.util.Set;
 
 @Component
 public class WithMockGestorSecurityContextFactory implements WithSecurityContextFactory<WithMockGestor> {
@@ -23,9 +26,23 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
+        Long gestorId;
+        try {
+            gestorId = Long.parseLong(customUser.value());
+        } catch (NumberFormatException e) {
+            gestorId = 222222222222L; // Default value
+        }
 
-        Usuario principal = usuarioRepo.findById(customUser.value())
-            .orElseGet(() -> usuarioRepo.save(new Usuario(customUser.value(), "Gestor User", "gestor@example.com", null, null, null)));
+        final Long finalGestorId = gestorId;
+        Usuario principal = usuarioRepo.findById(finalGestorId)
+            .orElseGet(() -> {
+                Usuario gestor = new Usuario();
+                gestor.setTituloEleitoral(finalGestorId);
+                gestor.setNome("Gestor User");
+                gestor.setEmail("gestor@example.com");
+                gestor.setPerfis(Set.of(Perfil.GESTOR));
+                return usuarioRepo.save(gestor);
+            });
 
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());

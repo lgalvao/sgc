@@ -24,6 +24,7 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -87,17 +88,19 @@ public class CDU13IntegrationTest {
     @BeforeEach
     void setUp() {
         Usuario titular = new Usuario();
-        titular.setTitulo("chefe");
+        titular.setTituloEleitoral(333333333333L);
         titular.setNome("Chefe da Unidade");
+        titular.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(titular);
 
         unidadeSuperior = new Unidade("Unidade Superior", "UO_SUP");
         unidadeRepo.save(unidadeSuperior);
 
         Usuario gestorDaUnidade = new Usuario();
-        gestorDaUnidade.setTitulo("gestor_unidade");
+        gestorDaUnidade.setTituloEleitoral(222222222222L);
         gestorDaUnidade.setNome("Gestor da Unidade");
         gestorDaUnidade.setUnidade(unidadeSuperior);
+        gestorDaUnidade.setPerfis(java.util.Set.of(Perfil.GESTOR));
         usuarioRepo.save(gestorDaUnidade);
 
         unidadeSuperior.setTitular(gestorDaUnidade);
@@ -109,8 +112,9 @@ public class CDU13IntegrationTest {
         unidadeRepo.save(unidade);
 
         Usuario adminUser = new Usuario();
-        adminUser.setTitulo("admin");
+        adminUser.setTituloEleitoral(111111111111L);
         adminUser.setNome("Administrador");
+        adminUser.setPerfis(java.util.Set.of(Perfil.ADMIN));
         usuarioRepo.save(adminUser);
 
         Unidade sedoc = new Unidade("Secretaria de Documentação", "SEDOC");
@@ -212,7 +216,7 @@ public class CDU13IntegrationTest {
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("gestor_unidade"); // From @WithMockGestor
+            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("222222222222"); // From @WithMockGestor
 
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());

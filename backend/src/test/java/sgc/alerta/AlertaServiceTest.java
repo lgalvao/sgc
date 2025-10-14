@@ -113,7 +113,8 @@ class AlertaServiceTest {
     @DisplayName("Deve marcar alerta como lido com sucesso")
     void marcarComoLido_deveMarcarComoLido() {
         Long alertaId = 1L;
-        String usuarioTitulo = "user.teste";
+        String usuarioTituloStr = "123456789012";
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         alertaUsuario.setId(id);
@@ -121,7 +122,7 @@ class AlertaServiceTest {
 
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.of(alertaUsuario));
 
-        alertaService.marcarComoLido(usuarioTitulo, alertaId);
+        alertaService.marcarComoLido(usuarioTituloStr, alertaId);
 
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
@@ -132,11 +133,12 @@ class AlertaServiceTest {
     @DisplayName("Deve lançar exceção ao tentar marcar como lido alerta inexistente")
     void marcarComoLido_deveLancarExcecaoSeAlertaNaoEncontrado() {
         Long alertaId = 1L;
-        String usuarioTitulo = "user.teste";
+        String usuarioTituloStr = "123456789012";
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTitulo, alertaId));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
     }
 
     @Test
