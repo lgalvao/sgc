@@ -19,7 +19,6 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -29,7 +28,6 @@ import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -63,26 +61,23 @@ class CDU08IntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
-    private Unidade unidade;
-    private Usuario chefe;
     private Mapa mapa;
-    private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        chefe = new Usuario();
+        Usuario chefe = new Usuario();
         chefe.setTitulo("chefe-cdu08");
         chefe.setNome("Chefe de Teste");
         usuarioRepo.save(chefe);
 
-        unidade = new Unidade("UNIDADE-CDU08", "U08");
+        Unidade unidade = new Unidade("UNIDADE-CDU08", "U08");
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
         mapa = new Mapa();
         mapaRepo.save(mapa);
 
-        subprocesso = new Subprocesso();
+        Subprocesso subprocesso = new Subprocesso();
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);

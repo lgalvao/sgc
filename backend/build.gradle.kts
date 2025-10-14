@@ -7,7 +7,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.spotbugs") version "6.0.21"
+    id("com.github.spotbugs") version "6.2.5"
     pmd
 }
 
@@ -26,12 +26,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
@@ -42,7 +39,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.h2database:h2")
-    testImplementation("org.awaitility:awaitility:4.2.1")
+    testImplementation("org.awaitility:awaitility")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
 }
@@ -63,10 +60,10 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     forkEvery = 100L
     jvmArgs = listOf(
-        "-Xmx2g",
+        "-Xmx4g",
         "-XX:+UseParallelGC",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
@@ -128,8 +125,7 @@ tasks.withType<Test> {
                             errorMessage = rootCause?.message ?: exception?.message ?: "Unknown error",
                             errorType = rootCause?.javaClass?.simpleName ?: exception?.javaClass?.simpleName
                             ?: "Exception",
-                            stackTrace = filterStackTrace(rootCause ?: exception),
-                            fullStackTrace = getFullStackTrace(rootCause ?: exception)
+                            stackTrace = filterStackTrace(rootCause ?: exception)
                         )
                     )
                 }
@@ -178,38 +174,29 @@ tasks.withType<Test> {
                 }
         }
 
-        private fun getFullStackTrace(exception: Throwable?): List<String> {
-            if (exception == null) return emptyList()
-            return exception.stackTrace
-                .take(30)
-                .map { element ->
-                    "${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
-                }
-        }
-
         private fun outputAgentSummary(
             result: TestResult,
             failures: List<TestFailure>,
             skipped: List<String>
         ) {
-            val status = if (result.failedTestCount == 0L) "✅ SUCESSO" else "❌ FALHA"
+            val status = if (result.failedTestCount == 0L) "SUCESSO" else "FALHA"
             val durationSec = (result.endTime - result.startTime) / 1000.0
 
-            println("\n${"=".repeat(80)}")
+            println("\n${"=".repeat(20)}")
             println("RESUMO DOS TESTES")
-            println("=".repeat(80))
+            println("=".repeat(20))
             println()
-            println("Status: $status")
+            println("Situacao: $status")
             println("Total:    ${result.testCount}")
             println("Sucesso:  ${result.successfulTestCount}")
             println("Falhas:   ${result.failedTestCount}")
             println("Ignorados: ${result.skippedTestCount}")
-            println("Duração:  %.2fs".format(durationSec))
+            println("Tempo:  %.2fs".format(durationSec))
 
             if (failures.isNotEmpty()) {
-                println("\n${"-".repeat(80)}")
+                println("\n${"-".repeat(20)}")
                 println("TESTES QUE FALHARAM (${failures.size})")
-                println("-".repeat(80))
+                println("-".repeat(20))
                 failures.forEachIndexed { index, failure ->
                     println("\n${index + 1}. ${failure.testClass}")
                     println("   Método: ${failure.testMethod}")
@@ -224,14 +211,13 @@ tasks.withType<Test> {
             }
 
             if (skipped.isNotEmpty()) {
-                println("\n${"-".repeat(80)}")
+                println("\n${"-".repeat(20)}")
                 println("TESTES IGNORADOS (${skipped.size})")
-                println("-".repeat(80))
+                println("-".repeat(20))
                 skipped.forEach { println("  • $it") }
             }
 
-            println("\n${"=".repeat(80)}")
-
+            println("\n${"=".repeat(20)}")
             outputJsonSummary(result, failures, skipped)
         }
 
@@ -242,19 +228,19 @@ tasks.withType<Test> {
         ) {
             val json = """
 {
-  "status": "${if (result.failedTestCount == 0L) "passed" else "failed"}",
-  "summary": {
+  "situacao": "${if (result.failedTestCount == 0L) "sucesso" else "falha"}",
+  "resumo": {
     "total": ${result.testCount},
-    "passed": ${result.successfulTestCount},
-    "failed": ${result.failedTestCount},
-    "skipped": ${result.skippedTestCount},
-    "duration_ms": ${result.endTime - result.startTime}
+    "sucesso": ${result.successfulTestCount},
+    "falha": ${result.failedTestCount},
+    "ignorados": ${result.skippedTestCount},
+    "duracao": ${result.endTime - result.startTime}
   },
-  "failures": [
-${failures.joinToString(",\n") { "    " + it.toJson().prependIndent("    ").trim() }}
+  "falhas": [
+    ${failures.joinToString(",\n") { "    " + it.toJson().prependIndent("    ").trim() }}
   ],
-  "skipped": [
-${skipped.joinToString(",\n") { "    \"$it\"" }}
+  "ignorados": [
+    ${skipped.joinToString(",\n") { "    \"$it\"" }}
   ]
 }
             """.trimIndent()
@@ -267,9 +253,8 @@ ${skipped.joinToString(",\n") { "    \"$it\"" }}
 
     reports {
         html.required.set(false)
-        junitXml.required.set(true)
+        junitXml.required.set(false)
     }
-
     failFast = project.hasProperty("failFast")
 }
 
@@ -312,6 +297,7 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
     }
+    // As opções do MapStruct foram removidas pois a injeção de campo no ConhecimentoMapper já resolve o problema.
 }
 
 tasks.named("build") {

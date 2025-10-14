@@ -66,6 +66,4 @@ stateDiagram-v2
     MAPA_DISPONIBILIZADO --> MAPA_VALIDADO: validarMapa()
     MAPA_VALIDADO --> MAPA_HOMOLOGADO: homologarMapa()
     MAPA_HOMOLOGADO --> [*]: Processo finalizado
-
-    note "Para cada transição, uma Movimentacao é criada" as N1
 ```

@@ -17,6 +17,7 @@ public interface SubprocessoMapper {
     @Mapping(target = "processo", expression = "java(dto.getProcessoCodigo() != null ? new sgc.processo.modelo.Processo() {{ setCodigo(dto.getProcessoCodigo()); }} : null)")
     @Mapping(target = "unidade", expression = "java(dto.getUnidadeCodigo() != null ? new sgc.unidade.modelo.Unidade() {{ setCodigo(dto.getUnidadeCodigo()); }} : null)")
     @Mapping(target = "mapa", expression = "java(dto.getMapaCodigo() != null ? new sgc.mapa.modelo.Mapa() {{ setCodigo(dto.getMapaCodigo()); }} : null)")
+    @Mapping(target = "dataFimEtapa3", ignore = true)
     Subprocesso toEntity(SubprocessoDto dto);
 
 }

@@ -31,7 +31,7 @@ Os processos e subprocessos mantidos pelo sistema seguem um fluxo previsível, p
 
 ```mermaid
 ---
-title: Processo de Mapeamento: Situações e transições
+title: "Processo de Mapeamento: Situações e transições"
 ---
 
 stateDiagram-v2
@@ -108,5 +108,84 @@ stateDiagram-v2
         DecisaoValidaMapa --> MapaHomologado: SEDOC?
         DecisaoValidaMapa --> MapaValidado: int?
     }
+    MapaHomologado --> [*]
+```
+
+```mermaid
+---
+title: "Processo de Revisão: Situações e transições (por IA, nao validado)"
+---
+stateDiagram-v2
+    NaoIniciado: "Não iniciado"
+
+    [*] --> NaoIniciado
+    NaoIniciado --> RevisaoEmAndamento: unidade inicia revisão
+
+    state Cadastro {
+        RevisaoEmAndamento: Revisão do cadastro em andamento
+        RevisaoDisponibilizada: Revisão do cadastro disponibilizada
+        RevisaoHomologada: Revisão do cadastro homologada
+
+        state DecisaoAcaoCadastro <<choice>>
+        state DecisaoDevolucaoCadastro <<choice>>
+        state DecisaoValidacaoCadastro <<choice>>
+
+        RevisaoEmAndamento --> RevisaoDisponibilizada: unidade disponibiliza
+
+        RevisaoDisponibilizada --> DecisaoAcaoCadastro: SEDOC avalia
+        DecisaoAcaoCadastro --> DecisaoDevolucaoCadastro: devolve
+        DecisaoAcaoCadastro --> DecisaoValidacaoCadastro: valida
+
+        DecisaoDevolucaoCadastro --> RevisaoEmAndamento: para unidade
+        DecisaoDevolucaoCadastro --> RevisaoDisponibilizada: para SEDOC (ajuste interno)
+
+        DecisaoValidacaoCadastro --> RevisaoHomologada: SEDOC homologa
+        DecisaoValidacaoCadastro --> RevisaoDisponibilizada: para SEDOC (ajuste interno)
+
+        RevisaoHomologada --> MapaAjustado: SEDOC ajusta mapa
+    }
+
+    state Mapa {
+        MapaAjustado: Mapa ajustado
+        MapaDisponibilizado: Mapa disponibilizado
+        MapaComSugestoes: Mapa com sugestões
+        MapaValidado: Mapa validado
+        MapaHomologado: Mapa homologado
+
+        state DecisaoSugestoesMapa <<choice>>
+        state DecisaoAcaoSugestoes <<choice>>
+        state DecisaoValidaSugestoes <<choice>>
+        state DecisaoDevolveSugestoes <<choice>>
+        state DecisaoAcaoValidado <<choice>>
+        state DecisaoValidaMapa <<choice>>
+        state DecisaoDevolveValidacao <<choice>>
+        
+        MapaAjustado --> MapaDisponibilizado: SEDOC disponibiliza
+        MapaDisponibilizado --> DecisaoSugestoesMapa: hierarquia avalia
+        DecisaoSugestoesMapa --> MapaComSugestoes: com sugestões
+        DecisaoSugestoesMapa --> MapaValidado: sem sugestões (valida)
+        DecisaoSugestoesMapa --> MapaAjustado: hierarquia devolve para SEDOC (ajuste)
+
+        MapaComSugestoes --> DecisaoAcaoSugestoes: SEDOC avalia sugestões
+        DecisaoAcaoSugestoes --> DecisaoValidaSugestoes: valida
+        DecisaoAcaoSugestoes --> DecisaoDevolveSugestoes: devolve
+
+        DecisaoValidaSugestoes --> MapaAjustado: SEDOC acata e ajusta
+        DecisaoValidaSugestoes --> MapaComSugestoes: para SEDOC (ajuste interno)
+
+        DecisaoDevolveSugestoes --> MapaDisponibilizado: para hierarquia
+        DecisaoDevolveSugestoes --> MapaComSugestoes: para SEDOC (ajuste interno)
+
+        MapaValidado --> DecisaoAcaoValidado: SEDOC avalia mapa validado
+        DecisaoAcaoValidado --> DecisaoValidaMapa: homologa
+        DecisaoAcaoValidado --> DecisaoDevolveValidacao: devolve
+
+        DecisaoValidaMapa --> MapaHomologado: SEDOC homologa
+        DecisaoValidaMapa --> MapaValidado: para SEDOC (ajuste interno)
+
+        DecisaoDevolveValidacao --> MapaDisponibilizado: para hierarquia
+        DecisaoDevolveValidacao --> MapaValidado: para SEDOC (ajuste interno)
+    }
+
     MapaHomologado --> [*]
 ```

@@ -14,6 +14,7 @@ public interface AtividadeMapper {
     AtividadeDto toDTO(Atividade atividade);
 
     @Mapping(source = "mapaCodigo", target = "mapa")
+    @Mapping(target = "conhecimentos", ignore = true)
     Atividade toEntity(AtividadeDto atividadeDTO);
 
     default Mapa map(Long value) {

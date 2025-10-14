@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,15 +50,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU11IntegrationTest {
     private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{id}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
-    private static final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    // Repositories
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired

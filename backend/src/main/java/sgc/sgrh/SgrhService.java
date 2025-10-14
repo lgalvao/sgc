@@ -2,7 +2,6 @@ package sgc.sgrh;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
@@ -22,14 +21,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
-    // ========== USUÁRIOS ==========
-    /**
-     * Busca usuário por título (CPF).
-     *
-     * @param titulo CPF/título do servidor
-     * @return Optional com dados do usuário se encontrado
-     */
-    @Cacheable(value = "sgrh-usuarios", key = "#titulo")
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
         log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
         return Optional.of(new UsuarioDto(
@@ -46,7 +37,6 @@ public class SgrhService {
      * @param email Email do servidor
      * @return Optional com dados do usuário se encontrado
      */
-    @Cacheable(value = "sgrh-usuarios", key = "#email")
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         String titulo = email.split("@")[0];
         return Optional.of(new UsuarioDto(
@@ -62,12 +52,8 @@ public class SgrhService {
      *
      * @return Lista de usuários ativos
      */
-    @Cacheable("sgrh-usuarios")
     public List<UsuarioDto> buscarUsuariosAtivos() {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Listando usuários ativos");
-
         return List.of(
                 new UsuarioDto("12345678901", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001",
                         "Analista Judiciário"),
@@ -77,15 +63,12 @@ public class SgrhService {
                         "Analista Judiciário"));
     }
 
-    // ========== UNIDADES ==========
-
     /**
      * Busca unidade por código.
      *
      * @param codigo Código da unidade
      * @return Optional com dados da unidade se encontrada
      */
-    @Cacheable(value = "sgrh-unidades", key = "#codigo")
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
         log.warn("MOCK SGRH: Buscando unidade por código: {}", codigo);
         Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
@@ -97,12 +80,8 @@ public class SgrhService {
      *
      * @return Lista de unidades ativas
      */
-    @Cacheable("sgrh-unidades")
     public List<UnidadeDto> buscarUnidadesAtivas() {
-        // TODO: Conectar ao banco SGRH real
-
         log.warn("MOCK SGRH: Listando unidades ativas");
-
         return new ArrayList<>(criarUnidadesMock().values());
     }
 
@@ -112,7 +91,6 @@ public class SgrhService {
      * @param codigoPai Código da unidade pai
      * @return Lista de subunidades
      */
-    @Cacheable(value = "sgrh-unidades", key = "'subunidades-' + #codigoPai")
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
         log.warn("MOCK SGRH: Buscando subunidades de: {}", codigoPai);
         return criarUnidadesMock().values().stream()
@@ -126,7 +104,6 @@ public class SgrhService {
      *
      * @return Lista de unidades raiz com hierarquia completa
      */
-    @Cacheable("sgrh-arvore-unidades")
     public List<UnidadeDto> construirArvoreHierarquica() {
         log.warn("MOCK SGRH: Construindo árvore hierárquica de unidades");
 
@@ -164,15 +141,12 @@ public class SgrhService {
                 filhos.isEmpty() ? null : filhos);
     }
 
-    // ========== RESPONSABILIDADES ==========
-
     /**
      * Busca responsável (titular e substituto) de uma unidade.
      *
      * @param unidadeCodigo Código da unidade
      * @return Optional com dados do responsável se encontrado
      */
-    @Cacheable(value = "sgrh-responsabilidades", key = "#unidadeCodigo")
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
         log.warn("MOCK SGRH: Buscando responsável da unidade: {}", unidadeCodigo);
 
@@ -190,20 +164,19 @@ public class SgrhService {
      * @param unidadesCodigos Lista de códigos de unidade
      * @return Mapa de código da unidade para dados do responsável
      */
-    @Cacheable(value = "sgrh-responsabilidades", key = "'bulk-unidades-' + #unidadesCodigos")
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
         return unidadesCodigos.stream()
-            .collect(Collectors.toMap(
-                codigo -> codigo,
-                codigo -> new ResponsavelDto(
-                    codigo,
-                    "titular" + codigo,
-                    "Titular da Unidade " + codigo,
-                    "substituto" + codigo,
-                    "Substituto da Unidade " + codigo
-                )
-            ));
+                .collect(Collectors.toMap(
+                        codigo -> codigo,
+                        codigo -> new ResponsavelDto(
+                                codigo,
+                                "titular" + codigo,
+                                "Titular da Unidade " + codigo,
+                                "substituto" + codigo,
+                                "Substituto da Unidade " + codigo
+                        )
+                ));
     }
 
     /**
@@ -212,21 +185,20 @@ public class SgrhService {
      * @param titulos Lista de títulos (CPFs)
      * @return Mapa de título para dados do usuário
      */
-    @Cacheable(value = "sgrh-usuarios", key = "'bulk-titulos-' + #titulos")
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
         log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
         return titulos.stream()
-            .collect(Collectors.toMap(
-                titulo -> titulo,
-                titulo -> new UsuarioDto(
-                    titulo,
-                    "Usuário Mock " + titulo,
-                    titulo + "@tre-pe.jus.br",
-                    "MAT" + titulo.substring(0, Math.min(6, titulo.length())),
-                    "Analista Judiciário"
-                ),
-                (u1, u2) -> u1 // Em caso de duplicatas
-            ));
+                .collect(Collectors.toMap(
+                        titulo -> titulo,
+                        titulo -> new UsuarioDto(
+                                titulo,
+                                "Usuário Mock " + titulo,
+                                titulo + "@tre-pe.jus.br",
+                                "MAT" + titulo.substring(0, Math.min(6, titulo.length())),
+                                "Analista Judiciário"
+                        ),
+                        (u1, u2) -> u1 // Em caso de duplicatas
+                ));
     }
 
     /**
@@ -235,15 +207,11 @@ public class SgrhService {
      * @param titulo CPF/título do servidor
      * @return Lista de códigos de unidades onde é responsável
      */
-    @Cacheable(value = "sgrh-responsabilidades", key = "'unidades-' + #titulo")
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
         log.warn("MOCK SGRH: Buscando unidades onde {} é responsável", titulo);
-
         // Mock: retorna algumas unidades
         return List.of(1L, 2L, 10L);
     }
-
-    // ========== PERFIS ==========
 
     /**
      * Busca todos os perfis de um usuário.
@@ -251,7 +219,6 @@ public class SgrhService {
      * @param titulo CPF/título do servidor
      * @return Lista de perfis com unidades associadas
      */
-    @Cacheable(value = "sgrh-perfis", key = "#titulo")
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         log.warn("MOCK SGRH: Buscando perfis do usuário: {}", titulo);
 
@@ -264,8 +231,8 @@ public class SgrhService {
     /**
      * Verifica se usuário tem perfil específico em uma unidade.
      *
-     * @param titulo CPF/título do servidor
-     * @param perfil Nome do perfil (ADMIN, GESTOR, CHEFE, SERVIDOR)
+     * @param titulo        CPF/título do servidor
+     * @param perfil        Nome do perfil (ADMIN, GESTOR, CHEFE, SERVIDOR)
      * @param unidadeCodigo Código da unidade
      * @return true se usuário tem o perfil na unidade
      */
@@ -283,7 +250,6 @@ public class SgrhService {
      * @param perfil Nome do perfil
      * @return Lista de códigos de unidades
      */
-    @Cacheable(value = "sgrh-perfis", key = "#titulo + '-' + #perfil")
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         log.warn("MOCK SGRH: Buscando unidades onde {} tem perfil {}", titulo, perfil);
 
@@ -302,7 +268,7 @@ public class SgrhService {
         Map<Long, UnidadeDto> unidades = new HashMap<>();
 
         // Unidade raiz
-        unidades.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "INTERMEDIARIA"));
+        unidades.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "ADMINISTRATIVA"));
 
         // Nível 1
         unidades.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));

@@ -59,7 +59,7 @@ class AnaliseServiceTest {
 
             assertFalse(resultado.isEmpty());
             assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.CADASTRO, resultado.get(0).getTipo());
+            assertEquals(TipoAnalise.CADASTRO, resultado.getFirst().getTipo());
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -75,7 +75,7 @@ class AnaliseServiceTest {
 
             assertFalse(resultado.isEmpty());
             assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.VALIDACAO, resultado.get(0).getTipo());
+            assertEquals(TipoAnalise.VALIDACAO, resultado.getFirst().getTipo());
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -84,9 +84,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-                service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
-            });
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
         }
     }
 
@@ -129,9 +127,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-                service.criarAnalise(99L, "Obs", TipoAnalise.CADASTRO, null, null, null, null);
-            });
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.criarAnalise(99L, "Obs", TipoAnalise.CADASTRO, null, null, null, null));
         }
     }
 

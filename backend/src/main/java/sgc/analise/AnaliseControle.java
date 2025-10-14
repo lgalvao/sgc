@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.analise.modelo.TipoAnalise;
 
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;

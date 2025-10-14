@@ -11,7 +11,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 

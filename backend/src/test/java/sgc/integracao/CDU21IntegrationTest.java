@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,7 +77,6 @@ class CDU21IntegrationTest {
     private NotificacaoService notificacaoService;
 
     private Processo processo;
-    private Unidade unidadeIntermediaria;
     private Unidade unidadeOperacional1;
     private Unidade unidadeOperacional2;
 
@@ -93,7 +91,7 @@ class CDU21IntegrationTest {
         Usuario titularOp2 = usuarioRepo.save(new Usuario("T03", "Titular Op2", "titular.op2@test.com", null, null, null));
 
         // 3. Create Units
-        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
+        Unidade unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
         unidadeOperacional1 = unidadeRepo.save(new Unidade("Unidade Operacional 1", "UOP1", titularOp1, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
         unidadeOperacional2 = unidadeRepo.save(new Unidade("Unidade Operacional 2", "UOP2", titularOp2, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
 

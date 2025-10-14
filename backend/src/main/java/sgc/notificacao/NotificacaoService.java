@@ -52,11 +52,6 @@ public class NotificacaoService {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpoHtml, true));
     }
 
-    @Transactional
-    public void enviarEmailDto(EmailDto emailDto) {
-        processarEnvioDeEmail(emailDto);
-    }
-
     private void processarEnvioDeEmail(EmailDto emailDto) {
         if (!isEmailValido(emailDto.destinatario())) {
             log.error("Endereço de e-mail inválido, envio cancelado: {}", emailDto.destinatario());

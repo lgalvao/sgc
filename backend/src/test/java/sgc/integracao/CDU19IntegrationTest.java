@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.integracao.mocks.WithMockGestor;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -96,7 +95,7 @@ public class CDU19IntegrationTest {
 
     @Test
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockChefe("chefe")
+    @WithMockChefe()
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
