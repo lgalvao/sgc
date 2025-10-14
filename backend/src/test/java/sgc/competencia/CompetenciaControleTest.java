@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -40,24 +41,15 @@ class CompetenciaControleTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private CompetenciaRepo competenciaRepo;
+    private CompetenciaService competenciaService;
     @MockitoBean
     private CompetenciaMapper competenciaMapper;
-    @MockitoBean
-    private AtividadeRepo atividadeRepo;
-    @MockitoBean
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @Test
     void listarCompetencias_deveRetornarListaDeCompetencias() throws Exception {
-        Competencia competencia = new Competencia();
-        competencia.setCodigo(1L);
-        competencia.setDescricao(TEST_DESC);
-
         CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, TEST_DESC);
 
-        when(competenciaRepo.findAll()).thenReturn(Collections.singletonList(competencia));
-        when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
+        when(competenciaService.listarCompetencias()).thenReturn(Collections.singletonList(competenciaDTO));
 
         // When & Then
         mockMvc.perform(get("/api/competencias").with(user(TESTUSER)))
@@ -69,14 +61,9 @@ class CompetenciaControleTest {
 
     @Test
     void obterCompetencia_quandoEncontrada_deveRetornarCompetencia() throws Exception {
-        Competencia competencia = new Competencia();
-        competencia.setCodigo(1L);
-        competencia.setDescricao(TEST_DESC);
-
         CompetenciaDto competenciaDTO = new CompetenciaDto(1L, null, TEST_DESC);
 
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.of(competencia));
-        when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(competenciaDTO);
+        when(competenciaService.obterCompetencia(1L)).thenReturn(competenciaDTO);
 
         mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isOk())
@@ -87,7 +74,7 @@ class CompetenciaControleTest {
 
     @Test
     void obterCompetencia_quandoNaoEncontrada_deveRetornarNotFound() throws Exception {
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.empty());
+        when(competenciaService.obterCompetencia(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
         mockMvc.perform(get(API_COMPETENCIAS_1).with(user(TESTUSER)))
                 .andExpect(status().isNotFound());
@@ -96,19 +83,9 @@ class CompetenciaControleTest {
     @Test
     void criarCompetencia_deveCriarEretornarCompetencia() throws Exception {
         CompetenciaDto dto = new CompetenciaDto(null, null, "Nova Competencia");
+        CompetenciaDto savedDto = new CompetenciaDto(1L, null, "Nova Competencia");
 
-        Competencia entity = new Competencia();
-        entity.setDescricao(dto.descricao());
-
-        Competencia savedEntity = new Competencia();
-        savedEntity.setCodigo(1L);
-        savedEntity.setDescricao(entity.getDescricao());
-
-        CompetenciaDto savedDto = new CompetenciaDto(savedEntity.getCodigo(), null, savedEntity.getDescricao());
-
-        when(competenciaMapper.toEntity(any(CompetenciaDto.class))).thenReturn(entity);
-        when(competenciaRepo.save(any(Competencia.class))).thenReturn(savedEntity);
-        when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(savedDto);
+        when(competenciaService.criarCompetencia(any(CompetenciaDto.class))).thenReturn(savedDto);
 
         // When & Then
         mockMvc.perform(post("/api/competencias")
@@ -123,21 +100,10 @@ class CompetenciaControleTest {
 
     @Test
     void atualizarCompetencia_quandoEncontrada_deveAtualizarEretornarCompetencia() throws Exception {
-        CompetenciaDto dto = new CompetenciaDto(null, null, "Competencia Atualizada");
+        CompetenciaDto dto = new CompetenciaDto(1L, null, "Competencia Atualizada");
+        CompetenciaDto updatedDto = new CompetenciaDto(1L, null, "Competencia Atualizada");
 
-        Competencia existingEntity = new Competencia();
-        existingEntity.setCodigo(1L);
-        existingEntity.setDescricao("Competencia Antiga");
-
-        Competencia updatedEntity = new Competencia();
-        updatedEntity.setCodigo(1L);
-        updatedEntity.setDescricao(dto.descricao());
-
-        CompetenciaDto updatedDto = new CompetenciaDto(1L, null, dto.descricao());
-
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.of(existingEntity));
-        when(competenciaRepo.save(any(Competencia.class))).thenReturn(updatedEntity);
-        when(competenciaMapper.toDTO(any(Competencia.class))).thenReturn(updatedDto);
+        when(competenciaService.atualizarCompetencia(eq(1L), any(CompetenciaDto.class))).thenReturn(updatedDto);
 
         mockMvc.perform(put(API_COMPETENCIAS_1)
                         .with(user(TESTUSER)).with(csrf())
@@ -149,10 +115,7 @@ class CompetenciaControleTest {
 
     @Test
     void excluirCompetencia_quandoEncontrada_deveRetornarNoContent() throws Exception {
-        Competencia existingEntity = new Competencia();
-        existingEntity.setCodigo(1L);
-        when(competenciaRepo.findById(1L)).thenReturn(Optional.of(existingEntity));
-        doNothing().when(competenciaRepo).deleteById(1L);
+        doNothing().when(competenciaService).excluirCompetencia(1L);
 
         // When & Then
         mockMvc.perform(delete(API_COMPETENCIAS_1).with(user(TESTUSER)).with(csrf()))
@@ -165,10 +128,7 @@ class CompetenciaControleTest {
         long idCompetencia = 1L;
         long idAtividade = 2L;
 
-        when(competenciaRepo.findById(idCompetencia)).thenReturn(Optional.of(new Competencia()));
-        when(atividadeRepo.findById(idAtividade)).thenReturn(Optional.of(new Atividade()));
-        when(competenciaAtividadeRepo.existsById(any())).thenReturn(false);
-        when(competenciaAtividadeRepo.save(any())).thenReturn(new CompetenciaAtividade());
+        when(competenciaService.vincularAtividade(idCompetencia, idAtividade)).thenReturn(new CompetenciaAtividade());
 
         String requestBody = "{\"idAtividade\": " + idAtividade + "}";
 
@@ -183,10 +143,8 @@ class CompetenciaControleTest {
     void desvincularAtividade_deveRemoverVinculo() throws Exception {
         long idCompetencia = 1L;
         long idAtividade = 2L;
-        CompetenciaAtividade.Id vinculoId = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
 
-        when(competenciaAtividadeRepo.existsById(vinculoId)).thenReturn(true);
-        doNothing().when(competenciaAtividadeRepo).deleteById(vinculoId);
+        doNothing().when(competenciaService).desvincularAtividade(idCompetencia, idAtividade);
 
         mockMvc.perform(delete("/api/competencias/{idCompetencia}/atividades/{idAtividade}", idCompetencia, idAtividade)
                         .with(user(TESTUSER)).with(csrf()))
@@ -196,8 +154,7 @@ class CompetenciaControleTest {
     @Test
     void listarAtividadesVinculadas_deveRetornarLista() throws Exception {
         long idCompetencia = 1L;
-        when(competenciaRepo.existsById(idCompetencia)).thenReturn(true);
-        when(competenciaAtividadeRepo.findAll()).thenReturn(List.of()); // Simplesmente retorna lista vazia
+        when(competenciaService.listarAtividadesVinculadas(idCompetencia)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/competencias/{idCompetencia}/atividades", idCompetencia)
                         .with(user(TESTUSER)))

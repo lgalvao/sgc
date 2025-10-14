@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.atividade.modelo.Atividade;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.MapaService;
@@ -16,12 +17,8 @@ import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.processo.modelo.Processo;
 import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
 
 import java.net.URI;
 import java.util.List;
@@ -31,20 +28,15 @@ import java.util.Map;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 public class SubprocessoControle {
-    private final SubprocessoRepo subprocessoRepo;
     private final SubprocessoService subprocessoService;
     private final MapaService mapaService;
     private final ImpactoMapaService impactoMapaService;
-    private final SubprocessoMapper subprocessoMapper;
     private final sgc.analise.AnaliseService analiseService;
     private final sgc.analise.dto.AnaliseMapper analiseMapper;
 
     @GetMapping
     public List<SubprocessoDto> listar() {
-        return subprocessoRepo.findAll()
-                .stream()
-                .map(subprocessoMapper::toDTO)
-                .toList();
+        return subprocessoService.listar();
     }
 
     @GetMapping("/{id}")
@@ -92,50 +84,19 @@ public class SubprocessoControle {
 
     @PostMapping
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var entity = subprocessoMapper.toEntity(subprocessoDto);
-        var salvo = subprocessoRepo.save(entity);
-
+        var salvo = subprocessoService.criar(subprocessoDto);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(subprocessoMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SubprocessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody SubprocessoDto subprocessoDto) {
-        return subprocessoRepo.findById(id)
-                .map(subprocesso -> {
-                    if (subprocessoDto.getProcessoCodigo() != null) {
-                        Processo p = new Processo();
-                        p.setCodigo(subprocessoDto.getProcessoCodigo());
-                        subprocesso.setProcesso(p);
-                    } else {
-                        subprocesso.setProcesso(null);
-                    }
-
-                    if (subprocessoDto.getUnidadeCodigo() != null) {
-                        Unidade u = new Unidade();
-                        u.setCodigo(subprocessoDto.getUnidadeCodigo());
-                        subprocesso.setUnidade(u);
-                    } else {
-                        subprocesso.setUnidade(null);
-                    }
-
-                    if (subprocessoDto.getMapaCodigo() != null) {
-                        Mapa m = new Mapa();
-                        m.setCodigo(subprocessoDto.getMapaCodigo());
-                        subprocesso.setMapa(m);
-                    } else {
-                        subprocesso.setMapa(null);
-                    }
-
-                    subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
-                    subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
-                    subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataLimiteEtapa2());
-                    subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
-                    subprocesso.setSituacao(subprocessoDto.getSituacao());
-                    var atualizado = subprocessoRepo.save(subprocesso);
-                    return ResponseEntity.ok(subprocessoMapper.toDTO(atualizado));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            var atualizado = subprocessoService.atualizar(id, subprocessoDto);
+            return ResponseEntity.ok(atualizado);
+        } catch (ErroDominioNaoEncontrado e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/{id}/devolver-cadastro")
@@ -314,8 +275,12 @@ public class SubprocessoControle {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        subprocessoRepo.deleteById(id);
-        return ResponseEntity.noContent().build();
+        try {
+            subprocessoService.excluir(id);
+            return ResponseEntity.noContent().build();
+        } catch (ErroDominioNaoEncontrado e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}/mapa-ajuste")
