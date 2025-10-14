@@ -95,61 +95,7 @@ public class SubprocessoService {
                 .filter(c -> c.getAtividade() != null && idsAtividades.contains(c.getAtividade().getCodigo()))
                 .collect(Collectors.toList());
 
-        return paraDetalheDTO(sp, movimentacoes, atividades, conhecimentos);
-    }
-
-    private SubprocessoDetalheDto paraDetalheDTO(Subprocesso sp, List<Movimentacao> movimentacoes, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
-        SubprocessoDetalheDto.UnidadeDTO unidadeDto = null;
-        if (sp.getUnidade() != null) {
-            unidadeDto = SubprocessoDetalheDto.UnidadeDTO.builder()
-                .codigo(sp.getUnidade().getCodigo())
-                .sigla(sp.getUnidade().getSigla())
-                .nome(sp.getUnidade().getNome())
-                .build();
-        }
-
-        SubprocessoDetalheDto.ResponsavelDTO responsavelDto = null;
-        if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
-            var titular = sp.getUnidade().getTitular();
-            responsavelDto = SubprocessoDetalheDto.ResponsavelDTO.builder()
-                .nome(titular.getNome())
-                .ramal(titular.getRamal())
-                .email(titular.getEmail())
-                .build();
-        }
-
-        String localizacaoAtual = null;
-        if (movimentacoes != null && !movimentacoes.isEmpty()) {
-            Movimentacao m = movimentacoes.getFirst();
-            if (m.getUnidadeDestino() != null) {
-                localizacaoAtual = m.getUnidadeDestino().getSigla();
-            }
-        }
-
-        var prazoEtapaAtual = sp.getDataLimiteEtapa1() != null ? sp.getDataLimiteEtapa1() : sp.getDataLimiteEtapa2();
-
-        List<MovimentacaoDto> movimentacoesDto = new ArrayList<>();
-        if (movimentacoes != null) {
-            movimentacoesDto = movimentacoes.stream().map(movimentacaoMapper::toDTO).collect(Collectors.toList());
-        }
-
-        List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = new ArrayList<>();
-        if (atividades != null) {
-            atividades.forEach(a -> elementos.add(new SubprocessoDetalheDto.ElementoProcessoDTO("ATIVIDADE", atividadeMapper.toDTO(a))));
-        }
-        if (conhecimentos != null) {
-            conhecimentos.forEach(c -> elementos.add(new SubprocessoDetalheDto.ElementoProcessoDTO("CONHECIMENTO", conhecimentoMapper.toDTO(c))));
-        }
-
-        return SubprocessoDetalheDto.builder()
-            .unidade(unidadeDto)
-            .responsavel(responsavelDto)
-            .situacao(sp.getSituacao().name())
-            .localizacaoAtual(localizacaoAtual)
-            .prazoEtapaAtual(prazoEtapaAtual)
-            .movimentacoes(movimentacoesDto)
-            .elementosDoProcesso(elementos)
-            .build();
+        return SubprocessoDetalheDto.of(sp, movimentacoes, atividades.stream().map(atividadeMapper::toDTO).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDTO).collect(Collectors.toList()), movimentacaoMapper);
     }
 
     @Transactional(readOnly = true)
@@ -392,10 +338,7 @@ public class SubprocessoService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        String sugestoes = sp.getMapa() != null ? sp.getMapa().getSugestoes() : null;
-        boolean sugestoesApresentadas = sugestoes != null && !sugestoes.trim().isEmpty();
-        String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : null;
-        return new SugestoesDto(sugestoes, sugestoesApresentadas, nomeUnidade);
+        return SugestoesDto.of(sp);
     }
 
 
@@ -466,47 +409,17 @@ public class SubprocessoService {
         }
 
         Long idMapa = sp.getMapa().getCodigo();
-        String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";
 
-        String justificativa = analiseService.listarPorSubprocesso(idSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
-                .map(Analise::getObservacoes)
+        Analise analise = analiseService.listarPorSubprocesso(idSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst()
                 .orElse(null);
 
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(idMapa);
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);
-        List<CompetenciaAjusteDto> competenciaDtos = new ArrayList<>();
+        List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(idMapa);
+        List<CompetenciaAtividade> competenciaAtividades = competenciaAtividadeRepo.findByMapaCodigo(idMapa);
 
-        for (Competencia comp : competencias) {
-            List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
-            for (Atividade ativ : atividades) {
-                List<Conhecimento> conhecimentos = repositorioConhecimento.findByAtividadeCodigo(ativ.getCodigo());
-                boolean isLinked = competenciaAtividadeRepo.existsById(new CompetenciaAtividade.Id(comp.getCodigo(), ativ.getCodigo()));
-                List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentos.stream()
-                        .map(con -> ConhecimentoAjusteDto.builder()
-                            .conhecimentoId(con.getCodigo())
-                            .nome(con.getDescricao())
-                            .incluido(isLinked)
-                            .build())
-                        .collect(Collectors.toList());
-                atividadeDtos.add(AtividadeAjusteDto.builder()
-                    .atividadeId(ativ.getCodigo())
-                    .nome(ativ.getDescricao())
-                    .conhecimentos(conhecimentoDtos)
-                    .build());
-            }
-            competenciaDtos.add(CompetenciaAjusteDto.builder()
-                .competenciaId(comp.getCodigo())
-                .nome(comp.getDescricao())
-                .atividades(atividadeDtos)
-                .build());
-        }
 
-        return MapaAjusteDto.builder()
-            .mapaId(idMapa)
-            .unidadeNome(nomeUnidade)
-            .competencias(competenciaDtos)
-            .justificativaDevolucao(justificativa)
-            .build();
+        return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos, competenciaAtividades);
     }
 
     @Transactional
