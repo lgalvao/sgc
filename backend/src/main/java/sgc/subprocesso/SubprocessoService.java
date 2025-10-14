@@ -101,13 +101,21 @@ public class SubprocessoService {
     private SubprocessoDetalheDto paraDetalheDTO(Subprocesso sp, List<Movimentacao> movimentacoes, List<Atividade> atividades, List<Conhecimento> conhecimentos) {
         SubprocessoDetalheDto.UnidadeDTO unidadeDto = null;
         if (sp.getUnidade() != null) {
-            unidadeDto = new SubprocessoDetalheDto.UnidadeDTO(sp.getUnidade().getCodigo(), sp.getUnidade().getSigla(), sp.getUnidade().getNome());
+            unidadeDto = SubprocessoDetalheDto.UnidadeDTO.builder()
+                .codigo(sp.getUnidade().getCodigo())
+                .sigla(sp.getUnidade().getSigla())
+                .nome(sp.getUnidade().getNome())
+                .build();
         }
 
         SubprocessoDetalheDto.ResponsavelDTO responsavelDto = null;
         if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
             var titular = sp.getUnidade().getTitular();
-            responsavelDto = new SubprocessoDetalheDto.ResponsavelDTO(null, titular.getNome(), null, titular.getRamal(), titular.getEmail());
+            responsavelDto = SubprocessoDetalheDto.ResponsavelDTO.builder()
+                .nome(titular.getNome())
+                .ramal(titular.getRamal())
+                .email(titular.getEmail())
+                .build();
         }
 
         String localizacaoAtual = null;
@@ -133,15 +141,15 @@ public class SubprocessoService {
             conhecimentos.forEach(c -> elementos.add(new SubprocessoDetalheDto.ElementoProcessoDTO("CONHECIMENTO", conhecimentoMapper.toDTO(c))));
         }
 
-        return new SubprocessoDetalheDto(
-                unidadeDto,
-                responsavelDto,
-                sp.getSituacao().name(),
-                localizacaoAtual,
-                prazoEtapaAtual,
-                movimentacoesDto,
-                elementos
-        );
+        return SubprocessoDetalheDto.builder()
+            .unidade(unidadeDto)
+            .responsavel(responsavelDto)
+            .situacao(sp.getSituacao().name())
+            .localizacaoAtual(localizacaoAtual)
+            .prazoEtapaAtual(prazoEtapaAtual)
+            .movimentacoes(movimentacoesDto)
+            .elementosDoProcesso(elementos)
+            .build();
     }
 
     @Transactional(readOnly = true)
@@ -160,19 +168,19 @@ public class SubprocessoService {
                         ? emptyList()
                         : ks.stream().map(conhecimentoMapper::toDTO).toList();
 
-                atividadesComConhecimentos.add(new SubprocessoCadastroDto.AtividadeCadastroDTO(
-                        a.getCodigo(),
-                        a.getDescricao(),
-                        ksDto
-                ));
+                atividadesComConhecimentos.add(SubprocessoCadastroDto.AtividadeCadastroDTO.builder()
+                    .id(a.getCodigo())
+                    .descricao(a.getDescricao())
+                    .conhecimentos(ksDto)
+                    .build());
             }
         }
 
-        return new SubprocessoCadastroDto(
-                sp.getCodigo(),
-                sp.getUnidade() != null ? sp.getUnidade().getSigla() : null,
-                atividadesComConhecimentos
-        );
+        return SubprocessoCadastroDto.builder()
+            .subprocessoId(sp.getCodigo())
+            .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
+            .atividades(atividadesComConhecimentos)
+            .build();
     }
 
 
@@ -474,14 +482,31 @@ public class SubprocessoService {
                 List<Conhecimento> conhecimentos = repositorioConhecimento.findByAtividadeCodigo(ativ.getCodigo());
                 boolean isLinked = competenciaAtividadeRepo.existsById(new CompetenciaAtividade.Id(comp.getCodigo(), ativ.getCodigo()));
                 List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentos.stream()
-                        .map(con -> new ConhecimentoAjusteDto(con.getCodigo(), con.getDescricao(), isLinked))
+                        .map(con -> ConhecimentoAjusteDto.builder()
+                            .conhecimentoId(con.getCodigo())
+                            .nome(con.getDescricao())
+                            .incluido(isLinked)
+                            .build())
                         .collect(Collectors.toList());
-                atividadeDtos.add(new AtividadeAjusteDto(ativ.getCodigo(), ativ.getDescricao(), conhecimentoDtos));
+                atividadeDtos.add(AtividadeAjusteDto.builder()
+                    .atividadeId(ativ.getCodigo())
+                    .nome(ativ.getDescricao())
+                    .conhecimentos(conhecimentoDtos)
+                    .build());
             }
-            competenciaDtos.add(new CompetenciaAjusteDto(comp.getCodigo(), comp.getDescricao(), atividadeDtos));
+            competenciaDtos.add(CompetenciaAjusteDto.builder()
+                .competenciaId(comp.getCodigo())
+                .nome(comp.getDescricao())
+                .atividades(atividadeDtos)
+                .build());
         }
 
-        return new MapaAjusteDto(idMapa, nomeUnidade, competenciaDtos, justificativa);
+        return MapaAjusteDto.builder()
+            .mapaId(idMapa)
+            .unidadeNome(nomeUnidade)
+            .competencias(competenciaDtos)
+            .justificativaDevolucao(justificativa)
+            .build();
     }
 
     @Transactional
@@ -498,18 +523,18 @@ public class SubprocessoService {
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
 
         for (CompetenciaAjusteDto compDto : competencias) {
-            List<CompetenciaAtividade> linksExistentes = competenciaAtividadeRepo.findByCompetenciaCodigo(compDto.competenciaId());
+            List<CompetenciaAtividade> linksExistentes = competenciaAtividadeRepo.findByCompetenciaCodigo(compDto.getCompetenciaId());
             if (linksExistentes != null && !linksExistentes.isEmpty()) {
                 competenciaAtividadeRepo.deleteAll(linksExistentes);
             }
         }
 
         for (CompetenciaAjusteDto compDto : competencias) {
-            for (AtividadeAjusteDto ativDto : compDto.atividades()) {
-                boolean deveVincular = ativDto.conhecimentos().stream().anyMatch(ConhecimentoAjusteDto::incluido);
+            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                boolean deveVincular = ativDto.getConhecimentos().stream().anyMatch(ConhecimentoAjusteDto::isIncluido);
                 if (deveVincular) {
                     CompetenciaAtividade novoLink = new CompetenciaAtividade();
-                    novoLink.setId(new CompetenciaAtividade.Id(compDto.competenciaId(), ativDto.atividadeId()));
+                    novoLink.setId(new CompetenciaAtividade.Id(compDto.getCompetenciaId(), ativDto.getAtividadeId()));
                     competenciaAtividadeRepo.save(novoLink);
                 }
             }
