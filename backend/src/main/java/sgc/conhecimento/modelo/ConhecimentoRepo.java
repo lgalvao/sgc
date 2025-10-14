@@ -18,4 +18,7 @@ public interface ConhecimentoRepo extends JpaRepository<Conhecimento, Long> {
      * @return lista de Conhecimento
      */
     List<Conhecimento> findByAtividadeCodigo(Long atividadeCodigo);
+
+    @org.springframework.data.jpa.repository.Query("SELECT c FROM Conhecimento c JOIN c.atividade a WHERE a.mapa.codigo = :idMapa")
+    List<Conhecimento> findByMapaCodigo(@org.springframework.data.repository.query.Param("idMapa") Long idMapa);
 }
