@@ -26,9 +26,11 @@ import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.ImpactoMapaService;
+import sgc.mapa.modelo.Mapa;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.eventos.SubprocessoDisponibilizadoEvento;
 import sgc.processo.eventos.SubprocessoRevisaoDisponibilizadaEvento;
+import sgc.processo.modelo.Processo;
 import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.modelo.Movimentacao;
@@ -990,5 +992,67 @@ public class SubprocessoService {
         if (!atividadesSemAssociacao.isEmpty()) {
             throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.", java.util.Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<SubprocessoDto> listar() {
+        return repositorioSubprocesso.findAll()
+            .stream()
+            .map(subprocessoMapper::toDTO)
+            .toList();
+    }
+
+    @Transactional
+    public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
+        var entity = subprocessoMapper.toEntity(subprocessoDto);
+        var salvo = repositorioSubprocesso.save(entity);
+        return subprocessoMapper.toDTO(salvo);
+    }
+
+    @Transactional
+    public SubprocessoDto atualizar(Long id, SubprocessoDto subprocessoDto) {
+        return repositorioSubprocesso.findById(id)
+            .map(subprocesso -> {
+                if (subprocessoDto.getProcessoCodigo() != null) {
+                    Processo p = new Processo();
+                    p.setCodigo(subprocessoDto.getProcessoCodigo());
+                    subprocesso.setProcesso(p);
+                } else {
+                    subprocesso.setProcesso(null);
+                }
+
+                if (subprocessoDto.getUnidadeCodigo() != null) {
+                    Unidade u = new Unidade();
+                    u.setCodigo(subprocessoDto.getUnidadeCodigo());
+                    subprocesso.setUnidade(u);
+                } else {
+                    subprocesso.setUnidade(null);
+                }
+
+                if (subprocessoDto.getMapaCodigo() != null) {
+                    Mapa m = new Mapa();
+                    m.setCodigo(subprocessoDto.getMapaCodigo());
+                    subprocesso.setMapa(m);
+                } else {
+                    subprocesso.setMapa(null);
+                }
+
+                subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
+                subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
+                subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataLimiteEtapa2());
+                subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
+                subprocesso.setSituacao(subprocessoDto.getSituacao());
+                var atualizado = repositorioSubprocesso.save(subprocesso);
+                return subprocessoMapper.toDTO(atualizado);
+            })
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        if (!repositorioSubprocesso.existsById(id)) {
+            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id);
+        }
+        repositorioSubprocesso.deleteById(id);
     }
 }

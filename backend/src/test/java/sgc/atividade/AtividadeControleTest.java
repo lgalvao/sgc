@@ -53,22 +53,13 @@ class AtividadeControleTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private AtividadeRepo atividadeRepo;
+    private AtividadeService atividadeService;
 
     @MockitoBean
     private AtividadeMapper atividadeMapper;
 
     @MockitoBean
-    private ConhecimentoRepo conhecimentoRepo;
-
-    @MockitoBean
     private ConhecimentoMapper conhecimentoMapper;
-
-    @MockitoBean
-    private SubprocessoRepo subprocessoRepo;
-
-    @MockitoBean
-    private UsuarioRepo usuarioRepo;
 
     @Nested
     @DisplayName("Testes para CRUD de Atividades")
@@ -76,14 +67,9 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve retornar lista de atividades com status 200 OK")
         void deveRetornarListaDeAtividades() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setDescricao(ATIVIDADE_TESTE);
-
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
-            when(atividadeRepo.findAll()).thenReturn(List.of(atividade));
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
+            when(atividadeService.listar()).thenReturn(List.of(atividadeDto));
 
             mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
@@ -95,7 +81,7 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve retornar lista vazia com status 200 OK")
         void deveRetornarListaVazia() throws Exception {
-            when(atividadeRepo.findAll()).thenReturn(Collections.emptyList());
+            when(atividadeService.listar()).thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
@@ -111,12 +97,9 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve retornar uma atividade com status 200 OK")
         void deveRetornarAtividadePorId() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
+            when(atividadeService.obterPorId(1L)).thenReturn(atividadeDto);
 
             mockMvc.perform(get(API_ATIVIDADES_1))
                     .andExpect(status().isOk())
@@ -126,7 +109,7 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve retornar 404 Not Found para ID inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(atividadeService.obterPorId(99L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
             mockMvc.perform(get(API_ATIVIDADES_99))
                     .andExpect(status().isNotFound());
@@ -141,33 +124,14 @@ class AtividadeControleTest {
         @DisplayName("Deve criar uma atividade e retornar 201 Created")
         void deveCriarAtividade() throws Exception {
             var atividadeDto = new AtividadeDto(null, 10L, NOVA_ATIVIDADE);
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setDescricao(NOVA_ATIVIDADE);
-            var mapa = new Mapa();
-            mapa.setCodigo(10L);
-            atividade.setMapa(mapa);
-
-            var chefe = new Usuario();
-            chefe.setTitulo("chefe");
-            var unidade = new sgc.unidade.modelo.Unidade();
-            unidade.setTitular(chefe);
-            var subprocesso = new sgc.subprocesso.modelo.Subprocesso();
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            subprocesso.setUnidade(unidade);
-
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);
 
-            when(usuarioRepo.findByTitulo("chefe")).thenReturn(Optional.of(chefe));
-            when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(atividade);
-            when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividade);
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeSalvaDto);
+            when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("chefe")))
+                            .with(user("user")))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -194,24 +158,10 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve atualizar uma atividade e retornar 200 OK")
         void deveAtualizarAtividade() throws Exception {
-            var atividadeExistente = new Atividade();
-            atividadeExistente.setCodigo(1L);
-            atividadeExistente.setDescricao("Descrição Antiga");
-
             var atividadeDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
-            var entidadeParaAtualizar = new Atividade();
-            entidadeParaAtualizar.setDescricao(DESCRICAO_ATUALIZADA);
-
-            var atividadeAtualizada = new Atividade();
-            atividadeAtualizada.setCodigo(1L);
-            atividadeAtualizada.setDescricao(DESCRICAO_ATUALIZADA);
-
             var atividadeAtualizadaDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividadeExistente));
-            when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(entidadeParaAtualizar);
-            when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividadeAtualizada);
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeAtualizadaDto);
+            when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
             mockMvc.perform(put(API_ATIVIDADES_1).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -225,7 +175,7 @@ class AtividadeControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             var atividadeDto = new AtividadeDto(99L, null, "Tanto faz");
 
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
             mockMvc.perform(put(API_ATIVIDADES_99).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -241,23 +191,18 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve excluir uma atividade e retornar 204 No Content")
         void deveExcluirAtividade() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(Collections.emptyList());
-            doNothing().when(atividadeRepo).delete(any(Atividade.class));
+            doNothing().when(atividadeService).excluir(1L);
 
             mockMvc.perform(delete(API_ATIVIDADES_1).with(csrf()))
                     .andExpect(status().isNoContent());
 
-            verify(atividadeRepo, times(1)).delete(any(Atividade.class));
+            verify(atividadeService, times(1)).excluir(1L);
         }
 
         @Test
         @DisplayName("Deve retornar 404 Not Found para ID inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(atividadeService).excluir(99L);
 
             mockMvc.perform(delete(API_ATIVIDADES_99).with(csrf()))
                     .andExpect(status().isNotFound());
@@ -276,12 +221,9 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve listar conhecimentos de uma atividade")
         void deveListarConhecimentos() throws Exception {
-            var conhecimento = new Conhecimento();
-            conhecimento.setCodigo(1L);
             var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Conhecimento Teste");
 
-            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(List.of(conhecimento));
-            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
+            when(atividadeService.listarConhecimentos(1L)).thenReturn(List.of(conhecimentoDto));
 
             mockMvc.perform(get(API_CONHECIMENTOS))
                 .andExpect(status().isOk())
@@ -291,18 +233,10 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve criar um conhecimento para uma atividade")
         void deveCriarConhecimento() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
             var conhecimentoDto = new ConhecimentoDto(null, 1L, NOVO_CONHECIMENTO);
-            var conhecimento = new Conhecimento(NOVO_CONHECIMENTO, atividade);
-            var conhecimentoSalvo = new Conhecimento(NOVO_CONHECIMENTO, atividade);
-            conhecimentoSalvo.setCodigo(1L);
             var conhecimentoSalvoDto = new ConhecimentoDto(1L, 1L, NOVO_CONHECIMENTO);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(conhecimento);
-            when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimentoSalvo);
-            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoSalvoDto);
+            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoSalvoDto);
 
             mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -315,18 +249,9 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve atualizar um conhecimento")
         void deveAtualizarConhecimento() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            var conhecimentoExistente = new Conhecimento("Antigo", atividade);
-            conhecimentoExistente.setCodigo(1L);
-
             var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Atualizado");
-            var conhecimentoParaAtualizar = new Conhecimento("Atualizado", atividade);
 
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimentoExistente));
-            when(conhecimentoMapper.toEntity(any(ConhecimentoDto.class))).thenReturn(conhecimentoParaAtualizar);
-            when(conhecimentoRepo.save(any(Conhecimento.class))).thenReturn(conhecimentoExistente);
-            when(conhecimentoMapper.toDTO(any(Conhecimento.class))).thenReturn(conhecimentoDto);
+            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
 
             mockMvc.perform(put(API_CONHECIMENTOS_1).with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -338,19 +263,12 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve excluir um conhecimento")
         void deveExcluirConhecimento() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            var conhecimento = new Conhecimento();
-            conhecimento.setCodigo(1L);
-            conhecimento.setAtividade(atividade);
-
-            when(conhecimentoRepo.findById(1L)).thenReturn(Optional.of(conhecimento));
-            doNothing().when(conhecimentoRepo).delete(any(Conhecimento.class));
+            doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
             mockMvc.perform(delete(API_CONHECIMENTOS_1).with(csrf()))
                 .andExpect(status().isNoContent());
 
-            verify(conhecimentoRepo, times(1)).delete(conhecimento);
+            verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);
         }
     }
 }
