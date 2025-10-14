@@ -27,6 +27,7 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -93,7 +94,8 @@ class CDU10IntegrationTest {
         unidadeChefe = new Unidade("Unidade Teste", "UT");
         unidadeChefe.setUnidadeSuperior(unidadeSuperior);
         var chefe = new Usuario();
-        chefe.setTitulo("chefe");
+        chefe.setTituloEleitoral(333333333333L);
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         chefe = usuarioRepo.save(chefe);
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
@@ -165,11 +167,12 @@ class CDU10IntegrationTest {
     @DisplayName("Testes de Segurança")
     class Seguranca {
         @Test
-        @WithMockChefe("outro_chefe")
+        @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             var outroChefe = new Usuario();
-            outroChefe.setTitulo("outro_chefe");
+            outroChefe.setTituloEleitoral(999999999999L);
+            outroChefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
             usuarioRepo.save(outroChefe);
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))

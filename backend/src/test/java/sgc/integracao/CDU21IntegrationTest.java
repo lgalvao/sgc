@@ -25,6 +25,7 @@ import sgc.notificacao.NotificacaoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.*;
 import sgc.sgrh.SgrhService;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
@@ -40,6 +41,7 @@ import sgc.unidade.modelo.UnidadeRepo;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -86,9 +88,9 @@ class CDU21IntegrationTest {
         doNothing().when(notificacaoService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         // 2. Create Users
-        Usuario titularIntermediaria = usuarioRepo.save(new Usuario("T01", "Titular Intermediaria", "titular.intermediaria@test.com", null, null, null));
-        Usuario titularOp1 = usuarioRepo.save(new Usuario("T02", "Titular Op1", "titular.op1@test.com", null, null, null));
-        Usuario titularOp2 = usuarioRepo.save(new Usuario("T03", "Titular Op2", "titular.op2@test.com", null, null, null));
+        Usuario titularIntermediaria = usuarioRepo.save(new Usuario(101010101010L, "Titular Intermediaria", "titular.intermediaria@test.com", null, null, Set.of(Perfil.CHEFE)));
+        Usuario titularOp1 = usuarioRepo.save(new Usuario(202020202020L, "Titular Op1", "titular.op1@test.com", null, null, Set.of(Perfil.CHEFE)));
+        Usuario titularOp2 = usuarioRepo.save(new Usuario(303030303030L, "Titular Op2", "titular.op2@test.com", null, null, Set.of(Perfil.CHEFE)));
 
         // 3. Create Units
         Unidade unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
@@ -106,20 +108,20 @@ class CDU21IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         // 6. Create UnidadeProcesso snapshots
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), titularIntermediaria.getTitulo(), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional1.getCodigo(), unidadeOperacional1.getNome(), unidadeOperacional1.getSigla(), titularOp1.getTitulo(), unidadeOperacional1.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional2.getCodigo(), unidadeOperacional2.getNome(), unidadeOperacional2.getSigla(), titularOp2.getTitulo(), unidadeOperacional2.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), String.valueOf(titularIntermediaria.getTituloEleitoral()), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional1.getCodigo(), unidadeOperacional1.getNome(), unidadeOperacional1.getSigla(), String.valueOf(titularOp1.getTituloEleitoral()), unidadeOperacional1.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional2.getCodigo(), unidadeOperacional2.getNome(), unidadeOperacional2.getSigla(), String.valueOf(titularOp2.getTituloEleitoral()), unidadeOperacional2.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
 
         // 7. Mock SGRH Service
         when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-            unidadeIntermediaria.getCodigo(), new ResponsavelDto(unidadeIntermediaria.getCodigo(), titularIntermediaria.getTitulo(), "Titular Intermediaria", null, null),
-            unidadeOperacional1.getCodigo(), new ResponsavelDto(unidadeOperacional1.getCodigo(), titularOp1.getTitulo(), "Titular Op1", null, null),
-            unidadeOperacional2.getCodigo(), new ResponsavelDto(unidadeOperacional2.getCodigo(), titularOp2.getTitulo(), "Titular Op2", null, null)
+            unidadeIntermediaria.getCodigo(), new ResponsavelDto(unidadeIntermediaria.getCodigo(), String.valueOf(titularIntermediaria.getTituloEleitoral()), "Titular Intermediaria", null, null),
+            unidadeOperacional1.getCodigo(), new ResponsavelDto(unidadeOperacional1.getCodigo(), String.valueOf(titularOp1.getTituloEleitoral()), "Titular Op1", null, null),
+            unidadeOperacional2.getCodigo(), new ResponsavelDto(unidadeOperacional2.getCodigo(), String.valueOf(titularOp2.getTituloEleitoral()), "Titular Op2", null, null)
         ));
         when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-            "T01", new UsuarioDto("T01", "Titular Intermediaria", "titular.intermediaria@test.com", "123", "Cargo"),
-            "T02", new UsuarioDto("T02", "Titular Op1", "titular.op1@test.com", "123", "Cargo"),
-            "T03", new UsuarioDto("T03", "Titular Op2", "titular.op2@test.com", "123", "Cargo")
+            String.valueOf(101010101010L), new UsuarioDto("101010101010", "Titular Intermediaria", "titular.intermediaria@test.com", "123", "Cargo"),
+            String.valueOf(202020202020L), new UsuarioDto("202020202020", "Titular Op1", "titular.op1@test.com", "123", "Cargo"),
+            String.valueOf(303030303030L), new UsuarioDto("303030303030", "Titular Op2", "titular.op2@test.com", "123", "Cargo")
         ));
     }
 

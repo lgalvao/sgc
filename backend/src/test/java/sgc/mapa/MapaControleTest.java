@@ -54,7 +54,7 @@ public class MapaControleTest {
     @BeforeEach
     void setUp() {
         Usuario usuario = new Usuario();
-        usuario.setTitulo("test-user");
+        usuario.setTituloEleitoral(123456789012L);
 
         HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
 
@@ -194,7 +194,7 @@ public class MapaControleTest {
         SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
         MapaCompletoDto mapaCompletoDto = new MapaCompletoDto(1L, 100L, OBS, Collections.emptyList());
 
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyString())).thenReturn(mapaCompletoDto);
+        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenReturn(mapaCompletoDto);
 
         mockMvc.perform(put(API_MAPAS_1_COMPLETO)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -206,7 +206,7 @@ public class MapaControleTest {
     @Test
     void salvarCompleto_QuandoServicoLancaExcecao_DeveRetornarBadRequest() throws Exception {
         SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyString())).thenThrow(new RuntimeException("Erro"));
+        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenThrow(new RuntimeException("Erro"));
 
         mockMvc.perform(put(API_MAPAS_1_COMPLETO)
                         .contentType(MediaType.APPLICATION_JSON)

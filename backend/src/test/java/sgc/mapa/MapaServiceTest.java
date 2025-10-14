@@ -150,7 +150,7 @@ class MapaServiceTest {
         when(repositorioCompetencia.save(any(Competencia.class))).thenReturn(competencia);
         when(atividadeRepo.existsById(1L)).thenReturn(true);
 
-        mapaServico.salvarMapaSubprocesso(100L, request, "user");
+        mapaServico.salvarMapaSubprocesso(100L, request, 123456789012L);
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
     }
@@ -161,7 +161,7 @@ class MapaServiceTest {
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
-        assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, "user"))
+        assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, 123456789012L))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: NAO_INICIADO");
     }

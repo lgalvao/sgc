@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.*;
 import sgc.processo.modelo.Processo;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.*;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -247,21 +245,21 @@ public class AlertaService {
         return criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codigoUnidadeDestino, descricao, null);
     }
 
-    private void criarAlertaUsuario(Alerta alerta, String usuarioTitulo, Long codigoUnidade) {
+    private void criarAlertaUsuario(Alerta alerta, String usuarioTituloStr, Long codigoUnidade) {
         try {
+            Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
             Usuario usuario = usuarioRepo.findById(usuarioTitulo)
                     .orElseGet(() -> {
                         log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH...", usuarioTitulo);
-                        return servicoSgrh.buscarUsuarioPorTitulo(usuarioTitulo)
+                        return servicoSgrh.buscarUsuarioPorTitulo(usuarioTituloStr)
                                 .map(usuarioDto -> {
                                     Usuario novoUsuario = new Usuario();
-                                    novoUsuario.setTitulo(usuarioDto.titulo());
+                                    novoUsuario.setTituloEleitoral(Long.parseLong(usuarioDto.titulo()));
                                     novoUsuario.setNome(usuarioDto.nome());
                                     novoUsuario.setEmail(usuarioDto.email());
-                                    novoUsuario.setRamal(null);
+                                    novoUsuario.setPerfis(java.util.Set.of(Perfil.CHEFE)); // Default role
                                     repositorioUnidade.findById(codigoUnidade).ifPresent(novoUsuario::setUnidade);
-                                    Usuario savedUsuario = usuarioRepo.save(novoUsuario);
-                                    return usuarioRepo.findById(savedUsuario.getTitulo()).orElseThrow(); // Re-fetch to ensure it's fully managed
+                                    return usuarioRepo.save(novoUsuario);
                                 })
                                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado no SGRH: " + usuarioTitulo));
                     });
@@ -270,13 +268,13 @@ public class AlertaService {
             AlertaUsuario.Chave id = new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo);
             alertaUsuario.setId(id);
             alertaUsuario.setAlerta(alerta);
-            alertaUsuario.setUsuario(usuario); // Definir o usuário
-            alertaUsuario.setDataHoraLeitura(null); // Não lido
+            alertaUsuario.setUsuario(usuario);
+            alertaUsuario.setDataHoraLeitura(null);
 
             repositorioAlertaUsuario.save(alertaUsuario);
             log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), usuarioTitulo);
         } catch (Exception e) {
-            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), usuarioTitulo, e.getMessage(), e);
+            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), usuarioTituloStr, e.getMessage(), e);
         }
     }
 
@@ -295,7 +293,8 @@ public class AlertaService {
      * @param alertaId O ID do alerta a ser marcado como lido.
      */
     @Transactional
-    public void marcarComoLido(String usuarioTitulo, Long alertaId) {
+    public void marcarComoLido(String usuarioTituloStr, Long alertaId) {
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         AlertaUsuario alertaUsuario = repositorioAlertaUsuario.findById(id)
             .orElseThrow(() -> new sgc.comum.erros.ErroEntidadeNaoEncontrada(

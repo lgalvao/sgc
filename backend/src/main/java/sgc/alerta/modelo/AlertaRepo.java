@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
-    Page<Alerta> findByUsuarioDestino_Titulo(String usuarioTitulo, Pageable pageable);
+    Page<Alerta> findByUsuarioDestino_TituloEleitoral(Long usuarioTitulo, Pageable pageable);
     Page<Alerta> findByUnidadeDestino_Codigo(Long unidadeCodigo, Pageable pageable);
     List<Alerta> findByProcessoCodigo(Long processoCodigo);
 }

@@ -5,9 +5,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import org.springframework.stereotype.Component;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 
+import java.util.Set;
+
+@Component
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
 
     @Autowired
@@ -16,10 +21,21 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Usuario usuario = usuarioRepo.findByTitulo(annotation.value())
+        Long chefeId;
+        try {
+            chefeId = Long.parseLong(annotation.value());
+        } catch (NumberFormatException e) {
+            chefeId = 333333333333L; // Default value
+        }
+
+        final Long finalChefeId = chefeId;
+        Usuario usuario = usuarioRepo.findByTituloEleitoral(finalChefeId)
             .orElseGet(() -> {
                 Usuario newUser = new Usuario();
-                newUser.setTitulo(annotation.value());
+                newUser.setTituloEleitoral(finalChefeId);
+                newUser.setNome("Chefe User");
+                newUser.setEmail("chefe@example.com");
+                newUser.setPerfis(Set.of(Perfil.CHEFE));
                 return usuarioRepo.save(newUser);
             });
 

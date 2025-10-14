@@ -99,7 +99,7 @@ public class MapaControle {
             @AuthenticationPrincipal Usuario usuario
     ) {
         try {
-            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTitulo());
+            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTituloEleitoral());
             return ResponseEntity.ok(mapa);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

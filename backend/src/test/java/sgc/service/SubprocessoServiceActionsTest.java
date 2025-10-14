@@ -22,6 +22,7 @@ import sgc.mapa.modelo.Mapa;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -92,13 +93,14 @@ public class SubprocessoServiceActionsTest {
         unidadeRepo.save(unidade);
 
         Usuario chefe = new Usuario();
-        chefe.setTitulo("chefe_ut");
+        chefe.setTituloEleitoral(111122223333L);
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
         usuario = new Usuario();
-        usuario.setTitulo("user_test");
+        usuario.setTituloEleitoral(444455556666L);
         usuario.setUnidade(unidade);
         usuarioRepo.save(usuario);
     }
@@ -133,7 +135,7 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
+            subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
@@ -165,7 +167,7 @@ public class SubprocessoServiceActionsTest {
             Unidade sedoc = new Unidade("SEDOC", "SEDOC");
             unidadeRepo.save(sedoc);
 
-            SubprocessoDto result = subprocessoService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTitulo());
+            SubprocessoDto result = subprocessoService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
 
             assertNotNull(result);
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();

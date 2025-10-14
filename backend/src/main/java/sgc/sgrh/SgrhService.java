@@ -55,11 +55,11 @@ public class SgrhService {
     public List<UsuarioDto> buscarUsuariosAtivos() {
         log.warn("MOCK SGRH: Listando usuários ativos");
         return List.of(
-                new UsuarioDto("12345678901", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001",
+                new UsuarioDto("123456789012", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001",
                         "Analista Judiciário"),
-                new UsuarioDto("98765432109", "Maria Santos", "maria.santos@tre-pe.jus.br", "MAT002",
+                new UsuarioDto("987654321098", "Maria Santos", "maria.santos@tre-pe.jus.br", "MAT002",
                         "Técnico Judiciário"),
-                new UsuarioDto("11122233344", "Pedro Oliveira", "pedro.oliveira@tre-pe.jus.br", "MAT003",
+                new UsuarioDto("111222333444", "Pedro Oliveira", "pedro.oliveira@tre-pe.jus.br", "MAT003",
                         "Analista Judiciário"));
     }
 
@@ -152,9 +152,9 @@ public class SgrhService {
 
         return Optional.of(new ResponsavelDto(
                 unidadeCodigo,
-                "12345678901",
+                "123456789012",
                 "João Silva (Titular)",
-                "98765432109",
+                "987654321098",
                 "Maria Santos (Substituto)"));
     }
 
@@ -171,9 +171,9 @@ public class SgrhService {
                         codigo -> codigo,
                         codigo -> new ResponsavelDto(
                                 codigo,
-                                "titular" + codigo,
+                                String.format("%012d", codigo), // titular
                                 "Titular da Unidade " + codigo,
-                                "substituto" + codigo,
+                                String.format("%012d", codigo + 1000), // substituto
                                 "Substituto da Unidade " + codigo
                         )
                 ));

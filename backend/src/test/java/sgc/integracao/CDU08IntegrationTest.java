@@ -19,6 +19,7 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
@@ -66,8 +67,9 @@ class CDU08IntegrationTest {
     @BeforeEach
     void setUp() {
         Usuario chefe = new Usuario();
-        chefe.setTitulo("chefe-cdu08");
+        chefe.setTituloEleitoral(888888888888L);
         chefe.setNome("Chefe de Teste");
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(chefe);
 
         Unidade unidade = new Unidade("UNIDADE-CDU08", "U08");
@@ -87,7 +89,7 @@ class CDU08IntegrationTest {
 
     @Nested
     @DisplayName("Testes de fluxo completo")
-    @WithMockChefe("chefe-cdu08")
+    @WithMockChefe("888888888888")
     class FluxoCompleto {
 
         @Test
