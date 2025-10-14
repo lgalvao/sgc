@@ -2,22 +2,61 @@ package sgc.subprocesso.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.
  */
+@Component
 @Mapper(componentModel = "spring")
-public interface SubprocessoMapper {
+public abstract class SubprocessoMapper {
+    @Autowired
+    protected ProcessoRepo processoRepo;
+    @Autowired
+    protected UnidadeRepo unidadeRepo;
+    @Autowired
+    protected MapaRepo mapaRepo;
+
     @Mapping(source = "processo.codigo", target = "processoCodigo")
     @Mapping(source = "unidade.codigo", target = "unidadeCodigo")
     @Mapping(source = "mapa.codigo", target = "mapaCodigo")
-    SubprocessoDto toDTO(Subprocesso subprocesso);
+    public abstract SubprocessoDto toDTO(Subprocesso subprocesso);
 
-    @Mapping(target = "processo", expression = "java(dto.getProcessoCodigo() != null ? new sgc.processo.modelo.Processo() {{ setCodigo(dto.getProcessoCodigo()); }} : null)")
-    @Mapping(target = "unidade", expression = "java(dto.getUnidadeCodigo() != null ? new sgc.unidade.modelo.Unidade() {{ setCodigo(dto.getUnidadeCodigo()); }} : null)")
-    @Mapping(target = "mapa", expression = "java(dto.getMapaCodigo() != null ? new sgc.mapa.modelo.Mapa() {{ setCodigo(dto.getMapaCodigo()); }} : null)")
+    @Mapping(source = "processoCodigo", target = "processo")
+    @Mapping(source = "unidadeCodigo", target = "unidade")
+    @Mapping(source = "mapaCodigo", target = "mapa")
     @Mapping(target = "dataFimEtapa3", ignore = true)
-    Subprocesso toEntity(SubprocessoDto dto);
+    public abstract Subprocesso toEntity(SubprocessoDto dto);
 
+    public Processo mapProcesso(Long value) {
+        if (value == null) {
+            return null;
+        }
+        return processoRepo.findById(value)
+                .orElseThrow(() -> new RuntimeException("Processo não encontrado com o código: " + value));
+    }
+
+    public Unidade mapUnidade(Long value) {
+        if (value == null) {
+            return null;
+        }
+        return unidadeRepo.findById(value)
+                .orElseThrow(() -> new RuntimeException("Unidade não encontrada com o código: " + value));
+    }
+
+    public Mapa mapMapa(Long value) {
+        if (value == null) {
+            return null;
+        }
+        return mapaRepo.findById(value)
+                .orElseThrow(() -> new RuntimeException("Mapa não encontrado com o código: " + value));
+    }
 }
