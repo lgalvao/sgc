@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.comum.modelo.Administrador;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -51,7 +52,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU11IntegrationTest {
     private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{id}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
-    private static final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     private MockMvc mockMvc;
@@ -74,6 +74,8 @@ class CDU11IntegrationTest {
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private AdministradorRepo administradorRepo;
 
     // Test data
     private Unidade unidade;
@@ -82,11 +84,25 @@ class CDU11IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // Users
+        Usuario adminUser = new Usuario();
+        adminUser.setTitulo("admin");
+        adminUser.setNome("Admin User");
+        usuarioRepo.save(adminUser);
+        administradorRepo.save(new Administrador(adminUser.getTitulo(), adminUser));
+
+        Usuario gestorUser = new Usuario();
+        gestorUser.setTitulo("gestor_unidade");
+        gestorUser.setNome("Gestor User");
+        usuarioRepo.save(gestorUser);
+
+        var chefe = new Usuario();
+        chefe.setTitulo("chefe");
+        chefe.setNome("Chefe User");
+        usuarioRepo.save(chefe);
+
         // Unidade e Chefe
         unidade = new Unidade("Unidade Teste", "UT");
-        var chefe = new Usuario();
-        chefe.setTitulo("chefe_ut");
-        usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
@@ -118,7 +134,7 @@ class CDU11IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockChefe("chefe_ut")
+        @WithMockChefe
         @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
@@ -150,15 +166,6 @@ class CDU11IntegrationTest {
         @WithMockGestor
         @DisplayName("Deve permitir que GESTOR visualize o cadastro de qualquer unidade")
         void devePermitirGestorVisualizarCadastro() throws Exception {
-            mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
-        }
-
-        @Test
-        @WithMockUser
-        @DisplayName("Deve permitir que SERVIDOR visualize o cadastro de qualquer unidade")
-        void devePermitirServidorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));

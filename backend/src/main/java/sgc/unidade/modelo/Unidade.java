@@ -14,6 +14,7 @@ import sgc.sgrh.Usuario;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SequenceGenerator(name="default_seq_gen", sequenceName="UNIDADE_SEQ", allocationSize=1)
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();

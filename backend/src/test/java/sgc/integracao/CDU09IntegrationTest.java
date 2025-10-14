@@ -160,7 +160,7 @@ class CDU09IntegrationTest {
     @DisplayName("Testes de Segurança")
     class Seguranca {
         @Test
-        @WithMockChefe("outro_chefe")
+        @WithMockChefe
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             var outroChefe = new Usuario();

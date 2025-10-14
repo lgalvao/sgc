@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.comum.modelo.Administrador;
 import sgc.comum.modelo.AdministradorRepo;
+import sgc.sgrh.CustomUserDetailsService;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.unidade.modelo.TipoUnidade;
@@ -19,6 +20,7 @@ import sgc.unidade.modelo.UnidadeRepo;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @SpringBootTest(classes = Sgc.class)
 @ActiveProfiles("test")
@@ -34,6 +36,9 @@ class PerfilUsuarioIntegrationTest {
 
     @Autowired
     private AdministradorRepo administradorRepo;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     private Unidade unidadeOperacional;
     private Unidade unidadeIntermediaria;
@@ -57,24 +62,15 @@ class PerfilUsuarioIntegrationTest {
     @Test
     @DisplayName("Deve atribuir ROLE_ADMIN para usuário cadastrado como Administrador")
     void deveAtribuirRoleAdmin() {
-        System.out.println("--- Iniciando deveAtribuirRoleAdmin ---");
         Usuario userAdmin = new Usuario();
         userAdmin.setTitulo("111111111111");
-        System.out.println("Criado usuário: " + userAdmin.getTitulo());
         usuarioRepo.save(userAdmin);
-        System.out.println("Salvo usuário: " + userAdmin.getTitulo());
 
         Administrador admin = new Administrador(userAdmin.getTitulo(), userAdmin);
-        System.out.println("Criado admin para: " + admin.getUsuarioTitulo());
         administradorRepo.save(admin);
-        System.out.println("Salvo admin para: " + admin.getUsuarioTitulo());
 
-        Usuario foundUser = usuarioRepo.findById("111111111111").orElseThrow();
-        System.out.println("Encontrado usuário: " + foundUser.getTitulo());
-        Collection<?> authorities = foundUser.determineAuthorities(administradorRepo);
-        System.out.println("Autoridades determinadas: " + authorities);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_ADMIN");
-        System.out.println("--- Finalizando deveAtribuirRoleAdmin ---");
+        UserDetails foundUser = userDetailsService.loadUserByUsername("111111111111");
+        assertThat(foundUser.getAuthorities()).extracting("authority").containsExactly("ROLE_ADMIN");
     }
 
     @Test
@@ -88,9 +84,8 @@ class PerfilUsuarioIntegrationTest {
         unidadeOperacional.setTitular(chefe);
         unidadeRepo.save(unidadeOperacional);
 
-        Usuario foundChefe = usuarioRepo.findById("222222222222").orElseThrow();
-        Collection<?> authorities = foundChefe.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_CHEFE");
+        UserDetails foundChefe = userDetailsService.loadUserByUsername("222222222222");
+        assertThat(foundChefe.getAuthorities()).extracting("authority").containsExactly("ROLE_CHEFE");
     }
 
     @Test
@@ -104,9 +99,8 @@ class PerfilUsuarioIntegrationTest {
         unidadeInteroperacional.setTitular(chefe);
         unidadeRepo.save(unidadeInteroperacional);
 
-        Usuario foundChefe = usuarioRepo.findById("333333333333").orElseThrow();
-        Collection<?> authorities = foundChefe.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_CHEFE");
+        UserDetails foundChefe = userDetailsService.loadUserByUsername("333333333333");
+        assertThat(foundChefe.getAuthorities()).extracting("authority").containsExactly("ROLE_CHEFE");
     }
 
     @Test
@@ -120,9 +114,8 @@ class PerfilUsuarioIntegrationTest {
         unidadeIntermediaria.setTitular(gestor);
         unidadeRepo.save(unidadeIntermediaria);
 
-        Usuario foundGestor = usuarioRepo.findById("444444444444").orElseThrow();
-        Collection<?> authorities = foundGestor.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_GESTOR");
+        UserDetails foundGestor = userDetailsService.loadUserByUsername("444444444444");
+        assertThat(foundGestor.getAuthorities()).extracting("authority").containsExactly("ROLE_GESTOR");
     }
 
     @Test
@@ -141,9 +134,8 @@ class PerfilUsuarioIntegrationTest {
         servidor.setUnidade(unidadeOperacional);
         usuarioRepo.save(servidor);
 
-        Usuario foundServidor = usuarioRepo.findById("666666666666").orElseThrow();
-        Collection<?> authorities = foundServidor.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_SERVIDOR");
+        UserDetails foundServidor = userDetailsService.loadUserByUsername("666666666666");
+        assertThat(foundServidor.getAuthorities()).extracting("authority").containsExactly("ROLE_SERVIDOR");
     }
 
     @Test
@@ -153,9 +145,8 @@ class PerfilUsuarioIntegrationTest {
         semUnidade.setTitulo("777777777777");
         usuarioRepo.save(semUnidade);
 
-        Usuario foundUser = usuarioRepo.findById("777777777777").orElseThrow();
-        Collection<?> authorities = foundUser.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").containsExactly("ROLE_SERVIDOR");
+        UserDetails foundUser = userDetailsService.loadUserByUsername("777777777777");
+        assertThat(foundUser.getAuthorities()).extracting("authority").containsExactly("ROLE_SERVIDOR");
     }
 
     @Test
@@ -166,8 +157,7 @@ class PerfilUsuarioIntegrationTest {
         naoAdmin.setUnidade(unidadeOperacional);
         usuarioRepo.save(naoAdmin);
 
-        Usuario foundUser = usuarioRepo.findById("888888888888").orElseThrow();
-        Collection<?> authorities = foundUser.determineAuthorities(administradorRepo);
-        assertThat(authorities).extracting("authority").doesNotContain("ROLE_ADMIN");
+        UserDetails foundUser = userDetailsService.loadUserByUsername("888888888888");
+        assertThat(foundUser.getAuthorities()).extracting("authority").doesNotContain("ROLE_ADMIN");
     }
 }

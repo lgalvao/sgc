@@ -2,33 +2,30 @@ package sgc.integracao.mocks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.comum.modelo.AdministradorRepo;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import org.springframework.stereotype.Component;
+import sgc.sgrh.CustomUserDetailsService;
 
+@Component
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
+    private final CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private AdministradorRepo administradorRepo;
+    public WithMockChefeSecurityContextFactory(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
-    public SecurityContext createSecurityContext(WithMockChefe annotation) {
+    public SecurityContext createSecurityContext(WithMockChefe customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Usuario usuario = usuarioRepo.findByTitulo(annotation.value())
-            .orElseGet(() -> {
-                Usuario newUser = new Usuario();
-                newUser.setTitulo(annotation.value());
-                return usuarioRepo.save(newUser);
-            });
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.determineAuthorities(administradorRepo));
-        context.setAuthentication(token);
+        UserDetails principal = userDetailsService.loadUserByUsername("chefe");
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+        context.setAuthentication(auth);
         return context;
     }
 }

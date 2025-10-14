@@ -7,33 +7,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import sgc.comum.erros.RestExceptionHandler;
-import sgc.processo.ProcessoControle;
-import sgc.processo.ProcessoService;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,8 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("CDU-03: Manter processo")
-@WithMockAdmin
+@WithMockUser(username = "admin", roles = "ADMIN")
 @Import(TestSecurityConfig.class)
 public class CDU03IntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
@@ -56,15 +49,15 @@ public class CDU03IntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ProcessoService processoService;
+    private UnidadeRepo unidadeRepo;
+
+    private Unidade unidade1;
+    private Unidade unidade2;
 
     @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService))
-                .setControllerAdvice(new RestExceptionHandler())
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .alwaysDo(print())
-                .build();
+    void setUp() {
+        unidade1 = unidadeRepo.save(new Unidade("Unidade Teste 1", "UT1"));
+        unidade2 = unidadeRepo.save(new Unidade("Unidade Teste 2", "UT2"));
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDate dataLimiteEtapa1) {
@@ -77,8 +70,7 @@ public class CDU03IntegrationTest {
 
     @Test
     void testCriarProcesso_sucesso() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L); // Assumindo que a unidade com ID 1 existe
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         CriarProcessoReq requestDTO = criarCriarProcessoReq(
                 "Processo de Mapeamento Teste",
@@ -89,17 +81,17 @@ public class CDU03IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.codigo").isNumber())
                 .andExpect(jsonPath("$.descricao").value("Processo de Mapeamento Teste"))
                 .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
-                .andExpect(jsonPath("$.situacao").value("CRIADO")); // Verifica se a situação inicial é 'Criado'
+                .andExpect(jsonPath("$.situacao").value("CRIADO"));
     }
 
     @Test
     void testCriarProcesso_descricaoVazia_falha() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         CriarProcessoReq requestDTO = criarCriarProcessoReq(
                 "", // Descrição vazia
@@ -110,8 +102,9 @@ public class CDU03IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição")); // Mensagem de validação
+                .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição"));
     }
 
     @Test
@@ -125,16 +118,14 @@ public class CDU03IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.subErrors[0].message").value("Pelo menos uma unidade participante deve ser incluída."));
     }
 
-    // Teste para edição de processo (requer um processo existente)
     @Test
     void testEditarProcesso_sucesso() throws Exception {
-        // 1. Criar um processo para ser editado
-        List<Long> unidadesIniciais = new ArrayList<>();
-        unidadesIniciais.add(1L);
+        List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
                 "Processo para Edição",
                 unidadesIniciais,
@@ -144,27 +135,25 @@ public class CDU03IntegrationTest {
         MvcResult result = mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
-        // 2. Editar o processo
-        List<Long> unidadesEditadas = new ArrayList<>();
-        unidadesEditadas.add(1L);
-        unidadesEditadas.add(2L); // Adiciona outra unidade
+        List<Long> unidadesEditadas = List.of(unidade1.getCodigo(), unidade2.getCodigo());
 
         AtualizarProcessoReq editarRequestDTO = criarAtualizarProcessoReq(
                 processoId,
                 "Processo Editado",
-                // Tipo não pode ser alterado na edição, mas é enviado no DTO
                 unidadesEditadas,
-                LocalDate.now().plusDays(40) // Nova data limite
+                LocalDate.now().plusDays(40)
         );
 
         mockMvc.perform(put(API_PROCESSOS_ID, processoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(processoId))
                 .andExpect(jsonPath("$.descricao").value("Processo Editado"));
@@ -172,8 +161,7 @@ public class CDU03IntegrationTest {
 
     @Test
     void testEditarProcesso_processoNaoEncontrado_falha() throws Exception {
-        List<Long> unidades = new ArrayList<>();
-        unidades.add(1L);
+        List<Long> unidades = List.of(unidade1.getCodigo());
 
         AtualizarProcessoReq editarRequestDTO = criarAtualizarProcessoReq(
                 999L, // Código que não existe
@@ -182,17 +170,16 @@ public class CDU03IntegrationTest {
                 LocalDate.now().plusDays(30)
         );
 
-        mockMvc.perform(put(API_PROCESSOS_ID, 999L) // ID que não existe
+        mockMvc.perform(put(API_PROCESSOS_ID, 999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
-                .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void testRemoverProcesso_sucesso() throws Exception {
-        // 1. Criar um processo para ser removido
-        List<Long> unidadesIniciais = new ArrayList<>();
-        unidadesIniciais.add(1L);
+        List<Long> unidadesIniciais = List.of(unidade1.getCodigo());
         CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
                 "Processo para Remoção",
                 unidadesIniciais,
@@ -202,23 +189,25 @@ public class CDU03IntegrationTest {
         MvcResult result = mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andReturn();
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
-        // 2. Remover o processo
         mockMvc.perform(delete(API_PROCESSOS_ID, processoId))
-                .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
+                .andDo(print())
+                .andExpect(status().isNoContent());
 
-        // 3. Tentar buscar o processo removido para confirmar que não existe mais
         mockMvc.perform(get(API_PROCESSOS_ID, processoId))
+                .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(delete(API_PROCESSOS_ID, 999L)) // ID que não existe
+        mockMvc.perform(delete(API_PROCESSOS_ID, 999L))
+                .andDo(print())
                 .andExpect(status().isNotFound());
     }
 }

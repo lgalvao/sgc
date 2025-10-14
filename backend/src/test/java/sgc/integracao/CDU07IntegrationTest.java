@@ -6,17 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.modelo.Administrador;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.modelo.Movimentacao;
@@ -28,8 +32,6 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,6 +46,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CDU07IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private AdministradorRepo administradorRepo;
 
     @Autowired
     private ProcessoRepo processoRepo;
@@ -64,6 +72,12 @@ public class CDU07IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        Usuario adminUser = new Usuario();
+        adminUser.setTitulo("admin");
+        adminUser.setNome("Admin User");
+        usuarioRepo.save(adminUser);
+        administradorRepo.save(new Administrador(adminUser.getTitulo(), adminUser));
+
         Unidade unidade = new Unidade();
         unidade.setNome("Unidade de Teste");
         unidade.setSigla("UT");

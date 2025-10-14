@@ -7,32 +7,25 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.comum.modelo.AdministradorRepo;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import sgc.sgrh.CustomUserDetailsService;
 
 @Component
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
 
-    private final UsuarioRepo usuarioRepo;
-    private final AdministradorRepo administradorRepo;
+    private final CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public WithMockAdminSecurityContextFactory(UsuarioRepo usuarioRepo, AdministradorRepo administradorRepo) {
-        this.usuarioRepo = usuarioRepo;
-        this.administradorRepo = administradorRepo;
+    public WithMockAdminSecurityContextFactory(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-
-        Usuario principal = usuarioRepo.findById("admin")
-            .orElseGet(() -> usuarioRepo.save(new Usuario("admin", "Admin User", "admin@example.com", null, null, null)));
-
-
-        Authentication auth =
-                new UsernamePasswordAuthenticationToken(principal, "password", principal.determineAuthorities(administradorRepo));
+        UserDetails principal = userDetailsService.loadUserByUsername("admin");
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
         context.setAuthentication(auth);
         return context;
     }

@@ -26,7 +26,7 @@ public abstract class EntidadeBase implements Serializable {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "default_seq_gen")
     @Column(name = "codigo")
     private Long codigo;
 }

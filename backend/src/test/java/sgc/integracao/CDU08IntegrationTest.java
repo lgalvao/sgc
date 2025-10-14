@@ -92,7 +92,7 @@ class CDU08IntegrationTest {
 
     @Nested
     @DisplayName("Testes de fluxo completo")
-    @WithMockChefe("chefe-cdu08")
+    @WithMockChefe
     class FluxoCompleto {
 
         @Test

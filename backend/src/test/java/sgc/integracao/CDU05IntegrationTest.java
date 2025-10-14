@@ -8,19 +8,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.comum.modelo.Administrador;
+import sgc.comum.modelo.AdministradorRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.sgrh.Usuario;
+import sgc.sgrh.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -28,8 +32,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +53,12 @@ public class CDU05IntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private AdministradorRepo administradorRepo;
+
+    @Autowired
     private UnidadeRepo unidadeRepo;
 
     @Autowired
@@ -63,6 +71,12 @@ public class CDU05IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        Usuario adminUser = new Usuario();
+        adminUser.setTitulo("admin");
+        adminUser.setNome("Admin User");
+        usuarioRepo.save(adminUser);
+        administradorRepo.save(new Administrador(adminUser.getTitulo(), adminUser));
+
         unidade = new Unidade();
         unidade.setNome("Test Unit");
         unidade.setSigla("TU");

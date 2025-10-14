@@ -96,7 +96,7 @@ public class CDU19IntegrationTest {
 
     @Test
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
-    @WithMockChefe("chefe")
+    @WithMockChefe
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
