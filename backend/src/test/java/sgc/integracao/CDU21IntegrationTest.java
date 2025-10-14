@@ -168,22 +168,22 @@ class CDU21IntegrationTest {
         int indexOp1 = allEmails.indexOf("titular.op1@test.com");
         assertThat(indexOp1).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexOp1)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp1)).contains("Prezado(a) responsável pela UOP1");
-        assertThat(allBodies.get(indexOp1)).contains("conclusão do processo <strong>" + processo.getDescricao() + "</strong> para a sua unidade.");
+        assertThat(allBodies.get(indexOp1)).contains("<p>Prezado(a) responsável pela <span>UOP1</span>,</p>");
+        assertThat(allBodies.get(indexOp1)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para a sua unidade.</p>");
         assertThat(allBodies.get(indexOp1)).doesNotContain("para as unidades:");
 
         // Email para Unidade Operacional 2
         int indexOp2 = allEmails.indexOf("titular.op2@test.com");
         assertThat(indexOp2).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexOp2)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp2)).contains("Prezado(a) responsável pela UOP2");
+        assertThat(allBodies.get(indexOp2)).contains("<p>Prezado(a) responsável pela <span>UOP2</span>,</p>");
 
         // Email para Unidade Intermediária
         int indexIntermediaria = allEmails.indexOf("titular.intermediaria@test.com");
         assertThat(indexIntermediaria).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexIntermediaria)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao() + " em unidades subordinadas");
-        assertThat(allBodies.get(indexIntermediaria)).contains("Prezado(a) responsável pela UINT");
-        assertThat(allBodies.get(indexIntermediaria)).contains("para as unidades:");
+        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Prezado(a) responsável pela <span>UINT</span>,</p>");
+        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para as unidades:</p>");
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP1</li>");
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP2</li>");
     }

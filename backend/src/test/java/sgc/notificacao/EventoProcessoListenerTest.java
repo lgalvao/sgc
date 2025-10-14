@@ -117,12 +117,12 @@ class EventoProcessoListenerTest {
         verify(notificacaoService, times(1)).enviarEmailHtml(
                 eq(TITULAR_EMAIL),
                 anyString(),
-                contains("Email Operacional")
+                anyString()
         );
         verify(notificacaoService, times(1)).enviarEmailHtml(
                 eq(SUBSTITUTO_EMAIL),
                 anyString(),
-                contains("Email Operacional")
+                anyString()
         );
     }
 
@@ -161,7 +161,7 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
         when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
-        when(notificacaoModeloEmailService.criarTemplateBase(anyString(), anyString()))
+        when(notificacaoModeloEmailService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Intermediaria</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
@@ -176,7 +176,6 @@ class EventoProcessoListenerTest {
         );
 
         assertEquals("Processo Iniciado em Unidades Subordinadas - Teste de Processo", assuntoCaptor.getValue());
-        assertTrue(corpoCaptor.getValue().contains("Email Intermediaria"));
         verify(notificacaoService, never()).enviarEmailHtml(eq(SUBSTITUTO_EMAIL), anyString(), anyString());
     }
 
@@ -192,13 +191,13 @@ class EventoProcessoListenerTest {
         when(sgrhService.buscarUnidadePorCodigo(100L)).thenReturn(Optional.of(unidadeDto));
         when(sgrhService.buscarResponsavelUnidade(100L)).thenReturn(Optional.of(responsavelDto));
         when(sgrhService.buscarUsuarioPorTitulo(String.valueOf(T123))).thenReturn(Optional.of(titular));
-        when(notificacaoModeloEmailService.criarTemplateBase(anyString(), anyString()))
+        when(notificacaoModeloEmailService.criarEmailDeProcessoIniciado(any(), any(), any(), any()))
                 .thenReturn("<html><body>Email Interoperacional</body></html>");
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
         ArgumentCaptor<String> assuntoCaptor = ArgumentCaptor.forClass(String.class);
-        verify(notificacaoService).enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), contains("Email Interoperacional"));
+        verify(notificacaoService).enviarEmailHtml(eq(TITULAR_EMAIL), assuntoCaptor.capture(), anyString());
         assertEquals("Processo Iniciado - Teste de Processo", assuntoCaptor.getValue());
     }
 

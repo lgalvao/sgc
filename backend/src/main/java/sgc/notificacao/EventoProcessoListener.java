@@ -134,7 +134,7 @@ public class EventoProcessoListener {
                 );
             } else if (TipoUnidade.INTERMEDIARIA.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado em Unidades Subordinadas - " + processo.getDescricao();
-                corpoHtml = criarEmailParaUnidadeIntermediaria(
+                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -142,7 +142,7 @@ public class EventoProcessoListener {
                 );
             } else if (TipoUnidade.INTEROPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
-                corpoHtml = criarEmailParaUnidadeInteroperacional(
+                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -185,84 +185,15 @@ public class EventoProcessoListener {
 
     private String criarEmailParaUnidadeIntermediaria(String nomeUnidade, String nomeProcesso,
                                                   String tipoProcesso, java.time.LocalDate dataLimite) {
-        String dataFormatada = dataLimite != null ?
-                String.format("%02d/%02d/%d",
-                        dataLimite.getDayOfMonth(),
-                        dataLimite.getMonthValue(),
-                        dataLimite.getYear()) :
-                "a definir";
-
-        String conteudo = String.format("""
-                        <p>Um novo processo de <strong>%s</strong> foi iniciado em unidades subordinadas à sua unidade.</p>%n
-                        %n
-                        <div style="background-color: #f0f8ff; padding: 15px; margin: 15px 0; border-left: 4px solid #0066cc;">%n
-                            <p style="margin: 5px 0;"><strong>Unidade:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Processo:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Tipo:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Data limite para etapa 1:</strong> %s</p>%n
-                        </div>%n
-                        %n
-                        <p><strong>Informações importantes:</strong></p>%n
-                        <ul>%n
-                            <li>As unidades subordinadas já podem iniciar o cadastro de atividades e conhecimentos.</li>%n
-                            <li>À medida que os cadastros forem disponibilizados, será possível visualizar e realizar a validação.</li>%n
-                            <li>Acompanhe o andamento no sistema SGC.</li>%n
-                        </ul>%n
-                        %n
-                        <p style="margin-top: 20px;">%n
-                            <a href="https://sgc.tre-pe.jus.br"%n
-                               style="background-color: #0066cc; color: white; padding: 10px 20px;%n
-                                      text-decoration: none; border-radius: 5px; display: inline-block;">%n
-                                Acompanhar Processo%n
-                            </a>%n
-                        </p>%n
-                        """,
-                tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
-
-        return notificacaoModeloEmailService.criarTemplateBase(
-                "Processo Iniciado em Unidades Subordinadas", conteudo);
+        // This method is not used anymore, but it's kept to avoid breaking changes in the listener.
+        // The logic was moved to NotificacaoModeloEmailService.
+        return "";
     }
 
     private String criarEmailParaUnidadeInteroperacional(String nomeUnidade, String nomeProcesso,
                                                      String tipoProcesso, java.time.LocalDate dataLimite) {
-        String dataFormatada = dataLimite != null ?
-                String.format("%02d/%02d/%d",
-                        dataLimite.getDayOfMonth(),
-                        dataLimite.getMonthValue(),
-                        dataLimite.getYear()) :
-                "a definir";
-
-        String conteudo = String.format("""
-                        <p>Um novo processo de <strong>%s</strong> foi iniciado para sua unidade.</p>%n
-                        %n
-                        <div style="background-color: #f0f8ff; padding: 15px; margin: 15px 0; border-left: 4px solid #0066cc;">%n
-                            <p style="margin: 5px 0;"><strong>Unidade:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Processo:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Tipo:</strong> %s</p>%n
-                            <p style="margin: 5px 0;"><strong>Data limite para etapa 1:</strong> %s</p>%n
-                        </div>%n
-                        %n
-                        <div style="background-color: #fff3cd; padding: 15px; margin: 15px 0; border-left: 4px solid #ffc107;">%n
-                            <p style="margin: 0;"><strong>⚠ Atenção:</strong> Sua unidade é do tipo <strong>Interoperacional</strong>.</p>%n
-                        </div>%n
-                        %n
-                        <p><strong>Você deverá realizar DUAS ações:</strong></p>%n
-                        <ol>%n
-                            <li><strong>Como unidade operacional:</strong> Realizar o cadastro de atividades e conhecimentos da sua própria unidade.</li>%n
-                            <li><strong>Como unidade intermediária:</strong> Validar os mapas das unidades subordinadas quando forem disponibilizados.</li>%n
-                        </ol>%n
-                        %n
-                        <p style="margin-top: 20px;">%n
-                            <a href="https://sgc.tre-pe.jus.br"%n
-                               style="background-color: #0066cc; color: white; padding: 10px 20px;%n
-                                      text-decoration: none; border-radius: 5px; display: inline-block;">%n
-                                Acessar Sistema%n
-                            </a>%n
-                        </p>%n
-                        """,
-                tipoProcesso, nomeUnidade, nomeProcesso, tipoProcesso, dataFormatada);
-
-        return notificacaoModeloEmailService.criarTemplateBase(
-                "Processo Iniciado - Unidade Interoperacional", conteudo);
+        // This method is not used anymore, but it's kept to avoid breaking changes in the listener.
+        // The logic was moved to NotificacaoModeloEmailService.
+        return "";
     }
 }
