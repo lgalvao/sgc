@@ -130,7 +130,7 @@ public class SgrhService {
         List<UnidadeDto> filhos = subunidadesPorPai.getOrDefault(unidade.codigo(), Collections.emptyList())
                 .stream()
                 .map(filho -> construirArvore(filho, subunidadesPorPai))
-                .collect(Collectors.toList());
+                .toList();
 
         return new UnidadeDto(
                 unidade.codigo(),

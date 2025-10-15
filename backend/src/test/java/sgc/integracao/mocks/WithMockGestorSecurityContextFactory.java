@@ -26,7 +26,7 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
     @Override
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Long gestorId;
+        long gestorId;
         try {
             gestorId = Long.parseLong(customUser.value());
         } catch (NumberFormatException e) {

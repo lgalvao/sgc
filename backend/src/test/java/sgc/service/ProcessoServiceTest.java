@@ -42,7 +42,6 @@ public class ProcessoServiceTest {
     private UnidadeRepo unidadeRepo;
     private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
-
     private ProcessoService processoService;
 
     @BeforeEach

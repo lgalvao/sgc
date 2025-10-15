@@ -49,7 +49,7 @@ public class ImpactoAtividadeService {
     }
 
     public List<AtividadeImpactadaDto> detectarAtividadesInseridas(List<Atividade> atuais,
-                                                                    List<Atividade> vigentes) {
+                                                                   List<Atividade> vigentes) {
         Set<String> descricoesVigentes = vigentes.stream()
                 .map(a -> a.getDescricao().toLowerCase().trim())
                 .collect(Collectors.toSet());
@@ -87,14 +87,7 @@ public class ImpactoAtividadeService {
                 .toList();
     }
 
-    public List<AtividadeImpactadaDto> detectarAtividadesAlteradas(
-            List<Atividade> atuais,
-            List<Atividade> vigentes,
-            Mapa mapaVigente) {
-
-        // This method is not needed anymore, as the logic is handled by
-        // detectarAtividadesInseridas and detectarAtividadesRemovidas.
-        // An "alteration" is a "removal" of the old activity and an "insertion" of the new one.
+    public List<AtividadeImpactadaDto> detectarAtividadesAlteradas(List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
         return new ArrayList<>();
     }
 }

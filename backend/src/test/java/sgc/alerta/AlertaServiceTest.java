@@ -9,7 +9,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.modelo.*;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.alerta.modelo.AlertaUsuario;
+import sgc.alerta.modelo.AlertaUsuarioRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.SgrhService;
@@ -24,6 +27,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.alerta.modelo.TipoAlerta.CADASTRO_DISPONIBILIZADO;
 
 @Nested
 @ExtendWith(MockitoExtension.class)
@@ -208,14 +212,14 @@ class AlertaServiceTest {
     @Test
     @DisplayName("Deve criar alerta mesmo se SGRH falhar ao buscar responsável")
     void criarAlerta_deveContinuarSeSGRHFalhar() {
-        Long unidadeDestinoCodigo = 30L;
-        when(repositorioUnidade.findById(unidadeDestinoCodigo)).thenReturn(Optional.of(new Unidade()));
-        when(servicoSgrh.buscarResponsavelUnidade(unidadeDestinoCodigo)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
+        Long codUnidadeDestino = 30L;
+        when(repositorioUnidade.findById(codUnidadeDestino)).thenReturn(Optional.of(new Unidade()));
+        when(servicoSgrh.buscarResponsavelUnidade(codUnidadeDestino)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Apenas chama o método. O teste passa se nenhuma exceção for lançada.
+        // Apenas chama o metodo. O teste passa se nenhuma exceção for lançada.
         assertDoesNotThrow(() -> {
-            alertaService.criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeDestinoCodigo, "Descrição", null);
+            alertaService.criarAlerta(processo, CADASTRO_DISPONIBILIZADO, codUnidadeDestino, "Descrição", null);
         });
 
         // Verifica que o alerta principal foi salvo, mas nenhum AlertaUsuario foi criado

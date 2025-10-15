@@ -4,14 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+
 import lombok.Getter;
-
-import java.util.List;
-
-/**
- * DTO para mapa de competências no contexto de ajustes.
- * CDU-16 item 4
- */
 import sgc.analise.modelo.Analise;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
@@ -24,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DTO para mapa de competências no contexto de ajustes.
+ * CDU-16 item 4
+ */
 @Getter
 @Builder
 public class MapaAjusteDto {
@@ -43,7 +41,7 @@ public class MapaAjusteDto {
         for (Competencia comp : competencias) {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
             for (Atividade ativ : atividades) {
-                List<Conhecimento> conhecimentosDaAtividade = conhecimentos.stream().filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo())).collect(Collectors.toList());
+                List<Conhecimento> conhecimentosDaAtividade = conhecimentos.stream().filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo())).toList();
                 boolean isLinked = competenciaAtividades.stream().anyMatch(ca -> ca.getId().getCompetenciaCodigo().equals(comp.getCodigo()) && ca.getId().getAtividadeCodigo().equals(ativ.getCodigo()));
                 List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentosDaAtividade.stream()
                         .map(con -> ConhecimentoAjusteDto.builder()

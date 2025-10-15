@@ -1,13 +1,12 @@
 package sgc.sgrh.dto;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DTO para dados de unidade do SGRH.
  * Suporta estrutura hierárquica com subunidades.
  */
-import java.util.ArrayList;
-
 public record UnidadeDto(
     Long codigo,
     String nome,

@@ -43,14 +43,6 @@ public class Atividade extends EntidadeBase {
         }
     }
 
-    public void setMapa(Mapa mapa) {
-        this.mapa = mapa;
-    }
-
-    public Mapa getMapa() {
-        return this.mapa;
-    }
-
     public void setConhecimentos(List<Conhecimento> conhecimentos) {
         this.conhecimentos = new ArrayList<>(conhecimentos);
     }

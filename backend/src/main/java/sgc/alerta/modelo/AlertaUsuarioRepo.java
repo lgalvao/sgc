@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUsuario.Chave> {
-    List<AlertaUsuario> findById_UsuarioTituloEleitoral(Long usuarioTituloEleitoral);
     List<AlertaUsuario> findByIdAlertaCodigo(Long alertaCodigo);
 }

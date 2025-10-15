@@ -18,6 +18,26 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.sgrh.Usuario;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.HtmlPolicyBuilder;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import sgc.analise.modelo.TipoAnalise;
+import sgc.atividade.modelo.Atividade;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.ImpactoMapaService;
+import sgc.mapa.MapaService;
+import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
+import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.*;
 
 import java.net.URI;
@@ -28,6 +48,9 @@ import java.util.Map;
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 public class SubprocessoControle {
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
+            .toFactory();
+
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoWorkflowService subprocessoWorkflowService;
@@ -108,10 +131,13 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.devolverCadastro(
             id,
-            request.motivo(),
-            request.observacoes(),
+            sanitizedMotivo,
+            sanitizedObservacoes,
             usuario
         );
     }
@@ -121,9 +147,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.aceitarCadastro(
             id,
-            request.observacoes(),
+            sanitizedObservacoes,
             usuario.getTituloEleitoral()
         );
     }
@@ -133,9 +161,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.homologarCadastro(
             id,
-            request.observacoes(),
+            sanitizedObservacoes,
             usuario.getTituloEleitoral()
         );
     }
@@ -145,10 +175,13 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.devolverRevisaoCadastro(
             id,
-            request.motivo(),
-            request.observacoes(),
+            sanitizedMotivo,
+            sanitizedObservacoes,
             usuario
         );
     }
@@ -158,9 +191,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.aceitarRevisaoCadastro(
             id,
-            request.observacoes(),
+            sanitizedObservacoes,
             usuario
         );
     }
@@ -170,9 +205,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.homologarRevisaoCadastro(
             id,
-            request.observacoes(),
+            sanitizedObservacoes,
             usuario
         );
     }
@@ -209,9 +246,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+
         subprocessoWorkflowService.disponibilizarMapa(
             id,
-            request.observacoes(),
+            sanitizedObservacoes,
             request.dataLimiteEtapa2(),
             usuario
         );
@@ -224,9 +263,11 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @RequestBody @Valid ApresentarSugestoesReq request,
             @AuthenticationPrincipal Usuario usuario) {
+        var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(request.sugestoes());
+
         subprocessoWorkflowService.apresentarSugestoes(
             id,
-            request.sugestoes(),
+            sanitizedSugestoes,
             usuario.getTituloEleitoral()
         );
     }
@@ -257,9 +298,11 @@ public class SubprocessoControle {
         @RequestBody @Valid DevolverValidacaoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
+        var sanitizedJustificativa = HTML_SANITIZER_POLICY.sanitize(request.justificativa());
+
         subprocessoWorkflowService.devolverValidacao(
             id,
-            request.justificativa(),
+            sanitizedJustificativa,
             usuario
         );
     }
@@ -274,7 +317,7 @@ public class SubprocessoControle {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.homologarValidacao(id, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.homologarValidacao(id);
     }
 
     @DeleteMapping("/{id}")
@@ -313,7 +356,10 @@ public class SubprocessoControle {
         @RequestBody @Valid SubmeterMapaAjustadoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        subprocessoWorkflowService.submeterMapaAjustado(id, request, usuario.getTituloEleitoral());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedRequest = new SubmeterMapaAjustadoReq(sanitizedObservacoes, request.dataLimiteEtapa2());
+
+        subprocessoWorkflowService.submeterMapaAjustado(id, sanitizedRequest, usuario.getTituloEleitoral());
     }
 
     @PostMapping("/{id}/importar-atividades")

@@ -3,6 +3,7 @@ package sgc.analise;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import sgc.analise.dto.CriarAnaliseRequestDto;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
 
@@ -49,7 +50,15 @@ public class AnaliseControle {
             throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
         }
         String observacoes = payload.getOrDefault("observacoes", "");
-        return analiseService.criarAnalise(id, observacoes, TipoAnalise.CADASTRO, null, payload.get("unidadeSigla"), payload.get("analistaUsuarioTitulo"), payload.get("motivo"));
+        return analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
+            .subprocessoCodigo(id)
+            .observacoes(observacoes)
+            .tipo(TipoAnalise.CADASTRO)
+            .acao(null)
+            .unidadeSigla(payload.get("unidadeSigla"))
+            .analistaUsuarioTitulo(payload.get("analistaUsuarioTitulo"))
+            .motivo(payload.get("motivo"))
+            .build());
     }
 
     @GetMapping("/analises-validacao")
@@ -65,6 +74,14 @@ public class AnaliseControle {
             throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
         }
         String observacoes = payload.getOrDefault("observacoes", "");
-        return analiseService.criarAnalise(id, observacoes, TipoAnalise.VALIDACAO, null, payload.get("unidadeSigla"), payload.get("analistaUsuarioTitulo"), payload.get("motivo"));
+        return analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
+            .subprocessoCodigo(id)
+            .observacoes(observacoes)
+            .tipo(TipoAnalise.VALIDACAO)
+            .acao(null)
+            .unidadeSigla(payload.get("unidadeSigla"))
+            .analistaUsuarioTitulo(payload.get("analistaUsuarioTitulo"))
+            .motivo(payload.get("motivo"))
+            .build());
     }
 }

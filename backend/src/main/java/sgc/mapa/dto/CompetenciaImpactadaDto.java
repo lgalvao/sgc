@@ -3,6 +3,7 @@ package sgc.mapa.dto;
 import sgc.mapa.modelo.TipoImpactoCompetencia;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DTO que representa uma competência que foi impactada pelas mudanças
@@ -10,8 +11,6 @@ import java.util.List;
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
  */
-import java.util.ArrayList;
-
 public record CompetenciaImpactadaDto(
     Long codigo,
     String descricao,
@@ -20,10 +19,5 @@ public record CompetenciaImpactadaDto(
 ) {
     public CompetenciaImpactadaDto {
         atividadesAfetadas = new ArrayList<>(atividadesAfetadas);
-    }
-
-    @Override
-    public List<String> atividadesAfetadas() {
-        return new ArrayList<>(atividadesAfetadas);
     }
 }

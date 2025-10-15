@@ -49,27 +49,4 @@ public class Movimentacao extends EntidadeBase {
         this.dataHora = LocalDateTime.now();
     }
 
-    public void setSubprocesso(Subprocesso subprocesso) {
-        this.subprocesso = subprocesso;
-    }
-
-    public Subprocesso getSubprocesso() {
-        return this.subprocesso;
-    }
-
-    public void setUnidadeOrigem(Unidade unidadeOrigem) {
-        this.unidadeOrigem = unidadeOrigem;
-    }
-
-    public Unidade getUnidadeOrigem() {
-        return this.unidadeOrigem;
-    }
-
-    public void setUnidadeDestino(Unidade unidadeDestino) {
-        this.unidadeDestino = unidadeDestino;
-    }
-
-    public Unidade getUnidadeDestino() {
-        return this.unidadeDestino;
-    }
 }

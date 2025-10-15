@@ -4,13 +4,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Request para salvar ajustes no mapa de competências.
  * CDU-16 item 5
  */
-import java.util.ArrayList;
-
 public record SalvarAjustesReq(
     @NotNull @Valid List<CompetenciaAjusteDto> competencias
 ) {

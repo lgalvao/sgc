@@ -1,10 +1,10 @@
 package sgc.subprocesso.dto;
 
+import sgc.subprocesso.modelo.Subprocesso;
+
 /**
  * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).
  */
-import sgc.subprocesso.modelo.Subprocesso;
-
 public record SugestoesDto(
     String sugestoes,
     boolean sugestoesApresentadas,

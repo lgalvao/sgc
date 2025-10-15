@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.mapa.modelo.Mapa;
@@ -27,9 +26,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
-
-    @InjectMocks
-    private SubprocessoMapperImpl subprocessoMapper;
+    private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -37,7 +34,22 @@ class MapperTest {
     @Mock
     private MapaRepo mapaRepo;
 
-    private MovimentacaoMapper movimentacaoMapper = Mappers.getMapper(MovimentacaoMapper.class);
+    private final MovimentacaoMapper movimentacaoMapper = Mappers.getMapper(MovimentacaoMapper.class);
+
+    @BeforeEach
+    void setUp() throws NoSuchFieldException, IllegalAccessException {
+        java.lang.reflect.Field processoRepoField = SubprocessoMapper.class.getDeclaredField("processoRepo");
+        processoRepoField.setAccessible(true);
+        processoRepoField.set(subprocessoMapper, processoRepo);
+
+        java.lang.reflect.Field unidadeRepoField = SubprocessoMapper.class.getDeclaredField("unidadeRepo");
+        unidadeRepoField.setAccessible(true);
+        unidadeRepoField.set(subprocessoMapper, unidadeRepo);
+
+        java.lang.reflect.Field mapaRepoField = SubprocessoMapper.class.getDeclaredField("mapaRepo");
+        mapaRepoField.setAccessible(true);
+        mapaRepoField.set(subprocessoMapper, mapaRepo);
+    }
 
     @Test
     void subprocessoMapper_MapsEntityToDtoCorrectly() {
@@ -74,15 +86,15 @@ class MapperTest {
     @Test
     void subprocessoMapper_MapsDtoToEntityCorrectly() {
         SubprocessoDto dto = new SubprocessoDto(
-            1L,
-            100L,
-            200L,
-            300L,
-            LocalDate.now(),
-            LocalDateTime.now(),
-            LocalDate.now().plusDays(10),
-            LocalDateTime.now().plusHours(1),
-            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
+                1L,
+                100L,
+                200L,
+                300L,
+                LocalDate.now(),
+                LocalDateTime.now(),
+                LocalDate.now().plusDays(10),
+                LocalDateTime.now().plusHours(1),
+                SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
         );
 
         Processo processo = new Processo();

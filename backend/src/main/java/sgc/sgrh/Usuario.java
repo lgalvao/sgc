@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sgc.unidade.modelo.Unidade;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 @Table(name = "USUARIO", schema = "sgc")
@@ -83,11 +81,4 @@ public class Usuario implements Serializable, UserDetails {
         this.perfis = new java.util.HashSet<>(perfis);
     }
 
-    public void setUnidade(Unidade unidade) {
-        this.unidade = unidade;
-    }
-
-    public Unidade getUnidade() {
-        return this.unidade;
-    }
 }

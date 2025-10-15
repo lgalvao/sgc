@@ -9,33 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.CopiaMapaService;
-import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoModeloEmailService;
-import sgc.notificacao.NotificacaoService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.ProcessoCriadoEvento;
-import sgc.processo.eventos.ProcessoFinalizadoEvento;
-import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.*;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.dto.ResponsavelDto;
-import sgc.sgrh.dto.UsuarioDto;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.TipoUnidade;
-import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -62,7 +47,7 @@ public class ProcessoService {
         if (requisicao.descricao() == null || requisicao.descricao().isBlank()) {
             throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
         }
-        if (requisicao.unidades() == null || requisicao.unidades().isEmpty()) {
+        if (requisicao.unidades().isEmpty()) {
             throw new ConstraintViolationException("Pelo menos uma unidade participante deve ser selecionada.", null);
         }
 

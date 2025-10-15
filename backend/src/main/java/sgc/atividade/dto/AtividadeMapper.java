@@ -2,15 +2,17 @@ package sgc.atividade.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import sgc.atividade.modelo.Atividade;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.
  */
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class AtividadeMapper {
@@ -26,9 +28,6 @@ public abstract class AtividadeMapper {
 
     public Mapa map(Long idMapa) {
         if (idMapa == null) return null;
-
-        // TODO Deveria gerar uma exceção mais específica
-        return mapaRepo.findById(idMapa)
-                .orElseThrow(() -> new RuntimeException("Mapa não encontrado com o código: " + idMapa));
+        return mapaRepo.findById(idMapa).orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", idMapa));
     }
 }

@@ -67,10 +67,7 @@ public class ImpactoMapaService {
 
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
-            // TODO muito ruim essa instancianção cheio de valores 'vazios'
-            return new ImpactoMapaDto(
-                    false, 0, 0, 0, 0,
-                    List.of(), List.of(), List.of(), List.of());
+            return ImpactoMapaDto.semImpacto();
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
@@ -85,40 +82,33 @@ public class ImpactoMapaService {
         List<AtividadeImpactadaDto> alteradas = impactoAtividadeService.detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, mapaVigente);
         List<CompetenciaImpactadaDto> competenciasImpactadas = impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, removidas, alteradas);
 
-        boolean temImpactos = !inseridas.isEmpty() || !removidas.isEmpty() || !alteradas.isEmpty();
+        ImpactoMapaDto impactos = ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
 
         log.info("Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
-                temImpactos, inseridas.size(), removidas.size(), alteradas.size());
+                impactos.temImpactos(), impactos.totalAtividadesInseridas(), impactos.totalAtividadesRemovidas(), impactos.totalAtividadesAlteradas());
 
-        // TODO rever essa instanciação com muitos parâmetros. Está frágil!
-        return new ImpactoMapaDto(
-                temImpactos,
-                inseridas.size(),
-                removidas.size(),
-                alteradas.size(),
-                competenciasImpactadas.size(),
-                inseridas,
-                removidas,
-                alteradas,
-                competenciasImpactadas);
+        return impactos;
     }
 
-    //TODO rever esse método para evitar tantos strings fixos e linhas longas demais
+    private static final String MSG_ERRO_CHEFE = "O chefe da unidade só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro em andamento'.";
+    private static final String MSG_ERRO_GESTOR = "O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro disponibilizada'.";
+    private static final String MSG_ERRO_ADMIN = "O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.";
+
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
-        SituacaoSubprocesso sitSubprocesso = subprocesso.getSituacao();
+        final SituacaoSubprocesso situacao = subprocesso.getSituacao();
 
         if (hasRole(usuario, "CHEFE")) {
-            if (sitSubprocesso != REVISAO_CADASTRO_EM_ANDAMENTO) {
-                throw new ErroDominioAccessoNegado("O chefe da unidade só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro em andamento'.");
-            }
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_EM_ANDAMENTO), MSG_ERRO_CHEFE);
         } else if (hasRole(usuario, "GESTOR")) {
-            if (sitSubprocesso != REVISAO_CADASTRO_DISPONIBILIZADA) {
-                throw new ErroDominioAccessoNegado("O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro disponibilizada'.");
-            }
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_DISPONIBILIZADA), MSG_ERRO_GESTOR);
         } else if (hasRole(usuario, "ADMIN")) {
-            if (sitSubprocesso != REVISAO_CADASTRO_HOMOLOGADA && sitSubprocesso != SituacaoSubprocesso.MAPA_AJUSTADO) {
-                throw new ErroDominioAccessoNegado("O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.");
-            }
+            validarSituacao(situacao, List.of(REVISAO_CADASTRO_HOMOLOGADA, MAPA_AJUSTADO), MSG_ERRO_ADMIN);
+        }
+    }
+
+    private void validarSituacao(SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
+        if (!esperadas.contains(atual)) {
+            throw new ErroDominioAccessoNegado(mensagemErro);
         }
     }
 

@@ -80,26 +80,6 @@ public class Subprocesso extends EntidadeBase {
         }
     }
 
-    public void setProcesso(Processo processo) {
-        this.processo = processo;
-    }
-
-    public Processo getProcesso() {
-        return this.processo;
-    }
-
-    public void setUnidade(Unidade unidade) {
-        this.unidade = unidade;
-    }
-
-    public Unidade getUnidade() {
-        return this.unidade;
-    }
-
-    public void setMapa(Mapa mapa) {
-        this.mapa = mapa;
-    }
-
     public Mapa getMapa() {
         return this.mapa == null ? null : this.mapa;
     }

@@ -19,46 +19,44 @@ public record ImpactoMapaDto(
     List<AtividadeImpactadaDto> atividadesAlteradas,
     List<CompetenciaImpactadaDto> competenciasImpactadas
 ) {
-    public ImpactoMapaDto(
-        boolean temImpactos,
-        int totalAtividadesInseridas,
-        int totalAtividadesRemovidas,
-        int totalAtividadesAlteradas,
-        List<AtividadeImpactadaDto> atividadesInseridas,
-        List<AtividadeImpactadaDto> atividadesRemovidas,
-        List<AtividadeImpactadaDto> atividadesAlteradas,
-        List<CompetenciaImpactadaDto> competenciasImpactadas
+
+    // Compact constructor for defensive copying to ensure true immutability
+    public ImpactoMapaDto {
+        atividadesInseridas = List.copyOf(atividadesInseridas);
+        atividadesRemovidas = List.copyOf(atividadesRemovidas);
+        atividadesAlteradas = List.copyOf(atividadesAlteradas);
+        competenciasImpactadas = List.copyOf(competenciasImpactadas);
+    }
+
+    /**
+     * Factory method for creating an ImpactoMapaDto with no impacts.
+     * @return An empty ImpactoMapaDto.
+     */
+    public static ImpactoMapaDto semImpacto() {
+        return new ImpactoMapaDto(false, 0, 0, 0, 0, List.of(), List.of(), List.of(), List.of());
+    }
+
+    /**
+     * Factory method for creating an ImpactoMapaDto from lists of changes.
+     * It calculates the totals and the 'temImpactos' flag automatically.
+     */
+    public static ImpactoMapaDto comImpactos(
+            List<AtividadeImpactadaDto> atividadesInseridas,
+            List<AtividadeImpactadaDto> atividadesRemovidas,
+            List<AtividadeImpactadaDto> atividadesAlteradas,
+            List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
-        this(
+        boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty();
+        return new ImpactoMapaDto(
             temImpactos,
-            totalAtividadesInseridas,
-            totalAtividadesRemovidas,
-            totalAtividadesAlteradas,
+            atividadesInseridas.size(),
+            atividadesRemovidas.size(),
+            atividadesAlteradas.size(),
             competenciasImpactadas.size(),
-            new java.util.ArrayList<>(atividadesInseridas),
-            new java.util.ArrayList<>(atividadesRemovidas),
-            new java.util.ArrayList<>(atividadesAlteradas),
-            new java.util.ArrayList<>(competenciasImpactadas)
+            atividadesInseridas,
+            atividadesRemovidas,
+            atividadesAlteradas,
+            competenciasImpactadas
         );
-    }
-
-    @Override
-    public List<AtividadeImpactadaDto> atividadesInseridas() {
-        return new java.util.ArrayList<>(atividadesInseridas);
-    }
-
-    @Override
-    public List<AtividadeImpactadaDto> atividadesRemovidas() {
-        return new java.util.ArrayList<>(atividadesRemovidas);
-    }
-
-    @Override
-    public List<AtividadeImpactadaDto> atividadesAlteradas() {
-        return new java.util.ArrayList<>(atividadesAlteradas);
-    }
-
-    @Override
-    public List<CompetenciaImpactadaDto> competenciasImpactadas() {
-        return new java.util.ArrayList<>(competenciasImpactadas);
     }
 }

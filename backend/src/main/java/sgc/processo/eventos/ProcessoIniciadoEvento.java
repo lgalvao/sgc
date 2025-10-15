@@ -2,6 +2,7 @@ package sgc.processo.eventos;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Evento de domínio publicado quando um processo é iniciado.
@@ -14,8 +15,6 @@ import java.util.List;
  * @param dataHoraInicio A data e hora exatas do início.
  * @param idsUnidades A lista de IDs das unidades que participam do processo.
  */
-import java.util.ArrayList;
-
 public record ProcessoIniciadoEvento(
     Long idProcesso,
     String tipo,

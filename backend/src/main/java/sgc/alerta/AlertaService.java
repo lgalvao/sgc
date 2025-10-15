@@ -64,9 +64,9 @@ public class AlertaService {
         log.debug("Criando alerta tipo={} para unidade={}", tipoAlerta, codigoUnidadeDestino);
 
         // Buscar unidade destino
-        // TODO Lançar excecao de negócioo
+        // Lançar exceção de negócio
         Unidade unidadeDestino = repositorioUnidade.findById(codigoUnidadeDestino)
-                .orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada: " + codigoUnidadeDestino));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidadeDestino));
 
         // Criar alerta
         Alerta alerta = new Alerta();
@@ -209,9 +209,9 @@ public class AlertaService {
             Long codigoUnidadeOrigem,
             Long codigoUnidadeDestino) {
 
-        // TODO Lançar excecao de negócio
+        // Lançar exceção de negócio
         Unidade unidadeOrigem = repositorioUnidade.findById(codigoUnidadeOrigem)
-                .orElseThrow(() -> new IllegalArgumentException("Unidade de origem não encontrada: " + codigoUnidadeOrigem));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem", codigoUnidadeOrigem));
         String descricao = String.format(
                 "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro.",
                 unidadeOrigem.getSigla(),
@@ -260,8 +260,8 @@ public class AlertaService {
                                     repositorioUnidade.findById(codigoUnidade).ifPresent(novoUsuario::setUnidade);
                                     return usuarioRepo.save(novoUsuario);
                                 })
-                                // TODO Lançar excecao de negócio
-                                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado no SGRH: " + usuarioTitulo));
+                                // Lançar exceção de negócio
+                                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", usuarioTitulo));
                     });
 
             AlertaUsuario alertaUsuario = new AlertaUsuario();

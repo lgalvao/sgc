@@ -53,7 +53,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 @Import(TestSecurityConfig.class)
 class CDU04IntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
 

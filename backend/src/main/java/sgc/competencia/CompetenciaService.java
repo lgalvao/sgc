@@ -1,5 +1,7 @@
 package sgc.competencia;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.HtmlPolicyBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompetenciaService {
 
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
+            .toFactory();
+
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaMapper competenciaMapper;
     private final AtividadeRepo atividadeRepo;
@@ -42,7 +47,11 @@ public class CompetenciaService {
     }
 
     public CompetenciaDto criarCompetencia(CompetenciaDto competenciaDto) {
-        var entity = competenciaMapper.toEntity(competenciaDto);
+        // Sanitize the description before saving
+        var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(competenciaDto.descricao());
+        var sanitizedCompetenciaDto = new CompetenciaDto(competenciaDto.codigo(), competenciaDto.mapaCodigo(), sanitizedDescricao);
+
+        var entity = competenciaMapper.toEntity(sanitizedCompetenciaDto);
         var salvo = competenciaRepo.save(entity);
         return competenciaMapper.toDTO(salvo);
     }
@@ -57,7 +66,9 @@ public class CompetenciaService {
                 } else {
                     existing.setMapa(null);
                 }
-                existing.setDescricao(competenciaDto.descricao());
+                // Sanitize the description before updating
+                var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(competenciaDto.descricao());
+                existing.setDescricao(sanitizedDescricao);
                 var atualizado = competenciaRepo.save(existing);
                 return competenciaMapper.toDTO(atualizado);
             })

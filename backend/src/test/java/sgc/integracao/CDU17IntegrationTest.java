@@ -173,11 +173,11 @@ class CDU17IntegrationTest {
                     .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado com sucesso."));
 
             // Verificar o estado final no banco de dados
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
             assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite);
 
-            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).get();
+            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow(() -> new AssertionError("Mapa não encontrado após atualização."));
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
 
             // Verificar Movimentação

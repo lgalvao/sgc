@@ -55,10 +55,9 @@ public class ProcessoFinalizacaoService {
         log.info("Processo finalizado com sucesso: código={}", id);
     }
 
-    // TODO lançar uma exceção de negocio e nao uma generica do java
     private void validarFinalizacaoProcesso(Processo processo) {
         if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
-            throw new IllegalStateException("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
+            throw new ErroProcesso("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
         }
         validarTodosSubprocessosHomologados(processo);
     }

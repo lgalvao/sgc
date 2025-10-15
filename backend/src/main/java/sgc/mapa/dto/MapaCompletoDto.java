@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DTO que representa um mapa completo com todas as suas competências 
@@ -8,8 +9,6 @@ import java.util.List;
  * <p>
  * Usado para operações agregadas de leitura e escrita do mapa.
  */
-import java.util.ArrayList;
-
 public record MapaCompletoDto(
     Long codigo,
     Long subprocessoCodigo,

@@ -73,12 +73,12 @@ public class ProcessoControleTest {
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
         var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao(NOVO_PROCESSO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(MAPEAMENTO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao(NOVO_PROCESSO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(MAPEAMENTO)
+                .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
@@ -108,12 +108,12 @@ public class ProcessoControleTest {
     @Test
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao("Processo Teste")
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(MAPEAMENTO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao("Processo Teste")
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(MAPEAMENTO)
+                .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -139,12 +139,12 @@ public class ProcessoControleTest {
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
         var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDate.now().plusDays(45), List.of(1L));
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao(PROCESSO_ATUALIZADO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(REVISAO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao(PROCESSO_ATUALIZADO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(REVISAO)
+                .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
@@ -211,12 +211,12 @@ public class ProcessoControleTest {
     @Test
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
         var dto = ProcessoDetalheDto.builder()
-            .codigo(1L)
-            .descricao("Processo Detalhado")
-            .tipo(MAPEAMENTO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .dataCriacao(LocalDateTime.now())
-            .build();
+                .codigo(1L)
+                .descricao("Processo Detalhado")
+                .tipo(MAPEAMENTO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .dataCriacao(LocalDateTime.now())
+                .build();
 
         when(processoService.obterDetalhes(eq(1L))).thenReturn(dto);
 
@@ -246,13 +246,6 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo Iniciado")
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo(MAPEAMENTO)
-            .build();
-
         doNothing().when(processoIniciacaoService).iniciarProcessoMapeamento(eq(1L), anyList());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
@@ -265,13 +258,6 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo de Revisão Iniciado")
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo(REVISAO)
-            .build();
-
         doNothing().when(processoIniciacaoService).iniciarProcessoRevisao(eq(1L), anyList());
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar?tipo=REVISAO")
@@ -294,17 +280,9 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo Finalizado")
-            .situacao(SituacaoProcesso.FINALIZADO)
-            .tipo(MAPEAMENTO)
-            .build();
-
         doNothing().when(processoFinalizacaoService).finalizar(1L);
 
-        mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/processos/1/finalizar")).andExpect(status().isOk());
 
         verify(processoFinalizacaoService).finalizar(1L);
     }

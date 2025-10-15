@@ -10,6 +10,18 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
 import sgc.mapa.dto.SalvarMapaRequest;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.HtmlPolicyBuilder;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.MapaDto;
+import sgc.mapa.dto.MapaMapper;
+import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.sgrh.Usuario;
 
 import java.net.URI;
@@ -23,6 +35,9 @@ import java.util.List;
 @RequestMapping("/api/mapas")
 @RequiredArgsConstructor
 public class MapaControle {
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
+            .toFactory();
+
     private final MapaService mapaService;
     private final MapaCrudService mapaCrudService;
     private final MapaMapper mapaMapper;
@@ -47,7 +62,19 @@ public class MapaControle {
 
     @PostMapping
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
-        var entidade = mapaMapper.toEntity(mapaDto);
+        var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
+        var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
+
+        var sanitizedMapaDto = MapaDto.builder()
+                .codigo(mapaDto.getCodigo())
+                .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
+                .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
+                .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
+                .dataHoraHomologado(mapaDto.getDataHoraHomologado())
+                .sugestoes(sanitizedSugestoes)
+                .build();
+
+        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
         var salvo = mapaCrudService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
@@ -56,7 +83,19 @@ public class MapaControle {
     @PutMapping("/{id}")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
         try {
-            var entidade = mapaMapper.toEntity(mapaDto);
+            var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
+            var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
+
+            var sanitizedMapaDto = MapaDto.builder()
+                    .codigo(mapaDto.getCodigo())
+                    .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
+                    .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
+                    .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
+                    .dataHoraHomologado(mapaDto.getDataHoraHomologado())
+                    .sugestoes(sanitizedSugestoes)
+                    .build();
+
+            var entidade = mapaMapper.toEntity(sanitizedMapaDto);
             var atualizado = mapaCrudService.atualizar(id, entidade);
             return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
         } catch (Exception e) {

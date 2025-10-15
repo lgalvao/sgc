@@ -21,7 +21,7 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Long chefeId;
+        long chefeId;
         try {
             chefeId = Long.parseLong(annotation.value());
         } catch (NumberFormatException e) {

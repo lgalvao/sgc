@@ -3,6 +3,7 @@ package sgc.mapa.dto;
 import sgc.mapa.modelo.TipoImpactoAtividade;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DTO que representa uma atividade que sofreu alteração durante
@@ -10,8 +11,6 @@ import java.util.List;
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
  */
-import java.util.ArrayList;
-
 public record AtividadeImpactadaDto(
     Long codigo,
     String descricao,
@@ -21,10 +20,5 @@ public record AtividadeImpactadaDto(
 ) {
     public AtividadeImpactadaDto {
         competenciasVinculadas = new ArrayList<>(competenciasVinculadas);
-    }
-
-    @Override
-    public List<String> competenciasVinculadas() {
-        return new ArrayList<>(competenciasVinculadas);
     }
 }

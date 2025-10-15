@@ -1,5 +1,6 @@
 package sgc.subprocesso.dto;
 
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

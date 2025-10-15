@@ -4,14 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Request DTO para salvar um mapa completo.
  * Usado para criar ou atualizar o mapa com todas as suas competências
  * e vínculos com atividades de uma vez.
  */
-import java.util.ArrayList;
-
 public record SalvarMapaRequest(
     String observacoes,
     

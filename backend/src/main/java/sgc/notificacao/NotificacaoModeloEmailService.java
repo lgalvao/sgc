@@ -10,12 +10,22 @@ import java.util.List;
 
 /**
  * Serviço responsável por criar templates HTML para diferentes tipos de e-mail.
- * Cada método cria um template específico para um caso de uso do sistema.
+ * Cada metodo cria um template específico para um caso de uso do sistema.
  */
 @Service
-// TODO muitos strings fixos repetidos em toda esta classe
 public class NotificacaoModeloEmailService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    // Constantes para títulos de e-mail
+    private static final String TITULO_PROCESSO_INICIADO = "Processo Iniciado - ";
+    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro Disponibilizado para Análise";
+    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro Devolvido para Ajustes";
+    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências Disponibilizado";
+    private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências Validado";
+    private static final String TITULO_PROCESSO_FINALIZADO = "Processo Finalizado - Mapas Vigentes";
+    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "SGC: Conclusão do processo ";
+
+
     private final SpringTemplateEngine templateEngine;
 
     NotificacaoModeloEmailService(SpringTemplateEngine templateEngine) {
@@ -32,7 +42,7 @@ public class NotificacaoModeloEmailService {
             LocalDate dataLimite) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Processo Iniciado - " + tipoProcesso);
+        context.setVariable("titulo", TITULO_PROCESSO_INICIADO + tipoProcesso);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("tipoProcesso", tipoProcesso);
@@ -50,7 +60,7 @@ public class NotificacaoModeloEmailService {
             int quantidadeAtividades) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Cadastro Disponibilizado para Análise");
+        context.setVariable("titulo", TITULO_CADASTRO_DISPONIBILIZADO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("quantidadeAtividades", quantidadeAtividades);
@@ -68,7 +78,7 @@ public class NotificacaoModeloEmailService {
             String observacoes) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Cadastro Devolvido para Ajustes");
+        context.setVariable("titulo", TITULO_CADASTRO_DEVOLVIDO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("motivo", motivo);
@@ -86,7 +96,7 @@ public class NotificacaoModeloEmailService {
             LocalDate dataLimiteValidacao) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Mapa de Competências Disponibilizado");
+        context.setVariable("titulo", TITULO_MAPA_DISPONIBILIZADO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
@@ -102,7 +112,7 @@ public class NotificacaoModeloEmailService {
             String nomeProcesso) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Mapa de Competências Validado");
+        context.setVariable("titulo", TITULO_MAPA_VALIDADO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
@@ -118,7 +128,7 @@ public class NotificacaoModeloEmailService {
             int quantidadeMapas) {
 
         Context context = new Context();
-        context.setVariable("titulo", "Processo Finalizado - Mapas Vigentes");
+        context.setVariable("titulo", TITULO_PROCESSO_FINALIZADO);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
         context.setVariable("quantidadeMapas", quantidadeMapas);
@@ -134,7 +144,7 @@ public class NotificacaoModeloEmailService {
             String nomeProcesso) {
 
         Context context = new Context();
-        context.setVariable("titulo", "SGC: Conclusão do processo " + nomeProcesso);
+        context.setVariable("titulo", TITULO_PROCESSO_CONCLUSAO_SGC + nomeProcesso);
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
@@ -150,7 +160,7 @@ public class NotificacaoModeloEmailService {
             List<String> siglasUnidadesSubordinadas) {
 
         Context context = new Context();
-        context.setVariable("titulo", "SGC: Conclusão do processo " + nomeProcesso + " em unidades subordinadas");
+        context.setVariable("titulo", TITULO_PROCESSO_CONCLUSAO_SGC + nomeProcesso + " em unidades subordinadas");
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);

@@ -73,7 +73,7 @@ public class SubprocessoDtoService {
         final Set<Long> idsAtividades = atividades.stream().map(Atividade::getCodigo).filter(Objects::nonNull).collect(Collectors.toSet());
         List<Conhecimento> conhecimentos = repositorioConhecimento.findAll().stream()
                 .filter(c -> c.getAtividade() != null && idsAtividades.contains(c.getAtividade().getCodigo()))
-                .collect(Collectors.toList());
+                .toList();
 
         return SubprocessoDetalheDto.of(sp, movimentacoes, atividades.stream().map(atividadeMapper::toDTO).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDTO).collect(Collectors.toList()), movimentacaoMapper);
     }

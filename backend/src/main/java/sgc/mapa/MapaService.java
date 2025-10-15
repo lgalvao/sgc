@@ -18,6 +18,26 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.HtmlPolicyBuilder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.mapa.dto.CompetenciaMapaDto;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
+import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.HashSet;
@@ -37,6 +57,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaService {
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
+            .toFactory();
+
     private final MapaRepo repositorioMapa;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
@@ -106,7 +129,9 @@ public class MapaService {
         Mapa mapa = repositorioMapa.findById(idMapa)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(idMapa)));
 
-        mapa.setObservacoesDisponibilizacao(request.observacoes());
+        // Sanitize the observations before saving
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapa = repositorioMapa.save(mapa);
 
         List<Competencia> competenciasAtuais = repositorioCompetencia.findByMapaCodigo(idMapa);

@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DTO usado para atualizar um processo existente.
  */
-import java.util.ArrayList;
-
 public record AtualizarProcessoReq(
     Long codigo,
 

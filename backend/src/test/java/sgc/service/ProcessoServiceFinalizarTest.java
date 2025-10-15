@@ -14,8 +14,6 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.ProcessoFinalizacaoService;
-import sgc.processo.ProcessoNotificacaoService;
-import sgc.processo.ProcessoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.ProcessoMapper;
@@ -24,6 +22,7 @@ import sgc.processo.modelo.ErroProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.ProcessoNotificacaoService;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
@@ -55,9 +54,6 @@ public class ProcessoServiceFinalizarTest {
 
     @Mock
     private ProcessoMapper processoMapper;
-
-    @Mock
-    private sgc.sgrh.SgrhService sgrhService;
 
     @Mock
     private ProcessoNotificacaoService processoNotificacaoService;
@@ -118,7 +114,7 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(subprocessoHomologado));
         when(subprocessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(subprocessoHomologado));
         when(processoRepo.save(any(Processo.class))).thenReturn(processo);
-        when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.empty());
+        when(unidadeMapaRepo.findByUnidadeCodigo(anyLong())).thenReturn(Optional.of(new UnidadeMapa()));
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(List.of());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 

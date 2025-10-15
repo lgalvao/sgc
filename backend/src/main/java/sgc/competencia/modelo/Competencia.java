@@ -35,11 +35,4 @@ public class Competencia extends EntidadeBase {
         }
     }
 
-    public void setMapa(Mapa mapa) {
-        this.mapa = mapa;
-    }
-
-    public Mapa getMapa() {
-        return this.mapa;
-    }
 }
