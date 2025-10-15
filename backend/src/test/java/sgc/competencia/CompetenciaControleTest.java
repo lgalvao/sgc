@@ -128,7 +128,9 @@ class CompetenciaControleTest {
         long idCompetencia = 1L;
         long idAtividade = 2L;
 
-        when(competenciaService.vincularAtividade(idCompetencia, idAtividade)).thenReturn(new CompetenciaAtividade());
+        CompetenciaAtividade vinculo = new CompetenciaAtividade();
+        vinculo.setId(new CompetenciaAtividade.Id(idAtividade, idCompetencia));
+        when(competenciaService.vincularAtividade(idCompetencia, idAtividade)).thenReturn(vinculo);
 
         String requestBody = "{\"idAtividade\": " + idAtividade + "}";
 
@@ -136,7 +138,8 @@ class CompetenciaControleTest {
                         .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/competencias/1/atividades/2"));
     }
 
     @Test

@@ -34,7 +34,11 @@ public class ErroApi {
 
     public ErroApi(HttpStatus status, String message, List<ErroSubApi> subErrors) {
         this(status, message);
-        this.subErrors = subErrors;
+        this.subErrors = subErrors != null ? new java.util.ArrayList<>(subErrors) : null;
+    }
+
+    public List<ErroSubApi> getSubErrors() {
+        return subErrors != null ? new java.util.ArrayList<>(subErrors) : null;
     }
 
 }

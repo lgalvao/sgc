@@ -71,9 +71,9 @@ public class ProcessoServiceDetalhesTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoService,
-                notificacaoModeloEmailService,
-                sgrhService,
+                new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService),
+                new sgc.processo.ProcessoIniciacaoService(processoRepo, unidadeRepo, unidadeProcessoRepo, subprocessoRepo, mapaRepo, movimentacaoRepo, unidadeMapaRepo, servicoDeCopiaDeMapa, publicadorDeEventos),
+                new sgc.processo.ProcessoFinalizacaoService(processoRepo, subprocessoRepo, unidadeMapaRepo, unidadeProcessoRepo, publicadorDeEventos, new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService)),
                 processoMapper,
                 processoDetalheMapperCustom);
     }

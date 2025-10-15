@@ -10,6 +10,8 @@ import java.util.List;
 /**
  * DTO usado para atualizar um processo existente.
  */
+import java.util.ArrayList;
+
 public record AtualizarProcessoReq(
     Long codigo,
 
@@ -24,4 +26,13 @@ public record AtualizarProcessoReq(
 
     @NotEmpty(message = "Pelo menos uma unidade participante deve ser incluída.")
     List<Long> unidades
-) {}
+) {
+    public AtualizarProcessoReq {
+        unidades = new ArrayList<>(unidades);
+    }
+
+    @Override
+    public List<Long> unidades() {
+        return new ArrayList<>(unidades);
+    }
+}

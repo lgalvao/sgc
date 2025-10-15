@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.ArrayList;
+
 public record CriarProcessoReq(
     @NotBlank(message = "Preencha a descrição")
     String descricao,
@@ -19,4 +21,13 @@ public record CriarProcessoReq(
 
     @NotEmpty(message = "Pelo menos uma unidade participante deve ser incluída.")
     List<Long> unidades
-) {}
+) {
+    public CriarProcessoReq {
+        unidades = new ArrayList<>(unidades);
+    }
+
+    @Override
+    public List<Long> unidades() {
+        return new ArrayList<>(unidades);
+    }
+}

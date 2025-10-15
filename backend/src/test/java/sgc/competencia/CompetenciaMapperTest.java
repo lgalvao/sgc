@@ -30,8 +30,9 @@ class CompetenciaMapperTest {
 
     @Test
     void toDTO_semMapa_deveMapearCorretamente() {
-        Competencia competencia = new Competencia(null, DESCRICAO_TESTE);
+        Competencia competencia = new Competencia();
         competencia.setCodigo(10L);
+        competencia.setDescricao(DESCRICAO_TESTE);
 
         CompetenciaDto dto = mapper.toDTO(competencia);
 

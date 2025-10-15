@@ -10,10 +10,21 @@ import java.util.List;
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
  */
+import java.util.ArrayList;
+
 public record AtividadeImpactadaDto(
     Long codigo,
     String descricao,
     TipoImpactoAtividade tipoImpacto,  // INSERIDA, REMOVIDA, ALTERADA
     String descricaoAnterior,  // Para ALTERADA (null para outros tipos)
     List<String> competenciasVinculadas  // Nomes das competências vinculadas
-) {}
+) {
+    public AtividadeImpactadaDto {
+        competenciasVinculadas = new ArrayList<>(competenciasVinculadas);
+    }
+
+    @Override
+    public List<String> competenciasVinculadas() {
+        return new ArrayList<>(competenciasVinculadas);
+    }
+}

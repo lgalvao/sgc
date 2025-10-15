@@ -24,6 +24,20 @@ public class Competencia extends EntidadeBase {
 
     public Competencia(String descricao, Mapa mapa) {
         this.descricao = descricao;
-        this.mapa = mapa;
+        this.mapa = new Mapa(mapa);
+    }
+
+    public void setMapa(Mapa mapa) {
+        this.mapa = new Mapa(mapa);
+    }
+
+    public Mapa getMapa() {
+        return new Mapa(this.mapa);
+    }
+
+    public Competencia(Competencia competencia) {
+        super(competencia.getCodigo());
+        this.mapa = competencia.getMapa();
+        this.descricao = competencia.getDescricao();
     }
 }

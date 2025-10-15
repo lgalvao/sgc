@@ -188,7 +188,6 @@ class AlertaServiceTest {
     void criarAlertasProcessoIniciado_deveIgnorarSubprocessoSemUnidade() {
         Subprocesso subprocessoSemUnidade = new Subprocesso();
         subprocessoSemUnidade.setCodigo(101L);
-        subprocessoSemUnidade.setUnidade(null);
 
         alertaService.criarAlertasProcessoIniciado(processo, List.of(), List.of(subprocessoSemUnidade));
 

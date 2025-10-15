@@ -35,10 +35,30 @@ public record ImpactoMapaDto(
             totalAtividadesRemovidas,
             totalAtividadesAlteradas,
             competenciasImpactadas.size(),
-            atividadesInseridas,
-            atividadesRemovidas,
-            atividadesAlteradas,
-            competenciasImpactadas
+            new java.util.ArrayList<>(atividadesInseridas),
+            new java.util.ArrayList<>(atividadesRemovidas),
+            new java.util.ArrayList<>(atividadesAlteradas),
+            new java.util.ArrayList<>(competenciasImpactadas)
         );
+    }
+
+    @Override
+    public List<AtividadeImpactadaDto> atividadesInseridas() {
+        return new java.util.ArrayList<>(atividadesInseridas);
+    }
+
+    @Override
+    public List<AtividadeImpactadaDto> atividadesRemovidas() {
+        return new java.util.ArrayList<>(atividadesRemovidas);
+    }
+
+    @Override
+    public List<AtividadeImpactadaDto> atividadesAlteradas() {
+        return new java.util.ArrayList<>(atividadesAlteradas);
+    }
+
+    @Override
+    public List<CompetenciaImpactadaDto> competenciasImpactadas() {
+        return new java.util.ArrayList<>(competenciasImpactadas);
     }
 }

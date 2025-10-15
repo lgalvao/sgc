@@ -18,7 +18,11 @@ public class ErroValidacao extends RuntimeException {
 
     public ErroValidacao(String message, Map<String, ?> details) {
         super(message);
-        this.details = details;
+        this.details = details != null ? new java.util.HashMap<>(details) : null;
+    }
+
+    public Map<String, ?> getDetails() {
+        return details != null ? new java.util.HashMap<>(details) : null;
     }
 
 }

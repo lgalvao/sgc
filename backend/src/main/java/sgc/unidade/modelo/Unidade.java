@@ -22,6 +22,16 @@ public class Unidade extends EntidadeBase {
         this.situacao = SituacaoUnidade.ATIVA;
         this.tipo = TipoUnidade.OPERACIONAL;
     }
+
+    public Unidade(Unidade unidade) {
+        super(unidade.getCodigo());
+        this.nome = unidade.getNome();
+        this.sigla = unidade.getSigla();
+        this.titular = unidade.getTitular();
+        this.tipo = unidade.getTipo();
+        this.situacao = unidade.getSituacao();
+        this.unidadeSuperior = unidade.getUnidadeSuperior();
+    }
     @Column(name = "nome")
     private String nome;
 

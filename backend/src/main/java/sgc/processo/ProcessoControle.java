@@ -21,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProcessoControle {
     private final ProcessoService processoService;
+    private final ProcessoIniciacaoService processoIniciacaoService;
+    private final ProcessoFinalizacaoService processoFinalizacaoService;
 
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
@@ -70,14 +72,13 @@ public class ProcessoControle {
             @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
             @RequestBody(required = false) List<Long> unidades) {
 
-        ProcessoDto resultado;
         if ("REVISAO".equalsIgnoreCase(tipo)) {
-            resultado = processoService.iniciarProcessoRevisao(id, unidades);
+            processoIniciacaoService.iniciarProcessoRevisao(id, unidades);
         } else {
             // por padrão, inicia mapeamento
-            resultado = processoService.iniciarProcessoMapeamento(id, unidades);
+            processoIniciacaoService.iniciarProcessoMapeamento(id, unidades);
         }
-        return ResponseEntity.ok(resultado);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -92,7 +93,7 @@ public class ProcessoControle {
      */
     @PostMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        ProcessoDto finalizado = processoService.finalizar(id);
-        return ResponseEntity.ok(finalizado);
+        processoFinalizacaoService.finalizar(id);
+        return ResponseEntity.ok().build();
     }
 }

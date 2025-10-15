@@ -58,10 +58,47 @@ public class Subprocesso extends EntidadeBase {
      */
     public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDate dataLimiteEtapa1) {
         super();
-        this.processo = processo;
-        this.unidade = unidade;
-        this.mapa = mapa;
+        this.processo = new Processo(processo);
+        this.unidade = new Unidade(unidade);
+        this.mapa = new Mapa(mapa);
         this.situacao = situacao;
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
+    }
+
+    public Subprocesso(Subprocesso subprocesso) {
+        super(subprocesso.getCodigo());
+        this.processo = new Processo(subprocesso.getProcesso());
+        this.unidade = new Unidade(subprocesso.getUnidade());
+        this.mapa = new Mapa(subprocesso.getMapa());
+        this.dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
+        this.dataFimEtapa1 = subprocesso.getDataFimEtapa1();
+        this.dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
+        this.dataFimEtapa2 = subprocesso.getDataFimEtapa2();
+        this.dataFimEtapa3 = subprocesso.getDataFimEtapa3();
+        this.situacao = subprocesso.getSituacao();
+    }
+
+    public void setProcesso(Processo processo) {
+        this.processo = new Processo(processo);
+    }
+
+    public Processo getProcesso() {
+        return new Processo(this.processo);
+    }
+
+    public void setUnidade(Unidade unidade) {
+        this.unidade = new Unidade(unidade);
+    }
+
+    public Unidade getUnidade() {
+        return new Unidade(this.unidade);
+    }
+
+    public void setMapa(Mapa mapa) {
+        this.mapa = new Mapa(mapa);
+    }
+
+    public Mapa getMapa() {
+        return new Mapa(this.mapa);
     }
 }

@@ -24,11 +24,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MapaControle {
     private final MapaService mapaService;
+    private final MapaCrudService mapaCrudService;
     private final MapaMapper mapaMapper;
 
     @GetMapping
     public List<MapaDto> listar() {
-        return mapaService.listar()
+        return mapaCrudService.listar()
                 .stream()
                 .map(mapaMapper::toDTO)
                 .toList();
@@ -37,7 +38,7 @@ public class MapaControle {
     @GetMapping("/{id}")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
         try {
-            var mapa = mapaService.obterPorId(id);
+            var mapa = mapaCrudService.obterPorId(id);
             return ResponseEntity.ok(mapaMapper.toDTO(mapa));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -47,7 +48,7 @@ public class MapaControle {
     @PostMapping
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var entidade = mapaMapper.toEntity(mapaDto);
-        var salvo = mapaService.criar(entidade);
+        var salvo = mapaCrudService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
     }
@@ -56,7 +57,7 @@ public class MapaControle {
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
         try {
             var entidade = mapaMapper.toEntity(mapaDto);
-            var atualizado = mapaService.atualizar(id, entidade);
+            var atualizado = mapaCrudService.atualizar(id, entidade);
             return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -66,7 +67,7 @@ public class MapaControle {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         try {
-            mapaService.excluir(id);
+            mapaCrudService.excluir(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();

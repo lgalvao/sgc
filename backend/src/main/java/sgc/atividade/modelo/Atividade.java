@@ -30,7 +30,30 @@ public class Atividade extends EntidadeBase {
     private List<Conhecimento> conhecimentos = new ArrayList<>();
 
     public Atividade(Mapa mapa, String descricao) {
-        this.mapa = mapa;
+        this.mapa = new Mapa(mapa);
         this.descricao = descricao;
+    }
+
+    public Atividade(Atividade atividade) {
+        super(atividade.getCodigo());
+        this.mapa = new Mapa(atividade.getMapa());
+        this.descricao = atividade.getDescricao();
+        this.conhecimentos = new ArrayList<>(atividade.getConhecimentos());
+    }
+
+    public void setMapa(Mapa mapa) {
+        this.mapa = new Mapa(mapa);
+    }
+
+    public Mapa getMapa() {
+        return new Mapa(this.mapa);
+    }
+
+    public void setConhecimentos(List<Conhecimento> conhecimentos) {
+        this.conhecimentos = new ArrayList<>(conhecimentos);
+    }
+
+    public List<Conhecimento> getConhecimentos() {
+        return new ArrayList<>(this.conhecimentos);
     }
 }
