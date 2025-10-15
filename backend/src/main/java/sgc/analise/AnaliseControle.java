@@ -18,24 +18,6 @@ import java.util.Map;
 public class AnaliseControle {
     private final AnaliseService analiseService;
 
-    @ExceptionHandler(ErroDominioNaoEncontrado.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
-        return Map.of("message", ex.getMessage());
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return Map.of("message", "A requisição contém um argumento inválido ou malformado.");
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleGenericException(Exception ex) {
-        return Map.of("message", "Ocorreu um erro inesperado. Contate o suporte.");
-    }
-
 
     @GetMapping("/analises-cadastro")
     public List<Analise> listarAnalisesCadastro(@PathVariable("id") Long id) {

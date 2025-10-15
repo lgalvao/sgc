@@ -1,4 +1,3 @@
-// import com.github.spotbugs.snom.SpotBugsHtmlReport
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -266,8 +265,7 @@ data class TestFailure(
     val testMethod: String,
     val errorMessage: String,
     val errorType: String,
-    val stackTrace: List<String>,
-    val fullStackTrace: List<String> = emptyList()
+    val stackTrace: List<String>
 ) {
     fun toJson(): String {
         val escapedMessage = errorMessage
@@ -285,9 +283,6 @@ data class TestFailure(
   "error_message": "$escapedMessage",
   "stack_trace_relevant": [
          ${stackTrace.joinToString(",\n") { "    \"${it.replace("\"", "\\\"")}\"" }}
-  ],
-  "stack_trace_full": [
-         ${fullStackTrace.joinToString(",\n") { "    \"${it.replace("\"", "\\\"")}\"" }}
   ]
 }
         """.trimIndent()
@@ -300,7 +295,6 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
     }
-    // As opções do MapStruct foram removidas pois a injeção de campo no ConhecimentoMapper já resolve o problema.
 }
 
 tasks.named("build") {
@@ -326,7 +320,7 @@ tasks.spotbugsMain {
 }
 
 tasks.spotbugsTest {
-    enabled = false
+    enabled = true
 }
 
 tasks.pmdMain {
@@ -334,7 +328,7 @@ tasks.pmdMain {
 }
 
 tasks.pmdTest {
-    enabled = false
+    enabled = true
 }
 
 

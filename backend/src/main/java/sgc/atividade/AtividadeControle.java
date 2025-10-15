@@ -30,83 +30,47 @@ public class AtividadeControle {
 
     @GetMapping("/{idAtividade}")
     public ResponseEntity<AtividadeDto> obterPorId(@PathVariable Long idAtividade) {
-        try {
-            return ResponseEntity.ok(atividadeService.obterPorId(idAtividade));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(atividadeService.obterPorId(idAtividade));
     }
 
     @PostMapping
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
-            URI uri = URI.create("/api/atividades/%d".formatted(salvo.codigo()));
-            return ResponseEntity.created(uri).body(salvo);
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.badRequest().build();
-        } catch (ErroDominioAccessoNegado e) {
-            return ResponseEntity.status(403).build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
+        var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
+        URI uri = URI.create("/api/atividades/%d".formatted(salvo.codigo()));
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtividadeDto atividadeDto) {
-        try {
-            return ResponseEntity.ok(atividadeService.atualizar(id, atividadeDto));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(atividadeService.atualizar(id, atividadeDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        try {
-            atividadeService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        atividadeService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{atividadeId}/conhecimentos")
     public ResponseEntity<List<ConhecimentoDto>> listarConhecimentos(@PathVariable Long atividadeId) {
-        try {
-            return ResponseEntity.ok(atividadeService.listarConhecimentos(atividadeId));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(atividadeService.listarConhecimentos(atividadeId));
     }
 
     @PostMapping("/{atividadeId}/conhecimentos")
     public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long atividadeId, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        try {
-            var salvo = atividadeService.criarConhecimento(atividadeId, conhecimentoDto);
-            URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(atividadeId, salvo.codigo()));
-            return ResponseEntity.created(uri).body(salvo);
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        var salvo = atividadeService.criarConhecimento(atividadeId, conhecimentoDto);
+        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(atividadeId, salvo.codigo()));
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     @PutMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")
     public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long atividadeId, @PathVariable Long conhecimentoId, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        try {
-            return ResponseEntity.ok(atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, conhecimentoDto));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, conhecimentoDto));
     }
 
     @DeleteMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")
     public ResponseEntity<Void> excluirConhecimento(@PathVariable Long atividadeId, @PathVariable Long conhecimentoId) {
-        try {
-            atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-            return ResponseEntity.noContent().build();
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+        return ResponseEntity.noContent().build();
     }
 }

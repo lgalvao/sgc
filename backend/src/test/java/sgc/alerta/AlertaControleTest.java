@@ -30,7 +30,9 @@ class AlertaControleTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(alertaControle).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(alertaControle)
+                .setControllerAdvice(new sgc.comum.erros.RestExceptionHandler())
+                .build();
     }
 
     @Test

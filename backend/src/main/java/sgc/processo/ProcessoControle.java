@@ -94,11 +94,7 @@ public class ProcessoControle {
      */
     @PostMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        try {
-            processoFinalizacaoService.finalizar(id);
-            return ResponseEntity.ok().build();
-        } catch (sgc.processo.modelo.ErroProcesso e) {
-            return ResponseEntity.unprocessableEntity().body(Map.of("message", e.getMessage()));
-        }
+        processoFinalizacaoService.finalizar(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -52,12 +52,8 @@ public class MapaControle {
 
     @GetMapping("/{id}")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
-        try {
-            var mapa = mapaCrudService.obterPorId(id);
-            return ResponseEntity.ok(mapaMapper.toDTO(mapa));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        var mapa = mapaCrudService.obterPorId(id);
+        return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
     @PostMapping
@@ -82,35 +78,27 @@ public class MapaControle {
 
     @PutMapping("/{id}")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
-        try {
-            var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
-            var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
+        var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
+        var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
 
-            var sanitizedMapaDto = MapaDto.builder()
-                    .codigo(mapaDto.getCodigo())
-                    .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
-                    .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
-                    .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
-                    .dataHoraHomologado(mapaDto.getDataHoraHomologado())
-                    .sugestoes(sanitizedSugestoes)
-                    .build();
+        var sanitizedMapaDto = MapaDto.builder()
+                .codigo(mapaDto.getCodigo())
+                .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
+                .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
+                .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
+                .dataHoraHomologado(mapaDto.getDataHoraHomologado())
+                .sugestoes(sanitizedSugestoes)
+                .build();
 
-            var entidade = mapaMapper.toEntity(sanitizedMapaDto);
-            var atualizado = mapaCrudService.atualizar(id, entidade);
-            return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
+        var atualizado = mapaCrudService.atualizar(id, entidade);
+        return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        try {
-            mapaCrudService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        mapaCrudService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -119,12 +107,8 @@ public class MapaControle {
      */
     @GetMapping("/{id}/completo")
     public ResponseEntity<MapaCompletoDto> obterCompleto(@PathVariable Long id) {
-        try {
-            MapaCompletoDto mapa = mapaService.obterMapaCompleto(id);
-            return ResponseEntity.ok(mapa);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        MapaCompletoDto mapa = mapaService.obterMapaCompleto(id);
+        return ResponseEntity.ok(mapa);
     }
 
     /**
@@ -138,11 +122,7 @@ public class MapaControle {
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        try {
-            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTituloEleitoral());
-            return ResponseEntity.ok(mapa);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTituloEleitoral());
+        return ResponseEntity.ok(mapa);
     }
 }

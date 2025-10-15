@@ -29,11 +29,7 @@ public class CompetenciaControle {
 
     @GetMapping("/{id}")
     public ResponseEntity<CompetenciaDto> obterCompetencia(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(competenciaService.obterCompetencia(id));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(competenciaService.obterCompetencia(id));
     }
 
     @PostMapping
@@ -45,53 +41,31 @@ public class CompetenciaControle {
 
     @PutMapping("/{id}")
     public ResponseEntity<CompetenciaDto> atualizarCompetencia(@PathVariable Long id, @Valid @RequestBody CompetenciaDto competenciaDto) {
-        try {
-            return ResponseEntity.ok(competenciaService.atualizarCompetencia(id, competenciaDto));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(competenciaService.atualizarCompetencia(id, competenciaDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirCompetencia(@PathVariable Long id) {
-        try {
-            competenciaService.excluirCompetencia(id);
-            return ResponseEntity.noContent().build();
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        competenciaService.excluirCompetencia(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{idCompetencia}/atividades")
     public ResponseEntity<List<CompetenciaAtividade>> listarAtividadesVinculadas(@PathVariable Long idCompetencia) {
-        try {
-            return ResponseEntity.ok(competenciaService.listarAtividadesVinculadas(idCompetencia));
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(competenciaService.listarAtividadesVinculadas(idCompetencia));
     }
 
     @PostMapping("/{idCompetencia}/atividades")
     public ResponseEntity<?> vincularAtividade(@PathVariable Long idCompetencia, @Valid @RequestBody CompetenciaControle.VinculoAtividadeReq requisicao) {
-        try {
-            var salvo = competenciaService.vincularAtividade(idCompetencia, requisicao.getIdAtividade());
-            URI uri = URI.create("/api/competencias/%d/atividades/%d".formatted(idCompetencia, requisicao.getIdAtividade()));
-            return ResponseEntity.created(uri).body(salvo);
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        }
+        var salvo = competenciaService.vincularAtividade(idCompetencia, requisicao.getIdAtividade());
+        URI uri = URI.create("/api/competencias/%d/atividades/%d".formatted(idCompetencia, requisicao.getIdAtividade()));
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     @DeleteMapping("/{idCompetencia}/atividades/{idAtividade}")
     public ResponseEntity<?> desvincularAtividade(@PathVariable Long idCompetencia, @PathVariable Long idAtividade) {
-        try {
-            competenciaService.desvincularAtividade(idCompetencia, idAtividade);
-            return ResponseEntity.noContent().build();
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        competenciaService.desvincularAtividade(idCompetencia, idAtividade);
+        return ResponseEntity.noContent().build();
     }
 
     @Setter

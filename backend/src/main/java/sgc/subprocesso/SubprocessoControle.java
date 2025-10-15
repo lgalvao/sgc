@@ -118,12 +118,8 @@ public class SubprocessoControle {
 
     @PutMapping("/{id}")
     public ResponseEntity<SubprocessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody SubprocessoDto subprocessoDto) {
-        try {
-            var atualizado = subprocessoService.atualizar(id, subprocessoDto);
-            return ResponseEntity.ok(atualizado);
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        var atualizado = subprocessoService.atualizar(id, subprocessoDto);
+        return ResponseEntity.ok(atualizado);
     }
 
     @PostMapping("/{id}/devolver-cadastro")
@@ -322,12 +318,8 @@ public class SubprocessoControle {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        try {
-            subprocessoService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (ErroDominioNaoEncontrado e) {
-            return ResponseEntity.notFound().build();
-        }
+        subprocessoService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/mapa-ajuste")

@@ -60,6 +60,7 @@ public class MapaControleTest {
         HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
 
         mockMvc = MockMvcBuilders.standaloneSetup(mapaControle)
+                .setControllerAdvice(new sgc.comum.erros.RestExceptionHandler())
                 .setCustomArgumentResolvers(authenticationPrincipalResolver)
                 .build();
 
@@ -184,7 +185,7 @@ public class MapaControleTest {
 
     @Test
     void obterCompleto_QuandoServicoLancaExcecao_DeveRetornarNotFound() throws Exception {
-        when(mapaService.obterMapaCompleto(1L)).thenThrow(new RuntimeException("Erro"));
+        when(mapaService.obterMapaCompleto(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("Mapa não encontrado"));
 
         mockMvc.perform(get(API_MAPAS_1_COMPLETO))
                 .andExpect(status().isNotFound());
@@ -207,7 +208,7 @@ public class MapaControleTest {
     @Test
     void salvarCompleto_QuandoServicoLancaExcecao_DeveRetornarBadRequest() throws Exception {
         SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenThrow(new RuntimeException("Erro"));
+        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenThrow(new IllegalArgumentException("Argumento inválido"));
 
         mockMvc.perform(put(API_MAPAS_1_COMPLETO)
                         .contentType(MediaType.APPLICATION_JSON)
