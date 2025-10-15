@@ -42,10 +42,34 @@ public class Movimentacao extends EntidadeBase {
      */
     public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao) {
         super();
-        this.subprocesso = subprocesso;
-        this.unidadeOrigem = unidadeOrigem;
-        this.unidadeDestino = unidadeDestino;
+        this.subprocesso = new Subprocesso(subprocesso);
+        this.unidadeOrigem = new Unidade(unidadeOrigem);
+        this.unidadeDestino = new Unidade(unidadeDestino);
         this.descricao = descricao;
         this.dataHora = LocalDateTime.now();
+    }
+
+    public void setSubprocesso(Subprocesso subprocesso) {
+        this.subprocesso = new Subprocesso(subprocesso);
+    }
+
+    public Subprocesso getSubprocesso() {
+        return new Subprocesso(this.subprocesso);
+    }
+
+    public void setUnidadeOrigem(Unidade unidadeOrigem) {
+        this.unidadeOrigem = new Unidade(unidadeOrigem);
+    }
+
+    public Unidade getUnidadeOrigem() {
+        return new Unidade(this.unidadeOrigem);
+    }
+
+    public void setUnidadeDestino(Unidade unidadeDestino) {
+        this.unidadeDestino = new Unidade(unidadeDestino);
+    }
+
+    public Unidade getUnidadeDestino() {
+        return new Unidade(this.unidadeDestino);
     }
 }

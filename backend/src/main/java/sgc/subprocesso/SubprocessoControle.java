@@ -29,21 +29,25 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SubprocessoControle {
     private final SubprocessoService subprocessoService;
+    private final SubprocessoDtoService subprocessoDtoService;
+    private final SubprocessoWorkflowService subprocessoWorkflowService;
+    private final SubprocessoMapaService subprocessoMapaService;
     private final MapaService mapaService;
+    private final sgc.mapa.MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
     private final sgc.analise.AnaliseService analiseService;
     private final sgc.analise.dto.AnaliseMapper analiseMapper;
 
     @GetMapping
     public List<SubprocessoDto> listar() {
-        return subprocessoService.listar();
+        return subprocessoDtoService.listar();
     }
 
     @GetMapping("/{id}")
     public SubprocessoDetalheDto obterPorId(@PathVariable Long id,
                                               @RequestParam(required = false) String perfil,
                                               @RequestParam(required = false) Long unidadeUsuario) {
-        return subprocessoService.obterDetalhes(id, perfil, unidadeUsuario);
+        return subprocessoDtoService.obterDetalhes(id, perfil, unidadeUsuario);
     }
 
     @GetMapping("/{id}/historico-cadastro")
@@ -59,7 +63,7 @@ public class SubprocessoControle {
         @PathVariable("id") Long subprocessoId,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        subprocessoService.disponibilizarCadastro(subprocessoId, usuario);
+        subprocessoWorkflowService.disponibilizarCadastro(subprocessoId, usuario);
         return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }
 
@@ -73,13 +77,13 @@ public class SubprocessoControle {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.", Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoService.disponibilizarRevisao(id, usuario);
+        subprocessoWorkflowService.disponibilizarRevisao(id, usuario);
         return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
     }
 
     @GetMapping("/{id}/cadastro")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long id) {
-        return subprocessoService.obterCadastro(id);
+        return subprocessoDtoService.obterCadastro(id);
     }
 
     @PostMapping
@@ -100,11 +104,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/devolver-cadastro")
-    public SubprocessoDto devolverCadastro(
+    public void devolverCadastro(
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.devolverCadastro(
+        subprocessoWorkflowService.devolverCadastro(
             id,
             request.motivo(),
             request.observacoes(),
@@ -113,11 +117,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/aceitar-cadastro")
-    public SubprocessoDto aceitarCadastro(
+    public void aceitarCadastro(
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.aceitarCadastro(
+        subprocessoWorkflowService.aceitarCadastro(
             id,
             request.observacoes(),
             usuario.getTituloEleitoral()
@@ -125,11 +129,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/homologar-cadastro")
-    public SubprocessoDto homologarCadastro(
+    public void homologarCadastro(
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.homologarCadastro(
+        subprocessoWorkflowService.homologarCadastro(
             id,
             request.observacoes(),
             usuario.getTituloEleitoral()
@@ -137,11 +141,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/devolver-revisao-cadastro")
-    public SubprocessoDto devolverRevisaoCadastro(
+    public void devolverRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.devolverRevisaoCadastro(
+        subprocessoWorkflowService.devolverRevisaoCadastro(
             id,
             request.motivo(),
             request.observacoes(),
@@ -150,11 +154,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/aceitar-revisao-cadastro")
-    public SubprocessoDto aceitarRevisaoCadastro(
+    public void aceitarRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.aceitarRevisaoCadastro(
+        subprocessoWorkflowService.aceitarRevisaoCadastro(
             id,
             request.observacoes(),
             usuario
@@ -162,11 +166,11 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/homologar-revisao-cadastro")
-    public SubprocessoDto homologarRevisaoCadastro(
+    public void homologarRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.homologarRevisaoCadastro(
+        subprocessoWorkflowService.homologarRevisaoCadastro(
             id,
             request.observacoes(),
             usuario
@@ -185,7 +189,7 @@ public class SubprocessoControle {
 
     @GetMapping("/{id}/mapa-visualizacao")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("id") Long subprocessoId) {
-        return mapaService.obterMapaParaVisualizacao(subprocessoId);
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocessoId);
     }
     
     @PutMapping("/{id}/mapa")
@@ -205,7 +209,7 @@ public class SubprocessoControle {
             @PathVariable Long id,
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        subprocessoService.disponibilizarMapa(
+        subprocessoWorkflowService.disponibilizarMapa(
             id,
             request.observacoes(),
             request.dataLimiteEtapa2(),
@@ -216,11 +220,11 @@ public class SubprocessoControle {
     
     @PostMapping("/{id}/apresentar-sugestoes")
     @Transactional
-    public SubprocessoDto apresentarSugestoes(
+    public void apresentarSugestoes(
             @PathVariable Long id,
             @RequestBody @Valid ApresentarSugestoesReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.apresentarSugestoes(
+        subprocessoWorkflowService.apresentarSugestoes(
             id,
             request.sugestoes(),
             usuario.getTituloEleitoral()
@@ -229,13 +233,13 @@ public class SubprocessoControle {
     
     @PostMapping("/{id}/validar-mapa")
     @Transactional
-    public SubprocessoDto validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.validarMapa(id, usuario.getTituloEleitoral());
+    public void validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.validarMapa(id, usuario.getTituloEleitoral());
     }
 
     @GetMapping("/{id}/sugestoes")
     public SugestoesDto obterSugestoes(@PathVariable Long id) {
-        return subprocessoService.obterSugestoes(id);
+        return subprocessoDtoService.obterSugestoes(id);
     }
 
     @GetMapping("/{id}/historico-validacao")
@@ -248,12 +252,12 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/devolver-validacao")
     @Transactional
-    public SubprocessoDto devolverValidacao(
+    public void devolverValidacao(
         @PathVariable Long id,
         @RequestBody @Valid DevolverValidacaoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoService.devolverValidacao(
+        subprocessoWorkflowService.devolverValidacao(
             id,
             request.justificativa(),
             usuario
@@ -262,15 +266,15 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/aceitar-validacao")
     @Transactional
-    public SubprocessoDto aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.aceitarValidacao(id, usuario);
+    public void aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.aceitarValidacao(id, usuario);
     }
 
     @PostMapping("/{id}/homologar-validacao")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public SubprocessoDto homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.homologarValidacao(id, usuario.getTituloEleitoral());
+    public void homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.homologarValidacao(id, usuario.getTituloEleitoral());
     }
 
     @DeleteMapping("/{id}")
@@ -285,17 +289,17 @@ public class SubprocessoControle {
 
     @GetMapping("/{id}/mapa-ajuste")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long id) {
-        return subprocessoService.obterMapaParaAjuste(id);
+        return subprocessoDtoService.obterMapaParaAjuste(id);
     }
 
     @PutMapping("/{id}/mapa-ajuste")
     @Transactional
-    public SubprocessoDto salvarAjustesMapa(
+    public void salvarAjustesMapa(
         @PathVariable Long id,
         @RequestBody @Valid SalvarAjustesReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoService.salvarAjustesMapa(
+        subprocessoMapaService.salvarAjustesMapa(
             id,
             request.competencias(),
             usuario.getTituloEleitoral()
@@ -304,12 +308,12 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/submeter-mapa-ajustado")
     @Transactional
-    public SubprocessoDto submeterMapaAjustado(
+    public void submeterMapaAjustado(
         @PathVariable Long id,
         @RequestBody @Valid SubmeterMapaAjustadoReq request,
         @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoService.submeterMapaAjustado(id, request, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.submeterMapaAjustado(id, request, usuario.getTituloEleitoral());
     }
 
     @PostMapping("/{id}/importar-atividades")
@@ -318,7 +322,7 @@ public class SubprocessoControle {
         @PathVariable Long id,
         @RequestBody @Valid ImportarAtividadesRequest request
     ) {
-        subprocessoService.importarAtividades(id, request.subprocessoOrigemId());
+        subprocessoMapaService.importarAtividades(id, request.subprocessoOrigemId());
         return Map.of("message", "Atividades importadas com sucesso.");
     }
 }

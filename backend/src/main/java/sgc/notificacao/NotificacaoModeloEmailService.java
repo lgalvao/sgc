@@ -17,7 +17,7 @@ public class NotificacaoModeloEmailService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final SpringTemplateEngine templateEngine;
 
-    public NotificacaoModeloEmailService(SpringTemplateEngine templateEngine) {
+    NotificacaoModeloEmailService(SpringTemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 

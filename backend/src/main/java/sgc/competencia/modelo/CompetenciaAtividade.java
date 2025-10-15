@@ -38,8 +38,32 @@ public class CompetenciaAtividade implements Serializable {
     private Competencia competencia;
 
     public CompetenciaAtividade(Id id, Competencia competencia, Atividade atividade) {
-        this.id = id;
-        this.competencia = competencia;
-        this.atividade = atividade;
+        this.id = new Id(id.getAtividadeCodigo(), id.getCompetenciaCodigo());
+        this.competencia = new Competencia(competencia);
+        this.atividade = new Atividade(atividade);
+    }
+
+    public void setId(Id id) {
+        this.id = new Id(id.getAtividadeCodigo(), id.getCompetenciaCodigo());
+    }
+
+    public Id getId() {
+        return new Id(this.id.getAtividadeCodigo(), this.id.getCompetenciaCodigo());
+    }
+
+    public void setCompetencia(Competencia competencia) {
+        this.competencia = new Competencia(competencia);
+    }
+
+    public Competencia getCompetencia() {
+        return new Competencia(this.competencia);
+    }
+
+    public void setAtividade(Atividade atividade) {
+        this.atividade = new Atividade(atividade);
+    }
+
+    public Atividade getAtividade() {
+        return new Atividade(this.atividade);
     }
 }

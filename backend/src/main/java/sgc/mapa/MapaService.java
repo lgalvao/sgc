@@ -48,6 +48,7 @@ public class MapaService {
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     private final AtividadeRepo atividadeRepo;
     private final SubprocessoRepo repositorioSubprocesso;
+    private final MapaVisualizacaoService mapaVisualizacaoService;
 
     /**
      * Obtém um mapa completo com todas as competências e atividades vinculadas.
@@ -302,82 +303,5 @@ public class MapaService {
             .orElse(null);
     }
 
-    /**
-     * Obtém um mapa completo formatado para visualização, conforme CDU-18.
-     *
-     * @param subprocessoId O ID do subprocesso.
-     * @return Um DTO com os dados do mapa prontos para exibição.
-     */
-    @Transactional(readOnly = true)
-    public MapaVisualizacaoDto obterMapaParaVisualizacao(Long subprocessoId) {
-        log.debug("Obtendo mapa para visualização do subprocesso: id={}", subprocessoId);
 
-        Subprocesso subprocesso = repositorioSubprocesso.findById(subprocessoId)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + subprocessoId));
-
-        if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado.");
-        }
-
-        Unidade unidade = subprocesso.getUnidade();
-        var unidadeDto = new MapaVisualizacaoDto.UnidadeDto(unidade.getCodigo(), unidade.getSigla(), unidade.getNome());
-
-        List<Competencia> competencias = repositorioCompetencia.findByMapaCodigo(subprocesso.getMapa().getCodigo());
-
-        List<CompetenciaDto> competenciasDto = competencias.stream().map(competencia -> {
-            List<Atividade> atividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(competencia.getCodigo())
-                .stream()
-                .map(CompetenciaAtividade::getAtividade)
-                .toList();
-
-            List<AtividadeDto> atividadesDto = atividades.stream().map(atividade -> {
-                List<Conhecimento> conhecimentos = atividade.getConhecimentos();
-                List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
-                    .map(c -> new ConhecimentoDto(c.getCodigo(), c.getDescricao()))
-                    .toList();
-                return new AtividadeDto(atividade.getCodigo(), atividade.getDescricao(), conhecimentosDto);
-            }).toList();
-
-            return new CompetenciaDto(competencia.getCodigo(), competencia.getDescricao(), atividadesDto);
-        }).toList();
-
-        return new MapaVisualizacaoDto(unidadeDto, competenciasDto);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Mapa> listar() {
-        return repositorioMapa.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Mapa obterPorId(Long id) {
-        return repositorioMapa.findById(id)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: " + id));
-    }
-
-    @Transactional
-    public Mapa criar(Mapa mapa) {
-        return repositorioMapa.save(mapa);
-    }
-
-    @Transactional
-    public Mapa atualizar(Long id, Mapa mapa) {
-        return repositorioMapa.findById(id)
-            .map(existente -> {
-                existente.setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado());
-                existente.setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao());
-                existente.setSugestoesApresentadas(mapa.getSugestoesApresentadas());
-                existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
-                return repositorioMapa.save(existente);
-            })
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: " + id));
-    }
-
-    @Transactional
-    public void excluir(Long id) {
-        if (!repositorioMapa.existsById(id)) {
-            throw new ErroEntidadeNaoEncontrada("Mapa não encontrado: " + id);
-        }
-        repositorioMapa.deleteById(id);
-    }
 }

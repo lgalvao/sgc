@@ -43,6 +43,12 @@ public class ProcessoControleTest {
     @MockitoBean
     private ProcessoService processoService;
 
+    @MockitoBean
+    private ProcessoIniciacaoService processoIniciacaoService;
+
+    @MockitoBean
+    private ProcessoFinalizacaoService processoFinalizacaoService;
+
     @Captor
     private ArgumentCaptor<CriarProcessoReq> criarCaptor;
 
@@ -55,7 +61,7 @@ public class ProcessoControleTest {
 
     @BeforeEach
     void setUp() {
-        ProcessoControle controle = new ProcessoControle(processoService);
+        ProcessoControle controle = new ProcessoControle(processoService, processoIniciacaoService, processoFinalizacaoService);
         mockMvc = MockMvcBuilders.standaloneSetup(controle)
                 .setControllerAdvice(new RestExceptionHandler()) // Register the global exception handler
                 .build();
@@ -247,15 +253,14 @@ public class ProcessoControleTest {
             .tipo(MAPEAMENTO)
             .build();
 
-        when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
+        doNothing().when(processoIniciacaoService).iniciarProcessoMapeamento(eq(1L), anyList());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+                .andExpect(status().isOk());
 
-        verify(processoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
+        verify(processoIniciacaoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
     }
 
     @Test
@@ -267,20 +272,19 @@ public class ProcessoControleTest {
             .tipo(REVISAO)
             .build();
 
-        when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
+        doNothing().when(processoIniciacaoService).iniciarProcessoRevisao(eq(1L), anyList());
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar?tipo=REVISAO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+                .andExpect(status().isOk());
 
-        verify(processoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
+        verify(processoIniciacaoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
     }
 
     @Test
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
-        doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), anyList());
+        doThrow(new IllegalArgumentException()).when(processoIniciacaoService).iniciarProcessoMapeamento(eq(999L), anyList());
 
         mockMvc.perform(post("/api/processos/999/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -297,18 +301,17 @@ public class ProcessoControleTest {
             .tipo(MAPEAMENTO)
             .build();
 
-        when(processoService.finalizar(1L)).thenReturn(dto);
+        doNothing().when(processoFinalizacaoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+                .andExpect(status().isOk());
 
-        verify(processoService).finalizar(1L);
+        verify(processoFinalizacaoService).finalizar(1L);
     }
 
     @Test
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).finalizar(999L);
+        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoFinalizacaoService).finalizar(999L);
 
         mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar"))
                 .andExpect(status().isNotFound());
@@ -316,7 +319,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        doThrow(new IllegalStateException("Processo em estado inválido")).when(processoService).finalizar(1L);
+        doThrow(new IllegalStateException("Processo em estado inválido")).when(processoFinalizacaoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isConflict())
@@ -325,7 +328,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ValidacaoFalhou_RetornaUnprocessableEntity() throws Exception {
-        doThrow(new ErroProcesso("Subprocessos não homologados")).when(processoService).finalizar(1L);
+        doThrow(new ErroProcesso("Subprocessos não homologados")).when(processoFinalizacaoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
                 .andExpect(status().isUnprocessableEntity())

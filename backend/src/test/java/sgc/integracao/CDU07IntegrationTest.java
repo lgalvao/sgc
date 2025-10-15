@@ -16,6 +16,7 @@ import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.SubprocessoDtoService;
 import sgc.subprocesso.SubprocessoService;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -58,6 +59,9 @@ public class CDU07IntegrationTest {
     @Autowired
     private SubprocessoService subprocessoService;
 
+    @Autowired
+    private SubprocessoDtoService subprocessoDtoService;
+
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -93,6 +97,6 @@ public class CDU07IntegrationTest {
 
     @Test
     void testDetalharSubprocesso_naoEncontrado_falha() {
-        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.obterDetalhes(999L, "ADMIN", null));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, "ADMIN", null));
     }
 }

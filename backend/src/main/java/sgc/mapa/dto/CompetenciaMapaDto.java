@@ -9,6 +9,8 @@ import java.util.List;
  * DTO que representa uma competência no contexto do mapa completo.
  * Contém os dados da competência e os códigos das atividades vinculadas.
  */
+import java.util.ArrayList;
+
 public record CompetenciaMapaDto(
     Long codigo,  // null quando for nova competência
     
@@ -17,4 +19,13 @@ public record CompetenciaMapaDto(
     
     @NotNull(message = "Lista de atividades não pode ser nula")
     List<Long> atividadesCodigos  // IDs das atividades vinculadas à competência
-) {}
+) {
+    public CompetenciaMapaDto {
+        atividadesCodigos = new ArrayList<>(atividadesCodigos);
+    }
+
+    @Override
+    public List<Long> atividadesCodigos() {
+        return new ArrayList<>(atividadesCodigos);
+    }
+}

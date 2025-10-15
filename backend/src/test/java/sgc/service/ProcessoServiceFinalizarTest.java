@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.processo.ProcessoFinalizacaoService;
 import sgc.processo.ProcessoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDto;
@@ -58,7 +59,7 @@ public class ProcessoServiceFinalizarTest {
     private sgc.sgrh.SgrhService sgrhService;
 
     @InjectMocks
-    private ProcessoService processoService;
+    private ProcessoFinalizacaoService processoFinalizacaoService;
 
     private Processo processo;
     private Subprocesso subprocessoHomologado;
@@ -93,7 +94,7 @@ public class ProcessoServiceFinalizarTest {
         when(subprocessoRepo.findByProcessoCodigo(1L))
                 .thenReturn(List.of(subprocessoHomologado, subprocessoPendente));
 
-        assertThatThrownBy(() -> processoService.finalizar(1L))
+        assertThatThrownBy(() -> processoFinalizacaoService.finalizar(1L))
                 .isInstanceOf(ErroProcesso.class)
                 .hasMessageContaining("Unidades pendentes de homologação:");
 
@@ -113,7 +114,7 @@ public class ProcessoServiceFinalizarTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(List.of());
         when(processoMapper.toDTO(any(Processo.class))).thenReturn(ProcessoDto.builder().codigo(1L).situacao(SituacaoProcesso.FINALIZADO).build());
 
-        processoService.finalizar(1L);
+        processoFinalizacaoService.finalizar(1L);
 
         verify(processoRepo, times(1)).save(processo);
         verify(unidadeMapaRepo, times(1)).save(any(UnidadeMapa.class));

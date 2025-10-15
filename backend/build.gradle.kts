@@ -312,23 +312,24 @@ pmd {
 }
 
 tasks.withType<Pmd> {
-    ruleSets = listOf("category/java/errorprone.xml")
+    ruleSets = listOf()
+    ruleSetFiles = files("../config/pmd/custom-ruleset.xml")
     reports {
         xml.required.set(true)
-        html.required.set(false)
+        html.required.set(true)
     }
 }
 
 tasks.spotbugsMain {
-    enabled = false
-}
-
-tasks.spotbugsTest {
     enabled = true
 }
 
-tasks.pmdMain {
+tasks.spotbugsTest {
     enabled = false
+}
+
+tasks.pmdMain {
+    enabled = true
 }
 
 tasks.pmdTest {

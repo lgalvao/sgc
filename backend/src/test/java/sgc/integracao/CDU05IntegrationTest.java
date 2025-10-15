@@ -101,9 +101,7 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(processoId))
-                .andExpect(jsonPath("$.situacao").value("EM_ANDAMENTO"));
+                .andExpect(status().isOk());
     }
 
     @Test

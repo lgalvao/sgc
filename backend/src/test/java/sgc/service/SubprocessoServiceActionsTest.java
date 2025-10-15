@@ -53,6 +53,9 @@ public class SubprocessoServiceActionsTest {
     private SubprocessoService subprocessoService;
 
     @Autowired
+    private sgc.subprocesso.SubprocessoWorkflowService subprocessoWorkflowService;
+
+    @Autowired
     private SubprocessoRepo subprocessoRepo;
 
     @Autowired
@@ -135,7 +138,7 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            subprocessoService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
@@ -167,9 +170,8 @@ public class SubprocessoServiceActionsTest {
             Unidade sedoc = new Unidade("SEDOC", "SEDOC");
             unidadeRepo.save(sedoc);
 
-            SubprocessoDto result = subprocessoService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
 
-            assertNotNull(result);
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
             assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());
         }
@@ -184,9 +186,8 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
 
-            SubprocessoDto result = subprocessoService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
+            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            assertNotNull(result);
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
             assertEquals(OBSERVACOES, analise.get().getObservacoes());
@@ -202,7 +203,7 @@ public class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -210,7 +211,7 @@ public class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso sp = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            assertThrows(IllegalStateException.class, () -> subprocessoService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
+            assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(sp.getCodigo(), OBSERVACOES, usuario));
         }
     }
 
@@ -226,16 +227,15 @@ public class SubprocessoServiceActionsTest {
                 .thenReturn(new ImpactoMapaDto(false, 0,0,0, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
 
 
-            SubprocessoDto result = subprocessoService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
+            subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
-            assertNotNull(result);
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
             assertEquals(SituacaoSubprocesso.MAPA_HOMOLOGADO, spAtualizado.getSituacao());
         }
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -243,7 +243,7 @@ public class SubprocessoServiceActionsTest {
         void deveLancarExcecaoSeSituacaoIncorreta_homologar() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            assertThrows(IllegalStateException.class, () -> subprocessoService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
+            assertThrows(IllegalStateException.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario));
         }
     }
 
@@ -256,9 +256,8 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            SubprocessoDto result = subprocessoService.devolverCadastro(subprocesso.getCodigo(), "Motivo Teste", OBSERVACOES, usuario);
+            subprocessoWorkflowService.devolverCadastro(subprocesso.getCodigo(), "Motivo Teste", OBSERVACOES, usuario);
 
-            assertNotNull(result);
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
             assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, spAtualizado.getSituacao());
             assertNull(spAtualizado.getDataFimEtapa1());

@@ -7,8 +7,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.notificacao.NotificacaoModeloEmailService;
-import sgc.notificacao.NotificacaoService;
+import sgc.processo.ProcessoFinalizacaoService;
+import sgc.processo.ProcessoIniciacaoService;
+import sgc.processo.ProcessoNotificacaoService;
 import sgc.processo.ProcessoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.CriarProcessoReq;
@@ -20,7 +21,6 @@ import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
-import sgc.sgrh.SgrhService;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -56,11 +56,11 @@ public class ProcessoServiceTest {
         UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
         CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoService notificacaoService = mock(NotificacaoService.class);
-        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
-        SgrhService sgrhService = mock(SgrhService.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
+        ProcessoIniciacaoService processoIniciacaoService = mock(ProcessoIniciacaoService.class);
+        ProcessoFinalizacaoService processoFinalizacaoService = mock(ProcessoFinalizacaoService.class);
+        ProcessoNotificacaoService processoNotificacaoService = mock(ProcessoNotificacaoService.class);
 
         processoService = new ProcessoService(
                 processoRepo,
@@ -72,9 +72,9 @@ public class ProcessoServiceTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoService,
-                notificacaoModeloEmailService,
-                sgrhService,
+                processoNotificacaoService,
+                processoIniciacaoService,
+                processoFinalizacaoService,
                 processoMapper,
                 processoDetalheMapperCustom
         );

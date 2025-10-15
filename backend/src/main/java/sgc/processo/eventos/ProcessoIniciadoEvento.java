@@ -14,9 +14,20 @@ import java.util.List;
  * @param dataHoraInicio A data e hora exatas do início.
  * @param idsUnidades A lista de IDs das unidades que participam do processo.
  */
+import java.util.ArrayList;
+
 public record ProcessoIniciadoEvento(
     Long idProcesso,
     String tipo,
     LocalDateTime dataHoraInicio,
     List<Long> idsUnidades
-) {}
+) {
+    public ProcessoIniciadoEvento {
+        idsUnidades = new ArrayList<>(idsUnidades);
+    }
+
+    @Override
+    public List<Long> idsUnidades() {
+        return new ArrayList<>(idsUnidades);
+    }
+}

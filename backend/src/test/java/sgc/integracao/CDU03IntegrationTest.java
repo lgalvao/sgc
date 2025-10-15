@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import sgc.comum.erros.RestExceptionHandler;
 import sgc.processo.ProcessoControle;
+import sgc.processo.ProcessoFinalizacaoService;
+import sgc.processo.ProcessoIniciacaoService;
 import sgc.processo.ProcessoService;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
@@ -52,9 +54,15 @@ public class CDU03IntegrationTest {
     @Autowired
     private ProcessoService processoService;
 
+    @Autowired
+    private ProcessoIniciacaoService processoIniciacaoService;
+
+    @Autowired
+    private ProcessoFinalizacaoService processoFinalizacaoService;
+
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoControle(processoService, processoIniciacaoService, processoFinalizacaoService))
                 .setControllerAdvice(new RestExceptionHandler())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .alwaysDo(print())

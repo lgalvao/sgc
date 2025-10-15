@@ -43,6 +43,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
     private ApplicationEventPublisher publicadorDeEventos;
     private ProcessoMapper processoMapper;
     private ProcessoService processoService;
+    private sgc.processo.ProcessoIniciacaoService processoIniciacaoService;
 
     @BeforeEach
     public void setup() {
@@ -71,9 +72,9 @@ public class ProcessoServiceIniciarMapeamentoTest {
                 unidadeMapaRepo,
                 servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                notificacaoService,
-                notificacaoModeloEmailService,
-                sgrhService,
+                new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService),
+                new sgc.processo.ProcessoIniciacaoService(processoRepo, unidadeRepo, unidadeProcessoRepo, subprocessoRepo, mapaRepo, movimentacaoRepo, unidadeMapaRepo, servicoDeCopiaDeMapa, publicadorDeEventos),
+                new sgc.processo.ProcessoFinalizacaoService(processoRepo, subprocessoRepo, unidadeMapaRepo, unidadeProcessoRepo, publicadorDeEventos, new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService)),
                 processoMapper,
                 processoDetalheMapperCustom
         );
@@ -130,9 +131,14 @@ public class ProcessoServiceIniciarMapeamentoTest {
         });
 
         // Execução
-        var dto = processoService.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
+        processoIniciacaoService.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
 
         // Asserções
+        Processo processoSalvo = new Processo();
+        processoSalvo.setCodigo(idProcesso);
+        processoSalvo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        when(processoRepo.findById(idProcesso)).thenReturn(Optional.of(processoSalvo));
+        var dto = processoService.obterPorId(idProcesso).get();
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(idProcesso);
         assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
@@ -152,7 +158,7 @@ public class ProcessoServiceIniciarMapeamentoTest {
 
         when(processoRepo.findById(idProcesso)).thenReturn(Optional.of(processo));
 
-        assertThatThrownBy(() -> processoService.iniciarProcessoMapeamento(idProcesso, List.of(1L)))
+        assertThatThrownBy(() -> processoIniciacaoService.iniciarProcessoMapeamento(idProcesso, List.of(1L)))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

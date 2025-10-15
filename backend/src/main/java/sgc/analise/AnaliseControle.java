@@ -44,8 +44,11 @@ public class AnaliseControle {
     @PostMapping("/analises-cadastro")
     @ResponseStatus(HttpStatus.CREATED)
     public Analise criarAnaliseCadastro(@PathVariable("id") Long id,
-                                                 @RequestBody Map<String, String> payload) {
-        String observacoes = payload != null ? payload.getOrDefault("observacoes", "") : "";
+                                                 @RequestBody(required = false) Map<String, String> payload) {
+        if (payload == null) {
+            throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
+        }
+        String observacoes = payload.getOrDefault("observacoes", "");
         return analiseService.criarAnalise(id, observacoes, TipoAnalise.CADASTRO, null, payload.get("unidadeSigla"), payload.get("analistaUsuarioTitulo"), payload.get("motivo"));
     }
 
@@ -57,8 +60,11 @@ public class AnaliseControle {
     @PostMapping("/analises-validacao")
     @ResponseStatus(HttpStatus.CREATED)
     public Analise criarAnaliseValidacao(@PathVariable("id") Long id,
-                                                  @RequestBody Map<String, String> payload) {
-        String observacoes = payload != null ? payload.getOrDefault("observacoes", "") : "";
+                                                  @RequestBody(required = false) Map<String, String> payload) {
+        if (payload == null) {
+            throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
+        }
+        String observacoes = payload.getOrDefault("observacoes", "");
         return analiseService.criarAnalise(id, observacoes, TipoAnalise.VALIDACAO, null, payload.get("unidadeSigla"), payload.get("analistaUsuarioTitulo"), payload.get("motivo"));
     }
 }
