@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.sgrh.dto.EntrarRequest;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.unidade.modelo.Unidade;
@@ -55,15 +56,23 @@ public class UsuarioService {
     }
 
     /**
-     * Simula o login final do usuário, definindo seu contexto de trabalho.
+     * Simula a entrada final do usuário, definindo seu contexto de trabalho.
      *
      * @param tituloEleitoral O título eleitoral do usuário.
      * @param pu              O par `PerfilUnidade` escolhido pelo usuário.
      */
-    public void login(long tituloEleitoral, PerfilUnidade pu) {
+    public void entrar(long tituloEleitoral, PerfilUnidade pu) {
         // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
         // Para esta simulação, apenas registramos a escolha.
-        log.info("Usuário com título {} logado com sucesso. Perfil: {}, Unidade: {}",
+        log.info("Usuário com título {} entrou com sucesso. Perfil: {}, Unidade: {}",
             tituloEleitoral, pu.getPerfil(), pu.getUnidade().getSigla());
+    }
+
+    public void entrar(EntrarRequest request) {
+        Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
+        Perfil perfil = Perfil.valueOf(request.getPerfil());
+        PerfilUnidade pu = new PerfilUnidade(perfil, unidade);
+        this.entrar(request.getTituloEleitoral(), pu);
     }
 }
