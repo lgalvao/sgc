@@ -46,6 +46,8 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     implementation("ch.qos.logback:logback-core:1.5.19")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+    testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35")
+    testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 }
 
 tasks.named<ProcessResources>("processResources") {
