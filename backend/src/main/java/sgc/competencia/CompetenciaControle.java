@@ -7,8 +7,10 @@ import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.competencia.dto.CompetenciaDto;
+import io.swagger.v3.oas.annotations.Operation;
 import sgc.competencia.modelo.CompetenciaAtividade;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 
@@ -18,20 +20,24 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/competencias")
 @RequiredArgsConstructor
+@Tag(name = "Competências", description = "Endpoints para gerenciamento de competências e suas associações com atividades")
 public class CompetenciaControle {
     private final CompetenciaService competenciaService;
 
     @GetMapping
+    @Operation(summary = "Lista todas as competências")
     public List<CompetenciaDto> listarCompetencias() {
         return competenciaService.listarCompetencias();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtém uma competência pelo ID")
     public ResponseEntity<CompetenciaDto> obterCompetencia(@PathVariable Long id) {
         return ResponseEntity.ok(competenciaService.obterCompetencia(id));
     }
 
     @PostMapping
+    @Operation(summary = "Cria uma nova competência")
     public ResponseEntity<CompetenciaDto> criarCompetencia(@Valid @RequestBody CompetenciaDto competenciaDto) {
         var salvo = competenciaService.criarCompetencia(competenciaDto);
         URI uri = URI.create("/api/competencias/%d".formatted(salvo.getCodigo()));
@@ -39,22 +45,26 @@ public class CompetenciaControle {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualiza uma competência existente")
     public ResponseEntity<CompetenciaDto> atualizarCompetencia(@PathVariable Long id, @Valid @RequestBody CompetenciaDto competenciaDto) {
         return ResponseEntity.ok(competenciaService.atualizarCompetencia(id, competenciaDto));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Exclui uma competência")
     public ResponseEntity<Void> excluirCompetencia(@PathVariable Long id) {
         competenciaService.excluirCompetencia(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{idCompetencia}/atividades")
+    @Operation(summary = "Lista todas as atividades vinculadas a uma competência")
     public ResponseEntity<List<CompetenciaAtividade>> listarAtividadesVinculadas(@PathVariable Long idCompetencia) {
         return ResponseEntity.ok(competenciaService.listarAtividadesVinculadas(idCompetencia));
     }
 
     @PostMapping("/{idCompetencia}/atividades")
+    @Operation(summary = "Vincula uma atividade a uma competência")
     public ResponseEntity<?> vincularAtividade(@PathVariable Long idCompetencia, @Valid @RequestBody CompetenciaControle.VinculoAtividadeReq requisicao) {
         var salvo = competenciaService.vincularAtividade(idCompetencia, requisicao.getIdAtividade());
         URI uri = URI.create("/api/competencias/%d/atividades/%d".formatted(idCompetencia, requisicao.getIdAtividade()));
@@ -62,6 +72,7 @@ public class CompetenciaControle {
     }
 
     @DeleteMapping("/{idCompetencia}/atividades/{idAtividade}")
+    @Operation(summary = "Desvincula uma atividade de uma competência")
     public ResponseEntity<?> desvincularAtividade(@PathVariable Long idCompetencia, @PathVariable Long idAtividade) {
         competenciaService.desvincularAtividade(idCompetencia, idAtividade);
         return ResponseEntity.noContent().build();

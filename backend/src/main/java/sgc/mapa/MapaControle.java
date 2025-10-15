@@ -14,6 +14,8 @@ import sgc.mapa.dto.MapaMapper;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.sgrh.Usuario;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/mapas")
 @RequiredArgsConstructor
+@Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaControle {
     private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
             .toFactory();
@@ -47,6 +50,7 @@ public class MapaControle {
     }
 
     @GetMapping
+    @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
         return mapaCrudService.listar()
                 .stream()
@@ -55,12 +59,14 @@ public class MapaControle {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtém um mapa pelo ID")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
         var mapa = mapaCrudService.obterPorId(id);
         return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
     @PostMapping
+    @Operation(summary = "Cria um novo mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
         var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
@@ -71,6 +77,7 @@ public class MapaControle {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
         var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
@@ -80,6 +87,7 @@ public class MapaControle {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         mapaCrudService.excluir(id);
         return ResponseEntity.noContent().build();
@@ -90,6 +98,7 @@ public class MapaControle {
      * GET /api/mapas/{id}/completo
      */
     @GetMapping("/{id}/completo")
+    @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterCompleto(@PathVariable Long id) {
         MapaCompletoDto mapa = mapaService.obterMapaCompleto(id);
         return ResponseEntity.ok(mapa);
@@ -101,6 +110,7 @@ public class MapaControle {
      */
     @PutMapping("/{id}/completo")
     @Transactional
+    @Operation(summary = "Salva um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> salvarCompleto(
             @PathVariable Long id,
             @RequestBody @Valid SalvarMapaRequest request,

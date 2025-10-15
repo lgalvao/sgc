@@ -139,7 +139,14 @@ Para executar a aplicação:
 ```bash
 ./gradlew :backend:bootRun
 ```
-A API estará disponível em `http://localhost:8080`.
+A API estará disponível em `http://localhost:10000`.
+
+## Documentação da API (Swagger UI)
+A documentação da API é gerada automaticamente com SpringDoc e está acessível em:
+[http://localhost:10000/swagger-ui.html](http://localhost:10000/swagger-ui.html)
+
+A especificação OpenAPI em formato JSON pode ser encontrada em:
+[http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
 ## Padrões de Design e Boas Práticas
 - **Injeção de Dependência:** Utilizada extensivamente pelo Spring Framework.

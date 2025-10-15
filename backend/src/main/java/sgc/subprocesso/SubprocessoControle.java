@@ -19,8 +19,10 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.sgrh.Usuario;
+import io.swagger.v3.oas.annotations.Operation;
 import sgc.subprocesso.dto.*;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoControle {
     private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
             .toFactory();
@@ -63,6 +66,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/disponibilizar")
+    @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
         @PathVariable("id") Long subprocessoId,
         @AuthenticationPrincipal Usuario usuario
@@ -72,6 +76,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/disponibilizar-revisao")
+    @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(id);
         if (faltando != null && !faltando.isEmpty()) {
@@ -104,6 +109,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/devolver-cadastro")
+    @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
@@ -120,6 +126,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/aceitar-cadastro")
+    @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
@@ -134,6 +141,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/homologar-cadastro")
+    @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
@@ -148,6 +156,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/devolver-revisao-cadastro")
+    @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     public void devolverRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody DevolverCadastroReq request,
@@ -164,6 +173,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/aceitar-revisao-cadastro")
+    @Operation(summary = "Aceita a revisão do cadastro de atividades")
     public void aceitarRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody AceitarCadastroReq request,
@@ -178,6 +188,7 @@ public class SubprocessoControle {
     }
 
     @PostMapping("/{id}/homologar-revisao-cadastro")
+    @Operation(summary = "Homologa a revisão do cadastro de atividades")
     public void homologarRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
@@ -192,6 +203,7 @@ public class SubprocessoControle {
     }
 
     @GetMapping("/{id}/impactos-mapa")
+    @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         return impactoMapaService.verificarImpactos(id, usuario);
     }
@@ -219,6 +231,7 @@ public class SubprocessoControle {
     @PostMapping("/{id}/disponibilizar-mapa")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Disponibiliza o mapa de competências para as unidades")
     public ResponseEntity<RespostaDto> disponibilizarMapa(
             @PathVariable Long id,
             @RequestBody @Valid DisponibilizarMapaReq request,
@@ -236,6 +249,7 @@ public class SubprocessoControle {
     
     @PostMapping("/{id}/apresentar-sugestoes")
     @Transactional
+    @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
             @PathVariable Long id,
             @RequestBody @Valid ApresentarSugestoesReq request,
@@ -251,6 +265,7 @@ public class SubprocessoControle {
     
     @PostMapping("/{id}/validar-mapa")
     @Transactional
+    @Operation(summary = "Valida o mapa de competências da unidade")
     public void validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         subprocessoWorkflowService.validarMapa(id, usuario.getTituloEleitoral());
     }
@@ -270,6 +285,7 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/devolver-validacao")
     @Transactional
+    @Operation(summary = "Devolve a validação do mapa para a unidade de negócio")
     public void devolverValidacao(
         @PathVariable Long id,
         @RequestBody @Valid DevolverValidacaoReq request,
@@ -286,6 +302,7 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/aceitar-validacao")
     @Transactional
+    @Operation(summary = "Aceita a validação do mapa")
     public void aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         subprocessoWorkflowService.aceitarValidacao(id, usuario);
     }
@@ -293,6 +310,7 @@ public class SubprocessoControle {
     @PostMapping("/{id}/homologar-validacao")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Homologa a validação do mapa")
     public void homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         subprocessoWorkflowService.homologarValidacao(id);
     }
@@ -324,6 +342,7 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/submeter-mapa-ajustado")
     @Transactional
+    @Operation(summary = "Submete o mapa ajustado para nova validação")
     public void submeterMapaAjustado(
         @PathVariable Long id,
         @RequestBody @Valid SubmeterMapaAjustadoReq request,
@@ -337,6 +356,7 @@ public class SubprocessoControle {
 
     @PostMapping("/{id}/importar-atividades")
     @Transactional
+    @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
         @PathVariable Long id,
         @RequestBody @Valid ImportarAtividadesRequest request
