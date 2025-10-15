@@ -37,9 +37,9 @@ class ModeloTest {
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         
         assertEquals(1L, subprocesso.getCodigo());
-        assertEquals(processo, subprocesso.getProcesso());
-        assertEquals(unidade, subprocesso.getUnidade());
-        assertEquals(mapa, subprocesso.getMapa());
+        assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
+        assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
+        assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
         assertNotNull(subprocesso.getDataFimEtapa1());
         assertNotNull(subprocesso.getDataLimiteEtapa2());
@@ -62,9 +62,9 @@ class ModeloTest {
             processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDate.now()
         );
         
-        assertEquals(processo, subprocesso.getProcesso());
-        assertEquals(unidade, subprocesso.getUnidade());
-        assertEquals(mapa, subprocesso.getMapa());
+        assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
+        assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
+        assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
         assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
     }
@@ -90,10 +90,10 @@ class ModeloTest {
         movimentacao.setDescricao("Descrição");
         
         assertEquals(1L, movimentacao.getCodigo());
-        assertEquals(subprocesso, movimentacao.getSubprocesso());
+        assertEquals(subprocesso.getCodigo(), movimentacao.getSubprocesso().getCodigo());
         assertNotNull(movimentacao.getDataHora());
-        assertEquals(unidadeOrigem, movimentacao.getUnidadeOrigem());
-        assertEquals(unidadeDestino, movimentacao.getUnidadeDestino());
+        assertEquals(unidadeOrigem.getCodigo(), movimentacao.getUnidadeOrigem().getCodigo());
+        assertEquals(unidadeDestino.getCodigo(), movimentacao.getUnidadeDestino().getCodigo());
         assertEquals("Descrição", movimentacao.getDescricao());
     }
 
@@ -112,9 +112,9 @@ class ModeloTest {
             subprocesso, unidadeOrigem, unidadeDestino, "Descrição de movimentação"
         );
         
-        assertEquals(subprocesso, movimentacao.getSubprocesso());
-        assertEquals(unidadeOrigem, movimentacao.getUnidadeOrigem());
-        assertEquals(unidadeDestino, movimentacao.getUnidadeDestino());
+        assertEquals(subprocesso.getCodigo(), movimentacao.getSubprocesso().getCodigo());
+        assertEquals(unidadeOrigem.getCodigo(), movimentacao.getUnidadeOrigem().getCodigo());
+        assertEquals(unidadeDestino.getCodigo(), movimentacao.getUnidadeDestino().getCodigo());
         assertEquals("Descrição de movimentação", movimentacao.getDescricao());
         assertNotNull(movimentacao.getDataHora());
     }

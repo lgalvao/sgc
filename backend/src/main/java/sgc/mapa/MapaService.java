@@ -169,7 +169,7 @@ public class MapaService {
         log.debug("Obtendo mapa do subprocesso: id={}", idSubprocesso);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + idSubprocesso));
 
         if (subprocesso.getMapa() == null) {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");

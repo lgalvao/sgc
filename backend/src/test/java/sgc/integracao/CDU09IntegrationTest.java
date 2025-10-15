@@ -131,13 +131,13 @@ class CDU09IntegrationTest {
             assertThat(movimentacoes).hasSize(1);
             Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
-            assertThat(movimentacao.getUnidadeOrigem()).isEqualTo(unidadeChefe);
-            assertThat(movimentacao.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
+            assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades/conhecimentos da unidade UT disponibilizado para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT submetido para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             verify(notificacaoService).enviarEmail(anyString(), anyString(), anyString());

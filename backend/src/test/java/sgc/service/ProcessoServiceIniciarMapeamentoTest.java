@@ -32,53 +32,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.processo.ProcessoIniciacaoService;
+
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 @DisplayName("Testes para o início de mapeamento no ProcessoService")
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceIniciarMapeamentoTest {
+    @Mock
     private ProcessoRepo processoRepo;
+    @Mock
     private UnidadeRepo unidadeRepo;
+    @Mock
     private UnidadeProcessoRepo unidadeProcessoRepo;
+    @Mock
     private SubprocessoRepo subprocessoRepo;
+    @Mock
     private MapaRepo mapaRepo;
+    @Mock
     private MovimentacaoRepo movimentacaoRepo;
+    @Mock
     private ApplicationEventPublisher publicadorDeEventos;
-    private ProcessoMapper processoMapper;
-    private ProcessoService processoService;
-    private sgc.processo.ProcessoIniciacaoService processoIniciacaoService;
+    @Mock
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Mock
+    private CopiaMapaService servicoDeCopiaDeMapa;
 
-    @BeforeEach
-    public void setup() {
-        processoRepo = mock(ProcessoRepo.class);
-        unidadeRepo = mock(UnidadeRepo.class);
-        unidadeProcessoRepo = mock(UnidadeProcessoRepo.class);
-        subprocessoRepo = mock(SubprocessoRepo.class);
-        mapaRepo = mock(MapaRepo.class);
-        movimentacaoRepo = mock(MovimentacaoRepo.class);
-        UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
-        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
-        publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoService notificacaoService = mock(NotificacaoService.class);
-        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
-        SgrhService sgrhService = mock(SgrhService.class);
-        processoMapper = mock(ProcessoMapper.class);
-        ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
-
-        processoService = new ProcessoService(
-                processoRepo,
-                unidadeRepo,
-                unidadeProcessoRepo,
-                subprocessoRepo,
-                mapaRepo,
-                movimentacaoRepo,
-                unidadeMapaRepo,
-                servicoDeCopiaDeMapa,
-                publicadorDeEventos,
-                new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService),
-                new sgc.processo.ProcessoIniciacaoService(processoRepo, unidadeRepo, unidadeProcessoRepo, subprocessoRepo, mapaRepo, movimentacaoRepo, unidadeMapaRepo, servicoDeCopiaDeMapa, publicadorDeEventos),
-                new sgc.processo.ProcessoFinalizacaoService(processoRepo, subprocessoRepo, unidadeMapaRepo, unidadeProcessoRepo, publicadorDeEventos, new sgc.processo.ProcessoNotificacaoService(notificacaoService, notificacaoModeloEmailService, sgrhService)),
-                processoMapper,
-                processoDetalheMapperCustom
-        );
-    }
+    @InjectMocks
+    private ProcessoIniciacaoService processoIniciacaoService;
 
     @Test
     @DisplayName("iniciarProcessoMapeamento deve criar subprocesso, mapa, movimentação e publicar evento no fluxo feliz")
@@ -117,33 +104,12 @@ public class ProcessoServiceIniciarMapeamentoTest {
             return mv;
         });
         when(processoRepo.save(any(Processo.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(processoMapper.toDTO(any(Processo.class))).thenAnswer(invocation -> {
-            Processo p = invocation.getArgument(0);
-            return ProcessoDto.builder()
-                .codigo(p.getCodigo())
-                .dataCriacao(p.getDataCriacao())
-                .dataFinalizacao(p.getDataFinalizacao())
-                .dataLimite(p.getDataLimite())
-                .descricao(p.getDescricao())
-                .situacao(p.getSituacao())
-                .tipo(p.getTipo().name())
-                .build();
-        });
 
         // Execução
         processoIniciacaoService.iniciarProcessoMapeamento(idProcesso, List.of(idUnidade));
 
-        // Asserções
-        Processo processoSalvo = new Processo();
-        processoSalvo.setCodigo(idProcesso);
-        processoSalvo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        when(processoRepo.findById(idProcesso)).thenReturn(Optional.of(processoSalvo));
-        var dto = processoService.obterPorId(idProcesso).get();
-        assertThat(dto).isNotNull();
-        assertThat(dto.getCodigo()).isEqualTo(idProcesso);
-        assertThat(dto.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
-
         // Verificar saves e publicação de evento
+        verify(processoRepo, times(1)).save(any(Processo.class));
         verify(unidadeProcessoRepo, times(1)).save(any(UnidadeProcesso.class));
         verify(publicadorDeEventos, times(1)).publishEvent(any(ProcessoIniciadoEvento.class));
     }

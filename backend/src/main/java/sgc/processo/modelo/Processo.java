@@ -32,16 +32,15 @@ public class Processo extends EntidadeBase {
      * Construtor de cópia.
      */
     public Processo(Processo outro) {
-        super(outro);
-        if (outro == null) {
-            return;
+        if (outro != null) {
+            super.setCodigo(outro.getCodigo());
+            this.descricao = outro.descricao;
+            this.tipo = outro.tipo;
+            this.situacao = outro.situacao;
+            this.dataLimite = outro.dataLimite;
+            this.dataCriacao = outro.dataCriacao;
+            this.dataFinalizacao = outro.dataFinalizacao;
         }
-        this.descricao = outro.descricao;
-        this.tipo = outro.tipo;
-        this.situacao = outro.situacao;
-        this.dataLimite = outro.dataLimite;
-        this.dataCriacao = outro.dataCriacao;
-        this.dataFinalizacao = outro.dataFinalizacao;
     }
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;

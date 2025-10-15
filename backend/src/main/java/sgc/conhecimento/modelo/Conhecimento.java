@@ -24,14 +24,14 @@ public class Conhecimento extends EntidadeBase {
 
     public Conhecimento(String descricao, Atividade atividade) {
         this.descricao = descricao;
-        this.atividade = new Atividade(atividade);
+        this.atividade = atividade;
     }
 
     public void setAtividade(Atividade atividade) {
-        this.atividade = new Atividade(atividade);
+        this.atividade = atividade;
     }
 
     public Atividade getAtividade() {
-        return new Atividade(this.atividade);
+        return this.atividade;
     }
 }

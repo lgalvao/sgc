@@ -23,14 +23,26 @@ public class Unidade extends EntidadeBase {
         this.tipo = TipoUnidade.OPERACIONAL;
     }
 
+    public Unidade(String nome, String sigla, Usuario titular, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
+        super();
+        this.nome = nome;
+        this.sigla = sigla;
+        this.titular = titular;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.unidadeSuperior = unidadeSuperior;
+    }
+
     public Unidade(Unidade unidade) {
-        super(unidade.getCodigo());
-        this.nome = unidade.getNome();
-        this.sigla = unidade.getSigla();
-        this.titular = unidade.getTitular();
-        this.tipo = unidade.getTipo();
-        this.situacao = unidade.getSituacao();
-        this.unidadeSuperior = unidade.getUnidadeSuperior();
+        if (unidade != null) {
+            super.setCodigo(unidade.getCodigo());
+            this.nome = unidade.getNome();
+            this.sigla = unidade.getSigla();
+            this.titular = unidade.getTitular();
+            this.tipo = unidade.getTipo();
+            this.situacao = unidade.getSituacao();
+            this.unidadeSuperior = unidade.getUnidadeSuperior();
+        }
     }
     @Column(name = "nome")
     private String nome;

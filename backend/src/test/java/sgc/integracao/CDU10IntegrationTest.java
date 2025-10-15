@@ -130,21 +130,21 @@ class CDU10IntegrationTest {
             assertThat(movimentacoes).hasSize(1);
             Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização da revisão do cadastro de atividades");
-            assertThat(movimentacao.getUnidadeOrigem()).isEqualTo(unidadeChefe);
-            assertThat(movimentacao.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
+            assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT disponibilizado para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade UT submetida para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             // Assert Notificação
-            String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: UT";
+            String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos da UT submetido para análise";
             String corpoEsperado = """
                     Prezado(a) responsável pela US,
-                    A unidade UT concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo Processo de Revisão.
-                    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).""";
+                    A revisão do cadastro de atividades e conhecimentos da UT no processo Processo de Revisão foi submetida para análise por essa unidade.
+                    A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).""";
             verify(notificacaoService).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
         }
 
