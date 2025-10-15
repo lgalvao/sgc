@@ -117,8 +117,7 @@ class ImpactoMapaServiceTest {
         competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
 
         AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(10L, "Atividade Antiga", TipoImpactoAtividade.REMOVIDA, null, List.of());
         List<AtividadeImpactadaDto> removidas = List.of(atividadeRemovidaDto);
@@ -161,8 +160,7 @@ class ImpactoMapaServiceTest {
         competencia.setCodigo(20L);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
 
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
@@ -237,8 +235,7 @@ class ImpactoMapaServiceTest {
         competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
 
         AtividadeImpactadaDto atividadeAlteradaDto = new AtividadeImpactadaDto(11L, "Descrição Nova", TipoImpactoAtividade.ALTERADA, "Descrição Antiga", List.of());
         List<AtividadeImpactadaDto> alteradas = List.of(atividadeAlteradaDto);

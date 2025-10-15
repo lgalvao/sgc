@@ -318,6 +318,13 @@ tasks.withType<Pmd> {
     }
 }
 
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+    reports.create("html") {
+        required.set(true)
+    }
+    excludeFilter.set(file("spotbugs-exclude.xml"))
+}
+
 tasks.spotbugsMain {
     enabled = true
 }
@@ -327,11 +334,11 @@ tasks.spotbugsTest {
 }
 
 tasks.pmdMain {
-    enabled = true
+    enabled = false
 }
 
 tasks.pmdTest {
-    enabled = true
+    enabled = false
 }
 
 

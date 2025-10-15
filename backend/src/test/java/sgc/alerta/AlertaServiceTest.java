@@ -130,7 +130,8 @@ class AlertaServiceTest {
 
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
-        assertNotNull(captor.getValue().getDataHoraLeitura());
+        AlertaUsuario alertaUsuarioSalvo = captor.getValue();
+        assertNotNull(alertaUsuarioSalvo.getDataHoraLeitura());
     }
 
     @Test
@@ -166,7 +167,8 @@ class AlertaServiceTest {
         // A asserção principal aqui é que o metodo não lança exceção com data nula.
         // A formatação da data em si é privada, mas seu efeito na descrição pode ser verificado.
         String descricaoEsperada = "Cadastro disponibilizado pela unidade ORIGEM no processo 'Processo de Teste'. Realize a análise do cadastro.";
-        assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+        Alerta alertaSalvo = alertaCaptor.getValue();
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
@@ -184,7 +186,8 @@ class AlertaServiceTest {
         verify(repositorioAlerta).save(alertaCaptor.capture());
 
         String descricaoEsperada = "Cadastro devolvido no processo 'Processo de Teste'. Motivo: Informações incompletas. Realize os ajustes necessários e disponibilize novamente.";
-        assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+        Alerta alertaSalvo = alertaCaptor.getValue();
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
