@@ -93,7 +93,6 @@ class MapperTest {
                 LocalDate.now(),
                 LocalDateTime.now(),
                 LocalDate.now().plusDays(10),
-                LocalDateTime.now().plusHours(1),
                 SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
         );
 

@@ -98,6 +98,7 @@ public class SubprocessoService {
     }
 
     @Transactional
+    @SuppressWarnings("LawOfDemeter")
     public SubprocessoDto atualizar(Long id, SubprocessoDto subprocessoDto) {
         return repositorioSubprocesso.findById(id)
             .map(subprocesso -> {
@@ -127,8 +128,12 @@ public class SubprocessoService {
 
                 subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
                 subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
-                subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataFimEtapa2());
-                subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2() != null ? subprocessoDto.getDataFimEtapa2().atStartOfDay() : null);
+                var dataFimEtapa2 = subprocessoDto.getDataFimEtapa2();
+                if (dataFimEtapa2 != null) {
+                    subprocesso.setDataFimEtapa2(dataFimEtapa2.atStartOfDay());
+                } else {
+                    subprocesso.setDataFimEtapa2(null);
+                }
                 subprocesso.setSituacao(subprocessoDto.getSituacao());
                 var atualizado = repositorioSubprocesso.save(subprocesso);
                 return subprocessoMapper.toDTO(atualizado);
