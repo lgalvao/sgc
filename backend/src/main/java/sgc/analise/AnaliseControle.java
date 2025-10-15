@@ -7,8 +7,6 @@ import sgc.analise.dto.CriarAnaliseRequestDto;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
 
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-
 import java.util.List;
 import java.util.Map;
 

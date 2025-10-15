@@ -266,7 +266,7 @@ class SubprocessoDtoTest {
         assertEquals(4L, dto.getMapaCodigo());
         assertEquals(dataLimite, dto.getDataLimiteEtapa1());
         assertEquals(dataFim, dto.getDataFimEtapa1());
-        assertEquals(dataLimite.plusDays(1), dto.getDataLimiteEtapa2());
+        assertEquals(dataLimite.plusDays(1), dto.getDataFimEtapa2());
         assertEquals(dataFim.plusHours(1), dto.getDataFimEtapa2());
         assertEquals(SituacaoSubprocesso.NAO_INICIADO, dto.getSituacao());
     }

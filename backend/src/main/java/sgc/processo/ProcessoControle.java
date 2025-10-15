@@ -11,7 +11,6 @@ import sgc.processo.dto.ProcessoDto;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller REST para Processos.

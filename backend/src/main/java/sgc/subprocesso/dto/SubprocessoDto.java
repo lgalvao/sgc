@@ -22,8 +22,11 @@ public class SubprocessoDto {
     private Long mapaCodigo;
     private LocalDate dataLimiteEtapa1;
     private LocalDateTime dataFimEtapa1;
-    private LocalDate dataLimiteEtapa2;
-    private LocalDateTime dataFimEtapa2;
+    private LocalDate dataFimEtapa2;
     private SituacaoSubprocesso situacao;
+
+    public SubprocessoDto sanitize() {
+        return this;
+    }
 }
 

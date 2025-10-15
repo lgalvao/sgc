@@ -1,23 +1,5 @@
 package sgc.mapa;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.HtmlPolicyBuilder;
 import lombok.RequiredArgsConstructor;

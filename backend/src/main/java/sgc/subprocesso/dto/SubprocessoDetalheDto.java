@@ -6,6 +6,7 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.conhecimento.dto.ConhecimentoDto;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.Subprocesso;
+import sgc.util.HtmlUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public class SubprocessoDetalheDto {
         if (sp.getUnidade() != null) {
             unidadeDto = UnidadeDTO.builder()
                 .codigo(sp.getUnidade().getCodigo())
-                .sigla(sp.getUnidade().getSigla())
-                .nome(sp.getUnidade().getNome())
+                .sigla(HtmlUtils.escapeHtml(sp.getUnidade().getSigla()))
+                .nome(HtmlUtils.escapeHtml(sp.getUnidade().getNome()))
                 .build();
         }
 
@@ -40,9 +41,9 @@ public class SubprocessoDetalheDto {
         if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
             var titular = sp.getUnidade().getTitular();
             responsavelDto = ResponsavelDTO.builder()
-                .nome(titular.getNome())
-                .ramal(titular.getRamal())
-                .email(titular.getEmail())
+                .nome(HtmlUtils.escapeHtml(titular.getNome()))
+                .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
+                .email(HtmlUtils.escapeHtml(titular.getEmail()))
                 .build();
         }
 
@@ -50,7 +51,7 @@ public class SubprocessoDetalheDto {
         if (movimentacoes != null && !movimentacoes.isEmpty()) {
             Movimentacao m = movimentacoes.getFirst();
             if (m.getUnidadeDestino() != null) {
-                localizacaoAtual = m.getUnidadeDestino().getSigla();
+                localizacaoAtual = HtmlUtils.escapeHtml(m.getUnidadeDestino().getSigla());
             }
         }
 

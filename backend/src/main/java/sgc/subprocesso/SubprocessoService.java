@@ -127,8 +127,8 @@ public class SubprocessoService {
 
                 subprocesso.setDataLimiteEtapa1(subprocessoDto.getDataLimiteEtapa1());
                 subprocesso.setDataFimEtapa1(subprocessoDto.getDataFimEtapa1());
-                subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataLimiteEtapa2());
-                subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2());
+                subprocesso.setDataLimiteEtapa2(subprocessoDto.getDataFimEtapa2());
+                subprocesso.setDataFimEtapa2(subprocessoDto.getDataFimEtapa2() != null ? subprocessoDto.getDataFimEtapa2().atStartOfDay() : null);
                 subprocesso.setSituacao(subprocessoDto.getSituacao());
                 var atualizado = repositorioSubprocesso.save(subprocesso);
                 return subprocessoMapper.toDTO(atualizado);

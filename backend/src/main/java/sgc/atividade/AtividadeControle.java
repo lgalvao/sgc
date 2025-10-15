@@ -7,8 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sgc.atividade.dto.AtividadeDto;
-import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.dto.ConhecimentoDto;
 
 import java.net.URI;
@@ -35,14 +33,17 @@ public class AtividadeControle {
 
     @PostMapping
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
-        var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
+        var sanitizedAtividadeDto = atividadeDto.sanitize();
+        var salvo = atividadeService.criar(sanitizedAtividadeDto, userDetails.getUsername());
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.codigo()));
-        return ResponseEntity.created(uri).body(salvo);
+        return ResponseEntity.created(uri).body(salvo.sanitize());
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtividadeDto atividadeDto) {
-        return ResponseEntity.ok(atividadeService.atualizar(id, atividadeDto));
+        var sanitizedAtividadeDto = atividadeDto.sanitize();
+        return ResponseEntity.ok(atividadeService.atualizar(id, sanitizedAtividadeDto));
     }
 
     @DeleteMapping("/{id}")
@@ -58,14 +59,16 @@ public class AtividadeControle {
 
     @PostMapping("/{atividadeId}/conhecimentos")
     public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long atividadeId, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        var salvo = atividadeService.criarConhecimento(atividadeId, conhecimentoDto);
+        var sanitizedConhecimentoDto = conhecimentoDto.sanitize();
+        var salvo = atividadeService.criarConhecimento(atividadeId, sanitizedConhecimentoDto);
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(atividadeId, salvo.codigo()));
-        return ResponseEntity.created(uri).body(salvo);
+        return ResponseEntity.created(uri).body(salvo.sanitize());
     }
 
     @PutMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")
     public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long atividadeId, @PathVariable Long conhecimentoId, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        return ResponseEntity.ok(atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, conhecimentoDto));
+        var sanitizedConhecimentoDto = conhecimentoDto.sanitize();
+        return ResponseEntity.ok(atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, sanitizedConhecimentoDto));
     }
 
     @DeleteMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")

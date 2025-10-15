@@ -1,23 +1,5 @@
 package sgc.subprocesso;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import sgc.analise.modelo.TipoAnalise;
-import sgc.atividade.modelo.Atividade;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.ImpactoMapaService;
-import sgc.mapa.MapaService;
-import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.sgrh.Usuario;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.HtmlPolicyBuilder;
 import jakarta.validation.Valid;
@@ -29,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.atividade.modelo.Atividade;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.ImpactoMapaService;
 import sgc.mapa.MapaService;
@@ -113,7 +94,7 @@ public class SubprocessoControle {
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
         var salvo = subprocessoService.criar(subprocessoDto);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(salvo);
+        return ResponseEntity.created(uri).body(salvo.sanitize());
     }
 
     @PutMapping("/{id}")

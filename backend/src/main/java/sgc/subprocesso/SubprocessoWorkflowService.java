@@ -41,20 +41,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        // Authorization Check
-        if (!sp.getUnidade().getTitular().equals(usuario)) {
-            throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
-        }
-
-        // Validation Check
-        if (!subprocessoService.obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
-            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
-        }
-
-        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            throw new IllegalStateException("Subprocesso sem mapa associado");
-        }
-
+        validarSubprocessoParaDisponibilizacao(sp, usuario, idSubprocesso);
         sp.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
@@ -74,20 +61,7 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
-        // Authorization Check
-        if (!sp.getUnidade().getTitular().equals(usuario)) {
-            throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
-        }
-
-        // Validation Check
-        if (!subprocessoService.obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
-            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
-        }
-
-        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
-            throw new IllegalStateException("Subprocesso sem mapa associado");
-        }
-
+        validarSubprocessoParaDisponibilizacao(sp, usuario, idSubprocesso);
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
@@ -101,6 +75,22 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeSuperior);
 
         publicadorDeEventos.publishEvent(new SubprocessoRevisaoDisponibilizadaEvento(sp.getCodigo()));
+    }
+
+    private void validarSubprocessoParaDisponibilizacao(Subprocesso sp, Usuario usuario, Long idSubprocesso) {
+        // Authorization Check
+        if (!sp.getUnidade().getTitular().equals(usuario)) {
+            throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
+        }
+
+        // Validation Check
+        if (!subprocessoService.obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
+            throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
+        }
+
+        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
+            throw new IllegalStateException("Subprocesso sem mapa associado");
+        }
     }
 
     @Transactional

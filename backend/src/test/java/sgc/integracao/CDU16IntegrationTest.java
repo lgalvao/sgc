@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,8 +19,10 @@ import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
@@ -35,15 +38,10 @@ import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.SituacaoProcesso;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
 @AutoConfigureMockMvc
@@ -60,14 +58,22 @@ public class CDU16IntegrationTest {
     private ObjectMapper objectMapper;
 
     // Repositories
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
 

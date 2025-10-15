@@ -44,6 +44,7 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
+    implementation("ch.qos.logback:logback-core:1.5.19")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -77,7 +78,9 @@ tasks.withType<Test> {
         "-Xshare:off",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
-        "-XX:+EnableDynamicAgentLoading"
+        "-XX:+EnableDynamicAgentLoading",
+        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
+        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
     )
 
     val byteBuddyAgentFile =

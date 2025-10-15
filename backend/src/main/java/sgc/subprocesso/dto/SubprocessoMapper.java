@@ -1,6 +1,5 @@
 package sgc.subprocesso.dto;
 
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import sgc.unidade.modelo.UnidadeRepo;
 /**
  * Mapper (usando MapStruct) entre a entidade Subprocesso e seu DTO.
  */
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class SubprocessoMapper {
@@ -34,6 +34,7 @@ public abstract class SubprocessoMapper {
     @Mapping(source = "processoCodigo", target = "processo")
     @Mapping(source = "unidadeCodigo", target = "unidade")
     @Mapping(source = "mapaCodigo", target = "mapa")
+    @Mapping(target = "dataFimEtapa2", ignore = true)
     @Mapping(target = "dataFimEtapa3", ignore = true)
     public abstract Subprocesso toEntity(SubprocessoDto dto);
 

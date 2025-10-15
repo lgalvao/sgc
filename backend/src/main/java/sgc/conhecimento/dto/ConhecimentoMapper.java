@@ -8,6 +8,7 @@ import sgc.conhecimento.modelo.Conhecimento;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
 public abstract class ConhecimentoMapper {

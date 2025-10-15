@@ -24,6 +24,7 @@ import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.util.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +105,7 @@ public class SubprocessoDtoService {
 
         return SubprocessoCadastroDto.builder()
             .subprocessoId(sp.getCodigo())
-            .unidadeSigla(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null)
+            .unidadeSigla(HtmlUtils.escapeHtml(sp.getUnidade() != null ? sp.getUnidade().getSigla() : null))
             .atividades(atividadesComConhecimentos)
             .build();
     }

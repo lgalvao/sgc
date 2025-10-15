@@ -12,20 +12,6 @@ import sgc.conhecimento.dto.ConhecimentoDto;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.sgrh.UsuarioRepo;
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.HtmlPolicyBuilder;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.dto.AtividadeDto;
-import sgc.atividade.dto.AtividadeMapper;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.conhecimento.dto.ConhecimentoDto;
-import sgc.conhecimento.dto.ConhecimentoMapper;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
@@ -35,8 +21,6 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class AtividadeService {
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
-            .toFactory();
 
     private final AtividadeRepo atividadeRepo;
     private final AtividadeMapper atividadeMapper;
@@ -72,11 +56,7 @@ public class AtividadeService {
             throw new IllegalStateException("Subprocesso já está finalizado.");
         }
 
-        // Sanitize the description before saving
-        var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(atividadeDto.descricao());
-        var sanitizedAtividadeDto = new AtividadeDto(atividadeDto.codigo(), atividadeDto.mapaCodigo(), sanitizedDescricao);
-
-        var entidade = atividadeMapper.toEntity(sanitizedAtividadeDto);
+        var entidade = atividadeMapper.toEntity(atividadeDto);
         var salvo = atividadeRepo.save(entidade);
         return atividadeMapper.toDTO(salvo);
     }
@@ -84,11 +64,7 @@ public class AtividadeService {
     public AtividadeDto atualizar(Long id, AtividadeDto atividadeDto) {
         return atividadeRepo.findById(id)
                 .map(existente -> {
-                    // Sanitize the description before updating
-                    var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(atividadeDto.descricao());
-                    var sanitizedAtividadeDto = new AtividadeDto(atividadeDto.codigo(), atividadeDto.mapaCodigo(), sanitizedDescricao);
-
-                    var entidadeParaAtualizar = atividadeMapper.toEntity(sanitizedAtividadeDto);
+                    var entidadeParaAtualizar = atividadeMapper.toEntity(atividadeDto);
                     existente.setDescricao(entidadeParaAtualizar.getDescricao());
                     existente.setMapa(entidadeParaAtualizar.getMapa());
 
@@ -121,11 +97,7 @@ public class AtividadeService {
     public ConhecimentoDto criarConhecimento(Long idAtividade, ConhecimentoDto conhecimentoDto) {
         return atividadeRepo.findById(idAtividade)
                 .map(atividade -> {
-                    // Sanitize the description before saving
-                    var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(conhecimentoDto.descricao());
-                    var sanitizedConhecimentoDto = new ConhecimentoDto(conhecimentoDto.codigo(), conhecimentoDto.atividadeCodigo(), sanitizedDescricao);
-
-                    var conhecimento = conhecimentoMapper.toEntity(sanitizedConhecimentoDto);
+                    var conhecimento = conhecimentoMapper.toEntity(conhecimentoDto);
                     conhecimento.setAtividade(atividade);
                     var salvo = conhecimentoRepo.save(conhecimento);
                     return conhecimentoMapper.toDTO(salvo);
@@ -137,11 +109,7 @@ public class AtividadeService {
         return conhecimentoRepo.findById(idConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(idAtividade))
                 .map(existente -> {
-                    // Sanitize the description before updating
-                    var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(conhecimentoDto.descricao());
-                    var sanitizedConhecimentoDto = new ConhecimentoDto(conhecimentoDto.codigo(), conhecimentoDto.atividadeCodigo(), sanitizedDescricao);
-
-                    var paraAtualizar = conhecimentoMapper.toEntity(sanitizedConhecimentoDto);
+                    var paraAtualizar = conhecimentoMapper.toEntity(conhecimentoDto);
                     existente.setDescricao(paraAtualizar.getDescricao());
                     var atualizado = conhecimentoRepo.save(existente);
                     return conhecimentoMapper.toDTO(atualizado);

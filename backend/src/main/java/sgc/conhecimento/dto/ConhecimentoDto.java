@@ -2,6 +2,8 @@ package sgc.conhecimento.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 
 /**
  * DTO para Conhecimento usado nas APIs (entrada/saída).
@@ -13,4 +15,12 @@ public record ConhecimentoDto(
     Long atividadeCodigo,
     @NotBlank(message = "Descrição não pode ser vazia")
     String descricao
-) {}
+) {
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
+            .toFactory();
+
+    public ConhecimentoDto sanitize() {
+        String sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(this.descricao);
+        return new ConhecimentoDto(this.codigo, this.atividadeCodigo, sanitizedDescricao);
+    }
+}

@@ -111,7 +111,7 @@ public class NotificacaoService {
         return CompletableFuture.completedFuture(false);
     }
 
-    private void enviarEmailSmtp(EmailDto emailDto) throws MessagingException, UnsupportedEncodingException {
+    private void enviarEmailSmtp(EmailDto emailDto) throws UnsupportedEncodingException, MessagingException {
         MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 

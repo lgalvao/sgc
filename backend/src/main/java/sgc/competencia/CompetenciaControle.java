@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.competencia.dto.CompetenciaDto;
 import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
 
 import java.net.URI;
 import java.util.List;
@@ -35,8 +34,8 @@ public class CompetenciaControle {
     @PostMapping
     public ResponseEntity<CompetenciaDto> criarCompetencia(@Valid @RequestBody CompetenciaDto competenciaDto) {
         var salvo = competenciaService.criarCompetencia(competenciaDto);
-        URI uri = URI.create("/api/competencias/%d".formatted(salvo.codigo()));
-        return ResponseEntity.created(uri).body(salvo);
+        URI uri = URI.create("/api/competencias/%d".formatted(salvo.getCodigo()));
+        return ResponseEntity.created(uri).body(salvo.sanitize());
     }
 
     @PutMapping("/{id}")
