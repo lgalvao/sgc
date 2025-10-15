@@ -6,7 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public enum Perfil {
     ADMIN,
     GESTOR,
-    CHEFE;
+    CHEFE,
+    SERVIDOR;
 
     public GrantedAuthority toGrantedAuthority() {
         return new SimpleGrantedAuthority("ROLE_" + this.name());
