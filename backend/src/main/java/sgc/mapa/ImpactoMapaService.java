@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
  * CDU-12 - Verificar impactos no mapa de competências
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ImpactoMapaService {
     private final SubprocessoRepo repositorioSubprocesso;
@@ -44,6 +43,16 @@ public class ImpactoMapaService {
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     private final ImpactoAtividadeService impactoAtividadeService;
     private final ImpactoCompetenciaService impactoCompetenciaService;
+
+    public ImpactoMapaService(SubprocessoRepo repositorioSubprocesso, MapaRepo repositorioMapa, AtividadeRepo atividadeRepo, CompetenciaRepo repositorioCompetencia, CompetenciaAtividadeRepo repositorioCompetenciaAtividade, ImpactoAtividadeService impactoAtividadeService, ImpactoCompetenciaService impactoCompetenciaService) {
+        this.repositorioSubprocesso = repositorioSubprocesso;
+        this.repositorioMapa = repositorioMapa;
+        this.atividadeRepo = atividadeRepo;
+        this.repositorioCompetencia = repositorioCompetencia;
+        this.repositorioCompetenciaAtividade = repositorioCompetenciaAtividade;
+        this.impactoAtividadeService = impactoAtividadeService;
+        this.impactoCompetenciaService = impactoCompetenciaService;
+    }
 
     /**
      * Verifica impactos no mapa de competências comparando o cadastro atual

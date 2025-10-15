@@ -223,7 +223,7 @@ class EventoProcessoListenerTest {
 
         ouvinteDeEvento.aoIniciarProcesso(evento);
 
-        verify(sgrhService, never()).buscarUnidadePorCodigo(any());
+        verify(sgrhService, never()).buscarUnidadePorCodigo(anyLong());
         verify(notificacaoService, never()).enviarEmailHtml(any(), any(), any());
     }
 

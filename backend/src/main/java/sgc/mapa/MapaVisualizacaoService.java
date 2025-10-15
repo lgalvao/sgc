@@ -30,6 +30,7 @@ public class MapaVisualizacaoService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
+    private final sgc.conhecimento.modelo.ConhecimentoRepo repositorioConhecimento;
 
     /**
      * Obtém um mapa completo formatado para visualização, conforme CDU-18.
@@ -59,7 +60,7 @@ public class MapaVisualizacaoService {
                 .toList();
 
             List<AtividadeDto> atividadesDto = atividades.stream().map(atividade -> {
-                List<Conhecimento> conhecimentos = atividade.getConhecimentos();
+                List<Conhecimento> conhecimentos = repositorioConhecimento.findByAtividadeCodigo(atividade.getCodigo());
                 List<ConhecimentoDto> conhecimentosDto = conhecimentos.stream()
                     .map(c -> new ConhecimentoDto(c.getCodigo(), c.getDescricao()))
                     .toList();

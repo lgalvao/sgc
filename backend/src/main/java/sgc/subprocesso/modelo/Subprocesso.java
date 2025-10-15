@@ -58,47 +58,50 @@ public class Subprocesso extends EntidadeBase {
      */
     public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDate dataLimiteEtapa1) {
         super();
-        this.processo = new Processo(processo);
-        this.unidade = new Unidade(unidade);
-        this.mapa = new Mapa(mapa);
+        this.processo = processo;
+        this.unidade = unidade;
+        this.mapa = mapa;
         this.situacao = situacao;
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
     }
 
     public Subprocesso(Subprocesso subprocesso) {
-        super(subprocesso.getCodigo());
-        this.processo = new Processo(subprocesso.getProcesso());
-        this.unidade = new Unidade(subprocesso.getUnidade());
-        this.mapa = new Mapa(subprocesso.getMapa());
-        this.dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
-        this.dataFimEtapa1 = subprocesso.getDataFimEtapa1();
-        this.dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
-        this.dataFimEtapa2 = subprocesso.getDataFimEtapa2();
-        this.dataFimEtapa3 = subprocesso.getDataFimEtapa3();
-        this.situacao = subprocesso.getSituacao();
+        if (subprocesso != null) {
+            super.setCodigo(subprocesso.getCodigo());
+            this.processo = subprocesso.getProcesso();
+            this.unidade = subprocesso.getUnidade();
+            this.mapa = subprocesso.getMapa();
+            this.dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
+            this.dataFimEtapa1 = subprocesso.getDataFimEtapa1();
+            this.dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
+            this.dataFimEtapa2 = subprocesso.getDataFimEtapa2();
+            this.dataFimEtapa3 = subprocesso.getDataFimEtapa3();
+            this.situacao = subprocesso.getSituacao();
+        }
     }
 
     public void setProcesso(Processo processo) {
-        this.processo = new Processo(processo);
+        this.processo = processo;
     }
 
     public Processo getProcesso() {
-        return new Processo(this.processo);
+        return this.processo;
     }
 
     public void setUnidade(Unidade unidade) {
-        this.unidade = new Unidade(unidade);
+        this.unidade = unidade;
     }
 
     public Unidade getUnidade() {
-        return new Unidade(this.unidade);
+        return this.unidade;
     }
 
     public void setMapa(Mapa mapa) {
-        this.mapa = new Mapa(mapa);
+        this.mapa = mapa;
     }
 
     public Mapa getMapa() {
-        return new Mapa(this.mapa);
+        return this.mapa == null ? null : this.mapa;
     }
+
 }

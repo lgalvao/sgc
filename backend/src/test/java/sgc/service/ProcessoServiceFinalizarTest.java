@@ -14,6 +14,7 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.ProcessoFinalizacaoService;
+import sgc.processo.ProcessoNotificacaoService;
 import sgc.processo.ProcessoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDto;
@@ -58,6 +59,9 @@ public class ProcessoServiceFinalizarTest {
     @Mock
     private sgc.sgrh.SgrhService sgrhService;
 
+    @Mock
+    private ProcessoNotificacaoService processoNotificacaoService;
+
     @InjectMocks
     private ProcessoFinalizacaoService processoFinalizacaoService;
 
@@ -80,11 +84,15 @@ public class ProcessoServiceFinalizarTest {
         subprocessoHomologado.setCodigo(100L);
         subprocessoHomologado.setUnidade(unidade);
         subprocessoHomologado.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
+        subprocessoHomologado.setMapa(mapa);
 
         subprocessoPendente = new Subprocesso();
         subprocessoPendente.setCodigo(101L);
         subprocessoPendente.setUnidade(unidade);
         subprocessoPendente.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+        subprocessoPendente.setMapa(new Mapa());
     }
 
     @Test

@@ -75,7 +75,7 @@ public class CompetenciaControle {
     public ResponseEntity<?> vincularAtividade(@PathVariable Long idCompetencia, @Valid @RequestBody CompetenciaControle.VinculoAtividadeReq requisicao) {
         try {
             var salvo = competenciaService.vincularAtividade(idCompetencia, requisicao.getIdAtividade());
-            URI uri = URI.create("/api/competencias/%d/atividades".formatted(idCompetencia));
+            URI uri = URI.create("/api/competencias/%d/atividades/%d".formatted(idCompetencia, requisicao.getIdAtividade()));
             return ResponseEntity.created(uri).body(salvo);
         } catch (ErroDominioNaoEncontrado e) {
             return ResponseEntity.badRequest().body(e.getMessage());
