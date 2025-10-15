@@ -45,6 +45,7 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     implementation("ch.qos.logback:logback-core:1.5.19")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
 }
 
 tasks.named<ProcessResources>("processResources") {

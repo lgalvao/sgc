@@ -6,9 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
+import io.swagger.v3.oas.annotations.Operation;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
+@Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoControle {
     private final ProcessoService processoService;
     private final ProcessoIniciacaoService processoIniciacaoService;
@@ -67,6 +70,7 @@ public class ProcessoControle {
      * O corpo opcional pode conter uma lista de unidades (IDs) que participam do início.
      */
     @PostMapping("/{id}/iniciar")
+    @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long id,
             @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
@@ -92,6 +96,7 @@ public class ProcessoControle {
      * @return ProcessoDto com dados do processo finalizado
      */
     @PostMapping("/{id}/finalizar")
+    @Operation(summary = "Finaliza um processo (CDU-21)")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
         processoFinalizacaoService.finalizar(id);
         return ResponseEntity.ok().build();
