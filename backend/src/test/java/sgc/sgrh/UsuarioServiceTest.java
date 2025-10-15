@@ -91,13 +91,13 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve simular o login com sucesso")
-    void login_deveExecutarSemErro() {
+    @DisplayName("Deve simular a entrada com sucesso")
+    void entrar_deveExecutarSemErro() {
         long tituloEleitoral = 123456789L;
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeMock);
 
         // Apenas verifica se o método executa sem lançar exceções,
         // já que a implementação atual apenas loga a informação.
-        usuarioService.login(tituloEleitoral, perfilUnidade);
+        usuarioService.entrar(tituloEleitoral, perfilUnidade);
     }
 }
