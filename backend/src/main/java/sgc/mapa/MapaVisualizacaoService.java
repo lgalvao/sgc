@@ -9,7 +9,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
 import sgc.mapa.dto.visualizacao.CompetenciaDto;
@@ -26,7 +26,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaVisualizacaoService {
-
     private final SubprocessoRepo repositorioSubprocesso;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
@@ -42,10 +41,10 @@ public class MapaVisualizacaoService {
         log.debug("Obtendo mapa para visualização do subprocesso: id={}", subprocessoId);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(subprocessoId)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + subprocessoId));
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", subprocessoId));
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado.");
+            throw new ErroDominioNaoEncontrado("Subprocesso não possui mapa associado.");
         }
 
         Unidade unidade = subprocesso.getUnidade();

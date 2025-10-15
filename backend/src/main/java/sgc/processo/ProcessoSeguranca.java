@@ -11,7 +11,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ProcessoSeguranca {
-
     private final SubprocessoRepo subprocessoRepo;
     private final SgrhService sgrhService;
 
@@ -46,6 +45,7 @@ public class ProcessoSeguranca {
         if (idUnidadeUsuario == null) {
             return false;
         }
+
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(idProcesso, idUnidadeUsuario);
     }
 }

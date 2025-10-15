@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
@@ -84,7 +84,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
         }
     }
 
@@ -127,7 +127,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.criarAnalise(99L, "Obs", TipoAnalise.CADASTRO, null, null, null, null));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> service.criarAnalise(99L, "Obs", TipoAnalise.CADASTRO, null, null, null, null));
         }
     }
 

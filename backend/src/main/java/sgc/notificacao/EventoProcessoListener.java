@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.modelo.Alerta;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -21,6 +22,8 @@ import sgc.unidade.modelo.TipoUnidade;
 
 import java.util.List;
 import java.util.Optional;
+
+import static sgc.unidade.modelo.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.
@@ -37,7 +40,7 @@ public class EventoProcessoListener {
     private final NotificacaoModeloEmailService notificacaoModeloEmailService;
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
-    private final SubprocessoRepo subprocessoRepo;
+    private final SubprocessoRepo repoSubprocesso;
 
     /**
      * Processa o evento de processo iniciado.
@@ -50,22 +53,18 @@ public class EventoProcessoListener {
     public void aoIniciarProcesso(ProcessoIniciadoEvento evento) {
         log.info("Processando evento de processo iniciado: idProcesso={}, tipo={}",
                 evento.idProcesso(), evento.tipo());
-
         try {
             Processo processo = processoRepo.findById(evento.idProcesso())
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Processo não encontrado: " + evento.idProcesso()));
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo não encontrado: ", evento.idProcesso()));
 
-            List<Subprocesso> subprocessos = subprocessoRepo
-                    .findByProcessoCodigoWithUnidade(evento.idProcesso());
+            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.idProcesso());
 
             if (subprocessos.isEmpty()) {
                 log.warn("Nenhum subprocesso encontrado para o processo {}", evento.idProcesso());
                 return;
             }
 
-            log.info("Encontrados {} subprocessos para o processo {}",
-                    subprocessos.size(), evento.idProcesso());
+            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.idProcesso());
 
             // 1. Criar alertas diferenciados por tipo de unidade
             List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
@@ -83,7 +82,6 @@ public class EventoProcessoListener {
                     log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getMessage(), e);
                 }
             }
-
             log.info("Processamento de evento concluído para o processo {}", processo.getCodigo());
         } catch (Exception e) {
             log.error("Erro ao processar evento de processo iniciado: {}", e.getMessage(), e);
@@ -97,14 +95,12 @@ public class EventoProcessoListener {
         }
 
         Long codigoUnidade = subprocesso.getUnidade().getCodigo();
-
         try {
             UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(codigoUnidade)
                     .orElseThrow(() -> new IllegalArgumentException(
                             "Unidade não encontrada no SGRH: " + codigoUnidade));
 
             Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
-
             if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {
                 log.warn("Responsável não encontrado para a unidade {} ({})",
                         unidade.nome(), codigoUnidade);
@@ -112,7 +108,6 @@ public class EventoProcessoListener {
             }
 
             UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavelOpt.get().titularTitulo()).orElse(null);
-
             if (titular == null || titular.email() == null || titular.email().isBlank()) {
                 log.warn("E-mail não encontrado para o titular {} da unidade {}",
                         responsavelOpt.get().titularTitulo(), unidade.nome());
@@ -124,7 +119,7 @@ public class EventoProcessoListener {
             TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidade.tipo());
             TipoProcesso tipoProcesso = processo.getTipo();
 
-            if (TipoUnidade.OPERACIONAL.equals(tipoUnidade)) {
+            if (OPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
@@ -132,7 +127,7 @@ public class EventoProcessoListener {
                         tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-            } else if (TipoUnidade.INTERMEDIARIA.equals(tipoUnidade)) {
+            } else if (INTERMEDIARIA.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado em Unidades Subordinadas - " + processo.getDescricao();
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
@@ -140,7 +135,7 @@ public class EventoProcessoListener {
                         tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
                 );
-            } else if (TipoUnidade.INTEROPERACIONAL.equals(tipoUnidade)) {
+            } else if (INTEROPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - " + processo.getDescricao();
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
@@ -149,8 +144,7 @@ public class EventoProcessoListener {
                         subprocesso.getDataLimiteEtapa1()
                 );
             } else {
-                log.warn("Tipo de unidade desconhecido: {} (unidade={})",
-                        tipoUnidade, codigoUnidade);
+                log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
                 return;
             }
 
@@ -163,8 +157,7 @@ public class EventoProcessoListener {
             }
 
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail para a unidade {}: {}",
-                    codigoUnidade, e.getMessage(), e);
+            log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getMessage(), e);
         }
     }
 
@@ -178,22 +171,7 @@ public class EventoProcessoListener {
                         nomeUnidade, substituto.nome(), substituto.email());
             }
         } catch (Exception e) {
-            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}",
-                    nomeUnidade, e.getMessage());
+            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getMessage());
         }
-    }
-
-    private String criarEmailParaUnidadeIntermediaria(String nomeUnidade, String nomeProcesso,
-                                                  String tipoProcesso, java.time.LocalDate dataLimite) {
-        // This method is not used anymore, but it's kept to avoid breaking changes in the listener.
-        // The logic was moved to NotificacaoModeloEmailService.
-        return "";
-    }
-
-    private String criarEmailParaUnidadeInteroperacional(String nomeUnidade, String nomeProcesso,
-                                                     String tipoProcesso, java.time.LocalDate dataLimite) {
-        // This method is not used anymore, but it's kept to avoid breaking changes in the listener.
-        // The logic was moved to NotificacaoModeloEmailService.
-        return "";
     }
 }

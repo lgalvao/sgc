@@ -74,7 +74,7 @@ public class ProcessoNotificacaoService {
 
     private void enviarEmailUnidadeIntermediaria(Processo processo, UnidadeProcesso unidadeIntermediaria, String email, List<UnidadeProcesso> todasUnidades) {
         List<String> siglasSubordinadas = todasUnidades.stream()
-            .filter(u -> unidadeIntermediaria.getUnidadeCodigo().equals(u.getUnidadeSuperiorCodigo()))
+            .filter(u -> u.getUnidadeSuperiorCodigo() != null && u.getUnidadeSuperiorCodigo().equals(unidadeIntermediaria.getUnidadeCodigo()))
             .map(UnidadeProcesso::getSigla)
             .sorted()
             .toList();

@@ -23,17 +23,15 @@ import java.util.List;
 public class AtividadeControle {
     private final AtividadeService atividadeService;
 
-    // Endpoints para Atividades
-
     @GetMapping
     public List<AtividadeDto> listar() {
         return atividadeService.listar();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AtividadeDto> obterPorId(@PathVariable Long id) {
+    @GetMapping("/{idAtividade}")
+    public ResponseEntity<AtividadeDto> obterPorId(@PathVariable Long idAtividade) {
         try {
-            return ResponseEntity.ok(atividadeService.obterPorId(id));
+            return ResponseEntity.ok(atividadeService.obterPorId(idAtividade));
         } catch (ErroDominioNaoEncontrado e) {
             return ResponseEntity.notFound().build();
         }
@@ -72,8 +70,6 @@ public class AtividadeControle {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // Endpoints para Conhecimentos aninhados em Atividades
 
     @GetMapping("/{atividadeId}/conhecimentos")
     public ResponseEntity<List<ConhecimentoDto>> listarConhecimentos(@PathVariable Long atividadeId) {

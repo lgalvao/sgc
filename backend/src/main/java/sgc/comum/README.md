@@ -54,7 +54,7 @@ graph LR
 **Localização:** `backend/src/main/java/sgc/comum/erros/`
 - **Descrição:** Define uma hierarquia de exceções customizadas e não checadas (`RuntimeException`) para padronizar o tratamento de erros. Inclui também o `RestExceptionHandler` (`@ControllerAdvice`) que captura essas exceções e as traduz em respostas HTTP padronizadas.
 - **Exceções Notáveis:**
-  - `ErroEntidadeNaoEncontrada`: Lançada quando uma busca por uma entidade no banco de dados não retorna resultados (resulta em HTTP 404).
+  - `ErroDominioNaoEncontrado`: Lançada quando uma busca por uma entidade no banco de dados não retorna resultados (resulta em HTTP 404).
   - `ErroAcessoNegado`: Lançada quando um usuário tenta executar uma ação para a qual não tem permissão (resulta em HTTP 403).
   - `ErroServicoExterno`: Para erros de comunicação com serviços externos (resulta em HTTP 502).
 
@@ -77,7 +77,7 @@ public class MeuServico {
 
     public Recurso buscarRecurso(Long id) {
         return recursoRepository.findById(id)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Recurso com ID " + id + " não encontrado."));
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Recurso", id));
     }
 }
 ```

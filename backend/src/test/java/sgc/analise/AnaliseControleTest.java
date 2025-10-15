@@ -12,7 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -104,7 +104,7 @@ class AnaliseControleTest {
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistente() throws Exception {
-            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.CADASTRO)).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_CADASTRO))
                     .andExpect(status().isNotFound());
@@ -191,7 +191,7 @@ class AnaliseControleTest {
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_CADASTRO);
 
-            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_CADASTRO), eq(TipoAnalise.CADASTRO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -282,7 +282,7 @@ class AnaliseControleTest {
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistenteValidacao() throws Exception {
-            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO)).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.listarPorSubprocesso(99L, TipoAnalise.VALIDACAO)).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(get(API_SUBPROCESSOS_99_ANALISES_VALIDACAO))
                     .andExpect(status().isNotFound());
@@ -353,7 +353,7 @@ class AnaliseControleTest {
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacaoValidacao() throws Exception {
             var payload = Map.of(OBSERVACOES, ANALISE_DE_VALIDACAO);
 
-            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroEntidadeNaoEncontrada(SUBPROCESSO_NAO_ENCONTRADO));
+            when(analiseService.criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull())).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -392,7 +392,13 @@ class AnaliseControleTest {
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseService, times(1)).criarAnalise(eq(99L), eq(ANALISE_DE_VALIDACAO), eq(TipoAnalise.VALIDACAO), isNull(), isNull(), isNull(), isNull());
+            verify(analiseService, times(1)).criarAnalise(eq(99L),
+                    eq(ANALISE_DE_VALIDACAO),
+                    eq(TipoAnalise.VALIDACAO),
+                    isNull(),
+                    isNull(),
+                    isNull(),
+                    isNull());
         }
     }
 }

@@ -24,11 +24,11 @@ public abstract class AtividadeMapper {
     @Mapping(target = "conhecimentos", ignore = true)
     public abstract Atividade toEntity(AtividadeDto atividadeDTO);
 
-    public Mapa map(Long value) {
-        if (value == null) {
-            return null;
-        }
-        return mapaRepo.findById(value)
-                .orElseThrow(() -> new RuntimeException("Mapa não encontrado com o código: " + value));
+    public Mapa map(Long idMapa) {
+        if (idMapa == null) return null;
+
+        // TODO Deveria gerar uma exceção mais específica
+        return mapaRepo.findById(idMapa)
+                .orElseThrow(() -> new RuntimeException("Mapa não encontrado com o código: " + idMapa));
     }
 }

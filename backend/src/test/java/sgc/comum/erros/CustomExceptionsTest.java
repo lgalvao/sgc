@@ -23,13 +23,6 @@ class CustomExceptionsTest {
         assertEquals(message, exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Deve instanciar ErroEntidadeNaoEncontrada")
-    void testErroEntidadeNaoEncontrada() {
-        String message = "Entidade não encontrada";
-        ErroEntidadeNaoEncontrada exception = new ErroEntidadeNaoEncontrada(message);
-        assertEquals(message, exception.getMessage());
-    }
 
     @Test
     @DisplayName("Deve instanciar ErroServicoExterno com mensagem")

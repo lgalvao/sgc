@@ -10,21 +10,15 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.conhecimento.modelo.Conhecimento;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.dto.visualizacao.AtividadeDto;
-import sgc.mapa.dto.visualizacao.CompetenciaDto;
-import sgc.mapa.dto.visualizacao.ConhecimentoDto;
-import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
 
 import java.util.HashSet;
 import java.util.List;
@@ -54,15 +48,14 @@ public class MapaService {
      * Obtém um mapa completo com todas as competências e atividades vinculadas.
      *
      * @param idMapa Código do mapa
-     * @return DTO com o mapa completo aninhado
-     * @throws ErroEntidadeNaoEncontrada se o mapa não existir
+     * @throws ErroDominioNaoEncontrado se o mapa não existir
      */
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long idMapa) {
         log.debug("Obtendo mapa completo: id={}", idMapa);
 
         Mapa mapa = repositorioMapa.findById(idMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(idMapa)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(idMapa)));
 
         Long idSubprocesso = buscarSubprocessoDoMapa(idMapa);
         List<Competencia> competencias = repositorioCompetencia.findByMapaCodigo(idMapa);
@@ -101,17 +94,17 @@ public class MapaService {
      * - Atualiza competências existentes
      * - Atualiza todos os vínculos com atividades
      *
-     * @param idMapa Código do mapa a ser atualizado
-     * @param request Request com dados do mapa completo
+     * @param idMapa                 Código do mapa a ser atualizado
+     * @param request                Request com dados do mapa completo
      * @param usuarioTituloEleitoral Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
-     * @throws ErroEntidadeNaoEncontrada se o mapa não existir
+     * @throws ErroDominioNaoEncontrado se o mapa não existir
      */
     public MapaCompletoDto salvarMapaCompleto(Long idMapa, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: id={}, usuario={}", idMapa, usuarioTituloEleitoral);
 
         Mapa mapa = repositorioMapa.findById(idMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(idMapa)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(idMapa)));
 
         mapa.setObservacoesDisponibilizacao(request.observacoes());
         mapa = repositorioMapa.save(mapa);
@@ -145,7 +138,7 @@ public class MapaService {
                 log.debug("Nova competência criada: {}", competencia.getCodigo());
             } else {
                 competencia = repositorioCompetencia.findById(compDto.codigo())
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.codigo())));
+                        .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada: %d".formatted(compDto.codigo())));
                 competencia.setDescricao(compDto.descricao());
                 competencia = repositorioCompetencia.save(competencia);
                 log.debug("Competência atualizada: {}", competencia.getCodigo());
@@ -162,17 +155,17 @@ public class MapaService {
      *
      * @param idSubprocesso Código do subprocesso
      * @return DTO com o mapa completo do subprocesso
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou mapa não existir
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou mapa não existir
      */
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaSubprocesso(Long idSubprocesso) {
         log.debug("Obtendo mapa do subprocesso: id={}", idSubprocesso);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
         }
 
         return obterMapaCompleto(subprocesso.getMapa().getCodigo());
@@ -184,18 +177,18 @@ public class MapaService {
      * Se for a primeira vez que competências são criadas,
      * atualiza a situação do subprocesso para MAPA_CRIADO.
      *
-     * @param idSubprocesso Código do subprocesso
-     * @param request Request com dados do mapa completo
+     * @param idSubprocesso          Código do subprocesso
+     * @param request                Request com dados do mapa completo
      * @param usuarioTituloEleitoral Título do usuário que está salvando (para auditoria)
      * @return DTO com o mapa completo atualizado
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou mapa não existir
-     * @throws IllegalStateException se a situação do subprocesso não permitir a operação
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou mapa não existir
+     * @throws IllegalStateException     se a situação do subprocesso não permitir a operação
      */
     public MapaCompletoDto salvarMapaSubprocesso(Long idSubprocesso, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
         log.info("Salvando mapa do subprocesso: idSubprocesso={}, usuario={}", idSubprocesso, usuarioTituloEleitoral);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
@@ -203,7 +196,7 @@ public class MapaService {
         }
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
+            throw new ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
         }
 
         Long idMapa = subprocesso.getMapa().getCodigo();
@@ -257,25 +250,25 @@ public class MapaService {
     private void atualizarVinculosAtividades(Long idCompetencia, List<Long> novosIdsAtividades) {
         List<CompetenciaAtividade> vinculosAtuais = repositorioCompetenciaAtividade.findByCompetenciaCodigo(idCompetencia);
         Set<Long> idsAtuais = vinculosAtuais.stream()
-            .map(v -> v.getId().getAtividadeCodigo())
-            .collect(Collectors.toSet());
+                .map(v -> v.getId().getAtividadeCodigo())
+                .collect(Collectors.toSet());
 
         Set<Long> novosIds = new HashSet<>(novosIdsAtividades);
 
         // Remover os que não estão na nova lista
         vinculosAtuais.stream()
-            .filter(v -> !novosIds.contains(v.getId().getAtividadeCodigo()))
-            .forEach(repositorioCompetenciaAtividade::delete);
+                .filter(v -> !novosIds.contains(v.getId().getAtividadeCodigo()))
+                .forEach(repositorioCompetenciaAtividade::delete);
 
         // Adicionar os que não estão na lista atual
         Competencia competencia = repositorioCompetencia.findById(idCompetencia).orElseThrow();
         novosIds.stream()
-            .filter(id -> !idsAtuais.contains(id))
-            .forEach(idAtividade -> atividadeRepo.findById(idAtividade).ifPresent(atividade -> {
-                CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
-                CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
-                repositorioCompetenciaAtividade.save(vinculo);
-            }));
+                .filter(id -> !idsAtuais.contains(id))
+                .forEach(idAtividade -> atividadeRepo.findById(idAtividade).ifPresent(atividade -> {
+                    CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(idAtividade, idCompetencia);
+                    CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
+                    repositorioCompetenciaAtividade.save(vinculo);
+                }));
 
         log.debug("Atualizados {} vínculos para competência {}", novosIdsAtividades.size(), idCompetencia);
     }
@@ -299,8 +292,8 @@ public class MapaService {
 
     private Long buscarSubprocessoDoMapa(Long idMapa) {
         return repositorioSubprocesso.findByMapaCodigo(idMapa)
-            .map(Subprocesso::getCodigo)
-            .orElse(null);
+                .map(Subprocesso::getCodigo)
+                .orElse(null);
     }
 
 

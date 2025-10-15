@@ -13,6 +13,7 @@ import java.util.List;
  * Cada método cria um template específico para um caso de uso do sistema.
  */
 @Service
+// TODO muitos strings fixos repetidos em toda esta classe
 public class NotificacaoModeloEmailService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final SpringTemplateEngine templateEngine;

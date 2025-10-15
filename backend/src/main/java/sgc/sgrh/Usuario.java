@@ -79,15 +79,15 @@ public class Usuario implements Serializable, UserDetails {
         this.nome = nome;
         this.email = email;
         this.ramal = ramal;
-        this.unidade = new Unidade(unidade);
+        this.unidade = unidade;
         this.perfis = new java.util.HashSet<>(perfis);
     }
 
     public void setUnidade(Unidade unidade) {
-        this.unidade = new Unidade(unidade);
+        this.unidade = unidade;
     }
 
     public Unidade getUnidade() {
-        return new Unidade(this.unidade);
+        return this.unidade;
     }
 }

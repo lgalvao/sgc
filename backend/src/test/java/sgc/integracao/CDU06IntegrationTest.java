@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockAdmin
 @Import(TestSecurityConfig.class)
 @Transactional
+@DisplayName("CDU-06: Detalhar processo")
 public class CDU06IntegrationTest {
     @Autowired
     private MockMvc mockMvc;

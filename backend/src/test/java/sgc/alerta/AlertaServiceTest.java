@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.modelo.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.UnidadeDto;
@@ -138,7 +138,7 @@ class AlertaServiceTest {
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
     }
 
     @Test

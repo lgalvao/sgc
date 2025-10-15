@@ -7,7 +7,7 @@ import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
@@ -21,17 +21,18 @@ public class AnaliseService {
     private final SubprocessoRepo subprocessoRepo;
 
     @Transactional(readOnly = true)
-    public List<Analise> listarPorSubprocesso(Long subprocessoCodigo, TipoAnalise tipo) {
-        if (subprocessoRepo.findById(subprocessoCodigo).isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(subprocessoCodigo));
+    public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipo) {
+        if (subprocessoRepo.findById(codSubprocesso).isEmpty()) {
+            throw new ErroDominioNaoEncontrado("Subprocesso", codSubprocesso);
         }
-        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoCodigo)
+        return analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSubprocesso)
             .stream()
             .filter(a -> a.getTipo() == tipo)
             .toList();
     }
 
     @Transactional
+    // TODO Muitos parâmetros!
     public Analise criarAnalise(Long subprocessoCodigo,
                                 String observacoes,
                                 TipoAnalise tipo,
@@ -41,7 +42,7 @@ public class AnaliseService {
                                 String motivo) {
 
         Subprocesso sp = subprocessoRepo.findById(subprocessoCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(subprocessoCodigo)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", subprocessoCodigo));
 
         Analise a = new Analise();
         a.setSubprocesso(sp);

@@ -12,7 +12,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -99,7 +99,7 @@ class MapaServiceTest {
         when(repositorioMapa.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .isInstanceOf(ErroDominioNaoEncontrado.class)
                 .hasMessage("Mapa não encontrado: 1");
     }
 
@@ -122,7 +122,7 @@ class MapaServiceTest {
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
 
         assertThatThrownBy(() -> mapaServico.obterMapaSubprocesso(100L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .isInstanceOf(ErroDominioNaoEncontrado.class)
                 .hasMessage("Subprocesso não possui mapa associado");
     }
 

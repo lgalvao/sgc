@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.ErroProcesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
@@ -28,7 +28,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ProcessoFinalizacaoService {
-
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
@@ -41,22 +40,22 @@ public class ProcessoFinalizacaoService {
         log.info("Iniciando finalização do processo: código={}", id);
 
         Processo processo = processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", id));
 
         validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);
 
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setDataFinalizacao(LocalDateTime.now());
+
         processoRepo.save(processo);
-
         processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo()));
-
         publicadorDeEventos.publishEvent(new ProcessoFinalizadoEvento(this, processo.getCodigo()));
 
         log.info("Processo finalizado com sucesso: código={}", id);
     }
 
+    // TODO lançar uma exceção de negocio e nao uma generica do java
     private void validarFinalizacaoProcesso(Processo processo) {
         if (processo.getSituacao() != SituacaoProcesso.EM_ANDAMENTO) {
             throw new IllegalStateException("Apenas processos 'EM ANDAMENTO' podem ser finalizados.");
@@ -66,7 +65,7 @@ public class ProcessoFinalizacaoService {
 
     private void validarTodosSubprocessosHomologados(Processo processo) {
         log.debug("Validando homologação de subprocessos do processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
 
         List<String> pendentes = subprocessos.stream()
             .filter(sp -> sp.getSituacao() != SituacaoSubprocesso.MAPA_HOMOLOGADO)
@@ -88,7 +87,7 @@ public class ProcessoFinalizacaoService {
 
     private void tornarMapasVigentes(Processo processo) {
         log.info("Tornando mapas vigentes para o processo {}", processo.getCodigo());
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processo.getCodigo());
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
             Long codigoUnidade = Optional.ofNullable(subprocesso.getUnidade()).map(Unidade::getCodigo)
@@ -106,6 +105,7 @@ public class ProcessoFinalizacaoService {
 
             log.debug("Mapa vigente para unidade {} definido como mapa {}", codigoUnidade, mapaDoSubprocesso.getCodigo());
         }
+
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
     }
 }

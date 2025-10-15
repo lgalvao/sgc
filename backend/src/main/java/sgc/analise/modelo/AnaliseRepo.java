@@ -7,9 +7,9 @@ import java.util.List;
 
 @Repository
 public interface AnaliseRepo extends JpaRepository<Analise, Long> {
-    void deleteBySubprocessoCodigo(Long subprocessoCodigo);
+    void deleteBySubprocessoCodigo(Long codSuprocesso);
 
-    List<Analise> findBySubprocessoCodigoOrderByDataHoraDesc(Long subprocessoCodigo);
+    List<Analise> findBySubprocessoCodigoOrderByDataHoraDesc(Long codSuprocesso);
 
-    List<Analise> findBySubprocesso_Codigo(Long subprocessoCodigo);
+    List<Analise> findBySubprocesso_Codigo(Long codSubprocesso);
 }

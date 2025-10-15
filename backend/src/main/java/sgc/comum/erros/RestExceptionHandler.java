@@ -78,8 +78,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
-    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
-    protected ResponseEntity<Object> handleErroEntidadeNaoEncontrada(ErroEntidadeNaoEncontrada ex) {
+    @ExceptionHandler(ErroDominioNaoEncontrado.class)
+    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitize(ex.getMessage())));
     }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
 
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 
 import java.util.List;
 import java.util.Map;
@@ -17,9 +17,9 @@ import java.util.Map;
 public class AnaliseControle {
     private final AnaliseService analiseService;
 
-    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
+    @ExceptionHandler(ErroDominioNaoEncontrado.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleErroEntidadeNaoEncontrada(ErroEntidadeNaoEncontrada ex) {
+    public Map<String, String> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
         return Map.of("message", ex.getMessage());
     }
 

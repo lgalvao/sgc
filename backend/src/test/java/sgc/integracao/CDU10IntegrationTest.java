@@ -141,10 +141,14 @@ class CDU10IntegrationTest {
 
             // Assert Notificação
             String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos da UT submetido para análise";
-            String corpoEsperado = """
-                    Prezado(a) responsável pela US,
-                    A revisão do cadastro de atividades e conhecimentos da UT no processo Processo de Revisão foi submetida para análise por essa unidade.
-                    A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).""";
+            String corpoEsperado = String.format(
+                    "Prezado(a) responsável pela %s,%n" +
+                            "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
+                            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+                    unidadeSuperior.getSigla(),
+                    unidadeChefe.getSigla(),
+                    subprocessoRevisao.getProcesso().getDescricao()
+            );
             verify(notificacaoService).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
         }
 

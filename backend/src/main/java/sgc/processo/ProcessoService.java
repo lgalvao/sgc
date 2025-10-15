@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
@@ -69,7 +69,7 @@ public class ProcessoService {
         if ("REVISAO".equalsIgnoreCase(requisicao.tipo()) || "DIAGNOSTICO".equalsIgnoreCase(requisicao.tipo())) {
             for (Long codigoUnidade : requisicao.unidades()) {
                 if (unidadeRepo.findById(codigoUnidade).isEmpty()) {
-                    throw new ErroEntidadeNaoEncontrada("Unidade com código " + codigoUnidade + " não foi encontrada.");
+                    throw new ErroDominioNaoEncontrado("Unidade", codigoUnidade);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class ProcessoService {
     @Transactional
     public ProcessoDto atualizar(Long id, AtualizarProcessoReq requisicao) {
         Processo processo = processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", id));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -111,7 +111,7 @@ public class ProcessoService {
     @Transactional
     public void apagar(Long id) {
         Processo processo = processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", id));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser removidos.");
@@ -130,7 +130,7 @@ public class ProcessoService {
     @PreAuthorize("hasRole('ADMIN') or @processoSeguranca.checarAcesso(authentication, #idProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long idProcesso) {
         Processo processo = processoRepo.findById(idProcesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + idProcesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", idProcesso));
 
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);

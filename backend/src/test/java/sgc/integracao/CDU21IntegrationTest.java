@@ -92,30 +92,24 @@ class CDU21IntegrationTest {
         Usuario titularOp1 = new Usuario(202020202020L, "Titular Op1", "titular.op1@test.com", null, null, Set.of(Perfil.CHEFE));
         Usuario titularOp2 = new Usuario(303030303030L, "Titular Op2", "titular.op2@test.com", null, null, Set.of(Perfil.CHEFE));
         usuarioRepo.saveAll(List.of(titularIntermediaria, titularOp1, titularOp2));
-        usuarioRepo.saveAll(List.of(titularIntermediaria, titularOp1, titularOp2));
-        usuarioRepo.saveAll(List.of(titularIntermediaria, titularOp1, titularOp2));
 
         // 3. Create Units
         Unidade unidadeIntermediaria = new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null);
         unidadeRepo.save(unidadeIntermediaria);
-        unidadeRepo.save(unidadeIntermediaria);
+
         unidadeOperacional1 = new Unidade("Unidade Operacional 1", "UOP1", titularOp1, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria);
         unidadeOperacional2 = new Unidade("Unidade Operacional 2", "UOP2", titularOp2, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria);
         unidadeRepo.saveAll(List.of(unidadeOperacional1, unidadeOperacional2));
-        unidadeRepo.saveAll(List.of(unidadeOperacional1, unidadeOperacional2));
-        unidadeRepo.saveAll(List.of(unidadeIntermediaria, unidadeOperacional1, unidadeOperacional2));
 
         // 4. Create Process
         processo = processoRepo.save(new Processo("Processo de Teste para Finalizar", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30)));
 
         // 5. Create Subprocesses and Maps
-        Mapa mapa1 = new Mapa();
-        mapaRepo.save(mapa1);
+        Mapa mapa1 = mapaRepo.save(new Mapa());
         Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp1);
 
-        Mapa mapa2 = new Mapa();
-        mapaRepo.save(mapa2);
+        Mapa mapa2 = mapaRepo.save(new Mapa());
         Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp2);
 

@@ -107,8 +107,7 @@ public class NotificacaoService {
                 }
             }
         }
-        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.",
-                MAX_TENTATIVAS, emailDto.destinatario(), excecaoFinal);
+        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS, emailDto.destinatario(), excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
@@ -118,7 +117,7 @@ public class NotificacaoService {
 
         helper.setFrom(new InternetAddress(remetente, nomeRemetente));
         helper.setTo(emailDto.destinatario());
-        String assuntoCompleto = prefixoAssunto + " " + emailDto.assunto();
+        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.assunto());
         helper.setSubject(assuntoCompleto);
         helper.setText(emailDto.corpo(), emailDto.html());
 
@@ -129,8 +128,7 @@ public class NotificacaoService {
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s",
-                emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
+        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
         if (conteudo.length() > 500) {
             conteudo = conteudo.substring(0, 497) + "...";
         }

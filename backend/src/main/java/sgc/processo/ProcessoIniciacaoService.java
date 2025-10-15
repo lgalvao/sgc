@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.ErroProcesso;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
@@ -44,7 +44,7 @@ public class ProcessoIniciacaoService {
     @Transactional
     public void iniciarProcessoMapeamento(Long id, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", id));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -58,7 +58,7 @@ public class ProcessoIniciacaoService {
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
 
             criarSubprocessoParaMapeamento(processo, unidade);
         }
@@ -79,7 +79,7 @@ public class ProcessoIniciacaoService {
     @Transactional
     public void iniciarProcessoRevisao(Long id, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(id)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: " + id));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", id));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -94,7 +94,7 @@ public class ProcessoIniciacaoService {
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada: " + codigoUnidade));
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
 
             criarSubprocessoParaRevisao(processo, unidade);
         }

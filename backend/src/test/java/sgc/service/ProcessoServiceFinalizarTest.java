@@ -99,7 +99,7 @@ public class ProcessoServiceFinalizarTest {
     @DisplayName("finalizar deve lançar ErroProcesso quando subprocessos não estão homologados")
     void finalizar_deveLancarErroProcesso_quandoSubprocessosNaoEstaoHomologados() {
         when(processoRepo.findById(1L)).thenReturn(Optional.of(processo));
-        when(subprocessoRepo.findByProcessoCodigo(1L))
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L))
                 .thenReturn(List.of(subprocessoHomologado, subprocessoPendente));
 
         assertThatThrownBy(() -> processoFinalizacaoService.finalizar(1L))

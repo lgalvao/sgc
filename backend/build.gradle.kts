@@ -4,12 +4,12 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.2.5"
-    pmd
     id("org.sonarqube") version "5.1.0.4882"
+    java
+    pmd
 }
 
 java {
@@ -43,7 +43,8 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
+    testImplementation("com.tngtech.archunit:archunit:1.4.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -124,7 +125,7 @@ tasks.withType<Test> {
                         TestFailure(
                             testClass = desc.className ?: "Unknown",
                             testMethod = desc.name,
-                            errorMessage = rootCause?.message ?: exception?.message ?: "Unknown error",
+                            errorMessage = rootCause?.message ?: exception?.message ?: "Erro desconhecido",
                             errorType = rootCause?.javaClass?.simpleName ?: exception?.javaClass?.simpleName
                             ?: "Exception",
                             stackTrace = filterStackTrace(rootCause ?: exception)
@@ -136,7 +137,6 @@ tasks.withType<Test> {
                     totalTests++
                     skipped.add("${desc.className ?: "Unknown"}.${desc.name}")
                 }
-
                 else -> {}
             }
         }
@@ -164,6 +164,7 @@ tasks.withType<Test> {
                     (className.startsWith("sgc") ||
                             className.startsWith("org.springframework.web") ||
                             className.startsWith("org.springframework.data") ||
+                            className.startsWith("org.hibernate") ||
                             className.startsWith("org.springframework.security") ||
                             (className.startsWith("org.springframework.boot") && !className.contains(".test."))) &&
                             !className.contains("gradle") &&

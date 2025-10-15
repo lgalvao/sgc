@@ -6,26 +6,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.TipoImpactoAtividade;
-import sgc.mapa.modelo.TipoImpactoCompetencia;
 import sgc.sgrh.Usuario;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+
+import static sgc.subprocesso.SituacaoSubprocesso.*;
 
 /**
  * Interface do serviço responsável por detectar impactos no mapa de competências
@@ -35,24 +31,13 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ImpactoMapaService {
     private final SubprocessoRepo repositorioSubprocesso;
-    private final MapaRepo repositorioMapa;
+    private final MapaRepo mapaRepo;
     private final AtividadeRepo atividadeRepo;
-    private final CompetenciaRepo repositorioCompetencia;
-    private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     private final ImpactoAtividadeService impactoAtividadeService;
     private final ImpactoCompetenciaService impactoCompetenciaService;
-
-    public ImpactoMapaService(SubprocessoRepo repositorioSubprocesso, MapaRepo repositorioMapa, AtividadeRepo atividadeRepo, CompetenciaRepo repositorioCompetencia, CompetenciaAtividadeRepo repositorioCompetenciaAtividade, ImpactoAtividadeService impactoAtividadeService, ImpactoCompetenciaService impactoCompetenciaService) {
-        this.repositorioSubprocesso = repositorioSubprocesso;
-        this.repositorioMapa = repositorioMapa;
-        this.atividadeRepo = atividadeRepo;
-        this.repositorioCompetencia = repositorioCompetencia;
-        this.repositorioCompetenciaAtividade = repositorioCompetenciaAtividade;
-        this.impactoAtividadeService = impactoAtividadeService;
-        this.impactoCompetenciaService = impactoCompetenciaService;
-    }
 
     /**
      * Verifica impactos no mapa de competências comparando o cadastro atual
@@ -73,50 +58,39 @@ public class ImpactoMapaService {
         log.info("Verificando impactos no mapa: subprocesso={}", idSubprocesso);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(idSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Subprocesso não encontrado: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", idSubprocesso));
 
         verificarAcesso(usuario, subprocesso);
 
-        Optional<Mapa> mapaVigenteOpt = repositorioMapa
+        Optional<Mapa> mapaVigenteOpt = mapaRepo
                 .findMapaVigenteByUnidade(subprocesso.getUnidade().getCodigo());
 
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
+            // TODO muito ruim essa instancianção cheio de valores 'vazios'
             return new ImpactoMapaDto(
                     false, 0, 0, 0, 0,
                     List.of(), List.of(), List.of(), List.of());
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-
-        Mapa mapaSubprocesso = repositorioMapa
+        Mapa mapaSubprocesso = mapaRepo
                 .findBySubprocessoCodigo(idSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(
-                        "Mapa não encontrado para subprocesso: " + idSubprocesso));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado para subprocesso", idSubprocesso));
 
-        List<Atividade> atividadesAtuais = atividadeRepo
-                .findByMapaCodigo(mapaSubprocesso.getCodigo());
-
+        List<Atividade> atividadesAtuais = atividadeRepo.findByMapaCodigo(mapaSubprocesso.getCodigo());
         List<Atividade> atividadesVigentes = impactoAtividadeService.obterAtividadesDoMapa(mapaVigente);
-
-        List<AtividadeImpactadaDto> inseridas = impactoAtividadeService.detectarAtividadesInseridas(atividadesAtuais,
-                atividadesVigentes);
-
-        List<AtividadeImpactadaDto> removidas = impactoAtividadeService.detectarAtividadesRemovidas(atividadesAtuais,
-                atividadesVigentes, mapaVigente);
-
-        List<AtividadeImpactadaDto> alteradas = impactoAtividadeService.detectarAtividadesAlteradas(atividadesAtuais,
-                atividadesVigentes, mapaVigente);
-
-        List<CompetenciaImpactadaDto> competenciasImpactadas = impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente,
-                removidas, alteradas);
+        List<AtividadeImpactadaDto> inseridas = impactoAtividadeService.detectarAtividadesInseridas(atividadesAtuais, atividadesVigentes);
+        List<AtividadeImpactadaDto> removidas = impactoAtividadeService.detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, mapaVigente);
+        List<AtividadeImpactadaDto> alteradas = impactoAtividadeService.detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, mapaVigente);
+        List<CompetenciaImpactadaDto> competenciasImpactadas = impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, removidas, alteradas);
 
         boolean temImpactos = !inseridas.isEmpty() || !removidas.isEmpty() || !alteradas.isEmpty();
 
         log.info("Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
                 temImpactos, inseridas.size(), removidas.size(), alteradas.size());
 
+        // TODO rever essa instanciação com muitos parâmetros. Está frágil!
         return new ImpactoMapaDto(
                 temImpactos,
                 inseridas.size(),
@@ -129,19 +103,20 @@ public class ImpactoMapaService {
                 competenciasImpactadas);
     }
 
-
+    //TODO rever esse método para evitar tantos strings fixos e linhas longas demais
     private void verificarAcesso(Usuario usuario, Subprocesso subprocesso) {
+        SituacaoSubprocesso sitSubprocesso = subprocesso.getSituacao();
+
         if (hasRole(usuario, "CHEFE")) {
-            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) {
+            if (sitSubprocesso != REVISAO_CADASTRO_EM_ANDAMENTO) {
                 throw new ErroDominioAccessoNegado("O chefe da unidade só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro em andamento'.");
             }
         } else if (hasRole(usuario, "GESTOR")) {
-            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
+            if (sitSubprocesso != REVISAO_CADASTRO_DISPONIBILIZADA) {
                 throw new ErroDominioAccessoNegado("O gestor só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro disponibilizada'.");
             }
         } else if (hasRole(usuario, "ADMIN")) {
-            if (subprocesso.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
-                    subprocesso.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
+            if (sitSubprocesso != REVISAO_CADASTRO_HOMOLOGADA && sitSubprocesso != SituacaoSubprocesso.MAPA_AJUSTADO) {
                 throw new ErroDominioAccessoNegado("O administrador só pode verificar os impactos com o subprocesso na situação 'Revisão do cadastro homologada' ou 'Mapa Ajustado'.");
             }
         }
@@ -149,21 +124,9 @@ public class ImpactoMapaService {
 
     private boolean hasRole(Usuario usuario, String role) {
         return usuario.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_%s".formatted(role)));
     }
 
-    private static class CompetenciaImpactoAcumulador {
-        final Long codigo;
-        final String descricao;
-        final Set<String> atividadesAfetadas = new LinkedHashSet<>();
-
-        CompetenciaImpactoAcumulador(Long codigo, String descricao) {
-            this.codigo = codigo;
-            this.descricao = descricao;
-        }
-
-        void adicionarImpacto(String descricaoImpacto) {
-            atividadesAfetadas.add(descricaoImpacto);
-        }
+    private record CompetenciaImpactoAcumulador(Long codigo, String descricao) {
     }
 }

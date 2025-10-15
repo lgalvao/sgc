@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 public record AtividadeDto(
     Long codigo,
     Long mapaCodigo,
-    @NotBlank(message = "descricao não pode ser vazia")
+
+    @NotBlank(message = "Descrição não pode ser vazia")
     String descricao
 ) {}

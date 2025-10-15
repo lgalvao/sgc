@@ -11,6 +11,7 @@ import sgc.processo.dto.ProcessoDto;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller REST para Processos.
@@ -93,7 +94,11 @@ public class ProcessoControle {
      */
     @PostMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        processoFinalizacaoService.finalizar(id);
-        return ResponseEntity.ok().build();
+        try {
+            processoFinalizacaoService.finalizar(id);
+            return ResponseEntity.ok().build();
+        } catch (sgc.processo.modelo.ErroProcesso e) {
+            return ResponseEntity.unprocessableEntity().body(Map.of("message", e.getMessage()));
+        }
     }
 }

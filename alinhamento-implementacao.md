@@ -10,8 +10,8 @@ A análise revelou que a arquitetura do backend é robusta e, em sua maior parte
 
 1.  **Integração com SGRH Simulada:** A integração com o sistema de RH (`SgrhService`) é totalmente simulada (mock). Embora isso permita o desenvolvimento e teste do restante da aplicação, a conexão com o banco de dados Oracle real é uma pendência crítica para a produção.
 2.  **Lógica de Perfil Incompleta:** A atribuição de perfis de usuário (`Usuario.getAuthorities`) não contempla o perfil `SERVIDOR`, tratando todos os não-ADMIN/GESTORES como `CHEFE`.
-3.  **Criação de Mapa em Processo de Revisão:** O fluxo de "Iniciar processo de revisão" (CDU-05) cria um mapa de competências novo e vazio, em vez de criar uma cópia do mapa vigente, como especificado.
-4.  **Gerenciamento de Conhecimentos:** A API para gerenciar `Atividades` (`AtividadeControle`) não possui endpoints para adicionar, editar ou remover as entidades de `Conhecimento` associadas, representando uma lacuna funcional no CDU-08.
+
+**Observação:** Análises anteriores apontavam falhas na implementação do CDU-05 (Iniciar processo de revisão) e CDU-08 (Manter cadastro de atividades e conhecimentos). Uma reavaliação do código-fonte em **15/10/2025** confirmou que essas funcionalidades foram corrigidas e agora atendem aos requisitos.
 
 ## Análise Detalhada por Caso de Uso
 
@@ -54,9 +54,9 @@ A seguir, uma análise detalhada para cada CDU.
 
 ### CDU-05: Iniciar processo de revisão
 - **Propósito:** Iniciar o fluxo de trabalho para um processo de revisão.
-- **Status Geral:** **Não Atendido**
-- **Análise:** Embora o endpoint `POST /api/processos/{id}/iniciar` e o método `iniciarProcessoRevisao` existam, a implementação está incorreta.
-  - **Requisito 10 (Copiar mapa vigente):** **Não Atendido.** O código explicitamente cria um novo mapa (`new Mapa()`) em vez de copiar o mapa vigente da unidade, contradizendo o requisito fundamental deste caso de uso. A lógica de cópia, embora exista no `CopiaMapaService`, não é utilizada aqui.
+- **Status Geral:** **Atendido**
+- **Análise:** O endpoint `POST /api/processos/{id}/iniciar` aciona o método `iniciarProcessoRevisao` no `ProcessoService`.
+  - **Requisito 10 (Copiar mapa vigente):** **Atendido.** A implementação utiliza o `CopiaMapaService` para criar uma cópia do mapa de competências vigente da unidade, vinculando-o ao novo subprocesso de revisão. A análise anterior, que indicava a criação de um mapa vazio, estava desatualizada.
 
 ---
 
@@ -76,11 +76,11 @@ A seguir, uma análise detalhada para cada CDU.
 
 ### CDU-08: Manter cadastro de atividades e conhecimentos
 - **Propósito:** Permitir que o CHEFE gerencie a lista de atividades e conhecimentos de sua unidade.
-- **Status Geral:** **Parcialmente Atendido**
+- **Status Geral:** **Atendido**
 - **Análise:**
-  - **CRUD de Atividades:** Atendido. O `AtividadeControle` fornece endpoints para criar, editar e remover atividades.
+  - **CRUD de Atividades:** Atendido. O `AtividadeControle` fornece endpoints para criar, editar e remover atividades (`/api/atividades`).
   - **Importação de Atividades:** Atendido. O endpoint `POST /api/subprocessos/{id}/importar-atividades` implementa a funcionalidade de importação.
-  - **Gerenciamento de Conhecimentos:** **Não Atendido.** Não existem endpoints na API para adicionar, editar ou remover `Conhecimentos` associados a uma atividade. O `AtividadeControle` gerencia apenas a entidade `Atividade`, tornando impossível para o frontend implementar a gestão completa exigida pelo CDU.
+  - **Gerenciamento de Conhecimentos:** **Atendido.** O `AtividadeControle` expõe uma API aninhada (`/api/atividades/{atividadeId}/conhecimentos`) com endpoints `POST`, `PUT` e `DELETE` para o gerenciamento completo dos conhecimentos associados a uma atividade, cumprindo os requisitos do caso de uso. A análise anterior, que apontava a ausência destes endpoints, estava desatualizada.
 
 ---
 

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class AlertaControle {
             String usuarioTitulo = "USUARIO_ATUAL"; // Exemplo
             alertaService.marcarComoLido(usuarioTitulo, id);
             return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));
-        } catch (ErroEntidadeNaoEncontrada e) {
+        } catch (ErroDominioNaoEncontrado e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));

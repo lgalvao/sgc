@@ -27,11 +27,7 @@ public class Conhecimento extends EntidadeBase {
         this.atividade = atividade;
     }
 
-    public void setAtividade(Atividade atividade) {
-        this.atividade = atividade;
-    }
-
-    public Atividade getAtividade() {
-        return this.atividade;
+    public Long getCodigoAtividade() {
+        return atividade.getCodigo();
     }
 }

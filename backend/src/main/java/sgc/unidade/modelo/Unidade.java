@@ -1,7 +1,6 @@
 package sgc.unidade.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,6 @@ import sgc.sgrh.Usuario;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();
@@ -44,6 +42,7 @@ public class Unidade extends EntidadeBase {
             this.unidadeSuperior = unidade.getUnidadeSuperior();
         }
     }
+
     @Column(name = "nome")
     private String nome;
 

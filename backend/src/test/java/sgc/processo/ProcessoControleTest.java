@@ -164,7 +164,7 @@ public class ProcessoControleTest {
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
         var req = new AtualizarProcessoReq(999L, "Teste", MAPEAMENTO, null, List.of(1L));
 
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
         mockMvc.perform(put(API_PROCESSOS_999)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
 
         mockMvc.perform(delete(API_PROCESSOS_999))
                 .andExpect(status().isNotFound());
@@ -230,7 +230,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).obterDetalhes(eq(999L));
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).obterDetalhes(eq(999L));
 
         mockMvc.perform(get("/api/processos/999/detalhes"))
                 .andExpect(status().isNotFound());
@@ -311,7 +311,7 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoFinalizacaoService).finalizar(999L);
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoFinalizacaoService).finalizar(999L);
 
         mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar"))
                 .andExpect(status().isNotFound());
