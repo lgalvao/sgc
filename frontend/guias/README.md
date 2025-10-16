@@ -1,29 +1,15 @@
-# Diretório `guias`
+# Diretório de Guias
 
-Este diretório centraliza a documentação e os guias de desenvolvimento do projeto frontend. O objetivo é fornecer um conjunto de diretrizes, padrões e boas práticas para garantir a consistência, qualidade e manutenibilidade do código.
-
-Consultar estes guias é fundamental antes de iniciar novas tarefas de desenvolvimento ou refatoração.
+Este diretório centraliza a documentação técnica e arquitetural do _frontend_ do SGC. O objetivo é fornecer guias e padrões para auxiliar no desenvolvimento, manutenção e integração de novos membros à equipe.
 
 ## Conteúdo
 
-Abaixo está um resumo de cada guia disponível:
+Aqui você encontrará documentos em formato Markdown (`.md`) que abordam:
 
-### `guia-endpoints.md`
+- **Padrões de Código**: Convenções de nomenclatura, formatação e estilo de código.
+- **Decisões Arquiteturais**: Justificativas para a escolha de bibliotecas, _frameworks_ e padrões de projeto (e.g., gerenciamento de estado com Pinia, estrutura de componentes).
+- **Guias de Testes**: Estratégias para testes unitários, de componentes e _end-to-end_, com exemplos práticos.
+- **Fluxos de Trabalho**: Descrições de fluxos de trabalho importantes da aplicação, como autenticação, submissão de formulários e comunicação com o _backend_.
+- **Configuração de Ambiente**: Instruções detalhadas para configurar o ambiente de desenvolvimento local.
 
-Descreve o padrão para a definição e consumo de endpoints da API no frontend. Detalha como as chamadas de API devem ser estruturadas, onde a lógica de acesso a dados deve residir e como os erros de comunicação com o backend devem ser tratados.
-
-### `guia-perfis.md`
-
-Explica o sistema de perfis de usuário (`CHEFE`, `GESTOR`, `SERVIDOR`, etc.) e como o controle de acesso baseado em papéis (RBAC - Role-Based Access Control) é implementado no frontend. Orienta sobre como exibir/ocultar componentes e rotas com base nas permissões do usuário logado.
-
-### `guia-refatoracao.md`
-
-Fornece diretrizes sobre como e quando refatorar o código. Inclui exemplos de "code smells" (sinais de código problemático) comuns no contexto do Vue e TypeScript e sugere as melhores abordagens para corrigi-los, promovendo um código mais limpo e eficiente.
-
-### `guia-testes-e2e.md`
-
-Um guia detalhado sobre como escrever e estruturar testes _end-to-end_ (E2E) com Playwright. Cobre a organização dos arquivos de teste, o uso de comandos customizados, a criação de dados de teste (massa de dados) e as melhores práticas para criar testes robustos e fáceis de manter.
-
-### `guia-testes-vitest.md`
-
-Focado nos testes unitários e de componentes com Vitest. O guia explica como testar componentes Vue, funções "composables", stores Pinia e utilitários. Inclui exemplos de como mockar dependências, simular interações do usuário e fazer asserções eficazes.
+Consulte os documentos neste diretório para obter uma compreensão aprofundada da estrutura e das melhores práticas adotadas no projeto.
