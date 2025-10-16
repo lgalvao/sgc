@@ -63,12 +63,20 @@ export const usePerfilStore = defineStore('perfil', {
       const api = useApi()
 
       try {
-        const response = await api.post<LoginResponse>('/login/autenticar', credenciais)
-        this.loginResponse = response
+        // O backend real tem um fluxo em múltiplos passos
+        await api.post('/usuarios/autenticar', credenciais)
+        const perfisResponse = await api.post<PerfilUnidadeDto[]>('/usuarios/autorizar', credenciais.tituloEleitoral)
+
+        // Simula a resposta do loginResponse que a UI espera
+        this.loginResponse = {
+            nome: "Usuário", // O nome não vem na resposta, pode ser ajustado no futuro
+            tituloEleitoral: credenciais.tituloEleitoral,
+            pares: perfisResponse
+        }
 
         // Se houver apenas um par, já finaliza o login
-        if (response.pares.length === 1) {
-          await this.entrar(response.pares[0])
+        if (this.loginResponse.pares.length === 1) {
+          await this.entrar(this.loginResponse.pares[0])
         }
         // Se houver múltiplos pares, a UI irá solicitar a seleção
       } catch (error) {
@@ -91,21 +99,22 @@ export const usePerfilStore = defineStore('perfil', {
       this.erroAutenticacao = null
       const api = useApi()
 
-      const request: EntrarRequest = {
+      const request = { // O DTO do backend espera `unidadeCodigo`
         tituloEleitoral: this.loginResponse.tituloEleitoral,
         perfil: par.perfil,
-        unidade: par.unidade
+        unidadeCodigo: par.unidade.id // Ajustado para enviar o código
       }
 
       try {
-        // O backend ainda não tem o endpoint 'entrar', vamos simular a resposta
-        // const response = await api.post<UsuarioAutenticado>('/login/entrar', request);
+        await api.post('/usuarios/entrar', request);
+
+        // Simula a criação do objeto de usuário local após o sucesso
         const usuario: UsuarioAutenticado = {
           nome: this.loginResponse.nome,
           tituloEleitoral: this.loginResponse.tituloEleitoral,
           perfil: par.perfil,
-          unidade: par.unidade,
-          token: 'token-simulado' // Token simulado
+          unidade: par.unidade.sigla, // Armazena a sigla na UI
+          token: 'token-simulado' // O backend não retorna token, mantemos simulado
         }
 
         this.usuario = usuario

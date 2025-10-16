@@ -1,39 +1,50 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
+import { useApi } from '@/composables/useApi';
 
 interface ConfiguracoesState {
     diasInativacaoProcesso: number;
     diasAlertaNovo: number;
+    loading: boolean;
+    error: string | null;
 }
 
 export const useConfiguracoesStore = defineStore('configuracoes', {
     state: (): ConfiguracoesState => ({
-        diasInativacaoProcesso: 10,
-        diasAlertaNovo: 7,
+        diasInativacaoProcesso: 10, // Valor padrão
+        diasAlertaNovo: 7,       // Valor padrão
+        loading: false,
+        error: null,
     }),
     actions: {
-        loadConfiguracoes() {
+        async fetchConfiguracoes() {
+            this.loading = true;
+            this.error = null;
+            const api = useApi();
             try {
-                const savedConfig = localStorage.getItem('appConfiguracoes');
-                if (savedConfig) {
-                    const parsedConfig = JSON.parse(savedConfig);
-                    this.diasInativacaoProcesso = parsedConfig.diasInativacaoProcesso || this.diasInativacaoProcesso;
-                    this.diasAlertaNovo = parsedConfig.diasAlertaNovo || this.diasAlertaNovo;
-                }
-            } catch (e) {
-                console.error('Erro ao carregar configurações do localStorage:', e);
+                const { data } = await api.get('/api/configuracoes');
+                this.diasInativacaoProcesso = data.diasInativacaoProcesso;
+                this.diasAlertaNovo = data.diasAlertaNovo;
+            } catch (error) {
+                this.error = 'Falha ao carregar configurações.';
+            } finally {
+                this.loading = false;
             }
         },
-        saveConfiguracoes() {
+        async saveConfiguracoes() {
+            this.loading = true;
+            this.error = null;
+            const api = useApi();
             try {
                 const configToSave = {
                     diasInativacaoProcesso: this.diasInativacaoProcesso,
                     diasAlertaNovo: this.diasAlertaNovo,
                 };
-                localStorage.setItem('appConfiguracoes', JSON.stringify(configToSave));
-                return true;
-            } catch (e) {
-                console.error('Erro ao salvar configurações no localStorage:', e);
-                return false;
+                await api.put('/api/configuracoes', configToSave);
+            } catch (error) {
+                this.error = 'Falha ao salvar configurações.';
+                throw new Error('Falha ao salvar configurações.');
+            } finally {
+                this.loading = false;
             }
         },
         setDiasInativacaoProcesso(dias: number) {

@@ -51,10 +51,9 @@ describe('useMapasStore', () => {
         });
 
         it('should handle errors during fetch', async () => {
-            const errorMessage = 'Network Error';
             // Mock the rejected value of useApi().get
             mockedUseApi.mockReturnValue({
-                get: vi.fn().mockRejectedValue(new Error(errorMessage)),
+                get: vi.fn().mockRejectedValue(new Error('Network Error')),
                 post: vi.fn(),
                 put: vi.fn(),
                 del: vi.fn(),
@@ -68,8 +67,80 @@ describe('useMapasStore', () => {
             await store.fetchMapas();
 
             expect(store.loading).toBe(false);
-            expect(store.error).toContain(errorMessage);
+            expect(store.error).toBe('Falha ao buscar mapas.');
             expect(store.mapas).toEqual([]);
+        });
+    });
+
+    describe('adicionarMapa action', () => {
+        it('should call post and refresh the list on success', async () => {
+            const getMock = vi.fn().mockResolvedValue({ data: [] });
+            const postMock = vi.fn().mockResolvedValue({});
+            mockedUseApi.mockReturnValue({
+                get: getMock,
+                post: postMock,
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useMapasStore();
+            const novoMapa = { unidade: 'SELOG', idProcesso: 3, situacao: 'novo' };
+
+            await store.adicionarMapa(novoMapa as any);
+
+            expect(postMock).toHaveBeenCalledWith('/api/mapas', novoMapa);
+            expect(getMock).toHaveBeenCalledWith('/api/mapas');
+        });
+
+        it('should throw an error on failure', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn(),
+                post: vi.fn().mockRejectedValue(new Error('Failed to post')),
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useMapasStore();
+            const novoMapa = { unidade: 'SELOG', idProcesso: 3, situacao: 'novo' };
+
+            await expect(store.adicionarMapa(novoMapa as any)).rejects.toThrow('Falha ao adicionar o mapa.');
+        });
+    });
+
+    describe('editarMapa action', () => {
+        it('should call put and refresh the list on success', async () => {
+            const getMock = vi.fn().mockResolvedValue({ data: [] });
+            const putMock = vi.fn().mockResolvedValue({});
+            mockedUseApi.mockReturnValue({
+                get: getMock,
+                post: vi.fn(),
+                put: putMock,
+                del: vi.fn(),
+            });
+
+            const store = useMapasStore();
+            const dadosAtualizados = { situacao: 'atualizado' };
+            const mapaId = 1;
+
+            await store.editarMapa(mapaId, dadosAtualizados);
+
+            expect(putMock).toHaveBeenCalledWith(`/api/mapas/${mapaId}`, dadosAtualizados);
+            expect(getMock).toHaveBeenCalledWith('/api/mapas');
+        });
+
+        it('should throw an error on failure', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn(),
+                post: vi.fn(),
+                put: vi.fn().mockRejectedValue(new Error('Failed to put')),
+                del: vi.fn(),
+            });
+
+            const store = useMapasStore();
+            const dadosAtualizados = { situacao: 'atualizado' };
+            const mapaId = 1;
+
+            await expect(store.editarMapa(mapaId, dadosAtualizados)).rejects.toThrow('Falha ao editar o mapa.');
         });
     });
 

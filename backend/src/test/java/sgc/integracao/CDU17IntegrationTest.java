@@ -23,7 +23,6 @@ import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroApi;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.modelo.Mapa;
@@ -57,7 +56,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
-@org.springframework.context.annotation.Import(TestSecurityConfig.class)
 class CDU17IntegrationTest {
     private static final String API_URL = "/api/subprocessos/{id}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";

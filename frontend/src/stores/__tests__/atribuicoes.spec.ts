@@ -1,124 +1,100 @@
-import {beforeEach, describe, expect, it} from 'vitest';
-import {initPinia} from '@/test/helpers';
-import {useAtribuicaoTemporariaStore} from '../atribuicoes';
-import type {AtribuicaoTemporaria} from '@/types/tipos';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import { useAtribuicaoTemporariaStore } from '../atribuicoes';
+import { useApi } from '@/composables/useApi';
+
+vi.mock('@/composables/useApi', () => ({
+    useApi: vi.fn(),
+}));
+
+const mockedUseApi = vi.mocked(useApi);
+
+const mockAtribuicoes = [
+    { id: 1, idServidor: 1, unidade: 'COSIS', dataInicio: '2023-01-01T00:00:00Z', dataTermino: '2023-01-31T00:00:00Z' },
+    { id: 2, idServidor: 2, unidade: 'SESEL', dataInicio: '2023-02-01T00:00:00Z', dataTermino: '2023-02-28T00:00:00Z' },
+];
 
 describe('useAtribuicaoTemporariaStore', () => {
-    let atribuicaoTemporariaStore: ReturnType<typeof useAtribuicaoTemporariaStore>;
-
     beforeEach(() => {
-        initPinia();
-        atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
-        atribuicaoTemporariaStore.$patch({atribuicoes: []});
+        setActivePinia(createPinia());
+        vi.clearAllMocks();
     });
 
-    it('should initialize with an empty array of atribuicoes', () => {
-        expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(0);
-    });
-
-    describe('actions', () => {
-        it('criarAtribuicao should add a new atribuicao to the store', () => {
-            const novaAtribuicao: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
-                justificativa: 'Teste de criação'
-            };
-            const initialLength = atribuicaoTemporariaStore.atribuicoes.length;
-
-            atribuicaoTemporariaStore.criarAtribuicao(novaAtribuicao);
-
-            expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(initialLength + 1);
-            expect(atribuicaoTemporariaStore.atribuicoes[0]).toEqual(novaAtribuicao);
-        });
-
-        it('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
-            const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
-                justificativa: 'J1'
-            };
-            const atribuicao2: AtribuicaoTemporaria = {
-                unidade: 'B',
-                idServidor: 2,
-                dataInicio: new Date('2025-02-01'),
-                dataTermino: new Date('2025-02-28'),
-                justificativa: 'J2'
-            };
-            const atribuicao3: AtribuicaoTemporaria = {
-                unidade: 'C',
-                idServidor: 1,
-                dataInicio: new Date('2025-03-01'),
-                dataTermino: new Date('2025-03-31'),
-                justificativa: 'J3'
-            };
-
-            atribuicaoTemporariaStore.$patch({
-                atribuicoes: [atribuicao1, atribuicao2, atribuicao3]
+    describe('fetchAtribuicoes', () => {
+        it('deve buscar atribuições com sucesso', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn().mockResolvedValue({ data: mockAtribuicoes }),
+                post: vi.fn(),
+                put: vi.fn(),
+                del: vi.fn(),
             });
 
-            const manuallyFiltered = atribuicaoTemporariaStore.atribuicoes.filter(a => Number(a.idServidor) === 1);
-            expect(manuallyFiltered.length).toBe(2);
-            expect(manuallyFiltered[0]).toEqual(atribuicao1);
-            expect(manuallyFiltered[1]).toEqual(atribuicao3);
+            const store = useAtribuicaoTemporariaStore();
+            await store.fetchAtribuicoes();
+
+            expect(store.loading).toBe(false);
+            expect(store.items.length).toBe(2);
+            expect(store.items[0].unidade).toBe('COSIS');
+            expect(store.items[0].dataInicio).toBeInstanceOf(Date);
+            expect(mockedUseApi().get).toHaveBeenCalledWith('/api/atribuicoes');
         });
 
-        it('getAtribuicoesPorServidor should return an empty array if no matching idServidor', () => {
-            const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
-            };
-            atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
+        it('deve lidar com erros na busca', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn().mockRejectedValue(new Error()),
+                post: vi.fn(),
+                put: vi.fn(),
+                del: vi.fn(),
+            });
 
-            const result = atribuicaoTemporariaStore.getAtribuicoesPorServidor(999);
-            expect(result.length).toBe(0);
+            const store = useAtribuicaoTemporariaStore();
+            await store.fetchAtribuicoes();
+
+            expect(store.error).toBe('Falha ao buscar atribuições.');
+        });
+    });
+
+    describe('criarAtribuicao', () => {
+        it('deve criar uma atribuição e recarregar a lista', async () => {
+            const postMock = vi.fn().mockResolvedValue({});
+            const getMock = vi.fn().mockResolvedValue({ data: [] });
+            mockedUseApi.mockReturnValue({
+                get: getMock,
+                post: postMock,
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useAtribuicaoTemporariaStore();
+            const novaAtribuicao = { idServidor: 3, unidade: 'TESTE' };
+            await store.criarAtribuicao(novaAtribuicao as any);
+
+            expect(postMock).toHaveBeenCalledWith('/api/atribuicoes', novaAtribuicao);
+            expect(getMock).toHaveBeenCalledWith('/api/atribuicoes');
+        });
+
+        it('deve lançar um erro em caso de falha', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn(),
+                post: vi.fn().mockRejectedValue(new Error()),
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useAtribuicaoTemporariaStore();
+            await expect(store.criarAtribuicao({} as any)).rejects.toThrow('Falha ao criar atribuição.');
         });
     });
 
     describe('getters', () => {
-        it('getAtribuicoesPorUnidade should filter atribuicoes by unidade', () => {
-            const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
-                justificativa: 'J1'
-            };
-            const atribuicao2: AtribuicaoTemporaria = {
-                unidade: 'SESEL',
-                idServidor: 2,
-                dataInicio: new Date('2025-02-01'),
-                dataTermino: new Date('2025-02-28'),
-                justificativa: 'J2'
-            };
-            const atribuicao3: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 3,
-                dataInicio: new Date('2025-03-01'),
-                dataTermino: new Date('2025-03-31'),
-                justificativa: 'J3'
-            };
+        it('deve filtrar atribuições por servidor e unidade', () => {
+            const store = useAtribuicaoTemporariaStore();
+            store.items = mockAtribuicoes as any;
 
-            atribuicaoTemporariaStore.$patch({
-                atribuicoes: [atribuicao1, atribuicao2, atribuicao3]
-            });
-
-            const result = atribuicaoTemporariaStore.getAtribuicoesPorUnidade('COSIS');
-            expect(result.length).toBe(2);
-            expect(result[0]).toEqual(atribuicao1);
-            expect(result[1]).toEqual(atribuicao3);
-        });
-
-        it('getAtribuicoesPorUnidade should return an empty array if no matching unidade', () => {
-            const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'COSIS', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
-            };
-            atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
-
-            const result = atribuicaoTemporariaStore.getAtribuicoesPorUnidade('NONEXISTENT');
-            expect(result.length).toBe(0);
+            expect(store.getAtribuicoesPorServidor(1).length).toBe(1);
+            expect(store.getAtribuicoesPorServidor(1)[0].unidade).toBe('COSIS');
+            expect(store.getAtribuicoesPorUnidade('SESEL').length).toBe(1);
+            expect(store.getAtribuicoesPorUnidade('SESEL')[0].idServidor).toBe(2);
         });
     });
 });

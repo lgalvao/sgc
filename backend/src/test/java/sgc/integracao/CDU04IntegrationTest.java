@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.SituacaoProcesso;
@@ -51,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
-@Import(TestSecurityConfig.class)
 class CDU04IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
