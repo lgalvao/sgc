@@ -26,9 +26,11 @@ export const useAlertasStore = defineStore('alertas', {
         alertasServidor: alertasServidorMock.map(parseAlertaServidorDates) as AlertaServidor[]
     }),
     getters: {
-        getAlertasDoServidor: (state) => () => {
+        getAlertasDoServidor(state) {
             const perfilStore = usePerfilStore();
             const servidorLogado = perfilStore.servidorId;
+
+            if (!servidorLogado) return [];
 
             return state.alertas.map(alerta => {
                 const alertaServidor = state.alertasServidor.find(
@@ -42,16 +44,14 @@ export const useAlertasStore = defineStore('alertas', {
                 };
             });
         },
-        getAlertasNaoLidos: (state) => () => {
+        getAlertasNaoLidos(state) {
             const perfilStore = usePerfilStore();
             const servidorLogado = perfilStore.servidorId;
+            if (!servidorLogado) return [];
 
-            return state.alertas.filter(alerta => {
-                const alertaServidor = state.alertasServidor.find(
-                    as => as.idAlerta === alerta.id && as.idServidor === servidorLogado
-                );
-                return !alertaServidor?.lido;
-            });
+            const alertasDoServidor = this.getAlertasDoServidor;
+
+            return alertasDoServidor.filter(alerta => !alerta.lido);
         }
     },
     actions: {
