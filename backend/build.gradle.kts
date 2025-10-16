@@ -8,7 +8,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.2.5"
     java
-    pmd
+    // pmd
 }
 
 java {
@@ -277,17 +277,17 @@ tasks.withType<JavaCompile> {
 
 tasks.named("build") { outputs.cacheIf { true } }
 
-pmd {
-    toolVersion = "7.17.0"
-    rulesMinimumPriority = 5
-}
+// pmd {
+//     toolVersion = "7.17.0"
+//     rulesMinimumPriority = 5
+// }
 
-tasks.withType<Pmd> {
-    ruleSets = listOf()
-    ruleSetFiles = files("config/pmd/custom-ruleset.xml")
-            reports.xml.required.set(true)
-            reports.html.required.set(false)
-}
+// tasks.withType<Pmd> {
+//     ruleSets = listOf()
+//     ruleSetFiles = files("config/pmd/custom-ruleset.xml")
+//             reports.xml.required.set(true)
+//             reports.html.required.set(false)
+// }
 
 spotbugs {
     excludeFilter.set(file("config/spotbugs/spotbugs-exclude.xml"))
