@@ -76,11 +76,13 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.withType<BootJar> {
-    enabled = true
     if (project.hasProperty("withFrontend") && project.property("withFrontend").toString() == "true") {
         dependsOn(":copyFrontend")
     }
-    mainClass.set("sgc.SgcApplication")
+}
+
+tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+    mainClass.set("sgc.Sgc")
 }
 
 tasks.withType<Test> {
