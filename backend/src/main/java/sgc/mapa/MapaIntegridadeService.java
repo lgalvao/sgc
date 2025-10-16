@@ -22,9 +22,6 @@ public class MapaIntegridadeService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    private final MapaService mapaService;
-
-
 
     public void validarIntegridadeMapa(Long idMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);

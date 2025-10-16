@@ -46,10 +46,6 @@ public class ProcessoServiceTest {
         unidadeRepo = mock(UnidadeRepo.class);
         UnidadeProcessoRepo unidadeProcessoRepo = mock(UnidadeProcessoRepo.class);
         SubprocessoRepo subprocessoRepo = mock(SubprocessoRepo.class);
-        MapaRepo mapaRepo = mock(MapaRepo.class);
-        MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
-        UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
-        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);

@@ -46,23 +46,15 @@ public class ProcessoServiceDetalhesTest {
     @BeforeEach
     public void setup() {
         processoRepo = mock(ProcessoRepo.class);
-        UnidadeRepo unidadeRepo = mock(UnidadeRepo.class);
         unidadeProcessoRepo = mock(UnidadeProcessoRepo.class);
         subprocessoRepo = mock(SubprocessoRepo.class);
-        MapaRepo mapaRepo = mock(MapaRepo.class);
-        MovimentacaoRepo movimentacaoRepo = mock(MovimentacaoRepo.class);
-        UnidadeMapaRepo unidadeMapaRepo = mock(UnidadeMapaRepo.class);
-        CopiaMapaService servicoDeCopiaDeMapa = mock(CopiaMapaService.class);
         ApplicationEventPublisher publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        NotificacaoService notificacaoService = mock(NotificacaoService.class);
-        NotificacaoModeloEmailService notificacaoModeloEmailService = mock(NotificacaoModeloEmailService.class);
-        SgrhService sgrhService = mock(SgrhService.class);
         ProcessoMapper processoMapper = mock(ProcessoMapper.class);
         processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
 
         new ProcessoService(
                 processoRepo,
-                unidadeRepo,
+                mock(UnidadeRepo.class),
                 unidadeProcessoRepo,
                 subprocessoRepo,
                 publicadorDeEventos,
