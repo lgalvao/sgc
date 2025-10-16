@@ -6,6 +6,7 @@ import sgc.atividade.modelo.Atividade;
 
 import java.io.Serializable;
 
+@SuppressWarnings("PMD.DataClass")
 @Entity
 @Table(name = "COMPETENCIA_ATIVIDADE", schema = "sgc")
 @Getter

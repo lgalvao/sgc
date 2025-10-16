@@ -14,4 +14,7 @@ public class PerfilUnidade {
     private Perfil perfil;
     private Unidade unidade;
 
+    public String getSiglaUnidade() {
+        return unidade.getSigla();
+    }
 }

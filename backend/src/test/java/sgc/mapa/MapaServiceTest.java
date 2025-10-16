@@ -13,22 +13,17 @@ import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -46,9 +41,6 @@ class MapaServiceTest {
 
     @Mock
     private SubprocessoRepo repositorioSubprocesso;
-
-    @Mock
-    private sgc.atividade.modelo.AtividadeRepo atividadeRepo;
 
     @InjectMocks
     private MapaService mapaServico;
@@ -101,68 +93,5 @@ class MapaServiceTest {
         assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L))
                 .isInstanceOf(ErroDominioNaoEncontrado.class)
                 .hasMessage("Mapa não encontrado: 1");
-    }
-
-    @Test
-    void obterMapaSubprocesso_deveRetornarMapa_quandoSubprocessoTemMapa() {
-        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
-
-        MapaCompletoDto result = mapaServico.obterMapaSubprocesso(100L);
-
-        assertThat(result).isNotNull();
-        assertThat(result.codigo()).isEqualTo(mapa.getCodigo());
-    }
-
-    @Test
-    void obterMapaSubprocesso_deveLancarErro_quandoSubprocessoNaoTemMapa() {
-        subprocesso.setMapa(null);
-        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
-
-        assertThatThrownBy(() -> mapaServico.obterMapaSubprocesso(100L))
-                .isInstanceOf(ErroDominioNaoEncontrado.class)
-                .hasMessage("Subprocesso não possui mapa associado");
-    }
-
-    @Test
-    void validarMapaCompleto_deveLancarErro_quandoCompetenciaNaoTemAtividades() {
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        when(repositorioSubprocesso.findAll()).thenReturn(List.of(subprocesso));
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> mapaServico.validarMapaCompleto(1L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("A competência 'Competência 1' não possui atividades vinculadas");
-    }
-
-    @Test
-    void salvarMapaSubprocesso_deveAtualizarSituacao_quandoPrimeiraEdicao() {
-        SalvarMapaRequest request = new SalvarMapaRequest("Obs", List.of(new CompetenciaMapaDto(1L, "Comp 1", List.of(1L))));
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
-        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapa);
-        when(repositorioCompetencia.findById(1L)).thenReturn(Optional.of(competencia));
-        when(repositorioCompetencia.save(any(Competencia.class))).thenReturn(competencia);
-        when(atividadeRepo.existsById(1L)).thenReturn(true);
-
-        mapaServico.salvarMapaSubprocesso(100L, request, 123456789012L);
-
-        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_CRIADO);
-    }
-
-    @Test
-    void salvarMapaSubprocesso_deveLancarErro_quandoSituacaoInvalida() {
-        SalvarMapaRequest request = new SalvarMapaRequest("Obs", Collections.emptyList());
-        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
-
-        assertThatThrownBy(() -> mapaServico.salvarMapaSubprocesso(100L, request, 123456789012L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: NAO_INICIADO");
     }
 }

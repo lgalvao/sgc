@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.CouplingBetweenObjects"})
 @Service
 @RequiredArgsConstructor
 public class SubprocessoDtoService {

@@ -10,64 +10,42 @@ O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências 
 
 ```mermaid
 graph TD
-    subgraph "Frontend (Cliente)"
-        direction LR
-        Frontend
+    subgraph "1. Frontend (Cliente)"
+        Frontend[Aplicação Vue.js]
     end
 
-    subgraph "API (sgc.*.controle)"
-        direction LR
-        ProcessoControle
-        SubprocessoControle
-        AtividadeControle
+    subgraph "2. Camada de API"
+        API[Controladores REST]
     end
 
-    subgraph "Camada de Serviço (sgc.*.servico)"
-        direction LR
-        P[processo]
-        SP[subprocesso]
-        M[mapa]
-        A[atividade]
+    subgraph "3. Camada de Serviço"
+        Servico[Serviços de Negócio]
+        Processo[Processo Orquestrador]
     end
 
-    subgraph "Camada de Domínio e Dados (sgc.*.modelo, sgrh)"
-        direction LR
-        Dominio[Entidades JPA]
-        SGRH[sgrh]
-        Unidade[unidade]
+    subgraph "4. Camada de Domínio e Dados"
+        Dominio[Entidades JPA & Repositórios]
+        IntegracaoRH[SGRH & Unidade]
     end
 
-    subgraph "Módulos de Suporte"
-        direction LR
-        Notificacao[notificacao]
-        Alerta[alerta]
-        Analise[analise]
-        Comum[comum]
+    subgraph "5. Módulos Reativos & Suporte"
+        Eventos[Eventos de Domínio]
+        Notificacao[Notificação]
+        Alerta[Alerta]
+        Comum[Comum Utilitários]
     end
 
-    Frontend --> ProcessoControle
-    Frontend --> SubprocessoControle
-    Frontend --> AtividadeControle
+    Frontend --> API
+    API --> Servico
+    Servico --> Dominio
 
-    ProcessoControle --> P
-    SubprocessoControle --> SP
-    AtividadeControle --> A
+    Processo -- Publica --> Eventos
+    Eventos --> Notificacao
+    Eventos --> Alerta
 
-    P --> SP
-    P --> M
-    P -- Publica eventos para --> Notificacao & Alerta
+    IntegracaoRH -- Popula Dados --> Dominio
 
-    SP -- Utiliza --> M
-    SP -- Registra --> Analise
-
-    M -- Utiliza --> A
-
-    A -- Gerencia --> Dominio
-
-    P & SP & A -- Utilizam --> Dominio & Unidade
-    Dominio & Unidade -- Populados por --> SGRH
-
-    Comum -- Fornece suporte para --> P & SP & M & A & Notificacao & Alerta & Analise
+    Comum -- Suporte Geral --> Servico & Dominio & Notificacao & Alerta
 ```
 
 ## Módulos Principais (`src/main/java/sgc/`)

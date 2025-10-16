@@ -65,7 +65,7 @@ public class UsuarioService {
         // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
         // Para esta simulação, apenas registramos a escolha.
         log.info("Usuário com título {} entrou com sucesso. Perfil: {}, Unidade: {}",
-            tituloEleitoral, pu.getPerfil(), pu.getUnidade().getSigla());
+            tituloEleitoral, pu.getPerfil(), pu.getSiglaUnidade());
     }
 
     public void entrar(EntrarRequest request) {

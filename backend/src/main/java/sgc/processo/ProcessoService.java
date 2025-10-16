@@ -31,14 +31,7 @@ public class ProcessoService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeProcessoRepo unidadeProcessoRepo;
     private final SubprocessoRepo subprocessoRepo;
-    private final MapaRepo mapaRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
-    private final UnidadeMapaRepo unidadeMapaRepo;
-    private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ApplicationEventPublisher publicadorDeEventos;
-    private final ProcessoNotificacaoService processoNotificacaoService;
-    private final ProcessoIniciacaoService processoIniciacaoService;
-    private final ProcessoFinalizacaoService processoFinalizacaoService;
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 

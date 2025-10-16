@@ -1,3 +1,4 @@
+import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -6,7 +7,6 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.2.5"
-    id("org.sonarqube") version "5.1.0.4882"
     java
     pmd
 }
@@ -18,37 +18,55 @@ java {
 
 extra["jjwt.version"] = "0.13.0"
 extra["mapstruct.version"] = "1.6.3"
+extra["lombok.version"] = "1.18.42"
 
 dependencies {
+    // Spring
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+
+    // BD
     runtimeOnly("org.postgresql:postgresql")
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
+    annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
+    testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
+
+    // MapStruct
+    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
+    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+
+    // JWT
     implementation("io.jsonwebtoken:jjwt-api:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${property("jjwt.version")}")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${property("jjwt.version")}")
-    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
-    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+
+    // Segurança
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+
+    // Testes
     testImplementation("com.h2database:h2")
     testImplementation("org.awaitility:awaitility")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testAnnotationProcessor("org.projectlombok:lombok")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
-    implementation("ch.qos.logback:logback-core:1.5.19")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Documentação da API
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-    implementation("org.apache.commons:commons-lang3:3.19.0")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
+
+    // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
+    implementation("org.apache.commons:commons-lang3:3.19.0")
+    implementation("ch.qos.logback:logback-core:1.5.19")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -70,7 +88,7 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     forkEvery = 100L
     jvmArgs = listOf(
-        "-Xmx8g",
+        "-Xmx4g",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
         "-Dlogging.level.org.hibernate=ERROR",
@@ -93,7 +111,7 @@ tasks.withType<Test> {
         if (byteBuddyAgentFile != null) {
             jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
         } else {
-            logger.warn("byte-buddy-agent not found in testRuntimeClasspath. Mockito warnings might persist.")
+            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
 
@@ -142,14 +160,13 @@ tasks.withType<Test> {
                     totalTests++
                     skipped.add("${desc.className ?: "Unknown"}.${desc.name}")
                 }
+
                 else -> {}
             }
         }
 
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            if (suite.parent == null) {
-                outputAgentSummary(result, failures, skipped)
-            }
+            if (suite.parent == null) outputAgentSummary(result, failures, skipped)
         }
 
         private fun getRootCause(exception: Throwable?): Throwable? {
@@ -202,7 +219,7 @@ tasks.withType<Test> {
             println("Ignorados: ${result.skippedTestCount}")
             println("Tempo:  %.2fs".format(durationSec))
             if (failures.isNotEmpty()) {
-                println("\n$separator2")
+                println(separator2)
                 println("TESTES FALHANDO (${failures.size})")
                 println(separator2)
                 failures.forEachIndexed { index, failure ->
@@ -223,7 +240,7 @@ tasks.withType<Test> {
                 println(separator2)
                 skipped.forEach { println("  • $it") }
             }
-            println("\n$separator")
+            println(separator)
         }
     })
 
@@ -231,6 +248,7 @@ tasks.withType<Test> {
         html.required.set(false)
         junitXml.required.set(false)
     }
+
     failFast = project.hasProperty("failFast")
 }
 
@@ -248,56 +266,54 @@ tasks.withType<JavaCompile> {
         isFork = true
         encoding = "UTF-8"
     }
+    options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: emptyList()) + listOf(
+        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED",
+        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    )
 }
 
-tasks.named("build") {
-    outputs.cacheIf { true }
-}
+tasks.named("build") { outputs.cacheIf { true } }
 
 pmd {
-    toolVersion = "7.16.0"
+    toolVersion = "7.17.0"
     rulesMinimumPriority = 5
 }
 
 tasks.withType<Pmd> {
     ruleSets = listOf()
-    ruleSetFiles = files("../config/pmd/custom-ruleset.xml")
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
+    ruleSetFiles = files("config/pmd/custom-ruleset.xml")
+            reports.xml.required.set(true)
+            reports.html.required.set(false)
+}
+
+spotbugs {
+    excludeFilter.set(file("config/spotbugs/spotbugs-exclude.xml"))
+}
+
+tasks.withType<SpotBugsTask> {
+    reports.create("html") {
+        required.set(false)
+    }
+    reports.create("xml") {
+        required.set(true)
+        outputLocation.set(file("${layout.buildDirectory.get()}/reports/spotbugs/spotbugs.xml"))
     }
 }
 
-tasks.spotbugsMain {
-    enabled = true
-}
-
-tasks.spotbugsTest {
-    enabled = true
-}
-
-tasks.pmdMain {
-    enabled = false
-}
-
-tasks.pmdTest {
-    enabled = false
-}
-
-
 tasks.register("agentTest") {
     group = "verification"
-    description = "Run tests with agent-optimized output"
+    description = "Rodar testes com saída otimizada para agentes"
     dependsOn("test")
 }
 
+
 tasks.register<Test>("verboseTest") {
-    group = "verification"
-    description = "Run tests with verbose output for debugging"
     useJUnitPlatform()
+    group = "verification"
+    description = "Rodar testes com saída completa"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
-    forkEvery = 100L
-    jvmArgs = tasks.withType<Test>().getByName("test").jvmArgs
+    jvmArgs.set(tasks.withType<Test>().getByName("test").jvmArgs)
 
     val byteBuddyAgentFile =
         project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
@@ -306,7 +322,7 @@ tasks.register<Test>("verboseTest") {
         if (byteBuddyAgentFile != null) {
             jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
         } else {
-            logger.warn("byte-buddy-agent not found in testRuntimeClasspath. Mockito warnings might persist.")
+            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
 
@@ -319,23 +335,6 @@ tasks.register<Test>("verboseTest") {
         showStandardStreams = true
     }
 
-    failFast = project.hasProperty("failFast")
-
-    // Copia a configuração da tarefa de teste padrão para garantir que os testes sejam encontrados e executados
     testClassesDirs = tasks.test.get().testClassesDirs
     classpath = tasks.test.get().classpath
-}
-
-sonar {
-    properties {
-        property("sonar.projectKey", "sgc-backend")
-        property("sonar.projectName", "SGC :: Backend")
-        property("sonar.host.url", "http://localhost:9000")
-        property("sonar.token", System.getenv("SONAR_TOKEN") ?: "")
-        property("sonar.sources", "src/main/java")
-        property("sonar.tests", "src/test/java")
-        property("sonar.java.binaries", "${layout.buildDirectory.get()}/classes/java/main")
-        property("sonar.junit.reportPaths", "${layout.buildDirectory.get()}/test-results/test")
-        property("sonar.qualitygate.wait", "true")
-    }
 }

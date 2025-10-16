@@ -73,23 +73,18 @@ public class SubprocessoWorkflowService {
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização da revisão do cadastro de atividades"));
         analiseService.removerPorSubprocesso(sp.getCodigo());
 
-        // Notification
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeSuperior);
 
         publicadorDeEventos.publishEvent(new SubprocessoRevisaoDisponibilizadaEvento(sp.getCodigo()));
     }
 
     private void validarSubprocessoParaDisponibilizacao(Subprocesso sp, Usuario usuario, Long idSubprocesso) {
-        // Authorization Check
         if (!sp.getUnidade().getTitular().equals(usuario)) {
             throw new ErroDominioAccessoNegado("Usuário não é o chefe da unidade do subprocesso.");
         }
-
-        // Validation Check
         if (!subprocessoService.obterAtividadesSemConhecimento(idSubprocesso).isEmpty()) {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.");
         }
-
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
@@ -127,8 +122,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC").orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
         repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
 
         subprocessoNotificacaoService.notificarDisponibilizacaoMapa(sp);
@@ -170,18 +164,22 @@ public class SubprocessoWorkflowService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes(justificativa)
-            .tipo(TipoAnalise.VALIDACAO)
-            .acao(TipoAcaoAnalise.DEVOLUCAO)
-            .unidadeSigla(usuario.getUnidade().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
-            .motivo(justificativa)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes(justificativa)
+                .tipo(TipoAnalise.VALIDACAO)
+                .acao(TipoAcaoAnalise.DEVOLUCAO)
+                .unidadeSigla(usuario.getUnidade().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(justificativa)
+                .build());
 
         Unidade unidadeDevolucao = sp.getUnidade();
-
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), unidadeDevolucao, "Devolução da validação do mapa de competências para ajustes"));
+        repositorioMovimentacao.save(new Movimentacao(
+                sp,
+                sp.getUnidade().getUnidadeSuperior(),
+                unidadeDevolucao,
+                "Devolução da validação do mapa de competências para ajustes")
+        );
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         sp.setDataFimEtapa2(null);
@@ -196,14 +194,14 @@ public class SubprocessoWorkflowService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes("Aceite da validação")
-            .tipo(TipoAnalise.VALIDACAO)
-            .acao(TipoAcaoAnalise.ACEITE)
-            .unidadeSigla(usuario.getUnidade().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
-            .motivo(null)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes("Aceite da validação")
+                .tipo(TipoAnalise.VALIDACAO)
+                .acao(TipoAcaoAnalise.ACEITE)
+                .unidadeSigla(usuario.getUnidade().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(null)
+                .build());
 
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         Unidade proximaUnidade = unidadeSuperior != null ? unidadeSuperior.getUnidadeSuperior() : null;
@@ -250,14 +248,14 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes(observacoes)
-            .tipo(TipoAnalise.CADASTRO)
-            .acao(TipoAcaoAnalise.DEVOLUCAO)
-            .unidadeSigla(usuario.getUnidade().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
-            .motivo(motivo)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.DEVOLUCAO)
+                .unidadeSigla(usuario.getUnidade().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(motivo)
+                .build());
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
@@ -275,14 +273,14 @@ public class SubprocessoWorkflowService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes(observacoes)
-            .tipo(TipoAnalise.CADASTRO)
-            .acao(TipoAcaoAnalise.ACEITE)
-            .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuarioTituloEleitoral))
-            .motivo(null)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.ACEITE)
+                .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuarioTituloEleitoral))
+                .motivo(null)
+                .build());
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
@@ -328,14 +326,14 @@ public class SubprocessoWorkflowService {
         }
 
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes(observacoes)
-            .tipo(TipoAnalise.CADASTRO)
-            .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
-            .unidadeSigla(usuario.getUnidade().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
-            .motivo(motivo)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.DEVOLUCAO_REVISAO)
+                .unidadeSigla(usuario.getUnidade().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(motivo)
+                .build());
 
         Unidade unidadeAnalise = usuario.getUnidade();
         Unidade unidadeDestino = sp.getUnidade(); // A devolução é para a unidade do subprocesso
@@ -361,14 +359,14 @@ public class SubprocessoWorkflowService {
         }
 
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(idSubprocesso)
-            .observacoes(observacoes)
-            .tipo(TipoAnalise.CADASTRO)
-            .acao(TipoAcaoAnalise.ACEITE_REVISAO)
-            .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
-            .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
-            .motivo(null)
-            .build());
+                .subprocessoCodigo(idSubprocesso)
+                .observacoes(observacoes)
+                .tipo(TipoAnalise.CADASTRO)
+                .acao(TipoAcaoAnalise.ACEITE_REVISAO)
+                .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
+                .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
+                .motivo(null)
+                .build());
 
         Unidade unidadeOrigem = sp.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();

@@ -8,7 +8,7 @@ A integração será realizada de forma iterativa, módulo por módulo (ex: Proc
 
 1.  **Configurar a comunicação** entre o servidor de desenvolvimento do frontend e o backend.
 2.  **Centralizar o acesso à API** para reutilização de código e fácil manutenção.
-3.  **Implementar o fluxo de autenticação** real.
+3.  **Implementar o fluxo de autenticação** realista -- mas por enquanto mockado no nível de serviços
 4.  **Substituir os dados mockados** por chamadas à API dentro dos `stores` do Pinia.
 5.  **Mapear os DTOs** do backend para os tipos de dados do frontend.
 6.  **Definir um padrão para tratamento de erros** da API.
@@ -18,20 +18,6 @@ A integração será realizada de forma iterativa, módulo por módulo (ex: Proc
 ### 2.1. Configuração do Proxy do Servidor de Desenvolvimento
 
 O `vite.config.js` já possui a configuração de proxy necessária. Todas as requisições feitas pelo frontend para o caminho `/api` serão automaticamente redirecionadas para o servidor backend em `http://localhost:8080`.
-
-**Ação:** Nenhuma ação é necessária. A configuração existente será utilizada.
-
-```javascript
-// frontend/vite.config.js
-server: {
-    proxy: {
-        '/api': {
-            target: 'http://localhost:8080',
-            changeOrigin: true
-        }
-    }
-}
-```
 
 ### 2.2. Criação de um Cliente de API Centralizado
 
@@ -109,7 +95,19 @@ A estratégia de testes deve ser atualizada:
 
 *   **Testes Unitários (Vitest):** Os testes de stores devem ser adaptados para mockar as chamadas do `useApi`, permitindo testar a lógica do store (actions, mutations) isoladamente.
 *   **Testes End-to-End (Playwright):** Devem ser criados novos testes E2E para os fluxos mais críticos (login, cadastro de processo, etc.). Como o Playwright opera contra um ambiente real, ele testará a integração completa, desde a UI até o banco de dados do backend.
+*   **Verificação Contínua:** Para cada funcionalidade integrada, o agente deve rodar os testes unitários e/ou E2E relacionados para garantir a estabilidade e o correto funcionamento.
 
 ## 3. Conclusão
 
-Este plano fornece um roteiro claro para a integração do frontend com o backend. A abordagem gradual e modular minimiza os riscos e permite a entrega contínua de valor. A chave para o sucesso será a comunicação constante entre as equipes de frontend e backend para garantir o alinhamento dos contratos de API (endpoints, DTOs).
+Este plano fornece um roteiro claro para a integração do frontend com o backend. A abordagem gradual e modular minimiza os riscos e permite a entrega contínua de valor. A chave para o sucesso será a comunicação constante entre as equipes de frontend e backend para garantir o alinhamento dos contratos de API (endpoints, DTOs). Para cada funcionalidade integrada, o agente deve propor commits intermediários, garantindo rastreabilidade e facilitando a revisão do código.
+
+## 4. Recomendações para Robustez Adicional
+
+Para aumentar ainda mais a robustez e a resiliência da aplicação, considere as seguintes recomendações:
+
+*   **Versionamento da API:** Estabelecer uma política clara de versionamento da API para gerenciar mudanças e evitar quebras de compatibilidade entre frontend e backend.
+*   **Mecanismo de Retry/Backoff:** Implementar um mecanismo de retry com backoff exponencial no `useApi` para lidar com falhas de rede temporárias ou sobrecarga do servidor, aumentando a resiliência das chamadas.
+*   **Cache de Dados:** Para endpoints que retornam dados que não mudam com frequência, considere implementar um cache no frontend (no `useApi` ou nos stores) para melhorar a performance e reduzir a carga no backend.
+*   **Estados de Carregamento (Loading States):** Gerenciar explicitamente os estados de carregamento (`isLoading`, `isError`) nos stores e componentes para fornecer feedback visual ao usuário durante as operações assíncronas.
+*   **Validação de Dados Abrangente:** Reforçar a validação de dados tanto no frontend quanto no backend para garantir a integridade e consistência das informações.
+*   **Documentação de Endpoints:** Manter uma documentação clara e atualizada dos endpoints da API (utilizando ferramentas como Swagger/OpenAPI) para facilitar a comunicação e o alinhamento entre as equipes de frontend e backend.

@@ -25,6 +25,9 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.modelo.TipoProcesso;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -118,6 +121,7 @@ public class CDU03IntegrationTest {
                 .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição")); // Mensagem de validação
     }
 
+    @Test
     void testCriarProcesso_semUnidades_falha() throws Exception {
         CriarProcessoReq requestDTO = criarCriarProcessoReq(
                 "Processo sem unidades",
@@ -131,9 +135,10 @@ public class CDU03IntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String responseBody = result.getResponse().getContentAsString();
+        String responseBody = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         try {
-            java.nio.file.Files.write(java.nio.file.Paths.get("C:\\sgc\\test-output.txt"), responseBody.getBytes());
+            Files.createDirectories(Paths.get("build"));
+            Files.write(Paths.get("build/test-output.txt"), responseBody.getBytes(StandardCharsets.UTF_8));
         } catch (java.io.IOException e) {
             // Ignore for test purposes
         }

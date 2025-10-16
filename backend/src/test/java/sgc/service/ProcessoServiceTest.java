@@ -53,23 +53,13 @@ public class ProcessoServiceTest {
         publicadorDeEventos = mock(ApplicationEventPublisher.class);
         processoMapper = mock(ProcessoMapper.class);
         ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
-        ProcessoIniciacaoService processoIniciacaoService = mock(ProcessoIniciacaoService.class);
-        ProcessoFinalizacaoService processoFinalizacaoService = mock(ProcessoFinalizacaoService.class);
-        ProcessoNotificacaoService processoNotificacaoService = mock(ProcessoNotificacaoService.class);
 
         processoService = new ProcessoService(
                 processoRepo,
                 unidadeRepo,
                 unidadeProcessoRepo,
                 subprocessoRepo,
-                mapaRepo,
-                movimentacaoRepo,
-                unidadeMapaRepo,
-                servicoDeCopiaDeMapa,
                 publicadorDeEventos,
-                processoNotificacaoService,
-                processoIniciacaoService,
-                processoFinalizacaoService,
                 processoMapper,
                 processoDetalheMapperCustom
         );

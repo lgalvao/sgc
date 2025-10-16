@@ -1,0 +1,87 @@
+package sgc.subprocesso;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import sgc.mapa.ImpactoMapaService;
+import sgc.mapa.MapaService;
+import sgc.mapa.MapaVisualizacaoService;
+import sgc.mapa.dto.ImpactoMapaDto;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.SalvarMapaRequest;
+import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
+import sgc.sgrh.Usuario;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.dto.SalvarAjustesReq;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
+
+@RestController
+@RequestMapping("/api/subprocessos")
+@RequiredArgsConstructor
+@Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
+public class SubprocessoMapaControle {
+
+    private final SubprocessoMapaService subprocessoMapaService;
+    private final MapaService mapaService;
+    private final MapaVisualizacaoService mapaVisualizacaoService;
+    private final ImpactoMapaService impactoMapaService;
+    private final SubprocessoDtoService subprocessoDtoService;
+    private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+
+    @GetMapping("/{id}/impactos-mapa")
+    @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
+    public ImpactoMapaDto verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+        return impactoMapaService.verificarImpactos(id, usuario);
+    }
+
+    private final SubprocessoRepo subprocessoRepo;
+
+    @GetMapping("/{id}/mapa")
+    public MapaCompletoDto obterMapa(@PathVariable Long id) {
+        Subprocesso subprocesso = subprocessoRepo.findById(id)
+                .orElseThrow(() -> new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
+        if (subprocesso.getMapa() == null) {
+            throw new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
+        }
+        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo());
+    }
+
+    @GetMapping("/{id}/mapa-visualizacao")
+    public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("id") Long subprocessoId) {
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocessoId);
+    }
+
+    @PutMapping("/{id}/mapa")
+    @Transactional
+    public MapaCompletoDto salvarMapa(
+            @PathVariable Long id,
+            @RequestBody @Valid SalvarMapaRequest request,
+            @AuthenticationPrincipal Usuario usuario
+    ) {
+        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
+    }
+
+    @GetMapping("/{id}/mapa-ajuste")
+    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long id) {
+        return subprocessoDtoService.obterMapaParaAjuste(id);
+    }
+
+    @PutMapping("/{id}/mapa-ajuste")
+    @Transactional
+    public void salvarAjustesMapa(
+            @PathVariable Long id,
+            @RequestBody @Valid SalvarAjustesReq request,
+            @AuthenticationPrincipal Usuario usuario
+    ) {
+        subprocessoMapaService.salvarAjustesMapa(
+                id,
+                request.competencias(),
+                usuario.getTituloEleitoral()
+        );
+    }
+}
