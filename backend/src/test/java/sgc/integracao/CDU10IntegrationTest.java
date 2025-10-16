@@ -38,7 +38,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +100,7 @@ class CDU10IntegrationTest {
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
 
-        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());

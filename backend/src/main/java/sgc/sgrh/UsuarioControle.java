@@ -7,11 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
 import sgc.sgrh.dto.PerfilUnidade;
-import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
 import java.util.List;

@@ -23,6 +23,8 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class SubprocessoWorkflowService {
@@ -94,7 +96,7 @@ public class SubprocessoWorkflowService {
     }
 
     @Transactional
-    public void disponibilizarMapa(Long idSubprocesso, String observacoes, java.time.LocalDate dataLimiteEtapa2, Usuario usuario) {
+    public void disponibilizarMapa(Long idSubprocesso, String observacoes, LocalDateTime dataLimiteEtapa2, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(idSubprocesso)));
 
@@ -208,12 +210,10 @@ public class SubprocessoWorkflowService {
 
         if (proximaUnidade == null) {
             sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-            sp.setDataFimEtapa3(java.time.LocalDateTime.now());
             repositorioSubprocesso.save(sp);
         } else {
             repositorioMovimentacao.save(new Movimentacao(sp, unidadeSuperior, proximaUnidade, "Mapa de competências validado"));
             sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
-            sp.setDataFimEtapa3(java.time.LocalDateTime.now());
             repositorioSubprocesso.save(sp);
             subprocessoNotificacaoService.notificarAceite(sp);
         }

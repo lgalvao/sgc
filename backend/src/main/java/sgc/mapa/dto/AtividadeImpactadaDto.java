@@ -2,8 +2,8 @@ package sgc.mapa.dto;
 
 import sgc.mapa.modelo.TipoImpactoAtividade;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO que representa uma atividade que sofreu alteração durante

@@ -36,7 +36,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -50,28 +50,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
 public class CDU16IntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Repositories
     @Autowired
     private ProcessoRepo processoRepo;
+
     @Autowired
     private UnidadeRepo unidadeRepo;
+
     @Autowired
     private SubprocessoRepo subprocessoRepo;
+
     @Autowired
     private MapaRepo mapaRepo;
+
     @Autowired
     private AtividadeRepo atividadeRepo;
+
     @Autowired
     private CompetenciaRepo competenciaRepo;
+
     @Autowired
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+
     @Autowired
     private UsuarioRepo usuarioRepo;
 
@@ -83,16 +88,27 @@ public class CDU16IntegrationTest {
         admin.setTituloEleitoral(111111111111L);
         admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
         usuarioRepo.save(admin);
-
         unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
+
         Unidade unidade = new Unidade("Unidade Teste", "UT");
         unidadeRepo.save(unidade);
 
-        Processo processo = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processo = new Processo(
+                "Processo de Revisão",
+                TipoProcesso.REVISAO,
+                SituacaoProcesso.EM_ANDAMENTO,
+                LocalDateTime.now().plusDays(30)
+        );
         processoRepo.save(processo);
 
         Mapa mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, processo.getDataLimite());
+        subprocesso = new Subprocesso(
+                processo,
+                unidade,
+                mapa,
+                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                processo.getDataLimite()
+        );
         subprocessoRepo.save(subprocesso);
 
         Competencia c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
@@ -103,7 +119,10 @@ public class CDU16IntegrationTest {
     @Test
     @DisplayName("Deve submeter o mapa ajustado e alterar a situação do subprocesso")
     void deveSubmeterMapaAjustadoComSucesso() throws Exception {
-        SubmeterMapaAjustadoReq request = new SubmeterMapaAjustadoReq("Ajustes realizados conforme solicitado.", LocalDate.now().plusDays(10));
+        var request = new SubmeterMapaAjustadoReq(
+                "Ajustes realizados conforme solicitado.",
+                LocalDateTime.now().plusDays(10)
+        );
 
         mockMvc.perform(post("/api/subprocessos/{id}/submeter-mapa-ajustado", subprocesso.getCodigo())
                         .with(csrf())

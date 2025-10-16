@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import sgc.processo.SituacaoProcesso;
 import sgc.unidade.modelo.TipoUnidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,11 +13,13 @@ class ModeloTest {
     @Test
     void processo_GettersAndSetters() {
         Processo processo = new Processo();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dataLimite = now.plusDays(30);
 
         processo.setCodigo(1L);
-        processo.setDataCriacao(LocalDateTime.now());
-        processo.setDataFinalizacao(LocalDateTime.now());
-        processo.setDataLimite(LocalDate.now().plusDays(30));
+        processo.setDataCriacao(now);
+        processo.setDataFinalizacao(now);
+        processo.setDataLimite(dataLimite);
         processo.setDescricao("Descrição do Processo");
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -25,13 +27,12 @@ class ModeloTest {
         assertEquals(1L, processo.getCodigo());
         assertNotNull(processo.getDataCriacao());
         assertNotNull(processo.getDataFinalizacao());
-        assertEquals(LocalDate.now().plusDays(30), processo.getDataLimite());
+        assertTrue(ChronoUnit.SECONDS.between(dataLimite, processo.getDataLimite()) < 1);
         assertEquals("Descrição do Processo", processo.getDescricao());
         assertEquals(SituacaoProcesso.CRIADO, processo.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
 
-        Processo processo2 = new Processo(LocalDateTime.now(), LocalDateTime.now(),
-                LocalDate.now().plusDays(30), "Descricao", SituacaoProcesso.CRIADO, TipoProcesso.MAPEAMENTO);
+        Processo processo2 = new Processo(now, now, dataLimite, "Descricao", SituacaoProcesso.CRIADO, TipoProcesso.MAPEAMENTO);
         assertNotNull(processo2);
     }
 

@@ -4,15 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-
 import lombok.Getter;
 import sgc.analise.modelo.Analise;
+import sgc.atividade.modelo.Atividade;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.atividade.modelo.Atividade;
-
 
 import java.util.ArrayList;
 import java.util.List;

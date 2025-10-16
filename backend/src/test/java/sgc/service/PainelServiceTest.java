@@ -13,7 +13,6 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class PainelServiceTest {
         p1.setSituacao(SituacaoProcesso.CRIADO);
         p1.setTipo(TipoProcesso.MAPEAMENTO);
         p1.setDataCriacao(LocalDateTime.now());
-        p1.setDataLimite(LocalDate.now());
+        p1.setDataLimite(LocalDateTime.now());
 
         Processo p2 = new Processo();
         p2.setCodigo(2L);
@@ -47,7 +46,7 @@ public class PainelServiceTest {
         p2.setSituacao(SituacaoProcesso.FINALIZADO);
         p2.setTipo(TipoProcesso.MAPEAMENTO);
         p2.setDataCriacao(LocalDateTime.now());
-        p2.setDataLimite(LocalDate.now());
+        p2.setDataLimite(LocalDateTime.now());
 
         UnidadeProcesso up1 = new UnidadeProcesso();
         up1.setCodigo(10L);

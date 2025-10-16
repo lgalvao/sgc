@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.*;
@@ -32,13 +34,11 @@ import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -147,7 +147,7 @@ class CDU04IntegrationTest {
         processo.setDescricao("Processo de Mapeamento Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.CRIADO);
-        processo.setDataLimite(LocalDate.now().plusDays(30));
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
 
         processo = processoRepo.save(processo);
     }

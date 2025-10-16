@@ -24,7 +24,6 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +81,7 @@ public class ProcessoServiceDetalhesTest {
     public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {
         Processo p = mock(Processo.class);
         LocalDateTime dataCriacao = LocalDateTime.now();
-        LocalDate dataLimite = LocalDate.now().plusDays(7);
+        LocalDateTime dataLimite = LocalDateTime.now().plusDays(7);
 
         when(p.getCodigo()).thenReturn(1L);
         when(p.getDescricao()).thenReturn("Proc Teste");
@@ -108,19 +107,19 @@ public class ProcessoServiceDetalhesTest {
         sp.setCodigo(100L);
         sp.setUnidade(unidade);
         sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-        sp.setDataLimiteEtapa1(LocalDate.now().plusDays(5));
+        sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
 
-        ProcessoDetalheDto.UnidadeParticipanteDTO unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
-            .unidadeCodigo(10L)
+        ProcessoDetalheDto.UnidadeParticipanteDto unidadeParticipanteDTO = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+            .codUnidade(10L)
             .nome(DIRETORIA_X)
             .sigla("DX")
             .situacaoSubprocesso(SituacaoSubprocesso.NAO_INICIADO)
-            .dataLimite(LocalDate.now().plusDays(7))
+            .dataLimite(LocalDateTime.now().plusDays(7))
             .build();
         ProcessoResumoDto processoResumoDTO = ProcessoResumoDto.builder()
             .codigo(100L)
             .situacao(SituacaoProcesso.CRIADO)
-            .dataLimite(LocalDate.now().plusDays(5))
+            .dataLimite(LocalDateTime.now().plusDays(5))
             .unidadeCodigo(10L)
             .unidadeNome(DIRETORIA_X)
             .build();

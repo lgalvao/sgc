@@ -1,9 +1,9 @@
 package sgc.mapa;
 
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.HtmlPolicyBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;

@@ -1,14 +1,14 @@
 package sgc.atividade.dto;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.modelo.Atividade;
 import sgc.mapa.modelo.Mapa;
-import org.junit.jupiter.api.BeforeEach;
 import sgc.mapa.modelo.MapaRepo;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 

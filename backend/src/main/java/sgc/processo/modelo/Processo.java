@@ -8,7 +8,6 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.processo.SituacaoProcesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Processo extends EntidadeBase {
 
-    public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDate dataLimite) {
+    public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDateTime dataLimite) {
         super();
         this.descricao = descricao;
         this.tipo = tipo;
@@ -49,7 +48,7 @@ public class Processo extends EntidadeBase {
     private LocalDateTime dataFinalizacao;
 
     @Column(name = "data_limite")
-    private LocalDate dataLimite;
+    private LocalDateTime dataLimite;
 
     @Column(name = "descricao")
     private String descricao;

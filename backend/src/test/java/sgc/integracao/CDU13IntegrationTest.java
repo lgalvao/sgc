@@ -38,7 +38,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -131,7 +131,7 @@ public class CDU13IntegrationTest {
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        subprocesso.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado

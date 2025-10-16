@@ -2,11 +2,18 @@ package sgc.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.processo.ProcessoIniciacaoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.eventos.ProcessoIniciadoEvento;
 import sgc.processo.modelo.*;
@@ -22,15 +29,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.processo.ProcessoIniciacaoService;
-
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 @DisplayName("Testes para o início de mapeamento no ProcessoService")
 @ExtendWith(MockitoExtension.class)

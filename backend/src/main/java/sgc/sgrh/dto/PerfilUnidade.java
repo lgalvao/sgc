@@ -1,10 +1,6 @@
 package sgc.sgrh.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.sgrh.Perfil;
 import sgc.unidade.modelo.Unidade;
 

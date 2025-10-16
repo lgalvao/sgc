@@ -6,7 +6,6 @@ import sgc.processo.modelo.Processo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,9 +29,9 @@ class ModeloTest {
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
-        subprocesso.setDataLimiteEtapa1(LocalDate.now());
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now());
         subprocesso.setDataFimEtapa1(LocalDateTime.now());
-        subprocesso.setDataLimiteEtapa2(LocalDate.now());
+        subprocesso.setDataLimiteEtapa2(LocalDateTime.now());
         subprocesso.setDataFimEtapa2(LocalDateTime.now());
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         
@@ -59,7 +58,7 @@ class ModeloTest {
         mapa.setCodigo(1L);
         
         Subprocesso subprocesso = new Subprocesso(
-            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDate.now()
+            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
         );
         
         assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());

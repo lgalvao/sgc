@@ -3,8 +3,8 @@ package sgc.mapa.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request DTO para salvar um mapa completo.

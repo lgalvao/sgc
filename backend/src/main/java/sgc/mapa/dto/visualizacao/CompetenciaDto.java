@@ -1,8 +1,7 @@
 package sgc.mapa.dto.visualizacao;
 
-import java.util.List;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public record CompetenciaDto(
     Long id,

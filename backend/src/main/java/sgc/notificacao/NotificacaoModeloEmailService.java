@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class NotificacaoModeloEmailService {
             String nomeUnidade,
             String nomeProcesso,
             String tipoProcesso,
-            LocalDate dataLimite) {
+            LocalDateTime dataLimite) {
 
         Context context = new Context();
         context.setVariable("titulo", TITULO_PROCESSO_INICIADO + tipoProcesso);
@@ -93,7 +93,7 @@ public class NotificacaoModeloEmailService {
     public String criarEmailDeMapaDisponibilizado(
             String nomeUnidade,
             String nomeProcesso,
-            LocalDate dataLimiteValidacao) {
+            LocalDateTime dataLimiteValidacao) {
 
         Context context = new Context();
         context.setVariable("titulo", TITULO_MAPA_DISPONIBILIZADO);
@@ -124,7 +124,7 @@ public class NotificacaoModeloEmailService {
      */
     public String criarEmailDeProcessoFinalizado(
             String nomeProcesso,
-            LocalDate dataFinalizacao,
+            LocalDateTime dataFinalizacao,
             int quantidadeMapas) {
 
         Context context = new Context();

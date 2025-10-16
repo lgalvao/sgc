@@ -1,5 +1,7 @@
 package sgc.analise;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -7,8 +9,6 @@ import sgc.analise.dto.CriarAnaliseRequestDto;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
 

@@ -39,7 +39,6 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.*;
@@ -113,7 +112,7 @@ class CDU12IntegrationTest {
                 "Processo de Revisão 2024",
                 TipoProcesso.REVISAO,
                 SituacaoProcesso.EM_ANDAMENTO,
-                LocalDate.now().plusMonths(3)
+                LocalDateTime.now().plusMonths(3)
         );
         processoRepo.save(processoRevisao);
 

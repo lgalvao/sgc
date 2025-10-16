@@ -8,7 +8,7 @@ import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.util.HtmlUtils;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,28 +19,32 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class SubprocessoDetalheDto {
-    private final UnidadeDTO unidade;
-    private final ResponsavelDTO responsavel;
+    private final UnidadeDto unidade;
+    private final ResponsavelDto responsavel;
     private final String situacao;
     private final String localizacaoAtual;
-    private final LocalDate prazoEtapaAtual;
+    private final LocalDateTime prazoEtapaAtual;
     private final List<MovimentacaoDto> movimentacoes;
-    private final List<ElementoProcessoDTO> elementosDoProcesso;
+    private final List<ElementoProcessoDto> elementosProcesso;
 
-    public static SubprocessoDetalheDto of(Subprocesso sp, List<Movimentacao> movimentacoes, List<AtividadeDto> atividades, List<ConhecimentoDto> conhecimentos, MovimentacaoMapper movimentacaoMapper) {
-        UnidadeDTO unidadeDto = null;
+    public static SubprocessoDetalheDto of(Subprocesso sp,
+                                           List<Movimentacao> movimentacoes,
+                                           List<AtividadeDto> atividades,
+                                           List<ConhecimentoDto> conhecimentos,
+                                           MovimentacaoMapper movimentacaoMapper) {
+        UnidadeDto unidadeDto = null;
         if (sp.getUnidade() != null) {
-            unidadeDto = UnidadeDTO.builder()
+            unidadeDto = UnidadeDto.builder()
                 .codigo(sp.getUnidade().getCodigo())
                 .sigla(HtmlUtils.escapeHtml(sp.getUnidade().getSigla()))
                 .nome(HtmlUtils.escapeHtml(sp.getUnidade().getNome()))
                 .build();
         }
 
-        ResponsavelDTO responsavelDto = null;
+        ResponsavelDto responsavelDto = null;
         if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
             var titular = sp.getUnidade().getTitular();
-            responsavelDto = ResponsavelDTO.builder()
+            responsavelDto = ResponsavelDto.builder()
                 .nome(HtmlUtils.escapeHtml(titular.getNome()))
                 .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
                 .email(HtmlUtils.escapeHtml(titular.getEmail()))
@@ -62,12 +66,12 @@ public class SubprocessoDetalheDto {
             movimentacoesDto = movimentacoes.stream().map(movimentacaoMapper::toDTO).collect(Collectors.toList());
         }
 
-        List<ElementoProcessoDTO> elementos = new ArrayList<>();
+        List<ElementoProcessoDto> elementos = new ArrayList<>();
         if (atividades != null) {
-            atividades.forEach(a -> elementos.add(new ElementoProcessoDTO("ATIVIDADE", a)));
+            atividades.forEach(a -> elementos.add(new ElementoProcessoDto("ATIVIDADE", a)));
         }
         if (conhecimentos != null) {
-            conhecimentos.forEach(c -> elementos.add(new ElementoProcessoDTO("CONHECIMENTO", c)));
+            conhecimentos.forEach(c -> elementos.add(new ElementoProcessoDto("CONHECIMENTO", c)));
         }
 
         return SubprocessoDetalheDto.builder()
@@ -77,13 +81,13 @@ public class SubprocessoDetalheDto {
             .localizacaoAtual(localizacaoAtual)
             .prazoEtapaAtual(prazoEtapaAtual)
             .movimentacoes(movimentacoesDto)
-            .elementosDoProcesso(elementos)
+            .elementosProcesso(elementos)
             .build();
     }
 
     @Getter
     @Builder
-    public static class UnidadeDTO {
+    public static class UnidadeDto {
         private final Long codigo;
         private final String sigla;
         private final String nome;
@@ -91,7 +95,7 @@ public class SubprocessoDetalheDto {
 
     @Getter
     @Builder
-    public static class ResponsavelDTO {
+    public static class ResponsavelDto {
         private final Long id;
         private final String nome;
         private final String tipoResponsabilidade;
@@ -99,7 +103,7 @@ public class SubprocessoDetalheDto {
         private final String email;
     }
 
-    public record ElementoProcessoDTO(
+    public record ElementoProcessoDto(
             String tipo,
             Object payload
     ) {

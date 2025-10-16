@@ -35,7 +35,7 @@ public abstract class SubprocessoMapper {
     @Mapping(source = "unidadeCodigo", target = "unidade")
     @Mapping(source = "mapaCodigo", target = "mapa")
     @Mapping(target = "dataFimEtapa2", ignore = true)
-    @Mapping(target = "dataFimEtapa3", ignore = true)
+
     public abstract Subprocesso toEntity(SubprocessoDto dto);
 
     public Processo mapProcesso(Long value) {

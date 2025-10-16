@@ -21,7 +21,6 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +82,7 @@ class EventoProcessoListenerTest {
         subprocessoOperacional.setCodigo(10L);
         subprocessoOperacional.setProcesso(processo);
         subprocessoOperacional.setUnidade(unidadeOperacional);
-        subprocessoOperacional.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
+        subprocessoOperacional.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
 
         evento = new ProcessoIniciadoEvento(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
     }

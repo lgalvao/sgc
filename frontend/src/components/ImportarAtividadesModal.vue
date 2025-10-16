@@ -1,145 +1,145 @@
 <template>
-  <div
-    v-if="mostrar"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
-  >
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            Importação de atividades
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="fechar"
-          />
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label
-              class="form-label"
-              for="processo-select"
-            >Processo</label>
-            <select
-              id="processo-select"
-              v-model="processoSelecionadoId"
-              class="form-select"
-              data-testid="select-processo"
-            >
-              <option
-                disabled
-                value=""
-              >
-                Selecione
-              </option>
-              <option
-                v-for="proc in processosDisponiveis"
-                :key="proc.id"
-                :value="proc.id"
-              >
-                {{ proc.descricao }}
-              </option>
-            </select>
-            <div
-              v-if="!processosDisponiveis.length"
-              class="text-center text-muted mt-3"
-            >
-              Nenhum processo disponível para importação.
-            </div>
+  <div v-if="mostrar">
+    <div
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Importação de atividades
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="fechar"
+            />
           </div>
-
-          <div class="mb-3">
-            <label
-              class="form-label"
-              for="unidade-select"
-            >Unidade</label>
-            <select
-              id="unidade-select"
-              v-model="unidadeSelecionadaId"
-              :disabled="!processoSelecionado"
-              class="form-select"
-              data-testid="select-unidade"
-            >
-              <option
-                disabled
-                value=""
+          <div class="modal-body">
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="processo-select"
+              >Processo</label>
+              <select
+                id="processo-select"
+                v-model="processoSelecionadoId"
+                class="form-select"
+                data-testid="select-processo"
               >
-                Selecione
-              </option>
-              <option
-                v-for="pu in unidadesParticipantes"
-                :key="pu.id"
-                :value="pu.id"
-              >
-                {{ pu.unidade }}
-              </option>
-            </select>
-          </div>
-
-          <div v-if="unidadeSelecionada">
-            <h6>Atividades para importar</h6>
-            <div
-              v-if="atividadesParaImportar.length"
-              class="atividades-container border rounded p-2"
-            >
+                <option
+                  disabled
+                  value=""
+                >
+                  Selecione
+                </option>
+                <option
+                  v-for="proc in processosDisponiveis"
+                  :key="proc.id"
+                  :value="proc.id"
+                >
+                  {{ proc.descricao }}
+                </option>
+              </select>
               <div
-                v-for="ativ in atividadesParaImportar"
-                :key="ativ.id"
-                class="form-check"
+                v-if="!processosDisponiveis.length"
+                class="text-center text-muted mt-3"
               >
-                <input
-                  :id="`ativ-check-${ativ.id}`"
-                  v-model="atividadesSelecionadas"
-                  :value="ativ"
-                  class="form-check-input"
-                  type="checkbox"
-                >
-                <label
-                  :for="`ativ-check-${ativ.id}`"
-                  class="form-check-label"
-                >
-                  {{ ativ.descricao }}
-                </label>
+                Nenhum processo disponível para importação.
               </div>
             </div>
-            <div
-              v-else
-              class="text-center text-muted mt-3"
-            >
-              Nenhuma atividade encontrada para esta unidade/processo.
+
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="unidade-select"
+              >Unidade</label>
+              <select
+                id="unidade-select"
+                v-model="unidadeSelecionadaId"
+                :disabled="!processoSelecionado"
+                class="form-select"
+                data-testid="select-unidade"
+              >
+                <option
+                  disabled
+                  value=""
+                >
+                  Selecione
+                </option>
+                <option
+                  v-for="pu in unidadesParticipantes"
+                  :key="pu.id"
+                  :value="pu.id"
+                >
+                  {{ pu.unidade }}
+                </option>
+              </select>
+            </div>
+
+            <div v-if="unidadeSelecionada">
+              <h6>Atividades para importar</h6>
+              <div
+                v-if="atividadesParaImportar.length"
+                class="atividades-container border rounded p-2"
+              >
+                <div
+                  v-for="ativ in atividadesParaImportar"
+                  :key="ativ.id"
+                  class="form-check"
+                >
+                  <input
+                    :id="`ativ-check-${ativ.id}`"
+                    v-model="atividadesSelecionadas"
+                    :value="ativ"
+                    class="form-check-input"
+                    type="checkbox"
+                  >
+                  <label
+                    :for="`ativ-check-${ativ.id}`"
+                    class="form-check-label"
+                  >
+                    {{ ativ.descricao }}
+                  </label>
+                </div>
+              </div>
+              <div
+                v-else
+                class="text-center text-muted mt-3"
+              >
+                Nenhuma atividade encontrada para esta unidade/processo.
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            data-testid="btn-modal-cancelar"
-            @click="fechar"
-          >
-            Cancelar
-          </button>
-          <button
-            :disabled="!atividadesSelecionadas.length"
-            class="btn btn-outline-primary"
-            type="button"
-            data-testid="btn-importar"
-            @click="importar"
-          >
-            Importar
-          </button>
+          <div class="modal-footer">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              data-testid="btn-modal-cancelar"
+              @click="fechar"
+            >
+              Cancelar
+            </button>
+            <button
+              :disabled="!atividadesSelecionadas.length"
+              class="btn btn-outline-primary"
+              type="button"
+              data-testid="btn-importar"
+              @click="importar"
+            >
+              Importar
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <div
+      class="modal-backdrop fade show"
+    />
   </div>
-  <div
-    v-if="mostrar"
-    class="modal-backdrop fade show"
-  />
 </template>
 
 <script lang="ts" setup>

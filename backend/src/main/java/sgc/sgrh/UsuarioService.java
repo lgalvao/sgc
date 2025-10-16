@@ -29,7 +29,7 @@ public class UsuarioService {
      * @return Sempre `true` para simular sucesso.
      */
     public boolean autenticar(long tituloEleitoral, String senha) {
-        log.info("Simulando autenticação para o título eleitoral: {}", tituloEleitoral);
+        log.info("Simulando autenticação para: {}/{}", tituloEleitoral, senha);
         // Em um cenário real, aqui haveria a chamada para o AcessoAD.
         // Para esta simulação, consideramos sempre autenticado com sucesso.
         return true;

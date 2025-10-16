@@ -1,7 +1,7 @@
 package sgc.mapa.dto;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO que representa um mapa completo com todas as suas competências 

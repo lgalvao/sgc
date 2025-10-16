@@ -41,7 +41,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,7 +138,7 @@ public class CDU20IntegrationTest {
         processo = new Processo("Processo de Validação",
                 TipoProcesso.MAPEAMENTO,
                 SituacaoProcesso.EM_ANDAMENTO,
-                LocalDate.now().plusDays(30));
+                LocalDateTime.now().plusDays(30));
 
         processoRepo.save(processo);
 

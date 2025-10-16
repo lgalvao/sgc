@@ -11,6 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -21,10 +23,8 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,7 +62,7 @@ public class CDU06IntegrationTest {
         processo.setDescricao("Processo de Teste");
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDataLimite(LocalDate.now().plusDays(10));
+        processo.setDataLimite(LocalDateTime.now().plusDays(10));
         processoRepo.save(processo);
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());

@@ -1,4 +1,3 @@
-
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
@@ -24,8 +23,8 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.*;
-import sgc.sgrh.SgrhService;
 import sgc.sgrh.Perfil;
+import sgc.sgrh.SgrhService;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
@@ -38,12 +37,14 @@ import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -102,7 +103,7 @@ class CDU21IntegrationTest {
         unidadeRepo.saveAll(List.of(unidadeOperacional1, unidadeOperacional2));
 
         // 4. Create Process
-        processo = processoRepo.save(new Processo("Processo de Teste para Finalizar", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30)));
+        processo = processoRepo.save(new Processo("Processo de Teste para Finalizar", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30)));
 
         // 5. Create Subprocesses and Maps
         Mapa mapa1 = mapaRepo.save(new Mapa());
@@ -157,7 +158,7 @@ class CDU21IntegrationTest {
         UnidadeMapa um1 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo()).orElseThrow();
         Subprocesso sp1 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo())).findFirst().orElseThrow();
         assertThat(um1.getMapaVigenteCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(um1.getDataVigencia()).isEqualTo(LocalDate.now());
+        assertThat(um1.getDataVigencia()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
 
         UnidadeMapa um2 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo()).orElseThrow();
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();

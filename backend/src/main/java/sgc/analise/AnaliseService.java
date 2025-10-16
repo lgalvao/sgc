@@ -3,13 +3,13 @@ package sgc.analise;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.analise.dto.CriarAnaliseRequestDto;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.analise.dto.CriarAnaliseRequestDto; // Added import
 
 import java.time.LocalDateTime;
 import java.util.List;

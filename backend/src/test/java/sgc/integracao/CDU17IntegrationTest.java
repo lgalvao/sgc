@@ -42,7 +42,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,7 +160,7 @@ class CDU17IntegrationTest {
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
             analiseRepo.save(analiseAntiga);
 
-            LocalDate dataLimite = LocalDate.now().plusDays(10);
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(10);
             String observacoes = "Observações de teste para o mapa.";
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
 
@@ -213,7 +213,7 @@ class CDU17IntegrationTest {
             var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -229,7 +229,7 @@ class CDU17IntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -248,7 +248,7 @@ class CDU17IntegrationTest {
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, dummyActivity));
             // A 'atividade' principal (criada no setUp) permanece não associada.
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             String responseBody = mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -275,7 +275,7 @@ class CDU17IntegrationTest {
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
             competenciaRepo.save(new Competencia(mapa, "Competência Solta"));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())

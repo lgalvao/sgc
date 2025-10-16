@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
@@ -22,12 +25,10 @@ import sgc.processo.modelo.TipoProcesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockAdmin
 @Import(TestSecurityConfig.class)
 @Transactional
+@DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
     private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{id}/iniciar?tipo=REVISAO";
 
@@ -73,7 +75,7 @@ public class CDU05IntegrationTest {
         unidadeMapaRepo.save(unidadeMapa);
     }
 
-    private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDate dataLimiteEtapa1) {
+    private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
         return new CriarProcessoReq(descricao, TipoProcesso.REVISAO.name(), dataLimiteEtapa1, unidades);
     }
 
@@ -85,7 +87,7 @@ public class CDU05IntegrationTest {
         CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
                 "Processo de Revisão para Iniciar",
                 unidades,
-                LocalDate.now().plusDays(30)
+                LocalDateTime.now().plusDays(30)
         );
 
         MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())
@@ -116,7 +118,7 @@ public class CDU05IntegrationTest {
         CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
                 "Processo de Revisão para Unidade Sem Mapa",
                 unidades,
-                LocalDate.now().plusDays(30)
+                LocalDateTime.now().plusDays(30)
         );
 
         MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())
@@ -148,7 +150,7 @@ public class CDU05IntegrationTest {
         CriarProcessoReq criarRequestDTO = criarCriarProcessoReq(
                 "Processo de Revisão para Iniciar Duas Vezes",
                 unidades,
-                LocalDate.now().plusDays(30)
+                LocalDateTime.now().plusDays(30)
         );
 
         MvcResult result = mockMvc.perform(post("/api/processos").with(csrf())

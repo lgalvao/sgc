@@ -60,7 +60,6 @@ class AnaliseControleTest {
     @Nested
     @DisplayName("Testes para listar análises de cadastro")
     class ListarAnalisesCadastro {
-
         @Test
         @DisplayName("Deve retornar lista de análises de cadastro com status 200 OK")
         void deveRetornarListaDeAnalisesCadastro() throws Exception {

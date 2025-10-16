@@ -8,7 +8,7 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Entidade que registra o mapa de competências vigente de cada unidade.
@@ -30,7 +30,7 @@ public class UnidadeMapa extends EntidadeBase {
     private Long mapaVigenteCodigo;
 
     @Column(name = "data_vigencia")
-    private LocalDate dataVigencia;
+    private LocalDateTime dataVigencia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)

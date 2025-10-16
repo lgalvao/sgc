@@ -3,7 +3,6 @@ package sgc.subprocesso.dto;
 import org.junit.jupiter.api.Test;
 import sgc.subprocesso.SituacaoSubprocesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -109,7 +108,7 @@ class SubprocessoDtoTest {
 
     @Test
     void DisponibilizarMapaReq_RecordConstructorAndGetters() {
-        LocalDate dataLimite = LocalDate.now().plusDays(10);
+        LocalDateTime dataLimite = LocalDateTime.now().plusDays(10);
         DisponibilizarMapaReq req = new DisponibilizarMapaReq(OBSERVACOES, dataLimite);
 
         assertEquals(OBSERVACOES, req.observacoes());
@@ -189,21 +188,21 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoDetalheDto_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = SubprocessoDetalheDto.UnidadeDTO.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = SubprocessoDetalheDto.ResponsavelDTO.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
-        LocalDate prazo = LocalDate.now();
+        SubprocessoDetalheDto.UnidadeDto unidade = SubprocessoDetalheDto.UnidadeDto.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        LocalDateTime prazo = LocalDateTime.now();
         List<MovimentacaoDto> movimentacoes = List.of();
-        List<SubprocessoDetalheDto.ElementoProcessoDTO> elementos = List.of();
+        List<SubprocessoDetalheDto.ElementoProcessoDto> elementos = List.of();
 
         SubprocessoDetalheDto dto = SubprocessoDetalheDto.builder()
-            .unidade(unidade)
-            .responsavel(responsavel)
-            .situacao(SituacaoSubprocesso.NAO_INICIADO.name())
-            .localizacaoAtual("Localizacao")
-            .prazoEtapaAtual(prazo)
-            .movimentacoes(movimentacoes)
-            .elementosDoProcesso(elementos)
-            .build();
+                .unidade(unidade)
+                .responsavel(responsavel)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO.name())
+                .localizacaoAtual("Localizacao")
+                .prazoEtapaAtual(prazo)
+                .movimentacoes(movimentacoes)
+                .elementosProcesso(elementos)
+                .build();
 
         assertEquals(unidade, dto.getUnidade());
         assertEquals(responsavel, dto.getResponsavel());
@@ -211,12 +210,12 @@ class SubprocessoDtoTest {
         assertEquals("Localizacao", dto.getLocalizacaoAtual());
         assertEquals(prazo, dto.getPrazoEtapaAtual());
         assertEquals(movimentacoes, dto.getMovimentacoes());
-        assertEquals(elementos, dto.getElementosDoProcesso());
+        assertEquals(elementos, dto.getElementosProcesso());
     }
 
     @Test
     void SubprocessoDetalheDto_UnidadeDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.UnidadeDTO unidade = SubprocessoDetalheDto.UnidadeDTO.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
+        SubprocessoDetalheDto.UnidadeDto unidade = SubprocessoDetalheDto.UnidadeDto.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
 
         assertEquals(1L, unidade.getCodigo());
         assertEquals(SIGLA, unidade.getSigla());
@@ -225,7 +224,7 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoDetalheDto_ResponsavelDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.ResponsavelDTO responsavel = SubprocessoDetalheDto.ResponsavelDTO.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
 
         assertEquals(1L, responsavel.getId());
         assertEquals(NOME, responsavel.getNome());
@@ -237,7 +236,7 @@ class SubprocessoDtoTest {
     @Test
     void SubprocessoDetalheDto_ElementoProcessoDTO_RecordConstructorAndAccessors() {
         Object payload = new Object();
-        SubprocessoDetalheDto.ElementoProcessoDTO elemento = new SubprocessoDetalheDto.ElementoProcessoDTO("TIPO", payload);
+        SubprocessoDetalheDto.ElementoProcessoDto elemento = new SubprocessoDetalheDto.ElementoProcessoDto("TIPO", payload);
 
         assertEquals("TIPO", elemento.tipo());
         assertEquals(payload, elemento.payload());
@@ -245,27 +244,30 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoDto_RecordConstructorAndAccessors() {
-        LocalDate dataLimite = LocalDate.now().plusDays(10);
-        LocalDateTime dataFim = LocalDateTime.now();
+        LocalDateTime dataLimite1 = LocalDateTime.now().plusDays(10);
+        LocalDateTime dataLimite2 = LocalDateTime.now().plusDays(30);
+        LocalDateTime dataFim1 = dataLimite1.plusDays(1);
 
         SubprocessoDto dto = new SubprocessoDto(
-            1L,
-            2L,
-            3L,
-            4L,
-            dataLimite,
-            dataFim,
-            dataLimite.plusDays(1),
-            SituacaoSubprocesso.NAO_INICIADO
+                1L,
+                2L,
+                3L,
+                4L,
+                dataLimite1,
+                dataFim1,
+                dataLimite2,
+                null,
+                SituacaoSubprocesso.NAO_INICIADO
         );
 
         assertEquals(1L, dto.getCodigo());
         assertEquals(2L, dto.getProcessoCodigo());
         assertEquals(3L, dto.getUnidadeCodigo());
         assertEquals(4L, dto.getMapaCodigo());
-        assertEquals(dataLimite, dto.getDataLimiteEtapa1());
-        assertEquals(dataFim, dto.getDataFimEtapa1());
-        assertEquals(dataLimite.plusDays(1), dto.getDataFimEtapa2());
+        assertEquals(dataLimite1, dto.getDataLimiteEtapa1());
+        assertEquals(dataFim1, dto.getDataFimEtapa1());
+        assertEquals(dataLimite2, dto.getDataLimiteEtapa2());
+        assertNull(dto.getDataFimEtapa2());
         assertEquals(SituacaoSubprocesso.NAO_INICIADO, dto.getSituacao());
     }
 

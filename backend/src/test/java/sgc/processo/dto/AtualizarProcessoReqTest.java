@@ -2,7 +2,7 @@ package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +20,7 @@ class AtualizarProcessoReqTest {
             1L,
             "Test Description",
             "TIPO_A",
-            LocalDate.now(),
+            LocalDateTime.now(),
             unidades
         );
 
@@ -36,7 +36,7 @@ class AtualizarProcessoReqTest {
             2L,
             "New Description",
             "TIPO_B",
-            LocalDate.now().plusDays(1),
+            LocalDateTime.now().plusDays(1),
             new ArrayList<>(List.of(3L))
         );
 

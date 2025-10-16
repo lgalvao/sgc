@@ -25,7 +25,6 @@ public class AlertaControle {
     @PostMapping("/{id}/marcar-como-lido")
     @Operation(summary = "Marca um alerta como lido (CDU-02)")
     public ResponseEntity<?> marcarComoLido(@PathVariable Long id) {
-        // O título (matrícula) do usuário viria do token JWT em um ambiente de produção
         String usuarioTitulo = "USUARIO_ATUAL"; // Exemplo
         alertaService.marcarComoLido(usuarioTitulo, id);
         return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import sgc.processo.SituacaoProcesso;
 import sgc.subprocesso.SituacaoSubprocesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +20,13 @@ public class ProcessoDetalheDto {
     private String descricao;
     private String tipo;
     private SituacaoProcesso situacao;
-    private LocalDate dataLimite;
+    private LocalDateTime dataLimite;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
+
     @Builder.Default
-    private List<UnidadeParticipanteDTO> unidades = new ArrayList<>();
+    private List<UnidadeParticipanteDto> unidades = new ArrayList<>();
+
     @Builder.Default
     private List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
 
@@ -33,14 +34,15 @@ public class ProcessoDetalheDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UnidadeParticipanteDTO {
-        private Long unidadeCodigo;
+    public static class UnidadeParticipanteDto {
         private String nome;
         private String sigla;
-        private Long unidadeSuperiorCodigo;
+        private Long codUnidade;
+        private Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
-        private LocalDate dataLimite;
+        private LocalDateTime dataLimite;
+
         @Builder.Default
-        private List<UnidadeParticipanteDTO> filhos = new ArrayList<>();
+        private List<UnidadeParticipanteDto> filhos = new ArrayList<>();
     }
 }

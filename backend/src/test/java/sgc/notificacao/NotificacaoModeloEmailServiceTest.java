@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -47,7 +47,7 @@ class NotificacaoModeloEmailServiceTest {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
         String tipoProcesso = "REVISAO";
-        LocalDate dataLimite = LocalDate.of(2024, 1, 1);
+        LocalDateTime dataLimite = LocalDateTime.now();
 
         notificacaoModeloEmailService.criarEmailDeProcessoIniciado(nomeUnidade, nomeProcesso, tipoProcesso, dataLimite);
 
@@ -101,7 +101,7 @@ class NotificacaoModeloEmailServiceTest {
     void criarEmailDeMapaDisponibilizado() {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
-        LocalDate dataLimite = LocalDate.of(2024, 1, 1);
+        LocalDateTime dataLimite = LocalDateTime.now();
 
         notificacaoModeloEmailService.criarEmailDeMapaDisponibilizado(nomeUnidade, nomeProcesso, dataLimite);
 
@@ -132,7 +132,7 @@ class NotificacaoModeloEmailServiceTest {
     @DisplayName("Deve criar email de processo finalizado com os dados corretos")
     void criarEmailDeProcessoFinalizado() {
         String nomeProcesso = "Processo Teste";
-        LocalDate dataFinalizacao = LocalDate.of(2024, 1, 1);
+        LocalDateTime dataFinalizacao = LocalDateTime.now();
         int quantidadeMapas = 5;
 
         notificacaoModeloEmailService.criarEmailDeProcessoFinalizado(nomeProcesso, dataFinalizacao, quantidadeMapas);

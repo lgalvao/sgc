@@ -1,5 +1,7 @@
 package sgc.competencia;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +9,8 @@ import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.competencia.dto.CompetenciaDto;
-import io.swagger.v3.oas.annotations.Operation;
 import sgc.competencia.modelo.CompetenciaAtividade;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 

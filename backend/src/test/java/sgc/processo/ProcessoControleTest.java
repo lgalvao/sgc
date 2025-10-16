@@ -18,7 +18,6 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.modelo.ErroProcesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +70,7 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
         var dto = ProcessoDto.builder()
                 .codigo(1L)
                 .dataCriacao(LocalDateTime.now())
@@ -97,7 +96,7 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        var req = new CriarProcessoReq("", MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq("", MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +136,7 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDate.now().plusDays(45), List.of(1L));
+        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDateTime.now().plusDays(45), List.of(1L));
         var dto = ProcessoDto.builder()
                 .codigo(1L)
                 .dataCriacao(LocalDateTime.now())

@@ -46,6 +46,7 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     implementation("ch.qos.logback:logback-core:1.5.19")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+    implementation("org.apache.commons:commons-lang3:3.19.0")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
 }
@@ -69,8 +70,7 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     forkEvery = 100L
     jvmArgs = listOf(
-        "-Xmx4g",
-        "-XX:+UseParallelGC",
+        "-Xmx8g",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
         "-Dlogging.level.org.hibernate=ERROR",
@@ -78,10 +78,10 @@ tasks.withType<Test> {
         "-Dspring.jpa.show-sql=false",
         "-Dspring.jpa.properties.hibernate.show_sql=false",
         "-Dspring.jpa.properties.hibernate.format_sql=false",
-        "-Xshare:off",
-        "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "-Dmockito.ext.disable=true",
+        "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
     )
@@ -189,73 +189,41 @@ tasks.withType<Test> {
         ) {
             val status = if (result.failedTestCount == 0L) "SUCESSO" else "FALHA"
             val durationSec = (result.endTime - result.startTime) / 1000.0
+            val separator = "=".repeat(20)
+            val separator2 = "-".repeat(20)
 
-            println("\n${"=".repeat(20)}")
+            println("\n$separator")
             println("RESUMO DOS TESTES")
-            println("=".repeat(20))
-            println()
+            println(separator)
             println("Situacao: $status")
             println("Total:    ${result.testCount}")
             println("Sucesso:  ${result.successfulTestCount}")
             println("Falhas:   ${result.failedTestCount}")
             println("Ignorados: ${result.skippedTestCount}")
             println("Tempo:  %.2fs".format(durationSec))
-
             if (failures.isNotEmpty()) {
-                println("\n${"-".repeat(20)}")
-                println("TESTES QUE FALHARAM (${failures.size})")
-                println("-".repeat(20))
+                println("\n$separator2")
+                println("TESTES FALHANDO (${failures.size})")
+                println(separator2)
                 failures.forEachIndexed { index, failure ->
                     println("\n${index + 1}. ${failure.testClass}")
-                    println("   Método: ${failure.testMethod}")
+                    println("   Metodo: ${failure.testMethod}")
                     println("   Erro: [${failure.errorType}] ${failure.errorMessage}")
                     if (failure.stackTrace.isNotEmpty()) {
-                        println("   Stack trace relevante:")
+                        println("   Stack trace filtrado:")
                         failure.stackTrace.forEach { line -> println("   $line") }
                     } else {
-                        println("   (sem stack trace da aplicação)")
+                        println("   (sem stack trace da aplicacao)")
                     }
                 }
             }
-
             if (skipped.isNotEmpty()) {
-                println("\n${"-".repeat(20)}")
+                println("\n$separator2")
                 println("TESTES IGNORADOS (${skipped.size})")
-                println("-".repeat(20))
+                println(separator2)
                 skipped.forEach { println("  • $it") }
             }
-
-            println("\n${"=".repeat(20)}")
-            outputJsonSummary(result, failures, skipped)
-        }
-
-        private fun outputJsonSummary(
-            result: TestResult,
-            failures: List<TestFailure>,
-            skipped: List<String>
-        ) {
-            val json = """
-{
-  "situacao": "${if (result.failedTestCount == 0L) "sucesso" else "falha"}",
-  "resumo": {
-    "total": ${result.testCount},
-    "sucesso": ${result.successfulTestCount},
-    "falha": ${result.failedTestCount},
-    "ignorados": ${result.skippedTestCount},
-    "duracao": ${result.endTime - result.startTime}
-  },
-  "falhas": [
-    ${failures.joinToString(",\n") { "    " + it.toJson().prependIndent("    ").trim() }}
-  ],
-  "ignorados": [
-    ${skipped.joinToString(",\n") { "    \"$it\"" }}
-  ]
-}
-            """.trimIndent()
-
-            println("\n---JSON_START---")
-            println(json)
-            println("---JSON_END---")
+            println("\n$separator")
         }
     })
 
@@ -272,28 +240,7 @@ data class TestFailure(
     val errorMessage: String,
     val errorType: String,
     val stackTrace: List<String>
-) {
-    fun toJson(): String {
-        val escapedMessage = errorMessage
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t")
-
-        return """
-{
-  "class": "$testClass",
-  "method": "$testMethod",
-  "error_type": "$errorType",
-  "error_message": "$escapedMessage",
-  "stack_trace_relevant": [
-         ${stackTrace.joinToString(",\n") { "    \"${it.replace("\"", "\\\"")}\"" }}
-  ]
-}
-        """.trimIndent()
-    }
-}
+)
 
 tasks.withType<JavaCompile> {
     options.apply {
@@ -321,13 +268,6 @@ tasks.withType<Pmd> {
     }
 }
 
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
-    reports.create("html") {
-        required.set(true)
-    }
-    excludeFilter.set(file("spotbugs-exclude.xml"))
-}
-
 tasks.spotbugsMain {
     enabled = true
 }
@@ -349,6 +289,41 @@ tasks.register("agentTest") {
     group = "verification"
     description = "Run tests with agent-optimized output"
     dependsOn("test")
+}
+
+tasks.register<Test>("verboseTest") {
+    group = "verification"
+    description = "Run tests with verbose output for debugging"
+    useJUnitPlatform()
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
+    forkEvery = 100L
+    jvmArgs = tasks.withType<Test>().getByName("test").jvmArgs
+
+    val byteBuddyAgentFile =
+        project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }
+
+    doFirst {
+        if (byteBuddyAgentFile != null) {
+            jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
+        } else {
+            logger.warn("byte-buddy-agent not found in testRuntimeClasspath. Mockito warnings might persist.")
+        }
+    }
+
+    testLogging {
+        events = setOf(TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = true
+    }
+
+    failFast = project.hasProperty("failFast")
+
+    // Copia a configuração da tarefa de teste padrão para garantir que os testes sejam encontrados e executados
+    testClassesDirs = tasks.test.get().testClassesDirs
+    classpath = tasks.test.get().classpath
 }
 
 sonar {

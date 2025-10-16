@@ -1,9 +1,11 @@
 package sgc.subprocesso;
 
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.HtmlPolicyBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,10 +21,8 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.sgrh.Usuario;
-import io.swagger.v3.oas.annotations.Operation;
 import sgc.subprocesso.dto.*;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class SubprocessoControle {
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
         var salvo = subprocessoService.criar(subprocessoDto);
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(salvo.sanitize());
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     @PutMapping("/{id}")

@@ -6,11 +6,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.processo.modelo.ErroProcesso;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.eventos.ProcessoFinalizadoEvento;
+import sgc.processo.modelo.ErroProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.UnidadeProcessoRepo;
@@ -19,7 +19,6 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +98,7 @@ public class ProcessoFinalizacaoService {
                 .orElse(new UnidadeMapa(codigoUnidade));
 
             unidadeMapa.setMapaVigenteCodigo(mapaDoSubprocesso.getCodigo());
-            unidadeMapa.setDataVigencia(LocalDate.now());
+            unidadeMapa.setDataVigencia(LocalDateTime.now());
             unidadeMapaRepo.save(unidadeMapa);
 
             log.debug("Mapa vigente para unidade {} definido como mapa {}", codigoUnidade, mapaDoSubprocesso.getCodigo());

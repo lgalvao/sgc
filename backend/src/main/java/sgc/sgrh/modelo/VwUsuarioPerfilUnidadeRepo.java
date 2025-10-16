@@ -52,7 +52,7 @@ public interface VwUsuarioPerfilUnidadeRepo
            "u.perfil = :perfil AND u.ativo = true")
     boolean existsByUsuarioUnidadeAndPerfil(
         @Param("titulo") String titulo,
-        @Param("unidadeCodigo") Long unidadeCodigo,
+        @Param("codUnidade") Long unidadeCodigo,
         @Param("perfil") String perfil
     );
     

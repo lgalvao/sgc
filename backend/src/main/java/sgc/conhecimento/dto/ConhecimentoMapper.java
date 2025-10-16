@@ -2,11 +2,11 @@ package sgc.conhecimento.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component

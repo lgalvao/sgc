@@ -30,7 +30,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -78,7 +78,7 @@ class CDU18IntegrationTest {
         unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.setDataLimite(LocalDate.now().plusMonths(1));
+        processo.setDataLimite(LocalDateTime.now().plusMonths(1));
         processo.setDescricao("Processo de Teste");
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
@@ -89,7 +89,7 @@ class CDU18IntegrationTest {
             unidade,
             mapa,
             SituacaoSubprocesso.CADASTRO_HOMOLOGADO,
-            LocalDate.now().plusMonths(1)
+            LocalDateTime.now().plusMonths(1)
         );
         subprocesso = subprocessoRepo.save(subprocesso);
 

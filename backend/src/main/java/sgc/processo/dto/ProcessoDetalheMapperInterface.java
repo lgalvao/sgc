@@ -11,18 +11,21 @@ import sgc.subprocesso.modelo.Subprocesso;
  */
 @Mapper(componentModel = "spring")
 public interface ProcessoDetalheMapperInterface {
-
     @Mapping(target = "unidades", ignore = true) // Mapeamento customizado necessário
     @Mapping(target = "resumoSubprocessos", ignore = true)
-        // Mapeamento customizado necessário
+
+    // Mapeamento customizado
     ProcessoDetalheDto toDetailDTO(Processo processo);
 
     // Mapeamento de entidade para DTO de participante
     @Mapping(target = "filhos", ignore = true)
-    // Assumindo que filhos não vem diretamente de UnidadeProcesso
+
+    // Presume que filhos não vêm diretamente de UnidadeProcesso
     @Mapping(target = "situacaoSubprocesso", ignore = true)
     @Mapping(target = "dataLimite", ignore = true)
-    ProcessoDetalheDto.UnidadeParticipanteDTO unidadeProcessoToUnidadeParticipanteDTO(UnidadeProcesso unidadeProcesso);
+    @Mapping(target = "codUnidade", source = "unidadeCodigo")
+    @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperiorCodigo")
+    ProcessoDetalheDto.UnidadeParticipanteDto unidadeProcessoToUnidadeParticipanteDTO(UnidadeProcesso unidadeProcesso);
 
     // Mapeamento de subprocesso para DTO de resumo
     @Mapping(target = "codigo", source = "processo.codigo")
@@ -36,12 +39,12 @@ public interface ProcessoDetalheMapperInterface {
     ProcessoResumoDto subprocessoToProcessoResumoDto(Subprocesso subprocesso);
 
     // Mapeamento de subprocesso para DTO de participante (usado quando não há UnidadeProcesso correspondente)
-    @Mapping(target = "unidadeCodigo", source = "unidade.codigo")
+    @Mapping(target = "codUnidade", source = "unidade.codigo")
     @Mapping(target = "nome", source = "unidade.nome")
     @Mapping(target = "sigla", source = "unidade.sigla")
-    @Mapping(target = "unidadeSuperiorCodigo", source = "unidade.unidadeSuperior.codigo")
+    @Mapping(target = "codUnidadeSuperior", source = "unidade.unidadeSuperior.codigo")
     @Mapping(target = "situacaoSubprocesso", source = "situacao")
     @Mapping(target = "dataLimite", source = "dataLimiteEtapa1")
     @Mapping(target = "filhos", ignore = true)
-    ProcessoDetalheDto.UnidadeParticipanteDTO subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso);
+    ProcessoDetalheDto.UnidadeParticipanteDto subprocessoToUnidadeParticipanteDTO(Subprocesso subprocesso);
 }

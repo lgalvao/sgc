@@ -16,7 +16,6 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
     private final SubprocessoMapper subprocessoMapper = Mappers.getMapper(SubprocessoMapper.class);
+
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -67,9 +67,9 @@ class MapperTest {
         entity.setProcesso(processo);
         entity.setUnidade(unidade);
         entity.setMapa(mapa);
-        entity.setDataLimiteEtapa1(LocalDate.now());
+        entity.setDataLimiteEtapa1(LocalDateTime.now());
         entity.setDataFimEtapa1(LocalDateTime.now());
-        entity.setDataLimiteEtapa2(LocalDate.now().plusDays(10));
+        entity.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
         entity.setDataFimEtapa2(LocalDateTime.now().plusHours(1));
         entity.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
@@ -90,9 +90,10 @@ class MapperTest {
                 100L,
                 200L,
                 300L,
-                LocalDate.now(),
                 LocalDateTime.now(),
-                LocalDate.now().plusDays(10),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(10),
                 SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO
         );
 

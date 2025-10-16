@@ -21,7 +21,7 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +64,7 @@ class AlertaServiceTest {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        subprocesso.setDataLimiteEtapa1(LocalDate.of(2025, 12, 31));
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2025, 12, 31, 0, 0));
     }
 
     @Test

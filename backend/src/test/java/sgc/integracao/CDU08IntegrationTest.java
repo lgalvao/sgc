@@ -28,13 +28,14 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -83,7 +84,7 @@ class CDU08IntegrationTest {
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-        subprocesso.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoRepo.save(subprocesso);
     }
 

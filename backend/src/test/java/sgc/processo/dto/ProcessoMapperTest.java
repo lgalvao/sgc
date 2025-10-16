@@ -6,7 +6,6 @@ import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.TipoProcesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +22,7 @@ class ProcessoMapperTest {
         processo.setCodigo(1L);
         processo.setDataCriacao(LocalDateTime.now());
         processo.setDataFinalizacao(LocalDateTime.now().plusDays(1));
-        processo.setDataLimite(LocalDate.now().plusDays(5));
+        processo.setDataLimite(LocalDateTime.now().plusDays(5));
         processo.setDescricao(TEST_DESCRIPTION);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -48,7 +47,7 @@ class ProcessoMapperTest {
             .codigo(1L)
             .dataCriacao(LocalDateTime.now())
             .dataFinalizacao(LocalDateTime.now().plusDays(1))
-            .dataLimite(LocalDate.now().plusDays(5))
+            .dataLimite(LocalDateTime.now().plusDays(5))
             .descricao(TEST_DESCRIPTION)
             .situacao(SituacaoProcesso.EM_ANDAMENTO)
             .tipo(TipoProcesso.MAPEAMENTO.name())

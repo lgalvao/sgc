@@ -7,11 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import sgc.mapa.CopiaMapaService;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.processo.ProcessoFinalizacaoService;
-import sgc.processo.ProcessoIniciacaoService;
-import sgc.processo.ProcessoNotificacaoService;
-import sgc.processo.ProcessoService;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.*;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoDto;
@@ -26,7 +22,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,7 +77,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
-        var requisicao = new CriarProcessoReq("Processo de teste", TipoProcesso.MAPEAMENTO.name(), LocalDate.now().plusDays(10), List.of(1L, 2L));
+        var requisicao = new CriarProcessoReq("Processo de teste", TipoProcesso.MAPEAMENTO.name(), LocalDateTime.now().plusDays(10), List.of(1L, 2L));
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);

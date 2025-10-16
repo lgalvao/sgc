@@ -8,7 +8,7 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.sgrh.Usuario;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ATRIBUICAO_TEMPORARIA", schema = "sgc")
@@ -26,10 +26,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     private Usuario usuario;
 
     @Column(name = "data_inicio")
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
     @Column(name = "data_termino")
-    private LocalDate dataTermino;
+    private LocalDateTime dataTermino;
 
     @Column(name = "justificativa", length = 500)
     private String justificativa;

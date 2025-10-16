@@ -18,7 +18,6 @@ import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +36,8 @@ import static sgc.alerta.modelo.TipoAlerta.*;
 @Slf4j
 public class AlertaService {
     private final AlertaRepo repositorioAlerta;
-    private final AlertaUsuarioRepo repositorioAlertaUsuario;
-    private final UnidadeRepo repositorioUnidade;
+    private final AlertaUsuarioRepo alertaUsuarioRepo;
+    private final UnidadeRepo unidadeRepo;
     private final SgrhService servicoSgrh;
     private final UsuarioRepo usuarioRepo;
 
@@ -46,29 +45,26 @@ public class AlertaService {
      * Cria um alerta para uma unidade específica.
      * Identifica automaticamente os destinatários (responsável + superiores).
      *
-     * @param processo             Processo relacionado ao alerta
-     * @param tipoAlerta           Tipo do alerta (PROCESSO_INICIADO_OPERACIONAL, etc)
-     * @param codigoUnidadeDestino Código da unidade destino
-     * @param descricao            Descrição do alerta
-     * @param dataLimite           Data limite relacionada ao alerta (opcional)
+     * @param processo          Processo relacionado ao alerta
+     * @param tipoAlerta        Tipo do alerta (PROCESSO_INICIADO_OPERACIONAL, etc)
+     * @param codUnidadeDestino Código da unidade destino
+     * @param descricao         Descrição do alerta
+     * @param dataLimite        Data limite relacionada ao alerta (opcional)
      * @return Alerta criado
      */
     @Transactional
     public Alerta criarAlerta(
             Processo processo,
             TipoAlerta tipoAlerta,
-            Long codigoUnidadeDestino,
+            Long codUnidadeDestino,
             String descricao,
-            LocalDate dataLimite) {
+            LocalDateTime dataLimite) {
 
-        log.debug("Criando alerta tipo={} para unidade={}", tipoAlerta, codigoUnidadeDestino);
+        log.debug("Criando alerta tipo={} para unidade={}", tipoAlerta, codUnidadeDestino);
 
-        // Buscar unidade destino
-        // Lançar exceção de negócio
-        Unidade unidadeDestino = repositorioUnidade.findById(codigoUnidadeDestino)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidadeDestino));
+        Unidade unidadeDestino = unidadeRepo.findById(codUnidadeDestino)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codUnidadeDestino));
 
-        // Criar alerta
         Alerta alerta = new Alerta();
         alerta.setProcesso(processo);
         alerta.setDataHora(LocalDateTime.now());
@@ -82,21 +78,20 @@ public class AlertaService {
 
         // Buscar responsável da unidade via SGRH
         try {
-            Optional<ResponsavelDto> responsavel = servicoSgrh.buscarResponsavelUnidade(codigoUnidadeDestino);
+            Optional<ResponsavelDto> responsavel = servicoSgrh.buscarResponsavelUnidade(codUnidadeDestino);
             if (responsavel.isPresent() && responsavel.get().titularTitulo() != null) {
-                criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo(), codigoUnidadeDestino);
+                criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo(), codUnidadeDestino);
                 // Se houver substituto, também o adiciona
                 if (responsavel.get().substitutoTitulo() != null) {
-                    criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codigoUnidadeDestino);
+                    criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codUnidadeDestino);
                 }
             } else {
-                log.warn("Responsável não encontrado para a unidade {}", codigoUnidadeDestino);
+                log.warn("Responsável não encontrado para a unidade {}", codUnidadeDestino);
             }
         } catch (Exception e) {
-            log.error("Erro ao buscar responsável da unidade {}: {}", codigoUnidadeDestino, e.getMessage(), e);
+            log.error("Erro ao buscar responsável da unidade {}: {}", codUnidadeDestino, e.getMessage(), e);
             // Não interrompe o fluxo se não conseguir buscar o responsável
         }
-
         return alertaSalvo;
     }
 
@@ -121,12 +116,12 @@ public class AlertaService {
         log.info("Criando alertas para processo iniciado: {} unidades", codigosUnidades.size());
         List<Alerta> alertasCriados = new ArrayList<>();
 
-        for (Long codigoUnidade : codigosUnidades) {
+        for (Long codUnidade : codigosUnidades) {
             try {
                 // Buscar tipo da unidade via SGRH
-                Optional<UnidadeDto> unidadeDtoOptional = servicoSgrh.buscarUnidadePorCodigo(codigoUnidade);
+                Optional<UnidadeDto> unidadeDtoOptional = servicoSgrh.buscarUnidadePorCodigo(codUnidade);
                 if (unidadeDtoOptional.isEmpty()) {
-                    log.warn("Unidade não encontrada no SGRH: {}", codigoUnidade);
+                    log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
                     continue;
                 }
 
@@ -134,8 +129,8 @@ public class AlertaService {
                 String nomeProcesso = processo.getDescricao();
 
                 // Encontrar o subprocesso correspondente para obter a data limite
-                LocalDate dataLimite = subprocessos.stream()
-                        .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codigoUnidade))
+                LocalDateTime dataLimite = subprocessos.stream()
+                        .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidade))
                         .map(Subprocesso::getDataLimiteEtapa1)
                         .findFirst()
                         .orElse(processo.getDataLimite()); // Fallback para a data limite do processo se não encontrar subprocesso
@@ -148,7 +143,7 @@ public class AlertaService {
                             formatarData(dataLimite)
                     );
 
-                    Alerta alerta = criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, codigoUnidade, descricao, dataLimite);
+                    Alerta alerta = criarAlerta(processo, PROCESSO_INICIADO_OPERACIONAL, codUnidade, descricao, dataLimite);
                     alertasCriados.add(alerta);
 
                 } else if (TipoUnidade.INTERMEDIARIA.equals(tipoUnidade)) {
@@ -159,7 +154,7 @@ public class AlertaService {
                             formatarData(dataLimite)
                     );
 
-                    Alerta alerta = criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, codigoUnidade, descricao, dataLimite);
+                    Alerta alerta = criarAlerta(processo, PROCESSO_INICIADO_INTERMEDIARIA, codUnidade, descricao, dataLimite);
                     alertasCriados.add(alerta);
 
                 } else if (TipoUnidade.INTEROPERACIONAL.equals(tipoUnidade)) {
@@ -169,7 +164,12 @@ public class AlertaService {
                             formatarData(dataLimite)
                     );
                     log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_OP: {}", descOperacional);
-                    Alerta alertaOperacional = criarAlerta(processo, PROCESSO_INICIADO_INTEROPERACIONAL_OP, codigoUnidade, descOperacional, dataLimite);
+                    Alerta alertaOperacional = criarAlerta(processo,
+                            PROCESSO_INICIADO_INTEROPERACIONAL_OP,
+                            codUnidade,
+                            descOperacional,
+                            dataLimite);
+
                     alertasCriados.add(alertaOperacional);
 
                     String descIntermediaria = String.format(
@@ -179,15 +179,20 @@ public class AlertaService {
                             formatarData(dataLimite)
                     );
                     log.debug("Descrição para PROCESSO_INICIADO_INTEROPERACIONAL_INT: {}", descIntermediaria);
-                    Alerta alertaIntermediaria = criarAlerta(processo, PROCESSO_INICIADO_INTEROPERACIONAL_INT, codigoUnidade, descIntermediaria, dataLimite);
+
+                    Alerta alertaIntermediaria = criarAlerta(processo,
+                            PROCESSO_INICIADO_INTEROPERACIONAL_INT,
+                            codUnidade,
+                            descIntermediaria,
+                            dataLimite);
+
                     alertasCriados.add(alertaIntermediaria);
 
                 } else {
-                    log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codigoUnidade);
+                    log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codUnidade);
                 }
-
             } catch (Exception e) {
-                log.error("Erro ao criar alerta para a unidade {}: {}", codigoUnidade, e.getMessage(), e);
+                log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getMessage(), e);
             }
         }
 
@@ -198,27 +203,27 @@ public class AlertaService {
     /**
      * Cria alerta para cadastro disponibilizado.
      *
-     * @param processo             Processo relacionado
-     * @param codigoUnidadeOrigem  Código da unidade que disponibilizou
-     * @param codigoUnidadeDestino Código da unidade destino (SEDOC)
+     * @param processo          Processo relacionado
+     * @param codUnidadeOrigem  Código da unidade que disponibilizou
+     * @param codUnidadeDestino Código da unidade destino (SEDOC)
      * @return Alerta criado
      */
     @Transactional
     public Alerta criarAlertaCadastroDisponibilizado(
             Processo processo,
-            Long codigoUnidadeOrigem,
-            Long codigoUnidadeDestino) {
+            Long codUnidadeOrigem,
+            Long codUnidadeDestino) {
 
-        // Lançar exceção de negócio
-        Unidade unidadeOrigem = repositorioUnidade.findById(codigoUnidadeOrigem)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem", codigoUnidadeOrigem));
+        Unidade unidadeOrigem = unidadeRepo.findById(codUnidadeOrigem)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem", codUnidadeOrigem));
+
         String descricao = String.format(
                 "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro.",
                 unidadeOrigem.getSigla(),
                 processo.getDescricao()
         );
 
-        return criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codigoUnidadeDestino, descricao, null);
+        return criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao, null);
     }
 
     /**
@@ -244,45 +249,43 @@ public class AlertaService {
         return criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codigoUnidadeDestino, descricao, null);
     }
 
-    private void criarAlertaUsuario(Alerta alerta, String usuarioTituloStr, Long codigoUnidade) {
+    private void criarAlertaUsuario(Alerta alerta, String tituloStr, Long codUnidade) {
         try {
-            Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
-            Usuario usuario = usuarioRepo.findById(usuarioTitulo)
+            Long titulo = Long.parseLong(tituloStr);
+            Usuario usuario = usuarioRepo.findById(titulo)
                     .orElseGet(() -> {
-                        log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH...", usuarioTitulo);
-                        return servicoSgrh.buscarUsuarioPorTitulo(usuarioTituloStr)
+                        log.info("Usuário {} não encontrado no banco de dados. Buscando no SGRH...", titulo);
+                        return servicoSgrh.buscarUsuarioPorTitulo(tituloStr)
                                 .map(usuarioDto -> {
                                     Usuario novoUsuario = new Usuario();
                                     novoUsuario.setTituloEleitoral(Long.parseLong(usuarioDto.titulo()));
                                     novoUsuario.setNome(usuarioDto.nome());
                                     novoUsuario.setEmail(usuarioDto.email());
                                     novoUsuario.setPerfis(java.util.Set.of(Perfil.CHEFE)); // Default role
-                                    repositorioUnidade.findById(codigoUnidade).ifPresent(novoUsuario::setUnidade);
+                                    unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);
                                     return usuarioRepo.save(novoUsuario);
                                 })
-                                // Lançar exceção de negócio
-                                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", usuarioTitulo));
+                                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", titulo));
                     });
 
             AlertaUsuario alertaUsuario = new AlertaUsuario();
-            AlertaUsuario.Chave id = new AlertaUsuario.Chave(alerta.getCodigo(), usuarioTitulo);
+            AlertaUsuario.Chave id = new AlertaUsuario.Chave(alerta.getCodigo(), titulo);
             alertaUsuario.setId(id);
             alertaUsuario.setAlerta(alerta);
             alertaUsuario.setUsuario(usuario);
             alertaUsuario.setDataHoraLeitura(null);
 
-            repositorioAlertaUsuario.save(alertaUsuario);
-            log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), usuarioTitulo);
+            alertaUsuarioRepo.save(alertaUsuario);
+            log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), titulo);
         } catch (Exception e) {
-            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), usuarioTituloStr, e.getMessage(), e);
+            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), tituloStr, e.getMessage(), e);
         }
     }
 
-    private String formatarData(LocalDate data) {
-        if (data == null) {
-            return "Data não definida";
-        }
-        return String.format("%02d/%02d/%d", data.getDayOfMonth(), data.getMonthValue(), data.getYear());
+    private String formatarData(LocalDateTime data) {
+        return data != null
+                ? String.format("%02d/%02d/%d", data.getDayOfMonth(), data.getMonthValue(), data.getYear())
+                : "Data não definida";
     }
 
     /**
@@ -295,13 +298,13 @@ public class AlertaService {
     public void marcarComoLido(String usuarioTituloStr, Long alertaId) {
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
-        AlertaUsuario alertaUsuario = repositorioAlertaUsuario.findById(id).orElseThrow(() -> new ErroDominioNaoEncontrado(
+        AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(id).orElseThrow(() -> new ErroDominioNaoEncontrado(
                 "Não foi encontrado o alerta %d para o usuário %d".formatted(alertaId, usuarioTitulo))
         );
 
         if (alertaUsuario.getDataHoraLeitura() == null) {
             alertaUsuario.setDataHoraLeitura(LocalDateTime.now());
-            repositorioAlertaUsuario.save(alertaUsuario);
+            alertaUsuarioRepo.save(alertaUsuario);
             log.info("Alerta {} marcado como lido para o usuário {}", alertaId, usuarioTitulo);
         }
     }

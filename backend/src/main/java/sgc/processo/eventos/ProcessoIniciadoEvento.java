@@ -1,8 +1,8 @@
 package sgc.processo.eventos;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Evento de domínio publicado quando um processo é iniciado.

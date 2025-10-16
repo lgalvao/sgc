@@ -36,12 +36,12 @@ public class ProcessoDetalheMapperCustom {
         // Mapeia os dados básicos do processo usando MapStruct
         ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
 
-        Map<String, ProcessoDetalheDto.UnidadeParticipanteDTO> unidadesBySigla = new HashMap<>();
+        Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
 
         // Mapeia as unidades de processo
         if (unidadesProcesso != null) {
             for (UnidadeProcesso up : unidadesProcesso) {
-                ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
+                ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
                 if (unit.getSigla() != null) {
                     unidadesBySigla.put(unit.getSigla(), unit);
                 }
@@ -55,12 +55,12 @@ public class ProcessoDetalheMapperCustom {
 
                 if (sigla != null && unidadesBySigla.containsKey(sigla)) {
                     // Atualiza a unidade existente com informações do subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDTO existingUnit = unidadesBySigla.get(sigla);
-                    ProcessoDetalheDto.UnidadeParticipanteDTO updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
-                        .unidadeCodigo(existingUnit.getUnidadeCodigo())
+                    ProcessoDetalheDto.UnidadeParticipanteDto existingUnit = unidadesBySigla.get(sigla);
+                    ProcessoDetalheDto.UnidadeParticipanteDto updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+                        .codUnidade(existingUnit.getCodUnidade())
                         .nome(existingUnit.getNome())
                         .sigla(existingUnit.getSigla())
-                        .unidadeSuperiorCodigo(existingUnit.getUnidadeSuperiorCodigo())
+                        .codUnidadeSuperior(existingUnit.getCodUnidadeSuperior())
                         .situacaoSubprocesso(sp.getSituacao()) // Novo valor
                         .dataLimite(sp.getDataLimiteEtapa1())   // Novo valor
                         .filhos(existingUnit.getFilhos())
@@ -68,7 +68,7 @@ public class ProcessoDetalheMapperCustom {
                     unidadesBySigla.put(sigla, updatedUnit); // Atualizar no mapa
                 } else {
                     // Cria uma nova unidade participante baseada no subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
+                    ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
                     if (unit.getSigla() != null) {
                         unidadesBySigla.put(unit.getSigla(), unit);
                     }
@@ -77,7 +77,7 @@ public class ProcessoDetalheMapperCustom {
         }
 
         // Constroi a lista final de unidades a partir do mapa para garantir que as atualizações sejam refletidas
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = new ArrayList<>(unidadesBySigla.values());
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> unidades = new ArrayList<>(unidadesBySigla.values());
 
         // Mapeia os subprocessos para resumo
         List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
