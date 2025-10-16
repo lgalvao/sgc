@@ -1,13 +1,17 @@
 package sgc.sgrh.dto;
 
-/**
- * DTO para dados de usuário do SGRH.
- */
-public record UsuarioDto(
-    String titulo,
-    String nome,
-    String email,
-    String matricula,
-    String cargo
-) {
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
+import sgc.sgrh.Perfil;
+
+@Value
+@Builder
+@Jacksonized
+public class UsuarioDto {
+    String nome;
+    Long tituloEleitoral;
+    Perfil perfil;
+    String unidade;
+    String token;
 }

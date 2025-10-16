@@ -214,12 +214,19 @@ export async function clicarUnidade(page: Page, nomeUnidade: string): Promise<vo
 async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS, idServidorOverride?: string): Promise<void> {
     const dadosUsuario = DADOS_TESTE.PERFIS[perfil];
     const finalIdServidor = idServidorOverride || dadosUsuario.idServidor;
-    await page.context().addInitScript((dados) => {
-        localStorage.setItem('idServidor', dados.idServidor);
-        localStorage.setItem('perfilSelecionado', dados.perfil);
-        localStorage.setItem('unidadeSelecionada', dados.unidade);
-    }, {...dadosUsuario, idServidor: finalIdServidor});
-    await page.goto(URLS.PAINEL);
+
+    await login(page, finalIdServidor);
+    await clicarBotaoEntrar(page);
+
+    // Se o usuário tiver mais de um perfil, um modal de seleção aparecerá.
+    // Esta lógica seleciona o perfil correto para o teste.
+    const modalPerfil = page.locator('div.modal-body');
+    if (await modalPerfil.isVisible()) {
+        const seletorPerfil = `[data-testid="perfil-option-${dadosUsuario.perfil}-${dadosUsuario.unidade}"]`;
+        await page.locator(seletorPerfil).click();
+        await page.getByTestId('btn-modal-confirmar').click();
+    }
+
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/painel/);
 }
