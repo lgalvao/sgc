@@ -33,6 +33,7 @@ dependencies {
 
     // BD
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2") // Para rodar localmente sem Docker
 
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
@@ -53,7 +54,6 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     // Testes
-    testImplementation("com.h2database:h2")
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.tngtech.archunit:archunit:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
