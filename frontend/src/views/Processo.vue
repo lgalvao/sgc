@@ -215,10 +215,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
@@ -246,6 +247,7 @@ interface TreeTableItem {
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 const {processos} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
@@ -271,11 +273,15 @@ const mostrarModalFinalizacao = ref(false)
 const idProcesso = computed(() =>
     Number(route.params.idProcesso || route.params.id || route.query.idProcesso))
 
+onMounted(async () => {
+  await processosStore.carregarDetalhesProcesso(idProcesso.value);
+});
+
 const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === idProcesso.value))
 
 const unidadesParticipantes = computed<string[]>(() => {
   if (!processo.value) return []
-  return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)
+  return subprocessosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)
 })
 
 // Computed para identificar subprocessos elegíveis
@@ -283,12 +289,12 @@ const subprocessosElegiveis = computed(() => {
   if (!idProcesso.value) return []
 
   if (perfilStore.perfilSelecionado === 'GESTOR' && perfilStore.unidadeSelecionada) {
-    return processosStore.getSubprocessosElegiveisAceiteBloco(
+    return subprocessosStore.getSubprocessosElegiveisAceiteBloco(
         idProcesso.value,
         perfilStore.unidadeSelecionada
     )
   } else if (perfilStore.perfilSelecionado === 'ADMIN') {
-    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value)
+    return subprocessosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value)
   }
   return []
 })
@@ -350,7 +356,7 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
     let unidadeAtual = 'Não informado';
 
     if (!isIntermediaria) {
-      const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: Subprocesso) => pu.unidade === item.sigla);
+      const Subprocesso = subprocessosStore.getUnidadesDoProcesso(idProcesso).find((pu: Subprocesso) => pu.unidade === item.sigla);
       if (Subprocesso) {
         situacao = Subprocesso.situacao;
 
@@ -375,7 +381,7 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
  
 function abrirDetalhesUnidade(item: any) {
   if (item) {
-    const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
+    const Subprocesso = subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
     if (Subprocesso && Subprocesso.unidade) {
       // É uma unidade participante direta: abre a visão padrão da unidade no processo
       // ADMIN e GESTOR podem navegar para detalhes de qualquer unidade
@@ -403,7 +409,7 @@ async function finalizarProcesso() {
   const processoAtual = processo.value;
 
   // Verificar se todos os subprocessos de unidades operacionais/interoperacionais estão em 'Mapa homologado'
-  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
+  const subprocessos = subprocessosStore.getUnidadesDoProcesso(processoAtual.id);
   const subprocessosOperacionais = subprocessos.filter(pu => {
     const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
     return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');
@@ -429,7 +435,7 @@ async function executarFinalizacao() {
   const processoAtual = processo.value;
 
   // Obter subprocessos novamente (já verificados anteriormente)
-  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
+  const subprocessos = subprocessosStore.getUnidadesDoProcesso(processoAtual.id);
   const subprocessosOperacionais = subprocessos.filter(pu => {
     const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
     return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');

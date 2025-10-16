@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 
 import {useProcessosStore} from '@/stores/processos'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import {usePerfilStore} from '@/stores/perfil'
 import {Perfil, Processo, Subprocesso} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
@@ -35,7 +36,7 @@ type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
-
+const subprocessosStore = useSubprocessosStore()
 const perfil = usePerfilStore()
 
 const criterio = ref<SortCriteria>('descricao')
@@ -43,12 +44,19 @@ const asc = ref(true)
 
 const {processosFiltrados} = useProcessosFiltrados(ref(true));
 
+onMounted(async () => {
+  // Garante que os subprocessos de todos os processos visíveis sejam carregados
+  for (const processo of processosFiltrados.value) {
+    await processosStore.carregarDetalhesProcesso(processo.id);
+  }
+});
+
 const processosFinalizadosOrdenados = computed(() => {
   return [...processosFiltrados.value].sort((a: Processo, b: Processo) => {
 
     if (criterio.value === 'unidades') {
-      const valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
-      const valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: Subprocesso) => pu.unidade).join(', ');
+      const valA = subprocessosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
+      const valB = subprocessosStore.getUnidadesDoProcesso(b.id).map((pu: Subprocesso) => pu.unidade).join(', ');
       if (valA < valB) return asc.value ? -1 : 1;
       if (valA > valB) return asc.value ? 1 : -1;
       return 0;
@@ -86,7 +94,7 @@ const processosFinalizadosOrdenados = computed(() => {
 const processosFinalizadosOrdenadosComFormatacao = computed(() => {
   return processosFinalizadosOrdenados.value.map(p => ({
     ...p,
-    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', '),
+    unidadesFormatadas: subprocessosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', '),
     dataFinalizacaoFormatada: p.dataFinalizacao ? new Date(p.dataFinalizacao).toLocaleDateString('pt-BR') : null
   }));
 });
