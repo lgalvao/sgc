@@ -1,26 +1,44 @@
-import {defineStore} from 'pinia'
-import mapasData from '../mocks/mapas.json';
-import type {Mapa} from '@/types/tipos'
-import {SITUACOES_MAPA} from '@/constants/situacoes'
-import {mapMapasArray} from '@/mappers/entidades';
+import { defineStore } from 'pinia';
+import type { Mapa } from '@/types/tipos';
+import { useApi } from '@/composables/useApi';
 
 export const useMapasStore = defineStore('mapas', {
     state: () => ({
-        mapas: mapMapasArray(mapasData as any) as Mapa[]
+        mapas: [] as Mapa[],
+        loading: false,
+        error: null as string | null,
     }),
     getters: {
         getMapaByUnidadeId: (state) => (unidadeId: string, idProcesso: number): Mapa | undefined => {
             return state.mapas.find(m => m.unidade === unidadeId && m.idProcesso === idProcesso)
         },
         getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
-            // Considerar mapas 'vigente', 'em_andamento' e 'disponibilizado' como elegíveis para revisão
-            return state.mapas.find(m =>
-                m.unidade === unidadeId &&
-                (m.situacao === SITUACOES_MAPA.VIGENTE || m.situacao === SITUACOES_MAPA.EM_ANDAMENTO || m.situacao === SITUACOES_MAPA.DISPONIBILIZADO)
-            )
+            // No SGC, um mapa vigente é o que está associado à UnidadeMapa
+            // Esta lógica precisará ser revista para se alinhar com a API
+            return state.mapas.find(m => m.unidade === unidadeId);
         }
     },
     actions: {
+        async fetchMapas() {
+            this.loading = true;
+            this.error = null;
+            const api = useApi();
+            try {
+                // TODO: O endpoint correto precisa ser verificado e implementado no backend
+                // Por enquanto, vamos assumir um endpoint genérico /api/mapas
+                const response = await api.get('/api/mapas');
+                this.mapas = response.data as Mapa[]; // Assumindo que a API retorna um array de mapas
+            } catch (error: any) {
+                this.error = error.message || 'Falha ao buscar mapas.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /*
+        // Ações antigas que modificam o estado localmente.
+        // Precisarão ser reimplementadas para chamar a API.
+
         adicionarMapa(mapa: Mapa) {
             this.mapas.push(mapa);
         },
@@ -42,5 +60,6 @@ export const useMapasStore = defineStore('mapas', {
                 this.mapas[mapaIndex].dataFinalizacao = new Date();
             }
         }
+        */
     }
 })
