@@ -1,316 +1,126 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {useAtividadesStore} from '../atividades';
-import type {Atividade, Conhecimento} from '@/types/tipos';
-import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore} from '@/test/helpers';
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { useAtividadesStore } from '../atividades'
+import { useApi } from '@/composables/useApi'
+import type { SubprocessoCadastroDto } from '@/types/SubprocessoCadastroDto'
+import type { Atividade } from '@/types/tipos'
 
-// Mock the atividades.json import at the top level
-vi.mock('../../mocks/atividades.json', async () => {
-    return {
-        default: getMockAtividadesData(), // Use the helper to get fresh data
-    };
-});
+// Mock the useApi composable
+vi.mock('@/composables/useApi', () => ({
+  useApi: vi.fn()
+}))
+
+const mockSubprocessoCadastro: SubprocessoCadastroDto.SubprocessoCadastro = {
+  subprocessoId: 1,
+  unidadeSigla: 'TEST',
+  atividades: [
+    {
+      id: 1,
+      descricao: 'Atividade de Teste 1',
+      conhecimentos: [{ id: 101, descricao: 'Conhecimento de Teste 1' }]
+    },
+    {
+      id: 2,
+      descricao: 'Atividade de Teste 2',
+      conhecimentos: []
+    }
+  ]
+}
 
 describe('useAtividadesStore', () => {
-    let atividadesStore: ReturnType<typeof useAtividadesStore>;
+  let store: ReturnType<typeof useAtividadesStore>
+  const mockApi = {
+    get: vi.fn()
+  }
 
-    beforeEach(async () => { // Make beforeEach async
-        initPinia();
-        // Dynamically import useAtividadesStore after the mock is set up
-        const {useAtividadesStore: useAtividadesStoreActual} = (await vi.importActual('../atividades')) as {
-            useAtividadesStore: typeof useAtividadesStore
-        };
-        atividadesStore = useAtividadesStoreActual();
-        // Reset the store state to the mock data before each test
-        // Pinia's $reset() method is not available for stores with custom state setup
-        // So, manually reset the state based on the initial mock data
-        const initialAtividades = getMockAtividadesData();
-        atividadesStore.atividades = initialAtividades.map((a: Atividade) => ({
-            ...a,
-            conhecimentos: a.conhecimentos.map((c: Conhecimento) => ({...c}))
-        }));
-        atividadesStore.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: Conhecimento) => c.id)])) + 1;
-    });
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.mocked(useApi).mockReturnValue(mockApi)
+    store = useAtividadesStore()
+    store.$reset() // Reset store state before each test
+    mockApi.get.mockClear()
+  })
 
-    it('should initialize with mock activities and correct nextId', () => {
-        expect(atividadesStore.atividades.length).toBe(getMockAtividadesData().length);
-        expect(atividadesStore.nextId).toBe(41); // Based on mock data's max ID
-    });
+  it('should initialize with correct default state', () => {
+    expect(store.atividades).toEqual([])
+    expect(store.loading).toBe(false)
+    expect(store.error).toBeNull()
+  })
 
-    describe('getters', () => {
-        it('getAtividadesPorsubprocesso should filter activities by idSubprocesso', () => {
-            const atividades = atividadesStore.getAtividadesPorSubprocesso(3);
-            expect(atividades.length).toBe(2);
-            expect(atividades[0].id).toBe(1);
-            expect(atividades[1].id).toBe(2);
-        });
+  describe('actions', () => {
+    describe('carregarAtividades', () => {
+      it('should fetch and map atividades from the API', async () => {
+        mockApi.get.mockResolvedValue(mockSubprocessoCadastro)
 
-        it('getAtividadesPorsubprocesso should return empty array if no matching idSubprocesso', () => {
-            const atividades = atividadesStore.getAtividadesPorSubprocesso(999);
-            expect(atividades.length).toBe(0);
-        });
-    });
+        await store.carregarAtividades(1)
 
-    describe('actions', () => {
-        it('setAtividades should replace activities for a given idSubprocesso', () => {
-            const novasAtividades: Atividade[] = [
-                {id: 100, descricao: 'Nova Atividade 1', idSubprocesso: 3, conhecimentos: []},
-                {id: 101, descricao: 'Nova Atividade 2', idSubprocesso: 3, conhecimentos: []},
-            ];
-            const initialLength = atividadesStore.atividades.length;
-            atividadesStore.setAtividades(3, novasAtividades);
+        expect(store.loading).toBe(false)
+        expect(store.error).toBeNull()
+        expect(mockApi.get).toHaveBeenCalledWith('/subprocessos/1/cadastro')
 
-            // Should remove old activities for idSubprocesso 3 (id 1, 2) and add new ones
-            expect(atividadesStore.atividades.length).toBe(initialLength - 2 + novasAtividades.length);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === 1)).toBe(false);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === 2)).toBe(false);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === 100)).toBe(true);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === 101)).toBe(true);
-        });
+        const atividades = store.getAtividadesPorSubprocesso(1)
+        expect(atividades).toHaveLength(2)
+        expect(atividades[0].id).toBe(1)
+        expect(atividades[0].descricao).toBe('Atividade de Teste 1')
+        expect(atividades[0].idSubprocesso).toBe(1)
+        expect(atividades[0].conhecimentos[0].descricao).toBe('Conhecimento de Teste 1')
+      })
 
-        it('adicionarAtividade should add a new activity and assign nextId', () => {
-            const novaAtividade: Atividade = {
-                id: 0, // ID will be assigned by the store
-                descricao: 'Atividade Teste',
-                idSubprocesso: 5,
-                conhecimentos: []
-            };
-            const initialLength = atividadesStore.atividades.length;
-            const expectedNextId = atividadesStore.nextId;
+      it('should not fetch if data for the subprocesso already exists', async () => {
+        // Pre-populate the store
+        store.atividades = [
+          {
+            id: 1,
+            idSubprocesso: 1,
+            descricao: 'Atividade Existente',
+            conhecimentos: []
+          }
+        ]
 
-            atividadesStore.adicionarAtividade(novaAtividade);
+        await store.carregarAtividades(1)
 
-            expect(atividadesStore.atividades.length).toBe(initialLength + 1);
-            expect(novaAtividade.id).toBe(expectedNextId);
-            expect(atividadesStore.nextId).toBe(expectedNextId + 1);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === expectedNextId)).toBe(true);
-        });
+        expect(mockApi.get).not.toHaveBeenCalled()
+        expect(store.loading).toBe(false)
+      })
 
-        it('removerAtividade should remove an activity by ID', () => {
-            const initialLength = atividadesStore.atividades.length;
-            atividadesStore.removerAtividade(1);
-            expect(atividadesStore.atividades.length).toBe(initialLength - 1);
-            expect(atividadesStore.atividades.some((a: Atividade) => a.id === 1)).toBe(false);
-        });
+      it('should handle API errors', async () => {
+        const errorMessage = 'Failed to fetch'
+        mockApi.get.mockRejectedValue(new Error(errorMessage))
 
-        it('removerAtividade should not change state if activity not found', () => {
-            const initialLength = atividadesStore.atividades.length;
-            atividadesStore.removerAtividade(999);
-            expect(atividadesStore.atividades.length).toBe(initialLength);
-        });
+        await store.carregarAtividades(2)
 
-        it('adicionarConhecimento should add a knowledge to an activity and assign nextId', () => {
-            const atividadeId = 1;
-            const novoConhecimento: Conhecimento = {id: 0, descricao: 'Novo Conhecimento Teste'};
-            const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId)?.conhecimentos.length || 0;
-            const expectedNextId = atividadesStore.nextId;
+        expect(store.loading).toBe(false)
+        expect(store.error).toBe(errorMessage)
+        expect(store.atividades).toEqual([])
+      })
 
-            atividadesStore.adicionarConhecimento(atividadeId, novoConhecimento, []);
+      it('should set loading state correctly', async () => {
+        mockApi.get.mockResolvedValue(mockSubprocessoCadastro)
+        const promise = store.carregarAtividades(1)
+        expect(store.loading).toBe(true)
+        await promise
+        expect(store.loading).toBe(false)
+      })
 
-            const atividadeAtualizada = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId);
-            expect(atividadeAtualizada?.conhecimentos.length).toBe(initialConhecimentosLength + 1);
-            expect(novoConhecimento.id).toBe(expectedNextId);
-            expect(atividadesStore.nextId).toBe(expectedNextId + 1);
-            expect(atividadeAtualizada?.conhecimentos.some((c: Conhecimento) => c.id === expectedNextId)).toBe(true);
-        });
+      it('should correctly add new atividades without removing ones from other subprocessos', async () => {
+        // Pre-populate with data from another subprocesso
+        const atividadeExistente: Atividade = {
+          id: 99,
+          idSubprocesso: 9,
+          descricao: 'Atividade de Outro Processo',
+          conhecimentos: []
+        }
+        store.atividades = [atividadeExistente]
 
-        it('adicionarConhecimento should not add knowledge if activity not found', () => {
-            const initialNextId = atividadesStore.nextId;
-            const initialLength = atividadesStore.atividades.length;
-            atividadesStore.adicionarConhecimento(999, {id: 0, descricao: 'Non Existent'}, []);
-            expect(atividadesStore.atividades.length).toBe(initialLength);
-            expect(atividadesStore.nextId).toBe(initialNextId);
-        });
+        mockApi.get.mockResolvedValue(mockSubprocessoCadastro)
+        await store.carregarAtividades(1)
 
-        it('removerConhecimento should remove a knowledge from an activity', () => {
-            const atividadeId = 1;
-            const conhecimentoId = 1; // ID of "Criação de testes de integração em Cypress"
-            const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId)?.conhecimentos.length || 0;
-
-            atividadesStore.removerConhecimento(atividadeId, conhecimentoId, []);
-
-            const atividadeAtualizada = atividadesStore.atividades.find((a: Atividade) => a.id === atividadeId);
-            expect(atividadeAtualizada?.conhecimentos.length).toBe(initialConhecimentosLength - 1);
-            expect(atividadeAtualizada?.conhecimentos.some((c: Conhecimento) => c.id === conhecimentoId)).toBe(false);
-        });
-
-        it('removerConhecimento should not change state if activity or knowledge not found', () => {
-            const initialLength = atividadesStore.atividades.length;
-            const initialConhecimentosLength = atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length || 0;
-
-            atividadesStore.removerConhecimento(999, 1, []); // Non-existent activity
-            expect(atividadesStore.atividades.length).toBe(initialLength);
-            expect(atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length).toBe(initialConhecimentosLength);
-
-            atividadesStore.removerConhecimento(1, 999, []); // Non-existent knowledge
-            expect(atividadesStore.atividades.length).toBe(initialLength);
-            expect(atividadesStore.atividades.find((a: Atividade) => a.id === 1)?.conhecimentos.length).toBe(initialConhecimentosLength);
-        });
-
-        it('fetchAtividadesPorsubprocesso should fetch and add activities without duplication', async () => {
-            // Prepare a fresh store instance for this test using helper
-            const testAtividadesStore = await prepareFreshAtividadesStore();
-    
-            // Spy on the fetchAtividadesPorSubprocesso action and mock its implementation
-            const fetchSpy = vi.spyOn(testAtividadesStore, 'fetchAtividadesPorSubprocesso').mockImplementation(async function (this: typeof testAtividadesStore, idSubprocesso: unknown) {
-                const id = idSubprocesso as number;
-                const fetchedActivities: Atividade[] = [
-                    {id: 4, descricao: "Fetched Activity 1", idSubprocesso: 3, conhecimentos: []},
-                    {id: 1, descricao: "Existing Activity", idSubprocesso: 3, conhecimentos: []}, // Duplicate
-                ];
-    
-                const atividadesDoProcesso = fetchedActivities.filter((a: Atividade) => a.idSubprocesso === id);
-    
-                atividadesDoProcesso.forEach((novaAtividade: Atividade) => {
-                    if (!testAtividadesStore.atividades.some((a: Atividade) => a.id === novaAtividade.id)) {
-                        this.atividades.push(novaAtividade);
-                    }
-                });
-            });
-    
-            const initialLength = testAtividadesStore.atividades.length; // This will be 3 (from mockAtividadesData)
-            await testAtividadesStore.fetchAtividadesPorSubprocesso(3);
-    
-            // Should add only non-duplicate fetched activity
-            expect(testAtividadesStore.atividades.length).toBe(initialLength + 1); // Expects 3 + 1 = 4
-            expect(testAtividadesStore.atividades.some((a: Atividade) => a.id === 4)).toBe(true);
-            expect(testAtividadesStore.atividades.filter((a: Atividade) => a.id === 1).length).toBe(1); // Should not duplicate existing ID 1
-    
-            fetchSpy.mockRestore(); // Restore the original implementation
-        });
-
-        it('fetchAtividadesPorSubprocesso should handle case when no activities found for subprocesso', async () => {
-            // Prepare a fresh store instance for this test using helper
-            const testAtividadesStore = await prepareFreshAtividadesStore();
-
-            const initialLength = testAtividadesStore.atividades.length;
-
-            // Fetch activities for a subprocesso that doesn't exist in mock data
-            await testAtividadesStore.fetchAtividadesPorSubprocesso(999);
-
-            // Should not add any activities since none match the subprocesso
-            expect(testAtividadesStore.atividades.length).toBe(initialLength);
-        });
-
-        it('adicionarMultiplasAtividades should add multiple activities and assign unique IDs', () => {
-            const novasAtividades: Atividade[] = [
-                {
-                    id: 0,
-                    descricao: 'Multi Atividade 1',
-                    idSubprocesso: 2,
-                    conhecimentos: [{id: 0, descricao: 'Multi Conhecimento 1'}]
-                },
-                {
-                    id: 0,
-                    descricao: 'Multi Atividade 2',
-                    idSubprocesso: 2,
-                    conhecimentos: [{id: 0, descricao: 'Multi Conhecimento 2'}]
-                },
-            ];
-            const initialLength = atividadesStore.atividades.length;
-            const initialNextId = atividadesStore.nextId;
-
-            atividadesStore.adicionarMultiplasAtividades(novasAtividades);
-
-            expect(atividadesStore.atividades.length).toBe(initialLength + 2);
-            expect(atividadesStore.atividades[initialLength].id).toBe(initialNextId);
-            expect(atividadesStore.atividades[initialLength].conhecimentos[0].id).toBe(initialNextId + 1);
-            expect(atividadesStore.atividades[initialLength + 1].id).toBe(initialNextId + 2);
-            expect(atividadesStore.atividades[initialLength + 1].conhecimentos[0].id).toBe(initialNextId + 3);
-            expect(atividadesStore.nextId).toBe(initialNextId + 4);
-        });
-
-        it('setAtividadesSnapshot should set the activities snapshot', () => {
-            const snapshotAtividades: Atividade[] = [
-                {id: 100, descricao: 'Snapshot Atividade 1', idSubprocesso: 1, conhecimentos: []},
-                {id: 101, descricao: 'Snapshot Atividade 2', idSubprocesso: 2, conhecimentos: []},
-            ];
-
-            atividadesStore.setAtividadesSnapshot(snapshotAtividades);
-
-            expect(atividadesStore.atividadesSnapshot).toEqual(snapshotAtividades);
-        });
-
-        it('importarAtividades should import activities with deduplication', () => {
-            // Mock the revisao store
-            const mockRevisaoStore = {
-                registrarMudanca: vi.fn()
-            };
-            vi.doMock('../revisao', () => ({
-                useRevisaoStore: vi.fn(() => mockRevisaoStore)
-            }));
-
-            const idSubprocessoDestino = 5;
-            const atividadesParaImportar: Atividade[] = [
-                {
-                    id: 0,
-                    descricao: 'Nova Atividade 1',
-                    idSubprocesso: 1,
-                    conhecimentos: [
-                        {id: 0, descricao: 'Conhecimento 1'},
-                        {id: 0, descricao: 'Conhecimento 2'},
-                        {id: 0, descricao: 'Conhecimento 1'} // Duplicado
-                    ]
-                },
-                {
-                    id: 0,
-                    descricao: 'Nova Atividade 2',
-                    idSubprocesso: 1,
-                    conhecimentos: [
-                        {id: 0, descricao: 'Conhecimento 3'}
-                    ]
-                },
-                {
-                    id: 0,
-                    descricao: '   ', // Descrição vazia
-                    idSubprocesso: 1,
-                    conhecimentos: []
-                },
-                {
-                    id: 0,
-                    descricao: 'Nova Atividade 1', // Duplicada na seleção
-                    idSubprocesso: 1,
-                    conhecimentos: []
-                }
-            ];
-
-            const initialLength = atividadesStore.atividades.length;
-            const initialNextId = atividadesStore.nextId;
-
-            const resultado = atividadesStore.importarAtividades(idSubprocessoDestino, atividadesParaImportar);
-
-            // Deve importar apenas atividades válidas e não duplicadas
-            expect(resultado.importadas).toBe(2); // 2 atividades válidas
-            expect(resultado.ignoradas.length).toBe(2); // 2 atividades ignoradas (vazia e duplicada)
-            expect(atividadesStore.atividades.length).toBe(initialLength + 2);
-
-            // Verificar se as atividades foram adicionadas com IDs corretos
-            const atividadesAdicionadas = atividadesStore.atividades.slice(-2);
-            expect(atividadesAdicionadas[0].id).toBe(initialNextId);
-            expect(atividadesAdicionadas[1].id).toBe(initialNextId + 3); // +3 porque: +1 para atividade1, +2 para seus 2 conhecimentos
-            expect(atividadesAdicionadas[0].idSubprocesso).toBe(idSubprocessoDestino);
-            expect(atividadesAdicionadas[1].idSubprocesso).toBe(idSubprocessoDestino);
-
-            // Verificar deduplicação de conhecimentos
-            expect(atividadesAdicionadas[0].conhecimentos.length).toBe(2); // 2 conhecimentos únicos
-            expect(atividadesAdicionadas[0].conhecimentos[0].id).toBe(initialNextId + 1);
-            expect(atividadesAdicionadas[0].conhecimentos[1].id).toBe(initialNextId + 2);
-
-            // Verificar se o nextId foi atualizado corretamente
-            expect(atividadesStore.nextId).toBe(initialNextId + 5); // 2 atividades + 3 conhecimentos (2 para primeira atividade, 1 para segunda)
-        });
-
-        it('importarAtividades should handle empty activities list', () => {
-            const mockRevisaoStore = {
-                registrarMudanca: vi.fn()
-            };
-            vi.doMock('../revisao', () => ({
-                useRevisaoStore: vi.fn(() => mockRevisaoStore)
-            }));
-
-            const resultado = atividadesStore.importarAtividades(1, []);
-
-            expect(resultado.importadas).toBe(0);
-            expect(resultado.ignoradas.length).toBe(0);
-        });
-    });
-});
+        expect(store.atividades).toHaveLength(3) // 1 existing + 2 new
+        expect(store.atividades).toEqual(
+          expect.arrayContaining([expect.objectContaining(atividadeExistente)])
+        )
+        expect(store.getAtividadesPorSubprocesso(1)).toHaveLength(2)
+      })
+    })
+  })
+})
