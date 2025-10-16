@@ -19,7 +19,6 @@ import sgc.sgrh.Usuario;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
 
 @RestController
 @RequestMapping("/api/subprocessos")
@@ -33,6 +32,7 @@ public class SubprocessoMapaControle {
     private final ImpactoMapaService impactoMapaService;
     private final SubprocessoDtoService subprocessoDtoService;
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
+    private final SubprocessoConsultaService subprocessoConsultaService;
 
     @GetMapping("/{id}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
@@ -40,15 +40,9 @@ public class SubprocessoMapaControle {
         return impactoMapaService.verificarImpactos(id, usuario);
     }
 
-    private final SubprocessoRepo subprocessoRepo;
-
     @GetMapping("/{id}/mapa")
     public MapaCompletoDto obterMapa(@PathVariable Long id) {
-        Subprocesso subprocesso = subprocessoRepo.findById(id)
-                .orElseThrow(() -> new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
-        if (subprocesso.getMapa() == null) {
-            throw new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
-        }
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(id);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
     }
 
@@ -93,11 +87,7 @@ public class SubprocessoMapaControle {
     @GetMapping("/{id}/mapa-completo")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long id) {
-        Subprocesso subprocesso = subprocessoRepo.findById(id)
-                .orElseThrow(() -> new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
-        if (subprocesso.getMapa() == null) {
-            throw new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
-        }
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(id);
         MapaCompletoDto mapa = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
         return ResponseEntity.ok(mapa);
     }

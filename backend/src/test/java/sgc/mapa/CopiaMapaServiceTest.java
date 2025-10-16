@@ -87,13 +87,15 @@ class CopiaMapaServiceTest {
 
         ArgumentCaptor<Atividade> atividadeCaptor = ArgumentCaptor.forClass(Atividade.class);
         verify(atividadeRepo, times(1)).save(atividadeCaptor.capture());
-        assertThat(atividadeCaptor.getValue().getDescricao()).isEqualTo("Atividade Teste");
-        assertThat(atividadeCaptor.getValue().getMapa().getUnidade()).isEqualTo(novoMapa.getUnidade());
+        Atividade atividadeSalva = atividadeCaptor.getValue();
+        assertThat(atividadeSalva.getDescricao()).isEqualTo("Atividade Teste");
+        assertThat(atividadeSalva.getMapa().getUnidade()).isEqualTo(novoMapa.getUnidade());
 
         ArgumentCaptor<Conhecimento> conhecimentoCaptor = ArgumentCaptor.forClass(Conhecimento.class);
         verify(repositorioConhecimento, times(1)).save(conhecimentoCaptor.capture());
-        assertThat(conhecimentoCaptor.getValue().getDescricao()).isEqualTo("Conhecimento Teste");
-        assertThat(conhecimentoCaptor.getValue().getAtividade().getDescricao()).isEqualTo(atividadeCaptor.getValue().getDescricao());
+        Conhecimento conhecimentoSalvo = conhecimentoCaptor.getValue();
+        assertThat(conhecimentoSalvo.getDescricao()).isEqualTo("Conhecimento Teste");
+        assertThat(conhecimentoSalvo.getAtividade().getDescricao()).isEqualTo(atividadeSalva.getDescricao());
     }
 
     @Test

@@ -130,8 +130,7 @@ class AlertaServiceTest {
 
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
-        AlertaUsuario alertaUsuarioSalvo = captor.getValue();
-        assertNotNull(alertaUsuarioSalvo.getDataHoraLeitura());
+        assertNotNull(captor.getValue().getDataHoraLeitura());
     }
 
     @Test
