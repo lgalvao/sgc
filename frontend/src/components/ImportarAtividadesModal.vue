@@ -145,6 +145,7 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import {useAtividadesStore} from '@/stores/atividades'
 import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
 
@@ -158,6 +159,7 @@ const emit = defineEmits<{
 }>()
 
 const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 const atividadesStore = useAtividadesStore()
 
 const processoSelecionado = ref<Processo | null>(null)
@@ -214,7 +216,7 @@ function resetModal() {
 
 function selecionarProcesso(processo: Processo | null) {
   processoSelecionado.value = processo
-  unidadesParticipantes.value = processo ? processosStore.getUnidadesDoProcesso(processo.id) : []
+  unidadesParticipantes.value = processo ? subprocessosStore.getUnidadesDoProcesso(processo.id) : []
   unidadeSelecionada.value = null
   unidadeSelecionadaId.value = null
 }

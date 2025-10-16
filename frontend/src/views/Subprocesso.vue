@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -87,6 +87,7 @@ import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import {usePerfilStore} from '@/stores/perfil'
 import {
   Mapa,
@@ -116,6 +117,7 @@ const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
 const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
 const {processos} = storeToRefs(processosStore)
@@ -123,8 +125,12 @@ const {processos} = storeToRefs(processosStore)
 // Estados reativos para o modal de alteração de data limite
 const mostrarModalAlterarDataLimite = ref(false)
 
+onMounted(async () => {
+  await processosStore.carregarDetalhesProcesso(idProcesso.value);
+});
+
 const SubprocessoDetalhes = computed<Subprocesso | undefined>(() => {
-  return processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === siglaParam.value);
+  return subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === siglaParam.value);
 });
 
 const processoAtual = computed<Processo | null>(() => {
@@ -258,7 +264,9 @@ const dataLimiteAtual = computed(() => {
 
 const movements = computed<Movimentacao[]>(() => {
   if (!SubprocessoDetalhes.value) return [];
-  return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.id);
+  // Assumindo que as movimentações farão parte do objeto Subprocesso no futuro.
+  // Por enquanto, pode vir de um mock ou de um estado separado se necessário.
+  return SubprocessoDetalhes.value.movimentacoes || [];
 });
 
 function navegarParaMapa() {

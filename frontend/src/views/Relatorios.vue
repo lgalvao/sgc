@@ -309,8 +309,9 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import {useMapasStore} from '@/stores/mapas'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
@@ -321,6 +322,7 @@ type CSVData = Record<string, string | number | undefined>;
 
 // Stores
 const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 const mapasStore = useMapasStore()
 
 
@@ -455,12 +457,19 @@ const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
 
+onMounted(async () => {
+  // Garante que os subprocessos de todos os processos visíveis sejam carregados
+  for (const processo of processosFiltrados.value) {
+    await processosStore.carregarDetalhesProcesso(processo.id);
+  }
+});
+
 const getUnidadesParticipantes = (idProcesso: number) => {
-  return processosStore.getUnidadesDoProcesso(idProcesso)
+  return subprocessosStore.getUnidadesDoProcesso(idProcesso)
 }
 
 const calcularPercentualConcluido = (idProcesso: number) => {
-  const subprocessos = processosStore.getUnidadesDoProcesso(idProcesso)
+  const subprocessos = subprocessosStore.getUnidadesDoProcesso(idProcesso)
   if (subprocessos.length === 0) return 0
 
   const concluidos = subprocessos.filter(sp =>
