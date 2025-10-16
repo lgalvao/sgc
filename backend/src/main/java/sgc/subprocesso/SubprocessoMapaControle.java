@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.ImpactoMapaService;
@@ -48,7 +49,7 @@ public class SubprocessoMapaControle {
         if (subprocesso.getMapa() == null) {
             throw new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
         }
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo());
+        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
     }
 
     @GetMapping("/{id}/mapa-visualizacao")
@@ -83,5 +84,37 @@ public class SubprocessoMapaControle {
                 request.competencias(),
                 usuario.getTituloEleitoral()
         );
+    }
+
+    /**
+     * CDU-15 - Obter mapa completo com competências e atividades aninhadas.
+     * GET /api/subprocessos/{id}/mapa-completo
+     */
+    @GetMapping("/{id}/mapa-completo")
+    @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
+    public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long id) {
+        Subprocesso subprocesso = subprocessoRepo.findById(id)
+                .orElseThrow(() -> new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
+        if (subprocesso.getMapa() == null) {
+            throw new sgc.comum.erros.ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
+        }
+        MapaCompletoDto mapa = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
+        return ResponseEntity.ok(mapa);
+    }
+
+    /**
+     * CDU-15 - Salvar mapa completo (criar/editar competências + vínculos).
+     * PUT /api/subprocessos/{id}/mapa-completo
+     */
+    @PutMapping("/{id}/mapa-completo")
+    @Transactional
+    @Operation(summary = "Salva um mapa completo com competências e atividades (CDU-15)")
+    public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
+            @PathVariable Long id,
+            @RequestBody @Valid SalvarMapaRequest request,
+            @AuthenticationPrincipal Usuario usuario
+    ) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
+        return ResponseEntity.ok(mapa);
     }
 }

@@ -35,18 +35,16 @@ public class MapaService {
     private final MapaRepo repositorioMapa;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
-    private final SubprocessoRepo repositorioSubprocesso;
     private final MapaVinculoService mapaVinculoService;
     private final MapaIntegridadeService mapaIntegridadeService;
 
     @Transactional(readOnly = true)
-    public MapaCompletoDto obterMapaCompleto(Long idMapa) {
-        log.debug("Obtendo mapa completo: id={}", idMapa);
+    public MapaCompletoDto obterMapaCompleto(Long idMapa, Long idSubprocesso) {
+        log.debug("Obtendo mapa completo: id={}, idSubprocesso={}", idMapa, idSubprocesso);
 
         Mapa mapa = repositorioMapa.findById(idMapa)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(idMapa)));
 
-        Long idSubprocesso = buscarSubprocessoDoMapa(idMapa);
         List<Competencia> competencias = repositorioCompetencia.findByMapaCodigo(idMapa);
 
         List<CompetenciaMapaDto> competenciasDto = competencias.stream()
@@ -117,12 +115,25 @@ public class MapaService {
         }
 
         mapaIntegridadeService.validarIntegridadeMapa(idMapa);
-        return obterMapaCompleto(idMapa);
+        // Reconstruir o MapaCompletoDto para retorno
+        List<Competencia> competenciasFinais = repositorioCompetencia.findByMapaCodigo(idMapa);
+        List<CompetenciaMapaDto> competenciasDtoFinais = competenciasFinais.stream()
+                .map(c -> {
+                    List<Long> idsAtividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getAtividadeCodigo()).collect(Collectors.toList());
+                    return new CompetenciaMapaDto(
+                            c.getCodigo(),
+                            c.getDescricao(),
+                            idsAtividades
+                    );
+                })
+                .toList();
+
+        return new MapaCompletoDto(
+                mapa.getCodigo(),
+                null, // idSubprocesso não está disponível aqui, deve ser tratado pelo chamador
+                mapa.getObservacoesDisponibilizacao(),
+                competenciasDtoFinais
+        );
     }
 
-    private Long buscarSubprocessoDoMapa(Long idMapa) {
-        return repositorioSubprocesso.findByMapaCodigo(idMapa)
-                .map(Subprocesso::getCodigo)
-                .orElse(null);
-    }
 }

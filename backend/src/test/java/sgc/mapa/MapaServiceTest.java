@@ -17,7 +17,6 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,14 +38,10 @@ class MapaServiceTest {
     @Mock
     private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 
-    @Mock
-    private SubprocessoRepo repositorioSubprocesso;
-
     @InjectMocks
     private MapaService mapaServico;
 
     private Mapa mapa;
-    private Subprocesso subprocesso;
     private Competencia competencia;
     private CompetenciaAtividade competenciaAtividade;
 
@@ -56,7 +51,7 @@ class MapaServiceTest {
         mapa.setCodigo(1L);
         mapa.setObservacoesDisponibilizacao("Observações do Mapa");
 
-        subprocesso = new Subprocesso();
+        Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setMapa(mapa);
 
@@ -72,15 +67,15 @@ class MapaServiceTest {
     @Test
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
         when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
-        when(repositorioSubprocesso.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
+        // Não precisamos mais mockar repositorioSubprocesso.findByMapaCodigo(1L) aqui, pois MapaService não o usa mais.
         when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
         when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 
-        MapaCompletoDto mapaCompleto = mapaServico.obterMapaCompleto(1L);
+        MapaCompletoDto mapaCompleto = mapaServico.obterMapaCompleto(1L, 100L); // Passando idSubprocesso
 
         assertThat(mapaCompleto).isNotNull();
         assertThat(mapaCompleto.codigo()).isEqualTo(1L);
-        assertThat(mapaCompleto.subprocessoCodigo()).isEqualTo(100L);
+        assertThat(mapaCompleto.subprocessoCodigo()).isEqualTo(100L); // Este valor agora vem do parâmetro
         assertThat(mapaCompleto.observacoes()).isEqualTo("Observações do Mapa");
         assertThat(mapaCompleto.competencias()).hasSize(1);
         assertThat(mapaCompleto.competencias().getFirst().descricao()).isEqualTo("Competência 1");
@@ -90,7 +85,7 @@ class MapaServiceTest {
     void obterMapaCompleto_deveLancarErro_quandoMapaNaoEncontrado() {
         when(repositorioMapa.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L))
+        assertThatThrownBy(() -> mapaServico.obterMapaCompleto(1L, 100L)) // Passando idSubprocesso
                 .isInstanceOf(ErroDominioNaoEncontrado.class)
                 .hasMessage("Mapa não encontrado: 1");
     }

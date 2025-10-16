@@ -5,51 +5,57 @@ Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subproce
 
 A principal responsabilidade deste módulo é garantir que as transições de estado (`situacao`) sigam as regras de negócio e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimentacao`).
 
+Para melhor organização e desacoplamento, o `SubprocessoControle` original foi dividido em três controladores especializados: `SubprocessoCrudControle`, `SubprocessoMapaControle` e `SubprocessoValidacaoControle`. Além disso, um novo serviço, `SubprocessoMapaWorkflowService`, foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
+
 ## Arquitetura de Serviços (Padrão Fachada)
-A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa, usando o padrão **Service Facade**. O `SubprocessoService` atua como o ponto de entrada, orquestrando as operações e delegando a lógica para serviços mais especializados.
+A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa, usando o padrão **Service Facade**. O `SubprocessoService` atua como o ponto de entrada para operações de CRUD, enquanto os novos controladores delegam a lógica para serviços mais especializados.
 
 ```mermaid
 graph TD
     subgraph "Frontend"
-        Controle(SubprocessoControle)
+        ControleCrud(SubprocessoCrudControle)
+        ControleMapa(SubprocessoMapaControle)
+        ControleValidacao(SubprocessoValidacaoControle)
     end
 
     subgraph "Módulo Subprocesso"
-        Facade(SubprocessoService - Fachada)
+        Facade(SubprocessoService - Fachada CRUD)
 
         subgraph "Serviços Especializados"
             Workflow(SubprocessoWorkflowService)
             DtoBuilder(SubprocessoDtoService)
             Mapa(SubprocessoMapaService)
+            MapaWorkflow(SubprocessoMapaWorkflowService)
             Notificacao(SubprocessoNotificacaoService)
         end
 
         Repos(Repositórios JPA)
     end
 
-    Controle -- Utiliza --> Facade
+    ControleCrud -- Utiliza --> Facade
+    ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder
+    ControleValidacao -- Utiliza --> Workflow & DtoBuilder
 
-    Facade -- Orquestra e delega para --> Workflow
-    Facade -- Orquestra e delega para --> DtoBuilder
-    Facade -- Orquestra e delega para --> Mapa
-    Facade -- Orquestra e delega para --> Notificacao
-
-    Workflow & DtoBuilder & Mapa & Notificacao -- Acessam --> Repos
+    Facade -- Orquestra e delega para --> Repos
+    Workflow & DtoBuilder & Mapa & MapaWorkflow & Notificacao -- Acessam --> Repos
 ```
 
 ## Componentes Principais
 
+### Controladores REST
+- **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD (criar, ler, atualizar, excluir) para a entidade `Subprocesso`.
+- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências dentro de um subprocesso, incluindo visualização, salvamento e verificação de impactos.
+- **`SubprocessoValidacaoControle`**: Lida com as ações de workflow e validação do subprocesso, como disponibilizar o mapa, apresentar sugestões, validar, devolver e homologar.
+
 ### Camada de Fachada
-- **`SubprocessoService`**: O ponto de entrada do módulo. Ele expõe métodos de alto nível (ex: `devolverCadastro`, `disponibilizarMapa`) e orquestra os serviços especializados para executar a ação.
+- **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD do subprocesso, delegando para os repositórios.
 
 ### Serviços Especializados
 - **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado, validando a situação atual, atualizando-a e criando o registro de `Movimentacao`.
 - **`SubprocessoDtoService`**: Responsável por construir os DTOs de visualização complexos (ex: `SubprocessoCadastroDto`), que agregam dados de múltiplas fontes.
 - **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação entre o subprocesso e o mapa de competências.
+- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow do subprocesso, incluindo a atualização do estado do subprocesso.
 - **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações (e-mails, alertas) específicas para os eventos do subprocesso.
-
-### Outros Componentes
-- **`SubprocessoControle`**: Expõe a API REST para o frontend. Cada endpoint corresponde a uma ação do usuário no workflow.
 - **`modelo/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
 - **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
 

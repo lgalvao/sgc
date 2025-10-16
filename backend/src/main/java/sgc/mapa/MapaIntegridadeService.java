@@ -24,28 +24,7 @@ public class MapaIntegridadeService {
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final MapaService mapaService;
 
-    @Transactional(readOnly = true)
-    public void validarMapaCompleto(Long idMapa) {
-        log.debug("Validando integridade do mapa: idMapa={}", idMapa);
 
-        MapaCompletoDto mapa = mapaService.obterMapaCompleto(idMapa);
-
-        for (CompetenciaMapaDto comp : mapa.competencias()) {
-            if (comp.atividadesCodigos().isEmpty()) {
-                throw new IllegalStateException("A competência '%s' não possui atividades vinculadas".formatted(comp.descricao()));
-            }
-        }
-
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);
-
-        for (Atividade atividade : atividades) {
-            boolean temVinculo = competenciaAtividadeRepo.existsByAtividadeCodigo(atividade.getCodigo());
-            if (!temVinculo) {
-                throw new IllegalStateException("A atividade '%s' não está vinculada a nenhuma competência".formatted(atividade.getDescricao()));
-            }
-        }
-        log.debug("Mapa {} validado com sucesso", idMapa);
-    }
 
     public void validarIntegridadeMapa(Long idMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);

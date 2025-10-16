@@ -23,7 +23,6 @@ class CustomExceptionsTest {
         assertEquals(message, exception.getMessage());
     }
 
-
     @Test
     @DisplayName("Deve instanciar ErroServicoExterno com mensagem")
     void testErroServicoExternoWithMessage() {

@@ -53,8 +53,8 @@ graph TD
 ### 1. `processo` (Orquestrador)
 - **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros módulos, mantendo o sistema desacoplado.
 
-### 2. `subprocesso` (Máquina de Estados)
-- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`.
+### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
+- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (operações de workflow e validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
 
 ### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
 - **Responsabilidade:** Gerenciam os artefatos centrais do sistema.

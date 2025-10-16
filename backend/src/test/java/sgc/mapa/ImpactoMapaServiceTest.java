@@ -13,8 +13,6 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -47,12 +45,6 @@ class ImpactoMapaServiceTest {
 
     @Mock
     private AtividadeRepo atividadeRepo;
-
-    @Mock
-    private CompetenciaRepo repositorioCompetencia;
-
-    @Mock
-    private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 
     @Mock
     private ImpactoAtividadeService impactoAtividadeService;
@@ -190,7 +182,13 @@ class ImpactoMapaServiceTest {
         atividadeNova.setDescricao("Atividade Nova");
         atividadeNova.setMapa(mapaSubprocesso);
 
-        AtividadeImpactadaDto atividadeInseridaDto = new AtividadeImpactadaDto(10L, "Atividade Nova", TipoImpactoAtividade.INSERIDA, null, List.of());
+        AtividadeImpactadaDto atividadeInseridaDto = new AtividadeImpactadaDto(
+                10L,
+                "Atividade Nova",
+                TipoImpactoAtividade.INSERIDA,
+                null,
+                List.of()
+        );
         List<AtividadeImpactadaDto> inseridas = List.of(atividadeInseridaDto);
 
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
@@ -246,7 +244,13 @@ class ImpactoMapaServiceTest {
         when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
         when(atividadeRepo.findByMapaCodigo(mapaSubprocesso.getCodigo())).thenReturn(List.of(atividadeAtual));
         when(impactoAtividadeService.obterAtividadesDoMapa(mapaVigente)).thenReturn(List.of(atividadeVigente));
-        AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(10L, "Descrição Antiga", TipoImpactoAtividade.REMOVIDA, null, List.of());
+
+        AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(10L,
+                "Descrição Antiga",
+                TipoImpactoAtividade.REMOVIDA,
+                null,
+                List.of());
+
         List<AtividadeImpactadaDto> removidas = List.of(atividadeRemovidaDto);
 
         when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividadeAtual), List.of(atividadeVigente))).thenReturn(alteradas);

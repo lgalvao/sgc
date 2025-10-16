@@ -313,7 +313,7 @@ tasks.register<Test>("verboseTest") {
     group = "verification"
     description = "Rodar testes com saída completa"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
-    jvmArgs.set(tasks.withType<Test>().getByName("test").jvmArgs)
+    jvmArgs.addAll(tasks.withType<Test>().getByName("test").jvmArgs)
 
     val byteBuddyAgentFile =
         project.configurations.getByName("testRuntimeClasspath").files.find { it.name.contains("byte-buddy-agent") }

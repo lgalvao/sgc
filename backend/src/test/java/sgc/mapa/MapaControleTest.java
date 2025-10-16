@@ -173,46 +173,4 @@ public class MapaControleTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    void obterCompleto_QuandoMapaExiste_DeveRetornarOk() throws Exception {
-        MapaCompletoDto mapaCompletoDto = new MapaCompletoDto(1L, 100L, OBS, Collections.emptyList());
-        when(mapaService.obterMapaCompleto(1L)).thenReturn(mapaCompletoDto);
-
-        mockMvc.perform(get(API_MAPAS_1_COMPLETO))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
-    }
-
-    @Test
-    void obterCompleto_QuandoServicoLancaExcecao_DeveRetornarNotFound() throws Exception {
-        when(mapaService.obterMapaCompleto(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("Mapa não encontrado"));
-
-        mockMvc.perform(get(API_MAPAS_1_COMPLETO))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void salvarCompleto_ComDadosValidos_DeveRetornarOk() throws Exception {
-        SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        MapaCompletoDto mapaCompletoDto = new MapaCompletoDto(1L, 100L, OBS, Collections.emptyList());
-
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenReturn(mapaCompletoDto);
-
-        mockMvc.perform(put(API_MAPAS_1_COMPLETO)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
-    }
-
-    @Test
-    void salvarCompleto_QuandoServicoLancaExcecao_DeveRetornarBadRequest() throws Exception {
-        SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyLong())).thenThrow(new IllegalArgumentException("Argumento inválido"));
-
-        mockMvc.perform(put(API_MAPAS_1_COMPLETO)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-    }
 }

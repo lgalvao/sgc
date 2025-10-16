@@ -93,30 +93,4 @@ public class MapaControle {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * CDU-15 - Obter mapa completo com competências e atividades aninhadas.
-     * GET /api/mapas/{id}/completo
-     */
-    @GetMapping("/{id}/completo")
-    @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
-    public ResponseEntity<MapaCompletoDto> obterCompleto(@PathVariable Long id) {
-        MapaCompletoDto mapa = mapaService.obterMapaCompleto(id);
-        return ResponseEntity.ok(mapa);
-    }
-
-    /**
-     * CDU-15 - Salvar mapa completo (criar/editar competências + vínculos).
-     * PUT /api/mapas/{id}/completo
-     */
-    @PutMapping("/{id}/completo")
-    @Transactional
-    @Operation(summary = "Salva um mapa completo com competências e atividades (CDU-15)")
-    public ResponseEntity<MapaCompletoDto> salvarCompleto(
-            @PathVariable Long id,
-            @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTituloEleitoral());
-        return ResponseEntity.ok(mapa);
-    }
 }
