@@ -1,90 +1,53 @@
-# Módulo de Competências - SGC
+# Módulo de Competência
 
 ## Visão Geral
-Este pacote é responsável por gerenciar as **Competências** e sua associação com **Atividades**. Ele fornece uma API REST para o gerenciamento CRUD (Criar, Ler, Atualizar, Excluir) de competências e para gerenciar os vínculos que conectam uma competência a uma ou mais atividades.
+Este pacote gerencia a entidade `Competencia` e sua associação com `Atividades`. Uma competência representa um conjunto de habilidades ou conhecimentos, e este módulo fornece a API REST para seu gerenciamento completo, incluindo a criação, leitura, atualização e exclusão de competências, bem como a gestão dos vínculos com as atividades que as compõem.
 
-A lógica de negócio e a exposição dos endpoints estão centralizadas em um único controlador, `CompetenciaControle`, que orquestra as interações com as entidades e repositórios.
+## Arquitetura e Componentes
+Seguindo o padrão arquitetural da aplicação, a lógica de negócio foi encapsulada no `CompetenciaService`. O `CompetenciaControle` atua como a camada de API, recebendo as requisições HTTP e delegando a execução para o serviço.
 
-## Arquivos Principais
-
-### 1. `CompetenciaControle.java`
-**Localização:** `backend/src/main/java/sgc/competencia/CompetenciaControle.java`
-- **Descrição:** Controlador REST que centraliza todas as operações relacionadas a competências e seus vínculos com atividades.
-- **Endpoints de Competência:**
-  - `GET /api/competencias`: Lista todas as competências.
-  - `POST /api/competencias`: Cria uma nova competência.
-  - `PUT /api/competencias/{id}`: Atualiza uma competência existente.
-  - `DELETE /api/competencias/{id}`: Exclui uma competência.
-- **Endpoints de Vínculo Competência-Atividade (Aninhados):**
-  - `GET /api/competencias/{idCompetencia}/atividades`: Lista as atividades vinculadas a uma competência.
-  - `POST /api/competencias/{idCompetencia}/atividades`: Cria um novo vínculo entre a competência e uma atividade.
-  - `DELETE /api/competencias/{idCompetencia}/atividades/{idAtividade}`: Remove um vínculo existente.
-
-### 2. Entidades (`modelo/`)
-- **`Competencia.java`**: Entidade JPA que representa uma competência. Mapeia a tabela `COMPETENCIA`.
-- **`CompetenciaAtividade.java`**: Entidade que representa a tabela de associação entre `Competencia` e `Atividade`. Utiliza uma chave primária composta (`@EmbeddedId`).
-
-### 3. Repositórios (`modelo/`)
-- **`CompetenciaRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade `Competencia`.
-- **`CompetenciaAtividadeRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade de associação `CompetenciaAtividade`.
-
-### 4. DTOs e Mappers (`dto/`)
-**Localização:** `backend/src/main/java/sgc/competencia/dto/`
-- **Descrição:** Contém os Data Transfer Objects (DTOs) para a comunicação via API, como `CompetenciaDto`, desacoplando a representação da API da estrutura interna das entidades.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário"
-        U[Usuário via API]
+    subgraph "Frontend"
+        Frontend
     end
 
     subgraph "Módulo Competência"
-        CC(CompetenciaControle)
-
-        CR[CompetenciaRepo]
-        CAR[CompetenciaAtividadeRepo]
-
-        C_E(Competencia)
-        CA_E(CompetenciaAtividade)
+        Controle(CompetenciaControle)
+        Service(CompetenciaService)
+        subgraph "Repositórios"
+            CompetenciaRepo
+            CompetenciaAtividadeRepo
+        end
+        subgraph "Modelos de Dados"
+            Competencia
+            CompetenciaAtividade
+        end
     end
 
-    U -- Requisições --> CC
-    CC -- Usa --> CR
-    CC -- Usa --> CAR
-    CR -- Gerencia --> C_E
-    CAR -- Gerencia --> CA_E
+    Frontend -- API REST --> Controle
+
+    Controle -- Delega para --> Service
+
+    Service -- Utiliza --> CompetenciaRepo & CompetenciaAtividadeRepo
+
+    CompetenciaRepo -- Gerencia --> Competencia
+    CompetenciaAtividadeRepo -- Gerencia --> CompetenciaAtividade
 ```
 
-## Como Usar
+## Componentes Principais
+- **`CompetenciaControle`**: Expõe a API REST para gerenciar `Competencias` e seus vínculos com `Atividades`.
+  - **Endpoints de Competência**:
+    - `POST /api/competencias`: Cria uma nova competência.
+    - `PUT /api/competencias/{id}`: Atualiza uma competência.
+    - `DELETE /api/competencias/{id}`: Exclui uma competência.
+  - **Endpoints de Vínculo (Sub-recurso)**:
+    - `POST /api/competencias/{competenciaId}/atividades`: Associa uma atividade a uma competência.
+    - `DELETE /api/competencias/{competenciaId}/atividades/{atividadeId}`: Desassocia uma atividade.
+- **`CompetenciaService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e as regras de validação antes de interagir com os repositórios.
+- **`Competencia`**: Entidade JPA que representa uma competência.
+- **`CompetenciaAtividade`**: Entidade de associação (tabela `competencia_atividade`) que representa a relação N-para-N entre `Competencia` e `Atividade`. Utiliza uma chave primária composta.
+- **`CompetenciaRepo` / `CompetenciaAtividadeRepo`**: Repositórios Spring Data para a persistência das entidades.
 
-### Gerenciando Competências
-Interaja com os endpoints base do `CompetenciaControle`.
-
-**Exemplo: Criar uma nova competência**
-```http
-POST /api/competencias
-Content-Type: application/json
-
-{
-  "descricao": "Capacidade de Análise Crítica",
-  "mapaCodigo": 42
-}
-```
-
-### Vinculando Competência e Atividade
-Interaja com os endpoints aninhados.
-
-**Exemplo: Vincular uma competência a uma atividade**
-```http
-POST /api/competencias/10/atividades
-Content-Type: application/json
-
-{
-  "idAtividade": 25
-}
-```
-
-## Notas Importantes
-- **Chave Primária Composta**: A entidade `CompetenciaAtividade` usa uma classe aninhada `Id` como chave primária composta (`@EmbeddedId`), uma abordagem padrão para gerenciar tabelas de associação muitos-para-muitos em JPA.
-- **Controlador Consolidado**: A gestão de competências e de seus relacionamentos está consolidada no `CompetenciaControle` para simplificar a API e manter a coesão.
+## Propósito e Uso
+O módulo permite que os usuários definam competências de forma granular e, em seguida, as componham associando-as a múltiplas atividades. A API aninhada para o gerenciamento de vínculos (`/api/competencias/{id}/atividades`) segue as melhores práticas RESTful, tornando a intenção da operação clara e semântica.

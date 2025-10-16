@@ -1,83 +1,72 @@
-# Módulo de Mapa de Competências - SGC
+# Módulo de Mapa
 
 ## Visão Geral
-O pacote `mapa` é um dos módulos mais críticos do sistema, responsável por toda a gestão do **Mapa de Competências**. Um "Mapa" é um artefato complexo que representa o conjunto de competências e atividades de uma unidade organizacional em um determinado período.
+Este é um dos módulos centrais do sistema, responsável por toda a gestão do **Mapa de Competências**. Um "Mapa" é o artefato que agrega competências, atividades e conhecimentos de uma unidade organizacional.
 
-Este pacote vai muito além de um simples CRUD. Ele orquestra operações de negócio complexas, como a criação e o salvamento transacional de mapas, a validação de sua integridade, a cópia de mapas entre unidades e a análise de impacto de mudanças.
+O pacote se destaca por sua arquitetura orientada a serviços, onde a lógica de negócio complexa é dividida em componentes coesos com responsabilidades únicas.
 
-## Arquivos e Componentes Principais
+## Arquitetura de Serviços (Padrão Fachada)
+O módulo utiliza o padrão **Service Facade**. O `MapaService` atua como uma fachada, orquestrando as operações e delegando a execução para serviços mais especializados. Isso simplifica a interação para os clientes do módulo (como o `MapaControle`) e mantém cada componente focado em uma única tarefa.
 
-### 1. Entidades Core (`modelo/`)
-**Localização:** `backend/src/main/java/sgc/mapa/modelo/`
-- **`Mapa.java`**: A entidade JPA central que representa o Mapa de Competências. Possui um ciclo de vida que inclui status como "disponibilizado" e "homologado", com timestamps para cada etapa, e está diretamente associado a uma `Unidade`.
-- **`UnidadeMapa.java`**: Entidade que representa a associação entre um mapa e uma unidade, registrando o status do mapa para aquela unidade (ex: `MAPEAMENTO_CONCLUIDO`).
-
-### 2. Serviços de Negócio
-Este pacote se destaca pela sua arquitetura orientada a serviços, onde cada serviço tem uma responsabilidade de negócio bem definida.
-
-- **`MapaService.java`**: O principal serviço para a manipulação de mapas. Suas funcionalidades chave incluem:
-  - `obterMapaCompleto(...)`: Carrega um mapa com toda a sua árvore de objetos (atividades, conhecimentos, competências).
-  - `salvarMapaCompleto(...)`: Executa o salvamento **atômico** de um mapa, garantindo que o mapa, suas competências, atividades e os vínculos sejam salvos de forma consistente dentro de uma única transação.
-  - `validarMapaCompleto(...)`: Aplica regras de negócio para garantir a integridade de um mapa antes de ser disponibilizado.
-
-- **`CopiaMapaService.java`**: Serviço especializado na clonagem de mapas. Sua principal função é `copiarMapaParaUnidade(...)`, que cria uma cópia exata de um mapa existente e a associa a uma nova unidade.
-
-- **`ImpactoMapaService.java`**: Implementa a análise de impacto (CDU-12). Sua função `verificarImpactos(...)` compara o mapa atual de uma unidade com uma nova versão e identifica todas as diferenças. **Nota:** Este serviço é invocado pelo `SubprocessoService`, não diretamente pelo `MapaControle`.
-
-### 3. Controlador REST
-- **`MapaControle.java`**: Expõe os endpoints da API para interagir com o `MapaService`, focando nas operações de obter e salvar o mapa completo.
-
-### 4. DTOs (Data Transfer Objects) (`dto/`)
-**Localização:** `backend/src/main/java/sgc/mapa/dto/`
-- **Descrição:** Este sub-pacote contém DTOs complexos para lidar com as operações do serviço.
-- **DTOs Notáveis:**
-  - `MapaCompletoDto`: Uma estrutura de dados aninhada que representa o mapa completo, usado para transferir o mapa e suas relações para o frontend de uma só vez.
-  - `SalvarMapaRequestDto`: DTO que encapsula todos os dados necessários para a operação de `salvarMapaCompleto`.
-  - `ImpactoMapaDto`: DTO que estrutura o resultado da análise de impacto, separando os itens por tipo de mudança (inserido, removido, alterado).
-
-## Fluxos de Operação
-
-### Salvando um Mapa
-1.  O frontend envia uma requisição complexa (`SalvarMapaRequestDto`) para o `MapaControle`.
-2.  O controller invoca `MapaService.salvarMapaCompleto()`.
-3.  Dentro de uma única transação (`@Transactional`), o serviço executa uma sequência de operações para garantir a consistência dos dados. Se qualquer etapa falhar, a transação inteira é revertida.
-
-### Verificando o Impacto de Mudanças (Via Módulo `subprocesso`)
-1.  Uma requisição para um endpoint em `SubprocessoControle` invoca `ImpactoMapaService.verificarImpactos()`.
-2.  O serviço carrega o mapa vigente e o novo cadastro de atividades.
-3.  Ele compara as duas versões e monta o `ImpactoMapaDto` com as diferenças.
-4.  O DTO resultante é retornado para ser exibido ao usuário.
-
-## Notas Importantes
-- **Complexidade de Negócio**: Este pacote encapsula uma lógica de negócio significativa. A separação em múltiplos serviços com responsabilidades únicas é uma prática de design chave.
-- **Transacionalidade**: A natureza atômica da operação de salvamento (`salvarMapaCompleto`) é crucial para a integridade dos dados.
-- **Invocação Indireta**: Serviços como `ImpactoMapaService` e `CopiaMapaService` são utilizados por outros módulos (`subprocesso`, `processo`), não sendo expostos diretamente na API do `mapa`.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Outros Módulos"
-        PS(ProcessoService)
-        SPS(SubprocessoService)
+    subgraph "Clientes do Módulo"
+        Controle(MapaControle)
+        ProcessoService
+        SubprocessoService
     end
 
     subgraph "Módulo Mapa"
-        MC(MapaControle)
-        MS(MapaService)
-        IS(ImpactoMapaService)
-        CS(CopiaMapaService)
-        MR[MapaRepo]
+        Facade(MapaService - Fachada)
+
+        subgraph "Serviços Especializados"
+            Crud(MapaCrudService)
+            Copia(CopiaMapaService)
+            Impacto(ImpactoMapaService)
+            Visualizacao(MapaVisualizacaoService)
+        end
+
+        Repos(Repositórios JPA)
     end
 
-    MC -- Orquestra --> MS
-    PS -- Usa --> CS
-    SPS -- Usa --> IS
+    Controle -- Utiliza --> Facade
+    ProcessoService -- Utiliza --> Facade
+    SubprocessoService -- Utiliza --> Facade
 
-    MS -- Usa --> MR
-    IS -- Usa --> MR
-    CS -- Usa --> MR
+    Facade -- Orquestra e delega para --> Crud
+    Facade -- Orquestra e delega para --> Copia
+    Facade -- Orquestra e delega para --> Impacto
+    Facade -- Orquestra e delega para --> Visualizacao
 
-    style MS fill:#cce5ff,stroke:#0066cc
-    style IS fill:#d4edda,stroke:#155724
-    style CS fill:#fff3cd,stroke:#856404
+    Crud & Copia & Impacto & Visualizacao -- Acessam --> Repos
 ```
+
+## Componentes Principais
+
+### Camada de Fachada
+- **`MapaService`**: O ponto de entrada principal do módulo. Ele não contém lógica de negócio complexa, mas orquestra os outros serviços para executar operações de alto nível, como `salvarMapaCompleto` ou `obterVisualizacao`.
+
+### Serviços Especializados
+- **`MapaCrudService`**: Gerencia as operações de criação, atualização e exclusão (CRUD) das entidades do mapa (`Mapa`, `Competencia`, `Atividade`, etc.). Garante a consistência dos dados dentro de uma única transação.
+- **`CopiaMapaService`**: Responsável por clonar um mapa existente. É utilizado pelo `ProcessoService` quando um processo de "Revisão" é iniciado.
+- **`ImpactoMapaService`**: Analisa as diferenças entre duas versões de um mapa para identificar impactos (itens adicionados, removidos ou alterados). É utilizado pelo `SubprocessoService`.
+- **`MapaVisualizacaoService`**: Constrói os DTOs de visualização complexos (`MapaVisualizacaoDto`) que são usados para exibir o mapa na interface do usuário.
+
+### Outros Componentes
+- **`MapaControle`**: Expõe a API REST, recebendo requisições e delegando-as para o `MapaService`.
+- **`modelo/`**: Contém as entidades JPA, como `Mapa` e `UnidadeMapa`.
+- **`dto/`**: Contém os Data Transfer Objects, incluindo DTOs complexos como `MapaVisualizacaoDto` e `ImpactoMapaDto`.
+
+## Fluxos de Trabalho Notáveis
+
+### Salvando um Mapa
+1.  O `MapaControle` recebe uma requisição com os dados do mapa.
+2.  Ele chama o `MapaService.salvarMapaCompleto(...)`.
+3.  O `MapaService` delega a operação para o `MapaCrudService`, que executa todas as operações de persistência de forma atômica e transacional.
+
+### Copiando um Mapa para Revisão
+1.  O `ProcessoService` (de outro módulo) inicia um processo de revisão.
+2.  Ele chama o `MapaService.copiarMapaVigente(...)`.
+3.  O `MapaService` delega a chamada para o `CopiaMapaService`, que executa a clonagem do mapa ativo da unidade.
+
+Esta arquitetura garante que a lógica de negócio seja altamente coesa, testável e fácil de manter, mesmo com a complexidade das operações.
