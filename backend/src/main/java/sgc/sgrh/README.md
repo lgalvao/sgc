@@ -1,94 +1,62 @@
-# Módulo de Integração SGRH e Modelo de Usuário
+# Pacote SGRH e Usuário
 
 ## Visão Geral
-Este pacote possui uma **responsabilidade dupla** e é fundamental para o funcionamento do SGC:
+Este pacote tem uma **dupla responsabilidade** fundamental para o SGC:
 
-1.  **Modelo de Domínio Interno**: Define as entidades principais de segurança e usuário da aplicação, como `Usuario` e `Perfil`, que são persistidas no banco de dados do próprio SGC.
-2.  **Fachada de Integração (Facade)**: Atua como uma camada de abstração para consultar dados de um sistema de RH externo (SGRH). Estes dados (como a estrutura organizacional e os responsáveis por unidades) são complementares e não são armazenados diretamente no SGC.
+1.  **Gestão de Usuários e Autenticação:** Define e gerencia a entidade `Usuario` do próprio SGC. Esta entidade é usada pelo Spring Security para autenticação e para armazenar os perfis de acesso (`Perfil`) do usuário no sistema.
+2.  **Fachada para o Sistema de RH Externo:** Através do `SgrhService`, atua como uma camada de abstração (uma fachada) para buscar dados complementares de um sistema de RH externo, como a estrutura de unidades e os responsáveis por elas.
 
-## Status da Implementação
-- ✅ **Modelo de Domínio Interno**: O modelo de `Usuario` e `Perfil` está completo e funcional.
-- ⚠️ **Fachada com Dados MOCK**: O `SgrhService` está totalmente implementado com **dados simulados (mock)**. Ele está pronto para ser conectado a uma fonte de dados real (como um banco de dados Oracle), mas atualmente não realiza chamadas externas. Marcadores `// TODO:` no código indicam onde a lógica de acesso real deve ser implementada.
+**Status da Integração:** A fachada (`SgrhService`) está implementada com **dados simulados (mock)**. Ela está pronta para ser conectada a uma fonte de dados real, mas atualmente não realiza chamadas externas.
 
-## Estrutura de Pacotes
-```
-sgc/sgrh/
-├── modelo/              # Contém DTOs para a comunicação com a fachada
-│   ├── dto/
-├── Usuario.java         # A entidade JPA principal para usuários no SGC
-├── Perfil.java          # A entidade para perfis de acesso
-├── UsuarioRepo.java     # Repositório para a entidade Usuario
-└── SgrhService.java     # Serviço que atua como fachada (atualmente com MOCK)
-```
+## Arquitetura Híbrida
+O pacote gerencia uma entidade interna (`Usuario`) e, ao mesmo tempo, consulta um serviço externo, como ilustrado abaixo.
 
-## Configuração para Conexão Real
-Para conectar o `SgrhService` a uma fonte de dados real (ex: Oracle), configure as variáveis no `application.yml`:
-```yaml
-spring:
-  sgrh:
-    datasource:
-      url: ${SGRH_DB_URL:jdbc:oracle:thin:@//localhost:1521/SGRH}
-      username: ${SGRH_DB_USERNAME:sgrh_reader}
-      password: ${SGRH_DB_PASSWORD:}
-```
-
-## Como Usar
-- **Para autenticação e autorização**, o Spring Security interage com `Usuario` e `UsuarioRepo`.
-- **Para obter dados de RH (unidades, responsáveis)**, outros serviços devem injetar e usar o `SgrhService`.
-
-```java
-@Service
-@RequiredArgsConstructor
-public class MeuServico {
-    private final SgrhService sgrhService;
-    private final UsuarioRepo usuarioRepo;
-    
-    public void executarAcao(String tituloUsuario, Long idUnidade) {
-        // Obter o usuário interno do SGC
-        Optional<Usuario> usuarioInterno = usuarioRepo.findByTitulo(tituloUsuario);
-
-        // Obter dados externos (atualmente mockados) do SGRH
-        Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(idUnidade);
-    }
-}
-```
-
-## Migração de MOCK para Real no `SgrhService`
-1.  **Configurar Conexão**: Forneça as credenciais da fonte de dados externa.
-2.  **Implementar Métodos no Serviço**: No `SgrhService.java`, substitua a lógica de mock pelas chamadas reais (ex: usando `JdbcTemplate`, um cliente REST, ou repositórios que mapeiem views externas).
-
-## Diagrama de Arquitetura
 ```mermaid
 graph TD
     subgraph "Aplicação SGC"
-        U(Usuario)
-        UR[UsuarioRepo]
-        OS(Outros Serviços)
+        direction LR
+        SpringSecurity
+        OutrosServicos
+        UsuarioControle
+        UsuarioService
     end
 
-    subgraph "Módulo SGRH (Híbrido)"
-        SS(SgrhService)
-        C{Cache}
+    subgraph "Pacote SGRH (este pacote)"
+        direction LR
+        UsuarioRepo
+        SgrhServiceFacade(SgrhService - Fachada)
     end
 
     subgraph "Fontes de Dados"
-        DB_SGC[Banco de Dados SGC]
-        DB_SGRH_EXT[Fonte Externa SGRH]
-        MOCK[Dados Mock]
+        direction LR
+        DB_SGC(Banco de Dados SGC)
+        SGRH_Externo(Sistema Externo de RH)
     end
 
-    OS -- Usa --> UR
-    UR -- Gerencia --> U
-    U -- Persistido em --> DB_SGC
+    SpringSecurity & UsuarioService -- Usa --> UsuarioRepo
+    UsuarioRepo -- Gerencia entidade Usuario em --> DB_SGC
+    UsuarioControle -- Usa --> UsuarioService
 
-    OS -- Consulta --> SS
-    SS -- Acessa/Popula --> C
-    SS -- Atualmente usa --> MOCK
-    SS -- Deveria usar --> DB_SGRH_EXT
+    OutrosServicos -- Consultam --> SgrhServiceFacade
+    SgrhServiceFacade -- Busca dados em --> SGRH_Externo
 
-    style MOCK fill:#ffe6e6,stroke:#c33
-    style DB_SGRH_EXT fill:#d4edda,stroke:#155724
+    subgraph "Estado Atual"
+       SGRH_Externo(Atualmente simulado/mockado)
+    end
 ```
 
----
-**Status Atual**: ✅ Modelo Interno OK | ⚠️ Fachada Externa com MOCK
+## Componentes Principais
+
+### Gestão de Usuários (Lógica Interna)
+- **`Usuario` / `Perfil`**: Entidades JPA que modelam o usuário do SGC e seus perfis de acesso (`ADMIN`, `CHEFE`, etc.). A entidade `Usuario` implementa a interface `UserDetails` do Spring Security.
+- **`UsuarioRepo`**: Repositório para persistir e buscar usuários no banco de dados do SGC.
+- **`UsuarioService` / `UsuarioControle`**: Camada de serviço e API para operações relacionadas ao usuário, como o fluxo de login/autenticação.
+
+### Fachada de Integração (Lógica Externa)
+- **`SgrhService`**: O serviço que atua como cliente do sistema de RH externo. Outros módulos do SGC (como `alerta` ou `processo`) utilizam este serviço para obter informações sobre unidades e seus responsáveis, sem precisar conhecer os detalhes da integração.
+
+## Propósito e Uso
+- **Para autenticação e autorização**, o Spring Security interage diretamente com o `UsuarioRepo` para carregar os dados do usuário.
+- **Para obter dados de RH (unidades, responsáveis, etc.)**, outros serviços devem injetar e utilizar o `SgrhService`.
+
+Esta separação é crucial: a autenticação depende de dados internos e controlados (`Usuario`), enquanto os dados organizacionais são buscados de uma fonte de verdade externa.
