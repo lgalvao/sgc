@@ -3,14 +3,14 @@ package sgc.sgrh.dto;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
-import sgc.sgrh.Perfil;
 
+import java.util.List;
 
 @Value
 @Builder
 @Jacksonized
-public class PerfilUnidade {
-    Perfil perfil;
-    String unidade;
-    Long unidadeCodigo;
+public class LoginResponse {
+    String nome;
+    Long tituloEleitoral;
+    List<PerfilUnidade> pares;
 }
