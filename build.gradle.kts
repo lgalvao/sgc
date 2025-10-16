@@ -20,9 +20,6 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_21
     }
 
-    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-        enabled = false
-    }
 }
 
 tasks.register<Exec>("installFrontend") {
