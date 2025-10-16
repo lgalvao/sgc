@@ -1,70 +1,65 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {initPinia} from '@/test/helpers';
-import {useServidoresStore} from '../servidores';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import { useServidoresStore } from '../servidores';
+import { useApi } from '@/composables/useApi';
 
-// Mock the servidores.json import
-vi.mock('../../mocks/servidores.json', () => ({
-    default: [
-        {
-            "id": 1,
-            "nome": "Ana Paula Souza",
-            "unidade": "SESEL",
-            "email": "ana.souza@tre-pe.jus.br",
-            "ramal": "1234"
-        },
-        {
-            "id": 2,
-            "nome": "Carlos Henrique Lima",
-            "unidade": "SGP",
-            "email": "carlos.lima@tre-pe.jus.br",
-            "ramal": "2345"
-        }
-    ]
+vi.mock('@/composables/useApi', () => ({
+    useApi: vi.fn(),
 }));
 
-describe('useServidoresStore', () => {
-    let servidoresStore: ReturnType<typeof useServidoresStore>;
+const mockedUseApi = vi.mocked(useApi);
 
+const mockServidores = [
+    { id: 1, nome: 'Servidor 1', unidade: 'TEST' },
+    { id: 2, nome: 'Servidor 2', unidade: 'PROD' },
+];
+
+describe('useServidoresStore', () => {
     beforeEach(() => {
-        initPinia();
-        servidoresStore = useServidoresStore();
-        // Manually reset the store state based on the initial mock data
-        servidoresStore.$patch({
-            servidores: [
-                {
-                    "id": 1,
-                    "nome": "Ana Paula Souza",
-                    "unidade": "SESEL",
-                    "email": "ana.souza@tre-pe.jus.br",
-                    "ramal": "1234"
-                },
-                {
-                    "id": 2,
-                    "nome": "Carlos Henrique Lima",
-                    "unidade": "SGP",
-                    "email": "carlos.lima@tre-pe.jus.br",
-                    "ramal": "2345"
-                }
-            ].map(s => ({...s}))
-        });
+        setActivePinia(createPinia());
+        vi.clearAllMocks();
     });
 
-    it('should initialize with mock servidores', () => {
-        expect(servidoresStore.servidores.length).toBe(2); // Directly use the expected length
-        expect(servidoresStore.servidores[0].id).toBe(1);
+    describe('fetchServidores', () => {
+        it('deve buscar servidores com sucesso', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn().mockResolvedValue({ data: mockServidores }),
+                post: vi.fn(),
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useServidoresStore();
+            await store.fetchServidores();
+
+            expect(store.items.length).toBe(2);
+            expect(store.items[0].nome).toBe('Servidor 1');
+            expect(mockedUseApi().get).toHaveBeenCalledWith('/api/servidores');
+        });
+
+        it('deve lidar com erros na busca', async () => {
+            mockedUseApi.mockReturnValue({
+                get: vi.fn().mockRejectedValue(new Error()),
+                post: vi.fn(),
+                put: vi.fn(),
+                del: vi.fn(),
+            });
+
+            const store = useServidoresStore();
+            await store.fetchServidores();
+
+            expect(store.error).toBe('Falha ao buscar servidores.');
+        });
     });
 
     describe('getters', () => {
-        it('getServidorById should return the correct servidor by ID', () => {
-            const servidor = servidoresStore.getServidorById(1);
-            expect(servidor).toBeDefined();
-            expect(servidor?.id).toBe(1);
-            expect(servidor?.nome).toBe('Ana Paula Souza');
-        });
+        it('getServidorById deve retornar o servidor correto', () => {
+            const store = useServidoresStore();
+            store.items = mockServidores as any;
 
-        it('getServidorById should return undefined if no matching servidor is found', () => {
-            const servidor = servidoresStore.getServidorById(999);
-            expect(servidor).toBeUndefined();
+            const servidor = store.getServidorById(2);
+            expect(servidor).toBeDefined();
+            expect(servidor?.nome).toBe('Servidor 2');
         });
     });
 });

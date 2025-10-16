@@ -50,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, WithMockAdminSecurityContextFactory.class, WithMockGestorSecurityContextFactory.class})
 @DisplayName("CDU-12: Verificar impactos no mapa de competências")
 class CDU12IntegrationTest {
 
