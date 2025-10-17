@@ -120,8 +120,9 @@
   - [ ] Investigate data flow from `idAtividade` on line 88.
   - [ ] Investigate data flow from `idCompetencia` on line 105.
   - [ ] Investigate data flow from `idAtividade` on line 105.
-- [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaDto.java
-- [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaMapper.java
+- [x] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaDto.java
+- [x] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaMapper.java
+  - [ ] Investigate data flow from `value` on line 20.
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/Competencia.java
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividade.java
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividadeRepo.java
