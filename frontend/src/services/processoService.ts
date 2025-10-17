@@ -18,6 +18,24 @@ export async function criarProcesso(request: CriarProcessoRequest): Promise<Proc
   }
 }
 
+export async function iniciarProcesso(id: number, tipo: string, unidadesIds: number[]): Promise<void> {
+  try {
+    await apiClient.post(`/processos/${id}/iniciar?tipo=${tipo}`, unidadesIds);
+  } catch (error) {
+    console.error(`Erro ao iniciar o processo ${id}:`, error);
+    throw error;
+  }
+}
+
+export async function finalizarProcesso(id: number): Promise<void> {
+  try {
+    await apiClient.post(`/processos/${id}/finalizar`);
+  } catch (error) {
+    console.error(`Erro ao finalizar o processo ${id}:`, error);
+    throw error;
+  }
+}
+
 export async function obterProcessoPorId(id: number): Promise<Processo> {
   try {
     const response = await apiClient.get<any>(`/processos/${id}`);

@@ -87,11 +87,11 @@
               >
                 <div
                   v-for="ativ in atividadesParaImportar"
-                  :key="ativ.id"
+                  :key="ativ.codigo"
                   class="form-check"
                 >
                   <input
-                    :id="`ativ-check-${ativ.id}`"
+                    :id="`ativ-check-${ativ.codigo}`"
                     v-model="atividadesSelecionadas"
                     :value="ativ"
                     class="form-check-input"
@@ -146,7 +146,8 @@
 import {computed, ref, watch, onMounted} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
-import {Atividade, SituacaoProcesso, TipoProcesso} from '@/types/tipos'
+import type { Atividade } from '@/models/atividade';
+import { SituacaoProcesso, TipoProcesso} from '@/types/tipos'
 import {ProcessoResumo, UnidadeParticipante} from "@/mappers/processos";
 
 const props = defineProps<{
@@ -167,7 +168,7 @@ const unidadesParticipantes = ref<UnidadeParticipante[]>([])
 const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
-const atividadesSelecionadas = ref<Atividade[]>([])
+const atividadesSelecionadas = ref<any[]>([])
 
 const processosDisponiveis = computed<ProcessoResumo[]>(() => {
   return processosStore.processosPainel.filter(p =>
@@ -234,7 +235,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesPorSubprocesso(unidadePu.codUnidade);
+    await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade);
     const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
     atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
   } else {

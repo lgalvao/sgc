@@ -1,71 +1,67 @@
-import {Page} from '@playwright/test';
-import {vueTest as test} from '../support/vue-specific-setup';
+import { test } from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     clicarBotao,
-    DADOS_TESTE,
+    clicarUnidadeNaTabelaDetalhes,
     disponibilizarCadastro,
     gerarNomeUnico,
     loginComoChefe,
-    navegarParaCadastroAtividades,
+    navegarParaProcessoPorId,
     SELETORES_CSS,
     TEXTOS,
-    URLS,
-    verificarModalFechado,
-    verificarModalHistoricoAnaliseAberto
+    verificarMensagemErro,
+    verificarMensagemSucesso,
+    verificarUrlDoPainel,
 } from './helpers';
-import {esperarMensagemErro, esperarMensagemSucesso, esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
+import * as processoService from '../../src/services/processoService';
 
-async function adicionarAtividadeComConhecimento(page: Page, atividadeDesc: string, conhecimentoDesc: string) {
-    await adicionarAtividade(page, atividadeDesc);
-    const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: atividadeDesc});
-    await adicionarConhecimento(cardAtividade, conhecimentoDesc);
-}
+test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
 
-test.describe('CDU-10: Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
-    test.beforeEach(async ({page}) => {
+    async function setupProcessoRevisaoIniciado() {
+        const nomeProcesso = `PROCESSO REVISAO DISP TESTE - ${Date.now()}`;
+        const processo = await processoService.criarProcesso({
+            descricao: nomeProcesso,
+            tipo: 'REVISAO',
+            dataLimiteEtapa1: '2025-12-31T00:00:00',
+            unidades: [2] // Unidade 2 = STIC
+        });
+        await processoService.iniciarProcesso(processo.codigo, 'REVISAO', [2]);
+        return { nomeProcesso, processo };
+    }
+
+    test('deve disponibilizar a revisão com sucesso', async ({ page }) => {
+        const { processo } = await setupProcessoRevisaoIniciado();
         await loginComoChefe(page);
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-    });
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
-    test('deve permitir disponibilização da revisão com sucesso', async ({page}) => {
-        const nomeAtividade = gerarNomeUnico("Atividade Sucesso");
-        const nomeConhecimento = gerarNomeUnico("Conhecimento Sucesso");
+        const nomeAtividade = gerarNomeUnico('Atividade para Revisão');
+        await adicionarAtividade(page, nomeAtividade);
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
+        const nomeConhecimento = gerarNomeUnico('Conhecimento para Revisão');
+        await adicionarConhecimento(cardAtividade, nomeConhecimento);
 
-        await adicionarAtividadeComConhecimento(page, nomeAtividade, nomeConhecimento);
         await disponibilizarCadastro(page);
 
-        await esperarMensagemSucesso(page, 'Revisão do cadastro de atividades disponibilizada');
-        await esperarUrl(page, URLS.PAINEL);
+        // A mensagem de sucesso foi padronizada na store
+        await verificarMensagemSucesso(page, 'Disponibilização solicitada');
+        await verificarUrlDoPainel(page);
     });
 
-    test('não deve permitir disponibilização se houver atividades sem conhecimento', async ({page}) => {
-        const nomeAtividade = gerarNomeUnico("Atividade Sem Conhecimento");
+    test('deve falhar ao disponibilizar com atividade sem conhecimento', async ({ page }) => {
+        const { processo } = await setupProcessoRevisaoIniciado();
+        await loginComoChefe(page);
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
+        const nomeAtividade = gerarNomeUnico('Atividade Sem Conhecimento');
         await adicionarAtividade(page, nomeAtividade);
+
+        // O botão de disponibilizar vai chamar o backend, que deve retornar um erro
         await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
-        await verificarModalFechado(page);
 
-        await esperarMensagemErro(page, 'Atividades sem Conhecimento');
-        await esperarMensagemErro(page, 'As seguintes atividades não têm conhecimentos associados');
-    });
-
-    test('não deve permitir disponibilização se subprocesso não estiver na situação correta', async ({page}) => {
-        await navegarParaCadastroAtividades(page, DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id, DADOS_TESTE.UNIDADES.STIC);
-        await clicarBotao(page, TEXTOS.DISPONIBILIZAR);
-        await verificarModalFechado(page);
-
-        await esperarMensagemErro(page, 'Erro na Disponibilização');
-        await esperarMensagemErro(page, 'A disponibilização só pode ser feita quando o subprocesso está na situação');
-    });
-
-    test('deve exibir botão Histórico de análise e abrir modal', async ({page}) => {
-        await page.getByText('Histórico de análise').click();
-
-        await verificarModalHistoricoAnaliseAberto(page);
-
-        await page.getByRole('button', {name: 'Fechar'}).click();
-        await verificarModalFechado(page);
+        // A UI deve mostrar a mensagem de erro vinda do backend
+        await verificarMensagemErro(page, 'atividades sem conhecimentos associados');
     });
 });

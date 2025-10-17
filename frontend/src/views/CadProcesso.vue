@@ -268,12 +268,11 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
-import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel} from '../mappers/processos'
+import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso} from '../mappers/processos'
 import {Unidade} from '../mappers/sgrh' // Reutilizando a interface Unidade do sgrh
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
-import {TipoProcesso} from "@/types/tipos"; // Importar o serviço de processo
 
 const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
 const descricao = ref<string>('')
@@ -441,10 +440,15 @@ function fecharModalConfirmacao() {
 }
 
 async function confirmarIniciarProcesso() {
-  mostrarModalConfirmacao.value = false
+  mostrarModalConfirmacao.value = false;
   if (processoEditando.value) {
     try {
-      await processoService.iniciarProcesso(processoEditando.value.codigo);
+      // Usa a action da store, passando os parâmetros necessários
+      await processosStore.iniciarProcesso(
+          processoEditando.value.codigo,
+          tipo.value as TipoProcesso, // Garante a tipagem correta
+          unidadesSelecionadas.value
+      );
       notificacoesStore.sucesso(
           'Processo iniciado',
           'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
@@ -456,7 +460,10 @@ async function confirmarIniciarProcesso() {
       console.error('Erro ao iniciar processo:', error);
     }
   } else {
-    notificacoesStore.erro('Erro', 'Não é possível iniciar um processo não salvo.');
+    // Idealmente, o processo deveria ser salvo primeiro.
+    // O fluxo atual de salvar e depois ter que voltar para iniciar não é ideal.
+    // Por enquanto, mantemos a lógica de que apenas processos já salvos (em edição) podem ser iniciados.
+    notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
   }
 }
 

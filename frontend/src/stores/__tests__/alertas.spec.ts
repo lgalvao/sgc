@@ -42,7 +42,7 @@ describe('useAlertasStore', () => {
     describe('actions', () => {
         it('fetchAlertas should call painelService and update state', async () => {
             const mockPage = {
-                content: [{codigo: 1, descricao: 'Alerta Teste', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, usuarioDestinoTitulo: '123'}],
+                content: [{codigo: 1, descricao: 'Alerta Teste', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, unidadeDestinoCodigo: 2, usuarioDestinoTitulo: '123'}],
                 totalPages: 1,
                 totalElements: 1,
                 number: 0,
@@ -65,7 +65,7 @@ describe('useAlertasStore', () => {
                 alertaService.marcarComoLido.mockResolvedValue();
                 // Mock para o fetchAlerts que é chamado internamente
                 const mockReloadPage = {
-                    content: [{codigo: 2, descricao: 'Alerta Recarregado', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, usuarioDestinoTitulo: '123'}],
+                    content: [{codigo: 2, descricao: 'Alerta Recarregado', dataHora: '2025-01-01T10:00:00', processoCodigo: 1, unidadeOrigemCodigo: 1, unidadeDestinoCodigo: 2, usuarioDestinoTitulo: '123'}],
                     totalPages: 1,
                     totalElements: 1,
                     number: 0,

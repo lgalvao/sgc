@@ -106,7 +106,7 @@ describe('useProcessosStore', () => {
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.criarProcesso.mockResolvedValue();
+            processoService.criarProcesso.mockResolvedValue({ codigo: 2, descricao: 'Novo Processo', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-02-01', dataFinalizacao: '' });
 
             await processosStore.criarProcesso(payload);
 
@@ -121,7 +121,7 @@ describe('useProcessosStore', () => {
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.atualizarProcesso.mockResolvedValue();
+            processoService.atualizarProcesso.mockResolvedValue({ codigo: 1, descricao: 'Processo Atualizado', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', dataFinalizacao: '' });
 
             await processosStore.atualizarProcesso(1, payload);
 
@@ -136,38 +136,24 @@ describe('useProcessosStore', () => {
             expect(processoService.excluirProcesso).toHaveBeenCalledWith(1);
         });
 
-        it('iniciarProcesso should call processoService', async () => {
-            processoService.criarProcesso.mockResolvedValue({
-                codigo: 1,
-                descricao: 'Processo Iniciado',
-                tipo: 'MAPEAMENTO',
-                situacao: 'CRIADO',
-                dataLimite: '2025-12-31',
-                dataCriacao: '2025-01-01',
-                unidadeCodigo: 1,
-                unidadeNome: 'TESTE'
-            });
+        it('iniciarProcesso should call processoService with correct parameters', async () => {
+            processoService.iniciarProcesso.mockResolvedValue();
+            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
 
-            await processosStore.iniciarProcesso(1);
+            await processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20]);
 
-            expect(processoService.criarProcesso).toHaveBeenCalled();
+            expect(processoService.iniciarProcesso).toHaveBeenCalledWith(1, 'MAPEAMENTO', [10, 20]);
+            expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
 
-        it('finalizarProcesso should call processoService', async () => {
-            processoService.atualizarProcesso.mockResolvedValue({
-                codigo: 1,
-                descricao: 'Processo Finalizado',
-                tipo: 'MAPEAMENTO',
-                situacao: 'FINALIZADO',
-                dataLimite: '2025-12-31',
-                dataCriacao: '2025-01-01',
-                unidadeCodigo: 1,
-                unidadeNome: 'TESTE'
-            });
+        it('finalizarProcesso should call processoService and reload details', async () => {
+            processoService.finalizarProcesso.mockResolvedValue();
+            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
 
             await processosStore.finalizarProcesso(1);
 
-            expect(processoService.atualizarProcesso).toHaveBeenCalled();
+            expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
+            expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
     });
 });
