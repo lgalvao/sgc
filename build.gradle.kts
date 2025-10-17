@@ -23,6 +23,10 @@ subprojects {
     tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
         enabled = false
     }
+
+    tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+        isEnabled = false
+    }
 }
 
 tasks.register<Exec>("installFrontend") {
