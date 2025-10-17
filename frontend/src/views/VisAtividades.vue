@@ -316,8 +316,8 @@ const unidadeSuperior = computed<string>(() => unidadesStore.getUnidadeImediataS
 const isHomologacao = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN && unidadeSuperior.value === 'SEDOC');
 
 const subprocesso = computed(() => {
-  if (!idSubprocesso.value) return null;
-  return (processosStore.subprocessos as Subprocesso[]).find(p => p.id === idSubprocesso.value);
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === unidadeId.value);
 });
 
 const podeVerImpacto = computed(() => {
@@ -331,21 +331,19 @@ const podeVerImpacto = computed(() => {
   return podeVer && situacaoCorreta && localizacaoCorreta;
 });
 
-const idSubprocesso = computed(() => {
-  const Subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
-      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
-  );
-  return Subprocesso?.id;
-});
+import {onMounted} from 'vue'
+
+const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
   if (idSubprocesso.value === undefined) return []
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
-const processoAtual = computed<Processo | null>(() => {
-  if (!idSubprocesso.value) return null;
-  return (processosStore.processos as Processo[]).find(p => p.id === idProcesso.value) || null;
+const processoAtual = computed(() => processosStore.processoDetalhe);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
 });
 
 const isRevisao = computed(() => processoAtual.value?.tipo === 'Revisão');
@@ -390,9 +388,8 @@ function confirmarValidacao() {
         descricao: 'Mapa de competências mantido (sem impactos)'
       });
       
-      const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-      if (subprocessoIndex !== -1) {
-        processosStore.subprocessos[subprocessoIndex].situacao = 'Mapa homologado';
+      if (subprocesso.value) {
+        subprocesso.value.situacaoSubprocesso = 'Mapa homologado';
       }
     } else {
       // 12.3 - Homologação com impactos
@@ -402,10 +399,9 @@ function confirmarValidacao() {
         unidadeDestino: 'SEDOC',
         descricao: isRevisao ? 'Cadastro de atividades e conhecimentos homologado' : 'Cadastro de atividades e conhecimentos homologado'
       });
-      
-      const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-      if (subprocessoIndex !== -1) {
-        processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro homologada' : 'Cadastro homologado';
+
+      if (subprocesso.value) {
+        subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro homologada' : 'Cadastro homologado';
       }
     }
 
@@ -433,10 +429,9 @@ function confirmarValidacao() {
     });
 
     // Alterar situação do subprocesso
-    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-    if (subprocessoIndex !== -1) {
-      processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro aceito';
-      processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSuperior || 'SEDOC';
+    if (subprocesso.value) {
+      subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro aceito';
+      subprocesso.value.unidadeAtual = unidadeSuperior || 'SEDOC';
     }
 
     // 10.7. Enviar notificação por e-mail
@@ -450,15 +445,7 @@ function confirmarValidacao() {
     const unidadeResponsavel: string = unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value) || '';
     notificacoesStore.email(assuntoEmail, 'Responsável pela ' + unidadeResponsavel, corpoEmail);
 
-    // 10.8. Criar alerta
-    const unidadeDestinoAlertaStr: string = unidadesStore.getUnidadeImediataSuperior(unidadeSubprocesso) || 'SEDOC';
-    alertasStore.criarAlerta({
-      idProcesso: idProcesso.value,
-      unidadeOrigem: unidadeAnalise,
-      unidadeDestino: unidadeDestinoAlertaStr,
-      descricao: `Cadastro de atividades e conhecimentos da unidade ${unidadeSubprocesso} submetido para análise`,
-      dataHora: new Date()
-    });
+    // A criação de alertas agora é responsabilidade do backend
 
     notificacoesStore.sucesso('Aceite registrado', 'A análise foi registrada com sucesso!');
     fecharModalValidar();
@@ -491,14 +478,13 @@ function confirmarDevolucao() {
   });
 
   // Alterar situação do subprocesso
-  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-  if (subprocessoIndex !== -1) {
-    processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
-    processosStore.subprocessos[subprocessoIndex].unidadeAtual = unidadeSubprocesso;
+  if (subprocesso.value) {
+    subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
+    subprocesso.value.unidadeAtual = unidadeSubprocesso;
 
     // 10.8. Se a unidade de devolução for a própria unidade do subprocesso, apagar dataFimEtapa1
     if (unidadeSubprocesso === siglaUnidade.value) {
-      processosStore.subprocessos[subprocessoIndex].dataFimEtapa1 = null;
+      // A data de fim da etapa será definida pelo backend
     }
   }
 
@@ -509,14 +495,7 @@ function confirmarDevolucao() {
 
   notificacoesStore.email(assuntoEmail, `Responsável pela ${unidadeSubprocesso}`, corpoEmail);
 
-  // 9.10. Criar alerta
-  alertasStore.criarAlerta({
-    idProcesso: idProcesso.value,
-    unidadeOrigem: unidadeAnalise,
-    unidadeDestino: unidadeSubprocesso,
-    descricao: `Cadastro de atividades e conhecimentos da unidade ${unidadeSubprocesso} devolvido para ajustes`,
-    dataHora: new Date()
-  });
+  // A criação de alertas agora é responsabilidade do backend
 
   const mensagemSucesso = isRevisao ? 'Revisão do cadastro devolvida' : 'Cadastro devolvido';
 
@@ -567,13 +546,10 @@ function fecharModalHomologacaoSemImpacto() {
 }
 
 function confirmarHomologacaoSemImpacto() {
-  if (!idSubprocesso.value) return;
+  if (!subprocesso.value) return;
   
   // 12.2.4 - Alterar situação para 'Mapa homologado'
-  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
-  if (subprocessoIndex !== -1) {
-    processosStore.subprocessos[subprocessoIndex].situacao = 'Mapa homologado';
-  }
+  subprocesso.value.situacaoSubprocesso = 'Mapa homologado';
   
   notificacoesStore.sucesso('Homologação efetivada', 'O mapa de competências vigente foi mantido!');
   fecharModalHomologacaoSemImpacto();

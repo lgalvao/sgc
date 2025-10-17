@@ -3,54 +3,37 @@ import {storeToRefs} from 'pinia';
 import {usePerfilStore} from '@/stores/perfil';
 import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
-import {Perfil, Processo, SituacaoProcesso} from '@/types/tipos';
+import {Perfil, SituacaoProcesso} from '@/types/tipos';
+import {ProcessoResumo} from "@/mappers/processos";
 
 export function useProcessosFiltrados(filterBySituacaoFinalizado: Ref<boolean> = ref(false)) {
-  const perfil = usePerfilStore();
-  const processosStore = useProcessosStore();
-  const unidadesStore = useUnidadesStore();
+    const perfil = usePerfilStore();
+    const processosStore = useProcessosStore();
+    const unidadesStore = useUnidadesStore();
 
-  const { processos } = storeToRefs(processosStore);
+    const {processosPainel} = storeToRefs(processosStore);
 
-  const processosFiltrados = computed<Processo[]>(() => {
-    const unidadeUsuario = perfil.unidadeSelecionada;
-    const perfilUsuario = perfil.perfilSelecionado;
+    const processosFiltrados = computed<ProcessoResumo[]>(() => {
+        const unidadeUsuario = perfil.unidadeSelecionada;
+        const perfilUsuario = perfil.perfilSelecionado;
 
-    let processosBase = processos.value as Processo[];
+        let processosBase = processosPainel.value;
 
-    if (filterBySituacaoFinalizado.value) {
-      processosBase = processosBase.filter(p => p.situacao === SituacaoProcesso.FINALIZADO);
-    }
+        if (filterBySituacaoFinalizado.value) {
+            processosBase = processosBase.filter(p => p.situacao === 'FINALIZADO');
+        }
 
-    // Se o perfil for ADMIN, retorna todos os processos (base ou finalizados)
-    if (perfilUsuario === Perfil.ADMIN) {
-      return processosBase;
-    }
-    
-    // Excluir processos "Criado" para perfis não-ADMIN (CDU-02)
-    processosBase = processosBase.filter(p => p.situacao !== SituacaoProcesso.CRIADO);
-    
-    // Para GESTOR, CHEFE, SERVIDOR, filtra pela unidade
-    if (unidadeUsuario) {
-      let unidadesParaFiltrar: string[] = [];
+        // A lógica de filtragem foi simplificada, pois o backend já deve retornar os processos
+        // corretos para o perfil e unidade do usuário.
+        // A filtragem client-side agora apenas lida com a situação (Finalizado/Não Finalizado).
 
-      if (perfilUsuario === Perfil.GESTOR) {
-        // Para GESTOR, inclui a unidade atual e todas as subordinadas
-        unidadesParaFiltrar = unidadesStore.getUnidadesSubordinadas(unidadeUsuario);
-      } else if (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR) {
-        // Para CHEFE e SERVIDOR, apenas a unidade atual
-        unidadesParaFiltrar = [unidadeUsuario];
-      }
+        // Excluir processos "Criado" para perfis não-ADMIN (CDU-02)
+        if (perfilUsuario !== Perfil.ADMIN) {
+            processosBase = processosBase.filter(p => p.situacao !== 'CRIADO');
+        }
 
-      return processosBase.filter(p => {
-        const unidadesDoProcesso = processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade);
-        // Verifica se alguma unidade do processo está na lista de unidades do usuário
-        return unidadesDoProcesso.some(unidadeProcesso => unidadesParaFiltrar.includes(unidadeProcesso));
-      });
-    }
-    // Se não houver unidade selecionada e não for ADMIN, retorna todos os processos base
-    return processosBase;
-  });
+        return processosBase;
+    });
 
-  return { processosFiltrados };
+    return {processosFiltrados};
 }

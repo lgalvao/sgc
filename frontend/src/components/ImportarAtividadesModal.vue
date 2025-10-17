@@ -37,8 +37,8 @@
                 </option>
                 <option
                   v-for="proc in processosDisponiveis"
-                  :key="proc.id"
-                  :value="proc.id"
+                  :key="proc.codigo"
+                  :value="proc.codigo"
                 >
                   {{ proc.descricao }}
                 </option>
@@ -71,10 +71,10 @@
                 </option>
                 <option
                   v-for="pu in unidadesParticipantes"
-                  :key="pu.id"
-                  :value="pu.id"
+                  :key="pu.codUnidade"
+                  :value="pu.codUnidade"
                 >
-                  {{ pu.unidade }}
+                  {{ pu.sigla }}
                 </option>
               </select>
             </div>
@@ -143,10 +143,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed, ref, watch, onMounted} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
-import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos'
+import {Atividade, SituacaoProcesso, TipoProcesso} from '@/types/tipos'
+import {ProcessoResumo, UnidadeParticipante} from "@/mappers/processos";
 
 const props = defineProps<{
   mostrar: boolean
@@ -160,19 +161,25 @@ const emit = defineEmits<{
 const processosStore = useProcessosStore()
 const atividadesStore = useAtividadesStore()
 
-const processoSelecionado = ref<Processo | null>(null)
+const processoSelecionado = ref<ProcessoResumo | null>(null)
 const processoSelecionadoId = ref<number | null>(null)
-const unidadesParticipantes = ref<Subprocesso[]>([])
-const unidadeSelecionada = ref<Subprocesso | null>(null)
+const unidadesParticipantes = ref<UnidadeParticipante[]>([])
+const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
 const atividadesSelecionadas = ref<Atividade[]>([])
 
-const processosDisponiveis = computed<Processo[]>(() => {
-  return processosStore.processos.filter(p =>
-    (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === SituacaoProcesso.FINALIZADO
+const processosDisponiveis = computed<ProcessoResumo[]>(() => {
+  return processosStore.processosPainel.filter(p =>
+      (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'FINALIZADO'
   )
 })
+
+onMounted(() => {
+  // Carregar processos quando o componente for montado
+  processosStore.fetchProcessosPainel('ADMIN', 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
+});
+
 
 watch(() => props.mostrar, (mostrar) => {
   if (mostrar) {
@@ -180,20 +187,20 @@ watch(() => props.mostrar, (mostrar) => {
   }
 })
 
-watch(processoSelecionadoId, (newId) => {
+watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosDisponiveis.value.find(p => p.id === newId)
+    const processo = processosDisponiveis.value.find(p => p.codigo === newId)
     if (processo) {
-      selecionarProcesso(processo)
+      await selecionarProcesso(processo)
     }
   } else {
-    selecionarProcesso(null)
+    await selecionarProcesso(null)
   }
 })
 
 watch(unidadeSelecionadaId, (newId) => {
   if (newId) {
-    const unidade = unidadesParticipantes.value.find(u => u.id === newId)
+    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === newId)
     if (unidade) {
       selecionarUnidade(unidade)
     }
@@ -212,21 +219,26 @@ function resetModal() {
   atividadesSelecionadas.value = []
 }
 
-function selecionarProcesso(processo: Processo | null) {
-  processoSelecionado.value = processo
-  unidadesParticipantes.value = processo ? processosStore.getUnidadesDoProcesso(processo.id) : []
+async function selecionarProcesso(processo: ProcessoResumo | null) {
+  processoSelecionado.value = processo;
+  if (processo) {
+    await processosStore.fetchProcessoDetalhe(processo.codigo);
+    unidadesParticipantes.value = processosStore.processoDetalhe?.unidades || [];
+  } else {
+    unidadesParticipantes.value = [];
+  }
   unidadeSelecionada.value = null
   unidadeSelecionadaId.value = null
 }
 
-async function selecionarUnidade(unidadePu: Subprocesso | null) {
+async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesPorSubprocesso(unidadePu.id)
-    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.id)
-    atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : []
+    await atividadesStore.fetchAtividadesPorSubprocesso(unidadePu.codUnidade);
+    const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade);
+    atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
   } else {
-    atividadesParaImportar.value = []
+    atividadesParaImportar.value = [];
   }
 }
 

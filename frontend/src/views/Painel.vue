@@ -193,13 +193,22 @@ const alertasOrdenados = computed(() => {
   });
 });
 
-function ordenarAlertasPor(campo: 'dataHora' | 'processoCodigo') {
-  if (alertaCriterio.value === campo) {
-    alertaAsc.value = !alertaAsc.value;
-  } else {
-    alertaCriterio.value = campo;
-    alertaAsc.value = true; // primeira ordenação do campo em asc
-  }
+function ordenarAlertasPor(campo: 'data' | 'processo') {
+    if (campo === 'data') {
+        if (alertaCriterio.value === 'dataHora') {
+            alertaAsc.value = !alertaAsc.value;
+        } else {
+            alertaCriterio.value = 'dataHora';
+            alertaAsc.value = false;
+        }
+    } else {
+        if (alertaCriterio.value === 'processoCodigo') {
+            alertaAsc.value = !alertaAsc.value;
+        } else {
+            alertaCriterio.value = 'processoCodigo';
+            alertaAsc.value = true;
+        }
+    }
 }
 
 function marcarComoLido(idAlerta: number) {

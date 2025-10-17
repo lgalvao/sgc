@@ -59,7 +59,7 @@
           </div>
 
           <div
-            v-if="loginStep === 2 && paresDisponiveis.length > 1"
+            v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
             class="mb-3"
             data-testid="secao-perfil-unidade"
           >

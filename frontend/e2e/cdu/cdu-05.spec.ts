@@ -61,7 +61,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
     test('deve iniciar processo com sucesso', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
         await preencherFormularioProcesso(page, 'Teste CDU-05 Sucesso', 'Revisão', '2025-12-31', true);
-        await iniciarProcesso(page);
+        await iniciarProcesso(page, 1, 'Revisão', [1, 2, 3]);
 
         await verificarMensagemSucesso(page, TEXTOS.PROCESSO_INICIADO);
         await verificarUrlDoPainel(page);
