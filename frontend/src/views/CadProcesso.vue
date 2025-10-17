@@ -263,7 +263,6 @@
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
-import { useSubprocessosStore } from '@/stores/subprocessos'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
@@ -281,7 +280,6 @@ const dataLimite = ref<string>('')
 const router = useRouter()
 const route = useRoute()
 const processosStore = useProcessosStore()
-const subprocessosStore = useSubprocessosStore()
 const unidadesStore = useUnidadesStore()
 const mapasStore = useMapasStore()
 const servidoresStore = useServidoresStore()
@@ -292,22 +290,18 @@ const mostrarModalRemocao = ref(false)
 const processoEditando = ref<Processo | null>(null)
 
 // Carregar processo se estiver editando
-onMounted(async () => {
+onMounted(() => {
   const idProcesso = route.query.idProcesso;
   if (idProcesso) {
-    const processoId = Number(idProcesso);
-    // Assegura que os detalhes do processo (incluindo subprocessos) sejam carregados
-    await processosStore.carregarDetalhesProcesso(processoId);
-
-    const processo = processosStore.processos.find(p => p.id === processoId);
+    const processo = processosStore.processos.find(p => p.id === Number(idProcesso));
     if (processo) {
       processoEditando.value = processo;
       descricao.value = processo.descricao;
       tipo.value = processo.tipo;
       dataLimite.value = processo.dataLimite.toISOString().split('T')[0];
-
-      // Carregar unidades participantes do store de subprocessos
-      const subprocessos = subprocessosStore.getUnidadesDoProcesso(processo.id);
+      
+      // Carregar unidades participantes
+      const subprocessos = processosStore.getUnidadesDoProcesso(processo.id);
       unidadesSelecionadas.value = subprocessos.map(sp => sp.unidade);
     }
   }

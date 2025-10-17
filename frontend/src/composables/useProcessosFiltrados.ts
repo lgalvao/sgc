@@ -2,14 +2,12 @@ import {computed, Ref, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import {usePerfilStore} from '@/stores/perfil';
 import {useProcessosStore} from '@/stores/processos';
-import { useSubprocessosStore } from '@/stores/subprocessos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {Perfil, Processo, SituacaoProcesso} from '@/types/tipos';
 
 export function useProcessosFiltrados(filterBySituacaoFinalizado: Ref<boolean> = ref(false)) {
   const perfil = usePerfilStore();
   const processosStore = useProcessosStore();
-  const subprocessosStore = useSubprocessosStore();
   const unidadesStore = useUnidadesStore();
 
   const { processos } = storeToRefs(processosStore);
@@ -45,7 +43,7 @@ export function useProcessosFiltrados(filterBySituacaoFinalizado: Ref<boolean> =
       }
 
       return processosBase.filter(p => {
-        const unidadesDoProcesso = subprocessosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade);
+        const unidadesDoProcesso = processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade);
         // Verifica se alguma unidade do processo está na lista de unidades do usuário
         return unidadesDoProcesso.some(unidadeProcesso => unidadesParaFiltrar.includes(unidadeProcesso));
       });

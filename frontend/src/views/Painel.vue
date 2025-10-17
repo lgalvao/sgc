@@ -86,11 +86,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
-import { useSubprocessosStore } from '@/stores/subprocessos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
 import {Perfil, Processo} from '@/types/tipos'
@@ -100,7 +99,6 @@ import {formatDateTimeBR} from '@/utils';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
-const subprocessosStore = useSubprocessosStore()
 const alertasStore = useAlertasStore()
 
 const {processos} = storeToRefs(processosStore) // Manter para alertas, mas não para a tabela de processos
@@ -114,21 +112,14 @@ const asc = ref(true)
 // Usar o novo composable para obter os processos filtrados
 const { processosFiltrados } = useProcessosFiltrados();
 
-onMounted(async () => {
-  // Garante que os subprocessos de todos os processos visíveis sejam carregados
-  for (const processo of processosFiltrados.value) {
-    await processosStore.carregarDetalhesProcesso(processo.id);
-  }
-});
-
 const processosOrdenados = computed<Processo[]>(() => {
   return [...processosFiltrados.value].sort((a, b) => {
     let valA: unknown = a[criterio.value as keyof Processo]
     let valB: unknown = b[criterio.value as keyof Processo]
 
     if (criterio.value === 'unidades') {
-      valA = subprocessosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidade).join(', ')
-      valB = subprocessosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidade).join(', ')
+      valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidade).join(', ')
+      valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidade).join(', ')
     }
 
     const valAString = String(valA);
@@ -144,7 +135,7 @@ const processosOrdenados = computed<Processo[]>(() => {
 const processosOrdenadosComUnidades = computed(() => {
   return processosOrdenados.value.map(p => ({
     ...p,
-    unidadesFormatadas: subprocessosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', ')
+    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', ')
   }));
 });
 

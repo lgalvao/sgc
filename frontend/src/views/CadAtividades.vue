@@ -368,7 +368,6 @@ import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import { useSubprocessosStore } from '@/stores/subprocessos'
 import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {useMapasStore} from '@/stores/mapas'
 import {useAlertasStore} from '@/stores/alertas'
@@ -395,7 +394,6 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
-const subprocessosStore = useSubprocessosStore()
 const revisaoStore = useRevisaoStore()
 const alertasStore = useAlertasStore()
 const analisesStore = useAnalisesStore()
@@ -424,10 +422,10 @@ const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}
 const novaAtividade = ref('')
 
 const idSubprocesso = computed(() => {
-  const subprocesso = subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find(
-      pu => pu.unidade === unidadeId.value
+  const Subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
-  return subprocesso?.id;
+  return Subprocesso?.id;
 });
 
 const atividades = computed<AtividadeComEdicao[]>({
@@ -656,7 +654,7 @@ const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE)
 
 const subprocesso = computed(() => {
   if (!idSubprocesso.value) return null;
-  return subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find(p => p.id === idSubprocesso.value);
+  return (processosStore.subprocessos as Subprocesso[]).find(p => p.id === idSubprocesso.value);
 });
 
 const podeVerImpacto = computed(() => {
@@ -690,8 +688,6 @@ const cleanupBackdrop = () => {
 };
 
 onMounted(async () => {
-  await processosStore.carregarDetalhesProcesso(idProcesso.value);
-
   modalElement.value = document.getElementById('importarAtividadesModal');
   modalElement.value?.addEventListener('hidden.bs.modal', cleanupBackdrop);
 
@@ -742,7 +738,7 @@ const processosDisponiveis = computed<Processo[]>(() => {
 
 function selecionarProcesso(processo: Processo | null) {
   processoSelecionado.value = processo
-  unidadesParticipantes.value = processo ? subprocessosStore.getUnidadesDoProcesso(processo.id) : []
+  unidadesParticipantes.value = processo ? processosStore.getUnidadesDoProcesso(processo.id) : []
   unidadeSelecionada.value = null // Reseta a unidade ao trocar de processo
   unidadeSelecionadaId.value = null
 }
@@ -782,8 +778,8 @@ function fecharModalHistorico() {
 
 function disponibilizarCadastro() {
   // 1. Verificação da situação do subprocesso
-  const subprocesso = subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find(
-      pu => pu.unidade === unidadeId.value
+  const subprocesso = (processosStore.subprocessos as Subprocesso[]).find(
+      pu => pu.idProcesso === idProcesso.value && pu.unidade === unidadeId.value
   );
 
   const situacaoEsperada = isRevisao.value ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
@@ -853,10 +849,12 @@ async function confirmarDisponibilizacao() {
   }
 
   // Alterar situação do subprocesso
-  const subprocessoRef = subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find(pu => pu.id === idSubprocesso.value);
-  if (subprocessoRef) {
-    subprocessoRef.situacao = isRevisao ? 'Revisão do cadastro disponibilizada' : 'Cadastro disponibilizado';
-    subprocessoRef.dataFimEtapa1 = new Date();
+  const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === idSubprocesso.value);
+  if (subprocessoIndex !== -1) {
+    processosStore.subprocessos[subprocessoIndex].situacao = isRevisao ? 'Revisão do cadastro disponibilizada' : 'Cadastro disponibilizado';
+
+    // Definir data/hora de conclusão da etapa 1
+    processosStore.subprocessos[subprocessoIndex].dataFimEtapa1 = new Date();
   }
 
   // Registrar movimentação
@@ -924,9 +922,9 @@ function fecharModalImpacto() {
 async function verificarEAlterarSituacao() {
   if (subprocesso.value?.situacao === 'Não iniciado' && idSubprocesso.value) {
     const novaSituacao = isRevisao.value ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
-    const subprocessoRef = subprocessosStore.getUnidadesDoProcesso(idProcesso.value).find(sp => sp.id === idSubprocesso.value);
-    if (subprocessoRef) {
-      subprocessoRef.situacao = novaSituacao;
+    const subprocessoIndex = processosStore.subprocessos.findIndex(sp => sp.id === idSubprocesso.value);
+    if (subprocessoIndex !== -1) {
+      processosStore.subprocessos[subprocessoIndex].situacao = novaSituacao;
       await nextTick();
     }
   }
