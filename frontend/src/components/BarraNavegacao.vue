@@ -48,7 +48,7 @@
 import {computed} from 'vue';
 import {type RouteLocationNamedRaw, useRoute, useRouter} from 'vue-router';
 import {usePerfilStore} from "@/stores/perfil";
-import {Perfil} from "@/types/tipos";
+import {Perfil} from "@/models/perfil";
 
 const route = useRoute();
 const router = useRouter();

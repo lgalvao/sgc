@@ -43,16 +43,16 @@
             <div class="d-flex flex-wrap gap-2">
               <div
                 v-for="atividade in atividades"
-                :key="atividade.id"
-                :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
+                :key="atividade.codigo"
+                :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
                 class="card atividade-card-item"
-                @click="toggleAtividade(atividade.id)"
+                @click="toggleAtividade(atividade.codigo)"
               >
                 <div class="card-body d-flex align-items-center py-2">
                   <input
-                    :id="`atv-${atividade.id}`"
+                    :id="`atv-${atividade.codigo}`"
                     v-model="atividadesSelecionadas"
-                    :value="atividade.id"
+                    :value="atividade.codigo"
                     class="form-check-input me-2"
                     hidden
                     type="checkbox"
@@ -106,7 +106,8 @@
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
-import {Atividade, Competencia} from '@/types/tipos'
+import {Atividade} from '@/models/atividade'
+import {Competencia} from '@/models/competencia'
 
 const props = defineProps<{
   mostrar: boolean
@@ -147,12 +148,12 @@ watch(() => props.mostrar, (mostrar) => {
   }
 })
 
-function toggleAtividade(id: number) {
-  const index = atividadesSelecionadas.value.indexOf(id)
+function toggleAtividade(codigo: number) {
+  const index = atividadesSelecionadas.value.indexOf(codigo)
   if (index > -1) {
     atividadesSelecionadas.value.splice(index, 1)
   } else {
-    atividadesSelecionadas.value.push(id)
+    atividadesSelecionadas.value.push(codigo)
   }
 }
 

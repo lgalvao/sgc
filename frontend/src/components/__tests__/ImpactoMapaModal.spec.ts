@@ -3,50 +3,56 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
 import {initPinia} from '@/test-utils/helpers';
 import {TipoMudanca} from '@/stores/revisao';
-import type {Atividade, Competencia, Conhecimento, Mapa, Processo, Unidade} from '@/types/tipos';
+import type {Atividade} from '@/models/atividade';
+import type {Competencia} from '@/models/competencia';
+import type {Conhecimento} from '@/models/conhecimento';
+import type {Mapa} from '@/models/mapa';
+import type {Processo} from '@/models/processo';
+import type {Unidade} from '@/models/unidade';
+
 
 // Mock de dados simplificados
 const mockUnidade: Unidade = {
-  id: 1,
+  codigo: 1,
   sigla: 'UNID1',
   nome: 'Unidade 1',
 } as Unidade; // Type assertion para evitar a necessidade de todas as propriedades
 
 const mockProcesso: Processo = {
-  id: 100,
+  codigo: 100,
   descricao: 'Processo de Teste',
 } as Processo;
 
 const mockCompetencia1: Competencia = {
-  id: 1,
+  codigo: 1,
   descricao: 'Competencia 1',
   atividadesAssociadas: [10, 11],
 } as Competencia;
 
 const mockCompetencia2: Competencia = {
-  id: 2,
+  codigo: 2,
   descricao: 'Competencia 2',
   atividadesAssociadas: [12],
 } as Competencia;
 
 const mockMapa: Mapa = {
-  id: 1,
+  codigo: 1,
   idUnidade: 1,
   idProcesso: 100,
   competencias: [mockCompetencia1, mockCompetencia2],
   atividades: [
-    { id: 10, descricao: 'Atividade Existente 1' } as Atividade,
-    { id: 11, descricao: 'Atividade Existente 2' } as Atividade,
+    { codigo: 10, descricao: 'Atividade Existente 1' } as Atividade,
+    { codigo: 11, descricao: 'Atividade Existente 2' } as Atividade,
   ],
 } as unknown as Mapa;
 
 const mockAtividadeAdicionada: Atividade = {
-  id: 20,
+  codigo: 20,
   descricao: 'Nova Atividade',
 } as Atividade;
 
 const mockConhecimentoAdicionado: Conhecimento = {
-  id: 30,
+  codigo: 30,
   descricao: 'Novo Conhecimento',
   idAtividade: 20,
 } as Conhecimento;
@@ -150,17 +156,17 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe atividades inseridas corretamente', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 1,
+        codigo: 1,
         tipo: TipoMudanca.AtividadeAdicionada,
         descricaoAtividade: mockAtividadeAdicionada.descricao,
-        idAtividade: mockAtividadeAdicionada.id,
+        idAtividade: mockAtividadeAdicionada.codigo,
         competenciasImpactadasIds: [],
       },
       {
-        id: 2,
+        codigo: 2,
         tipo: TipoMudanca.ConhecimentoAdicionado,
         descricaoConhecimento: mockConhecimentoAdicionado.descricao,
-        idAtividade: mockAtividadeAdicionada.id,
+        idAtividade: mockAtividadeAdicionada.codigo,
         competenciasImpactadasIds: [],
       },
     ];
@@ -197,7 +203,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe competências impactadas por atividade removida', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 3,
+        codigo: 3,
         tipo: TipoMudanca.AtividadeRemovida,
         descricaoAtividade: 'Atividade Removida',
         idAtividade: 10, // Atividade 10 está associada à Competencia 1 no mockMapa
@@ -222,7 +228,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe competências impactadas por conhecimento adicionado', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 4,
+        codigo: 4,
         tipo: TipoMudanca.ConhecimentoAdicionado,
         descricaoConhecimento: 'Conhecimento Adicionado',
         idAtividade: 10, // Atividade 10 está associada à Competencia 1 no mockMapa
@@ -272,7 +278,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe atividades alteradas corretamente', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 5,
+        codigo: 5,
         tipo: TipoMudanca.AtividadeAlterada,
         descricaoAtividade: 'Atividade Alterada',
         idAtividade: 10,
@@ -298,7 +304,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe conhecimentos alterados corretamente', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 6,
+        codigo: 6,
         tipo: TipoMudanca.ConhecimentoAlterado,
         descricaoConhecimento: 'Conhecimento Alterado',
         idAtividade: 10,
@@ -324,7 +330,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('exibe competências impactadas por IDs explícitos', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 7,
+        codigo: 7,
         tipo: TipoMudanca.AtividadeRemovida,
         descricaoAtividade: 'Atividade Removida',
         idAtividade: 10,
@@ -364,7 +370,7 @@ describe('ImpactoMapaModal.vue', () => {
   it('processa competências impactadas por atividades associadas', async () => {
     mockRevisaoStore.mudancasParaImpacto = [
       {
-        id: 8,
+        codigo: 8,
         tipo: TipoMudanca.ConhecimentoAdicionado,
         descricaoConhecimento: 'Novo Conhecimento',
         idAtividade: 10, // Atividade 10 está associada à Competencia 1

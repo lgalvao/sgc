@@ -98,7 +98,7 @@
                     type="checkbox"
                   >
                   <label
-                    :for="`ativ-check-${ativ.id}`"
+                    :for="`ativ-check-${ativ.codigo}`"
                     class="form-check-label"
                   >
                     {{ ativ.descricao }}
@@ -147,7 +147,7 @@ import {computed, ref, watch, onMounted} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
 import type { Atividade } from '@/models/atividade';
-import { SituacaoProcesso, TipoProcesso} from '@/types/tipos'
+import { SituacaoProcesso, TipoProcesso} from '@/models/processo'
 import {ProcessoResumo, UnidadeParticipante} from "@/mappers/processos";
 
 const props = defineProps<{

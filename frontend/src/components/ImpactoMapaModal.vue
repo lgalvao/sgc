@@ -37,7 +37,7 @@
                 <div class="list-group mb-4">
                   <div
                     v-for="atividade in atividadesInseridas"
-                    :key="atividade.id"
+                    :key="atividade.codigo"
                     class="list-group-item flex-column align-items-start"
                   >
                     <div class="d-flex w-100 justify-content-start align-items-start">
@@ -62,7 +62,7 @@
                           <ul class="list-unstyled mt-1">
                             <li
                               v-for="conhecimento in conhecimentosAtividade(atividade.idAtividade)"
-                              :key="conhecimento.id"
+                              :key="conhecimento.codigo"
                               class="d-flex align-items-center mb-1"
                             >
                               <i
@@ -109,7 +109,7 @@
                   <ul class="list-group list-group-flush">
                     <li
                       v-for="mudanca in mudancasCompetencia"
-                      :key="mudanca.id"
+                      :key="mudanca.codigo"
                       class="list-group-item d-flex align-items-center"
                     >
                       <i
@@ -186,7 +186,8 @@ import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
 import {Mudanca, TipoMudanca, useRevisaoStore} from '@/stores/revisao';
-import {Competencia, Processo} from '@/types/tipos';
+import {Competencia} from '@/models/competencia';
+import {Processo} from '@/models/processo';
 
 const props = defineProps<{
   mostrar: boolean;
@@ -231,7 +232,7 @@ const changeDetails = {
 const unidade = computed(() => unidadesStore.pesquisarUnidade(props.siglaUnidade));
 const processo = computed(() => processosStore.processoDetalhe ? {
     ...processosStore.processoDetalhe,
-    id: processosStore.processoDetalhe.codigo,
+    codigo: processosStore.processoDetalhe.codigo,
     dataFinalizacao: processosStore.processoDetalhe.dataFinalizacao ? new Date(processosStore.processoDetalhe.dataFinalizacao) : null,
     dataLimite: new Date(processosStore.processoDetalhe.dataLimite),
 } : undefined);
@@ -276,12 +277,12 @@ const competenciasImpactadas = computed<Map<number, { competencia: Competencia, 
         // Verifica competências explicitamente marcadas como impactadas
         if (mudanca.competenciasImpactadasIds && mudanca.competenciasImpactadasIds.length > 0) {
           mudanca.competenciasImpactadasIds.forEach(idCompetenciaImpactada => {
-            const competencia = mapaAtual.competencias.find(c => c.id === idCompetenciaImpactada);
+            const competencia = mapaAtual.competencias.find(c => c.codigo === idCompetenciaImpactada);
             if (competencia) {
-              if (!competenciasImpactadasMap.has(competencia.id)) {
-                competenciasImpactadasMap.set(competencia.id, {competencia, mudancas: []});
+              if (!competenciasImpactadasMap.has(competencia.codigo)) {
+                competenciasImpactadasMap.set(competencia.codigo, {competencia, mudancas: []});
               }
-              competenciasImpactadasMap.get(competencia.id)?.mudancas.push(mudanca);
+              competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
             }
           });
         }
@@ -290,12 +291,12 @@ const competenciasImpactadas = computed<Map<number, { competencia: Competencia, 
         if (mudanca.idAtividade) {
           mapaAtual.competencias.forEach(competencia => {
             if (competencia.atividadesAssociadas.includes(mudanca.idAtividade as number)) {
-              if (!competenciasImpactadasMap.has(competencia.id)) {
-                competenciasImpactadasMap.set(competencia.id, {competencia, mudancas: []});
+              if (!competenciasImpactadasMap.has(competencia.codigo)) {
+                competenciasImpactadasMap.set(competencia.codigo, {competencia, mudancas: []});
               }
-              const mudancasExistentes = competenciasImpactadasMap.get(competencia.id)?.mudancas || [];
-              if (!mudancasExistentes.some(m => m.id === mudanca.id)) {
-                competenciasImpactadasMap.get(competencia.id)?.mudancas.push(mudanca);
+              const mudancasExistentes = competenciasImpactadasMap.get(competencia.codigo)?.mudancas || [];
+              if (!mudancasExistentes.some(m => m.codigo === mudanca.codigo)) {
+                competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
               }
             }
           });

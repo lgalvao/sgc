@@ -35,7 +35,7 @@
 
 <script lang="ts" setup>
 import {PropType} from 'vue';
-import {Unidade} from '@/types/tipos';
+import {Unidade} from '@/models/unidade';
 
 defineProps({
   unidade: {
