@@ -11,6 +11,7 @@ import {
     alertasSchema,
     alertasServidorSchema,
     analisesSchema,
+    atividadesSchema,
     atribuicoesSchema,
     carregarMock,
     mapasSchema,
@@ -45,6 +46,11 @@ describe('Validação dos mocks com Zod', () => {
   it('servidores.json deve validar contra o schema mínimo', () => {
     const data = carregarMock('servidores.json');
     expect(() => servidoresSchema.parse(data)).not.toThrow();
+  });
+
+  it('atividades.json deve validar contra o schema mínimo', () => {
+    const data = carregarMock('atividades.json');
+    expect(() => atividadesSchema.parse(data)).not.toThrow();
   });
 
   it('analises.json deve validar contra o schema mínimo', () => {

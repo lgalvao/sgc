@@ -49,8 +49,8 @@ A substituição dos dados mockados está sendo feita de forma gradual, store po
 
 1.  **[CONCLUÍDO]** `unidades.ts` (`GET /api/unidades`)
 2.  **[CONCLUÍDO]** `processos.ts` (`GET /api/processos`)
-3.  **[CONCLUÍDO]** `subprocessos.ts` (`GET /api/processos/{id}/detalhes`)
-4.  **[CONCLUÍDO]** `atividades.ts` (`GET /api/subprocessos/{id}/cadastro`)
+3.  **[PENDENTE]** `subprocessos.ts` (`GET /api/processos/{id}/subprocessos`)
+4.  **[PENDENTE]** `atividades.ts` (`GET /api/subprocessos/{id}/cadastro`)
 5.  ... e assim por diante para os demais stores.
 
 ### 2.5. Mapeadores (Mappers)

@@ -45,8 +45,7 @@
       </div>
     </div>
 
-    <!-- Adicionar atividade (Funcionalidade desabilitada temporariamente) -->
-    <!--
+    <!-- Adicionar atividade -->
     <form
       class="row g-2 align-items-center mb-4"
       @submit.prevent="adicionarAtividade"
@@ -75,7 +74,6 @@
         </button>
       </div>
     </form>
-    -->
 
     <!-- Lista de atividades -->
     <div
@@ -455,7 +453,6 @@ const processoAtual = computed<Processo | null>(() => {
 
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
-/*
 function adicionarAtividade() {
   if (novaAtividade.value?.trim() && idSubprocesso.value !== undefined) {
     const novaAtividadeObj = {
@@ -464,7 +461,7 @@ function adicionarAtividade() {
       idSubprocesso: idSubprocesso.value,
       conhecimentos: [],
     };
-    // atividadesStore.adicionarAtividade(novaAtividadeObj);
+    atividadesStore.adicionarAtividade(novaAtividadeObj);
     revisaoStore.registrarMudanca({
       tipo: TipoMudanca.AtividadeAdicionada,
       idAtividade: novaAtividadeObj.id,
@@ -475,7 +472,6 @@ function adicionarAtividade() {
     // Notificação removida conforme plano UX
   }
 }
-*/
 
 async function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
