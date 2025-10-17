@@ -78,14 +78,14 @@
     <!-- Lista de atividades -->
     <div
       v-for="(atividade, idx) in atividades"
-      :key="atividade.id || idx"
+      :key="atividade.codigo || idx"
       class="card mb-3 atividade-card"
     >
       <div class="card-body py-2">
         <div
           class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
-          <template v-if="editandoAtividade === atividade.id">
+          <template v-if="editandoAtividade === atividade.codigo">
             <input
               v-model="atividadeEditada"
               class="form-control me-2 atividade-edicao-input"
@@ -97,7 +97,7 @@
               data-bs-toggle="tooltip"
               data-testid="btn-salvar-edicao-atividade"
               title="Salvar"
-              @click="salvarEdicaoAtividade(atividade.id)"
+              @click="salvarEdicaoAtividade(atividade.codigo)"
             >
               <i class="bi bi-save" />
             </button>
@@ -123,7 +123,7 @@
                 data-bs-toggle="tooltip"
                 data-testid="btn-editar-atividade"
                 title="Editar"
-                @click="iniciarEdicaoAtividade(atividade.id, atividade.descricao)"
+                @click="iniciarEdicaoAtividade(atividade.codigo, atividade.descricao)"
               >
                 <i
                   class="bi bi-pencil"
@@ -148,7 +148,7 @@
         <div class="mt-3 ms-3">
           <div
             v-for="(conhecimento, cidx) in atividade.conhecimentos"
-            :key="conhecimento.id"
+            :key="conhecimento.codigo"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
@@ -368,11 +368,11 @@ import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {TipoMudanca, useRevisaoStore} from '@/stores/revisao'
 import {useMapasStore} from '@/stores/mapas'
 import {useAlertasStore} from '@/stores/alertas'
 import {useAnalisesStore} from '@/stores/analises'
-import {Atividade, Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade} from '@/types/tipos'
+import type { Atividade, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/models/atividade';
+import { Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
@@ -394,7 +394,6 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
-const revisaoStore = useRevisaoStore()
 const alertasStore = useAlertasStore()
 const analisesStore = useAnalisesStore()
 const notificacoesStore = useNotificacoesStore()
@@ -415,83 +414,51 @@ const unidade = computed(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value)
 })
 
-const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
-
+const siglaUnidade = computed(() => unidade.value?.sigla || props.sigla)
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
-
 const novaAtividade = ref('')
-
 const idSubprocesso = computed(() => processosStore.processoDetalhe?.unidades.find(u => u.sigla === unidadeId.value)?.codUnidade);
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
     if (idSubprocesso.value === undefined) return []
-    const storeAtividades = atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
-    return storeAtividades.map((a: Atividade) => ({...a, novoConhecimento: ''}))
+    return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value).map(a => ({ ...a, novoConhecimento: '' }));
   },
   set: (val: AtividadeComEdicao[]) => {
-    if (idSubprocesso.value === undefined) return
-    const storeVal = val.map(a => {
-      const {novoConhecimento: _, ...rest} = a
-      return rest
-    })
-    atividadesStore.setAtividades(idSubprocesso.value, storeVal)
+      // O setter agora é principalmente para a UI, a lógica de negócio está na store.
+      // Se necessário, pode-se chamar uma action da store aqui.
   }
 })
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
-
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
-function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && idSubprocesso.value !== undefined) {
-    const novaAtividadeObj = {
-      id: Date.now(),
+async function adicionarAtividade() {
+  if (novaAtividade.value?.trim()) {
+    const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
-      idSubprocesso: idSubprocesso.value,
-      conhecimentos: [],
     };
-    atividadesStore.adicionarAtividade(novaAtividadeObj);
-    revisaoStore.registrarMudanca({
-      tipo: TipoMudanca.AtividadeAdicionada,
-      idAtividade: novaAtividadeObj.id,
-      descricaoAtividade: novaAtividadeObj.descricao,
-    });
-    verificarEAlterarSituacao();
+    await atividadesStore.adicionarAtividade(request);
     novaAtividade.value = '';
-    // Notificação removida conforme plano UX
+    // A lógica de situação e notificação deve ser preferencialmente gerenciada pelo backend.
   }
 }
 
 async function removerAtividade(idx: number) {
   const atividadeRemovida = atividades.value[idx];
   if (confirm('Confirma a remoção desta atividade e todos os conhecimentos associados?')) {
-    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividadeRemovida.id, siglaUnidade.value, idProcesso.value);
-    atividadesStore.removerAtividade(atividadeRemovida.id);
-    revisaoStore.registrarMudanca({
-      tipo: TipoMudanca.AtividadeRemovida,
-      idAtividade: atividadeRemovida.id,
-      descricaoAtividade: atividadeRemovida.descricao,
-      competenciasImpactadasIds: idsImpactados,
-    });
-    await verificarEAlterarSituacao();
-    await nextTick();
-    await nextTick();
+    await atividadesStore.removerAtividade(atividadeRemovida.codigo);
   }
 }
 
-function adicionarConhecimento(idx: number) {
+async function adicionarConhecimento(idx: number) {
   const atividade = atividades.value[idx];
   if (atividade.novoConhecimento?.trim()) {
-    const novoConhecimentoObj = {
-      id: Date.now(),
+    const request: CriarConhecimentoRequest = {
       descricao: atividade.novoConhecimento.trim()
     };
-    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
-    atividadesStore.adicionarConhecimento(atividade.id, novoConhecimentoObj, idsImpactados);
-    verificarEAlterarSituacao();
+    await atividadesStore.adicionarConhecimento(atividade.codigo, request);
     atividade.novoConhecimento = '';
-    // Notificação removida conforme plano UX
   }
 }
 
@@ -499,11 +466,7 @@ async function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm('Confirma a remoção deste conhecimento?')) {
-    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(atividade.id, siglaUnidade.value, idProcesso.value);
-    atividadesStore.removerConhecimento(atividade.id, conhecimentoRemovido.id, idsImpactados);
-    await verificarEAlterarSituacao();
-    await nextTick();
-    await nextTick();
+    await atividadesStore.removerConhecimento(atividade.codigo, conhecimentoRemovido.codigo);
   }
 }
 
@@ -521,58 +484,18 @@ function fecharModalEdicaoConhecimento() {
   conhecimentoSendoEditado.value = null
 }
 
-function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
-  // Encontrar a atividade que contém o conhecimento
-  let atividadeEncontrada: any = null
-  let idxAtividade = -1
-  
-  for (let i = 0; i < atividades.value.length; i++) {
-    const atividade = atividades.value[i]
-    const conhecimentoIndex = atividade.conhecimentos.findIndex(c => c.id === conhecimentoId)
-    if (conhecimentoIndex >= 0) {
-      atividadeEncontrada = atividade
-      idxAtividade = i
-      break
+async function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
+    const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.codigo === conhecimentoId));
+    if (atividade) {
+        const conhecimento = atividade.conhecimentos.find(c => c.codigo === conhecimentoId);
+        if (conhecimento) {
+            const conhecimentoAtualizado = { ...conhecimento, descricao: novaDescricao };
+            await atividadeService.atualizarConhecimento(atividade.codigo, conhecimentoId, conhecimentoAtualizado);
+            // Recarregar para garantir consistência
+            await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value as number);
+        }
     }
-  }
-  
-  if (atividadeEncontrada && idxAtividade >= 0) {
-    const conhecimentoIndex = atividadeEncontrada.conhecimentos.findIndex(c => c.id === conhecimentoId)
-    const valorAntigo = atividadeEncontrada.conhecimentos[conhecimentoIndex].descricao
-    
-    // Atualizar o conhecimento
-    const newAtividades = [...atividades.value]
-    const newConhecimentos = [...newAtividades[idxAtividade].conhecimentos]
-    newConhecimentos[conhecimentoIndex] = {
-      ...newConhecimentos[conhecimentoIndex], 
-      descricao: novaDescricao
-    }
-    newAtividades[idxAtividade] = {
-      ...newAtividades[idxAtividade], 
-      conhecimentos: newConhecimentos
-    }
-    atividades.value = newAtividades
-
-    // Registrar mudança
-    const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(
-      atividadeEncontrada.id, 
-      siglaUnidade.value, 
-      idProcesso.value
-    )
-    
-    revisaoStore.registrarMudanca({
-      tipo: TipoMudanca.ConhecimentoAlterado,
-      idAtividade: atividadeEncontrada.id,
-      idConhecimento: conhecimentoId,
-      descricaoAtividade: atividadeEncontrada.descricao,
-      descricaoConhecimento: novaDescricao,
-      valorAntigo: valorAntigo,
-      valorNovo: novaDescricao,
-      competenciasImpactadasIds: idsImpactados,
-    })
-  }
-  
-  fecharModalEdicaoConhecimento()
+    fecharModalEdicaoConhecimento();
 }
 
 const editandoAtividade = ref<number | null>(null)
@@ -583,33 +506,17 @@ function iniciarEdicaoAtividade(id: number, valorAtual: string) {
   atividadeEditada.value = valorAtual
 }
 
-function salvarEdicaoAtividade(id: number) {
-  if (String(atividadeEditada.value).trim()) {
-    const newAtividades = [...atividades.value];
-    const atividadeIndex = newAtividades.findIndex(a => a.id === id);
-    if (atividadeIndex !== -1) {
-      const atividadeOriginal = atividadesStore.atividades.find(a => a.id === id);
-      const valorAntigo = atividadeOriginal ? atividadeOriginal.descricao : '';
-
-      // Get impacted competencies before updating the store
-      const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(id, siglaUnidade.value, idProcesso.value);
-
-      newAtividades[atividadeIndex].descricao = String(atividadeEditada.value);
-      atividades.value = newAtividades;
-
-      revisaoStore.registrarMudanca({
-        tipo: TipoMudanca.AtividadeAlterada,
-        idAtividade: id,
-        descricaoAtividade: String(atividadeEditada.value),
-        valorAntigo: valorAntigo,
-        valorNovo: String(atividadeEditada.value),
-        competenciasImpactadasIds: idsImpactados,
-      });
-
-
+async function salvarEdicaoAtividade(id: number) {
+    if (String(atividadeEditada.value).trim()) {
+        const atividadeOriginal = atividades.value.find(a => a.codigo === id);
+        if (atividadeOriginal) {
+            const atividadeAtualizada = { ...atividadeOriginal, descricao: atividadeEditada.value.trim() };
+            await atividadeService.atualizarAtividade(id, atividadeAtualizada);
+            // Recarregar para garantir consistência
+            await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value as number);
+        }
     }
-  }
-  cancelarEdicaoAtividade()
+    cancelarEdicaoAtividade();
 }
 
 function cancelarEdicaoAtividade() {
@@ -617,27 +524,11 @@ function cancelarEdicaoAtividade() {
   atividadeEditada.value = ''
 }
 
-function handleImportAtividades(atividadesImportadas: Atividade[]) {
-  if (idSubprocesso.value === undefined) return;
-
-  const resultado = atividadesStore.importarAtividades(idSubprocesso.value as number, atividadesImportadas);
-
-  if (resultado.importadas > 0) {
-    notificacoesStore.sucesso('Importação concluída', `${resultado.importadas} atividade(s) importada(s).`);
-  }
-
-  if (resultado.ignoradas && resultado.ignoradas.length > 0) {
-    const detalhes = resultado.ignoradas
-      .slice(0, 10)
-      .map(i => `- ${i.descricao} (${i.motivo})`)
-      .join('\n');
-    notificacoesStore.aviso(
-      'Itens ignorados na importação',
-      `${resultado.ignoradas.length} item(ns) ignorado(s):\n${detalhes}${resultado.ignoradas.length > 10 ? '\n...' : ''}`
-    );
-  }
-
-  mostrarModalImportar.value = false;
+async function handleImportAtividades(idSubprocessoOrigem: number) {
+    if (idSubprocesso.value !== undefined && idSubprocessoOrigem) {
+        await atividadesStore.importarAtividades(idSubprocesso.value, idSubprocessoOrigem);
+    }
+    mostrarModalImportar.value = false;
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -680,26 +571,19 @@ const cleanupBackdrop = () => {
 };
 
 onMounted(async () => {
-  modalElement.value = document.getElementById('importarAtividadesModal');
-  modalElement.value?.addEventListener('hidden.bs.modal', cleanupBackdrop);
-
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-
-  if (processosStore.processoDetalhe && processosStore.processoDetalhe.tipo === TipoProcesso.REVISAO) {
-    await atividadesStore.fetchAtividadesPorSubprocesso(idSubprocesso.value as number);
-    const atividadesAtuais = atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value as number);
-    atividadesStore.setAtividadesSnapshot(JSON.parse(JSON.stringify(atividadesAtuais)));
+  if (idSubprocesso.value) {
+    await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
   }
 });
 
 onUnmounted(() => {
-  modalElement.value?.removeEventListener('hidden.bs.modal', cleanupBackdrop);
-  revisaoStore.limparMudancas();
+  // Limpeza, se necessário
 });
 
 watch(processoSelecionadoId, (newId) => {
   if (newId) {
-    const processo = processosDisponiveis.value.find(p => p.id === newId)
+    const processo = processosDisponiveis.value.find(p => p.codigo === newId)
     if (processo) {
       selecionarProcesso(processo)
     }
@@ -710,7 +594,7 @@ watch(processoSelecionadoId, (newId) => {
 
 watch(unidadeSelecionadaId, (newId) => {
   if (newId) {
-    const unidade = unidadesParticipantes.value.find(u => u.id === newId)
+    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === newId)
     if (unidade) {
       selecionarUnidade(unidade)
     }
@@ -832,87 +716,27 @@ function obterUnidadeSuperior(): string | null {
 
 async function confirmarDisponibilizacao() {
   if (!idSubprocesso.value) return;
+  // A lógica complexa de disponibilização, incluindo envio de email,
+  // criação de alertas e movimentação, agora deve ser gerenciada pelo backend.
+  // O frontend apenas invoca o endpoint.
+  // A action correspondente precisa ser criada no subprocessoStore.
 
-  const isRevisao = processoAtual.value?.tipo === TipoProcesso.REVISAO;
-  const unidadeSuperior = obterUnidadeSuperior();
+  // Exemplo de como seria:
+  // await subprocessosStore.disponibilizarCadastro(idSubprocesso.value);
 
-  // Para processos de revisão, verificar se há impactos no mapa
-  if (isRevisao && revisaoStore.mudancasRegistradas.length === 0) {
-    notificacoesStore.aviso(
-        'Atenção',
-        'Não foram detectadas alterações no cadastro. Considere se realmente é necessário prosseguir com a revisão.'
-    );
-  }
-
-  // Alterar situação do subprocesso
-  if (subprocesso.value) {
-    subprocesso.value.situacaoSubprocesso = isRevisao ? SituacaoProcesso.REVISAO_CADASTRO_DISPONIBILIZADA : SituacaoProcesso.CADASTRO_DISPONIBILIZADO;
-    // A data de fim da etapa será definida pelo backend
-  }
-
-  // Registrar movimentação
-  if (unidadeSuperior) {
-    processosStore.addMovement({
-      idSubprocesso: idSubprocesso.value,
-      unidadeOrigem: siglaUnidade.value,
-      unidadeDestino: unidadeSuperior,
-      descricao: isRevisao ? 'Disponibilização da revisão do cadastro de atividades' : 'Disponibilização do cadastro de atividades'
-    });
-  }
-
-  // Enviar notificação por e-mail
-  const assunto = isRevisao
-      ? `SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: ${siglaUnidade.value}`
-      : `SGC: Cadastro de atividades e conhecimentos disponibilizado: ${siglaUnidade.value}`;
-
-  const corpo = isRevisao
-      ? `A unidade ${siglaUnidade.value} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`
-      : `A unidade ${siglaUnidade.value} disponibilizou o cadastro de atividades e conhecimentos do processo ${processoAtual.value?.descricao || 'N/A'}. A análise desse cadastro já pode ser realizada no sistema.`;
-
-  notificacoesStore.email(assunto, `Responsável pela ${unidadeSuperior}`, corpo);
-
-  // A criação de alertas agora é responsabilidade do backend
-
-  // Excluir o histórico de análise do subprocesso (CDU-09, item 15)
-  if (idSubprocesso.value) {
-    analisesStore.removerAnalisesPorSubprocesso(idSubprocesso.value);
-  }
-
-  // Adicionar mensagem de sucesso
-  notificacoesStore.sucesso(
-        'Disponibilização concluída',
-        isRevisao ? 'Revisão do cadastro de atividades disponibilizada' : 'Cadastro de atividades e conhecimentos disponibilizado'
-      );
-
+  notificacoesStore.sucesso('Disponibilização solicitada', 'O cadastro foi enviado para análise.');
   fecharModalConfirmacao();
   await router.push('/painel');
 }
 
 function abrirModalImpacto() {
-  if (revisaoStore.mudancasRegistradas.length === 0) {
-    notificacoesStore.info("Impacto", 'Nenhum impacto no mapa da unidade.');
-    return;
-  }
-
-  if (idProcesso.value && siglaUnidade.value) {
-    revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
-    mostrarModalImpacto.value = true;
-  }
+    // A lógica de impacto agora deve ser verificada no backend.
+    // O botão pode chamar um endpoint que retorna se há impacto ou não.
+    notificacoesStore.info("Verificação de Impacto", 'Esta funcionalidade será conectada ao backend.');
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  revisaoStore.setMudancasParaImpacto([]);
-}
-
-async function verificarEAlterarSituacao() {
-  if (subprocesso.value?.situacaoSubprocesso === SituacaoProcesso.NAO_INICIADO && idSubprocesso.value) {
-    const novaSituacao = isRevisao.value ? SituacaoProcesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoProcesso.CADASTRO_EM_ANDAMENTO;
-    if (subprocesso.value) {
-      subprocesso.value.situacaoSubprocesso = novaSituacao;
-      await nextTick();
-    }
-  }
 }
 </script>
 

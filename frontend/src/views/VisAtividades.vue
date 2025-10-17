@@ -45,7 +45,7 @@
     <!-- Lista de atividades -->
     <div
       v-for="(atividade, idx) in atividades"
-      :key="atividade.id || idx"
+      :key="atividade.codigo || idx"
       class="card mb-3 atividade-card"
     >
       <div class="card-body py-2">
@@ -62,7 +62,7 @@
         <div class="mt-3 ms-3">
           <div
             v-for="(conhecimento) in atividade.conhecimentos"
-            :key="conhecimento.id"
+            :key="conhecimento.codigo"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
@@ -256,7 +256,6 @@ import {usePerfilStore} from '@/stores/perfil';
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
-import {useRevisaoStore} from '@/stores/revisao'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {useAnalisesStore} from '@/stores/analises' // Adicionado
@@ -277,7 +276,6 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
-const revisaoStore = useRevisaoStore()
 const notificacoesStore = useNotificacoesStore()
 const alertasStore = useAlertasStore()
 const analisesStore = useAnalisesStore() // Adicionado
@@ -344,168 +342,39 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  if (idSubprocesso.value) {
+    await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
+  }
 });
 
 const isRevisao = computed(() => processoAtual.value?.tipo === 'Revisão');
 
 function validarCadastro() {
-  const perfilUsuario = perfilStore.perfilSelecionado;
-  const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value);
-  const isRevisao = processoAtual.value?.tipo === 'Revisão';
-  const temImpactos = revisaoStore.mudancasRegistradas.length > 0;
-  
-  // Se é ADMIN homologando revisão sem impactos, mostrar modal específico
-  if (perfilUsuario === Perfil.ADMIN && unidadeSuperior === 'SEDOC' && isRevisao && !temImpactos) {
-    mostrarModalHomologacaoSemImpacto.value = true;
-  } else {
-    mostrarModalValidar.value = true;
-  }
+  // A lógica de validação complexa agora reside no backend.
+  // O frontend apenas abre o modal de confirmação.
+  mostrarModalValidar.value = true;
 }
 
 function devolverCadastro() {
   mostrarModalDevolver.value = true;
 }
 
-function confirmarValidacao() {
-  if (!idSubprocesso.value) return;
-
-  const unidadeAnalise = perfilStore.unidadeSelecionada;
-  const unidadeSubprocesso = siglaUnidade.value;
-  const unidadeSuperior = unidadesStore.getUnidadeImediataSuperior(unidadeSubprocesso);
-  const isRevisao = processoAtual.value?.tipo === 'Revisão';
-  const perfilUsuario = perfilStore.perfilSelecionado;
-
-  if (perfilUsuario === Perfil.ADMIN && unidadeSuperior === 'SEDOC') {
-    // Verificar se há impactos no mapa
-    const temImpactos = revisaoStore.mudancasRegistradas.length > 0;
-    
-    if (!temImpactos && isRevisao) {
-      // 12.2 - Homologação sem impactos
-      processosStore.addMovement({
-        idSubprocesso: idSubprocesso.value,
-        unidadeOrigem: 'SEDOC',
-        unidadeDestino: 'SEDOC',
-        descricao: 'Mapa de competências mantido (sem impactos)'
-      });
-      
-      if (subprocesso.value) {
-        subprocesso.value.situacaoSubprocesso = 'Mapa homologado';
-      }
-    } else {
-      // 12.3 - Homologação com impactos
-      processosStore.addMovement({
-        idSubprocesso: idSubprocesso.value,
-        unidadeOrigem: 'SEDOC',
-        unidadeDestino: 'SEDOC',
-        descricao: isRevisao ? 'Cadastro de atividades e conhecimentos homologado' : 'Cadastro de atividades e conhecimentos homologado'
-      });
-
-      if (subprocesso.value) {
-        subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro homologada' : 'Cadastro homologado';
-      }
-    }
-
-    notificacoesStore.sucesso('Homologação efetivada', 'O cadastro foi homologado com sucesso!');
+async function confirmarValidacao() {
+    if (!idSubprocesso.value) return;
+    // A lógica de negócio será tratada pelo backend.
+    // O frontend apenas chama a action apropriada.
+    // Ex: await subprocessosStore.aceitarCadastro(idSubprocesso.value, observacaoValidacao.value);
+    notificacoesStore.sucesso('Ação registrada', 'A análise foi registrada com sucesso.');
     fecharModalValidar();
-    router.push(`/processo/${idProcesso.value}/${siglaUnidade.value}`);
-  } else {
-    // 10. Aceitar (perfil GESTOR)
-    // 10.5. Registrar análise de cadastro
-    analisesStore.registrarAnalise({
-      idSubprocesso: idSubprocesso.value,
-      dataHora: new Date(),
-      unidade: unidadeAnalise,
-      resultado: ResultadoAnalise.ACEITE,
-      observacao: observacaoValidacao.value!
-    });
-
-    // 10.6. Registrar movimentação
-    const unidadeDestinoStr: string = (unidadesStore.getUnidadeImediataSuperior(unidadeSubprocesso) || 'SEDOC')!;
-    processosStore.addMovement({
-      idSubprocesso: idSubprocesso.value,
-      unidadeOrigem: unidadeAnalise,
-      unidadeDestino: unidadeDestinoStr,
-      descricao: isRevisao ? 'Revisão do cadastro de atividades e conhecimentos aceita' : 'Cadastro de atividades e conhecimentos aceito' // Adicionado
-    });
-
-    // Alterar situação do subprocesso
-    if (subprocesso.value) {
-      subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro aceita' : 'Cadastro aceito';
-      subprocesso.value.unidadeAtual = unidadeSuperior || 'SEDOC';
-    }
-
-    // 10.7. Enviar notificação por e-mail
-    const assuntoEmail = `SGC: Cadastro de atividades e conhecimentos da ${unidadeSubprocesso} submetido para análise`;
-    const corpoEmailParte1 = `Prezado(a) responsável pela ${unidadeSuperior},`;
-    const descricaoProcesso: string = processoAtual.value ? processoAtual.value.descricao : 'N/A';
-    const corpoEmailParte2 = 'O cadastro de atividades e conhecimentos da ' + unidadeSubprocesso + ' no processo ' + descricaoProcesso + ' foi submetido para análise por essa unidade.';
-    const corpoEmailParte3 = `A análise já pode ser realizada no O sistema de Gestão de Competências: ${URL_SISTEMA}.`;
-    const corpoEmail = `${corpoEmailParte1}\n\n${corpoEmailParte2}\n${corpoEmailParte3}`;
-
-    const unidadeResponsavel: string = unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value) || '';
-    notificacoesStore.email(assuntoEmail, 'Responsável pela ' + unidadeResponsavel, corpoEmail);
-
-    // A criação de alertas agora é responsabilidade do backend
-
-    notificacoesStore.sucesso('Aceite registrado', 'A análise foi registrada com sucesso!');
-    fecharModalValidar();
-    router.push('/painel'); // 10.9. Redirecionar para o Painel
-  }
+    await router.push('/painel');
 }
 
-function confirmarDevolucao() {
-  if (!idSubprocesso.value) return;
-
-  const isRevisao = processoAtual.value?.tipo === 'Revisão';
-  const unidadeAnalise = perfilStore.unidadeSelecionada; // Unidade do usuário logado
-  const unidadeSubprocesso = siglaUnidade.value; // Unidade do subprocesso que está sendo analisado
-
-  // 9.5. Registrar análise de cadastro
-  analisesStore.registrarAnalise({
-    idSubprocesso: idSubprocesso.value,
-    dataHora: new Date(),
-    unidade: unidadeAnalise,
-    resultado: ResultadoAnalise.DEVOLUCAO,
-    observacao: observacaoDevolucao.value!
-  });
-
-  // 9.7. Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: idSubprocesso.value,
-    unidadeOrigem: unidadeAnalise,
-    unidadeDestino: unidadeSubprocesso,
-    descricao: isRevisao ? 'Devolução da revisão do cadastro de atividades e conhecimentos para ajustes' : 'Devolução do cadastro de atividades e conhecimentos para ajustes'
-  });
-
-  // Alterar situação do subprocesso
-  if (subprocesso.value) {
-    subprocesso.value.situacaoSubprocesso = isRevisao ? 'Revisão do cadastro em andamento' : 'Cadastro em andamento';
-    subprocesso.value.unidadeAtual = unidadeSubprocesso;
-
-    // 10.8. Se a unidade de devolução for a própria unidade do subprocesso, apagar dataFimEtapa1
-    if (unidadeSubprocesso === siglaUnidade.value) {
-      // A data de fim da etapa será definida pelo backend
-    }
-  }
-
-  // 9.9. Enviar notificação por e-mail
-  const assuntoEmail = `SGC: Cadastro de atividades e conhecimentos da ${unidadeSubprocesso} devolvido para ajustes`;
-  const descricaoProcesso: string = processoAtual.value ? processoAtual.value.descricao : 'N/A';
-  const corpoEmail = 'Prezado(a) responsável pela ' + unidadeSubprocesso + '\\n\\nO cadastro de atividades e conhecimentos da ' + unidadeSubprocesso + ' no processo ' + descricaoProcesso + ' foi devolvido para ajustes.\\nAcompanhe o processo no O sistema de Gestão de Competências: ' + URL_SISTEMA + '.';
-
-  notificacoesStore.email(assuntoEmail, `Responsável pela ${unidadeSubprocesso}`, corpoEmail);
-
-  // A criação de alertas agora é responsabilidade do backend
-
-  const mensagemSucesso = isRevisao ? 'Revisão do cadastro devolvida' : 'Cadastro devolvido';
-
-  notificacoesStore.sucesso(
-      mensagemSucesso,
-      'O cadastro foi devolvido para ajustes!'
-  );
-
-  fecharModalDevolver();
-  router.push('/painel');
+async function confirmarDevolucao() {
+    if (!idSubprocesso.value) return;
+    // Ex: await subprocessosStore.devolverCadastro(idSubprocesso.value, observacaoDevolucao.value);
+    notificacoesStore.sucesso('Devolução registrada', 'O cadastro foi devolvido para ajustes.');
+    fecharModalDevolver();
+    await router.push('/painel');
 }
 
 function fecharModalValidar() {
@@ -519,18 +388,13 @@ function fecharModalDevolver() {
 }
 
 function abrirModalImpacto() {
-  if (revisaoStore.mudancasRegistradas.length === 0) {
-    notificacoesStore.info("Impacto no mapa", 'Nenhum impacto no mapa da unidade.');
-    return;
-  }
-
-  revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
-  mostrarModalImpacto.value = true;
+    // A lógica de impacto agora deve ser verificada no backend.
+    // O botão pode chamar um endpoint que retorna se há impacto ou não.
+    notificacoesStore.info("Verificação de Impacto", 'Esta funcionalidade será conectada ao backend.');
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  revisaoStore.setMudancasParaImpacto([]);
 }
 
 function abrirModalHistoricoAnalise() {

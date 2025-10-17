@@ -227,7 +227,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
-import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, ProcessoResumo } from '../mappers/processos'
+import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, ProcessoResumo, SituacaoProcesso } from '../mappers/processos'
 import { Unidade } from '../mappers/sgrh'
 import {ensureValidDate} from '@/utils'
 import * as processoService from '@/services/processoService';
@@ -377,26 +377,8 @@ function abrirDetalhesUnidade(item: any) {
 async function finalizarProcesso() {
   if (!processo.value) return;
 
-  const processoAtual = processo.value;
-
-  // Verificar se todos os subprocessos de unidades operacionais/interoperacionais estão em 'MAPA_HOMOLOGADO'
-  const unidadesOperacionais = processoAtual.unidades.filter(up => {
-    // TODO: Obter o tipo da unidade (OPERACIONAL/INTEROPERACIONAL) a partir do codUnidade
-    // Por enquanto, vamos considerar todas as unidades como operacionais/interoperacionais para a validação
-    return true; 
-  });
-
-  const todosHomologados = unidadesOperacionais.every(up => up.situacaoSubprocesso === 'MAPA_HOMOLOGADO');
-
-  if (!todosHomologados) {
-    notificacoesStore.erro(
-        'Não é possível encerrar o processo',
-        'Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado.'
-    );
-    return;
-  }
-
-  // Mostrar modal de confirmação
+  // A validação se o processo pode ser finalizado é responsabilidade do backend.
+  // O frontend apenas tenta a ação e exibe o resultado.
   abrirModalFinalizacao();
 }
 

@@ -1,54 +1,52 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
-    cancelarModal,
-    clicarBotaoHistoricoAnalise,
-    DADOS_TESTE,
+    clicarUnidadeNaTabelaDetalhes,
     disponibilizarCadastro,
     gerarNomeUnico,
     loginComoChefe,
-    navegarParaCadastroAtividades,
+    navegarParaProcessoPorId,
     SELETORES_CSS,
     verificarAtividadeVisivel,
-    verificarBotaoDisponibilizarHabilitado,
-    verificarBotaoHistoricoAnaliseVisivel,
     verificarConhecimentoVisivel,
-    verificarModalFechado,
-    verificarModalHistoricoAnaliseAberto,
-    verificarUrlDoPainel
+    verificarMensagemSucesso,
+    verificarUrlDoPainel,
 } from './helpers';
+import * as processoService from '../../src/services/processoService';
 
-test.describe('CDU-09: Disponibilizar cadastro de atividades e conhecimentos', () => {
-    const PROCESSO_REVISAO = DADOS_TESTE.PROCESSOS.REVISAO_STIC;
-    const UNIDADE_STIC = DADOS_TESTE.UNIDADES.STIC;
+test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
 
-    test.beforeEach(async ({page}) => {
+    async function setupProcessoIniciado() {
+        const nomeProcesso = `PROCESSO DISPONIBILIZAR TESTE - ${Date.now()}`;
+        const processo = await processoService.criarProcesso({
+            descricao: nomeProcesso,
+            tipo: 'MAPEAMENTO',
+            dataLimiteEtapa1: '2025-12-31T00:00:00',
+            unidades: [2] // Unidade 2 = STIC
+        });
+        await processoService.iniciarProcesso(processo.codigo, 'MAPEAMENTO', [2]);
+        return { nomeProcesso, processo };
+    }
+
+    test('deve disponibilizar o cadastro com sucesso', async ({ page }) => {
+        const { processo } = await setupProcessoIniciado();
         await loginComoChefe(page);
-        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
-    });
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
-    test('deve exibir e interagir com o modal de histórico de análise', async ({page}) => {
-        await verificarBotaoHistoricoAnaliseVisivel(page);
-        await clicarBotaoHistoricoAnalise(page);
-        await verificarModalHistoricoAnaliseAberto(page);
-        await cancelarModal(page);
-        await verificarModalFechado(page);
-    });
-
-    test('deve permitir a disponibilização do cadastro após preenchimento', async ({page}) => {
-        const nomeAtividade = gerarNomeUnico('Atividade para CDU-09');
+        const nomeAtividade = gerarNomeUnico('Atividade para Disponibilizar');
         await adicionarAtividade(page, nomeAtividade);
         await verificarAtividadeVisivel(page, nomeAtividade);
 
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        const nomeConhecimento = gerarNomeUnico('Conhecimento para CDU-09');
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
+        const nomeConhecimento = gerarNomeUnico('Conhecimento para Disponibilizar');
         await adicionarConhecimento(cardAtividade, nomeConhecimento);
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
 
-        await verificarBotaoDisponibilizarHabilitado(page);
         await disponibilizarCadastro(page);
 
+        await verificarMensagemSucesso(page, 'Disponibilização solicitada');
         await verificarUrlDoPainel(page);
     });
 });

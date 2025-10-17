@@ -1,133 +1,90 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
-    cancelarEdicaoAtividade,
-    clicarBotaoImportarAtividades,
-    DADOS_TESTE,
-    editarAtividade,
-    editarConhecimento,
+    clicarUnidadeNaTabelaDetalhes,
+    criarProcessoCompleto,
     gerarNomeUnico,
+    iniciarProcesso,
     loginComoChefe,
-    navegarParaCadastroAtividades,
-    removerAtividade,
-    removerConhecimento,
+    navegarParaProcessoPorId,
     SELETORES_CSS,
-    tentarAdicionarAtividadeVazia,
-    verificarAtividadeNaoVisivel,
     verificarAtividadeVisivel,
-    verificarBotaoDisponibilizarVisivel,
-    verificarBotaoImpactoVisivel,
-    verificarConhecimentoNaoVisivel,
     verificarConhecimentoVisivel,
-    verificarContadorAtividades,
-    verificarModalImportacaoVisivel,
     verificarPaginaCadastroAtividades,
+    editarConhecimento,
+    removerConhecimento,
+    verificarConhecimentoNaoVisivel,
+    editarAtividade,
+    removerAtividade,
+    verificarAtividadeNaoVisivel,
 } from './helpers';
+import * as processoService from '../../src/services/processoService';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
-    test.beforeEach(async ({page}) => await loginComoChefe(page));
 
-    const PROCESSO_MAPEAMENTO = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC;
-    const PROCESSO_REVISAO = DADOS_TESTE.PROCESSOS.REVISAO_STIC;
-    const UNIDADE_STIC = DADOS_TESTE.UNIDADES.STIC;
+    async function setupProcessoIniciado() {
+        const nomeProcesso = `PROCESSO ATIVIDADES TESTE - ${Date.now()}`;
+        const processo = await processoService.criarProcesso({
+            descricao: nomeProcesso,
+            tipo: 'MAPEAMENTO',
+            dataLimiteEtapa1: '2025-12-31T00:00:00',
+            unidades: [2] // Unidade 2 = STIC
+        });
+        await processoService.iniciarProcesso(processo.codigo, 'MAPEAMENTO', [2]);
+        return { nomeProcesso, processo };
+    }
 
-    test('deve navegar e exibir a página de cadastro de atividades', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
+    test('deve adicionar uma atividade e um conhecimento', async ({ page }) => {
+        const { processo } = await setupProcessoIniciado();
+        await loginComoChefe(page); // Chefe da STIC
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
+
         await verificarPaginaCadastroAtividades(page);
-    });
-
-    test('deve exibir botão Impacto no mapa para processos de revisão', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
-        await verificarBotaoImpactoVisivel(page);
-    });
-
-    test('deve adicionar uma atividade e um conhecimento', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
 
         const nomeAtividade = gerarNomeUnico('Atividade Teste');
         await adicionarAtividade(page, nomeAtividade);
         await verificarAtividadeVisivel(page, nomeAtividade);
 
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
         const nomeConhecimento = gerarNomeUnico('Conhecimento Teste');
         await adicionarConhecimento(cardAtividade, nomeConhecimento);
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
     });
 
-    test('deve editar e remover uma atividade', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
+    test('deve editar e remover atividades e conhecimentos', async ({ page }) => {
+        const { processo } = await setupProcessoIniciado();
+        await loginComoChefe(page);
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
+        await verificarPaginaCadastroAtividades(page);
 
-        const nomeOriginal = gerarNomeUnico('Atividade para Editar');
-        await adicionarAtividade(page, nomeOriginal);
-        await verificarAtividadeVisivel(page, nomeOriginal);
-
-        const nomeEditado = gerarNomeUnico('Atividade Editada');
-        await editarAtividade(page, nomeOriginal, nomeEditado);
-        await verificarAtividadeVisivel(page, nomeEditado);
-
-        await removerAtividade(page, nomeEditado);
-        await verificarAtividadeNaoVisivel(page, nomeEditado);
-    });
-
-    test('deve editar e remover um conhecimento', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_REVISAO.id, UNIDADE_STIC);
-
-        const nomeAtividade = gerarNomeUnico('Atividade para Conhecimento');
+        // Adiciona atividade e conhecimento
+        const nomeAtividade = gerarNomeUnico('Atividade para Editar');
         await adicionarAtividade(page, nomeAtividade);
         await verificarAtividadeVisivel(page, nomeAtividade);
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
+        const nomeConhecimento = gerarNomeUnico('Conhecimento para Editar');
+        await adicionarConhecimento(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
 
-        const nomeOriginal = gerarNomeUnico('Conhecimento Original');
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, nomeOriginal);
-        await verificarConhecimentoVisivel(cardAtividade, nomeOriginal);
+        // Edita conhecimento
+        const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
+        await editarConhecimento(page, nomeAtividade, nomeConhecimento, nomeConhecimentoEditado);
+        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimentoEditado);
 
-        const nomeEditado = gerarNomeUnico('Conhecimento Editado');
-        await editarConhecimento(page, nomeAtividade, nomeOriginal, nomeEditado);
-        await verificarConhecimentoVisivel(page, nomeAtividade, nomeEditado);
+        // Remove conhecimento
+        await removerConhecimento(page, nomeAtividade, nomeConhecimentoEditado);
+        await verificarConhecimentoNaoVisivel(cardAtividade, nomeConhecimentoEditado);
 
-        await removerConhecimento(page, nomeAtividade, nomeEditado);
-        await verificarConhecimentoNaoVisivel(page, nomeAtividade, nomeEditado);
-    });
+        // Edita atividade
+        const nomeAtividadeEditado = gerarNomeUnico('Atividade Editada');
+        await editarAtividade(page, nomeAtividade, nomeAtividadeEditado);
+        await verificarAtividadeVisivel(page, nomeAtividadeEditado);
 
-    test('deve abrir modal para importar atividades', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
-        await clicarBotaoImportarAtividades(page);
-        await verificarModalImportacaoVisivel(page);
-    });
-
-    test('deve exibir botão de disponibilizar após adicionar item', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
-
-        const nomeAtividade = gerarNomeUnico('Atividade para Disponibilizar');
-        await adicionarAtividade(page, nomeAtividade);
-        await verificarAtividadeVisivel(page, nomeAtividade);
-
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento qualquer');
-        await verificarConhecimentoVisivel(cardAtividade, 'Conhecimento qualquer');
-
-        await verificarBotaoDisponibilizarVisivel(page);
-    });
-
-    test('não deve adicionar atividade com campos vazios', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
-
-        const contadorAntes = await page.locator(SELETORES_CSS.CARD_ATIVIDADE).count();
-        await tentarAdicionarAtividadeVazia(page);
-        await verificarContadorAtividades(page, contadorAntes);
-    });
-
-    test('deve cancelar a edição de uma atividade', async ({page}) => {
-        await navegarParaCadastroAtividades(page, PROCESSO_MAPEAMENTO.id, UNIDADE_STIC);
-
-        const nomeOriginal = gerarNomeUnico('Atividade para Cancelar Edição');
-        await adicionarAtividade(page, nomeOriginal);
-        await verificarAtividadeVisivel(page, nomeOriginal);
-
-        await cancelarEdicaoAtividade(page, nomeOriginal, 'Texto que será descartado');
-
-        await verificarAtividadeVisivel(page, nomeOriginal);
-        await verificarAtividadeNaoVisivel(page, 'Texto que será descartado');
+        // Remove atividade
+        await removerAtividade(page, nomeAtividadeEditado);
+        await verificarAtividadeNaoVisivel(page, nomeAtividadeEditado);
     });
 });

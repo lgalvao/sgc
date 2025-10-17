@@ -4,7 +4,7 @@ import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
 import {Page} from '../services/painelService'
 import * as processoService from '../services/processoService'
-import {AtualizarProcessoRequest, CriarProcessoRequest, ProcessoDetalhe, ProcessoResumo} from '../mappers/processos'
+import {AtualizarProcessoRequest, CriarProcessoRequest, ProcessoDetalhe, ProcessoResumo, TipoProcesso} from '../mappers/processos'
 
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
@@ -65,11 +65,15 @@ export const useProcessosStore = defineStore('processos', {
         async removerProcesso(idProcesso: number) {
             await processoService.excluirProcesso(idProcesso);
         },
-        async iniciarProcesso(idProcesso: number) {
-            // A ser implementado pelo backend
+        async iniciarProcesso(idProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
+            await processoService.iniciarProcesso(idProcesso, tipo, unidadesIds);
+            // Após iniciar, é uma boa prática recarregar os detalhes para refletir a mudança de estado
+            await this.fetchProcessoDetalhe(idProcesso);
         },
         async finalizarProcesso(idProcesso: number) {
-            // A ser implementado pelo backend
+            await processoService.finalizarProcesso(idProcesso);
+            // Após finalizar, recarregar os detalhes para refletir a mudança de estado
+            await this.fetchProcessoDetalhe(idProcesso);
         },
         async processarCadastroBloco(payload: {
             idProcesso: number,
