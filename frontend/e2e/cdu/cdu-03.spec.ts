@@ -27,7 +27,8 @@ import {
     verificarPermanenciaFormularioEdicao,
     verificarProcessoEditado,
     verificarProcessoIniciadoComSucesso,
-    verificarSelecaoArvoreCheckboxes
+    verificarSelecaoArvoreCheckboxes,
+    verificarProcessoRemovidoComSucesso
 } from './helpers';
 
 test.describe('CDU-03: Manter processo', () => {
@@ -94,7 +95,6 @@ test.describe('CDU-03: Manter processo', () => {
 
     test('deve criar processo com sucesso e redirecionar para o Painel', async ({page}) => {
         const descricaoProcesso = 'Novo Processo de Mapeamento Teste';
-        await navegarParaCriacaoProcesso(page);
         await criarProcessoCompleto(page, descricaoProcesso, 'MAPEAMENTO', '2025-12-31', [1]);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
     });
@@ -103,11 +103,8 @@ test.describe('CDU-03: Manter processo', () => {
         // Pré-condição: Criar um processo para ser editado
         const descricaoOriginal = 'Processo para Edição';
         const descricaoEditada = 'Processo Editado com Sucesso';
-        const tipoProcesso = 'MAPEAMENTO';
-        const dataLimite = '2025-12-31';
-        const unidades = [1];
 
-        const processoCriado = await criarProcessoCompleto(page, descricaoOriginal, tipoProcesso, dataLimite, unidades);
+        await criarProcessoCompleto(page, descricaoOriginal, 'MAPEAMENTO', '2025-12-31', [1]);
         await aguardarProcessoNoPainel(page, descricaoOriginal);
 
         // Clicar na linha do processo para edição
@@ -115,19 +112,32 @@ test.describe('CDU-03: Manter processo', () => {
         await verificarPaginaEdicaoProcesso(page);
 
         // Modificar a descrição e salvar
-        await editarDescricaoProcesso(page, processoCriado.codigo, descricaoEditada, tipoProcesso, `${dataLimite}T00:00:00`, unidades);
+        await editarDescricaoProcesso(page, descricaoEditada);
 
         // Verificar se a descrição editada aparece na listagem e a original não
         await verificarProcessoEditado(page, descricaoOriginal, descricaoEditada);
     });
 
-    // Teste removido: "deve remover processo com sucesso após confirmação"
-    // Removido devido a instabilidade no módulo de notificações; reavaliar implementação do módulo antes de restaurar o teste.
+    test('deve remover processo com sucesso após confirmação', async ({ page }) => {
+        // Pré-condição: Criar um processo para ser removido
+        const descricaoProcessoRemover = 'Processo para Remoção';
+        await criarProcessoCompleto(page, descricaoProcessoRemover, 'MAPEAMENTO', '2025-12-31', [1]);
+        await aguardarProcessoNoPainel(page, descricaoProcessoRemover);
+
+        // Clicar na linha do processo para edição/remoção
+        await navegarParaProcessoNaTabela(page, descricaoProcessoRemover);
+        await verificarPaginaEdicaoProcesso(page);
+
+        // Remover o processo
+        await removerProcessoComConfirmacao(page);
+
+        // Verificar se o processo foi removido
+        await verificarProcessoRemovidoComSucesso(page, descricaoProcessoRemover);
+    });
 
     test('deve cancelar a remoção do processo', async ({page}) => {
         // Pré-condição: Criar um processo para tentar remover
         const descricaoProcessoCancelarRemocao = 'Processo para Cancelar Remoção';
-        await navegarParaCriacaoProcesso(page);
         await criarProcessoCompleto(page, descricaoProcessoCancelarRemocao, 'MAPEAMENTO', '2025-12-31', [1]);
         await aguardarProcessoNoPainel(page, descricaoProcessoCancelarRemocao);
 
