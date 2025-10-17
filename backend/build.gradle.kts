@@ -1,8 +1,6 @@
-import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     id("org.springframework.boot") version "3.5.6"
@@ -286,21 +284,21 @@ pmd {
 tasks.withType<Pmd> {
     ruleSets = listOf()
     ruleSetFiles = files("config/pmd/custom-ruleset.xml")
-            reports.xml.required.set(true)
-            reports.html.required.set(false)
+    reports.xml.required.set(true)
+    reports.html.required.set(false)
 }
 
 spotbugs {
     excludeFilter.set(file("config/spotbugs/spotbugs-exclude.xml"))
 }
 
-tasks.withType<SpotBugsTask> {
+tasks.spotbugsMain {
     reports.create("html") {
-        required.set(false)
+        required = false
     }
     reports.create("xml") {
-        required.set(true)
-        outputLocation.set(file("${layout.buildDirectory.get()}/reports/spotbugs/spotbugs.xml"))
+        required = true
+        outputLocation = layout.buildDirectory.file("reports/spotbugs/spotbugs.xml")
     }
 }
 

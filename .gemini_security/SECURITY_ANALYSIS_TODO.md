@@ -1,0 +1,324 @@
+- [x] Define the audit scope.
+- [x] SAST Recon on backend/src/main/java/sgc/Sgc.java
+- [x] SAST Recon on backend/src/main/java/sgc/alerta/AlertaControle.java
+  - [ ] Investigate data flow from `id` on line 23.
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/AlertaService.java
+  - [ ] Investigate data flow from `codUnidadeDestino` on line 50.
+  - [ ] Investigate data flow from `descricao` on line 51.
+  - [ ] Investigate data flow from `codigosUnidades` on line 99.
+  - [ ] Investigate data flow from `subprocessos` on line 100.
+  - [ ] Investigate data flow from `nomeProcesso` on line 126, 137, 152.
+  - [ ] Investigate data flow from `codUnidadeOrigem` on line 180.
+  - [ ] Investigate data flow from `codUnidadeDestino` on line 181.
+  - [ ] Investigate data flow from `motivo` on line 201.
+  - [ ] Investigate data flow from `tituloStr` on line 212.
+  - [ ] Investigate data flow from `usuarioTituloStr` on line 259.
+  - [ ] Investigate data flow from `alertaId` on line 259.
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/dto/AlertaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/modelo/Alerta.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/modelo/AlertaRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/modelo/AlertaUsuario.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/modelo/AlertaUsuarioRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/modelo/TipoAlerta.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/AnaliseControle.java
+  - [ ] Investigate data flow from `id` on line 23.
+  - [ ] Investigate data flow from `id` on line 30.
+  - [ ] Investigate data flow from `payload` on line 31.
+  - [ ] Investigate data flow from `observacoes` on line 35.
+  - [ ] Investigate data flow from `unidadeSigla` on line 40.
+  - [ ] Investigate data flow from `analistaUsuarioTitulo` on line 41.
+  - [ ] Investigate data flow from `motivo` on line 42.
+  - [ ] Investigate data flow from `id` on line 50.
+  - [ ] Investigate data flow from `id` on line 57.
+  - [ ] Investigate data flow from `payload` on line 58.
+  - [ ] Investigate data flow from `observacoes` on line 62.
+  - [ ] Investigate data flow from `unidadeSigla` on line 67.
+  - [ ] Investigate data flow from `analistaUsuarioTitulo` on line 68.
+  - [ ] Investigate data flow from `motivo` on line 69.
+- [x] SAST Recon on backend/src/main/java/sgc/analise/AnaliseService.java
+  - [ ] Investigate data flow from `codSubprocesso` on line 23.
+  - [ ] Investigate data flow from `request` on line 33.
+  - [ ] Investigate data flow from `request.subprocessoCodigo()` on line 36.
+  - [ ] Investigate data flow from `request.observacoes()` on line 40.
+  - [ ] Investigate data flow from `request.unidadeSigla()` on line 43.
+  - [ ] Investigate data flow from `request.analistaUsuarioTitulo()` on line 44.
+  - [ ] Investigate data flow from `request.motivo()` on line 45.
+  - [ ] Investigate data flow from `subprocessoCodigo` on line 50.
+- [x] SAST Recon on backend/src/main/java/sgc/analise/dto/AnaliseHistoricoDto.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/dto/AnaliseMapper.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/dto/AnaliseValidacaoHistoricoDto.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/dto/CriarAnaliseRequestDto.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/modelo/Analise.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/modelo/AnaliseRepo.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/modelo/TipoAcaoAnalise.java
+- [x] SAST Recon on backend/src/main/java/sgc/analise/modelo/TipoAnalise.java
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/AtividadeControle.java
+  - [ ] Investigate data flow from `idAtividade` on line 30.
+  - [ ] Investigate data flow from `atividadeDto` on line 36.
+  - [ ] Investigate `atividadeDto.sanitize()` on line 37.
+  - [ ] Investigate data flow from `id` on line 45.
+  - [ ] Investigate data flow from `atividadeDto` on line 45.
+  - [ ] Investigate data flow from `id` on line 51.
+  - [ ] Investigate data flow from `atividadeId` on line 57.
+  - [ ] Investigate data flow from `atividadeId` on line 63.
+  - [ ] Investigate data flow from `conhecimentoDto` on line 63.
+  - [ ] Investigate `conhecimentoDto.sanitize()` on line 64.
+  - [ ] Investigate data flow from `atividadeId` on line 72.
+  - [ ] Investigate data flow from `conhecimentoId` on line 72.
+  - [ ] Investigate data flow from `conhecimentoDto` on line 72.
+  - [ ] Investigate data flow from `atividadeId` on line 78.
+  - [ ] Investigate data flow from `conhecimentoId` on line 78.
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/AtividadeService.java
+  - [ ] Investigate data flow from `idAtividade` on line 39.
+  - [ ] Investigate data flow from `atividadeDto` on line 44.
+  - [ ] Investigate data flow from `atividadeDto.mapaCodigo()` on line 45.
+  - [ ] Investigate data flow from `username` on line 47.
+  - [ ] Investigate data flow from `id` on line 60.
+  - [ ] Investigate data flow from `atividadeDto` on line 60.
+  - [ ] Investigate data flow from `entidadeParaAtualizar.getDescricao()` on line 63.
+  - [ ] Investigate data flow from `entidadeParaAtualizar.getMapa()` on line 64.
+  - [ ] Investigate data flow from `idAtividade` on line 72.
+  - [ ] Investigate data flow from `idAtividade` on line 80.
+  - [ ] Investigate data flow from `idAtividade` on line 88.
+  - [ ] Investigate data flow from `conhecimentoDto` on line 88.
+  - [ ] Investigate data flow from `idAtividade` on line 97.
+  - [ ] Investigate data flow from `idConhecimento` on line 97.
+  - [ ] Investigate data flow from `conhecimentoDto` on line 97.
+  - [ ] Investigate data flow from `paraAtualizar.getDescricao()` on line 101.
+  - [ ] Investigate data flow from `idAtividade` on line 108.
+  - [ ] Investigate data flow from `idConhecimento` on line 108.
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/dto/AtividadeDto.java
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/dto/AtividadeMapper.java
+  - [ ] Investigate data flow from `idMapa` on line 29.
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/modelo/Atividade.java
+- [x] SAST Recon on backend/src/main/java/sgc/atividade/modelo/AtividadeRepo.java
+- [x] SAST Recon on backend/src/main/java/sgc/competencia/CompetenciaControle.java
+  - [ ] Investigate data flow from `id` on line 34.
+  - [ ] Investigate data flow from `competenciaDto` on line 40.
+  - [ ] Investigate `competenciaDto.sanitize()` on line 41.
+  - [ ] Investigate data flow from `id` on line 47.
+  - [ ] Investigate data flow from `competenciaDto` on line 47.
+  - [ ] Investigate data flow from `id` on line 53.
+  - [ ] Investigate data flow from `idCompetencia` on line 59.
+  - [ ] Investigate data flow from `idCompetencia` on line 65.
+  - [ ] Investigate data flow from `requisicao` on line 65.
+  - [ ] Investigate data flow from `requisicao.getIdAtividade()` on line 66.
+  - [ ] Investigate data flow from `idCompetencia` on line 72.
+  - [ ] Investigate data flow from `idAtividade` on line 72.
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/CompetenciaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/Competencia.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/CompetenciaAtividadeRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/CompetenciaRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/PainelControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/PainelService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/config/ConfigAplicacao.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/config/ConfigAsync.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/config/ConfigWeb.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroApi.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroDominioAccessoNegado.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroDominioNaoEncontrado.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroServicoExterno.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroSubApi.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/ErroValidacao.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/erros/package-info.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/modelo/Administrador.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/modelo/EntidadeBase.java
+- [ ] SAST Recon on backend/src/main/java/sgc/comum/modelo/Parametro.java
+- [ ] SAST Recon on backend/src/main/java/sgc/config/ThymeleafConfig.java
+- [ ] SAST Recon on backend/src/main/java/sgc/conhecimento/dto/ConhecimentoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/conhecimento/dto/ConhecimentoMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/conhecimento/modelo/Conhecimento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/conhecimento/modelo/ConhecimentoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/CopiaMapaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/ImpactoAtividadeService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/ImpactoCompetenciaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/ImpactoMapaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaCrudService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaIntegridadeService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaVinculoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/MapaVisualizacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/AtividadeImpactadaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/CompetenciaImpactadaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/CompetenciaMapaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/ImpactoMapaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/MapaCompletoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/MapaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/MapaMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/SalvarMapaRequest.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/visualizacao/AtividadeDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/visualizacao/CompetenciaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/visualizacao/ConhecimentoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/dto/visualizacao/MapaVisualizacaoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/Mapa.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/MapaRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/TipoImpactoAtividade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/TipoImpactoCompetencia.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/UnidadeMapa.java
+- [ ] SAST Recon on backend/src/main/java/sgc/mapa/modelo/UnidadeMapaRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/EventoProcessoListener.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/NotificacaoModeloEmailService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/NotificacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/dto/EmailDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/modelo/Notificacao.java
+- [ ] SAST Recon on backend/src/main/java/sgc/notificacao/modelo/NotificacaoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoFinalizacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoIniciacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoNotificacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoSeguranca.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/ProcessoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/SituacaoProcesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/AtualizarProcessoReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/CriarProcessoReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoDetalheMapperCustom.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoDetalheMapperInterface.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/dto/ProcessoResumoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/eventos/ProcessoCriadoEvento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/eventos/ProcessoFinalizadoEvento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/eventos/ProcessoIniciadoEvento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/eventos/SubprocessoDisponibilizadoEvento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/eventos/SubprocessoRevisaoDisponibilizadaEvento.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/ErroProcesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/Processo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/ProcessoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/TipoProcesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/UnidadeProcesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/processo/modelo/UnidadeProcessoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/Perfil.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/SgrhService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/Usuario.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/UsuarioControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/UsuarioRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/UsuarioService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/AutenticacaoRequest.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/EntrarRequest.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/PerfilDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/PerfilUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/ResponsavelDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/UnidadeDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/dto/UsuarioDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwResponsabilidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwResponsabilidadeRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUnidadeRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUsuario.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUsuarioPerfilUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUsuarioPerfilUnidadeRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/sgrh/modelo/VwUsuarioRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SituacaoSubprocesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoCadastroControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoConsultaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoCrudControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoDtoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoMapaControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoMapaService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoMapaWorkflowService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoNotificacaoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoValidacaoControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/SubprocessoWorkflowService.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/AceitarCadastroReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/AnaliseValidacaoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/ApresentarSugestoesReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/AtividadeAjusteDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/CompetenciaAjusteDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/ConhecimentoAjusteDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/DevolverCadastroReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/DevolverValidacaoReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/DisponibilizarMapaReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/HomologarCadastroReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/ImportarAtividadesRequest.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/MapaAjusteDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/MovimentacaoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/MovimentacaoMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/RespostaDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SalvarAjustesReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SubmeterMapaAjustadoReq.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SubprocessoCadastroDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SubprocessoDetalheDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SubprocessoDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SubprocessoMapper.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/dto/SugestoesDto.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/modelo/ErroSubprocesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/modelo/Movimentacao.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/modelo/MovimentacaoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/modelo/Subprocesso.java
+- [ ] SAST Recon on backend/src/main/java/sgc/subprocesso/modelo/SubprocessoRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/AtribuicaoTemporaria.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/SituacaoUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/TipoUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/Unidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/UnidadeRepo.java
+- [ ] SAST Recon on backend/src/main/java/sgc/unidade/modelo/VinculacaoUnidade.java
+- [ ] SAST Recon on backend/src/main/java/sgc/util/HtmlUtils.java
+- [x] SAST Recon on frontend/src/App.vue
+- [x] SAST Recon on frontend/src/components/AceitarMapaModal.vue
+- [x] SAST Recon on frontend/src/components/AcoesEmBlocoModal.vue
+- [x] SAST Recon on frontend/src/components/BarraNavegacao.vue
+- [x] SAST Recon on frontend/src/components/BaseModal.vue
+- [x] SAST Recon on frontend/src/components/CriarCompetenciaModal.vue
+- [x] SAST Recon on frontend/src/components/DisponibilizarMapaModal.vue
+- [x] SAST Recon on frontend/src/components/EditarConhecimentoModal.vue
+- [x] SAST Recon on frontend/src/components/HistoricoAnaliseModal.vue
+- [x] SAST Recon on frontend/src/components/ImpactoMapaModal.vue
+- [x] SAST Recon on frontend/src/components/ImportarAtividadesModal.vue
+- [x] SAST Recon on frontend/src/components/Navbar.vue
+- [x] SAST Recon on frontend/src/components/NotificacaoContainer.vue
+- [x] SAST Recon on frontend/src/components/SistemaNotificacoesModal.vue
+- [x] SAST Recon on frontend/src/components/SubprocessoCards.vue
+- [x] SAST Recon on frontend/src/components/SubprocessoHeader.vue
+- [x] SAST Recon on frontend/src/components/SubprocessoModal.vue
+- [x] SAST Recon on frontend/src/components/TabelaProcessos.vue
+- [x] SAST Recon on frontend/src/components/TreeRow.vue
+- [x] SAST Recon on frontend/src/components/TreeTable.vue
+- [x] SAST Recon on frontend/src/components/UnidadeTreeItem.vue
+- [x] SAST Recon on frontend/src/composables/usePerfil.ts
+- [x] SAST Recon on frontend/src/composables/useProcessosFiltrados.ts
+- [x] SAST Recon on frontend/src/constants/index.ts
+- [x] SAST Recon on frontend/src/constants/situacoes.ts
+- [x] SAST Recon on frontend/src/main.ts
+- [x] SAST Recon on frontend/src/mappers/entidades.ts
+- [x] SAST Recon on frontend/src/mappers/servidores.ts
+- [x] SAST Recon on frontend/src/mappers/unidades.ts
+- [x] SAST Recon on frontend/src/stores/alertas.ts
+- [x] SAST Recon on frontend/src/stores/analises.ts
+- [x] SAST Recon on frontend/src/stores/atividades.ts
+- [x] SAST Recon on frontend/src/stores/atribuicoes.ts
+- [x] SAST Recon on frontend/src/stores/configuracoes.ts
+- [x] SAST Recon on frontend/src/stores/mapas.ts
+- [x] SAST Recon on frontend/src/stores/notificacoes.ts
+- [x] SAST Recon on frontend/src/stores/perfil.ts
+- [x] SAST Recon on frontend/src/stores/processos.ts
+- [x] SAST Recon on frontend/src/stores/revisao.ts
+- [x] SAST Recon on frontend/src/stores/servidores.ts
+- [x] SAST Recon on frontend/src/stores/subprocessos.ts
+- [x] SAST Recon on frontend/src/stores/unidades.ts
+- [x] SAST Recon on frontend/src/style.css
+- [x] SAST Recon on frontend/src/utils/index.ts
+- [x] SAST Recon on frontend/src/validators/mocks.ts
+- [x] SAST Recon on frontend/src/views/CadAtividades.vue
+- [x] SAST Recon on frontend/src/views/CadAtribuicao.vue
+- [x] SAST Recon on frontend/src/views/CadMapa.vue
+- [x] SAST Recon on frontend/src/views/CadProcesso.vue
+- [x] SAST Recon on frontend/src/views/Configuracoes.vue
+- [x] SAST Recon on frontend/src/views/DiagnosticoEquipe.vue
+- [x] SAST Recon on frontend/src/views/Historico.vue
+- [x] SAST Recon on frontend/src/views/Login.vue
+- [x] SAST Recon on frontend/src/views/OcupacoesCriticas.vue
+- [x] SAST Recon on frontend/src/views/Painel.vue
+- [x] SAST Recon on frontend/src/views/Processo.vue
+- [x] SAST Recon on frontend/src/views/Relatorios.vue
+- [x] SAST Recon on frontend/src/views/Subprocesso.vue
+- [x] SAST Recon on frontend/src/views/Unidade.vue
+- [x] SAST Recon on frontend/src/views/VisAtividades.vue
+- [x] SAST Recon on frontend/src/views/VisMapa.vue
+- [ ] Conduct the final review of all findings as per your **Minimizing False Positives** operating principle and generate the final report.
