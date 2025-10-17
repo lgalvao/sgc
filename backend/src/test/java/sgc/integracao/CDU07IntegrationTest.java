@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockAdmin
+@Import(TestSecurityConfig.class)
 @Transactional
 public class CDU07IntegrationTest {
     @Autowired

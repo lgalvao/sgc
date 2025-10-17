@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import sgc.comum.erros.RestExceptionHandler;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.ProcessoControle;
 import sgc.processo.ProcessoFinalizacaoService;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @DisplayName("CDU-03: Manter processo")
 @WithMockAdmin
+@Import(TestSecurityConfig.class)
 public class CDU03IntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{id}";

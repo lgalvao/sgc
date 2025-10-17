@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import { useApi } from '@/composables/useApi';
-import { useMapasStore } from './mapas';
+import {defineStore} from 'pinia';
+import {useMapasStore} from './mapas';
+
 
 export enum TipoMudanca {
     AtividadeAdicionada = 'AtividadeAdicionada',
@@ -12,61 +12,26 @@ export enum TipoMudanca {
 }
 
 export interface Mudanca {
-    id: number;
+    id: number; // ID único da mudança
     tipo: TipoMudanca;
-    idAtividade?: number;
-    idConhecimento?: number;
-    descricaoAtividade?: string;
-    descricaoConhecimento?: string;
-    valorAntigo?: string;
-    valorNovo?: string;
-    competenciasImpactadasIds?: number[];
+    idAtividade?: number; // ID da atividade envolvida
+    idConhecimento?: number; // ID do conhecimento envolvido
+    descricaoAtividade?: string; // Descrição da atividade no momento da mudança
+    descricaoConhecimento?: string; // Descrição do conhecimento no momento da mudança
+    valorAntigo?: string; // Valor antigo (para alterações)
+    valorNovo?: string; // Valor novo (para alterações)
+    competenciasImpactadasIds?: number[]; // IDs das competências impactadas pela mudança
 }
 
 export const useRevisaoStore = defineStore('revisao', {
-    state: () => ({
-        items: [] as Mudanca[],
-        mudancasParaImpacto: [] as Mudanca[], // Mantido para lógica de UI de impacto
-        loading: false,
-        error: null as string | null,
-    }),
+    state: () => {
+        const storedMudancas = sessionStorage.getItem('revisaoMudancas');
+        return {
+            mudancasRegistradas: storedMudancas ? JSON.parse(storedMudancas) : [] as Mudanca[],
+            mudancasParaImpacto: [] as Mudanca[],
+        };
+    },
     actions: {
-        async fetchMudancas(idRevisao: number) {
-            this.loading = true;
-            this.error = null;
-            const api = useApi();
-            try {
-                const { data } = await api.get(`/api/revisoes/${idRevisao}/mudancas`);
-                this.items = data as Mudanca[];
-            } catch (error) {
-                this.error = 'Falha ao buscar mudanças da revisão.';
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        async registrarMudanca(idRevisao: number, mudanca: Omit<Mudanca, 'id'>) {
-            const api = useApi();
-            try {
-                await api.post(`/api/revisoes/${idRevisao}/mudancas`, mudanca);
-                await this.fetchMudancas(idRevisao);
-            } catch (error) {
-                throw new Error('Falha ao registrar a mudança.');
-            }
-        },
-
-        async limparMudancas(idRevisao: number) {
-            const api = useApi();
-            try {
-                // Presume um endpoint para limpar as mudanças de uma revisão
-                await api.del(`/api/revisoes/${idRevisao}/mudancas`);
-                this.items = [];
-            } catch (error) {
-                throw new Error('Falha ao limpar as mudanças.');
-            }
-        },
-
-        // A lógica abaixo é mais relacionada à UI e depende de outros stores, então é mantida.
         obterIdsCompetenciasImpactadas(atividadeId: number, siglaUnidade: string, idProcesso: number): number[] {
             const mapasStore = useMapasStore();
             const idsImpactados: number[] = [];
@@ -84,5 +49,15 @@ export const useRevisaoStore = defineStore('revisao', {
         setMudancasParaImpacto(mudancas: Mudanca[]) {
             this.mudancasParaImpacto = mudancas;
         },
+        registrarMudanca(mudanca: Omit<Mudanca, 'id'>) {
+            this.mudancasRegistradas.push({...mudanca, id: Date.now()});
+            sessionStorage.setItem('revisaoMudancas', JSON.stringify(this.mudancasRegistradas)); // Salva após cada registro
+        },
+        limparMudancas() {
+            this.mudancasRegistradas = [];
+            sessionStorage.removeItem('revisaoMudancas'); // Limpa o sessionStorage também
+        },
     },
 });
+
+

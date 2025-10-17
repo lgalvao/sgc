@@ -18,6 +18,7 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.modelo.MapaRepo;
@@ -52,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe
+@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class})
 @Transactional
 @DisplayName("CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos")
 class CDU09IntegrationTest {

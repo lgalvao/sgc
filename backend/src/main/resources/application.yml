@@ -27,8 +27,6 @@ spring:
     default-encoding: UTF-8
 server:
   port: 10000
-  servlet:
-    context-path: /api
 aplicacao:
   ambiente-testes: ${AMBIENTE_TESTES:true}
   url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:8081/api/acesso}

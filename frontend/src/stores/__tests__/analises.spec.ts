@@ -1,121 +1,105 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useAnalisesStore } from '../analises';
-import { useApi } from '@/composables/useApi';
-import { ResultadoAnalise } from '@/types/tipos';
-
-// Mock do composable useApi
-vi.mock('@/composables/useApi', () => ({
-    useApi: vi.fn(),
-}));
-
-const mockedUseApi = vi.mocked(useApi);
-
-const mockAnalises = [
-    { id: 1, idSubprocesso: 1, dataHora: '2023-01-01T10:00:00Z', unidade: 'UNIDADE_A', resultado: 'ACEITE' },
-    { id: 2, idSubprocesso: 1, dataHora: '2023-01-02T11:00:00Z', unidade: 'UNIDADE_B', resultado: 'DEVOLUCAO' },
-];
+import {beforeEach, describe, expect, it} from 'vitest';
+import {initPinia} from '@/test/helpers';
+import {mapResultadoAnalise, parseAnaliseDates, useAnalisesStore} from '../analises';
+import {ResultadoAnalise} from '@/types/tipos';
 
 describe('useAnalisesStore', () => {
+    let analisesStore: ReturnType<typeof useAnalisesStore>;
+
     beforeEach(() => {
-        setActivePinia(createPinia());
-        vi.clearAllMocks();
+        initPinia();
+        analisesStore = useAnalisesStore();
     });
 
-    describe('fetchAnalises', () => {
-        it('deve buscar análises com sucesso e atualizar o estado', async () => {
-            mockedUseApi.mockReturnValue({
-                get: vi.fn().mockResolvedValue({ data: mockAnalises }),
-                post: vi.fn(),
-                put: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useAnalisesStore();
-            const idSubprocesso = 1;
-
-            await store.fetchAnalises(idSubprocesso);
-
-            expect(store.loading).toBe(false);
-            expect(store.items.length).toBe(2);
-            expect(store.items[0].idSubprocesso).toBe(idSubprocesso);
-            expect(store.items[0].dataHora).toBeInstanceOf(Date);
-            expect(store.error).toBe(null);
-            expect(mockedUseApi().get).toHaveBeenCalledWith(`/api/subprocessos/${idSubprocesso}/analises`);
-        });
-
-        it('deve lidar com erros durante a busca', async () => {
-            mockedUseApi.mockReturnValue({
-                get: vi.fn().mockRejectedValue(new Error('API Error')),
-                post: vi.fn(),
-                put: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useAnalisesStore();
-            await store.fetchAnalises(1);
-
-            expect(store.loading).toBe(false);
-            expect(store.error).toBe('Falha ao buscar o histórico de análises.');
-            expect(store.items.length).toBe(0);
-        });
-    });
-
-    describe('registrarAnalise', () => {
-        it('deve chamar a API para registrar uma análise e recarregar a lista', async () => {
-            const postMock = vi.fn().mockResolvedValue({});
-            const getMock = vi.fn().mockResolvedValue({ data: [] });
-            mockedUseApi.mockReturnValue({
-                get: getMock,
-                post: postMock,
-                put: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useAnalisesStore();
-            const idSubprocesso = 1;
-            const novaAnalisePayload = {
-                unidade: 'NOVA_UNIDADE',
-                resultado: ResultadoAnalise.ACEITE,
-                observacao: 'Tudo certo.'
-            };
-
-            await store.registrarAnalise(idSubprocesso, novaAnalisePayload);
-
-            expect(postMock).toHaveBeenCalledWith(`/api/subprocessos/${idSubprocesso}/analises`, novaAnalisePayload);
-            expect(getMock).toHaveBeenCalledWith(`/api/subprocessos/${idSubprocesso}/analises`);
-        });
-
-        it('deve lançar um erro em caso de falha no registro', async () => {
-            mockedUseApi.mockReturnValue({
-                get: vi.fn(),
-                post: vi.fn().mockRejectedValue(new Error('Failed to post')),
-                put: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useAnalisesStore();
-            const payload = { unidade: 'TEST', resultado: ResultadoAnalise.DEVOLUCAO, observacao: '' };
-
-            await expect(store.registrarAnalise(1, payload)).rejects.toThrow('Falha ao registrar a análise.');
-        });
+    it('should initialize with mock analises', () => {
+        expect(analisesStore.analises.length).toBeGreaterThan(0);
+        expect(analisesStore.analises[0].dataHora).toBeInstanceOf(Date);
     });
 
     describe('getters', () => {
-        it('getAnalisesPorSubprocesso deve retornar análises filtradas por id', () => {
-            const store = useAnalisesStore();
-            store.items = [
-                ...mockAnalises,
-                { id: 3, idSubprocesso: 2, dataHora: '2023-01-03T12:00:00Z', unidade: 'UNIDADE_C', resultado: 'ACEITE' }
-            ] as any;
+        it('getAnalisesPorSubprocesso should filter and sort analyses by idSubprocesso', () => {
+            const analises = analisesStore.getAnalisesPorSubprocesso(1);
+            expect(Array.isArray(analises)).toBe(true);
+            analises.forEach(analise => {
+                expect(analise.idSubprocesso).toBe(1);
+            });
+        });
 
-            const analises = store.getAnalisesPorSubprocesso(1);
-            expect(analises.length).toBe(2);
-            expect(analises[0].id).toBe(1);
+        it('getAnalisesPorSubprocesso should return empty array for non-existent idSubprocesso', () => {
+            const analises = analisesStore.getAnalisesPorSubprocesso(999);
+            expect(analises).toEqual([]);
+        });
+    });
 
-            const analisesOutroId = store.getAnalisesPorSubprocesso(2);
-            expect(analisesOutroId.length).toBe(1);
-            expect(analisesOutroId[0].id).toBe(3);
+    describe('actions', () => {
+        it('registrarAnalise should add new analysis', () => {
+            const initialLength = analisesStore.analises.length;
+            const novaAnalise = analisesStore.registrarAnalise({
+                idSubprocesso: 1,
+                dataHora: new Date(),
+                unidade: 'TEST',
+                resultado: ResultadoAnalise.ACEITE,
+                observacao: 'Teste'
+            });
+
+            expect(analisesStore.analises.length).toBe(initialLength + 1);
+            expect(novaAnalise.id).toBeDefined();
+            expect(novaAnalise.unidade).toBe('TEST');
+        });
+
+        it('removerAnalisesPorSubprocesso should remove analyses by idSubprocesso', () => {
+            analisesStore.registrarAnalise({
+                idSubprocesso: 999,
+                dataHora: new Date(),
+                unidade: 'TEST',
+                resultado: ResultadoAnalise.ACEITE
+            });
+
+            const initialLength = analisesStore.analises.length;
+            analisesStore.removerAnalisesPorSubprocesso(999);
+            
+            expect(analisesStore.analises.length).toBe(initialLength - 1);
+            expect(analisesStore.getAnalisesPorSubprocesso(999)).toEqual([]);
+        });
+    });
+
+    describe('Auxiliary Functions', () => {
+        it('mapResultadoAnalise should return DEVOLUCAO for "Devolução"', () => {
+            const resultado = mapResultadoAnalise('Devolução');
+            expect(resultado).toBe(ResultadoAnalise.DEVOLUCAO);
+        });
+
+        it('mapResultadoAnalise should return ACEITE for unknown result', () => {
+            const resultado = mapResultadoAnalise('UNKNOWN');
+            expect(resultado).toBe(ResultadoAnalise.ACEITE);
+        });
+
+        it('parseAnaliseDates should parse dataHora and map resultado', () => {
+            const mockAnalise = {
+                id: 1,
+                dataHora: '2025-01-01T10:00:00Z',
+                resultado: 'Aceite',
+                idSubprocesso: 1,
+                unidade: 'TEST',
+                observacao: 'Obs'
+            };
+            const parsedAnalise = parseAnaliseDates(mockAnalise);
+            expect(parsedAnalise.dataHora).toEqual(new Date('2025-01-01T10:00:00Z'));
+            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
+        });
+
+        it('parseAnaliseDates should handle null dataHora and unknown resultado', () => {
+            const mockAnalise = {
+                id: 2,
+                dataHora: null, // Testando null dataHora
+                resultado: 'UNKNOWN', // Testando resultado desconhecido
+                idSubprocesso: 1,
+                unidade: 'TEST',
+                observacao: 'Obs'
+            };
+            const parsedAnalise = parseAnaliseDates(mockAnalise);
+            expect(parsedAnalise.dataHora).toBeInstanceOf(Date); // Deve ser uma nova data se null
+            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
         });
     });
 });

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.processo.SituacaoProcesso;
@@ -46,6 +47,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest(classes = TestSecurityConfig.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional

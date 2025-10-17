@@ -1,101 +1,117 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useConfiguracoesStore } from '../configuracoes';
-import { useApi } from '@/composables/useApi';
+import {initPinia} from '@/test/helpers';
+import {useConfiguracoesStore} from '../configuracoes';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-vi.mock('@/composables/useApi', () => ({
-    useApi: vi.fn(),
-}));
+// Mock localStorage
+const localStorageMock = (() => {
+    let store: { [key: string]: string } = {};
+    return {
+        getItem: (key: string) => store[key] || null,
+        setItem: (key: string, value: string) => {
+            store[key] = value.toString();
+        },
+        clear: () => {
+            store = {};
+        }
+    };
+})();
 
-const mockedUseApi = vi.mocked(useApi);
+Object.defineProperty(window, 'localStorage', {value: localStorageMock});
 
-describe('useConfiguracoesStore', () => {
+describe('Configuracoes Store', () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
-        vi.clearAllMocks();
+          initPinia();
+          localStorageMock.clear(); // Limpa o localStorage antes de cada teste
+        // Reset mocks for localStorage methods
+        vi.spyOn(localStorageMock, 'getItem').mockRestore();
+        vi.spyOn(localStorageMock, 'setItem').mockRestore();
     });
 
-    it('deve ter valores padrão', () => {
+    it('should have default values', () => {
         const store = useConfiguracoesStore();
         expect(store.diasInativacaoProcesso).toBe(10);
         expect(store.diasAlertaNovo).toBe(7);
     });
 
-    describe('fetchConfiguracoes', () => {
-        it('deve buscar configurações com sucesso', async () => {
-            const mockConfig = { diasInativacaoProcesso: 30, diasAlertaNovo: 15 };
-            mockedUseApi.mockReturnValue({
-                get: vi.fn().mockResolvedValue({ data: mockConfig }),
-                put: vi.fn(),
-                post: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useConfiguracoesStore();
-            await store.fetchConfiguracoes();
-
-            expect(store.diasInativacaoProcesso).toBe(30);
-            expect(store.diasAlertaNovo).toBe(15);
-            expect(mockedUseApi().get).toHaveBeenCalledWith('/api/configuracoes');
-        });
-
-        it('deve lidar com erros na busca', async () => {
-            mockedUseApi.mockReturnValue({
-                get: vi.fn().mockRejectedValue(new Error()),
-                put: vi.fn(),
-                post: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useConfiguracoesStore();
-            await store.fetchConfiguracoes();
-
-            expect(store.error).toBe('Falha ao carregar configurações.');
-        });
+    it('should load configurations from localStorage', () => {
+        localStorageMock.setItem('appConfiguracoes', JSON.stringify({
+            diasInativacaoProcesso: 45,
+            diasAlertaNovo: 10,
+        }));
+        const store = useConfiguracoesStore();
+        store.loadConfiguracoes();
+        expect(store.diasInativacaoProcesso).toBe(45);
+        expect(store.diasAlertaNovo).toBe(10);
     });
 
-    describe('saveConfiguracoes', () => {
-        it('deve salvar as configurações com sucesso', async () => {
-            const putMock = vi.fn().mockResolvedValue({});
-            mockedUseApi.mockReturnValue({
-                get: vi.fn(),
-                put: putMock,
-                post: vi.fn(),
-                del: vi.fn(),
-            });
+    it('should save configurations to localStorage', () => {
+        const store = useConfiguracoesStore();
+        store.setDiasInativacaoProcesso(60);
+        store.setDiasAlertaNovo(15);
+        store.saveConfiguracoes();
 
-            const store = useConfiguracoesStore();
-            store.diasInativacaoProcesso = 50;
-            store.diasAlertaNovo = 25;
-
-            await store.saveConfiguracoes();
-
-            expect(putMock).toHaveBeenCalledWith('/api/configuracoes', {
-                diasInativacaoProcesso: 50,
-                diasAlertaNovo: 25,
-            });
-        });
-
-        it('deve lançar um erro em caso de falha', async () => {
-            mockedUseApi.mockReturnValue({
-                get: vi.fn(),
-                put: vi.fn().mockRejectedValue(new Error()),
-                post: vi.fn(),
-                del: vi.fn(),
-            });
-
-            const store = useConfiguracoesStore();
-            await expect(store.saveConfiguracoes()).rejects.toThrow('Falha ao salvar configurações.');
-        });
+        const savedConfig = JSON.parse(localStorageMock.getItem('appConfiguracoes') || '{}');
+        expect(savedConfig.diasInativacaoProcesso).toBe(60);
+        expect(savedConfig.diasAlertaNovo).toBe(15);
     });
 
-    describe('setters', () => {
-        it('não deve permitir valores menores que 1', () => {
-            const store = useConfiguracoesStore();
-            store.setDiasInativacaoProcesso(0);
-            expect(store.diasInativacaoProcesso).toBe(10);
-            store.setDiasAlertaNovo(-1);
-            expect(store.diasAlertaNovo).toBe(7);
+    it('should not set diasInativacaoProcesso less than 1', () => {
+        const store = useConfiguracoesStore();
+        const initialValue = store.diasInativacaoProcesso;
+        store.setDiasInativacaoProcesso(0);
+        expect(store.diasInativacaoProcesso).toBe(initialValue);
+        store.setDiasInativacaoProcesso(-5);
+        expect(store.diasInativacaoProcesso).toBe(initialValue);
+    });
+
+    it('should not set diasAlertaNovo less than 1', () => {
+        const store = useConfiguracoesStore();
+        const initialValue = store.diasAlertaNovo;
+        store.setDiasAlertaNovo(0);
+        expect(store.diasAlertaNovo).toBe(initialValue);
+        store.setDiasAlertaNovo(-5);
+        expect(store.diasAlertaNovo).toBe(initialValue);
+    });
+
+    it('should set diasInativacaoProcesso when value is greater than or equal to 1', () => {
+        const store = useConfiguracoesStore();
+        store.setDiasInativacaoProcesso(30);
+        expect(store.diasInativacaoProcesso).toBe(30);
+        store.setDiasInativacaoProcesso(1);
+        expect(store.diasInativacaoProcesso).toBe(1);
+    });
+
+    it('should set diasAlertaNovo when value is greater than or equal to 1', () => {
+        const store = useConfiguracoesStore();
+        store.setDiasAlertaNovo(20);
+        expect(store.diasAlertaNovo).toBe(20);
+        store.setDiasAlertaNovo(1);
+        expect(store.diasAlertaNovo).toBe(1);
+    });
+
+    it('should handle localStorage errors gracefully during load', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
         });
+        vi.spyOn(localStorageMock, 'getItem').mockImplementation(() => {
+            throw new Error('localStorage read error');
+        });
+        const store = useConfiguracoesStore();
+        store.loadConfiguracoes();
+        // expect(consoleErrorSpy).toHaveBeenCalledWith('Erro ao carregar configurações do localStorage:', expect.any(Error));
+        expect(store.diasInativacaoProcesso).toBe(10);
+        consoleErrorSpy.mockRestore();
+    });
+
+    it('should handle localStorage errors gracefully during save', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+        });
+        vi.spyOn(localStorageMock, 'setItem').mockImplementation(() => {
+            throw new Error('localStorage write error');
+        });
+        const store = useConfiguracoesStore();
+        const result = store.saveConfiguracoes();
+        // expect(consoleErrorSpy).toHaveBeenCalledWith('Erro ao salvar configurações no localStorage:', expect.any(Error));
+        expect(result).toBe(false);
+        consoleErrorSpy.mockRestore();
     });
 });

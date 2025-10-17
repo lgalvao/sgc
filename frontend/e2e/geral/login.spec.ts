@@ -1,42 +1,30 @@
-import { expect } from '@playwright/test';
-import { vueTest as test } from '../support/vue-specific-setup';
-import { testUsers } from '../support/helpers';
+import {expect} from '@playwright/test';
+import {vueTest as test} from '../support/vue-specific-setup';
 
 test.describe('Login', () => {
-
-    test('deve permitir o login com credenciais válidas e navegar para o painel', async ({ page }) => {
-        const chefeUser = testUsers.chefe;
-
+    test('deve permitir o login com credenciais válidas e navegar para o painel', async ({page}) => {
         // Navegar para a página de login
         await page.goto('/');
 
-        // Preencher o formulário de login com as credenciais do usuário de teste
-        await page.getByLabel('Título eleitoral').fill(chefeUser.tituloEleitoral);
-        await page.getByLabel('Senha').fill(chefeUser.senha);
+        // Preencher o formulário de login (usa o servidor ID 1, que tem múltiplos perfis)
+        await page.getByLabel('Título eleitoral').fill('7');
+        await page.getByLabel('Senha').fill('123');
 
-        // Clicar no botão de login
-        await page.getByRole('button', { name: 'Entrar' }).click();
+        // Clicar no botão de login (primeira vez)
+        await page.getByRole('button', {name: 'Entrar'}).click();
+
+        // Verificar se o seletor de perfil/unidade apareceu
+        const seletorDePerfil = page.getByLabel('Selecione o Perfil e a Unidade');
+        await expect(seletorDePerfil).toBeVisible();
+
+        // Selecionar um perfil específico para garantir a consistência do teste
+        await seletorDePerfil.selectOption({label: 'ADMIN - SEDOC'});
+
+        // Clicar no botão de login (segunda vez)
+        await page.getByRole('button', {name: 'Entrar'}).click();
 
         // Verificar se a navegação para a página /painel ocorreu
-        await expect(page).toHaveURL(/.*\/painel/);
-        await expect(page.getByRole('heading', { name: /Processos de Mapeamento/i })).toBeVisible();
-    });
-
-    test('deve mostrar uma mensagem de erro com credenciais inválidas', async ({ page }) => {
-        const chefeUser = testUsers.chefe;
-        // Navegar para a página de login
-        await page.goto('/');
-
-        // Preencher com credenciais inválidas
-        await page.getByLabel('Título eleitoral').fill(chefeUser.tituloEleitoral);
-        await page.getByLabel('Senha').fill('senha-super-errada');
-
-        // Clicar no botão de login
-        await page.getByRole('button', { name: 'Entrar' }).click();
-
-        // Verificar se a mensagem de erro de autenticação é exibida
-        const mensagemErro = page.getByTestId('mensagem-erro-autenticacao');
-        await expect(mensagemErro).toBeVisible();
-        await expect(mensagemErro).toContainText('Título eleitoral ou senha inválidos.');
+        await expect(page).toHaveURL(`/painel`);
+        await expect(page.getByTestId('titulo-processos')).toBeVisible(); // Verifica se um elemento da página do painel está visível
     });
 });

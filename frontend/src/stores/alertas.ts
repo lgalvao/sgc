@@ -1,66 +1,93 @@
-import { defineStore } from 'pinia';
-import { useApi } from '@/composables/useApi';
-import type { AlertaUsuario } from '@/types/tipos';
+import {defineStore} from 'pinia';
+import alertasMock from '../mocks/alertas.json';
+import alertasServidorMock from '../mocks/alertas-servidor.json';
+import type {Alerta, AlertaServidor} from '@/types/tipos';
+import {usePerfilStore} from './perfil';
+
+function parseAlertaDates(alerta: Omit<Alerta, 'dataHora'> & { dataHora: string }): Alerta {
+    return {
+        ...alerta,
+        dataHora: new Date(alerta.dataHora),
+    };
+}
+
+function parseAlertaServidorDates(alertaServidor: Omit<AlertaServidor, 'dataLeitura'> & {
+    dataLeitura: string | null
+}): AlertaServidor {
+    return {
+        ...alertaServidor,
+        dataLeitura: alertaServidor.dataLeitura ? new Date(alertaServidor.dataLeitura) : null,
+    };
+}
 
 export const useAlertasStore = defineStore('alertas', {
     state: () => ({
-        items: [] as AlertaUsuario[],
-        loading: false,
-        error: null as string | null,
+        alertas: JSON.parse(JSON.stringify(alertasMock)).map(parseAlertaDates) as Alerta[],
+        alertasServidor: JSON.parse(JSON.stringify(alertasServidorMock)).map(parseAlertaServidorDates) as AlertaServidor[]
     }),
     getters: {
-        alertasNaoLidos(state): AlertaUsuario[] {
-            return state.items.filter(alerta => !alerta.lido);
+        getAlertasDoServidor(state) {
+            const perfilStore = usePerfilStore();
+            const servidorLogadoIdStr = perfilStore.usuario?.tituloEleitoral;
+            if (!servidorLogadoIdStr) return [];
+            const servidorLogadoId = parseInt(servidorLogadoIdStr, 10);
+
+            return state.alertas.map(alerta => {
+                const alertaServidor = state.alertasServidor.find(
+                    as => as.idAlerta === alerta.id && as.idServidor === servidorLogadoId
+                );
+                return {
+                    ...alerta,
+                    lido: !!alertaServidor?.lido,
+                    dataLeitura: alertaServidor?.dataLeitura || null,
+                };
+            });
         },
+        getAlertasNaoLidos(): Alerta[] {
+            return this.getAlertasDoServidor.filter(alerta => !alerta.lido);
+        }
     },
     actions: {
-        async fetchAlertas() {
-            this.loading = true;
-            this.error = null;
-            const api = useApi();
-            try {
-                const { data } = await api.get('/api/alertas');
-                // A API deve retornar as datas como strings ISO 8601, então convertemos para objetos Date.
-                this.items = (data as any[]).map(item => ({
-                    ...item,
-                    dataHora: new Date(item.dataHora),
-                    dataLeitura: item.dataLeitura ? new Date(item.dataLeitura) : null,
-                }));
-            } catch (error: any) {
-                this.error = 'Falha ao buscar alertas.';
-            } finally {
-                this.loading = false;
+        marcarAlertaComoLido(idAlerta: number): boolean {
+            const perfilStore = usePerfilStore();
+            const servidorLogadoIdStr = perfilStore.usuario?.tituloEleitoral;
+            if (!servidorLogadoIdStr) return false;
+            const servidorLogadoId = parseInt(servidorLogadoIdStr, 10);
+
+            if (!this.alertas.some(a => a.id === idAlerta)) return false;
+
+            const registroExistente = this.alertasServidor.find(
+                as => as.idAlerta === idAlerta && as.idServidor === servidorLogadoId
+            );
+
+            if (registroExistente) {
+                this.alertasServidor = this.alertasServidor.map(as =>
+                    as.id === registroExistente.id ? { ...as, lido: true, dataLeitura: new Date() } : as
+                );
+            } else {
+                const newId = (this.alertasServidor.length > 0 ? Math.max(...this.alertasServidor.map(as => as.id)) : 0) + 1;
+                this.alertasServidor.push({
+                    id: newId,
+                    idAlerta,
+                    idServidor: servidorLogadoId,
+                    lido: true,
+                    dataLeitura: new Date(),
+                });
             }
+            return true;
         },
 
-        async marcarAlertaComoLido(idAlerta: number) {
-            const api = useApi();
-            try {
-                // Endpoint para marcar um alerta específico como lido
-                await api.post(`/api/alertas/${idAlerta}/lido`, {});
-                // Atualiza o estado localmente ou busca novamente
-                const alerta = this.items.find(a => a.id === idAlerta);
-                if (alerta) {
-                    alerta.lido = true;
-                    alerta.dataLeitura = new Date();
+        marcarTodosAlertasComoLidos(): void {
+            this.getAlertasDoServidor.forEach(alerta => {
+                if (!alerta.lido) {
+                    this.marcarAlertaComoLido(alerta.id);
                 }
-            } catch (error: any) {
-                // Em caso de erro, talvez seja melhor recarregar a lista para garantir a consistência
-                await this.fetchAlertas();
-                throw new Error('Falha ao marcar alerta como lido.');
-            }
+            });
         },
 
-        async marcarTodosAlertasComoLidos() {
-            const api = useApi();
-            try {
-                // Endpoint para marcar todos os alertas do usuário como lidos
-                await api.post('/api/alertas/marcar-todos-lidos', {});
-                // Após marcar todos, busca a lista atualizada
-                await this.fetchAlertas();
-            } catch (error: any) {
-                throw new Error('Falha ao marcar todos os alertas como lidos.');
-            }
-        },
+        reset() {
+            this.alertas = JSON.parse(JSON.stringify(alertasMock)).map(parseAlertaDates);
+            this.alertasServidor = JSON.parse(JSON.stringify(alertasServidorMock)).map(parseAlertaServidorDates);
+        }
     }
 });
