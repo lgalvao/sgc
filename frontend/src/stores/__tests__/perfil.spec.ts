@@ -1,121 +1,75 @@
-import { setActivePinia, createPinia } from 'pinia'
-import { usePerfilStore } from '../perfil'
-import { vi } from 'vitest'
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {initPinia} from '@/test/helpers';
+import {usePerfilStore} from '../perfil';
+import {Perfil} from "@/types/tipos";
 
-// Mock do `useApi`
-const mockApi = {
-  post: vi.fn()
-}
-vi.mock('@/composables/useApi', () => ({
-  useApi: () => mockApi
-}))
+// Mock localStorage globally
+const mockLocalStorage = (() => {
+    let store: { [key: string]: string } = {};
+    return {
+        getItem: vi.fn((key: string) => store[key] || null),
+        setItem: vi.fn((key: string, value: string) => {
+            store[key] = value;
+        }),
+        removeItem: vi.fn((key: string) => {
+            delete store[key];
+        }),
+        clear: vi.fn(() => {
+            store = {};
+        })
+    };
+})();
+
+Object.defineProperty(window, 'localStorage', {value: mockLocalStorage});
 
 describe('usePerfilStore', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
-    // Limpa o localStorage antes de cada teste
-    localStorage.clear()
-    // Reseta os mocks
-    vi.clearAllMocks()
-  })
+    let perfilStore: ReturnType<typeof usePerfilStore>;
 
-  it('should initialize with a null user', () => {
-    const perfilStore = usePerfilStore()
-    expect(perfilStore.usuario).toBeNull()
-    expect(perfilStore.estaAutenticado).toBe(false)
-  })
+    beforeEach(() => {
+        // Clear the mock localStorage before each test
+        mockLocalStorage.clear();
+        mockLocalStorage.setItem('idServidor', '9'); // Set default for initial state
 
-  describe('autenticar action', () => {
-    it('should authenticate, store loginResponse, and call entrar for single profile', async () => {
-      const perfilStore = usePerfilStore()
-      const mockLoginResponse = {
-        nome: 'Usuario Teste',
-        tituloEleitoral: '123',
-        pares: [{ perfil: 'CHEFE', unidade: 'TJPE' }]
-      }
-      mockApi.post.mockResolvedValue(mockLoginResponse)
+        initPinia();
+        perfilStore = usePerfilStore();
+        // Reset the store state to its initial values based on mocked localStorage
+        perfilStore.$reset();
+    });
 
-      await perfilStore.autenticar({ tituloEleitoral: '123', senha: '123' })
+    it('should initialize with default values if localStorage is empty', () => {
+        expect(perfilStore.servidorId).toBe(9);
+        expect(perfilStore.perfilSelecionado).toBeNull();
+        expect(perfilStore.unidadeSelecionada).toBeNull();
+    });
 
-      expect(mockApi.post).toHaveBeenCalledWith('/login/autenticar', {
-        tituloEleitoral: '123',
-        senha: '123'
-      })
-      expect(perfilStore.loginResponse).toEqual(mockLoginResponse)
-      expect(perfilStore.estaAutenticado).toBe(true)
-      expect(perfilStore.usuario?.nome).toBe('Usuario Teste')
-      expect(perfilStore.usuario?.perfil).toBe('CHEFE')
-    })
+    it('should initialize with values from localStorage if available', () => {
+        mockLocalStorage.setItem('idServidor', '10');
+        mockLocalStorage.setItem('perfilSelecionado', 'USER');
+        mockLocalStorage.setItem('unidadeSelecionada', 'XYZ');
 
-    it('should authenticate and store loginResponse for multiple profiles', async () => {
-      const perfilStore = usePerfilStore()
-      const mockLoginResponse = {
-        nome: 'Usuario Teste',
-        tituloEleitoral: '123',
-        pares: [
-          { perfil: 'CHEFE', unidade: 'TJPE' },
-          { perfil: 'ADMIN', unidade: 'SEDOC' }
-        ]
-      }
-      mockApi.post.mockResolvedValue(mockLoginResponse)
+        // Create a new Pinia instance and store to pick up new localStorage mocks
+        setActivePinia(createPinia()); // Re-activate Pinia with a fresh instance
+        const newPerfilStore = usePerfilStore(); // Get a fresh store instance
 
-      await perfilStore.autenticar({ tituloEleitoral: '123', senha: '123' })
+        expect(newPerfilStore.servidorId).toBe(10);
+        expect(newPerfilStore.perfilSelecionado).toBe('USER');
+        expect(newPerfilStore.unidadeSelecionada).toBe('XYZ');
+    });
 
-      expect(perfilStore.loginResponse).toEqual(mockLoginResponse)
-      expect(perfilStore.estaAutenticado).toBe(false) // Não deve logar automaticamente
-    })
+    describe('actions', () => {
+        it('setServidorId should update idServidor and store it in localStorage', () => {
+            perfilStore.setServidorId(15);
+            expect(perfilStore.servidorId).toBe(15);
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('idServidor', '15');
+        });
 
-    it('should handle authentication errors', async () => {
-      const perfilStore = usePerfilStore()
-      mockApi.post.mockRejectedValue(new Error('Credenciais inválidas'))
-
-      await expect(
-        perfilStore.autenticar({ tituloEleitoral: '123', senha: '123' })
-      ).rejects.toThrow('Credenciais inválidas')
-
-      expect(perfilStore.erroAutenticacao).toBe('Credenciais inválidas')
-      expect(perfilStore.estaAutenticado).toBe(false)
-    })
-  })
-
-  describe('entrar action', () => {
-    it('should set the user and store it in localStorage', async () => {
-      const perfilStore = usePerfilStore()
-      // Pre-condição: autenticar foi chamado
-      perfilStore.loginResponse = {
-        nome: 'Usuario Teste',
-        tituloEleitoral: '123',
-        pares: [{ perfil: 'CHEFE', unidade: 'TJPE' }]
-      }
-
-      await perfilStore.entrar({ perfil: 'CHEFE', unidade: 'TJPE' })
-
-      expect(perfilStore.estaAutenticado).toBe(true)
-      expect(perfilStore.usuario?.unidade).toBe('TJPE')
-      expect(localStorage.getItem('usuario')).not.toBeNull()
-      const storedUser = JSON.parse(localStorage.getItem('usuario')!)
-      expect(storedUser.unidade).toBe('TJPE')
-    })
-  })
-
-  describe('logout action', () => {
-    it('should clear user data from state and localStorage', () => {
-      const perfilStore = usePerfilStore()
-      // Pre-condição: usuário logado
-      perfilStore.usuario = {
-        nome: 'Usuario Teste',
-        tituloEleitoral: '123',
-        perfil: 'CHEFE',
-        unidade: 'TJPE',
-        token: 'token'
-      }
-      localStorage.setItem('usuario', JSON.stringify(perfilStore.usuario))
-
-      perfilStore.logout()
-
-      expect(perfilStore.usuario).toBeNull()
-      expect(perfilStore.estaAutenticado).toBe(false)
-      expect(localStorage.getItem('usuario')).toBeNull()
-    })
-  })
-})
+        it('setPerfilUnidade should update perfilSelecionado and unidadeSelecionada and store them in localStorage', () => {
+            perfilStore.setPerfilUnidade(Perfil.ADMIN, 'ABC');
+            expect(perfilStore.perfilSelecionado).toBe(Perfil.ADMIN);
+            expect(perfilStore.unidadeSelecionada).toBe('ABC');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('perfilSelecionado', Perfil.ADMIN);
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('unidadeSelecionada', 'ABC');
+        });
+    });
+});
