@@ -1,3 +1,6 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
@@ -20,12 +23,11 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_21
     }
 
-    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    tasks.withType<BootJar> {
         enabled = false
     }
 
-    tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
-        isEnabled = false
+    tasks.withType<BootRun> {
     }
 }
 

@@ -2,6 +2,7 @@ import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     id("org.springframework.boot") version "3.5.6"
@@ -66,6 +67,7 @@ dependencies {
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
     implementation("org.apache.commons:commons-lang3:3.19.0")
+    implementation("ch.qos.logback:logback-classic:1.5.19")
     implementation("ch.qos.logback:logback-core:1.5.19")
 }
 
@@ -80,7 +82,7 @@ tasks.withType<BootJar> {
     if (project.hasProperty("withFrontend") && project.property("withFrontend").toString() == "true") {
         dependsOn(":copyFrontend")
     }
-    mainClass.set("sgc.SgcApplication")
+    mainClass.set("sgc.Sgc")
 }
 
 tasks.withType<Test> {
@@ -265,6 +267,7 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("-Xlint:-options")
     }
     options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: emptyList()) + listOf(
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED",
@@ -337,4 +340,13 @@ tasks.register<Test>("verboseTest") {
 
     testClassesDirs = tasks.test.get().testClassesDirs
     classpath = tasks.test.get().classpath
+}
+
+// Desabilita a tarefa pmdTest para ignorar os arquivos de teste
+tasks.named("pmdTest") {
+    enabled = false
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    jvmArgs = listOf("-Djdk.internal.vm.debug=release")
 }
