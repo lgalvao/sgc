@@ -6,16 +6,17 @@ export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', 
     state: () => ({
         atribuicoes: atribuicoesMock.map(a => ({
             ...a,
-            dataInicio: new Date(a.dataInicio),
-            dataTermino: new Date(a.dataTermino),
+            dataInicio: new Date(a.dataInicio).toISOString(),
+            dataFim: new Date(a.dataTermino).toISOString(),
+            dataTermino: new Date(a.dataTermino).toISOString(),
         })) as AtribuicaoTemporaria[]
     }),
     getters: {
         getAtribuicoesPorServidor: (state) => (servidorId: number): AtribuicaoTemporaria[] => {
-            return state.atribuicoes.filter(a => Number(a.idServidor) === servidorId)
+            return state.atribuicoes.filter(a => a.servidor.codigo === servidorId)
         },
         getAtribuicoesPorUnidade: (state) => (unidadeSigla: string): AtribuicaoTemporaria[] => {
-            return state.atribuicoes.filter(a => a.unidade === unidadeSigla)
+            return state.atribuicoes.filter(a => a.unidade.sigla === unidadeSigla)
         },
     },
     actions: {

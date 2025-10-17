@@ -4,24 +4,21 @@ import type {AnaliseValidacao} from '@/types/tipos'
 import {ResultadoAnalise} from '@/types/tipos'
 import {generateUniqueId, parseDate} from '@/utils'
 
-export function mapResultadoAnalise(resultado: string): ResultadoAnalise {
+export function mapResultadoAnalise(resultado: string): string {
     switch (resultado) {
         case 'Devolução':
-            return ResultadoAnalise.DEVOLUCAO;
+            return 'Devolução';
         case 'Aceite':
-            return ResultadoAnalise.ACEITE;
+            return 'Aceite';
         default:
-            return ResultadoAnalise.ACEITE;
+            return 'Aceite';
     }
 }
 
-export function parseAnaliseDates(analise: Omit<AnaliseValidacao, 'dataHora' | 'resultado'> & {
-    dataHora: string,
-    resultado: string
-}): AnaliseValidacao {
+export function parseAnaliseDates(analise: any): AnaliseValidacao {
     return {
         ...analise,
-        dataHora: parseDate(analise.dataHora) || new Date(),
+        dataHora: parseDate(analise.dataHora)?.toISOString() || new Date().toISOString(),
         resultado: mapResultadoAnalise(analise.resultado),
     };
 }
@@ -34,14 +31,14 @@ export const useAnalisesStore = defineStore('analises', {
         getAnalisesPorSubprocesso: (state) => (idSubprocesso: number): AnaliseValidacao[] => {
             return state.analises
                 .filter(analise => analise.idSubprocesso === idSubprocesso)
-                .sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime())
+                .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
         }
     },
     actions: {
-        registrarAnalise(payload: Omit<AnaliseValidacao, 'id'>) {
+        registrarAnalise(payload: Omit<AnaliseValidacao, 'codigo'>) {
             const novaAnalise: AnaliseValidacao = {
                 ...payload,
-                id: generateUniqueId()
+                codigo: generateUniqueId()
             }
             this.analises.push(novaAnalise)
             return novaAnalise

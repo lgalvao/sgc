@@ -268,8 +268,13 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
-import {AtualizarProcessoRequest, CriarProcessoRequest, Processo as ProcessoModel, TipoProcesso} from '../mappers/processos'
-import {Unidade} from '../mappers/sgrh' // Reutilizando a interface Unidade do sgrh
+import {
+  TipoProcesso,
+  type Unidade,
+  type Processo as ProcessoModel,
+  type CriarProcessoRequest,
+  type AtualizarProcessoRequest
+} from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
@@ -290,7 +295,7 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
 
-const tiposProcessoDisponiveis = ref<string[]>(['MAPEAMENTO', 'REVISAO', 'DIAGNOSTICO']);
+const tiposProcessoDisponiveis = ref<string[]>(Object.values(TipoProcesso));
 
 // Carregar processo se estiver editando
 onMounted(async () => {
@@ -380,7 +385,7 @@ async function salvarProcesso() {
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
-        tipo: tipo.value,
+        tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
         unidades: unidadesFiltradas
       };
@@ -394,7 +399,7 @@ async function salvarProcesso() {
       // Criando novo processo
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
-        tipo: tipo.value,
+        tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
         unidades: unidadesFiltradas
       };

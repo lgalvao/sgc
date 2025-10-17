@@ -15,7 +15,6 @@ export default defineConfig({
         reuseExistingServer: true,
         timeout: 120 * 1000,
     },
-    globalSetup: './e2e/support/global-setup.ts',
     use: {
         baseURL: 'http://localhost:5173/',
         trace: 'on-first-retry',

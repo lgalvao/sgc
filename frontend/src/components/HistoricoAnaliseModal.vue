@@ -74,7 +74,7 @@
 import {ref, watch} from 'vue';
 
 import {useAnalisesStore} from '@/stores/analises';
-import {AnaliseValidacao} from '@/models/analise';
+import {AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
 

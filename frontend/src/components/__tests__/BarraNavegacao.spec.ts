@@ -13,8 +13,7 @@ import {
 } from 'vue-router';
 import BarraNavegacao from '../BarraNavegacao.vue';
 import {useUnidadesStore} from '@/stores/unidades';
-import {Perfil} from '@/models/perfil';
-import {TipoResponsabilidade} from '@/models/unidade';
+import {Perfil, TipoResponsabilidade} from '@/types/tipos';
 import {computed} from "vue";
 import {usePerfilStore} from "@/stores/perfil";
 

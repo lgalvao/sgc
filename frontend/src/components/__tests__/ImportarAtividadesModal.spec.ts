@@ -10,7 +10,15 @@ import {
     selectFirstCheckbox
 } from '@/test-utils/uiHelpers';
 import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
-import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
+import {
+  Atividade,
+  Processo,
+  SituacaoProcesso,
+  Subprocesso,
+  TipoProcesso,
+  Unidade,
+  UnidadeParticipante
+} from '@/types/tipos';
 
 // Mock dos stores
 const mockProcessosStore = {
@@ -32,13 +40,16 @@ vi.mock('@/stores/atividades', () => ({
 }));
 
 // Helpers para reduzir repetição nos testes
-const criarProcesso = (overrides = {}) => ({
-    id: 1,
+const criarProcesso = (overrides = {}): Processo => ({
+    codigo: 1,
     descricao: 'Processo Teste',
     tipo: TipoProcesso.MAPEAMENTO,
     situacao: SituacaoProcesso.FINALIZADO,
-    dataLimite: new Date(),
-    dataFinalizacao: new Date(),
+    dataLimite: new Date().toISOString(),
+    dataCriacao: new Date().toISOString(),
+    dataFinalizacao: new Date().toISOString(),
+    unidades: [],
+    resumoSubprocessos: [],
     ...overrides
 });
 
@@ -48,7 +59,7 @@ function aplicarMocks({
                           atividades = []
                       }: {
     processos?: Processo[];
-    unidades?: Subprocesso[];
+    unidades?: UnidadeParticipante[];
     atividades?: Atividade[];
 } = {}) {
     mockProcessosStore.processos = processos;
@@ -115,30 +126,25 @@ describe('ImportarAtividadesModal.vue', () => {
         beforeEach(() => {
             aplicarMocks({
                 processos: [
-                    {
-                        id: 1,
+                    criarProcesso({
+                        codigo: 1,
                         descricao: 'Processo de Mapeamento 1',
                         tipo: TipoProcesso.MAPEAMENTO,
                         situacao: SituacaoProcesso.FINALIZADO,
-                        dataLimite: new Date(),
-                        dataFinalizacao: new Date()
-                    },
-                    {
-                        id: 2,
+                    }),
+                    criarProcesso({
+                        codigo: 2,
                         descricao: 'Processo de Revisão 1',
                         tipo: TipoProcesso.REVISAO,
                         situacao: SituacaoProcesso.FINALIZADO,
-                        dataLimite: new Date(),
-                        dataFinalizacao: new Date()
-                    },
-                    {
-                        id: 3,
+                    }),
+                    criarProcesso({
+                        codigo: 3,
                         descricao: 'Processo em Andamento',
                         tipo: TipoProcesso.MAPEAMENTO,
                         situacao: SituacaoProcesso.EM_ANDAMENTO,
-                        dataLimite: new Date(),
-                        dataFinalizacao: null
-                    },
+                        dataFinalizacao: undefined
+                    }),
                 ]
             });
         });
@@ -186,8 +192,8 @@ describe('ImportarAtividadesModal.vue', () => {
             aplicarMocks({
                 processos: [criarProcesso()],
                 unidades: [
-                    {id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
-                    {id: 2, unidade: 'UNID2', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
+                    {codUnidade: 1, sigla: 'UNID1'},
+                    {codUnidade: 2, sigla: 'UNID2'},
                 ]
             });
         });
@@ -219,11 +225,11 @@ describe('ImportarAtividadesModal.vue', () => {
             aplicarMocks({
                 processos: [criarProcesso()],
                 unidades: [
-                    {id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
+                    {codUnidade: 1, sigla: 'UNID1'},
                 ],
                 atividades: [
-                    {id: 1, descricao: 'Atividade 1', idSubprocesso: 1, conhecimentos: []} as Atividade,
-                    {id: 2, descricao: 'Atividade 2', idSubprocesso: 1, conhecimentos: []} as Atividade,
+                    {codigo: 1, descricao: 'Atividade 1', conhecimentos: []},
+                    {codigo: 2, descricao: 'Atividade 2', conhecimentos: []},
                 ]
             });
         });
@@ -256,11 +262,11 @@ describe('ImportarAtividadesModal.vue', () => {
             aplicarMocks({
                 processos: [criarProcesso()],
                 unidades: [
-                    {id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
+                    {codUnidade: 1, sigla: 'UNID1'},
                 ],
                 atividades: [
-                    {id: 1, descricao: 'Atividade 1', idSubprocesso: 1, conhecimentos: []} as Atividade,
-                    {id: 2, descricao: 'Atividade 2', idSubprocesso: 1, conhecimentos: []} as Atividade,
+                    {codigo: 1, descricao: 'Atividade 1', conhecimentos: []},
+                    {codigo: 2, descricao: 'Atividade 2', conhecimentos: []},
                 ]
             });
         });
@@ -322,7 +328,7 @@ describe('ImportarAtividadesModal.vue', () => {
             aplicarMocks({
                 processos: [criarProcesso()],
                 unidades: [
-                    {id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
+                    {codUnidade: 1, sigla: 'UNID1'},
                 ]
             });
 
@@ -375,18 +381,14 @@ describe('ImportarAtividadesModal.vue', () => {
 
         it('deve chamar selecionarUnidade(null) quando unidadeSelecionadaId é null', async () => {
             mockProcessosStore.processos = [
-                {
-                    id: 1,
+                criarProcesso({
+                    codigo: 1,
                     descricao: 'Processo Teste',
-                    tipo: TipoProcesso.MAPEAMENTO,
-                    situacao: SituacaoProcesso.FINALIZADO,
-                    dataLimite: new Date(),
-                    dataFinalizacao: new Date(),
-                },
+                }),
             ];
 
             mockProcessosStore.getUnidadesDoProcesso = vi.fn().mockReturnValue([
-                {id: 1, unidade: 'UNID1', idProcesso: 1, situacao: 'Finalizado'} as Subprocesso,
+                {codUnidade: 1, sigla: 'UNID1'},
             ]);
 
             const wrapper = mountComponent();

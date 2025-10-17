@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
+import {createRouter, createMemoryHistory, RouteRecordRaw} from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -35,20 +35,20 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade',
         name: 'Subprocesso',
         component: () => import('./views/Subprocesso.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
         meta: {
             title: 'Processos da Unidade',
-            breadcrumb: (route: RouteLocationNormalized) => `${route.params.siglaUnidade ?? ''}`
+            breadcrumb: (route) => `${route.params.siglaUnidade ?? ''}`
         },
     },
     {
         path: '/processo/:idProcesso/:siglaUnidade/mapa',
         name: 'SubprocessoMapa',
         component: () => import('./views/CadMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             sigla: route.params.siglaUnidade,
             idProcesso: Number(route.params.idProcesso)
         }),
@@ -58,7 +58,7 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
         name: 'SubprocessoVisMapa',
         component: () => import('./views/VisMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             sigla: route.params.siglaUnidade
         }),
@@ -68,7 +68,7 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade/cadastro',
         name: 'SubprocessoCadastro',
         component: () => import('./views/CadAtividades.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             sigla: route.params.siglaUnidade
         }),
@@ -78,7 +78,7 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
         name: 'SubprocessoVisCadastro',
         component: () => import('./views/VisAtividades.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             sigla: route.params.siglaUnidade
         }),
@@ -89,7 +89,7 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade/diagnostico-equipe',
         name: 'DiagnosticoEquipe',
         component: () => import('./views/DiagnosticoEquipe.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
@@ -99,7 +99,7 @@ const routes: RouteRecordRaw[] = [
         path: '/processo/:idProcesso/:siglaUnidade/ocupacoes-criticas',
         name: 'OcupacoesCriticas',
         component: () => import('./views/OcupacoesCriticas.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             idProcesso: Number(route.params.idProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
@@ -112,14 +112,14 @@ const routes: RouteRecordRaw[] = [
         props: true,
         meta: {
             title: 'Unidade',
-            breadcrumb: (route: RouteLocationNormalized) => `${route.params.siglaUnidade ?? ''}`,
+            breadcrumb: (route) => `${route.params.siglaUnidade ?? ''}`,
         }
     },
     {
         path: '/unidade/:siglaUnidade/mapa',
         name: 'Mapa',
         component: () => import('./views/CadMapa.vue'),
-        props: (route: RouteLocationNormalized) => ({
+        props: (route) => ({
             sigla: route.params.siglaUnidade,
             idProcesso: Number(route.query.idProcesso)
         }),
@@ -129,7 +129,7 @@ const routes: RouteRecordRaw[] = [
         path: '/unidade/:siglaUnidade/atribuicao',
         name: 'AtribuicaoTemporariaForm',
         component: () => import('./views/CadAtribuicao.vue'),
-        props: (route: RouteLocationNormalized) => ({sigla: route.params.siglaUnidade}),
+        props: (route) => ({sigla: route.params.siglaUnidade}),
         meta: {title: 'Atribuição Temporária', breadcrumb: 'Atribuição'},
     },
     {
@@ -153,14 +153,8 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createMemoryHistory(),
     routes,
 });
-
-router.afterEach((to) => {
-    const meta = to.meta || {}
-    const titleBase = typeof meta.title === 'string' ? meta.title : (to.name as string) || 'SGC'
-    document.title = `${titleBase} - SGC`
-})
 
 export default router;

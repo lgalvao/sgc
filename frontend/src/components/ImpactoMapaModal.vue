@@ -186,8 +186,7 @@ import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
 import {Mudanca, TipoMudanca, useRevisaoStore} from '@/stores/revisao';
-import {Competencia} from '@/models/competencia';
-import {Processo} from '@/models/processo';
+import {Competencia, Processo} from '@/types/tipos';
 
 const props = defineProps<{
   mostrar: boolean;

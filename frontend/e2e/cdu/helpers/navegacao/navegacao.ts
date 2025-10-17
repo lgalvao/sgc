@@ -218,6 +218,7 @@ async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFI
     await page.waitForLoadState('networkidle');
 
     await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(dadosUsuario.idServidor);
+    await page.waitForLoadState('networkidle');
     await page.getByLabel(ROTULOS.SENHA).fill(dadosUsuario.senha);
     await clicarBotaoEntrar(page);
 

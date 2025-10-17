@@ -344,12 +344,12 @@ const processosFiltrados = computed(() => {
 
   if (filtroDataInicio.value) {
     const dataInicio = new Date(filtroDataInicio.value)
-    processos = processos.filter(p => new Date(p.dataLimite) >= dataInicio)
+    processos = processos.filter(p => new Date(p.dataCriacao) >= dataInicio)
   }
 
   if (filtroDataFim.value) {
     const dataFim = new Date(filtroDataFim.value)
-    processos = processos.filter(p => new Date(p.dataLimite) <= dataFim)
+    processos = processos.filter(p => new Date(p.dataCriacao) <= dataFim)
   }
 
   return processos
@@ -357,7 +357,7 @@ const processosFiltrados = computed(() => {
 
 const mapasVigentes = computed(() => {
   // Filtrar mapas vigentes (aqueles com processos finalizados)
-  const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === 'Finalizado')
+  const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === SituacaoProcesso.FINALIZADO)
   const idsProcessosFinalizados = processosFinalizados.map(p => p.codigo)
 
   return mapasStore.mapas.filter(m =>
@@ -419,7 +419,7 @@ const diagnosticosGaps = computed(() => {
 const diagnosticosGapsFiltrados = computed(() => {
   let diagnosticos = diagnosticosGaps.value
 
-  if (filtroTipo.value && filtroTipo.value !== 'Diagnóstico') {
+  if (filtroTipo.value && filtroTipo.value !== TipoProcesso.DIAGNOSTICO) {
     // Se filtro não for diagnóstico, mostrar apenas diagnósticos relacionados ao tipo
     return []
   }
@@ -455,12 +455,12 @@ const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
 
-const calcularPercentualConcluido = (processo: any) => {
+const calcularPercentualConcluido = (processo: ProcessoResumo) => {
   // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
-  const total = processo.resumoSubprocessos?.total || 0;
+  const total = processo.unidades?.length || 0;
   if (total === 0) return 0;
-  const concluidos = processo.resumoSubprocessos?.concluidos || 0;
+  const concluidos = processo.unidades?.filter(u => u.situacao === SituacaoSubprocesso.CONCLUIDO).length || 0;
   return Math.round((concluidos / total) * 100);
 }
 

@@ -29,7 +29,7 @@
     >
       <div
         v-for="competencia in competencias"
-        :key="competencia.id"
+        :key="competencia.codigo"
         class="col-md-6 mb-4"
       >
         <div class="card h-100">
@@ -42,7 +42,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
               <select
-                v-model="avaliacoes[competencia.id].importancia"
+                v-model="avaliacoes[competencia.codigo].importancia"
                 class="form-select"
               >
                 <option value="1">
@@ -66,7 +66,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
               <select
-                v-model="avaliacoes[competencia.id].dominio"
+                v-model="avaliacoes[competencia.codigo].dominio"
                 class="form-select"
               >
                 <option value="1">
@@ -90,7 +90,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Observações:</label>
               <textarea
-                v-model="avaliacoes[competencia.id].observacoes"
+                v-model="avaliacoes[competencia.codigo].observacoes"
                 class="form-control"
                 rows="2"
                 placeholder="Comentários sobre esta competência..."
@@ -138,7 +138,7 @@
               <ul class="mb-0 mt-2">
                 <li
                   v-for="comp in avaliacoesPendentes"
-                  :key="comp.id"
+                  :key="comp.codigo"
                 >
                   {{ comp.descricao }}
                 </li>
@@ -200,8 +200,8 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
   competencias.value.forEach(comp => {
-    if (!avaliacoes.value[comp.id]) {
-      avaliacoes.value[comp.id] = {
+    if (!avaliacoes.value[comp.codigo]) {
+      avaliacoes.value[comp.codigo] = {
         importancia: 3,
         dominio: 3,
         observacoes: ''
@@ -219,7 +219,7 @@ const competencias = computed<Competencia[]>(() => {
 })
 
 // Estado das avaliações
-const avaliacoes = ref<Record<number, {
+const avaliacoes = ref<Record<string, {
   importancia: number
   dominio: number
   observacoes: string
@@ -231,8 +231,8 @@ const mostrarModalConfirmacao = ref(false)
 // Inicializar avaliações
 onMounted(() => {
   competencias.value.forEach(comp => {
-    if (!avaliacoes.value[comp.id]) {
-      avaliacoes.value[comp.id] = {
+    if (!avaliacoes.value[comp.codigo]) {
+      avaliacoes.value[comp.codigo] = {
         importancia: 3,
         dominio: 3,
         observacoes: ''
@@ -243,7 +243,7 @@ onMounted(() => {
 
 const avaliacoesPendentes = computed(() => {
   return competencias.value.filter(comp => {
-    const aval = avaliacoes.value[comp.id]
+    const aval = avaliacoes.value[comp.codigo]
     return !aval || aval.importancia === 0 || aval.dominio === 0
   })
 })

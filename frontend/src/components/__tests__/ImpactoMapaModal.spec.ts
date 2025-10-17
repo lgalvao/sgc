@@ -3,12 +3,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
 import {initPinia} from '@/test-utils/helpers';
 import {TipoMudanca} from '@/stores/revisao';
-import type {Atividade} from '@/models/atividade';
-import type {Competencia} from '@/models/competencia';
-import type {Conhecimento} from '@/models/conhecimento';
-import type {Mapa} from '@/models/mapa';
-import type {Processo} from '@/models/processo';
-import type {Unidade} from '@/models/unidade';
+import type {Atividade, Competencia, Conhecimento, Mapa, Processo, Unidade} from '@/types/tipos';
 
 
 // Mock de dados simplificados

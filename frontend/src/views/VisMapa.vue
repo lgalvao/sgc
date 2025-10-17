@@ -92,7 +92,7 @@
         </div>
         <div
           v-for="comp in competencias"
-          :key="comp.id"
+          :key="comp.codigo"
           class="card mb-3 competencia-card"
           data-testid="competencia-block"
         >
@@ -121,7 +121,7 @@
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
                       v-for="conhecimento in getConhecimentosAtividade(atvId)"
-                      :key="conhecimento.id"
+                      :key="conhecimento.codigo"
                       class="me-3 mb-1"
                       data-testid="conhecimento-item"
                     >
@@ -422,7 +422,7 @@
               <tbody>
                 <tr
                   v-for="item in historicoAnalise"
-                  :key="item.id"
+                  :key="item.codigo"
                   data-testid="historico-item"
                 >
                   <td>{{ item.data }}</td>
@@ -547,16 +547,16 @@ const historicoAnalise = computed(() => {
   if (!idSubprocesso.value) return []
 
   return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
-    id: analise.id,
-    data: analise.dataHora.toLocaleString('pt-BR'),
+    codigo: analise.codigo,
+    data: new Date(analise.dataHora).toLocaleString('pt-BR'),
     unidade: analise.unidade,
     resultado: analise.resultado,
-    observacao: analise.observacao || ''
+    observacoes: analise.observacoes || ''
   }))
 })
 
 function getAtividadeCompleta(id: number): Atividade | undefined {
-  return atividades.value.find(a => a.id === id)
+  return atividades.value.find(a => a.codigo === id);
 }
 
 function getConhecimentosAtividade(id: number): Conhecimento[] {

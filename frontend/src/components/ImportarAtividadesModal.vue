@@ -146,8 +146,7 @@
 import {computed, ref, watch, onMounted} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
-import type { Atividade } from '@/models/atividade';
-import { SituacaoProcesso, TipoProcesso} from '@/models/processo'
+import { SituacaoProcesso, TipoProcesso, type Atividade } from '@/types/tipos'
 import {ProcessoResumo, UnidadeParticipante} from "@/mappers/processos";
 
 const props = defineProps<{

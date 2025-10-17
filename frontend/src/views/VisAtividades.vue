@@ -44,8 +44,8 @@
 
     <!-- Lista de atividades -->
     <div
-      v-for="(atividade, idx) in atividades"
-      :key="atividade.codigo || idx"
+      v-for="(atividade) in atividades"
+      :key="atividade.codigo"
       class="card mb-3 atividade-card"
     >
       <div class="card-body py-2">
@@ -253,14 +253,14 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {usePerfilStore} from '@/stores/perfil';
-import {useAtividadesStore} from '@/stores/atividades'
-import {useUnidadesStore} from '@/stores/unidades'
-import {useProcessosStore} from '@/stores/processos'
-import {useNotificacoesStore} from '@/stores/notificacoes'
-import {useAlertasStore} from '@/stores/alertas'
-import {useAnalisesStore} from '@/stores/analises' // Adicionado
-import {useRouter} from 'vue-router'
-import {Atividade, Perfil, Processo, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos'
+import {useAtividadesStore} from '@/stores/atividades';
+import {useUnidadesStore} from '@/stores/unidades';
+import {useProcessosStore} from '@/stores/processos';
+import {useNotificacoesStore} from '@/stores/notificacoes';
+import {useAlertasStore} from '@/stores/alertas';
+import {useAnalisesStore} from '@/stores/analises';
+import {useRouter} from 'vue-router';
+import {Atividade, Perfil, Processo, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos';
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
 import {URL_SISTEMA} from '@/constants';

@@ -94,7 +94,7 @@ import {useRouter} from 'vue-router'
 import {Perfil} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {formatDateTimeBR} from '@/utils';
-import {ProcessoResumo} from '../mappers/processos';
+import {type ProcessoResumo} from '@/types/tipos';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
