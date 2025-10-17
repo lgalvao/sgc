@@ -91,12 +91,7 @@
           </button>
 
           <!-- Exibição de Erro -->
-          <div
-            v-if="perfilStore.erroAutenticacao"
-            class="alert alert-danger mt-3 text-center"
-            role="alert"
-            data-testid="alerta-erro"
-          >
+          <div v-if="perfilStore.erroAutenticacao" class="text-danger mt-3 text-center" data-testid="alerta-erro">
             {{ perfilStore.erroAutenticacao }}
           </div>
         </form>
@@ -149,7 +144,7 @@ const handleLogin = async () => {
   // Se ainda não autenticou, chama a primeira etapa
   if (!perfilStore.loginResponse) {
     if (!titulo.value) {
-      notificacoesStore.erro('Dados incompletos', 'Por favor, preencha o título eleitoral.')
+      perfilStore.erroAutenticacao = 'Por favor, preencha o título eleitoral.';
       return
     }
     try {
