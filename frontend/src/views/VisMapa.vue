@@ -501,11 +501,12 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const idSubprocesso = computed(() => {
-  const subprocesso = processosStore.subprocessos.find(
-      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
-  );
-  return subprocesso?.id;
+import {onMounted} from 'vue'
+
+const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
 });
 
 const atividades = computed<Atividade[]>(() => {
@@ -518,9 +519,10 @@ const atividades = computed<Atividade[]>(() => {
 const mapa = computed(() => mapaStore.mapas.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
 const competencias = computed<Competencia[]>(() => mapa.value ? mapa.value.competencias : [])
 
-const subprocesso = computed(() => processosStore.subprocessos.find(
-    (sp: Subprocesso) => sp.idProcesso === idProcesso.value && sp.unidade === sigla.value
-))
+const subprocesso = computed(() => {
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === sigla.value);
+})
 
 // Computed para determinar quais botões mostrar baseado no perfil e situação
 const podeValidar = computed(() => {

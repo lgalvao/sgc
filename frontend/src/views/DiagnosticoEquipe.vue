@@ -195,9 +195,20 @@ const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
-const processoAtual = computed<Processo | null>(() => {
-  return processosStore.processos.find(p => p.id === idProcesso.value) || null
-})
+const processoAtual = computed(() => processosStore.processoDetalhe);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  competencias.value.forEach(comp => {
+    if (!avaliacoes.value[comp.id]) {
+      avaliacoes.value[comp.id] = {
+        importancia: 3,
+        dominio: 3,
+        observacoes: ''
+      }
+    }
+  })
+});
 
 const mapa = computed<Mapa | null>(() => {
   return mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value) || null
@@ -249,23 +260,17 @@ function confirmarFinalizacao() {
   if (!processoAtual.value) return
 
   // Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: processosStore.subprocessos.find(sp =>
-      sp.idProcesso === idProcesso.value && sp.unidade === siglaUnidade.value
-    )?.id || 0,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Diagnóstico da equipe finalizado'
-  })
+  const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
+  if (subprocesso) {
+    processosStore.addMovement({
+      idSubprocesso: subprocesso.codUnidade,
+      unidadeOrigem: siglaUnidade.value,
+      unidadeDestino: 'SEDOC',
+      descricao: 'Diagnóstico da equipe finalizado'
+    });
+  }
 
-  // Criar alerta
-  alertasStore.criarAlerta({
-    idProcesso: idProcesso.value,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Diagnóstico da equipe finalizado',
-    dataHora: new Date()
-  })
+  // A criação de alertas agora é responsabilidade do backend
 
   notificacoesStore.sucesso(
     'Diagnóstico finalizado',

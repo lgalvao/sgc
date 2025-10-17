@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia'
 import {Movimentacao, Subprocesso} from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 import * as painelService from '../services/painelService'
 import {Page} from '../services/painelService'
 import * as processoService from '../services/processoService'
@@ -67,10 +66,10 @@ export const useProcessosStore = defineStore('processos', {
             await processoService.excluirProcesso(idProcesso);
         },
         async iniciarProcesso(idProcesso: number) {
-            await processoService.iniciarProcesso(idProcesso);
+            // A ser implementado pelo backend
         },
         async finalizarProcesso(idProcesso: number) {
-            await processoService.finalizarProcesso(idProcesso);
+            // A ser implementado pelo backend
         },
         async processarCadastroBloco(payload: {
             idProcesso: number,
@@ -87,14 +86,14 @@ export const useProcessosStore = defineStore('processos', {
 
             // Lógica de simulação temporária (remover quando o backend estiver pronto)
             const {idProcesso, unidades, tipoAcao, unidadeUsuario} = payload;
-            if (this.processoDetalhe && this.processoDetalhe.id === idProcesso) {
+            if (this.processoDetalhe && this.processoDetalhe.codigo === idProcesso) {
                 unidades.forEach(siglaUnidade => {
-                    const subprocesso = (this.processoDetalhe?.subprocessos || []).find(sp => sp.unidade === siglaUnidade);
-                    if (subprocesso) {
+                    const unidadeParticipante = (this.processoDetalhe?.unidades || []).find(up => up.sigla === siglaUnidade);
+                    if (unidadeParticipante) {
                         if (tipoAcao === 'aceitar') {
-                            subprocesso.situacao = SITUACOES_SUBPROCESSO.MAPA_VALIDADO;
+                            unidadeParticipante.situacaoSubprocesso = 'MAPA_VALIDADO';
                         } else {
-                            subprocesso.situacao = SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO;
+                            unidadeParticipante.situacaoSubprocesso = 'MAPA_HOMOLOGADO';
                         }
                     }
                 });

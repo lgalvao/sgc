@@ -61,7 +61,7 @@ test.describe('CDU-21: Finalizar processo de mapeamento ou de revisão', () => {
 
         test('deve finalizar processo com sucesso e marcar situação como Finalizado', async ({page}) => {
             await navegarParaProcessoPorId(page, ID_PROCESSO);
-            await finalizarProcesso(page);
+            await finalizarProcesso(page, ID_PROCESSO);
 
             await verificarMensagemFinalizacaoSucesso(page);
             await verificarProcessoFinalizadoNoPainel(page, PROCESSO_FINALIZACAO.nome);
@@ -69,7 +69,7 @@ test.describe('CDU-21: Finalizar processo de mapeamento ou de revisão', () => {
 
         test('deve informar vigência dos mapas ao finalizar processo de mapeamento', async ({page}) => {
             await navegarParaProcessoPorId(page, PROCESSO_MAPEAMENTO.id);
-            await finalizarProcesso(page);
+            await finalizarProcesso(page, PROCESSO_MAPEAMENTO.id);
 
             await verificarMapasVigentesNotificacao(page);
             await verificarProcessoFinalizadoNoPainel(page, PROCESSO_MAPEAMENTO.nome);
@@ -77,7 +77,7 @@ test.describe('CDU-21: Finalizar processo de mapeamento ou de revisão', () => {
 
         test('deve enviar notificações por e-mail ao finalizar processo de revisão', async ({page}) => {
             await navegarParaProcessoPorId(page, PROCESSO_REVISAO.id);
-            await finalizarProcesso(page);
+            await finalizarProcesso(page, PROCESSO_REVISAO.id);
 
             await verificarEmailFinalizacaoEnviado(page);
         });

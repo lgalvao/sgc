@@ -289,14 +289,14 @@
                 <tbody>
                   <tr
                     v-for="processo in processosFiltrados"
-                    :key="processo.id"
+                    :key="processo.codigo"
                   >
                     <td>{{ processo.descricao }}</td>
                     <td>{{ processo.tipo }}</td>
                     <td>{{ processo.situacao }}</td>
-                    <td>{{ formatarData(processo.dataLimite) }}</td>
-                    <td>{{ getUnidadesParticipantes(processo.id).length }}</td>
-                    <td>{{ calcularPercentualConcluido(processo.id) }}%</td>
+                    <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+                    <td>{{ processo.unidades?.length || 0 }}</td>
+                    <td>{{ calcularPercentualConcluido(processo) }}%</td>
                   </tr>
                 </tbody>
               </table>
@@ -336,7 +336,7 @@ const mostrarModalAndamentoGeral = ref(false)
 
 // Dados computados
 const processosFiltrados = computed(() => {
-  let processos = processosStore.processos
+  let processos = processosStore.processosPainel
 
   if (filtroTipo.value) {
     processos = processos.filter(p => p.tipo === filtroTipo.value)
@@ -344,12 +344,12 @@ const processosFiltrados = computed(() => {
 
   if (filtroDataInicio.value) {
     const dataInicio = new Date(filtroDataInicio.value)
-    processos = processos.filter(p => p.dataLimite >= dataInicio)
+    processos = processos.filter(p => new Date(p.dataLimite) >= dataInicio)
   }
 
   if (filtroDataFim.value) {
     const dataFim = new Date(filtroDataFim.value)
-    processos = processos.filter(p => p.dataLimite <= dataFim)
+    processos = processos.filter(p => new Date(p.dataLimite) <= dataFim)
   }
 
   return processos
@@ -357,8 +357,8 @@ const processosFiltrados = computed(() => {
 
 const mapasVigentes = computed(() => {
   // Filtrar mapas vigentes (aqueles com processos finalizados)
-  const processosFinalizados = processosStore.processos.filter(p => p.situacao === 'Finalizado')
-  const idsProcessosFinalizados = processosFinalizados.map(p => p.id)
+  const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === 'Finalizado')
+  const idsProcessosFinalizados = processosFinalizados.map(p => p.codigo)
 
   return mapasStore.mapas.filter(m =>
     idsProcessosFinalizados.includes(m.idProcesso) &&
@@ -455,19 +455,13 @@ const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
 
-const getUnidadesParticipantes = (idProcesso: number) => {
-  return processosStore.getUnidadesDoProcesso(idProcesso)
-}
-
-const calcularPercentualConcluido = (idProcesso: number) => {
-  const subprocessos = processosStore.getUnidadesDoProcesso(idProcesso)
-  if (subprocessos.length === 0) return 0
-
-  const concluidos = subprocessos.filter(sp =>
-      sp.situacao === 'Mapa homologado' || sp.situacao === SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO
-  ).length
-
-  return Math.round((concluidos / subprocessos.length) * 100)
+const calcularPercentualConcluido = (processo: any) => {
+  // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
+  // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
+  const total = processo.resumoSubprocessos?.total || 0;
+  if (total === 0) return 0;
+  const concluidos = processo.resumoSubprocessos?.concluidos || 0;
+  return Math.round((concluidos / total) * 100);
 }
 
 const abrirModalMapasVigentes = () => {
@@ -516,9 +510,9 @@ const exportarAndamentoGeral = () => {
     Descricao: processo.descricao,
     Tipo: processo.tipo,
     Situacao: processo.situacao,
-    'Data Limite': formatarData(processo.dataLimite),
-    'Unidades Participantes': getUnidadesParticipantes(processo.id).length,
-    '% Concluido': calcularPercentualConcluido(processo.id)
+    'Data Limite': formatarData(new Date(processo.dataLimite)),
+    'Unidades Participantes': processo.unidades?.length || 0,
+    '% Concluido': calcularPercentualConcluido(processo)
   }))
 
   const csv = gerarCSV(dados)

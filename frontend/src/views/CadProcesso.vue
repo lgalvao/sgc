@@ -102,7 +102,7 @@
                     >
                       <input
                           :id="`chk-${neta.sigla}`"
-                          :checked="isChecked(neta.sigla)"
+                          :checked="isChecked(neta.codigo)"
                           class="form-check-input"
                           type="checkbox"
                           @change="() => toggleUnidade(neta)"
@@ -444,9 +444,7 @@ async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false
   if (processoEditando.value) {
     try {
-      // TODO: O endpoint de iniciar processo no backend espera um tipo e uma lista de unidades
-      // Por enquanto, vamos chamar sem as unidades, mas isso precisa ser ajustado.
-      await processoService.iniciarProcesso(processoEditando.value.codigo, tipo.value, unidadesSelecionadas.value);
+      await processoService.iniciarProcesso(processoEditando.value.codigo);
       notificacoesStore.sucesso(
           'Processo iniciado',
           'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
@@ -491,51 +489,59 @@ async function confirmarRemocao() {
 
 // Funções de manipulação de unidades (serão ajustadas em uma etapa posterior)
 function getTodasSubunidades(unidade: Unidade): number[] {
-  let subunidades: number[] = []
-  // TODO: Implementar lógica para obter subunidades por código
-  return subunidades
+    let subunidades: number[] = [];
+    if (unidade.filhas) {
+        for (const filha of unidade.filhas) {
+            subunidades.push(filha.codigo);
+            subunidades = subunidades.concat(getTodasSubunidades(filha));
+        }
+    }
+    return subunidades;
 }
 
 function isFolha(unidade: Unidade): boolean {
-  // TODO: Implementar lógica para verificar se é folha
-  return true;
+    return !unidade.filhas || unidade.filhas.length === 0;
 }
 
 function isChecked(codigo: number): boolean {
-  return unidadesSelecionadas.value.includes(codigo)
+    return unidadesSelecionadas.value.includes(codigo);
 }
 
 function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
-  const selfSelected = isChecked(unidade.codigo)
+    const selfSelected = isChecked(unidade.codigo);
 
-  if (isFolha(unidade)) {
-    return selfSelected
-  }
+    if (isFolha(unidade)) {
+        return selfSelected;
+    }
 
-  const subunidades = getTodasSubunidades(unidade)
-  const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length
+    const subunidades = getTodasSubunidades(unidade);
+    if (subunidades.length === 0) {
+        return selfSelected;
+    }
+    const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length;
 
-  if (selecionadas === 0) {
-    return selfSelected
-  }
-  if (selecionadas === subunidades.length) return true
-  return 'indeterminate'
+    if (selecionadas === 0 && !selfSelected) {
+        return false;
+    }
+    if (selecionadas === subunidades.length && selfSelected) {
+        return true;
+    }
+    return 'indeterminate';
 }
 
 function toggleUnidade(unidade: Unidade) {
-  // TODO: Implementar lógica de toggle de unidade por código
-  const todasSubunidades = [unidade.codigo, ...getTodasSubunidades(unidade)]
-  const todasEstaoSelecionadas = todasSubunidades.every(codigo => isChecked(codigo))
+    const todasSubunidades = [unidade.codigo, ...getTodasSubunidades(unidade)];
+    const todasEstaoSelecionadas = todasSubunidades.every(codigo => isChecked(codigo));
 
-  if (todasEstaoSelecionadas) {
-    unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
-        codigo => !todasSubunidades.includes(codigo)
-    )
-  } else {
-    todasSubunidades.forEach(codigo => {
-      if (!unidadesSelecionadas.value.includes(codigo)) {
-        unidadesSelecionadas.value.push(codigo)
-      }
-    })
-  }
+    if (todasEstaoSelecionadas) {
+        unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
+            codigo => !todasSubunidades.includes(codigo)
+        );
+    } else {
+        todasSubunidades.forEach(codigo => {
+            if (!unidadesSelecionadas.value.includes(codigo)) {
+                unidadesSelecionadas.value.push(codigo);
+            }
+        });
+    }
 }

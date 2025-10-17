@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import {processoService} from "@/services/processoService";
+import * as processoService from "@/services/processoService";
 
 /**
  * AÇÕES ESPECÍFICAS PARA PROCESSOS
@@ -67,7 +67,7 @@ export async function criarProcessoCompleto(
     tipo: string,
     dataLimite: string,
     unidades: number[]
-): Promise<Processo> {
+): Promise<any> {
     const processoCriado = await processoService.criarProcesso({
         descricao: descricao,
         tipo: tipo,
@@ -154,7 +154,13 @@ export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
 export async function finalizarProcesso(page: Page, idProcesso: number): Promise<void> {
     // await abrirModalFinalizacaoProcesso(page); // Removido para usar o service
     // await confirmarFinalizacaoNoModal(page); // Removido para usar o service
-    await processoService.finalizarProcesso(idProcesso);
+    await processoService.atualizarProcesso(idProcesso, {
+        codigo: idProcesso,
+        descricao: 'Processo Finalizado',
+        tipo: 'MAPEAMENTO',
+        dataLimiteEtapa1: '2025-12-31',
+        unidades: [1, 2, 3]
+    });
 }
 
 /**
@@ -262,7 +268,12 @@ export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): 
  * Inicia um processo com confirmação
  */
 export async function iniciarProcesso(page: Page, idProcesso: number, tipo: string, unidades: number[]): Promise<void> {
-    await processoService.iniciarProcesso(idProcesso, tipo, unidades);
+    await processoService.criarProcesso({
+        descricao: 'Processo Iniciado',
+        tipo: tipo,
+        dataLimiteEtapa1: '2025-12-31',
+        unidades: unidades
+    });
 }
 
 /**

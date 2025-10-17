@@ -413,17 +413,15 @@ const idProcesso = computed(() => Number(route.params.idProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
-  if (!idProcesso.value || !siglaUnidade.value) return null;
-  return (processosStore.subprocessos as Subprocesso[]).find(
-      (pu) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaUnidade.value);
 });
 
 const podeVerImpacto = computed(() => {
   if (!perfilStore.perfilSelecionado || !subprocesso.value) return false;
 
   const perfil = perfilStore.perfilSelecionado;
-  const situacao = subprocesso.value.situacao;
+  const situacao = subprocesso.value.situacaoSubprocesso;
 
   const isPermittedProfile = perfil === Perfil.ADMIN;
   const isCorrectSituation = situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA || situacao === SITUACOES_SUBPROCESSO.MAPA_AJUSTADO;
@@ -462,11 +460,17 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
-const idSubprocesso = computed(() => {
-  const Subprocesso = processosStore.subprocessos.find(
-      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
-  return Subprocesso?.id;
+const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Inicializar tooltips após o componente ser montado
+  import('bootstrap').then(({Tooltip}) => {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipTriggerList.forEach(tooltipTriggerEl => {
+      new Tooltip(tooltipTriggerEl)
+    })
+  })
 });
 
 const atividades = computed<Atividade[]>(() => {
@@ -611,11 +615,8 @@ function adicionarOuAtualizarCompetencia() {
   }
   
   // 10. Se a situação do subprocesso ainda for 'Cadastro homologado', alterar para 'Mapa criado'
-  if (subprocesso.value && subprocesso.value.situacao === 'Cadastro homologado') {
-    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === subprocesso.value!.id);
-    if (subprocessoIndex !== -1) {
-      processosStore.subprocessos[subprocessoIndex].situacao = 'Mapa criado';
-    }
+  if (subprocesso.value && subprocesso.value.situacaoSubprocesso === SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO) {
+    subprocesso.value.situacaoSubprocesso = SITUACOES_SUBPROCESSO.MAPA_CRIADO;
   }
 
   novaCompetencia.value.descricao = '';
@@ -717,19 +718,18 @@ function disponibilizarMapa() {
   }
 
   // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
-  const subprocesso = processosStore.subprocessos.find(
-      pu => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
-  if (subprocesso) {
-    subprocesso.situacao = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
-    subprocesso.dataLimiteEtapa2 = new Date(dataLimiteValidacao.value);
+  const sub = subprocesso.value;
+  if (sub) {
+    sub.situacaoSubprocesso = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
+    sub.dataLimite = dataLimiteValidacao.value;
     if (observacoesDisponibilizacao.value) {
-      subprocesso.observacoes = observacoesDisponibilizacao.value;
+      // O DTO não tem mais um campo de observações direto, isso precisaria ser tratado
+      // em uma movimentação ou em um campo específico se existir no backend.
     }
 
     // Registrar movimentação
     processosStore.addMovement({
-      idSubprocesso: subprocesso.id,
+      idSubprocesso: sub.codUnidade,
       unidadeOrigem: 'SEDOC',
       unidadeDestino: siglaUnidade.value,
       descricao: 'Disponibilização do mapa de competências'
@@ -757,20 +757,10 @@ function disponibilizarMapa() {
       `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
   );
 
-  // Criar alerta interno (CDU-17 item 18)
-  alertasStore.criarAlerta({
-    descricao: `Mapa de competências da unidade ${currentUnidade.sigla} disponibilizado para análise`,
-    idProcesso: idProcesso.value,
-    dataHora: new Date(),
-    unidadeOrigem: 'SEDOC',
-    unidadeDestino: currentUnidade.sigla
-  });
+  // A criação de alertas agora é responsabilidade do backend
 
   // Excluir sugestões e histórico de análise (CDU-17 item 19)
-  if (subprocesso) {
-    subprocesso.sugestoes = '';
-    subprocesso.analises = [];
-  }
+  // A ser implementado no backend
 
   notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
 

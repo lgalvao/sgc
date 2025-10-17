@@ -32,7 +32,7 @@ import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {ProcessoResumo} from '../mappers/processos';
 import {formatDateTimeBR} from '@/utils';
 
-type SortCriteria = keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
+type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -42,24 +42,29 @@ const perfil = usePerfilStore()
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
-const processosFinalizados = ref<ProcessoResumo[]>([]);
+const processosFinalizados = ref<Processo[]>([]);
 
 onMounted(async () => {
   // TODO: Implementar a busca de processos finalizados do backend
   // Por enquanto, vamos usar os processos do painel e filtrar
   await processosStore.fetchProcessosPainel(perfil.perfilSelecionado || '', Number(perfil.unidadeSelecionada) || 0, 0, 100); // Buscar um número maior para simular todos
-  processosFinalizados.value = processosStore.processosPainel.filter(p => p.situacao === 'FINALIZADO');
+  processosFinalizados.value = processosStore.processosPainel.filter(p => p.situacao === 'FINALIZADO').map(p => ({
+    ...p,
+    id: p.codigo,
+    dataFinalizacao: p.dataFinalizacao ? new Date(p.dataFinalizacao) : null,
+    dataLimite: new Date(p.dataLimite),
+  }));
 });
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFinalizados.value].sort((a: ProcessoResumo, b: ProcessoResumo) => {
+  return [...processosFinalizados.value].sort((a: Processo, b: Processo) => {
 
     if (criterio.value === 'unidades') {
       // TODO: Implementar lógica de ordenação por unidades
       return 0;
     } else if (criterio.value === 'dataFinalizacao') {
-      const dateA = a.dataLimite ? new Date(a.dataLimite).getTime() : null; // Usando dataLimite como proxy para dataFinalizacao
-      const dateB = b.dataLimite ? new Date(b.dataLimite).getTime() : null;
+      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : null;
+      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : null;
 
       if (dateA === null && dateB === null) return 0;
       if (dateA === null) return asc.value ? -1 : 1;
@@ -92,7 +97,7 @@ const processosFinalizadosOrdenadosComFormatacao = computed(() => {
   return processosFinalizadosOrdenados.value.map(p => ({
     ...p,
     unidadesFormatadas: 'N/A', // TODO: Obter unidades do processo detalhe
-    dataFinalizacaoFormatada: p.dataLimite ? formatDateTimeBR(new Date(p.dataLimite)) : null // Usando dataLimite como proxy
+    dataFinalizacaoFormatada: p.dataFinalizacao ? formatDateTimeBR(new Date(p.dataFinalizacao)) : null
   }));
 });
 

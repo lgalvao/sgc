@@ -49,7 +49,7 @@
       </div>
     </div>
     <button
-      v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === 'Em andamento'"
+      v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === SituacaoProcesso.EM_ANDAMENTO"
       class="btn btn-danger mt-3"
       data-testid="btn-finalizar-processo"
       @click="finalizarProcesso"
@@ -242,7 +242,7 @@ interface TreeTableItem {
   children: TreeTableItem[];
   clickable?: boolean;
 
-  [key: string]: any;  
+  [key: string]: any;
 }
 
 const route = useRoute()
@@ -406,7 +406,7 @@ async function executarFinalizacao() {
   const processoAtual = processo.value;
 
   try {
-    await processoService.finalizarProcesso(processoAtual.codigo);
+    await processosStore.finalizarProcesso(processoAtual.codigo);
 
     // TODO: Definir mapas vigentes para as unidades participantes (se necessário, o backend deve cuidar disso)
     // TODO: Enviar notificações por e-mail (o backend deve cuidar disso)
@@ -519,4 +519,4 @@ async function confirmarAcaoBloco() {
 // Watch para mostrar/esconder botões
 watch(subprocessosElegiveis, (novosSubprocessos) => {
   mostrarBotoesBloco.value = novosSubprocessos.length > 0
-}, {immediate: true})
+}, {immediate: true});

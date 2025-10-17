@@ -181,7 +181,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
+import {computed, watch} from 'vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
@@ -229,7 +229,18 @@ const changeDetails = {
 };
 
 const unidade = computed(() => unidadesStore.pesquisarUnidade(props.siglaUnidade));
-const processo = computed<Processo | undefined>(() => processosStore.processos.find(p => p.id === props.idProcesso));
+const processo = computed(() => processosStore.processoDetalhe ? {
+    ...processosStore.processoDetalhe,
+    id: processosStore.processoDetalhe.codigo,
+    dataFinalizacao: processosStore.processoDetalhe.dataFinalizacao ? new Date(processosStore.processoDetalhe.dataFinalizacao) : null,
+    dataLimite: new Date(processosStore.processoDetalhe.dataLimite),
+} : undefined);
+
+watch(() => props.mostrar, (novoValor) => {
+  if (novoValor) {
+    processosStore.fetchProcessoDetalhe(props.idProcesso);
+  }
+});
 
 const mapa = computed(() => {
   return mapasStore.getMapaByUnidadeId(props.siglaUnidade, props.idProcesso);

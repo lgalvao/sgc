@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -123,13 +123,15 @@ const {processos} = storeToRefs(processosStore)
 // Estados reativos para o modal de alteração de data limite
 const mostrarModalAlterarDataLimite = ref(false)
 
-const SubprocessoDetalhes = computed<Subprocesso | undefined>(() => {
-  return processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === siglaParam.value);
+const SubprocessoDetalhes = computed(() => {
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaParam.value);
 });
 
-const processoAtual = computed<Processo | null>(() => {
-  if (!SubprocessoDetalhes.value) return null;
-  return (processos.value as Processo[]).find(p => p.id === SubprocessoDetalhes.value?.idProcesso) || null;
+const processoAtual = computed(() => processosStore.processoDetalhe);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
 });
 
 const sigla = computed<string | undefined>(() => {

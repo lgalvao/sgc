@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia';
 import {Perfil} from "@/types/tipos";
-import {usuarioService} from '../services/usuarioService';
+import * as usuarioService from '../services/usuarioService';
 import {PerfilUnidade} from '../mappers/sgrh';
 
 export const usePerfilStore = defineStore('perfil', {
@@ -51,3 +51,5 @@ export const usePerfilStore = defineStore('perfil', {
             this.setPerfilUnidade(perfilUnidade.perfil as Perfil, perfilUnidade.unidade.sigla);
             this.setServidorId(tituloEleitoral);
         }
+    },
+});

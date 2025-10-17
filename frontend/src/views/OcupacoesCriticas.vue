@@ -233,9 +233,13 @@ const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
-const processoAtual = computed<Processo | null>(() => {
-  return processosStore.processos.find(p => p.id === idProcesso.value) || null
-})
+import {onMounted} from 'vue'
+
+const processoAtual = computed(() => processosStore.processoDetalhe);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+});
 
 const mapa = computed<Mapa | null>(() => {
   return mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value) || null
@@ -304,23 +308,17 @@ function confirmarFinalizacao() {
   if (!processoAtual.value) return
 
   // Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: processosStore.subprocessos.find(sp =>
-      sp.idProcesso === idProcesso.value && sp.unidade === siglaUnidade.value
-    )?.id || 0,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Identificação de ocupações críticas finalizada'
-  })
+  const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
+  if (subprocesso) {
+    processosStore.addMovement({
+      idSubprocesso: subprocesso.codUnidade,
+      unidadeOrigem: siglaUnidade.value,
+      unidadeDestino: 'SEDOC',
+      descricao: 'Identificação de ocupações críticas finalizada'
+    });
+  }
 
-  // Criar alerta
-  alertasStore.criarAlerta({
-    idProcesso: idProcesso.value,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Ocupações críticas identificadas',
-    dataHora: new Date()
-  })
+  // A criação de alertas agora é responsabilidade do backend
 
   notificacoesStore.sucesso(
     'Identificação finalizada',
