@@ -129,18 +129,18 @@
               <div class="border rounded p-3">
                 <div
                   v-for="competencia in competencias"
-                  :key="competencia.id"
+                  :key="competencia.codigo"
                   class="form-check"
                 >
                   <input
-                    :id="'comp-' + competencia.id"
+                    :id="'comp-' + competencia.codigo"
                     v-model="novaOcupacao.competenciasCriticas"
                     :value="competencia.descricao"
                     type="checkbox"
                     class="form-check-input"
                   >
                   <label
-                    :for="'comp-' + competencia.id"
+                    :for="'comp-' + competencia.codigo"
                     class="form-check-label"
                   >
                     {{ competencia.descricao }}

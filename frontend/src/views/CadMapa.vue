@@ -40,7 +40,7 @@
 
         <div
           v-for="comp in competencias"
-          :key="comp.id"
+          :key="comp.codigo"
           class="card mb-2 competencia-card"
           data-testid="competencia-item"
         >
@@ -67,7 +67,7 @@
                   data-bs-toggle="tooltip"
                   data-testid="btn-excluir-competencia"
                   title="Excluir"
-                  @click="excluirCompetencia(comp.id)"
+                  @click="excluirCompetencia(comp.codigo)"
                 >
                   <i class="bi bi-trash" />
                 </button>
@@ -99,7 +99,7 @@
                     class="btn btn-sm btn-outline-secondary botao-acao-inline"
                     data-bs-toggle="tooltip"
                     title="Remover Atividade"
-                    @click="removerAtividadeAssociada(comp.id, atvId)"
+                    @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
                     <i class="bi bi-trash" />
                   </button>
@@ -160,11 +160,11 @@
               <div class="d-flex flex-wrap gap-2">
                 <div
                   v-for="atividade in atividades"
-                  :key="atividade.id"
-                  :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
+                  :key="atividade.codigo"
+                  :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
                   class="card atividade-card-item"
-                  :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.id)"
+                  :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
+                  @click="toggleAtividade(atividade.codigo)"
                 >
                   <div class="card-body d-flex align-items-center">
                     <input
@@ -582,14 +582,14 @@ function adicionarOuAtualizarCompetencia() {
   if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
 
   if (competenciaSendoEditada.value) {
-    const index = competencias.value.findIndex(c => c.id === competenciaSendoEditada.value!.id);
+    const index = competencias.value.findIndex(c => c.codigo === competenciaSendoEditada.value!.codigo);
     if (index !== -1) {
       competencias.value[index].descricao = novaCompetencia.value.descricao;
       competencias.value[index].atividadesAssociadas = [...atividadesSelecionadas.value];
     }
   } else {
     competencias.value.push({
-      id: Date.now(),
+      codigo: Date.now(),
       descricao: novaCompetencia.value.descricao,
       atividadesAssociadas: [...atividadesSelecionadas.value]
     });
@@ -651,8 +651,8 @@ function finalizarEdicao() {
   notificacaoDisponibilizacao.value = '';
 }
 
-function excluirCompetencia(id: number) {
-  const competencia = competencias.value.find(comp => comp.id === id);
+function excluirCompetencia(codigo: number) {
+  const competencia = competencias.value.find(comp => comp.codigo === codigo);
   if (competencia) {
     competenciaParaExcluir.value = competencia;
     mostrarModalExcluirCompetencia.value = true;
@@ -661,9 +661,9 @@ function excluirCompetencia(id: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    competencias.value = competencias.value.filter(comp => comp.id !== competenciaParaExcluir.value!.id);
+    competencias.value = competencias.value.filter(comp => comp.codigo !== competenciaParaExcluir.value!.codigo);
     if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+      mapasStore.editarMapa(mapa.value.codigo, {competencias: competencias.value});
     }
     fecharModalExcluirCompetencia();
   }
@@ -675,12 +675,12 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competenciaIndex = competencias.value.findIndex(comp => comp.id === competenciaId);
+  const competenciaIndex = competencias.value.findIndex(comp => comp.codigo === competenciaId);
   if (competenciaIndex !== -1) {
     const competencia = competencias.value[competenciaIndex];
     competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
     if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
+      mapasStore.editarMapa(mapa.value.codigo, {competencias: competencias.value});
     }
   }
 }

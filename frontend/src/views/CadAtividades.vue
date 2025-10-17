@@ -253,7 +253,7 @@
               <ul>
                 <li
                   v-for="atividade in atividadesSemConhecimento"
-                  :key="atividade.id"
+                  :key="atividade.codigo"
                 >
                   {{ atividade.descricao }}
                 </li>
@@ -323,12 +323,12 @@
                 <tbody>
                   <tr
                     v-for="analise in historicoAnalises"
-                    :key="analise.id"
+                    :key="analise.codigo"
                   >
                     <td>{{ formatarData(analise.dataHora) }}</td>
                     <td>{{ analise.unidade }}</td>
                     <td>{{ analise.resultado }}</td>
-                    <td>{{ analise.observacao || '-' }}</td>
+                    <td>{{ analise.observacoes || '-' }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -371,8 +371,20 @@ import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
 import {useAlertasStore} from '@/stores/alertas'
 import {useAnalisesStore} from '@/stores/analises'
-import type { Atividade, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/models/atividade';
-import { Perfil, Processo, SituacaoProcesso, Subprocesso, TipoProcesso, Unidade } from '@/types/tipos'
+import {
+  Perfil,
+  Processo,
+  SituacaoSubprocesso,
+  Subprocesso,
+  TipoProcesso,
+  Unidade,
+  type Atividade,
+  type CriarAtividadeRequest,
+  type CriarConhecimentoRequest,
+  type ProcessoResumo,
+  type UnidadeParticipante
+} from '@/types/tipos'
+import * as atividadeService from '@/services/atividadeService'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
@@ -542,14 +554,14 @@ const subprocesso = computed(() => {
 
 const podeVerImpacto = computed(() => {
   if (!isChefe.value || !subprocesso.value) return false;
-  return subprocesso.value.situacaoSubprocesso === SituacaoProcesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+  return subprocesso.value.situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 });
 
 // Variáveis reativas para o modal de importação
-const processoSelecionado = ref<Processo | null>(null)
+const processoSelecionado = ref<ProcessoResumo | null>(null)
 const processoSelecionadoId = ref<number | null>(null)
-const unidadesParticipantes = ref<Subprocesso[]>([])
-const unidadeSelecionada = ref<Subprocesso | null>(null)
+const unidadesParticipantes = ref<UnidadeParticipante[]>([])
+const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
 
@@ -646,8 +658,8 @@ const historicoAnalises = computed(() => {
   return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value)
 })
 
-function formatarData(data: Date): string {
-  return data.toLocaleString('pt-BR')
+function formatarData(data: string): string {
+  return new Date(data).toLocaleString('pt-BR')
 }
 
 function abrirModalHistorico() {
@@ -662,8 +674,8 @@ function disponibilizarCadastro() {
   // 1. Verificação da situação do subprocesso
   const sub = subprocesso.value;
 
-  const situacaoEsperada = isRevisao.value ? SituacaoProcesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoProcesso.CADASTRO_EM_ANDAMENTO;
-  if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
+  const situacaoEsperada = isRevisao.value ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
+  if (!sub || sub.situacao !== situacaoEsperada) {
     notificacoesStore.erro(
         'Erro na Disponibilização',
         `A disponibilização só pode ser feita quando o subprocesso está na situação "${situacaoEsperada}".`

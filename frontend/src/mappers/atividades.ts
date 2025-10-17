@@ -1,4 +1,4 @@
-import type { Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/models/atividade';
+import type { Atividade, Conhecimento } from '@/types/tipos';
 
 // Os DTOs do backend podem ter uma estrutura ligeiramente diferente.
 // Por enquanto, vamos assumir que são semelhantes aos modelos do frontend.

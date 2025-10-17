@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/models/atividade';
+import type { Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest } from '@/types/tipos';
 import * as atividadeService from '@/services/atividadeService';
 import * as subprocessoService from '@/services/subprocessoService';
 import { useNotificacoesStore } from './notificacoes';

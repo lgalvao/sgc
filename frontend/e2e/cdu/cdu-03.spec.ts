@@ -107,8 +107,7 @@ test.describe('CDU-03: Manter processo', () => {
         const dataLimite = '2025-12-31';
         const unidades = [1];
 
-        await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoOriginal, tipoProcesso, dataLimite, unidades);
+        const processoCriado = await criarProcessoCompleto(page, descricaoOriginal, tipoProcesso, dataLimite, unidades);
         await aguardarProcessoNoPainel(page, descricaoOriginal);
 
         // Clicar na linha do processo para edição
@@ -116,8 +115,7 @@ test.describe('CDU-03: Manter processo', () => {
         await verificarPaginaEdicaoProcesso(page);
 
         // Modificar a descrição e salvar
-        // TODO: Obter o ID do processo criado para passar para editarDescricaoProcesso
-        await editarDescricaoProcesso(page, 1, descricaoEditada, tipoProcesso, `${dataLimite}T00:00:00`, unidades);
+        await editarDescricaoProcesso(page, processoCriado.codigo, descricaoEditada, tipoProcesso, `${dataLimite}T00:00:00`, unidades);
 
         // Verificar se a descrição editada aparece na listagem e a original não
         await verificarProcessoEditado(page, descricaoOriginal, descricaoEditada);

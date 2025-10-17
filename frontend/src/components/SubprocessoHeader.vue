@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import {computed} from 'vue';
-import {Perfil} from '@/models/perfil';
+import {Perfil} from '@/types/tipos';
 import {badgeClass} from '@/utils'; // Importar a função badgeClass
 
 interface Props {

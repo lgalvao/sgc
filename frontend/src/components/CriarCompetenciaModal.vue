@@ -106,8 +106,7 @@
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
-import {Atividade} from '@/models/atividade'
-import {Competencia} from '@/models/competencia'
+import {Atividade, Competencia} from '@/types/tipos'
 
 const props = defineProps<{
   mostrar: boolean

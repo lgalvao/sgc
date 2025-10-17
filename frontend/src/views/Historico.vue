@@ -29,7 +29,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
 import {Perfil} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {ProcessoResumo} from '../mappers/processos';
+import {type Processo, type ProcessoResumo} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
 
 type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';

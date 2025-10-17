@@ -72,13 +72,13 @@
 <script lang="ts" setup>
 import {computed} from 'vue'
 import {useRouter} from 'vue-router'
-import {useUnidadesStore} from '@/stores/unidades.js'
-import {usePerfilStore} from '@/stores/perfil.js'
-import {useServidoresStore} from '@/stores/servidores.js'
-import {useMapasStore} from '@/stores/mapas.js'
+import {useUnidadesStore} from '@/stores/unidades'
+import {usePerfilStore} from '@/stores/perfil'
+import {useServidoresStore} from '@/stores/servidores'
+import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
 import {Mapa, Servidor, TipoResponsabilidade, Unidade} from '@/types/tipos';
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes.js'
+import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
 const props = defineProps<{ siglaUnidade: string }>();
 
@@ -110,12 +110,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
     // Retorna uma nova unidade com o responsável da atribuição temporária
     return {
       ...unidade,
-      responsavel: {
-        idServidor: atribuicaoVigente.idServidor,
-        tipo: TipoResponsabilidade.ATRIBUICAO, // Usar o enum
-        dataInicio: new Date(atribuicaoVigente.dataInicio),
-        dataFim: new Date(atribuicaoVigente.dataTermino),
-      }
+      responsavel: atribuicaoVigente.servidor
     };
   }
 
@@ -130,10 +125,10 @@ const titularDetalhes = computed<Servidor | null>(() => {
 });
 
 const responsavelDetalhes = computed<Servidor | null>(() => {
-  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.idServidor) {
+  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.codigo) {
     return null;
   }
-  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.idServidor) || null;
+  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
 });
 
 const mapaVigente = computed<Mapa | undefined>(() => mapasStore.getMapaVigentePorUnidade(sigla.value))

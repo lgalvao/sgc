@@ -4,23 +4,16 @@ import {Movimentacao, Subprocesso} from '@/types/tipos'
 import {parseDate} from '@/utils'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
 
-function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
+function parseSubprocessoDates(pu: any): Subprocesso {
     return {
-        id: pu.id || 0,
-        idProcesso: pu.idProcesso || 0,
-        unidade: pu.unidade || '',
-        situacao: SITUACOES_SUBPROCESSO.MAPA_CRIADO,
-        unidadeAtual: pu.unidadeAtual || '',
-        unidadeAnterior: pu.unidadeAnterior || null,
-        dataLimiteEtapa1: typeof pu.dataLimiteEtapa1 === 'string' ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
-        dataFimEtapa1: typeof pu.dataFimEtapa1 === 'string' ? parseDate(pu.dataFimEtapa1) : null,
-        dataLimiteEtapa2: typeof pu.dataLimiteEtapa2 === 'string' ? parseDate(pu.dataLimiteEtapa2) : null,
-        dataFimEtapa2: typeof pu.dataFimEtapa2 === 'string' ? parseDate(pu.dataFimEtapa2) : null,
-        sugestoes: pu.sugestoes || undefined,
-        observacoes: pu.observacoes || undefined,
-        movimentacoes: pu.movimentacoes || [],
-        analises: pu.analises || [],
-        idMapaCopiado: pu.idMapaCopiado || undefined,
+        ...pu,
+        dataLimite: new Date(pu.dataLimite).toISOString(),
+        unidade: {
+            ...pu.unidade,
+            dataFimEtapa1: pu.unidade.dataFimEtapa1 ? new Date(pu.unidade.dataFimEtapa1).toISOString() : undefined,
+            dataLimiteEtapa2: pu.unidade.dataLimiteEtapa2 ? new Date(pu.unidade.dataLimiteEtapa2).toISOString() : undefined,
+            dataFimEtapa2: pu.unidade.dataFimEtapa2 ? new Date(pu.unidade.dataFimEtapa2).toISOString() : undefined,
+        }
     };
 }
 
@@ -36,13 +29,13 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             return state.subprocessos.filter(pu => pu.idProcesso === idProcesso);
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            const subprocesso = state.subprocessos.find(sp => sp.id === idSubprocesso);
-            return subprocesso ? subprocesso.movimentacoes.sort((a: Movimentacao, b: Movimentacao) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
+            const subprocesso = state.subprocessos.find(sp => sp.codigo === idSubprocesso);
+            return subprocesso ? []: [];
         },
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             return state.subprocessos.filter(pu =>
                 pu.idProcesso === idProcesso &&
-                (pu.situacao === SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO || pu.situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_DISPONIBILIZADA)
+                (pu.situacao === SituacaoSubprocesso.ATIVIDADES_EM_HOMOLOGACAO || pu.situacao === SituacaoSubprocesso.ATIVIDADES_REVISADAS)
             );
         }
     },

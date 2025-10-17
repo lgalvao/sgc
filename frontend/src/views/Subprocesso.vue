@@ -125,7 +125,7 @@ const mostrarModalAlterarDataLimite = ref(false)
 
 const SubprocessoDetalhes = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaParam.value);
+  return processosStore.processoDetalhe.resumoSubprocessos.find(u => u.unidade.sigla === siglaParam.value);
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -135,7 +135,7 @@ onMounted(async () => {
 });
 
 const sigla = computed<string | undefined>(() => {
-  return SubprocessoDetalhes.value?.unidade;
+  return SubprocessoDetalhes.value?.unidade.sigla;
 });
 
 const unidadeOriginal = computed<Unidade | null>(() => {
@@ -203,7 +203,7 @@ const situacaoUnidadeNoProcesso = computed<string>(() => {
 
 const mapa = computed<Mapa | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !processoAtual.value) return null;
-  return mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.sigla, processoAtual.value.id) || null;
+  return mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.sigla, processoAtual.value.codigo) || null;
 });
 
 // Computed para verificar se o subprocesso está em andamento
@@ -211,16 +211,10 @@ const isSubprocessoEmAndamento = computed(() => {
   if (!SubprocessoDetalhes.value) return false;
   const situacao = SubprocessoDetalhes.value.situacao;
   const situacoesFinalizadas = [
-    SITUACOES_SUBPROCESSO.FINALIZADO,
-    SITUACOES_SUBPROCESSO.VALIDADO,
-    SITUACOES_SUBPROCESSO.DEVOLVIDO,
-    SITUACOES_SUBPROCESSO.MAPA_VALIDADO,
-    SITUACOES_SUBPROCESSO.MAPA_HOMOLOGADO,
-    SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA,
-    SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO,
-    SITUACOES_SUBPROCESSO.CADASTRO_ACEITO,
-    SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_ACEITA,
-    SITUACOES_SUBPROCESSO.NAO_INICIADO // Adicionado para garantir que não iniciado não seja considerado em andamento
+    SituacaoSubprocesso.CONCLUIDO,
+    SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
+    SituacaoSubprocesso.MAPA_HOMOLOGADO,
+    SituacaoSubprocesso.NAO_INICIADO
   ] as const;
 
   return !situacoesFinalizadas.includes(situacao as (typeof situacoesFinalizadas)[number]);
@@ -231,12 +225,12 @@ const etapaAtual = computed(() => {
   if (!SubprocessoDetalhes.value) return null;
 
   // Se etapa 1 ainda não terminou, é a etapa 1
-  if (!SubprocessoDetalhes.value.dataFimEtapa1) {
+  if (!SubprocessoDetalhes.value.unidade.dataFimEtapa1) {
     return 1;
   }
 
   // Se etapa 1 terminou mas etapa 2 não começou ou não terminou, é a etapa 2
-  if (SubprocessoDetalhes.value.dataLimiteEtapa2 && !SubprocessoDetalhes.value.dataFimEtapa2) {
+  if (SubprocessoDetalhes.value.unidade.dataLimiteEtapa2 && !SubprocessoDetalhes.value.unidade.dataFimEtapa2) {
     return 2;
   }
 
@@ -248,9 +242,9 @@ const dataLimiteAtual = computed(() => {
   if (!SubprocessoDetalhes.value || !etapaAtual.value) return null;
 
   if (etapaAtual.value === 1) {
-    return SubprocessoDetalhes.value.dataLimiteEtapa1;
+    return SubprocessoDetalhes.value.unidade.dataLimiteEtapa1;
   } else if (etapaAtual.value === 2) {
-    return SubprocessoDetalhes.value.dataLimiteEtapa2;
+    return SubprocessoDetalhes.value.unidade.dataLimiteEtapa2;
   }
 
   return null;
@@ -260,7 +254,7 @@ const dataLimiteAtual = computed(() => {
 
 const movements = computed<Movimentacao[]>(() => {
   if (!SubprocessoDetalhes.value) return [];
-  return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.id);
+  return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.codigo);
 });
 
 function navegarParaMapa() {
@@ -268,7 +262,7 @@ function navegarParaMapa() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'SubprocessoVisMapa', params});
 }
 
@@ -277,7 +271,7 @@ function irParaAtividadesConhecimentos() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
   if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === sigla.value) {
@@ -294,7 +288,7 @@ function irParaDiagnosticoEquipe() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'DiagnosticoEquipe', params});
 }
 
@@ -303,7 +297,7 @@ function irParaOcupacoesCriticas() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.id, siglaUnidade: sigla.value};
+  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'OcupacoesCriticas', params});
 }
 
@@ -324,7 +318,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
   try {
     // Chamar a store para atualizar a data limite
     await processosStore.alterarDataLimiteSubprocesso({
-      idProcesso: SubprocessoDetalhes.value.idProcesso,
+      idProcesso: processoAtual.value?.codigo || 0,
       unidade: SubprocessoDetalhes.value.unidade,
       etapa: etapaAtual.value || 1,
       novaDataLimite: parseDate(novaData) || new Date()

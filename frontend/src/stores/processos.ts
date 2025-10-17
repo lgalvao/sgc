@@ -4,7 +4,13 @@ import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
 import {Page} from '../services/painelService'
 import * as processoService from '../services/processoService'
-import {AtualizarProcessoRequest, CriarProcessoRequest, ProcessoDetalhe, ProcessoResumo, TipoProcesso} from '../mappers/processos'
+import {
+  AtualizarProcessoRequest,
+  CriarProcessoRequest,
+  ProcessoDetalhe,
+  ProcessoResumo,
+  TipoProcesso
+} from '@/types/tipos'
 
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
@@ -20,8 +26,7 @@ export const useProcessosStore = defineStore('processos', {
         getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
             // Se o processoDetalhe estiver carregado e for o processo correto, usar seus subprocessos
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                // TODO: Mapear UnidadeParticipante para Subprocesso
-                return [];
+                return state.processoDetalhe.resumoSubprocessos;
             }
             // Caso contrário, retornar vazio ou buscar de outra forma se necessário
             return [];
@@ -29,8 +34,7 @@ export const useProcessosStore = defineStore('processos', {
         // Subprocessos elegíveis para aceitação em bloco (GESTOR)
         getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                // TODO: Implementar lógica de filtro com base em UnidadeParticipante
-                return [];
+                return state.processoDetalhe.resumoSubprocessos.filter(s => s.unidade.sigla === siglaUnidadeUsuario);
             }
             return [];
         },
@@ -38,13 +42,12 @@ export const useProcessosStore = defineStore('processos', {
         // Subprocessos elegíveis para homologação em bloco (ADMIN)
         getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                // TODO: Implementar lógica de filtro com base em UnidadeParticipante
-                return [];
+                return state.processoDetalhe.resumoSubprocessos;
             }
             return [];
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.movements.filter(m => m.idSubprocesso === idSubprocesso).sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
+            return state.movements.filter(m => m.idSubprocesso === idSubprocesso).sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
         }
     },
     actions: {
@@ -153,10 +156,10 @@ export const useProcessosStore = defineStore('processos', {
             // Exemplo de como seria se houvesse um serviço:
             // await processoService.validarMapa(payload);
         },
-        addMovement(movement: Omit<Movimentacao, 'id' | 'dataHora'>) {
+        addMovement(movement: Omit<Movimentacao, 'codigo' | 'dataHora'>) {
             const newMovement: Movimentacao = {
-                id: generateUniqueId(),
-                dataHora: new Date(),
+                codigo: generateUniqueId(),
+                dataHora: new Date().toISOString(),
                 ...movement
             };
             this.movements.push(newMovement);

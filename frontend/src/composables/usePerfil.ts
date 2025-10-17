@@ -44,18 +44,18 @@ export function usePerfil() {
         });
 
         // 2. Adiciona perfis de atribuições temporárias
-        const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(idServidor);
+        const atribuicoes = atribuicaoTemporariaStore.getAtribuicoesPorServidor(idServidor.toString());
         atribuicoes.forEach(atrb => {
-            const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade);
+            const unidadeAtribuicao = unidadesStore.pesquisarUnidade(atrb.unidade.sigla);
             if (unidadeAtribuicao) {
                 const perfilAtribuicao = unidadeAtribuicao.tipo === 'INTERMEDIARIA' ? Perfil.GESTOR : Perfil.CHEFE;
-                pares.push({perfil: perfilAtribuicao, unidade: atrb.unidade});
+                pares.push({perfil: perfilAtribuicao, unidade: atrb.unidade.sigla});
             }
         });
 
         // 3. Adiciona o perfil SERVIDOR para a unidade de lotação principal,
         // SOMENTE SE essa unidade não tiver já um perfil de titular ou CHEFE por atribuição.
-        const unidadePrincipal = unidadesStore.pesquisarUnidade(servidor.unidade);
+        const unidadePrincipal = unidadesStore.pesquisarUnidade(servidor.unidade.sigla);
         if (unidadePrincipal) {
             const isOperacional = unidadePrincipal.tipo === 'OPERACIONAL' || unidadePrincipal.tipo === 'INTEROPERACIONAL';
             // Verifica se a unidade principal já foi adicionada com um perfil diferente de SERVIDOR
