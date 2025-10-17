@@ -51,20 +51,8 @@ export function useApi() {
 
     if (!response.ok) {
       // Tenta extrair uma mensagem de erro do corpo da resposta
-      const contentType = response.headers.get('content-type');
-      let errorMessage = `Erro na requisição: ${response.statusText}`;
-
-      if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json().catch(() => ({}));
-        errorMessage = errorData.message || JSON.stringify(errorData);
-      } else {
-        const textError = await response.text().catch(() => '');
-        if (textError) {
-          errorMessage = textError;
-        }
-      }
-
-      throw new Error(errorMessage);
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `Erro na requisição: ${response.statusText}`)
     }
 
     // Retorna a resposta como JSON se houver conteúdo

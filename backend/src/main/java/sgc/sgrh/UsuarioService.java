@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.*;
+import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.dto.PerfilUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -19,51 +20,59 @@ public class UsuarioService {
 
     private final SgrhService sgrhService;
     private final UnidadeRepo unidadeRepo;
-    private final UsuarioRepo usuarioRepo;
 
-    public void autenticar(long tituloEleitoral, String senha) {
+    /**
+     * Simula a autenticação do usuário no Active Directory.
+     *
+     * @param tituloEleitoral O título eleitoral do usuário.
+     * @param senha           A senha do usuário (não utilizada na simulação).
+     * @return Sempre `true` para simular sucesso.
+     */
+    public boolean autenticar(long tituloEleitoral, String senha) {
         log.info("Simulando autenticação para: {}/{}", tituloEleitoral, senha);
-        // A lógica de autenticação real seria implementada aqui.
+        // Em um cenário real, aqui haveria a chamada para o AcessoAD.
+        // Para esta simulação, consideramos sempre autenticado com sucesso.
+        return true;
     }
 
-    public LoginResponse autorizar(long tituloEleitoral) {
-        log.info("Buscando autorizações para o título: {}", tituloEleitoral);
-        Usuario usuario = usuarioRepo.findById(tituloEleitoral)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário não encontrado."));
+    /**
+     * Busca os pares de perfil-unidade que um usuário pode assumir no sistema.
+     *
+     * @param tituloEleitoral O título eleitoral do usuário.
+     * @return Uma lista de `PerfilUnidade` representando as opções de login.
+     */
+    public List<PerfilUnidade> autorizar(long tituloEleitoral) {
+        log.info("Buscando autorizações (perfis e unidades) para o título: {}", tituloEleitoral);
+        List<PerfilDto> perfisDto = sgrhService.buscarPerfisUsuario(String.valueOf(tituloEleitoral));
 
-        List<PerfilUnidade> pares = sgrhService.buscarPerfisUsuario(String.valueOf(tituloEleitoral)).stream()
+        return perfisDto.stream()
             .map(dto -> {
                 Unidade unidade = unidadeRepo.findById(dto.unidadeCodigo())
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada: " + dto.unidadeCodigo()));
-                return PerfilUnidade.builder()
-                    .perfil(Perfil.valueOf(dto.perfil()))
-                    .unidade(unidade.getSigla())
-                    .unidadeCodigo(unidade.getCodigo())
-                    .build();
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + dto.unidadeCodigo()));
+                Perfil perfil = Perfil.valueOf(dto.perfil());
+                return new PerfilUnidade(perfil, unidade);
             })
             .collect(Collectors.toList());
-
-        return LoginResponse.builder()
-            .nome(usuario.getNome())
-            .tituloEleitoral(usuario.getTituloEleitoral())
-            .pares(pares)
-            .build();
     }
 
-    public UsuarioDto entrar(EntrarRequest request) {
-        log.info("Finalizando login para: {}", request.getTituloEleitoral());
-        Usuario usuario = usuarioRepo.findById(request.getTituloEleitoral())
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário não encontrado."));
+    /**
+     * Simula a entrada final do usuário, definindo seu contexto de trabalho.
+     *
+     * @param tituloEleitoral O título eleitoral do usuário.
+     * @param pu              O par `PerfilUnidade` escolhido pelo usuário.
+     */
+    public void entrar(long tituloEleitoral, PerfilUnidade pu) {
+        // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
+        // Para esta simulação, apenas registramos a escolha.
+        log.info("Usuário com título {} entrou com sucesso. Perfil: {}, Unidade: {}",
+            tituloEleitoral, pu.getPerfil(), pu.getSiglaUnidade());
+    }
 
-        // A lógica de geração de token JWT seria implementada aqui.
-        String token = "jwt-token-simulado-para-" + request.getTituloEleitoral();
-
-        return UsuarioDto.builder()
-            .nome(usuario.getNome())
-            .tituloEleitoral(usuario.getTituloEleitoral())
-            .perfil(Perfil.valueOf(request.getPerfil()))
-            .unidade(unidadeRepo.findById(request.getUnidadeCodigo()).get().getSigla())
-            .token(token)
-            .build();
+    public void entrar(EntrarRequest request) {
+        Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
+        Perfil perfil = Perfil.valueOf(request.getPerfil());
+        PerfilUnidade pu = new PerfilUnidade(perfil, unidade);
+        this.entrar(request.getTituloEleitoral(), pu);
     }
 }

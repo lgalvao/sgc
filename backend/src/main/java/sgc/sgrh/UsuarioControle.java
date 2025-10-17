@@ -3,34 +3,40 @@ package sgc.sgrh;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.LoginResponse;
-import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.dto.PerfilUnidade;
+import sgc.unidade.modelo.UnidadeRepo;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 public class UsuarioControle {
 
     private final UsuarioService usuarioService;
+    private final UnidadeRepo unidadeRepo;
 
     @PostMapping("/autenticar")
-    public ResponseEntity<Void> autenticar(@Valid @RequestBody AutenticacaoRequest request) {
-        usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoRequest request) {
+        boolean autenticado = usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
+        return ResponseEntity.ok(autenticado);
     }
 
-    @GetMapping("/autorizar/{tituloEleitoral}")
-    public ResponseEntity<LoginResponse> autorizar(@PathVariable Long tituloEleitoral) {
-        LoginResponse response = usuarioService.autorizar(tituloEleitoral);
-        return ResponseEntity.ok(response);
+    @PostMapping("/autorizar")
+    public ResponseEntity<List<PerfilUnidade>> autorizar(@RequestBody Long tituloEleitoral) {
+        List<PerfilUnidade> perfis = usuarioService.autorizar(tituloEleitoral);
+        return ResponseEntity.ok(perfis);
     }
 
     @PostMapping("/entrar")
-    public ResponseEntity<UsuarioDto> entrar(@Valid @RequestBody EntrarRequest request) {
-        UsuarioDto usuario = usuarioService.entrar(request);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<Void> entrar(@Valid @RequestBody EntrarRequest request) {
+        usuarioService.entrar(request);
+        return ResponseEntity.ok().build();
     }
 }

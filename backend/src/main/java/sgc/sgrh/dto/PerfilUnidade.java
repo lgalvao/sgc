@@ -1,16 +1,20 @@
 package sgc.sgrh.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
+import lombok.*;
 import sgc.sgrh.Perfil;
+import sgc.unidade.modelo.Unidade;
 
-
-@Value
-@Builder
-@Jacksonized
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class PerfilUnidade {
-    Perfil perfil;
-    String unidade;
-    Long unidadeCodigo;
+
+    private Perfil perfil;
+    private Unidade unidade;
+
+    public String getSiglaUnidade() {
+        return unidade.getSigla();
+    }
 }
