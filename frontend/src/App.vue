@@ -3,7 +3,7 @@ import Navbar from './components/Navbar.vue'
 import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
 import BarraNavegacao from './components/BarraNavegacao.vue';
-import Notification from './components/Notification.vue';
+import NotificacaoContainer from './components/NotificacaoContainer.vue';
 import pkg from '../package.json';
 
 interface PackageJson {
@@ -51,7 +51,7 @@ const shouldShowNavBarExtras = computed(() => {
     </div>
   </div>
   <router-view />
-  <Notification />
+  <NotificacaoContainer />
   <footer
     v-if="route.path !== '/login'"
     class="bg-light text-muted border-top mt-4"
