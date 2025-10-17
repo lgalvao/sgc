@@ -82,8 +82,7 @@ class AlertaServiceTest {
 
         Alerta alertaSalvo = alertaCaptor.getValue();
         String descricaoEsperada = "Início do processo 'Processo de Teste'. Preencha as atividades e conhecimentos até 31/12/2025.";
-        String actualDescricao = alertaSalvo.getDescricao();
-        assertEquals(descricaoEsperada, actualDescricao);
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
@@ -131,8 +130,7 @@ class AlertaServiceTest {
 
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
-        AlertaUsuario alertaUsuarioCapturado = captor.getValue();
-        assertNotNull(alertaUsuarioCapturado.getDataHoraLeitura());
+        assertNotNull(captor.getValue().getDataHoraLeitura());
     }
 
     @Test
@@ -169,8 +167,7 @@ class AlertaServiceTest {
         // A formatação da data em si é privada, mas seu efeito na descrição pode ser verificado.
         String descricaoEsperada = "Cadastro disponibilizado pela unidade ORIGEM no processo 'Processo de Teste'. Realize a análise do cadastro.";
         Alerta alertaSalvo = alertaCaptor.getValue();
-        String actualDescricao = alertaSalvo.getDescricao();
-        assertEquals(descricaoEsperada, actualDescricao);
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
@@ -189,8 +186,7 @@ class AlertaServiceTest {
 
         String descricaoEsperada = "Cadastro devolvido no processo 'Processo de Teste'. Motivo: Informações incompletas. Realize os ajustes necessários e disponibilize novamente.";
         Alerta alertaSalvo = alertaCaptor.getValue();
-        String actualDescricao = alertaSalvo.getDescricao();
-        assertEquals(descricaoEsperada, actualDescricao);
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
