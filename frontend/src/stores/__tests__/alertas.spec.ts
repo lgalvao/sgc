@@ -1,37 +1,11 @@
 import { setActivePinia, createPinia } from 'pinia'
 import { useAlertasStore } from '../alertas'
 import { usePerfilStore } from '../perfil'
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-
-// Mocking the perfil store
-vi.mock('../perfil', () => ({
-  usePerfilStore: vi.fn(() => ({
-    usuario: {
-      nome: 'Usuário Teste',
-      tituloEleitoral: '1', // Corresponde ao `idServidor` no mock `alertas-servidor.json`
-      perfil: 'CHEFE',
-      unidade: 'TESTE',
-      token: 'fake-token'
-    }
-  }))
-}))
+import { vi } from 'vitest'
 
 describe('useAlertasStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    const alertasStore = useAlertasStore()
-    alertasStore.reset() // Garante estado limpo antes de cada teste
-
-    // Mock do perfilStore para simular um usuário logado
-    vi.mocked(usePerfilStore).mockReturnValue({
-      usuario: {
-        nome: 'Usuário Teste',
-        tituloEleitoral: '1',
-        perfil: 'CHEFE',
-        unidade: 'TESTE',
-        token: 'fake-token'
-      }
-    } as any)
   })
 
   it('should initialize with mock alerts and parsed dates', () => {
@@ -40,11 +14,22 @@ describe('useAlertasStore', () => {
     expect(alertasStore.alertas[0].dataHora).toBeInstanceOf(Date)
   })
 
+  // ... outros testes que não dependem do perfil ...
+
   describe('Sistema de Alertas por Servidor', () => {
-    // TODO: Estes testes estão sendo pulados temporariamente devido a um problema
-    // de poluição de estado no ambiente de teste que causa falhas inconsistentes.
-    // A lógica do store parece correta, mas os testes falham de forma intermitente.
-    it.skip('getAlertasDoServidor > should return alerts with correct read status', () => {
+    beforeEach(() => {
+      // Mock do estado do perfilStore para simular um usuário logado
+      const perfilStore = usePerfilStore()
+      perfilStore.usuario = {
+        nome: 'Teste',
+        tituloEleitoral: '1', // Corresponde ao servidorId 1 dos mocks
+        perfil: 'CHEFE',
+        unidade: 'TJPE',
+        token: 'token'
+      }
+    })
+
+    it('getAlertasDoServidor > should return alerts with read status', () => {
       const alertasStore = useAlertasStore()
       const alertas = alertasStore.getAlertasDoServidor
       const alerta1 = alertas.find((a) => a.id === 1) // Lido pelo servidor 1
@@ -54,23 +39,25 @@ describe('useAlertasStore', () => {
       expect(alerta2?.lido).toBe(false)
     })
 
-    it.skip('getAlertasNaoLidos > should return only unread alerts', () => {
+    it('getAlertasNaoLidos > should return only unread alerts', () => {
       const alertasStore = useAlertasStore()
       const alertasNaoLidos = alertasStore.getAlertasNaoLidos
       expect(alertasNaoLidos.length).toBe(1)
       expect(alertasNaoLidos[0].id).toBe(2)
     })
 
-    it.skip('marcarAlertaComoLido > should mark an alert as read', () => {
+    it('marcarAlertaComoLido > should mark an alert as read', () => {
       const alertasStore = useAlertasStore()
-
-      let alerta2_antes = alertasStore.getAlertasDoServidor.find((a) => a.id === 2)
-      expect(alerta2_antes?.lido).toBe(false)
+      let alertas = alertasStore.getAlertasDoServidor
+      let alerta2 = alertas.find((a) => a.id === 2)
+      expect(alerta2?.lido).toBe(false)
 
       alertasStore.marcarAlertaComoLido(2)
 
-      let alerta2_depois = alertasStore.getAlertasDoServidor.find((a) => a.id === 2)
-      expect(alerta2_depois?.lido).toBe(true)
+      // Re-busca os alertas para verificar a atualização
+      alertas = alertasStore.getAlertasDoServidor
+      alerta2 = alertas.find((a) => a.id === 2)
+      expect(alerta2?.lido).toBe(true)
     })
 
     it('marcarTodosAlertasComoLidos > should mark all alerts as read', () => {

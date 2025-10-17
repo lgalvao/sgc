@@ -59,13 +59,13 @@ describe('ImportarAtividadesModal.vue', () => {
   it('should load subprocessos when a processo is selected', async () => {
     const processo = { id: 1 } as Processo
     const subprocessos = [{ id: 10, unidade: 'U1' }] as Subprocesso[]
-    mockSubprocessosStore.getUnidadesDoProcesso.mockReturnValue(subprocessos)
+    mockSubprocessosStore.getUnidadesDoProcesso.mockReturnValue(subprocesses)
 
     const wrapper = mountComponent()
     const vm = wrapper.vm as any
     await vm.selecionarProcesso(processo)
 
-    expect(vm.unidadesParticipantes).toEqual(subprocessos)
+    expect(vm.unidadesParticipantes).toEqual(subprocesses)
     expect(mockSubprocessosStore.getUnidadesDoProcesso).toHaveBeenCalledWith(processo.id)
   })
 
