@@ -1,6 +1,6 @@
 - [x] Define the audit scope.
 - [x] SAST Recon on backend/src/main/java/sgc/Sgc.java
-- [x] SAST Recon on backend/src/main/java/sgc/alerta/AlertaControle.java
+- [ ] SAST Recon on backend/src/main/java/sgc/alerta/AlertaControle.java
   - [ ] Investigate data flow from `id` on line 23.
 - [ ] SAST Recon on backend/src/main/java/sgc/alerta/AlertaService.java
   - [ ] Investigate data flow from `codUnidadeDestino` on line 50.
@@ -105,7 +105,21 @@
   - [ ] Investigate data flow from `requisicao.getIdAtividade()` on line 66.
   - [ ] Investigate data flow from `idCompetencia` on line 72.
   - [ ] Investigate data flow from `idAtividade` on line 72.
-- [ ] SAST Recon on backend/src/main/java/sgc/competencia/CompetenciaService.java
+- [x] SAST Recon on backend/src/main/java/sgc/competencia/CompetenciaService.java
+  - [ ] Investigate data flow from `id` on line 39.
+  - [ ] Investigate data flow from `competenciaDto` on line 45.
+  - [ ] Investigate data flow from `competenciaDto.getDescricao()` on line 46.
+  - [ ] Investigate data flow from `competenciaDto.getMapaCodigo()` on line 48.
+  - [ ] Investigate data flow from `idCompetencia` on line 56.
+  - [ ] Investigate data flow from `competenciaDto` on line 56.
+  - [ ] Investigate data flow from `competenciaDto.getMapaCodigo()` on line 58.
+  - [ ] Investigate data flow from `competenciaDto.getDescricao()` on line 66.
+  - [ ] Investigate data flow from `id` on line 74.
+  - [ ] Investigate data flow from `idCompetencia` on line 81.
+  - [ ] Investigate data flow from `idCompetencia` on line 88.
+  - [ ] Investigate data flow from `idAtividade` on line 88.
+  - [ ] Investigate data flow from `idCompetencia` on line 105.
+  - [ ] Investigate data flow from `idAtividade` on line 105.
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaDto.java
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/dto/CompetenciaMapper.java
 - [ ] SAST Recon on backend/src/main/java/sgc/competencia/modelo/Competencia.java
