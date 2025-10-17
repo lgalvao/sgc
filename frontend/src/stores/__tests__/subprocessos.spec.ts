@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {useSubprocessosStore} from '../subprocessos';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 
 describe('useSubprocessosStore', () => {
     let subprocessosStore: ReturnType<typeof useSubprocessosStore>;

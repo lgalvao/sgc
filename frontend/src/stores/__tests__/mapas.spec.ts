@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {useMapasStore} from '../mapas';
 import type {Competencia, Mapa} from '@/types/tipos';
 

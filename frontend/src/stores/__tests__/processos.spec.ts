@@ -3,7 +3,7 @@ import {mapSituacaoProcesso, mapTipoProcesso, useProcessosStore} from '../proces
 import {Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 import {useNotificacoesStore} from '../notificacoes';
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'; // Adicionado
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 
 // Mock the JSON imports
 vi.mock('../../mocks/processos.json', () => ({

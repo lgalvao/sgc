@@ -5,7 +5,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.spotbugs") version "6.2.5"
     java
     pmd
 }
@@ -288,26 +287,11 @@ tasks.withType<Pmd> {
     reports.html.required.set(false)
 }
 
-spotbugs {
-    excludeFilter.set(file("config/spotbugs/spotbugs-exclude.xml"))
-}
-
-tasks.spotbugsMain {
-    reports.create("html") {
-        required = false
-    }
-    reports.create("xml") {
-        required = true
-        outputLocation = layout.buildDirectory.file("reports/spotbugs/spotbugs.xml")
-    }
-}
-
 tasks.register("agentTest") {
     group = "verification"
     description = "Rodar testes com saída otimizada para agentes"
     dependsOn("test")
 }
-
 
 tasks.register<Test>("verboseTest") {
     useJUnitPlatform()

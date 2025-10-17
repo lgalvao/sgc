@@ -1,4 +1,4 @@
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {useConfiguracoesStore} from '../configuracoes';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 

@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {usePerfilStore} from '../perfil';
 import {Perfil} from "@/types/tipos";
 

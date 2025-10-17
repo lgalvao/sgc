@@ -1,14 +1,14 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createPinia} from 'pinia';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {
     assertUnidadeOptions,
     expectImportButtonDisabled,
     expectImportButtonEnabled,
     selecionarProcessoEUnidade,
     selectFirstCheckbox
-} from '@/test/uiHelpers';
+} from '@/test-utils/uiHelpers';
 import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
 import {Atividade, Processo, SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 

@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createPinia} from 'pinia';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import NotificacaoContainer from '../NotificacaoContainer.vue';
 import {type TipoNotificacao, useNotificacoesStore} from '@/stores/notificacoes';
 import {iconeTipo} from '@/utils';

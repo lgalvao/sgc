@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {useAtribuicaoTemporariaStore} from '../atribuicoes';
 import type {AtribuicaoTemporaria} from '@/types/tipos';
 

@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, MockInstance, vi} from 'vitest';
 import {createPinia} from 'pinia';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import Navbar from '../Navbar.vue';
 import {ref} from 'vue';

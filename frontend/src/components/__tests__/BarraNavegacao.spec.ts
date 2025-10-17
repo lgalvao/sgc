@@ -1,8 +1,8 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia} from 'pinia';
-import {initPinia} from '@/test/helpers';
-import {navigateAndAssertBreadcrumbs} from '@/test/uiHelpers';
+import {initPinia} from '@/test-utils/helpers';
+import {navigateAndAssertBreadcrumbs} from '@/test-utils/uiHelpers';
 import {
     createRouter,
     createWebHistory,

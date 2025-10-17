@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {TipoMudanca, useRevisaoStore} from '../revisao';
 
 // Mock the mapas store before importing the revisao store

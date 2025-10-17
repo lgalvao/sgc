@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {TipoMudanca} from '@/stores/revisao';
 import type {Atividade, Competencia, Conhecimento, Mapa, Processo, Unidade} from '@/types/tipos';
 

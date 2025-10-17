@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useAtividadesStore} from '../atividades';
 import type {Atividade, Conhecimento} from '@/types/tipos';
-import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore} from '@/test/helpers';
+import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore} from '@/test-utils/helpers';
 
 // Mock the atividades.json import at the top level
 vi.mock('../../mocks/atividades.json', async () => {

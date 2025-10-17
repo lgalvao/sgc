@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 import {useUnidadesStore} from '../unidades';
-import {initPinia} from '@/test/helpers';
-import {expectContainsAll} from '@/test/uiHelpers';
+import {initPinia} from '@/test-utils/helpers';
+import {expectContainsAll} from '@/test-utils/uiHelpers';
 
 describe('useUnidadesStore', () => {
     let unidadesStore: ReturnType<typeof useUnidadesStore>;

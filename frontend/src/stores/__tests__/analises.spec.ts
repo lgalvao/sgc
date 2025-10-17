@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {mapResultadoAnalise, parseAnaliseDates, useAnalisesStore} from '../analises';
 import {ResultadoAnalise} from '@/types/tipos';
 
