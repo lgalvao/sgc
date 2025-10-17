@@ -71,7 +71,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         // Edita conhecimento
         const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
-        await editarConhecimento(page, nomeAtividade, nomeConhecimento, nomeConhecimentoEditado);
+        await editarConhecimento(nomeAtividade, nomeConhecimento, nomeConhecimentoEditado);
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimentoEditado);
 
         // Remove conhecimento

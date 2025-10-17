@@ -1,7 +1,4 @@
-export interface Conhecimento {
-  codigo: number;
-  descricao: string;
-}
+import { Conhecimento } from './conhecimento';
 
 export interface Atividade {
   codigo: number;
@@ -11,8 +8,4 @@ export interface Atividade {
 
 export interface CriarAtividadeRequest {
   descricao: string;
-}
-
-export interface CriarConhecimentoRequest {
-    descricao: string;
 }

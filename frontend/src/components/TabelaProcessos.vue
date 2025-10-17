@@ -52,7 +52,7 @@
       <tbody>
         <tr
           v-for="processo in processos"
-          :key="processo.id"
+          :key="processo.codigo"
           class="clickable-row"
           style="cursor:pointer;"
           @click="emit('selecionarProcesso', processo)"
@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import {Processo} from '@/types/tipos';
+import {Processo} from '@/models/processo';
 
 defineProps<{
   processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];

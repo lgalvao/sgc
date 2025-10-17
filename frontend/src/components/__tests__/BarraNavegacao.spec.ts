@@ -13,7 +13,8 @@ import {
 } from 'vue-router';
 import BarraNavegacao from '../BarraNavegacao.vue';
 import {useUnidadesStore} from '@/stores/unidades';
-import {Perfil, TipoResponsabilidade} from '@/types/tipos';
+import {Perfil} from '@/models/perfil';
+import {TipoResponsabilidade} from '@/models/unidade';
 import {computed} from "vue";
 import {usePerfilStore} from "@/stores/perfil";
 
@@ -107,7 +108,7 @@ describe('BarraNavegacao.vue', () => {
         // Mock das unidades store para não depender de dados reais
         const unidadesStore = useUnidadesStore();
         vi.spyOn(unidadesStore, 'pesquisarUnidade').mockImplementation((sigla: string) => ({
-            id: 1,
+            codigo: 1,
             sigla,
             nome: `Unidade ${sigla}`,
             tipo: 'Tipo',
