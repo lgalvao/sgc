@@ -19,7 +19,7 @@
         </router-link>
       </div>
       <TabelaProcessos
-        :processos="processosOrdenadosComUnidades"
+        :processos="processosOrdenados"
         :criterio-ordenacao="criterio"
         :direcao-ordenacao-asc="asc"
         @ordenar="ordenarPor"
@@ -62,14 +62,13 @@
           <tr
             v-for="(alerta, index) in alertasOrdenados"
             :key="index"
-            :class="{ 'fw-bold': !alerta.lido }"
             style="cursor: pointer;"
-            @click="marcarComoLido(alerta.id)"
+            @click="marcarComoLido(alerta.codigo)"
           >
             <td>{{ alerta.dataFormatada }}</td>
             <td>{{ alerta.descricao }}</td>
-            <td>{{ alerta.processo }}</td>
-            <td>{{ alerta.unidade }}</td>
+            <td>{{ alerta.processoCodigo }}</td>
+            <td>{{ alerta.unidadeOrigemCodigo }}</td>
           </tr>
           <tr v-if="!alertasOrdenados || alertasOrdenados.length === 0">
             <td
@@ -86,41 +85,40 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil, Processo} from '@/types/tipos'
+import {Perfil} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados'; // Importar o novo composable
 import {formatDateTimeBR} from '@/utils';
+import {ProcessoResumo} from '../mappers/processos';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
 const alertasStore = useAlertasStore()
 
-const {processos} = storeToRefs(processosStore) // Manter para alertas, mas não para a tabela de processos
-
+const { processosPainel } = storeToRefs(processosStore)
+const { alertas } = storeToRefs(alertasStore)
 
 const router = useRouter()
 
-const criterio = ref<keyof Processo | 'unidades'>('descricao')
+const criterio = ref<keyof ProcessoResumo>('descricao')
 const asc = ref(true)
 
-// Usar o novo composable para obter os processos filtrados
-const { processosFiltrados } = useProcessosFiltrados();
+onMounted(() => {
+  if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
+    processosStore.fetchProcessosPainel(perfil.perfilSelecionado, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
+    alertasStore.fetchAlertas(perfil.servidorId?.toString() || '', Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
+  }
+});
 
-const processosOrdenados = computed<Processo[]>(() => {
-  return [...processosFiltrados.value].sort((a, b) => {
-    let valA: unknown = a[criterio.value as keyof Processo]
-    let valB: unknown = b[criterio.value as keyof Processo]
-
-    if (criterio.value === 'unidades') {
-      valA = processosStore.getUnidadesDoProcesso(a.id).map(pu => pu.unidade).join(', ')
-      valB = processosStore.getUnidadesDoProcesso(b.id).map(pu => pu.unidade).join(', ')
-    }
+const processosOrdenados = computed<ProcessoResumo[]>(() => {
+  return [...processosPainel.value].sort((a, b) => {
+    let valA: unknown = a[criterio.value]
+    let valB: unknown = b[criterio.value]
 
     const valAString = String(valA);
     const valBString = String(valB);
@@ -131,15 +129,7 @@ const processosOrdenados = computed<Processo[]>(() => {
   })
 })
 
-// Novo computed para formatar as unidades antes de passar para o componente filho
-const processosOrdenadosComUnidades = computed(() => {
-  return processosOrdenados.value.map(p => ({
-    ...p,
-    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', ')
-  }));
-});
-
-function ordenarPor(campo: keyof Processo | 'unidades') {
+function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
     asc.value = !asc.value
   } else {
@@ -148,21 +138,21 @@ function ordenarPor(campo: keyof Processo | 'unidades') {
   }
 }
 
-function abrirDetalhesProcesso(processo: Processo) {
+function abrirDetalhesProcesso(processo: ProcessoResumo) {
   const perfilUsuario = perfil.perfilSelecionado;
   
   // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
-  if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'Criado') {
-    router.push({name: 'CadProcesso', query: {idProcesso: processo.id}})
+  if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'CRIADO') { 
+    router.push({name: 'CadProcesso', query: {idProcesso: processo.codigo}})
     return;
   }
   
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.id}})
+    router.push({name: 'Processo', params: {idProcesso: processo.codigo}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }
@@ -170,37 +160,32 @@ function abrirDetalhesProcesso(processo: Processo) {
 }
 
 const alertasFormatados = computed(() => {
-  const alertasDoServidor = alertasStore.getAlertasDoServidor();
- 
-  return alertasDoServidor.map(alerta => {
-    const processo = processos.value.find(p => p.id === alerta.idProcesso);
- 
+  return alertas.value.map(alerta => {
     return {
-      id: alerta.id,
-      data: alerta.dataHora,
-      processo: processo ? processo.descricao : 'Processo não encontrado',
-      unidade: alerta.unidadeOrigem,
+      codigo: alerta.codigo,
+      dataHora: new Date(alerta.dataHora), 
+      processoCodigo: alerta.processoCodigo,
+      unidadeOrigemCodigo: alerta.unidadeOrigemCodigo,
       descricao: alerta.descricao,
-      dataFormatada: formatDateTimeBR(alerta.dataHora),
-      lido: alerta.lido
+      dataFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
     };
   });
 });
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
-const alertaCriterio = ref<'data' | 'processo'>('data');
+const alertaCriterio = ref<'dataHora' | 'processoCodigo'>('dataHora');
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 
 const alertasOrdenados = computed(() => {
   const lista = [...alertasFormatados.value];
   return lista.sort((a, b) => {
-    if (alertaCriterio.value === 'data') {
-      const da = a.data.getTime();
-      const db = b.data.getTime();
+    if (alertaCriterio.value === 'dataHora') {
+      const da = a.dataHora.getTime();
+      const db = b.dataHora.getTime();
       return alertaAsc.value ? da - db : db - da;
     } else {
-      const pa = (a.processo || '').toLowerCase();
-      const pb = (b.processo || '').toLowerCase();
+      const pa = (a.processoCodigo || '').toString().toLowerCase();
+      const pb = (b.processoCodigo || '').toString().toLowerCase();
       if (pa < pb) return alertaAsc.value ? -1 : 1;
       if (pa > pb) return alertaAsc.value ? 1 : -1;
       return 0;
@@ -208,7 +193,7 @@ const alertasOrdenados = computed(() => {
   });
 });
 
-function ordenarAlertasPor(campo: 'data' | 'processo') {
+function ordenarAlertasPor(campo: 'dataHora' | 'processoCodigo') {
   if (alertaCriterio.value === campo) {
     alertaAsc.value = !alertaAsc.value;
   } else {
@@ -216,8 +201,6 @@ function ordenarAlertasPor(campo: 'data' | 'processo') {
     alertaAsc.value = true; // primeira ordenação do campo em asc
   }
 }
-
-// Removida função formatarDataHora - usando utilitário centralizado
 
 function marcarComoLido(idAlerta: number) {
   alertasStore.marcarAlertaComoLido(idAlerta);

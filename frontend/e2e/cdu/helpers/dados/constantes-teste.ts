@@ -98,7 +98,8 @@ export const SELETORES = {
     BTN_CONFIRMAR_ACAO_BLOCO: 'btn-confirmar-acao-bloco',
     // Novas chaves para o Grupo 5
     BTN_ACEITAR_EM_BLOCO: 'btn-aceitar-em-bloco',
-    BTN_FINALIZAR_PROCESSO: 'btn-finalizar-processo',
+    BTN_FINALIZAR_PROCESSO: 'btn-finalizar-proceso',
+    SELECT_PERFIL_UNIDADE: 'select-perfil-unidade',
 } as const;
 
 export const TEXTOS = {
@@ -215,11 +216,11 @@ export const DADOS_TESTE = {
         SEDOC: 'SEDOC',
     },
     PERFIS: {
-        ADMIN: {idServidor: '6', perfil: 'ADMIN', unidade: 'SEDOC'},
-        GESTOR: {idServidor: '1', perfil: 'GESTOR', unidade: 'SESEL'},
-        CHEFE: {idServidor: '14', perfil: 'CHEFE', unidade: 'STIC'},
-        CHEFE_SEDIA: {idServidor: '14', perfil: 'CHEFE', unidade: 'SEDIA'},
-        SERVIDOR: {idServidor: '15', perfil: 'SERVIDOR', unidade: 'STIC'},
+        ADMIN: {idServidor: '6', perfil: 'ADMIN', unidade: 'SEDOC', senha: '123456'},
+        GESTOR: {idServidor: '1', perfil: 'GESTOR', unidade: 'SESEL', senha: '123456'},
+        CHEFE: {idServidor: '14', perfil: 'CHEFE', unidade: 'STIC', senha: '123456'},
+        CHEFE_SEDIA: {idServidor: '14', perfil: 'CHEFE', unidade: 'SEDIA', senha: '123456'},
+        SERVIDOR: {idServidor: '15', perfil: 'SERVIDOR', unidade: 'STIC', senha: '123456'},
     },
 } as const;
 

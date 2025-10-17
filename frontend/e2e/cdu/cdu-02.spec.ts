@@ -62,7 +62,7 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
-            await loginComoChefe(page, '5'); // Chefe da STIC (id 5)
+            await loginComoChefe(page); // Chefe da STIC (id 5)
             await verificarVisibilidadeProcesso(page, /Revisão de mapa de competências STIC - 2024/, true);
             await verificarVisibilidadeProcesso(page, /Mapeamento inicial COJUR - 2025/, false);
         });

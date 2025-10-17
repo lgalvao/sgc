@@ -19,6 +19,7 @@
     "coverage:report": "npm run coverage:unit && echo 'Coverage report generated in coverage/ directory'"
   },
   "dependencies": {
+    "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "date-fns": "^4.1.0",

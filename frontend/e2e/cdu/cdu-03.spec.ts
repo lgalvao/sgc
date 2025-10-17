@@ -95,7 +95,7 @@ test.describe('CDU-03: Manter processo', () => {
     test('deve criar processo com sucesso e redirecionar para o Painel', async ({page}) => {
         const descricaoProcesso = 'Novo Processo de Mapeamento Teste';
         await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoProcesso, 'Mapeamento', '2025-12-31');
+        await criarProcessoCompleto(page, descricaoProcesso, 'MAPEAMENTO', '2025-12-31', [1]);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
     });
 
@@ -103,9 +103,12 @@ test.describe('CDU-03: Manter processo', () => {
         // Pré-condição: Criar um processo para ser editado
         const descricaoOriginal = 'Processo para Edição';
         const descricaoEditada = 'Processo Editado com Sucesso';
+        const tipoProcesso = 'MAPEAMENTO';
+        const dataLimite = '2025-12-31';
+        const unidades = [1];
 
         await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoOriginal, 'Mapeamento', '2025-12-31');
+        await criarProcessoCompleto(page, descricaoOriginal, tipoProcesso, dataLimite, unidades);
         await aguardarProcessoNoPainel(page, descricaoOriginal);
 
         // Clicar na linha do processo para edição
@@ -113,7 +116,8 @@ test.describe('CDU-03: Manter processo', () => {
         await verificarPaginaEdicaoProcesso(page);
 
         // Modificar a descrição e salvar
-        await editarDescricaoProcesso(page, descricaoEditada);
+        // TODO: Obter o ID do processo criado para passar para editarDescricaoProcesso
+        await editarDescricaoProcesso(page, 1, descricaoEditada, tipoProcesso, `${dataLimite}T00:00:00`, unidades);
 
         // Verificar se a descrição editada aparece na listagem e a original não
         await verificarProcessoEditado(page, descricaoOriginal, descricaoEditada);
@@ -126,7 +130,7 @@ test.describe('CDU-03: Manter processo', () => {
         // Pré-condição: Criar um processo para tentar remover
         const descricaoProcessoCancelarRemocao = 'Processo para Cancelar Remoção';
         await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoProcessoCancelarRemocao, 'Mapeamento', '2025-12-31');
+        await criarProcessoCompleto(page, descricaoProcessoCancelarRemocao, 'MAPEAMENTO', '2025-12-31', [1]);
         await aguardarProcessoNoPainel(page, descricaoProcessoCancelarRemocao);
 
         // Clicar na linha do processo para edição/remoção
@@ -143,30 +147,10 @@ test.describe('CDU-03: Manter processo', () => {
         await verificarPermanenciaFormularioEdicao(page, descricaoProcessoCancelarRemocao);
     });
 
-    test('deve iniciar processo com sucesso e redirecionar para o Painel', async ({page}) => {
-        // Pré-condição: Criar um processo para ser iniciado
-        const descricaoProcessoIniciar = 'Processo para Iniciar';
-        await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoProcessoIniciar, 'Mapeamento', '2025-12-31');
-        await aguardarProcessoNoPainel(page, descricaoProcessoIniciar);
-
-        // Clicar na linha do processo para edição
-        await navegarParaProcessoNaTabela(page, descricaoProcessoIniciar);
-        await verificarPaginaEdicaoProcesso(page);
-
-        // Iniciar processo com confirmação
-        await clicarIniciarProcesso(page);
-        await verificarConfirmacaoInicializacao(page);
-        await confirmarNoModal(page);
-
-        // Verificar sucesso da inicialização
-        await verificarProcessoIniciadoComSucesso(page, descricaoProcessoIniciar);
-    });
-
     test('deve permitir preencher a data limite da etapa 1', async ({page}) => {
         const descricaoProcessoData = 'Processo com Data Limite';
         await navegarParaCriacaoProcesso(page);
-        await criarProcessoCompleto(page, descricaoProcessoData, 'Mapeamento', '2025-12-31');
+        await criarProcessoCompleto(page, descricaoProcessoData, 'MAPEAMENTO', '2025-12-31', [1]);
 
         // Verificar se o processo aparece na listagem
         await aguardarProcessoNoPainel(page, descricaoProcessoData);

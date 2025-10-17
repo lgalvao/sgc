@@ -22,16 +22,17 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {Perfil, Processo, Subprocesso} from '@/types/tipos'
+import {Perfil} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados';
+import {ProcessoResumo} from '../mappers/processos';
+import {formatDateTimeBR} from '@/utils';
 
-type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';
+type SortCriteria = keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -41,20 +42,24 @@ const perfil = usePerfilStore()
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
-const {processosFiltrados} = useProcessosFiltrados(ref(true));
+const processosFinalizados = ref<ProcessoResumo[]>([]);
+
+onMounted(async () => {
+  // TODO: Implementar a busca de processos finalizados do backend
+  // Por enquanto, vamos usar os processos do painel e filtrar
+  await processosStore.fetchProcessosPainel(perfil.perfilSelecionado || '', Number(perfil.unidadeSelecionada) || 0, 0, 100); // Buscar um número maior para simular todos
+  processosFinalizados.value = processosStore.processosPainel.filter(p => p.situacao === 'FINALIZADO');
+});
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFiltrados.value].sort((a: Processo, b: Processo) => {
+  return [...processosFinalizados.value].sort((a: ProcessoResumo, b: ProcessoResumo) => {
 
     if (criterio.value === 'unidades') {
-      const valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
-      const valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: Subprocesso) => pu.unidade).join(', ');
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
+      // TODO: Implementar lógica de ordenação por unidades
       return 0;
     } else if (criterio.value === 'dataFinalizacao') {
-      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : null;
-      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : null;
+      const dateA = a.dataLimite ? new Date(a.dataLimite).getTime() : null; // Usando dataLimite como proxy para dataFinalizacao
+      const dateB = b.dataLimite ? new Date(b.dataLimite).getTime() : null;
 
       if (dateA === null && dateB === null) return 0;
       if (dateA === null) return asc.value ? -1 : 1;
@@ -86,8 +91,8 @@ const processosFinalizadosOrdenados = computed(() => {
 const processosFinalizadosOrdenadosComFormatacao = computed(() => {
   return processosFinalizadosOrdenados.value.map(p => ({
     ...p,
-    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', '),
-    dataFinalizacaoFormatada: p.dataFinalizacao ? new Date(p.dataFinalizacao).toLocaleDateString('pt-BR') : null
+    unidadesFormatadas: 'N/A', // TODO: Obter unidades do processo detalhe
+    dataFinalizacaoFormatada: p.dataLimite ? formatDateTimeBR(new Date(p.dataLimite)) : null // Usando dataLimite como proxy
   }));
 });
 
@@ -101,17 +106,16 @@ function ordenarPor(campo: SortCriteria) {
   }
 }
 
-function abrirProcesso(processo: Processo) {
+function abrirProcesso(processo: ProcessoResumo) {
   const perfilUsuario = perfil.perfilSelecionado;
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.id.toString()}}); // <-- Alterado aqui
+    router.push({name: 'Processo', params: {idProcesso: processo.codigo.toString()}}); 
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }
   }
 }
-</script>

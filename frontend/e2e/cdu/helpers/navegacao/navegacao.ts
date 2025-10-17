@@ -211,36 +211,45 @@ export async function clicarUnidade(page: Page, nomeUnidade: string): Promise<vo
 /**
  * Login genérico para diferentes perfis
  */
-async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS, idServidorOverride?: string): Promise<void> {
+async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS): Promise<void> {
     const dadosUsuario = DADOS_TESTE.PERFIS[perfil];
-    const finalIdServidor = idServidorOverride || dadosUsuario.idServidor;
-    await page.context().addInitScript((dados) => {
-        localStorage.setItem('idServidor', dados.idServidor);
-        localStorage.setItem('perfilSelecionado', dados.perfil);
-        localStorage.setItem('unidadeSelecionada', dados.unidade);
-    }, {...dadosUsuario, idServidor: finalIdServidor});
-    await page.goto(URLS.PAINEL);
+
+    await page.goto(URLS.LOGIN);
     await page.waitForLoadState('networkidle');
+
+    await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(dadosUsuario.idServidor);
+    await page.getByLabel(ROTULOS.SENHA).fill(dadosUsuario.senha);
+    await clicarBotaoEntrar(page);
+
+    // Verifica se há múltiplas opções de perfil/unidade
+    const seletorPerfilUnidade = page.getByTestId(SELETORES.SELECT_PERFIL_UNIDADE);
+    if (await seletorPerfilUnidade.isVisible()) {
+        await seletorPerfilUnidade.selectOption({
+            label: `${dadosUsuario.perfil} - ${dadosUsuario.unidade}`,
+        });
+        await clicarBotaoEntrar(page);
+    }
+
+    await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(/\/painel/);
 }
 
-export const loginComoAdmin = (page: Page, idServidor?: string) => fazerLoginComo(page, 'ADMIN', idServidor);
-export const loginComoGestor = (page: Page, idServidor?: string) => fazerLoginComo(page, 'GESTOR', idServidor);
-export const loginComoChefe = (page: Page, idServidor?: string) => fazerLoginComo(page, 'CHEFE', idServidor);
-export const loginComoChefeSedia = (page: Page, idServidor?: string) => fazerLoginComo(page, 'CHEFE_SEDIA', idServidor);
-export const loginComoServidor = (page: Page, idServidor?: string) => fazerLoginComo(page, 'SERVIDOR', idServidor);
+export const loginComoAdmin = (page: Page) => fazerLoginComo(page, 'ADMIN');
+export const loginComoGestor = (page: Page) => fazerLoginComo(page, 'GESTOR');
+export const loginComoChefe = (page: Page) => fazerLoginComo(page, 'CHEFE');
+export const loginComoChefeSedia = (page: Page) => fazerLoginComo(page, 'CHEFE_SEDIA');
+export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR');
 
 /**
  * Realiza o login pela UI, preenchendo título e senha.
  * Não clica em "Entrar", permitindo interações adicionais na tela de login.
  */
-export async function login(page: Page, idServidor: string): Promise<void> {
+export async function login(page: Page, idServidor: string, senha: string): Promise<void> {
     await page.goto(URLS.LOGIN);
     await page.waitForLoadState('networkidle');
 
-    // O login mockado usa o ID do servidor como "título" e uma senha padrão
     await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
-    await page.getByLabel(ROTULOS.SENHA).fill('senha-padrao'); // A senha é ignorada pelo mock
+    await page.getByLabel(ROTULOS.SENHA).fill(senha);
 }
 
 /**

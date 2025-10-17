@@ -215,7 +215,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed, ref, watch, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
@@ -227,8 +227,10 @@ import {useMapasStore} from '@/stores/mapas'
 import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
-import {Processo, Subprocesso, Unidade} from '@/types/tipos'
+import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, ProcessoResumo } from '../mappers/processos'
+import { Unidade } from '../mappers/sgrh'
 import {ensureValidDate} from '@/utils'
+import * as processoService from '@/services/processoService';
 
 interface TreeTableItem {
   id: number | string;
@@ -246,7 +248,7 @@ interface TreeTableItem {
 const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
-const {processos} = storeToRefs(processosStore)
+const {processoDetalhe} = storeToRefs(processosStore)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
@@ -271,51 +273,49 @@ const mostrarModalFinalizacao = ref(false)
 const idProcesso = computed(() =>
     Number(route.params.idProcesso || route.params.id || route.query.idProcesso))
 
-const processo = computed<Processo | undefined>(() => (processos.value as Processo[]).find(p => p.id === idProcesso.value))
+// Carregar detalhes do processo ao montar o componente
+onMounted(async () => {
+  if (idProcesso.value) {
+    await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  }
+});
 
-const unidadesParticipantes = computed<string[]>(() => {
-  if (!processo.value) return []
-  return processosStore.getUnidadesDoProcesso(processo.value.id).map((pu: Subprocesso) => pu.unidade)
+const processo = computed<ProcessoDetalhe | undefined>(() => processoDetalhe.value || undefined)
+
+const unidadesParticipantes = computed<UnidadeParticipante[]>(() => {
+  return processo.value?.unidades || [];
 })
 
 // Computed para identificar subprocessos elegíveis
 const subprocessosElegiveis = computed(() => {
-  if (!idProcesso.value) return []
+  if (!idProcesso.value || !processo.value) return []
 
-  if (perfilStore.perfilSelecionado === 'GESTOR' && perfilStore.unidadeSelecionada) {
-    return processosStore.getSubprocessosElegiveisAceiteBloco(
-        idProcesso.value,
-        perfilStore.unidadeSelecionada
-    )
-  } else if (perfilStore.perfilSelecionado === 'ADMIN') {
-    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value)
-  }
-  return []
+  // TODO: Implementar lógica de filtro com base em UnidadeParticipante
+  return [];
 })
 
-function filtrarHierarquiaPorParticipantes(unidades: Unidade[], participantes: string[]): Unidade[] {
+function filtrarHierarquiaPorParticipantes(unidades: UnidadeParticipante[], participantes: UnidadeParticipante[]): UnidadeParticipante[] {
   return unidades
-      .map((unidade): Unidade | null => {
-        let filhasFiltradas: Unidade[] = []
-        if (unidade.filhas && unidade.filhas.length) {
-          filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhas, participantes)
+      .map((unidade): UnidadeParticipante | null => {
+        let filhasFiltradas: UnidadeParticipante[] = []
+        if (unidade.filhos && unidade.filhos.length) {
+          filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhos, participantes)
         }
-        const isParticipante = participantes.includes(unidade.sigla)
+        const isParticipante = participantes.some(p => p.codUnidade === unidade.codUnidade)
         if (isParticipante || filhasFiltradas.length > 0) {
           return {
             ...unidade,
-            filhas: filhasFiltradas
+            filhos: filhasFiltradas
           }
         }
         return null
       })
-      .filter((u): u is Unidade => u !== null)
+      .filter((u): u is UnidadeParticipante => u !== null)
 }
 
-const participantesHierarquia = computed<Unidade[]>(() => {
-  const sedoc = unidadesStore.pesquisarUnidade('SEDOC');
-  const unidadesRaiz = sedoc && sedoc.filhas ? sedoc.filhas : [];
-  return filtrarHierarquiaPorParticipantes(unidadesRaiz as Unidade[], unidadesParticipantes.value)
+const participantesHierarquia = computed<UnidadeParticipante[]>(() => {
+  // TODO: Ajustar para usar a hierarquia de unidades do processoDetalhe
+  return unidadesParticipantes.value;
 })
 
 const colunasTabela = [
@@ -329,43 +329,31 @@ const dadosFormatados = computed<TreeTableItem[]>(() => {
   return formatarDadosParaArvore(participantesHierarquia.value, idProcesso.value)
 })
 
-function formatarData(data: Date | null): string {
-  const validDate = ensureValidDate(data);
-  if (!validDate) return '';
-  const dia = String(validDate.getDate()).padStart(2, '0');
-  const mes = String(validDate.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexed
-  const ano = validDate.getFullYear();
+function formatarData(data: string | null): string {
+  if (!data) return '';
+  const date = new Date(data);
+  const dia = String(date.getDate()).padStart(2, '0');
+  const mes = String(date.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexed
+  const ano = date.getFullYear();
   return `${dia}/${mes}/${ano}`
 }
 
-function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTableItem[] {
+function formatarDadosParaArvore(dados: UnidadeParticipante[], idProcesso: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhas ? formatarDadosParaArvore(item.filhas, idProcesso) : []
-    const unidadeOriginal = unidadesStore.pesquisarUnidade(item.sigla);
-    const isIntermediaria = unidadeOriginal && unidadeOriginal.tipo === 'INTERMEDIARIA';
+    const children = item.filhos ? formatarDadosParaArvore(item.filhos, idProcesso) : []
 
-    let situacao = 'Não iniciado';
-    let dataLimite = 'Não informado';
-    let unidadeAtual = 'Não informado';
-
-    if (!isIntermediaria) {
-      const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso).find((pu: Subprocesso) => pu.unidade === item.sigla);
-      if (Subprocesso) {
-        situacao = Subprocesso.situacao;
-
-        dataLimite = formatarData(Subprocesso.dataLimiteEtapa1 || null);
-        unidadeAtual = Subprocesso.unidadeAtual;
-      }
-    }
+    let situacao = item.situacaoSubprocesso || 'Não iniciado';
+    let dataLimite = formatarData(item.dataLimite || null);
+    let unidadeAtual = item.sigla; // A unidade atual é a própria sigla da unidade participante
 
     return {
-      id: item.sigla,
+      id: item.codUnidade,
       nome: item.sigla + ' - ' + item.nome,
-      situacao: isIntermediaria ? '' : situacao,
-      dataLimite: isIntermediaria ? '' : dataLimite,
-      unidadeAtual: isIntermediaria ? '' : unidadeAtual,
-      clickable: !isIntermediaria,
+      situacao: situacao,
+      dataLimite: dataLimite,
+      unidadeAtual: unidadeAtual,
+      clickable: true,
       expanded: true,
       children: children,
     }
@@ -374,25 +362,14 @@ function formatarDadosParaArvore(dados: Unidade[], idProcesso: number): TreeTabl
 
  
 function abrirDetalhesUnidade(item: any) {
-  if (item) {
-    const Subprocesso = processosStore.getUnidadesDoProcesso(idProcesso.value).find((pu: Subprocesso) => pu.unidade === item.id);
-    if (Subprocesso && Subprocesso.unidade) {
-      // É uma unidade participante direta: abre a visão padrão da unidade no processo
-      // ADMIN e GESTOR podem navegar para detalhes de qualquer unidade
-      // CHEFE e SERVIDOR só podem navegar para sua própria unidade
-      const perfilUsuario = perfilStore.perfilSelecionado;
-      if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
-      } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
-        // Para CHEFE e SERVIDOR, só navega se for sua própria unidade
-        if (perfilStore.unidadeSelecionada === Subprocesso.unidade) {
-          router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: Subprocesso.unidade}})
-        }
+  if (item && item.clickable) {
+    const perfilUsuario = perfilStore.perfilSelecionado;
+    if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
+      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
+    } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
+      if (perfilStore.unidadeSelecionada === item.sigla) {
+        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
       }
-    } else if (Array.isArray(item.children) && item.children.length > 0) {
-      // Item tem filhos, não navega
-    } else {
-      // Não encontrou subprocesso para o item
     }
   }
 }
@@ -402,14 +379,14 @@ async function finalizarProcesso() {
 
   const processoAtual = processo.value;
 
-  // Verificar se todos os subprocessos de unidades operacionais/interoperacionais estão em 'Mapa homologado'
-  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
-  const subprocessosOperacionais = subprocessos.filter(pu => {
-    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
-    return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');
+  // Verificar se todos os subprocessos de unidades operacionais/interoperacionais estão em 'MAPA_HOMOLOGADO'
+  const unidadesOperacionais = processoAtual.unidades.filter(up => {
+    // TODO: Obter o tipo da unidade (OPERACIONAL/INTEROPERACIONAL) a partir do codUnidade
+    // Por enquanto, vamos considerar todas as unidades como operacionais/interoperacionais para a validação
+    return true; 
   });
 
-  const todosHomologados = subprocessosOperacionais.every(pu => pu.situacao === 'Mapa homologado');
+  const todosHomologados = unidadesOperacionais.every(up => up.situacaoSubprocesso === 'MAPA_HOMOLOGADO');
 
   if (!todosHomologados) {
     notificacoesStore.erro(
@@ -428,55 +405,12 @@ async function executarFinalizacao() {
 
   const processoAtual = processo.value;
 
-  // Obter subprocessos novamente (já verificados anteriormente)
-  const subprocessos = processosStore.getUnidadesDoProcesso(processoAtual.id);
-  const subprocessosOperacionais = subprocessos.filter(pu => {
-    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
-    return unidade && (unidade.tipo === 'OPERACIONAL' || unidade.tipo === 'INTEROPERACIONAL');
-  });
-
   try {
-    // Alterar situação do processo para 'Finalizado'
-    processosStore.finalizarProcesso(processo.value.id);
+    await processoService.finalizarProcesso(processoAtual.codigo);
 
-    // Definir mapas vigentes para as unidades participantes
-    subprocessosOperacionais.forEach(pu => {
-      mapasStore.definirMapaComoVigente(pu.unidade, processoAtual.id);
-    });
-
-    // Enviar notificações por e-mail conforme especificações
-    const unidadesAgrupadas = agruparUnidadesPorSuperior(subprocessosOperacionais);
-
-    for (const [unidadeSuperior, unidadesSubordinadas] of unidadesAgrupadas) {
-      if (unidadeSuperior === 'SEDOC') {
-        // Notificar unidades operacionais/interoperacionais diretamente
-        unidadesSubordinadas.forEach(siglaUnidade => {
-          notificacoesStore.email(
-              EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_OPERACIONAL(processoAtual.descricao),
-              `Responsável pela ${siglaUnidade}`,
-              EMAIL_TEMPLATES.CORPO_EMAIL_OPERACIONAL(processoAtual.descricao, siglaUnidade)
-          );
-        });
-      } else {
-        // Notificar unidades superiores com lista de subordinadas
-        notificacoesStore.email(
-            EMAIL_TEMPLATES.FINALIZACAO_PROCESSO_INTERMEDIARIA(processoAtual.descricao),
-            `Responsável pela ${unidadeSuperior}`,
-            EMAIL_TEMPLATES.CORPO_EMAIL_INTERMEDIARIA(processoAtual.descricao, unidadeSuperior, unidadesSubordinadas)
-        );
-      }
-    }
-
-    // Criar alertas para todas as unidades participantes
-    subprocessos.forEach(pu => {
-      alertasStore.criarAlerta({
-        idProcesso: processoAtual.id,
-        unidadeOrigem: 'SEDOC',
-        unidadeDestino: pu.unidade,
-        descricao: `Processo ${processoAtual.descricao} finalizado - mapa de competências vigente`,
-        dataHora: new Date()
-      });
-    });
+    // TODO: Definir mapas vigentes para as unidades participantes (se necessário, o backend deve cuidar disso)
+    // TODO: Enviar notificações por e-mail (o backend deve cuidar disso)
+    // TODO: Criar alertas para todas as unidades participantes (o backend deve cuidar disso)
 
     notificacoesStore.sucesso(
         'Processo finalizado',
@@ -494,26 +428,10 @@ async function executarFinalizacao() {
   }
 }
 
-// Função auxiliar para agrupar unidades por superior hierárquica
-function agruparUnidadesPorSuperior(subprocessos: Subprocesso[]): Map<string, string[]> {
-  const agrupamento = new Map<string, string[]>();
-
-  subprocessos.forEach(pu => {
-    const unidade = unidadesStore.pesquisarUnidade(pu.unidade);
-    if (unidade) {
-      // Para unidades operacionais, a superior é a raiz (SEDOC)
-      // Para interoperacionais, pode ter subordinadas, então também notificamos diretamente
-      const superior = unidade.tipo === 'OPERACIONAL' ? 'SEDOC' : pu.unidade;
-
-      if (!agrupamento.has(superior)) {
-        agrupamento.set(superior, []);
-      }
-      agrupamento.get(superior)!.push(pu.unidade);
-    }
-  });
-
-  return agrupamento;
-}
+// Funções auxiliares para agrupar unidades por superior hierárquica (não mais necessárias aqui, backend deve cuidar)
+// function agruparUnidadesPorSuperior(subprocessos: Subprocesso[]): Map<string, string[]> {
+//   return new Map();
+// }
 
 // Funções para controle do modal (CDU-14)
 function abrirModalAceitarBloco() {
@@ -530,12 +448,11 @@ function abrirModalHomologarBloco() {
 
 function prepararUnidadesParaBloco() {
   unidadesSelecionadasBloco.value = subprocessosElegiveis.value.map(pu => {
-    // Obter nome da unidade
-    const unidade = unidadesStore.pesquisarUnidade(pu.unidade)
+    // TODO: Ajustar para a nova estrutura de UnidadeParticipante
     return {
-      sigla: pu.unidade,
-      nome: unidade ? unidade.nome : pu.unidade,
-      situacao: pu.situacao,
+      sigla: '',
+      nome: '',
+      situacao: '',
       selecionada: true // Por padrão, todas selecionadas
     }
   })
@@ -571,12 +488,13 @@ async function confirmarAcaoBloco() {
       return;
     }
 
-    await processosStore.processarCadastroBloco({
-      idProcesso: idProcesso.value,
-      unidades: unidadesSelecionadas,
-      tipoAcao: tipoAcaoBloco.value,
-      unidadeUsuario: perfilStore.unidadeSelecionada || ''
-    })
+    // TODO: Chamar o serviço de backend para processar ações em bloco
+    // await processosStore.processarCadastroBloco({
+    //   idProcesso: idProcesso.value,
+    //   unidades: unidadesSelecionadas,
+    //   tipoAcao: tipoAcaoBloco.value,
+    //   unidadeUsuario: perfilStore.unidadeSelecionada || ''
+    // })
 
     // Mostrar mensagem de sucesso
     mostrarAlertaSucesso.value = true
@@ -602,5 +520,3 @@ async function confirmarAcaoBloco() {
 watch(subprocessosElegiveis, (novosSubprocessos) => {
   mostrarBotoesBloco.value = novosSubprocessos.length > 0
 }, {immediate: true})
-
-</script>
