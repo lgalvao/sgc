@@ -1,12 +1,27 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import * as processoService from "@/services/processoService";
+import { navegarParaCriacaoProcesso } from '../navegacao';
 
 /**
  * AÇÕES ESPECÍFICAS PARA PROCESSOS
  * Funções para gerenciamento de processos em testes
  */
+
+/**
+ * Seleciona unidades na árvore de hierarquia com base em seus IDs.
+ * @param page - A instância da página do Playwright.
+ * @param unidades - Um array de IDs (números) das unidades a serem selecionadas.
+ */
+export async function selecionarUnidadesPorId(page: Page, unidades: number[]): Promise<void> {
+    for (const id of unidades) {
+        // O seletor assume que cada checkbox tem um `id` no formato `chk-unidade-${id}`
+        const seletorCheckbox = `#chk-unidade-${id}`;
+        await page.waitForSelector(seletorCheckbox, { state: 'visible' });
+        await page.check(seletorCheckbox);
+    }
+}
+
 
 /**
  * Preencher formulário básico de processo
@@ -59,7 +74,8 @@ export async function selecionarPrimeiroProcessoPorSituacao(page: Page, situacao
 }
 
 /**
- * Criar processo completo com dados básicos
+ * Criar processo completo com dados básicos, interagindo com a UI.
+ * Esta função agora retorna o ID do processo criado para uso em testes subsequentes.
  */
 export async function criarProcessoCompleto(
     page: Page,
@@ -67,14 +83,11 @@ export async function criarProcessoCompleto(
     tipo: string,
     dataLimite: string,
     unidades: number[]
-): Promise<any> {
-    const processoCriado = await processoService.criarProcesso({
-        descricao: descricao,
-        tipo: tipo,
-        dataLimiteEtapa1: `${dataLimite}T00:00:00`,
-        unidades: unidades
-    });
-    return processoCriado;
+): Promise<void> {
+    await navegarParaCriacaoProcesso(page);
+    await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
+    await selecionarUnidadesPorId(page, unidades);
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 }
 
 /**
@@ -102,14 +115,9 @@ export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso:
 /**
  * Editar descrição de processo existente
  */
-export async function editarDescricaoProcesso(page: Page, idProcesso: number, novaDescricao: string, tipo: string, dataLimiteEtapa1: string, unidades: number[]): Promise<void> {
-    await processoService.atualizarProcesso(idProcesso, {
-        codigo: idProcesso,
-        descricao: novaDescricao,
-        tipo: tipo,
-        dataLimiteEtapa1: dataLimiteEtapa1,
-        unidades: unidades
-    });
+export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
+    await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, novaDescricao);
+    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
 }
 
 /**
@@ -151,16 +159,9 @@ export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
 /**
  * Finaliza um processo com confirmação
  */
-export async function finalizarProcesso(page: Page, idProcesso: number): Promise<void> {
-    // await abrirModalFinalizacaoProcesso(page); // Removido para usar o service
-    // await confirmarFinalizacaoNoModal(page); // Removido para usar o service
-    await processoService.atualizarProcesso(idProcesso, {
-        codigo: idProcesso,
-        descricao: 'Processo Finalizado',
-        tipo: 'MAPEAMENTO',
-        dataLimiteEtapa1: '2025-12-31',
-        unidades: [1, 2, 3]
-    });
+export async function finalizarProcesso(page: Page): Promise<void> {
+    await abrirModalFinalizacaoProcesso(page);
+    await confirmarFinalizacaoNoModal(page);
 }
 
 /**
@@ -267,22 +268,21 @@ export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): 
 /**
  * Inicia um processo com confirmação
  */
-export async function iniciarProcesso(page: Page, idProcesso: number, tipo: string, unidades: number[]): Promise<void> {
-    await processoService.criarProcesso({
-        descricao: 'Processo Iniciado',
-        tipo: tipo,
-        dataLimiteEtapa1: '2025-12-31',
-        unidades: unidades
-    });
+export async function iniciarProcesso(page: Page): Promise<void> {
+    await clicarBotaoIniciarProcesso(page);
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**
  * Remover processo com confirmação
  */
-export async function removerProcessoComConfirmacao(page: Page, idProcesso: number): Promise<void> {
-    // await page.getByRole('button', {name: TEXTOS.REMOVER}).click(); // Removido para usar o service
-    // await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click(); // Removido para usar o service
-    await processoService.excluirProcesso(idProcesso);
+export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
+    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
 }
 
 /**

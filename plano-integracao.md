@@ -349,8 +349,8 @@ Para garantir uma integração gradual e gerenciável, o processo será dividido
     *   **Stores Pinia:** Atualize `frontend/src/stores/processos.ts` para chamar `processoService`. **[CONCLUÍDO]**
     *   **Componentes Vue:** Modifique `frontend/src/views/CadProcesso.vue` (criar/editar), `frontend/src/views/Processo.vue` (detalhes), `frontend/src/views/Historico.vue` (listagem). **[CONCLUÍDO]**
 *   **Testes E2E:**
-    *   Adapte `frontend/e2e/cdu/cdu-03.spec.ts` e `frontend/e2e/cdu/cdu-06.spec.ts` para testar o CRUD de processos com o backend real. **[EM ANDAMENTO]**
-    *   Atualize `frontend/e2e/geral/cad-processo.spec.ts` e `frontend/e2e/visual/03-processos.spec.ts` para usar o backend real.
+    *   Adapte `frontend/e2e/cdu/cdu-03.spec.ts` e `frontend/e2e/cdu/cdu-06.spec.ts` para testar o CRUD de processos com o backend real. **[CONCLUÍDO]**
+    *   Atualize `frontend/e2e/geral/cad-processo.spec.ts` e `frontend/e2e/visual/03-processos.spec.ts` para usar o backend real. **[CONCLUÍDO]**
 
 ### Etapa 4: Iniciar e Finalizar Processo
 
@@ -361,7 +361,7 @@ Para garantir uma integração gradual e gerenciável, o processo será dividido
     *   **Stores Pinia:** Atualize `frontend/src/stores/processos.ts` para chamar os serviços.
     *   **Componentes Vue:** Modifique `frontend/src/views/CadProcesso.vue` (botão iniciar), `frontend/src/views/Processo.vue` (botão finalizar).
 *   **Testes E2E:**
-    *   Adapte `frontend/e2e/cdu/cdu-04.spec.ts`, `frontend/e2e/cdu/cdu-05.spec.ts` e `frontend/e2e/cdu/cdu-21.spec.ts` para testar o início e finalização de processos.
+    *   Adapte `frontend/e2e/cdu/cdu-04.spec.ts`, `frontend/e2e/cdu/cdu-05.spec.ts` e `frontend/e2e/cdu/cdu-21.spec.ts` para testar o início e finalização de processos. **[CONCLUÍDO]**
 
 ### Etapa 5: Manter Atividades e Conhecimentos
 
