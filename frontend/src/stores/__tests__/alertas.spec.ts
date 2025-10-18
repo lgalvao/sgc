@@ -1,31 +1,32 @@
 import {beforeEach, describe, expect, it, vi, Mocked} from 'vitest';
 import {initPinia} from '@/test-utils/helpers';
 import {useAlertasStore} from '../alertas';
-import {usePerfilStore} from '../perfil';
-import type {Alerta} from '@/types/tipos';
 
 // Mock dos serviços
 vi.mock('@/services/painelService');
 vi.mock('@/services/alertaService');
 
-// Mock do perfilStore
+// Mock do perfilStore para garantir que a mesma instância seja usada
+const mockPerfilStoreValues = {
+    servidorId: 123 as number | null,
+    unidadeSelecionada: '456' as string | null,
+};
 vi.mock('../perfil', () => ({
-    usePerfilStore: vi.fn(() => ({
-        servidorId: 123, // Mock de um ID de servidor
-        unidadeSelecionada: '456', // Mock de uma unidade selecionada
-    })),
+    usePerfilStore: vi.fn(() => mockPerfilStoreValues),
 }));
 
 describe('useAlertasStore', () => {
     let alertasStore: ReturnType<typeof useAlertasStore>;
     let painelService: Mocked<typeof import('@/services/painelService')>;
     let alertaService: Mocked<typeof import('@/services/alertaService')>;
-    let perfilStore: ReturnType<typeof usePerfilStore>;
 
     beforeEach(async () => {
         initPinia();
         alertasStore = useAlertasStore();
-        perfilStore = usePerfilStore(); // Obter a instância mockada
+
+        // Resetar o estado do mock antes de cada teste
+        mockPerfilStoreValues.servidorId = 123;
+        mockPerfilStoreValues.unidadeSelecionada = '456';
 
         painelService = (await import('@/services/painelService')) as Mocked<typeof import('@/services/painelService')>;
         alertaService = (await import('@/services/alertaService')) as Mocked<typeof import('@/services/alertaService')>;
@@ -95,8 +96,8 @@ describe('useAlertasStore', () => {
 
             it('should handle missing perfilStore data', async () => {
                 // Configurar o mock para retornar null
-                (perfilStore as any).servidorId = null;
-                (perfilStore as any).unidadeSelecionada = null;
+                mockPerfilStoreValues.servidorId = null;
+                mockPerfilStoreValues.unidadeSelecionada = null;
 
                 alertaService.marcarComoLido.mockResolvedValue();
 

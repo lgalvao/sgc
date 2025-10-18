@@ -26,10 +26,9 @@ export const useAlertasStore = defineStore('alertas', {
         async marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
             try {
                 await alertaService.marcarComoLido(idAlerta);
-                // Após marcar como lido, recarregar a lista de alertas para refletir a mudança
                 const perfilStore = usePerfilStore();
                 if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
-                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20); // Recarrega a primeira página
+                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20);
                 }
                 return true;
             } catch (error) {
