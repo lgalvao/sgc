@@ -242,6 +242,19 @@ export const loginComoChefeSedia = (page: Page) => fazerLoginComo(page, 'CHEFE_S
 export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR');
 
 /**
+ * Realiza login com um perfil e unidade específicos.
+ */
+export async function loginComo(page: Page, perfil: Perfil, unidadeId: number): Promise<void> {
+    const credenciais = {
+        tituloEleitoral: DADOS_LOGIN.CHEFE.tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
+        senha: DADOS_LOGIN.CHEFE.senha,
+        perfil,
+        unidadeId,
+    };
+    await login(page, credenciais);
+}
+
+/**
  * Realiza o login pela UI, preenchendo título e senha.
  * Não clica em "Entrar", permitindo interações adicionais na tela de login.
  */

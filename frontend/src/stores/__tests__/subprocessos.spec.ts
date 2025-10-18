@@ -8,7 +8,7 @@ import {mockProcessoDetalhe} from "@/test-utils/mocks";
 // Mock a store completa
 vi.mock('@/stores/processos', () => ({
     useProcessosStore: vi.fn(() => ({
-        processoDetalhe: mockProcessoDetalhe,
+        processoDetalhe: { ...mockProcessoDetalhe, codigo: 1 },
         fetchProcessoDetalhe: vi.fn(),
     })),
 }));
@@ -62,55 +62,55 @@ describe('useSubprocessosStore', () => {
         it('disponibilizarCadastro should call service and refresh process details', async () => {
             await store.disponibilizarCadastro(idSubprocesso);
             expect(subprocessoService.disponibilizarCadastro).toHaveBeenCalledWith(idSubprocesso);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('disponibilizarRevisaoCadastro should call service and refresh process details', async () => {
             await store.disponibilizarRevisaoCadastro(idSubprocesso);
             expect(subprocessoService.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(idSubprocesso);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('devolverCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'GESTOR'};
             await store.devolverCadastro(idSubprocesso, req);
             expect(subprocessoService.devolverCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('aceitarCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'GESTOR'};
             await store.aceitarCadastro(idSubprocesso, req);
             expect(subprocessoService.aceitarCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('homologarCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'ADMIN'};
             await store.homologarCadastro(idSubprocesso, req);
             expect(subprocessoService.homologarCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('devolverRevisaoCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'GESTOR'};
             await store.devolverRevisaoCadastro(idSubprocesso, req);
             expect(subprocessoService.devolverRevisaoCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('aceitarRevisaoCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'GESTOR'};
             await store.aceitarRevisaoCadastro(idSubprocesso, req);
             expect(subprocessoService.aceitarRevisaoCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('homologarRevisaoCadastro should call service and refresh process details', async () => {
             const req = {observacoes: 'test', analista: 'ADMIN'};
             await store.homologarRevisaoCadastro(idSubprocesso, req);
             expect(subprocessoService.homologarRevisaoCadastro).toHaveBeenCalledWith(idSubprocesso, req);
-            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(mockProcessoDetalhe.codigo);
+            expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
     });
 });

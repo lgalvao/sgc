@@ -27,15 +27,15 @@ export async function obterAtividadePorId(id: number): Promise<Atividade> {
   }
 }
 
-export async function criarAtividade(request: CriarAtividadeRequest): Promise<Atividade> {
-  try {
-    const requestDto = mapCriarAtividadeRequestToDto(request);
-    const response = await apiClient.post<any>('/atividades', requestDto);
-    return mapAtividadeDtoToModel(response.data);
-  } catch (error) {
-    console.error('Erro ao criar atividade:', error);
-    throw error;
-  }
+export async function criarAtividade(request: any, idSubprocesso: number): Promise<Atividade> {
+    try {
+        const requestDto = mapCriarAtividadeRequestToDto(request, idSubprocesso);
+        const response = await apiClient.post<any>('/atividades', requestDto);
+        return mapAtividadeDtoToModel(response.data);
+    } catch (error) {
+        console.error('Erro ao criar atividade:', error);
+        throw error;
+    }
 }
 
 export async function atualizarAtividade(id: number, request: Atividade): Promise<Atividade> {

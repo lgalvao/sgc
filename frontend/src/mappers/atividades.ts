@@ -19,11 +19,11 @@ export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
   };
 }
 
-export function mapCriarAtividadeRequestToDto(request: CriarAtividadeRequest): any {
-  return {
-    descricao: request.descricao,
-    // O backend espera um mapa, então não incluímos conhecimentos aqui.
-  };
+export function mapCriarAtividadeRequestToDto(request: any, idSubprocesso: number): any {
+    return {
+        ...request,
+        idSubprocesso,
+    };
 }
 
 export function mapCriarConhecimentoRequestToDto(request: CriarConhecimentoRequest): any {

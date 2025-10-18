@@ -79,7 +79,7 @@ describe('useAtividadesStore', () => {
 
         await store.adicionarAtividade(idSubprocesso, request);
 
-        expect(atividadeService.criarAtividade).toHaveBeenCalledWith(request);
+        expect(atividadeService.criarAtividade).toHaveBeenCalledWith(request, idSubprocesso);
         expect(fetchSpy).toHaveBeenCalledWith(idSubprocesso);
     });
 

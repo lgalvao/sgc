@@ -7,6 +7,7 @@
 export {
     esperarMensagemSucesso as verificarMensagemSucesso,
     esperarMensagemErro as verificarMensagemErro,
+    verificarAlerta,
     esperarTextoVisivel,
     esperarElementoVisivel,
     esperarElementoInvisivel,

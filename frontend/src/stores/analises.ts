@@ -1,50 +1,41 @@
-import {defineStore} from 'pinia'
-import analisesMock from '../mocks/analises.json'
-import type {AnaliseValidacao} from '@/types/tipos'
-import {ResultadoAnalise} from '@/types/tipos'
-import {generateUniqueId, parseDate} from '@/utils'
-
-export function mapResultadoAnalise(resultado: string): string {
-    switch (resultado) {
-        case 'Devolução':
-            return 'Devolução';
-        case 'Aceite':
-            return 'Aceite';
-        default:
-            return 'Aceite';
-    }
-}
-
-export function parseAnaliseDates(analise: any): AnaliseValidacao {
-    return {
-        ...analise,
-        dataHora: parseDate(analise.dataHora)?.toISOString() || new Date().toISOString(),
-        resultado: mapResultadoAnalise(analise.resultado),
-    };
-}
+import {defineStore} from 'pinia';
+import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
+import * as analiseService from '@/services/analiseService';
+import {useNotificacoesStore} from "@/stores/notificacoes";
 
 export const useAnalisesStore = defineStore('analises', {
     state: () => ({
-        analises: analisesMock.map(parseAnaliseDates) as AnaliseValidacao[] // Initialize with mock data
+        analisesPorSubprocesso: new Map<number, (AnaliseCadastro | AnaliseValidacao)[]>(),
     }),
     getters: {
-        getAnalisesPorSubprocesso: (state) => (idSubprocesso: number): AnaliseValidacao[] => {
-            return state.analises
-                .filter(analise => analise.idSubprocesso === idSubprocesso)
-                .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
-        }
+        getAnalisesPorSubprocesso: (state) => (idSubprocesso: number) => {
+            return state.analisesPorSubprocesso.get(idSubprocesso) || [];
+        },
     },
     actions: {
-        registrarAnalise(payload: Omit<AnaliseValidacao, 'codigo'>) {
-            const novaAnalise: AnaliseValidacao = {
-                ...payload,
-                codigo: generateUniqueId()
+        async fetchAnalisesCadastro(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const analises = await analiseService.listarAnalisesCadastro(idSubprocesso);
+                const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
+                // Evita duplicatas se chamado múltiplas vezes
+                const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
+                this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar histórico de análises de cadastro.');
             }
-            this.analises.push(novaAnalise)
-            return novaAnalise
         },
-        removerAnalisesPorSubprocesso(idSubprocesso: number) {
-            this.analises = this.analises.filter(analise => analise.idSubprocesso !== idSubprocesso);
-        }
-    }
-})
+
+        async fetchAnalisesValidacao(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const analises = await analiseService.listarAnalisesValidacao(idSubprocesso);
+                const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
+                const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
+                this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar histórico de análises de validação.');
+            }
+        },
+    },
+});
