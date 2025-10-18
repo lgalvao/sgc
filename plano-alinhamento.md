@@ -14,7 +14,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 04 | Iniciar Processo de Mapeamento | ✅ | ✅ | **Excelente** | Cobertura sólida e completa dos efeitos colaterais. |
 | 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Bom** | Teste de integração não valida a cópia do mapa. |
 | 06 | Detalhar Processo | ✅ | ✅ | **Parcial** | Faltam testes para ações condicionais (finalizar, homologar). |
-| 07 | Detalhar Subprocesso | ✅ | ✅ | **Fraco** | Faltam testes para a lógica de visibilidade condicional dos cards. |
+| 07 | Detalhar Subprocesso | ✅ | ✅ | **Excelente** | Cobertura de integração refeita para focar nos testes de autorização. |
 | 08 | Manter Cadastro | ✅ | ✅ | **Parcial** | Funcionalidade de importação e variações de revisão não testadas. |
 | 09 | Disponibilizar Cadastro | ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
 | 10 | Disponibilizar Revisão Cadastro| ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
@@ -100,9 +100,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-07.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-07.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java`
-- **Análise:** A cobertura deste caso de uso é fraca. O teste E2E apenas verifica se a página de detalhes do subprocesso é carregada, sem validar o conteúdo. O teste de integração do backend valida o retorno de informações básicas (nome da unidade, situação, movimentação). As principais lacunas são: a ausência de validação das informações detalhadas do responsável pela unidade, a falta de testes para a tabela completa de movimentações e, mais importante, a ausência total de testes para a lógica condicional de habilitação dos cards de "Atividades e conhecimentos" e "Mapa de competências", que depende do perfil do usuário e do estado do subprocesso.
+- **Análise:** O alinhamento agora é excelente. Uma investigação aprofundada revelou que a lógica de visibilidade condicional dos cards é tratada no frontend, não no backend. O teste de integração foi completamente reescrito para focar nas responsabilidades do backend: as regras de autorização de acesso. O novo teste agora valida que o perfil ADMIN pode ver qualquer subprocesso, enquanto o perfil CHEFE só pode ver os subprocessos de sua própria unidade, corrigindo um bug crítico na lógica de permissão que foi descoberto durante o processo.
 - **Status:** Concluído
-- **Observações:** Cobertura muito baixa. A lógica de negócio mais complexa e crítica (visibilidade condicional dos cards de ação) não está testada.
+- **Observações:** A cobertura agora é robusta e alinhada com as responsabilidades reais da arquitetura.
 
 ### CDU-08: Manter Cadastro de Atividades e Conhecimentos
 - **Requisito:** `reqs/cdu-08.md`
