@@ -122,17 +122,50 @@ describe('atividadeService', () => {
     // Error handling tests
   it('listarAtividades should throw error on failure', async () => {
     mockApi.get.mockRejectedValue(new Error('Failed'))
-    await expect(service.listarAtividades()).rejects.toThrow()
+    await expect(service.listarAtividades()).rejects.toThrow('Failed')
+  })
+
+  it('obterAtividadePorId should throw error on failure', async () => {
+    mockApi.get.mockRejectedValue(new Error('Failed'))
+    await expect(service.obterAtividadePorId(1)).rejects.toThrow('Failed')
+  })
+
+  it('criarAtividade should throw error on failure', async () => {
+    const request = { descricao: 'Nova Atividade' }
+    mockApi.post.mockRejectedValue(new Error('Failed'))
+    await expect(service.criarAtividade(request, 123)).rejects.toThrow('Failed')
+  })
+
+  it('atualizarAtividade should throw error on failure', async () => {
+    const request: Atividade = { id: 1, descricao: 'Atividade Atualizada' }
+    mockApi.put.mockRejectedValue(new Error('Failed'))
+    await expect(service.atualizarAtividade(1, request)).rejects.toThrow('Failed')
+  })
+
+  it('excluirAtividade should throw error on failure', async () => {
+    mockApi.delete.mockRejectedValue(new Error('Failed'))
+    await expect(service.excluirAtividade(1)).rejects.toThrow('Failed')
+  })
+
+  it('listarConhecimentos should throw error on failure', async () => {
+    mockApi.get.mockRejectedValue(new Error('Failed'))
+    await expect(service.listarConhecimentos(1)).rejects.toThrow('Failed')
   })
 
   it('criarConhecimento should throw error on failure', async () => {
     const request = { descricao: 'Novo Conhecimento' }
     mockApi.post.mockRejectedValue(new Error('Failed'))
-    await expect(service.criarConhecimento(1, request)).rejects.toThrow()
+    await expect(service.criarConhecimento(1, request)).rejects.toThrow('Failed')
+  })
+
+  it('atualizarConhecimento should throw error on failure', async () => {
+    const request: Conhecimento = { id: 1, descricao: 'Conhecimento Atualizado' }
+    mockApi.put.mockRejectedValue(new Error('Failed'))
+    await expect(service.atualizarConhecimento(1, 1, request)).rejects.toThrow('Failed')
   })
 
   it('excluirConhecimento should throw error on failure', async () => {
     mockApi.delete.mockRejectedValue(new Error('Failed'))
-    await expect(service.excluirConhecimento(1, 1)).rejects.toThrow()
+    await expect(service.excluirConhecimento(1, 1)).rejects.toThrow('Failed')
   })
 })

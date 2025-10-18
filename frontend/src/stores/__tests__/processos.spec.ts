@@ -59,6 +59,8 @@ describe('useProcessosStore', () => {
     });
 
     describe('actions', () => {
+        const error = new Error('Service failed');
+
         it('fetchProcessosPainel should call painelService and update state', async () => {
             const mockPage = {
                 content: [{codigo: 1, descricao: 'Teste', tipo: 'MAPEAMENTO', situacao: 'EM_ANDAMENTO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE'}],
@@ -77,6 +79,27 @@ describe('useProcessosStore', () => {
             expect(painelService.listarProcessos).toHaveBeenCalledWith('perfil', 1, 0, 10);
             expect(processosStore.processosPainel).toEqual(mockPage.content);
             expect(processosStore.processosPainelPage).toEqual(mockPage);
+        });
+
+        it('fetchProcessosPainel should not update state on service failure', async () => {
+            painelService.listarProcessos.mockRejectedValue(error);
+            await expect(processosStore.fetchProcessosPainel('perfil', 1, 0, 10)).rejects.toThrow(error);
+            expect(processosStore.processosPainel).toEqual([]);
+            expect(processosStore.processosPainelPage).toEqual({});
+        });
+
+        it('fetchProcessosFinalizados should update state on success', async () => {
+            const mockProcessos = [{codigo: 2, descricao: 'Finalizado', tipo: 'DIAGNOSTICO', situacao: 'FINALIZADO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE'}];
+            processoService.fetchProcessosFinalizados.mockResolvedValue(mockProcessos);
+            await processosStore.fetchProcessosFinalizados();
+            expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
+            expect(processosStore.processosFinalizados).toEqual(mockProcessos);
+        });
+
+        it('fetchProcessosFinalizados should not update state on failure', async () => {
+            processoService.fetchProcessosFinalizados.mockRejectedValue(error);
+            await expect(processosStore.fetchProcessosFinalizados()).rejects.toThrow(error);
+            expect(processosStore.processosFinalizados).toEqual([]);
         });
 
         it('fetchProcessoDetalhe should call processoService and update state', async () => {
@@ -99,6 +122,12 @@ describe('useProcessosStore', () => {
             expect(processosStore.processoDetalhe).toEqual(mockDetalhe);
         });
 
+        it('fetchProcessoDetalhe should not update state on service failure', async () => {
+            processoService.obterDetalhesProcesso.mockRejectedValue(error);
+            await expect(processosStore.fetchProcessoDetalhe(1)).rejects.toThrow(error);
+            expect(processosStore.processoDetalhe).toBeNull();
+        });
+
         it('criarProcesso should call processoService', async () => {
             const payload = {
                 descricao: 'Novo Processo',
@@ -111,6 +140,12 @@ describe('useProcessosStore', () => {
             await processosStore.criarProcesso(payload);
 
             expect(processoService.criarProcesso).toHaveBeenCalledWith(payload);
+        });
+
+        it('criarProcesso should throw error on service failure', async () => {
+            const payload = { descricao: 'Novo Processo', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            processoService.criarProcesso.mockRejectedValue(error);
+            await expect(processosStore.criarProcesso(payload)).rejects.toThrow(error);
         });
 
         it('atualizarProcesso should call processoService', async () => {
@@ -128,6 +163,13 @@ describe('useProcessosStore', () => {
             expect(processoService.atualizarProcesso).toHaveBeenCalledWith(1, payload);
         });
 
+        it('atualizarProcesso should throw error on service failure', async () => {
+            const payload = { codigo: 1, descricao: 'Processo Atualizado', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            processoService.atualizarProcesso.mockRejectedValue(error);
+            await expect(processosStore.atualizarProcesso(1, payload)).rejects.toThrow(error);
+        });
+
+
         it('removerProcesso should call processoService', async () => {
             processoService.excluirProcesso.mockResolvedValue();
 
@@ -136,8 +178,14 @@ describe('useProcessosStore', () => {
             expect(processoService.excluirProcesso).toHaveBeenCalledWith(1);
         });
 
+        it('removerProcesso should throw error on service failure', async () => {
+            processoService.excluirProcesso.mockRejectedValue(error);
+            await expect(processosStore.removerProcesso(1)).rejects.toThrow(error);
+        });
+
         it('iniciarProcesso should call processoService with correct parameters', async () => {
             processoService.iniciarProcesso.mockResolvedValue();
+            processoService.obterDetalhesProcesso.mockResolvedValue({} as any);
             const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
 
             await processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20]);
@@ -146,8 +194,16 @@ describe('useProcessosStore', () => {
             expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
 
+        it('iniciarProcesso should throw error and not reload details on failure', async () => {
+            processoService.iniciarProcesso.mockRejectedValue(error);
+            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
+            await expect(processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20])).rejects.toThrow(error);
+            expect(fetchDetalheSpy).not.toHaveBeenCalled();
+        });
+
         it('finalizarProcesso should call processoService and reload details', async () => {
             processoService.finalizarProcesso.mockResolvedValue();
+            processoService.obterDetalhesProcesso.mockResolvedValue({} as any);
             const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
 
             await processosStore.finalizarProcesso(1);
@@ -155,6 +211,48 @@ describe('useProcessosStore', () => {
             expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
             expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
+
+        it('finalizarProcesso should throw error and not reload details on failure', async () => {
+            processoService.finalizarProcesso.mockRejectedValue(error);
+            const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
+            await expect(processosStore.finalizarProcesso(1)).rejects.toThrow(error);
+            expect(fetchDetalheSpy).not.toHaveBeenCalled();
+        });
+
+        it('processarCadastroBloco should update subprocesso statuses', () => {
+            processosStore.processoDetalhe = {
+                codigo: 1,
+                unidades: [
+                    { sigla: 'A', situacaoSubprocesso: 'AGUARDANDO_ACEITE' },
+                    { sigla: 'B', situacaoSubprocesso: 'AGUARDANDO_ACEITE' },
+                ]
+            };
+
+            processosStore.processarCadastroBloco({
+                idProcesso: 1,
+                unidades: ['A'],
+                tipoAcao: 'aceitar',
+                unidadeUsuario: 'USER'
+            });
+
+            const unidadeA = processosStore.processoDetalhe.unidades.find(u => u.sigla === 'A');
+            expect(unidadeA.situacaoSubprocesso).toBe('MAPA_VALIDADO');
+        });
+
+        it('addMovement should add a new movement with a generated id and date', () => {
+            const initialMovementsCount = processosStore.movements.length;
+            processosStore.addMovement({
+                idSubprocesso: 1,
+                responsavel: 'user',
+                acao: 'Teste',
+                detalhes: {}
+            });
+            expect(processosStore.movements.length).toBe(initialMovementsCount + 1);
+            const lastMovement = processosStore.movements[processosStore.movements.length - 1];
+            expect(lastMovement.codigo).toBeDefined();
+            expect(lastMovement.dataHora).toBeDefined();
+        });
+
     });
 
     describe('getters', () => {
