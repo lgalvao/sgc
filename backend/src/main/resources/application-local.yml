@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:sgcdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    # Defer datasource initialization to run after Hibernate has created the schema
+    defer-datasource-initialization: true
+  sql:
+    init:
+      # Ensure data.sql is always run for the local profile
+      mode: always
+sgrh:
+  mock:
+    enabled: true
+logging:
+  level:
+    sgc: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
