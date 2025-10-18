@@ -274,10 +274,13 @@ export async function verificarConfirmacaoInicializacao(page: Page): Promise<voi
 /**
  * Verifica modal de confirmação de inicialização de processo
  */
-export async function verificarModalConfirmacaoInicializacao(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
-    await expect(page.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
-    // Removido: verificação de notificação por email que pode não estar presente no modal atual
+export async function verificarModalConfirmacaoInicializacao(page: Page, descricao: string, tipo: string, numUnidades: number): Promise<void> {
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await expect(modal.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
+    await expect(modal.locator('p')).toContainText(`Descrição: ${descricao}`);
+    await expect(modal.locator('p')).toContainText(`Tipo: ${tipo}`);
+    await expect(modal.locator('p')).toContainText(`Unidades selecionadas: ${numUnidades}`);
 }
 
 /**
