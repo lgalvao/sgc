@@ -8,7 +8,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 
 | CDU | Título | Teste E2E | Teste de Integração | Alinhamento | Observações Principais |
 |---|---|:---:|:---:|---|---|
-| 01 | Realizar Login | ✅ | ❌ | **Fraco** | Ausência de teste de integração para a lógica de login. |
+| 01 | Realizar Login | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para o fluxo de login. |
 | 02 | Visualizar Painel | ✅ | ❌ | **Fraco** | Ausência de teste de integração para as consultas do painel. |
 | 03 | Manter Processo | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 04 | Iniciar Processo de Mapeamento | ✅ | ✅ | **Excelente** | Cobertura sólida e completa dos efeitos colaterais. |
@@ -52,9 +52,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-01.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-01.spec.ts`
 - **Teste de Integração:** `N/A`
-- **Análise:** O teste E2E cobre os fluxos principais de login, como sucesso, falha e logout. Também verifica a estrutura da tela para os perfis `ADMIN` e `SERVIDOR`. No entanto, o cenário em que um usuário tem múltiplos perfis/unidades e precisa escolher um não é explicitamente testado. A maior lacuna é a ausência de um teste de integração no backend para validar a lógica de autenticação e autorização.
+- **Análise:** O teste E2E cobre os fluxos principais de login. Foi adicionado um teste de integração (`CDU01IntegrationTest.java`) que valida o fluxo completo de autenticação, autorização e entrada no sistema, cobrindo cenários com um ou múltiplos perfis e tratando casos de erro, como unidades inexistentes.
 - **Status:** Concluído
-- **Observações:** A ausência do teste de integração do backend é um ponto crítico a ser resolvido.
+- **Observações:** O alinhamento agora é excelente, com cobertura E2E e de integração.
 
 ### CDU-02: Visualizar Painel
 - **Requisito:** `reqs/cdu-02.md`
