@@ -1,47 +1,144 @@
 import {defineStore} from 'pinia'
-import subprocessosMock from '../mocks/subprocessos.json'
-import {Movimentacao, Subprocesso} from '@/types/tipos'
-import {parseDate} from '@/utils'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
-
-function parseSubprocessoDates(pu: any): Subprocesso {
-    return {
-        ...pu,
-        dataLimite: new Date(pu.dataLimite).toISOString(),
-        unidade: {
-            ...pu.unidade,
-            dataFimEtapa1: pu.unidade.dataFimEtapa1 ? new Date(pu.unidade.dataFimEtapa1).toISOString() : undefined,
-            dataLimiteEtapa2: pu.unidade.dataLimiteEtapa2 ? new Date(pu.unidade.dataLimiteEtapa2).toISOString() : undefined,
-            dataFimEtapa2: pu.unidade.dataFimEtapa2 ? new Date(pu.unidade.dataFimEtapa2).toISOString() : undefined,
-        }
-    };
-}
+import {
+    AceitarCadastroRequest,
+    DevolverCadastroRequest,
+    HomologarCadastroRequest,
+    Subprocesso,
+    SubprocessoDetalhe
+} from '@/types/tipos'
+import {useNotificacoesStore} from './notificacoes'
+import * as subprocessoService from '@/services/subprocessoService'
+import {useProcessosStore} from "@/stores/processos";
 
 export const useSubprocessosStore = defineStore('subprocessos', {
-    state: () => {
-        return {
-             
-            subprocessos: (subprocessosMock as any[]).map(parseSubprocessoDates) as Subprocesso[],
-        };
-    },
-    getters: {
-        getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
-            return state.subprocessos.filter(pu => pu.idProcesso === idProcesso);
-        },
-        getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            const subprocesso = state.subprocessos.find(sp => sp.codigo === idSubprocesso);
-            return subprocesso ? []: [];
-        },
-        getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
-            return state.subprocessos.filter(pu =>
-                pu.idProcesso === idProcesso &&
-                (pu.situacao === SituacaoSubprocesso.ATIVIDADES_EM_HOMOLOGACAO || pu.situacao === SituacaoSubprocesso.ATIVIDADES_REVISADAS)
-            );
-        }
-    },
+    state: () => ({
+        subprocessoDetalhe: null as SubprocessoDetalhe | null,
+    }),
     actions: {
+        async fetchSubprocessoDetalhe(id: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                this.subprocessoDetalhe = await subprocessoService.obterSubprocessoDetalhe(id);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Não foi possível carregar as informações.');
+            }
+        },
+
+        async disponibilizarCadastro(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.disponibilizarCadastro(idSubprocesso);
+                notificacoes.sucesso('Cadastro disponibilizado', 'O cadastro foi enviado para a próxima etapa.');
+                // Atualizar o estado local para refletir a mudança
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
+            }
+        },
+
+        async disponibilizarRevisaoCadastro(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.disponibilizarRevisaoCadastro(idSubprocesso);
+                notificacoes.sucesso('Revisão disponibilizada', 'A revisão do cadastro foi enviada para a próxima etapa.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
+            }
+        },
+
+        async devolverCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.devolverCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Cadastro devolvido', 'O cadastro foi devolvido para ajustes.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
+            }
+        },
+
+        async aceitarCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.aceitarCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Cadastro aceito', 'A análise foi registrada com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
+            }
+        },
+
+        async homologarCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.homologarCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Cadastro homologado', 'O cadastro foi homologado com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
+            }
+        },
+
+        async devolverRevisaoCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.devolverRevisaoCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Revisão devolvida', 'A revisão do cadastro foi devolvida para ajustes.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
+            }
+        },
+
+        async aceitarRevisaoCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.aceitarRevisaoCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Revisão aceita', 'A análise da revisão foi registrada com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
+            }
+        },
+
+        async homologarRevisaoCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.homologarRevisaoCadastro(idSubprocesso, req);
+                notificacoes.sucesso('Revisão homologada', 'A revisão do cadastro foi homologada com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
+            }
+        },
+
         reset() {
-            this.subprocessos = [];
+            this.subprocessoDetalhe = null;
         }
     }
 });

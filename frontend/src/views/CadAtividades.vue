@@ -362,29 +362,27 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
-import {Modal} from 'bootstrap' // Importar Modal do Bootstrap
+import {computed, onMounted, ref, watch} from 'vue'
+import {Modal} from 'bootstrap'
 import {usePerfil} from '@/composables/usePerfil'
 import {useAtividadesStore} from '@/stores/atividades'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
-import {useAlertasStore} from '@/stores/alertas'
 import {useAnalisesStore} from '@/stores/analises'
+import {useSubprocessosStore} from '@/stores/subprocessos'
 import {
   Perfil,
-  Processo,
   SituacaoSubprocesso,
-  Subprocesso,
   TipoProcesso,
   Unidade,
   type Atividade,
+  type Conhecimento,
   type CriarAtividadeRequest,
   type CriarConhecimentoRequest,
   type ProcessoResumo,
   type UnidadeParticipante
 } from '@/types/tipos'
-import * as atividadeService from '@/services/atividadeService'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useRouter} from 'vue-router'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
@@ -406,7 +404,7 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
-const alertasStore = useAlertasStore()
+const subprocessosStore = useSubprocessosStore()
 const analisesStore = useAnalisesStore()
 const notificacoesStore = useNotificacoesStore()
 const router = useRouter()
@@ -434,11 +432,10 @@ const idSubprocesso = computed(() => processosStore.processoDetalhe?.unidades.fi
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
     if (idSubprocesso.value === undefined) return []
-    return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value).map(a => ({ ...a, novoConhecimento: '' }));
+    return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value).map(a => ({...a, novoConhecimento: ''}));
   },
-  set: (val: AtividadeComEdicao[]) => {
-      // O setter agora é principalmente para a UI, a lógica de negócio está na store.
-      // Se necessário, pode-se chamar uma action da store aqui.
+  set: () => {
+    // Setter intencionalmente vazio para evitar mutações diretas.
   }
 })
 
@@ -446,48 +443,49 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim()) {
+  if (novaAtividade.value?.trim() && idSubprocesso.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(request);
+    await atividadesStore.adicionarAtividade(idSubprocesso.value, request);
     novaAtividade.value = '';
-    // A lógica de situação e notificação deve ser preferencialmente gerenciada pelo backend.
   }
 }
 
 async function removerAtividade(idx: number) {
+  if (!idSubprocesso.value) return;
   const atividadeRemovida = atividades.value[idx];
   if (confirm('Confirma a remoção desta atividade e todos os conhecimentos associados?')) {
-    await atividadesStore.removerAtividade(atividadeRemovida.codigo);
+    await atividadesStore.removerAtividade(idSubprocesso.value, atividadeRemovida.codigo);
   }
 }
 
 async function adicionarConhecimento(idx: number) {
+  if (!idSubprocesso.value) return;
   const atividade = atividades.value[idx];
   if (atividade.novoConhecimento?.trim()) {
     const request: CriarConhecimentoRequest = {
       descricao: atividade.novoConhecimento.trim()
     };
-    await atividadesStore.adicionarConhecimento(atividade.codigo, request);
+    await atividadesStore.adicionarConhecimento(idSubprocesso.value, atividade.codigo, request);
     atividade.novoConhecimento = '';
   }
 }
 
 async function removerConhecimento(idx: number, cidx: number) {
+  if (!idSubprocesso.value) return;
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm('Confirma a remoção deste conhecimento?')) {
-    await atividadesStore.removerConhecimento(atividade.codigo, conhecimentoRemovido.codigo);
+    await atividadesStore.removerConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoRemovido.codigo);
   }
 }
 
-// ✅ NOVA IMPLEMENTAÇÃO: Modal para edição de conhecimento
 const mostrarModalEdicaoConhecimento = ref(false)
-const conhecimentoSendoEditado = ref<{ id: number; descricao: string } | null>(null)
+const conhecimentoSendoEditado = ref<Conhecimento | null>(null)
 
-function abrirModalEdicaoConhecimento(conhecimento: { id: number; descricao: string }) {
-  conhecimentoSendoEditado.value = conhecimento
+function abrirModalEdicaoConhecimento(conhecimento: Conhecimento) {
+  conhecimentoSendoEditado.value = {...conhecimento};
   mostrarModalEdicaoConhecimento.value = true
 }
 
@@ -497,17 +495,16 @@ function fecharModalEdicaoConhecimento() {
 }
 
 async function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
-    const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.codigo === conhecimentoId));
-    if (atividade) {
-        const conhecimento = atividade.conhecimentos.find(c => c.codigo === conhecimentoId);
-        if (conhecimento) {
-            const conhecimentoAtualizado = { ...conhecimento, descricao: novaDescricao };
-            await atividadeService.atualizarConhecimento(atividade.codigo, conhecimentoId, conhecimentoAtualizado);
-            // Recarregar para garantir consistência
-            await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value as number);
-        }
+  if (!idSubprocesso.value) return;
+  const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.codigo === conhecimentoId));
+  if (atividade) {
+    const conhecimento = atividade.conhecimentos.find(c => c.codigo === conhecimentoId);
+    if (conhecimento) {
+      const conhecimentoAtualizado: Conhecimento = {...conhecimento, descricao: novaDescricao};
+      await atividadesStore.atualizarConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoId, conhecimentoAtualizado);
     }
-    fecharModalEdicaoConhecimento();
+  }
+  fecharModalEdicaoConhecimento();
 }
 
 const editandoAtividade = ref<number | null>(null)
@@ -519,16 +516,14 @@ function iniciarEdicaoAtividade(id: number, valorAtual: string) {
 }
 
 async function salvarEdicaoAtividade(id: number) {
-    if (String(atividadeEditada.value).trim()) {
-        const atividadeOriginal = atividades.value.find(a => a.codigo === id);
-        if (atividadeOriginal) {
-            const atividadeAtualizada = { ...atividadeOriginal, descricao: atividadeEditada.value.trim() };
-            await atividadeService.atualizarAtividade(id, atividadeAtualizada);
-            // Recarregar para garantir consistência
-            await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value as number);
-        }
+  if (String(atividadeEditada.value).trim() && idSubprocesso.value) {
+    const atividadeOriginal = atividades.value.find(a => a.codigo === id);
+    if (atividadeOriginal) {
+      const atividadeAtualizada: Atividade = {...atividadeOriginal, descricao: atividadeEditada.value.trim()};
+      await atividadesStore.atualizarAtividade(idSubprocesso.value, id, atividadeAtualizada);
     }
-    cancelarEdicaoAtividade();
+  }
+  cancelarEdicaoAtividade();
 }
 
 function cancelarEdicaoAtividade() {
@@ -537,10 +532,10 @@ function cancelarEdicaoAtividade() {
 }
 
 async function handleImportAtividades(idSubprocessoOrigem: number) {
-    if (idSubprocesso.value !== undefined && idSubprocessoOrigem) {
-        await atividadesStore.importarAtividades(idSubprocesso.value, idSubprocessoOrigem);
-    }
-    mostrarModalImportar.value = false;
+  if (idSubprocesso.value !== undefined && idSubprocessoOrigem) {
+    await atividadesStore.importarAtividades(idSubprocesso.value, idSubprocessoOrigem);
+  }
+  mostrarModalImportar.value = false;
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -557,7 +552,6 @@ const podeVerImpacto = computed(() => {
   return subprocesso.value.situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 });
 
-// Variáveis reativas para o modal de importação
 const processoSelecionado = ref<ProcessoResumo | null>(null)
 const processoSelecionadoId = ref<number | null>(null)
 const unidadesParticipantes = ref<UnidadeParticipante[]>([])
@@ -571,26 +565,14 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalHistorico = ref(false)
 const atividadesSemConhecimento = ref<Atividade[]>([])
 
-const modalElement = ref<HTMLElement | null>(null)
-const cleanupBackdrop = () => {
-  const backdrop = document.querySelector('.modal-backdrop');
-  if (backdrop) {
-    backdrop.remove();
-  }
-  document.body.classList.remove('modal-open');
-  document.body.style.overflow = '';
-  document.body.style.paddingRight = '';
-};
+const confirmacaoModalRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
   if (idSubprocesso.value) {
     await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
+    await analisesStore.fetchAnalisesCadastro(idSubprocesso.value)
   }
-});
-
-onUnmounted(() => {
-  // Limpeza, se necessário
 });
 
 watch(processoSelecionadoId, (newId) => {
@@ -615,15 +597,11 @@ watch(unidadeSelecionadaId, (newId) => {
   }
 })
 
-// Computed property para processos disponíveis para importação
 const processosDisponiveis = computed<ProcessoResumo[]>(() => {
   return processosStore.processosPainel.filter(p =>
       (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'FINALIZADO'
   )
 })
-
-// Funções do modal
-
 
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo
@@ -633,7 +611,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
   } else {
     unidadesParticipantes.value = [];
   }
-  unidadeSelecionada.value = null // Reseta a unidade ao trocar de processo
+  unidadeSelecionada.value = null
   unidadeSelecionadaId.value = null
 }
 
@@ -647,7 +625,6 @@ async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
     atividadesParaImportar.value = []
   }
 }
-
 
 function validarAtividades(): Atividade[] {
   return atividades.value.filter(atividade => atividade.conhecimentos.length === 0);
@@ -671,80 +648,47 @@ function fecharModalHistorico() {
 }
 
 function disponibilizarCadastro() {
-  // 1. Verificação da situação do subprocesso
   const sub = subprocesso.value;
-
   const situacaoEsperada = isRevisao.value ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
+
   if (!sub || sub.situacao !== situacaoEsperada) {
-    notificacoesStore.erro(
-        'Erro na Disponibilização',
-        `A disponibilização só pode ser feita quando o subprocesso está na situação "${situacaoEsperada}".`
-    );
+    notificacoesStore.erro('Ação não permitida', `Ação permitida apenas na situação: "${situacaoEsperada}".`);
     return;
   }
 
-  // 2. Validação de atividades sem conhecimento
   atividadesSemConhecimento.value = validarAtividades();
   if (atividadesSemConhecimento.value.length > 0) {
     const atividadesDescricoes = atividadesSemConhecimento.value.map(a => `- ${a.descricao}`).join('\n');
-    notificacoesStore.erro(
-        'Atividades sem Conhecimento',
-        `As seguintes atividades não têm conhecimentos associados e precisam ser ajustadas antes da disponibilização:\n${atividadesDescricoes}`
-    );
-    return;
+    notificacoesStore.alerta('Atividades Incompletas', `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`);
   }
 
   mostrarModalConfirmacao.value = true;
 }
 
-const confirmacaoModalRef = ref<HTMLElement | null>(null); // Adicionar a referência
-
 function fecharModalConfirmacao() {
   if (confirmacaoModalRef.value) {
-    const modalInstance = Modal.getInstance(confirmacaoModalRef.value) || new Modal(confirmacaoModalRef.value);
-    modalInstance.hide();
+    const modalInstance = Modal.getInstance(confirmacaoModalRef.value);
+    modalInstance?.hide();
   }
-  mostrarModalConfirmacao.value = false; // Manter para consistência do estado reativo
+  mostrarModalConfirmacao.value = false;
   atividadesSemConhecimento.value = [];
-}
-
-function obterUnidadeSuperior(): string | null {
-  const buscarPai = (unidades: Unidade[], siglaFilha: string): string | null => {
-    for (const unidade of unidades) {
-      if (unidade.filhas && unidade.filhas.some(f => f.sigla === siglaFilha)) {
-        return unidade.sigla;
-      }
-      const paiEncontradoEmFilhas = buscarPai(unidade.filhas, siglaFilha);
-      if (paiEncontradoEmFilhas) {
-        return paiEncontradoEmFilhas;
-      }
-    }
-    return null;
-  };
-
-  const paiSigla = buscarPai(unidadesStore.unidades as Unidade[], siglaUnidade.value);
-  return paiSigla || 'SEDOC'; // Retorna 'SEDOC' se não encontrar um pai (unidade raiz ou não encontrada)
 }
 
 async function confirmarDisponibilizacao() {
   if (!idSubprocesso.value) return;
-  // A lógica complexa de disponibilização, incluindo envio de email,
-  // criação de alertas e movimentação, agora deve ser gerenciada pelo backend.
-  // O frontend apenas invoca o endpoint.
-  // A action correspondente precisa ser criada no subprocessoStore.
 
-  // Exemplo de como seria:
-  // await subprocessosStore.disponibilizarCadastro(idSubprocesso.value);
+  if (isRevisao.value) {
+    await subprocessosStore.disponibilizarRevisaoCadastro(idSubprocesso.value);
+  } else {
+    await subprocessosStore.disponibilizarCadastro(idSubprocesso.value);
+  }
 
-  notificacoesStore.sucesso('Disponibilização solicitada', 'O cadastro foi enviado para análise.');
   fecharModalConfirmacao();
   await router.push('/painel');
 }
 
 function abrirModalImpacto() {
-    // A lógica de impacto agora deve ser verificada no backend.
-    // O botão pode chamar um endpoint que retorna se há impacto ou não.
-    notificacoesStore.info("Verificação de Impacto", 'Esta funcionalidade será conectada ao backend.');
+  mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {

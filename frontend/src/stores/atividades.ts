@@ -95,6 +95,41 @@ export const useAtividadesStore = defineStore('atividades', {
             } catch (error) {
                 notificacoes.erro('Erro ao importar', 'Não foi possível importar as atividades.');
             }
+        },
+
+        async atualizarAtividade(idSubprocesso: number, atividadeId: number, data: Atividade) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const atividadeAtualizada = await atividadeService.atualizarAtividade(atividadeId, data);
+                const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                const index = atividades.findIndex(a => a.codigo === atividadeId);
+                if (index !== -1) {
+                    atividades[index] = atividadeAtualizada;
+                    this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
+                }
+                notificacoes.sucesso('Atividade atualizada', 'A atividade foi atualizada com sucesso.');
+            } catch (error) {
+                notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar a atividade.');
+            }
+        },
+
+        async atualizarConhecimento(idSubprocesso: number, atividadeId: number, conhecimentoId: number, data: Conhecimento) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const conhecimentoAtualizado = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
+                const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
+                if (atividade) {
+                    const index = atividade.conhecimentos.findIndex(c => c.codigo === conhecimentoId);
+                    if (index !== -1) {
+                        atividade.conhecimentos[index] = conhecimentoAtualizado;
+                        this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
+                    }
+                }
+                notificacoes.sucesso('Conhecimento atualizado', 'O conhecimento foi atualizado com sucesso.');
+            } catch (error) {
+                notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar o conhecimento.');
+            }
         }
     }
 });

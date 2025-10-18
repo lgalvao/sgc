@@ -460,7 +460,8 @@ import {useProcessosStore} from "@/stores/processos";
 import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
-import {Atividade, Competencia, Conhecimento, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos';
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {Atividade, Competencia, Conhecimento, Subprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -473,7 +474,8 @@ const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
 const analisesStore = useAnalisesStore()
-const {perfilSelecionado} = usePerfil()
+const subprocessosStore = useSubprocessosStore()
+const {perfilSelecionado, unidadeSelecionada} = usePerfil()
 
 // Estados reativos para o modal
 const mostrarModalAceitar = ref(false)
@@ -684,86 +686,33 @@ async function confirmarValidacao() {
   }
 }
 
-async function confirmarAceitacao() {
-  try {
-    // Registrar análise de aceite (apenas para GESTOR, ADMIN não registra análise)
-    if (perfilSelecionado.value === 'GESTOR' && idSubprocesso.value) {
-      analisesStore.registrarAnalise({
-        idSubprocesso: idSubprocesso.value,
-        dataHora: new Date(),
-        unidade: unidade.value?.sigla || '',
-        resultado: ResultadoAnalise.ACEITE,
-        observacao: undefined // Modal AceitarMapaModal não tem campo de observação
-      })
-    }
+async function confirmarAceitacao(observacoes?: string) {
+  if (!idSubprocesso.value) return;
 
-    await processosStore.aceitarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value,
-      perfil: perfilSelecionado.value || ''
-    })
+  const perfil = perfilSelecionado.value;
+  const isHomologacao = perfil === 'ADMIN';
 
-    fecharModalAceitar()
-
-    // Determinar mensagem baseada no perfil
-    // Usamos o título "Aceite registrado" para compatibilidade com os testes E2E,
-    // mantendo mensagens específicas no corpo.
-    let titulo = 'Aceite registrado';
-    let mensagem = 'Mapa aceito e submetido para análise da unidade superior';
-    if (perfilSelecionado.value === 'ADMIN') {
-      // Para ADMIN mantemos o título compatível com os helpers de teste
-      // e colocamos uma mensagem indicando homologação.
-      titulo = 'Aceite registrado';
-      mensagem = 'Mapa homologado';
-    }
-
-    notificacoesStore.sucesso(titulo, mensagem);
-
-    // Redirecionar para o painel
-    await router.push({ name: 'Painel' })
-
-  } catch {
-    notificacoesStore.erro(
-        'Erro ao aceitar mapa',
-        'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
-    )
+  if (isHomologacao) {
+    await subprocessosStore.homologarValidacao(idSubprocesso.value, { observacoes });
+  } else {
+    await subprocessosStore.aceitarValidacao(idSubprocesso.value, { observacoes });
   }
+
+  fecharModalAceitar();
+  await router.push({ name: 'Painel' });
 }
 
 
 
 async function confirmarDevolucao() {
-  try {
-    // Registrar análise de devolução
-    if (idSubprocesso.value) {
-      analisesStore.registrarAnalise({
-        idSubprocesso: idSubprocesso.value,
-        dataHora: new Date(),
-        unidade: perfilSelecionado.value === 'ADMIN' ? 'SEDOC' : (unidade.value?.sigla || ''),
-        resultado: ResultadoAnalise.DEVOLUCAO,
-        observacao: observacaoDevolucao.value || undefined
-      })
-    }
+  if (!idSubprocesso.value) return;
 
-    await processosStore.rejeitarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value
-    })
+  await subprocessosStore.devolverValidacao(idSubprocesso.value, {
+    observacoes: observacaoDevolucao.value,
+  });
 
-    fecharModalDevolucao()
-
-    // Notificação alinhada ao texto esperado pelos testes E2E
-    notificacoesStore.sucesso('Cadastro devolvido', 'O cadastro foi devolvido para ajustes!');
-
-    // Redirecionar para o painel
-    await router.push({ name: 'Painel' })
-
-  } catch {
-    notificacoesStore.erro(
-        'Erro ao devolver validação',
-        'Ocorreu um erro. Tente novamente.'
-    )
-  }
+  fecharModalDevolucao();
+  await router.push({ name: 'Painel' });
 }
 </script>
 
