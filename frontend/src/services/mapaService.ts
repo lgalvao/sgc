@@ -1,4 +1,4 @@
-import apiClient from './axios-setup';
+import apiClient from '@/axios-setup';
 import { mapMapaDtoToModel } from '@/mappers/mapas';
 import type { Mapa } from '@/types/tipos';
 
