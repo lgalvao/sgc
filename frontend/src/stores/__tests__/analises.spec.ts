@@ -1,105 +1,88 @@
-import {beforeEach, describe, expect, it} from 'vitest';
-import {initPinia} from '@/test-utils/helpers';
-import {mapResultadoAnalise, parseAnaliseDates, useAnalisesStore} from '../analises';
-import {ResultadoAnalise} from '@/types/tipos';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import {useAnalisesStore} from '../analises';
+import * as analiseService from '@/services/analiseService';
+import {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
+
+vi.mock('@/services/analiseService', () => ({
+    listarAnalisesCadastro: vi.fn(),
+    listarAnalisesValidacao: vi.fn(),
+}));
 
 describe('useAnalisesStore', () => {
-    let analisesStore: ReturnType<typeof useAnalisesStore>;
+    let store: ReturnType<typeof useAnalisesStore>;
 
     beforeEach(() => {
-        initPinia();
-        analisesStore = useAnalisesStore();
+        setActivePinia(createPinia());
+        store = useAnalisesStore();
+        vi.clearAllMocks();
     });
 
-    it('should initialize with mock analises', () => {
-        expect(analisesStore.analises.length).toBeGreaterThan(0);
-        expect(analisesStore.analises[0].dataHora).toBeInstanceOf(Date);
+    it('should initialize with an empty map for analyses', () => {
+        expect(store.analisesPorSubprocesso).toBeInstanceOf(Map);
+        expect(store.analisesPorSubprocesso.size).toBe(0);
     });
 
     describe('getters', () => {
-        it('getAnalisesPorSubprocesso should filter and sort analyses by idSubprocesso', () => {
-            const analises = analisesStore.getAnalisesPorSubprocesso(1);
-            expect(Array.isArray(analises)).toBe(true);
-            analises.forEach(analise => {
-                expect(analise.idSubprocesso).toBe(1);
-            });
+        it('getAnalisesPorSubprocesso should return an empty array if no analyses are present for the subprocess', () => {
+            const result = store.getAnalisesPorSubprocesso(123);
+            expect(result).toEqual([]);
         });
 
-        it('getAnalisesPorSubprocesso should return empty array for non-existent idSubprocesso', () => {
-            const analises = analisesStore.getAnalisesPorSubprocesso(999);
-            expect(analises).toEqual([]);
+        it('getAnalisesPorSubprocesso should return the correct analyses for a given subprocess', () => {
+            const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
+                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1'},
+                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2'},
+            ];
+            const idSubprocesso = 123;
+            store.analisesPorSubprocesso.set(idSubprocesso, mockAnalises);
+
+            const result = store.getAnalisesPorSubprocesso(idSubprocesso);
+            expect(result).toEqual(mockAnalises);
         });
     });
 
     describe('actions', () => {
-        it('registrarAnalise should add new analysis', () => {
-            const initialLength = analisesStore.analises.length;
-            const novaAnalise = analisesStore.registrarAnalise({
-                idSubprocesso: 1,
-                dataHora: new Date(),
-                unidade: 'TEST',
-                resultado: ResultadoAnalise.ACEITE,
-                observacao: 'Teste'
-            });
+        const idSubprocesso = 123;
+        const mockAnalisesCadastro: AnaliseCadastro[] = [
+            {codigo: 1, dataHora: '2023-01-01T10:00:00Z', observacoes: 'Cadastro 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1'},
+        ];
+        const mockAnalisesValidacao: AnaliseValidacao[] = [
+            {codigo: 2, dataHora: '2023-01-02T10:00:00Z', observacoes: 'Validacao 1', acao: 'DEVOLUCAO', unidadeSigla: 'DEF', analista: 'Analista 2'},
+        ];
 
-            expect(analisesStore.analises.length).toBe(initialLength + 1);
-            expect(novaAnalise.id).toBeDefined();
-            expect(novaAnalise.unidade).toBe('TEST');
+        it('fetchAnalisesCadastro should call the service and update the state', async () => {
+            vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(mockAnalisesCadastro);
+
+            await store.fetchAnalisesCadastro(idSubprocesso);
+
+            expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(idSubprocesso);
+            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesCadastro);
         });
 
-        it('removerAnalisesPorSubprocesso should remove analyses by idSubprocesso', () => {
-            analisesStore.registrarAnalise({
-                idSubprocesso: 999,
-                dataHora: new Date(),
-                unidade: 'TEST',
-                resultado: ResultadoAnalise.ACEITE
-            });
+        it('fetchAnalisesValidacao should call the service and update the state', async () => {
+            vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(mockAnalisesValidacao);
 
-            const initialLength = analisesStore.analises.length;
-            analisesStore.removerAnalisesPorSubprocesso(999);
-            
-            expect(analisesStore.analises.length).toBe(initialLength - 1);
-            expect(analisesStore.getAnalisesPorSubprocesso(999)).toEqual([]);
-        });
-    });
+            await store.fetchAnalisesValidacao(idSubprocesso);
 
-    describe('Auxiliary Functions', () => {
-        it('mapResultadoAnalise should return DEVOLUCAO for "Devolução"', () => {
-            const resultado = mapResultadoAnalise('Devolução');
-            expect(resultado).toBe(ResultadoAnalise.DEVOLUCAO);
+            expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(idSubprocesso);
+            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesValidacao);
         });
 
-        it('mapResultadoAnalise should return ACEITE for unknown result', () => {
-            const resultado = mapResultadoAnalise('UNKNOWN');
-            expect(resultado).toBe(ResultadoAnalise.ACEITE);
-        });
+        it('should merge results when fetching both cadastro and validacao analyses', async () => {
+            vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(mockAnalisesCadastro);
+            vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(mockAnalisesValidacao);
 
-        it('parseAnaliseDates should parse dataHora and map resultado', () => {
-            const mockAnalise = {
-                id: 1,
-                dataHora: '2025-01-01T10:00:00Z',
-                resultado: 'Aceite',
-                idSubprocesso: 1,
-                unidade: 'TEST',
-                observacao: 'Obs'
-            };
-            const parsedAnalise = parseAnaliseDates(mockAnalise);
-            expect(parsedAnalise.dataHora).toEqual(new Date('2025-01-01T10:00:00Z'));
-            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
-        });
+            // Fetch cadastro first
+            await store.fetchAnalisesCadastro(idSubprocesso);
+            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesCadastro);
 
-        it('parseAnaliseDates should handle null dataHora and unknown resultado', () => {
-            const mockAnalise = {
-                id: 2,
-                dataHora: null, // Testando null dataHora
-                resultado: 'UNKNOWN', // Testando resultado desconhecido
-                idSubprocesso: 1,
-                unidade: 'TEST',
-                observacao: 'Obs'
-            };
-            const parsedAnalise = parseAnaliseDates(mockAnalise);
-            expect(parsedAnalise.dataHora).toBeInstanceOf(Date); // Deve ser uma nova data se null
-            expect(parsedAnalise.resultado).toBe(ResultadoAnalise.ACEITE);
+            // Then fetch validacao
+            await store.fetchAnalisesValidacao(idSubprocesso);
+
+            const expected = [...mockAnalisesCadastro, ...mockAnalisesValidacao];
+            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(expect.arrayContaining(expected));
+            expect(store.getAnalisesPorSubprocesso(idSubprocesso).length).toBe(2);
         });
     });
 });

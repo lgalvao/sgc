@@ -1,48 +1,71 @@
 import {defineStore} from 'pinia'
-import mapasData from '../mocks/mapas.json';
-import type {Mapa} from '@/types/tipos'
-import {SITUACOES_MAPA} from '@/constants/situacoes'
+import {useNotificacoesStore} from './notificacoes'
+import * as MapaService from '@/services/mapaService'
+import * as SubprocessoService from '@/services/subprocessoService'
+import {
+    ImpactoMapa,
+    MapaAjuste,
+    MapaCompleto,
+    SalvarAjustesRequest,
+    SalvarMapaRequest
+} from "@/types/tipos";
 
 export const useMapasStore = defineStore('mapas', {
     state: () => ({
-        mapas: mapasData.map(m => ({
-            ...m,
-            unidade: {sigla: m.unidade}
-        })) as unknown as Mapa[]
+        mapaCompleto: null as MapaCompleto | null,
+        mapaAjuste: null as MapaAjuste | null,
+        impactoMapa: null as ImpactoMapa | null,
     }),
-    getters: {
-        getMapaByUnidadeId: (state) => (unidadeId: string, idProcesso: number): Mapa | undefined => {
-            return state.mapas.find(m => m.unidade.sigla === unidadeId && m.idProcesso === idProcesso)
-        },
-        getMapaVigentePorUnidade: (state) => (unidadeId: string): Mapa | undefined => {
-            // Considerar mapas 'vigente', 'em_andamento' e 'disponibilizado' como elegíveis para revisão
-            return state.mapas.find(m =>
-                m.unidade.sigla === unidadeId &&
-                (m.situacao === 'VIGENTE' || m.situacao === 'EM_ANDAMENTO' || m.situacao === 'DISPONIBILIZADO')
-            )
-        }
-    },
+
     actions: {
-        adicionarMapa(mapa: Mapa) {
-            this.mapas.push(mapa);
-        },
-        editarMapa(codigo: number, novosDados: Partial<Mapa>) {
-            const idx = this.mapas.findIndex(m => m.codigo === codigo)
-            if (idx !== -1) this.mapas[idx] = {...this.mapas[idx], ...novosDados}
-        },
- 
-        definirMapaComoVigente(unidadeId: string, idProcesso: number) {
-            // Primeiro, desmarcar qualquer mapa vigente anterior para esta unidade
-            this.mapas.forEach(mapa => {
-                if (mapa.unidade.sigla === unidadeId && mapa.situacao === 'VIGENTE') mapa.situacao = 'DISPONIBILIZADO';
-            });
- 
-            // Definir o mapa do processo como vigente
-            const mapaIndex = this.mapas.findIndex(m => m.unidade.sigla === unidadeId && m.idProcesso === idProcesso);
-            if (mapaIndex !== -1) {
-                this.mapas[mapaIndex].situacao = 'VIGENTE';
-                this.mapas[mapaIndex].dataFinalizacao = new Date().toISOString();
+        async fetchMapaCompleto(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                this.mapaCompleto = await SubprocessoService.obterMapaCompleto(idSubprocesso);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar mapa', 'Não foi possível carregar o mapa de competências.');
+                this.mapaCompleto = null;
             }
-        }
+        },
+
+        async salvarMapa(idSubprocesso: number, request: SalvarMapaRequest) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                this.mapaCompleto = await SubprocessoService.salvarMapa(idSubprocesso, request);
+                notificacoes.sucesso('Mapa salvo', 'O mapa de competências foi salvo com sucesso.');
+            } catch (error) {
+                notificacoes.erro('Erro ao salvar', 'Não foi possível salvar o mapa de competências.');
+            }
+        },
+
+        async fetchMapaAjuste(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                this.mapaAjuste = await SubprocessoService.obterMapaAjuste(idSubprocesso);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar mapa para ajuste', 'Não foi possível carregar as informações para o ajuste.');
+                this.mapaAjuste = null;
+            }
+        },
+
+        async salvarAjustes(idSubprocesso: number, request: SalvarAjustesRequest) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                await SubprocessoService.salvarAjustes(idSubprocesso, request);
+                notificacoes.sucesso('Ajustes salvos', 'Os ajustes no mapa foram salvos com sucesso.');
+            } catch (error) {
+                notificacoes.erro('Erro ao salvar ajustes', 'Não foi possível salvar os ajustes.');
+            }
+        },
+
+        async fetchImpactoMapa(idSubprocesso: number) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                this.impactoMapa = await SubprocessoService.verificarImpactosMapa(idSubprocesso);
+            } catch (error) {
+                notificacoes.erro('Erro ao verificar impactos', 'Não foi possível carregar os impactos no mapa.');
+                this.impactoMapa = null;
+            }
+        },
     }
 })

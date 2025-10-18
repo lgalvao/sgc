@@ -251,19 +251,25 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {usePerfilStore} from '@/stores/perfil';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useNotificacoesStore} from '@/stores/notificacoes';
-import {useAlertasStore} from '@/stores/alertas';
-import {useAnalisesStore} from '@/stores/analises';
 import {useRouter} from 'vue-router';
-import {Atividade, Perfil, Processo, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos';
+import {
+  AceitarCadastroRequest,
+  Atividade,
+  DevolverCadastroRequest,
+  HomologarCadastroRequest,
+  Perfil,
+  TipoProcesso,
+  Unidade
+} from '@/types/tipos';
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
-import {URL_SISTEMA} from '@/constants';
+import {useSubprocessosStore} from "@/stores/subprocessos";
 
 const props = defineProps<{
   idProcesso: number | string,
@@ -276,9 +282,7 @@ const idProcesso = computed(() => Number(props.idProcesso))
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
-const notificacoesStore = useNotificacoesStore()
-const alertasStore = useAlertasStore()
-const analisesStore = useAnalisesStore() // Adicionado
+const subprocessosStore = useSubprocessosStore()
 const perfilStore = usePerfilStore()
 const router = useRouter()
 
@@ -286,7 +290,6 @@ const mostrarModalImpacto = ref(false)
 const mostrarModalValidar = ref(false)
 const mostrarModalDevolver = ref(false)
 const mostrarModalHistoricoAnalise = ref(false)
-const mostrarModalHomologacaoSemImpacto = ref(false)
 const observacaoValidacao = ref<string>('')
 const observacaoDevolucao = ref<string>('')
 
@@ -305,31 +308,27 @@ const unidade = computed(() => {
 })
 
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value)
-
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
-
 const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
-const unidadeSuperior = computed<string>(() => unidadesStore.getUnidadeImediataSuperior(siglaUnidade.value) || '');
-
-const isHomologacao = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN && unidadeSuperior.value === 'SEDOC');
 
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
   return processosStore.processoDetalhe.unidades.find(u => u.sigla === unidadeId.value);
 });
 
-const podeVerImpacto = computed(() => {
-  if (!subprocesso.value || !perfilStore.perfilSelecionado) return false;
-
-  const perfil = perfilStore.perfilSelecionado;
-  const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada';
-  const localizacaoCorreta = subprocesso.value.unidadeAtual === perfilStore.unidadeSelecionada;
-
-  return podeVer && situacaoCorreta && localizacaoCorreta;
+const isHomologacao = computed(() => {
+    if (!subprocesso.value) return false;
+    const {situacao} = subprocesso.value;
+    return perfilSelecionado.value === Perfil.ADMIN && (situacao === 'Cadastro em homologação' || situacao === 'Revisão do cadastro em homologação');
 });
 
-import {onMounted} from 'vue'
+const podeVerImpacto = computed(() => {
+  if (!subprocesso.value || !perfilSelecionado.value) return false;
+  const perfil = perfilSelecionado.value;
+  const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
+  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada';
+  return podeVer && situacaoCorreta;
+});
 
 const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
@@ -339,6 +338,7 @@ const atividades = computed<Atividade[]>(() => {
 })
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
+const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
@@ -347,11 +347,7 @@ onMounted(async () => {
   }
 });
 
-const isRevisao = computed(() => processoAtual.value?.tipo === 'Revisão');
-
 function validarCadastro() {
-  // A lógica de validação complexa agora reside no backend.
-  // O frontend apenas abre o modal de confirmação.
   mostrarModalValidar.value = true;
 }
 
@@ -360,21 +356,48 @@ function devolverCadastro() {
 }
 
 async function confirmarValidacao() {
-    if (!idSubprocesso.value) return;
-    // A lógica de negócio será tratada pelo backend.
-    // O frontend apenas chama a action apropriada.
-    // Ex: await subprocessosStore.aceitarCadastro(idSubprocesso.value, observacaoValidacao.value);
-    notificacoesStore.sucesso('Ação registrada', 'A análise foi registrada com sucesso.');
-    fecharModalValidar();
-    await router.push('/painel');
+  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+
+  const commonRequest = {
+    observacoes: observacaoValidacao.value,
+    analista: perfilSelecionado.value,
+  };
+
+  if (isHomologacao.value) {
+    const req: HomologarCadastroRequest = { ...commonRequest };
+    if (isRevisao.value) {
+        await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, req);
+    } else {
+        await subprocessosStore.homologarCadastro(idSubprocesso.value, req);
+    }
+  } else {
+      const req: AceitarCadastroRequest = { ...commonRequest };
+      if (isRevisao.value) {
+          await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, req);
+      } else {
+          await subprocessosStore.aceitarCadastro(idSubprocesso.value, req);
+      }
+  }
+
+  fecharModalValidar();
+  await router.push('/painel');
 }
 
 async function confirmarDevolucao() {
-    if (!idSubprocesso.value) return;
-    // Ex: await subprocessosStore.devolverCadastro(idSubprocesso.value, observacaoDevolucao.value);
-    notificacoesStore.sucesso('Devolução registrada', 'O cadastro foi devolvido para ajustes.');
-    fecharModalDevolver();
-    await router.push('/painel');
+  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+  const req: DevolverCadastroRequest = {
+    observacoes: observacaoDevolucao.value,
+    analista: perfilSelecionado.value,
+  };
+
+  if (isRevisao.value) {
+      await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, req);
+  } else {
+      await subprocessosStore.devolverCadastro(idSubprocesso.value, req);
+  }
+
+  fecharModalDevolver();
+  await router.push('/painel');
 }
 
 function fecharModalValidar() {
@@ -388,9 +411,7 @@ function fecharModalDevolver() {
 }
 
 function abrirModalImpacto() {
-    // A lógica de impacto agora deve ser verificada no backend.
-    // O botão pode chamar um endpoint que retorna se há impacto ou não.
-    notificacoesStore.info("Verificação de Impacto", 'Esta funcionalidade será conectada ao backend.');
+  mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {
@@ -403,21 +424,6 @@ function abrirModalHistoricoAnalise() {
 
 function fecharModalHistoricoAnalise() {
   mostrarModalHistoricoAnalise.value = false;
-}
-
-function fecharModalHomologacaoSemImpacto() {
-  mostrarModalHomologacaoSemImpacto.value = false;
-}
-
-function confirmarHomologacaoSemImpacto() {
-  if (!subprocesso.value) return;
-  
-  // 12.2.4 - Alterar situação para 'Mapa homologado'
-  subprocesso.value.situacaoSubprocesso = 'Mapa homologado';
-  
-  notificacoesStore.sucesso('Homologação efetivada', 'O mapa de competências vigente foi mantido!');
-  fecharModalHomologacaoSemImpacto();
-  router.push(`/processo/${idProcesso.value}/${siglaUnidade.value}`);
 }
 </script>
 
