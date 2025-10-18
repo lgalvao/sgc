@@ -6,11 +6,10 @@ import {useProcessosStore} from "@/stores/processos";
 import {mockProcessoDetalhe} from "@/test-utils/mocks";
 
 // Mock a store completa
+let mockProcessosStore: any;
+
 vi.mock('@/stores/processos', () => ({
-    useProcessosStore: vi.fn(() => ({
-        processoDetalhe: { ...mockProcessoDetalhe, codigo: 1 },
-        fetchProcessoDetalhe: vi.fn(),
-    })),
+    useProcessosStore: vi.fn(() => mockProcessosStore),
 }));
 
 vi.mock('@/services/subprocessoService', () => ({
@@ -31,6 +30,10 @@ describe('useSubprocessosStore', () => {
 
     beforeEach(() => {
         setActivePinia(createPinia());
+        mockProcessosStore = {
+            processoDetalhe: { ...mockProcessoDetalhe, codigo: 1 },
+            fetchProcessoDetalhe: vi.fn(),
+        };
         store = useSubprocessosStore();
         processosStore = useProcessosStore();
         vi.clearAllMocks();
