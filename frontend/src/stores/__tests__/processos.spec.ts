@@ -156,4 +156,36 @@ describe('useProcessosStore', () => {
             expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
     });
+
+    describe('getters', () => {
+        beforeEach(() => {
+            processosStore.processoDetalhe = {
+                codigo: 1,
+                resumoSubprocessos: [
+                    { unidade: { sigla: 'A' } },
+                    { unidade: { sigla: 'B' } },
+                    { unidade: { sigla: 'A' } },
+                ]
+            };
+        });
+
+        it('getUnidadesDoProcesso should return subprocessos for the correct process', () => {
+            const subprocessos = processosStore.getUnidadesDoProcesso(1);
+            expect(subprocessos).toHaveLength(3);
+            const emptySubprocessos = processosStore.getUnidadesDoProcesso(2);
+            expect(emptySubprocessos).toHaveLength(0);
+        });
+
+        it('getSubprocessosElegiveisAceiteBloco should filter by unit', () => {
+            const subprocessos = processosStore.getSubprocessosElegiveisAceiteBloco(1, 'A');
+            expect(subprocessos).toHaveLength(2);
+            const emptySubprocessos = processosStore.getSubprocessosElegiveisAceiteBloco(1, 'C');
+            expect(emptySubprocessos).toHaveLength(0);
+        });
+
+        it('getSubprocessosElegiveisHomologacaoBloco should return all subprocessos', () => {
+            const subprocessos = processosStore.getSubprocessosElegiveisHomologacaoBloco(1);
+            expect(subprocessos).toHaveLength(3);
+        });
+    });
 });
