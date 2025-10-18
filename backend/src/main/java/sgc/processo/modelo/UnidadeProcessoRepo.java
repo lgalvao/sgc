@@ -21,4 +21,6 @@ public interface UnidadeProcessoRepo extends JpaRepository<UnidadeProcesso, Long
            "WHERE p.situacao = 'EM_ANDAMENTO' " +
            "AND up.unidadeCodigo IN :codigosUnidades")
     List<Long> findUnidadesInProcessosAtivos(@Param("codigosUnidades") List<Long> codigosUnidades);
+
+    List<UnidadeProcesso> findByUnidadeCodigoIn(List<Long> unidadeCodigos);
 }
