@@ -103,7 +103,7 @@ import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import servidoresMock from '@/mocks/servidores.json'
+import {useServidoresStore} from "@/stores/servidores";
 import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
 
 const props = defineProps<{ sigla: string }>()
@@ -113,6 +113,7 @@ const sigla = computed(() => props.sigla)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
+const servidoresStore = useServidoresStore()
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
@@ -138,10 +139,10 @@ const justificativa = ref("")
 const sucesso = ref(false)
 const erroServidor = ref("")
 
-const servidores = ref<Servidor[]>(servidoresMock as unknown as Servidor[])
+const servidores = computed(() => servidoresStore.servidores);
 
 const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade.sigla === sigla.value)
+  return servidores.value.filter(s => s.unidade?.sigla === sigla.value)
 })
 
 const servidoresElegiveis = computed<Servidor[]>(() => {

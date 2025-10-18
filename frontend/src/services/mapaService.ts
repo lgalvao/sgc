@@ -1,0 +1,27 @@
+import apiClient from './axios-setup';
+import { mapMapaDtoToModel } from '@/mappers/mapas';
+import type { Mapa } from '@/types/tipos';
+
+export const listarMapas = async (): Promise<Mapa[]> => {
+    const response = await apiClient.get('/mapas');
+    return response.data.map(mapMapaDtoToModel);
+};
+
+export const obterMapa = async (id: number): Promise<Mapa> => {
+    const response = await apiClient.get(`/mapas/${id}`);
+    return mapMapaDtoToModel(response.data);
+};
+
+export const criarMapa = async (mapa: Omit<Mapa, 'codigo'>): Promise<Mapa> => {
+    const response = await apiClient.post('/mapas', mapa);
+    return mapMapaDtoToModel(response.data);
+};
+
+export const atualizarMapa = async (id: number, mapa: Mapa): Promise<Mapa> => {
+    const response = await apiClient.put(`/mapas/${id}`, mapa);
+    return mapMapaDtoToModel(response.data);
+};
+
+export const excluirMapa = async (id: number): Promise<void> => {
+    await apiClient.delete(`/mapas/${id}`);
+};
