@@ -116,6 +116,14 @@ public class ProcessoService {
         return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
     }
 
+    @Transactional(readOnly = true)
+    public List<ProcessoDto> listarFinalizados() {
+        return processoRepo.findBySituacao(SituacaoProcesso.FINALIZADO)
+                .stream()
+                .map(processoMapper::toDTO)
+                .toList();
+    }
+
 
 
 

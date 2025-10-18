@@ -17,6 +17,7 @@ export const useProcessosStore = defineStore('processos', {
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
         processoDetalhe: null as ProcessoDetalhe | null, // Para armazenar o processo detalhado
+        processosFinalizados: [] as ProcessoResumo[],
         // As propriedades abaixo serão tratadas em etapas futuras ou removidas se não forem mais necessárias
         // processos: [] as Processo[], // Removido
         // subprocessos: [] as Subprocesso[], // Removido
@@ -55,6 +56,10 @@ export const useProcessosStore = defineStore('processos', {
             const response = await painelService.listarProcessos(perfil, unidade, page, size);
             this.processosPainel = response.content;
             this.processosPainelPage = response;
+        },
+        async fetchProcessosFinalizados() {
+            const response = await processoService.fetchProcessosFinalizados();
+            this.processosFinalizados = response;
         },
         async fetchProcessoDetalhe(idProcesso: number) {
             this.processoDetalhe = await processoService.obterDetalhesProcesso(idProcesso);
