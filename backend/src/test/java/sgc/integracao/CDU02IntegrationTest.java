@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,42 +8,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
+import sgc.comum.BeanUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-import sgc.integracao.mocks.WithMockCustomUser;
-import static sgc.sgrh.Perfil.*;
-
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.hasSize;
-import sgc.integracao.mocks.WithMockCustomUser;
 
-@SpringBootTest
+@SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, BeanUtil.class})
 public class CDU02IntegrationTest {
 
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
@@ -52,69 +55,49 @@ public class CDU02IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private UnidadeRepo unidadeRepo;
-
     @Autowired
     private ProcessoRepo processoRepo;
-
     @Autowired
     private AlertaRepo alertaRepo;
-
     @Autowired
     private UsuarioRepo usuarioRepo;
-
     @Autowired
     private UnidadeProcessoRepo unidadeProcessoRepo;
 
     // Unidades
     private Unidade unidadeRaiz, unidadeFilha1, unidadeFilha2, unidadeNeta1;
 
-    // Processos
-    private Processo processoRaiz, processoFilha1, processoFilha2, processoNeta1, processoCriado;
-
-    // Usuários
-    private Usuario usuarioGestor, usuarioChefe1, usuarioChefe2;
-
     @BeforeEach
     void setup() {
-        // Limpar dados
-        alertaRepo.deleteAll();
-        unidadeProcessoRepo.deleteAll();
-        processoRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
-
-        // 1. Criar hierarquia de unidades
-        unidadeRaiz = unidadeRepo.save(new Unidade("Raiz", "RAIZ"));
+        unidadeRaiz = new Unidade("Raiz", "RAIZ");
+        unidadeRepo.save(unidadeRaiz);
         unidadeFilha1 = new Unidade("Filha 1", "F1");
         unidadeFilha1.setUnidadeSuperior(unidadeRaiz);
         unidadeRepo.save(unidadeFilha1);
-
         unidadeFilha2 = new Unidade("Filha 2", "F2");
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeRepo.save(unidadeFilha2);
-
         unidadeNeta1 = new Unidade("Neta 1", "N1");
         unidadeNeta1.setUnidadeSuperior(unidadeFilha1);
         unidadeRepo.save(unidadeNeta1);
 
-        // 2. Criar usuários
-        usuarioGestor = usuarioRepo.save(new Usuario(1L, "Gestor Raiz", "gestor@test.com", "123", unidadeRaiz, List.of(sgc.sgrh.Perfil.GESTOR)));
-        usuarioChefe1 = usuarioRepo.save(new Usuario(2L, "Chefe Filha 1", "chefe1@test.com", "123", unidadeFilha1, List.of(sgc.sgrh.Perfil.CHEFE)));
-        usuarioChefe2 = usuarioRepo.save(new Usuario(3L, "Chefe Filha 2", "chefe2@test.com", "123", unidadeFilha2, List.of(sgc.sgrh.Perfil.CHEFE)));
+        Processo p1 = criarProcesso("Processo da Raiz", SituacaoProcesso.EM_ANDAMENTO, unidadeRaiz);
+        Processo p2 = criarProcesso("Processo da Filha 1", SituacaoProcesso.EM_ANDAMENTO, unidadeFilha1);
+        Processo p3 = criarProcesso("Processo da Filha 2", SituacaoProcesso.FINALIZADO, unidadeFilha2);
+        criarProcesso("Processo da Neta 1", SituacaoProcesso.EM_ANDAMENTO, unidadeNeta1);
+        criarProcesso("Processo Criado", SituacaoProcesso.CRIADO, unidadeRaiz);
 
-        // 3. Criar processos
-        processoRaiz = criarProcesso("Processo da Raiz", SituacaoProcesso.EM_ANDAMENTO, unidadeRaiz);
-        processoFilha1 = criarProcesso("Processo da Filha 1", SituacaoProcesso.EM_ANDAMENTO, unidadeFilha1);
-        processoFilha2 = criarProcesso("Processo da Filha 2", SituacaoProcesso.FINALIZADO, unidadeFilha2);
-        processoNeta1 = criarProcesso("Processo da Neta 1", SituacaoProcesso.EM_ANDAMENTO, unidadeNeta1);
-        processoCriado = criarProcesso("Processo Criado", SituacaoProcesso.CRIADO, unidadeRaiz);
+        Usuario u1 = new Usuario(1L, "Gestor Raiz", "gestor@test.com", "123", unidadeRaiz, List.of(Perfil.GESTOR));
+        usuarioRepo.save(u1);
+        Usuario u2 = new Usuario(2L, "Chefe Filha 1", "chefe1@test.com", "123", unidadeFilha1, List.of(Perfil.CHEFE));
+        usuarioRepo.save(u2);
+        Usuario u3 = new Usuario(3L, "Chefe Filha 2", "chefe2@test.com", "123", unidadeFilha2, List.of(Perfil.CHEFE));
+        usuarioRepo.save(u3);
 
-        // 4. Criar Alertas
-        criarAlerta("Alerta para Gestor", processoRaiz, usuarioGestor, null);
-        criarAlerta("Alerta para Unidade Filha 1", processoFilha1, null, unidadeFilha1);
+        criarAlerta("Alerta para Gestor", p1, u1, null);
+        criarAlerta("Alerta para Unidade Filha 1", p2, u2, unidadeFilha1);
     }
 
     private Processo criarProcesso(String descricao, SituacaoProcesso situacao, Unidade... participantes) {
@@ -123,13 +106,11 @@ public class CDU02IntegrationTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setSituacao(situacao);
         p.setDataLimite(LocalDateTime.now().plusDays(30));
-        Processo processoSalvo = processoRepo.save(p);
-
+        processoRepo.save(p);
         for (Unidade u : participantes) {
-            unidadeProcessoRepo.save(new UnidadeProcesso(processoSalvo.getCodigo(), u.getCodigo(), u.getNome(), u.getSigla(), null, u.getTipo(), u.getSituacao().name(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null));
+            unidadeProcessoRepo.save(new UnidadeProcesso(p.getCodigo(), u.getCodigo(), u.getNome(), u.getSigla(), null, u.getTipo(), u.getSituacao().name(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null));
         }
-
-        return processoSalvo;
+        return p;
     }
 
     private void criarAlerta(String descricao, Processo processo, Usuario usuario, Unidade unidade) {
@@ -142,13 +123,29 @@ public class CDU02IntegrationTest {
         alertaRepo.save(a);
     }
 
+    private void setupSecurityContext(long tituloEleitoral, Unidade unidade, String... perfis) {
+        Usuario principal = new Usuario(
+            tituloEleitoral,
+            "Usuario de Teste",
+            "teste@sgc.com",
+            "123",
+            unidade,
+            Arrays.stream(perfis).map(Perfil::valueOf).collect(Collectors.toList())
+        );
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            principal, null, principal.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+    }
+
     @Nested
     @DisplayName("Testes de Visibilidade de Processos")
     class VisibilidadeProcessosTestes {
 
         @Test
+        @WithMockAdmin
         @DisplayName("ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
-        @WithMockCustomUser(tituloEleitoral = 99L, unidadeId = 1L, perfis = {"ADMIN"})
         void testListarProcessos_Admin_VeTodos() throws Exception {
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "ADMIN"))
@@ -158,8 +155,8 @@ public class CDU02IntegrationTest {
 
         @Test
         @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
-        @WithMockCustomUser(tituloEleitoral = 1L, unidadeId = 1L, perfis = {"GESTOR"})
         void testListarProcessos_GestorRaiz_VeTodos() throws Exception {
+            setupSecurityContext(1L, unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
                             .param("unidade", unidadeRaiz.getCodigo().toString()))
@@ -169,32 +166,30 @@ public class CDU02IntegrationTest {
 
         @Test
         @DisplayName("CHEFE da unidade Filha 1 deve ver processos da sua unidade e da Neta 1")
-        @WithMockCustomUser(tituloEleitoral = 2L, unidadeId = 2L, perfis = {"CHEFE"})
         void testListarProcessos_ChefeUnidadeFilha1_VeProcessosSubordinados() throws Exception {
+            setupSecurityContext(2L, unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
                             .param("unidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    // Deve ver processoFilha1 e processoNeta1
                     .andExpect(jsonPath("$.content", hasSize(2)));
         }
 
         @Test
         @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
-        @WithMockCustomUser(tituloEleitoral = 3L, unidadeId = 3L, perfis = {"CHEFE"})
         void testListarProcessos_ChefeUnidadeFilha2_NaoVeProcessosDeOutros() throws Exception {
+            setupSecurityContext(3L, unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
                             .param("unidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    // Deve ver apenas processoFilha2
                     .andExpect(jsonPath("$.content", hasSize(1)));
         }
 
         @Test
         @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado'")
-        @WithMockCustomUser(tituloEleitoral = 1L, unidadeId = 1L, perfis = {"GESTOR"})
         void testListarProcessos_NaoAdmin_NaoVeProcessosCriados() throws Exception {
+            setupSecurityContext(1L, unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
                             .param("unidade", unidadeRaiz.getCodigo().toString()))
@@ -209,8 +204,8 @@ public class CDU02IntegrationTest {
 
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")
-        @WithMockCustomUser(tituloEleitoral = 1L, unidadeId = 1L, perfis = {"GESTOR"})
         void testListarAlertas_UsuarioVeSeusAlertas() throws Exception {
+            setupSecurityContext(1L, unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "1"))
                     .andExpect(status().isOk())
@@ -220,8 +215,8 @@ public class CDU02IntegrationTest {
 
         @Test
         @DisplayName("Usuário deve ver alertas direcionados à sua unidade")
-        @WithMockCustomUser(tituloEleitoral = 2L, unidadeId = 2L, perfis = {"CHEFE"})
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
+            setupSecurityContext(2L, unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("unidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
@@ -231,8 +226,8 @@ public class CDU02IntegrationTest {
 
         @Test
         @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
-        @WithMockCustomUser(tituloEleitoral = 3L, unidadeId = 3L, perfis = {"CHEFE"})
         void testListarAlertas_UsuarioNaoVeAlertasDeOutros() throws Exception {
+            setupSecurityContext(3L, unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "3")
                             .param("unidade", unidadeFilha2.getCodigo().toString()))

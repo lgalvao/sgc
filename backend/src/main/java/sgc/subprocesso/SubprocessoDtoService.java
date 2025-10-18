@@ -60,11 +60,11 @@ public class SubprocessoDtoService {
         Subprocesso sp = repositorioSubprocesso.findById(id)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(id)));
 
-        if ("GESTOR".equalsIgnoreCase(perfil)) {
+        if ("GESTOR".equalsIgnoreCase(perfil) || "CHEFE".equalsIgnoreCase(perfil)) {
             if (sp.getUnidade() == null || unidadeUsuario == null || !unidadeUsuario.equals(sp.getUnidade().getCodigo())) {
                 throw new ErroDominioAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
             }
-        } else if (!"ADMIN".equalsIgnoreCase(perfil) && !"GESTOR".equalsIgnoreCase(perfil)) {
+        } else if (!"ADMIN".equalsIgnoreCase(perfil)) {
             throw new ErroDominioAccessoNegado("Perfil sem permissão.");
         }
 
