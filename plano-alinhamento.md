@@ -12,7 +12,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 02 | Visualizar Painel | ✅ | ✅ | **Excelente** | Teste de integração (`CDU02IntegrationTest`) adicionado para validar as regras de visibilidade de processos e alertas. |
 | 03 | Manter Processo | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 04 | Iniciar Processo de Mapeamento | ✅ | ✅ | **Excelente** | Cobertura sólida e completa dos efeitos colaterais. |
-| 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Bom** | Teste de integração não valida a cópia do mapa. |
+| 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Excelente** | A cobertura foi estendida para validar a cópia do mapa. |
 | 06 | Detalhar Processo | ✅ | ✅ | **Parcial** | Faltam testes para ações condicionais (finalizar, homologar). |
 | 07 | Detalhar Subprocesso | ✅ | ✅ | **Excelente** | Cobertura de integração refeita para focar nos testes de autorização. |
 | 08 | Manter Cadastro | ✅ | ✅ | **Parcial** | Funcionalidade de importação e variações de revisão não testadas. |
@@ -84,9 +84,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-05.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-05.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU05IntegrationTest.java`
-- **Análise:** O alinhamento é bom, mas com uma ressalva importante. O teste E2E cobre o fluxo de início e cancelamento do processo, que é similar ao do CDU-04. O teste de integração do backend valida corretamente os casos de sucesso e falha, incluindo a regra de negócio de que uma unidade precisa ter um mapa vigente para participar de uma revisão. **No entanto, o teste de sucesso (`testIniciarProcessoRevisao_sucesso`) apenas verifica se a requisição retorna `200 OK`, sem validar se uma cópia do mapa de competências existente foi de fato criada para o novo subprocesso, conforme exigido pelo requisito.**
+- **Análise:** O alinhamento agora é excelente. O teste de integração do backend (`CDU05IntegrationTest.java`) foi aprimorado para validar que uma cópia profunda e completa do mapa de competências vigente da unidade é criada e associada ao novo subprocesso quando um processo de revisão é iniciado. Durante a implementação, um bug na lógica de cópia do `CopiaMapaService` foi identificado e corrigido, garantindo que não apenas as atividades, mas também os conhecimentos associados sejam duplicados corretamente.
 - **Status:** Concluído
-- **Observações:** A principal lacuna é a falta de uma asserção no teste de integração para verificar se a cópia do mapa de competências foi criada durante o início do processo de revisão.
+- **Observações:** A lacuna de cobertura foi totalmente resolvida e um bug corrigido.
 
 ### CDU-06: Detalhar Processo
 - **Requisito:** `reqs/cdu-06.md`
