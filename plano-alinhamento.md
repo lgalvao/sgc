@@ -9,7 +9,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | CDU | Título | Teste E2E | Teste de Integração | Alinhamento | Observações Principais |
 |---|---|:---:|:---:|---|---|
 | 01 | Realizar Login | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para o fluxo de login. |
-| 02 | Visualizar Painel | ✅ | ❌ | **Fraco** | Ausência de teste de integração para as consultas do painel. |
+| 02 | Visualizar Painel | ✅ | ✅ | **Excelente** | Teste de integração (`CDU02IntegrationTest`) adicionado para validar as regras de visibilidade de processos e alertas. |
 | 03 | Manter Processo | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 04 | Iniciar Processo de Mapeamento | ✅ | ✅ | **Excelente** | Cobertura sólida e completa dos efeitos colaterais. |
 | 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Bom** | Teste de integração não valida a cópia do mapa. |
@@ -59,10 +59,10 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 ### CDU-02: Visualizar Painel
 - **Requisito:** `reqs/cdu-02.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-02.spec.ts`
-- **Teste de Integração:** `N/A`
-- **Análise:** Os testes E2E validam a visibilidade de componentes por perfil (ex: botão "Criar processo" para ADMIN), a navegação para diferentes telas a partir da tabela de processos e a estrutura da tabela de alertas. A lógica de exibição de processos (apenas da unidade do usuário e subordinadas) também é testada. No entanto, a funcionalidade de ordenação das tabelas de processos e alertas não é coberta. Novamente, falta o teste de integração do backend para garantir a corretude das consultas que alimentam o painel.
+- **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU02IntegrationTest.java`
+- **Análise:** O alinhamento agora é excelente. Foi criado um teste de integração (`CDU02IntegrationTest.java`) que valida de forma completa as regras de negócio do backend para a visualização do painel. O teste cobre a visibilidade de processos por perfil (ADMIN vê todos, outros perfis veem apenas processos de sua unidade e subordinadas) e a visibilidade de alertas (direcionados ao usuário ou à sua unidade). A implementação do `PainelService` foi refatorada para usar consultas eficientes no banco de dados em vez de filtros em memória.
 - **Status:** Concluído
-- **Observações:** A ausência do teste de integração e da cobertura de ordenação das tabelas são as principais lacunas.
+- **Observações:** A lacuna de cobertura do backend foi totalmente resolvida. A única cobertura pendente, de baixa prioridade, é a ordenação das tabelas no frontend.
 
 ### CDU-03: Manter Processo
 - **Requisito:** `reqs/cdu-03.md`
