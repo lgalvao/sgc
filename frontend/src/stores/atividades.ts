@@ -3,10 +3,10 @@ import type { Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoR
 import * as atividadeService from '@/services/atividadeService';
 import * as subprocessoService from '@/services/subprocessoService';
 import { useNotificacoesStore } from './notificacoes';
+import { mapMapaVisualizacaoToAtividades } from '@/mappers/mapas';
 
 export const useAtividadesStore = defineStore('atividades', {
     state: () => ({
-        atividades: [] as Atividade[],
         atividadesPorSubprocesso: new Map<number, Atividade[]>(),
     }),
     getters: {
@@ -15,70 +15,71 @@ export const useAtividadesStore = defineStore('atividades', {
         }
     },
     actions: {
-        async fetchAtividades() {
-            try {
-                this.atividades = await atividadeService.listarAtividades();
-            } catch (error) {
-                useNotificacoesStore().erro('Erro ao buscar atividades', 'Não foi possível carregar a lista de atividades.');
-            }
-        },
-
         async fetchAtividadesParaSubprocesso(idSubprocesso: number) {
-            // No backend atual, não há um endpoint direto para buscar atividades por subprocesso.
-            // A lógica de negócio associa atividades a um mapa, que por sua vez está ligado a um subprocesso.
-            // Esta action precisará ser ajustada quando a lógica de busca de mapa estiver implementada.
-            // Por enquanto, vamos simular buscando todas e filtrando (ineficiente, para desenvolvimento).
-            if (this.atividades.length === 0) {
-                await this.fetchAtividades();
+            const notificacoes = useNotificacoesStore();
+            try {
+                const mapa = await subprocessoService.obterMapaVisualizacao(idSubprocesso);
+                const atividades = mapMapaVisualizacaoToAtividades(mapa);
+                this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
+            } catch (error) {
+                notificacoes.erro('Erro ao buscar atividades', 'Não foi possível carregar as atividades do subprocesso.');
             }
-            // A filtragem real dependerá da estrutura de dados do subprocesso.
-            // Ex: this.atividadesPorSubprocesso.set(idSubprocesso, this.atividades.filter(a => a.mapaCodigo === subprocesso.mapaCodigo));
-            // Por enquanto, apenas para demonstração:
-            this.atividadesPorSubprocesso.set(idSubprocesso, [...this.atividades]);
         },
 
-        async adicionarAtividade(request: CriarAtividadeRequest) {
+        async adicionarAtividade(idSubprocesso: number, request: CriarAtividadeRequest) {
             try {
+                // FIXME: O endpoint de criar atividade não a associa a um subprocesso/mapa.
+                // Isso é um problema do backend. Por enquanto, a atividade será criada
+                // mas não aparecerá na lista até que o backend seja ajustado e a lista recarregada.
                 const novaAtividade = await atividadeService.criarAtividade(request);
-                this.atividades.push(novaAtividade);
-                // O ideal seria associar a atividade ao subprocesso correto aqui.
+                const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                atividades.push(novaAtividade);
+                this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
+                useNotificacoesStore().sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
+                 // Recarregar para garantir consistência com o backend
+                await this.fetchAtividadesParaSubprocesso(idSubprocesso);
             } catch (error) {
                 useNotificacoesStore().erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
             }
         },
 
-        async removerAtividade(atividadeId: number) {
+        async removerAtividade(idSubprocesso: number, atividadeId: number) {
             try {
                 await atividadeService.excluirAtividade(atividadeId);
-                this.atividades = this.atividades.filter(a => a.codigo !== atividadeId);
-                // Também remover de todos os maps de subprocesso
-                this.atividadesPorSubprocesso.forEach((atividades, id) => {
-                    this.atividadesPorSubprocesso.set(id, atividades.filter(a => a.codigo !== atividadeId));
-                });
+                let atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                atividades = atividades.filter(a => a.codigo !== atividadeId);
+                this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
+                useNotificacoesStore().sucesso('Atividade removida', 'A atividade foi removida com sucesso.');
             } catch (error) {
                 useNotificacoesStore().erro('Erro ao remover atividade', 'Não foi possível remover a atividade.');
             }
         },
 
-        async adicionarConhecimento(atividadeId: number, request: CriarConhecimentoRequest) {
+        async adicionarConhecimento(idSubprocesso: number, atividadeId: number, request: CriarConhecimentoRequest) {
             try {
                 const novoConhecimento = await atividadeService.criarConhecimento(atividadeId, request);
-                const atividade = this.atividades.find(a => a.codigo === atividadeId);
+                const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
                 if (atividade) {
                     atividade.conhecimentos.push(novoConhecimento);
+                    this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
+                 useNotificacoesStore().sucesso('Conhecimento adicionado', 'O novo conhecimento foi adicionado com sucesso.');
             } catch (error) {
                 useNotificacoesStore().erro('Erro ao adicionar conhecimento', 'Não foi possível salvar o novo conhecimento.');
             }
         },
 
-        async removerConhecimento(atividadeId: number, conhecimentoId: number) {
+        async removerConhecimento(idSubprocesso: number, atividadeId: number, conhecimentoId: number) {
             try {
                 await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
-                const atividade = this.atividades.find(a => a.codigo === atividadeId);
+                const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
                 if (atividade) {
                     atividade.conhecimentos = atividade.conhecimentos.filter(c => c.codigo !== conhecimentoId);
+                    this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
+                useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido com sucesso.');
             } catch (error) {
                 useNotificacoesStore().erro('Erro ao remover conhecimento', 'Não foi possível remover o conhecimento.');
             }

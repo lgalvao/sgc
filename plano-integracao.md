@@ -368,9 +368,9 @@ Para garantir uma integração gradual e gerenciável, o processo será dividido
 *   **Objetivo:** Gerenciar atividades e conhecimentos dentro de um subprocesso.
 *   **Backend:** `sgc.atividade.AtividadeControle` (`/api/atividades`), `sgc.subprocesso.SubprocessoCadastroControle` (`/api/subprocessos/{id}/importar-atividades`).
 *   **Frontend:**
-    *   **Mappers:** Crie/atualize `frontend/src/mappers/atividades.ts` (mapear `AtividadeDto`, `ConhecimentoDto`).
-    *   **Serviços de API:** Crie `frontend/src/services/atividadeService.ts` (CRUD de atividades/conhecimentos), atualize `frontend/src/services/subprocessoService.ts` (método para importar atividades).
-    *   **Stores Pinia:** Atualize `frontend/src/stores/atividades.ts` para chamar os serviços.
+    *   **Mappers:** Crie/atualize `frontend/src/mappers/atividades.ts` (mapear `AtividadeDto`, `ConhecimentoDto`). **[CONCLUÍDO]**
+    *   **Serviços de API:** Crie `frontend/src/services/atividadeService.ts` (CRUD de atividades/conhecimentos), atualize `frontend/src/services/subprocessoService.ts` (método para importar atividades). **[CONCLUÍDO]**
+    *   **Stores Pinia:** Atualize `frontend/src/stores/atividades.ts` para chamar os serviços. **[CONCLUÍDO]**
     *   **Componentes Vue:** Modifique `frontend/src/views/CadAtividades.vue` (edição), `frontend/src/views/VisAtividades.vue` (visualização).
 *   **Testes E2E:**
     *   Adapte `frontend/e2e/cdu/cdu-08.spec.ts`, `frontend/e2e/cdu/cdu-09.spec.ts`, `frontend/e2e/cdu/cdu-10.spec.ts` e `frontend/e2e/cdu/cdu-11.spec.ts` para testar a manutenção de atividades e conhecimentos.

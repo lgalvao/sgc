@@ -274,3 +274,26 @@ export interface ProcessoDetalhe {
     unidades: UnidadeParticipante[];
     resumoSubprocessos: Subprocesso[];
 }
+
+export interface ConhecimentoVisualizacao {
+    codigo: number;
+    descricao: string;
+}
+
+export interface AtividadeVisualizacao {
+    codigo: number;
+    descricao: string;
+    conhecimentos: ConhecimentoVisualizacao[];
+}
+
+export interface CompetenciaVisualizacao {
+    codigo: number;
+    descricao: string;
+    atividades: AtividadeVisualizacao[];
+}
+
+export interface MapaVisualizacao {
+    codigo: number;
+    descricao: string;
+    competencias: CompetenciaVisualizacao[];
+}
