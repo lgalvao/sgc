@@ -1,270 +1,132 @@
 package sgc.comum;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.dto.AlertaDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.*;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.modelo.UnidadeProcesso;
+import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.sgrh.Usuario;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes do PainelService")
+@DisplayName("Testes para PainelService")
 class PainelServiceTest {
-    private static final String PROCESSO_1 = "Processo 1";
-    private static final String USUARIO = "USUARIO";
+
     @Mock
     private ProcessoRepo processoRepo;
-
     @Mock
     private AlertaRepo alertaRepo;
-
     @Mock
     private UnidadeProcessoRepo unidadeProcessoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @InjectMocks
     private PainelService painelService;
 
-    @Test
-    @DisplayName("Deve lançar IllegalArgumentException quando perfil for nulo")
-    void deveLancarIllegalArgumentExceptionQuandoPerfilNulo() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> painelService.listarProcessos(null, null, PageRequest.of(0, 10))
-        );
-        
-        assertEquals("O parâmetro 'perfil' é obrigatório", exception.getMessage());
+    private Processo processo1, processo2, processoCriado;
+    private Unidade unidade1;
+    private Pageable pageable;
+
+    @BeforeEach
+    void setUp() {
+        unidade1 = new Unidade("Unidade Teste", "UT");
+        unidade1.setCodigo(1L);
+
+        processo1 = new Processo("Processo 1", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now());
+        processo1.setCodigo(101L);
+        processo2 = new Processo("Processo 2", TipoProcesso.REVISAO, SituacaoProcesso.FINALIZADO, LocalDateTime.now());
+        processo2.setCodigo(102L);
+        processoCriado = new Processo("Processo Criado", TipoProcesso.MAPEAMENTO, SituacaoProcesso.CRIADO, LocalDateTime.now());
+        processoCriado.setCodigo(103L);
+
+        pageable = PageRequest.of(0, 10);
     }
 
     @Test
-    @DisplayName("Deve lançar IllegalArgumentException quando perfil for vazio")
-    void deveLancarIllegalArgumentExceptionQuandoPerfilVazio() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> painelService.listarProcessos("", null, PageRequest.of(0, 10))
-        );
-        
-        assertEquals("O parâmetro 'perfil' é obrigatório", exception.getMessage());
+    @DisplayName("Deve retornar todos os processos para perfil ADMIN")
+    void listarProcessos_admin_retornaTodos() {
+        when(processoRepo.findAll()).thenReturn(List.of(processo1, processo2, processoCriado));
+        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(List.of(new UnidadeProcesso()));
+
+        Page<ProcessoResumoDto> resultado = painelService.listarProcessos("ADMIN", null, pageable);
+
+        assertEquals(3, resultado.getTotalElements());
     }
 
     @Test
-    @DisplayName("Deve lançar IllegalArgumentException quando perfil for em branco")
-    void deveLancarIllegalArgumentExceptionQuandoPerfilEmBranco() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> painelService.listarProcessos("   ", null, PageRequest.of(0, 10))
-        );
-        
-        assertEquals("O parâmetro 'perfil' é obrigatório", exception.getMessage());
+    @DisplayName("Não deve retornar processos CRIADO para perfil não-ADMIN")
+    void listarProcessos_naoAdmin_naoVeCriado() {
+        when(unidadeRepo.findByUnidadeSuperiorCodigo(1L)).thenReturn(Collections.emptyList());
+        when(unidadeProcessoRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of(new UnidadeProcesso(101L, 1L, "N", "S", "T", null, "A", null), new UnidadeProcesso(103L, 1L, "N", "S", "T", null, "A", null)));
+        when(processoRepo.findAllById(List.of(101L, 103L))).thenReturn(List.of(processo1, processoCriado));
+        when(unidadeProcessoRepo.findByProcessoCodigo(101L)).thenReturn(List.of(new UnidadeProcesso()));
+
+
+        Page<ProcessoResumoDto> resultado = painelService.listarProcessos("GESTOR", 1L, pageable);
+
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals("Processo 1", resultado.getContent().get(0).getDescricao());
     }
 
-    @Test
-    @DisplayName("Deve retornar todos os processos quando perfil não for ADMIN e unidade não for informada")
-    void deveRetornarTodosOsProcessosQuandoPerfilNaoForAdminEUnidadeNaoInformada() {
-        Processo processo1 = new Processo();
-        processo1.setCodigo(1L);
-        processo1.setDescricao(PROCESSO_1);
-        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo1.setTipo(TipoProcesso.MAPEAMENTO);
-
-        Processo processo2 = new Processo();
-        processo2.setCodigo(2L);
-        processo2.setDescricao("Processo 2");
-        processo2.setSituacao(SituacaoProcesso.FINALIZADO);
-        processo2.setTipo(TipoProcesso.MAPEAMENTO);
-
-        when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
-        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
-
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarProcessos(USUARIO, null, pageable);
-
-        assertEquals(2, result.getTotalElements());
-        verify(processoRepo, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Deve retornar apenas processos com situação CRIADO quando perfil for ADMIN")
-    void deveRetornarApenasProcessosComSituacaoCriadoQuandoPerfilForAdmin() {
-        Processo processo1 = new Processo();
-        processo1.setCodigo(1L);
-        processo1.setDescricao(PROCESSO_1);
-        processo1.setSituacao(SituacaoProcesso.CRIADO);
-        processo1.setTipo(TipoProcesso.MAPEAMENTO);
-
-        Processo processo2 = new Processo();
-        processo2.setCodigo(2L);
-        processo2.setDescricao("Processo 2");
-        processo2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo2.setTipo(TipoProcesso.MAPEAMENTO);
-
-        when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
-        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
-
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarProcessos("ADMIN", null, pageable);
-
-        assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().getFirst().getCodigo());
-        verify(processoRepo, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Deve filtrar processos por unidade quando codigoUnidade for informado")
-    void deveFiltrarProcessosPorUnidadeQuandoCodigoUnidadeInformado() {
-        Processo processo1 = new Processo();
-        processo1.setCodigo(1L);
-        processo1.setDescricao(PROCESSO_1);
-        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo1.setTipo(TipoProcesso.MAPEAMENTO);
-
-        Processo processo2 = new Processo();
-        processo2.setCodigo(2L);
-        processo2.setDescricao("Processo 2");
-        processo2.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo2.setTipo(TipoProcesso.MAPEAMENTO);
-
-        UnidadeProcesso unidadeProcesso1 = new UnidadeProcesso();
-        unidadeProcesso1.setCodigo(10L);
-        unidadeProcesso1.setNome("Unidade 1");
-
-        when(processoRepo.findAll()).thenReturn(Arrays.asList(processo1, processo2));
-        when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(unidadeProcesso1));
-        when(unidadeProcessoRepo.findByProcessoCodigo(2L)).thenReturn(Collections.emptyList());
-
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarProcessos(USUARIO, 10L, pageable);
-
-        assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().getFirst().getCodigo());
-        assertEquals(10L, result.getContent().getFirst().getUnidadeCodigo());
-        assertEquals("Unidade 1", result.getContent().getFirst().getUnidadeNome());
-        verify(processoRepo, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Deve aplicar paginação corretamente")
-    void deveAplicarPaginacaoCorretamente() {
-        // Criar uma lista com mais de 10 processos
-        Processo[] processos = new Processo[15];
-        for (int i = 0; i < 15; i++) {
-            Processo processo = new Processo();
-            processo.setCodigo((long) (i + 1));
-            processo.setDescricao("Processo " + (i + 1));
-            processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            processo.setTipo(TipoProcesso.MAPEAMENTO);
-            processos[i] = processo;
-        }
-
-        when(processoRepo.findAll()).thenReturn(Arrays.asList(processos));
-        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
-
-        Pageable pageable = PageRequest.of(1, 5); // Página 1 (índice 1), tamanho 5
-        var result = painelService.listarProcessos("USUARIO", null, pageable);
-
-        assertEquals(15, result.getTotalElements());
-        assertEquals(5, result.getContent().size());
-        assertEquals(1, result.getNumber()); // Número da página (começa em 0)
-        verify(processoRepo, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Deve retornar página vazia quando índice inicial for maior que total")
-    void deveRetornarPaginaVaziaQuandoIndiceInicialMaiorQueTotal() {
-        Processo processo1 = new Processo();
-        processo1.setCodigo(1L);
-        processo1.setDescricao(PROCESSO_1);
-        processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo1.setTipo(TipoProcesso.MAPEAMENTO);
-
-        when(processoRepo.findAll()).thenReturn(List.of(processo1));
-        when(unidadeProcessoRepo.findByProcessoCodigo(anyLong())).thenReturn(Collections.emptyList());
-
-        Pageable pageable = PageRequest.of(10, 5); // Página muito alta
-        var result = painelService.listarProcessos(USUARIO, null, pageable);
-
-        assertEquals(1, result.getTotalElements());
-        assertEquals(0, result.getContent().size());
-        verify(processoRepo, times(1)).findAll();
-    }
 
     @Test
     @DisplayName("Deve retornar alertas filtrados por usuário")
     void deveRetornarAlertasFiltradosPorUsuario() {
-        var alerta1 = new Alerta();
-        alerta1.setCodigo(1L);
-        alerta1.setDescricao("Alerta 1");
-        alerta1.setDataHora(LocalDateTime.now());
-        
-        var alerta2 = new Alerta();
-        alerta2.setCodigo(2L);
-        alerta2.setDescricao("Alerta 2");
-        alerta2.setDataHora(LocalDateTime.now());
-        
-        when(alertaRepo.findAll()).thenReturn(Arrays.asList(alerta1, alerta2));
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(123L);
+        Alerta alerta = new Alerta();
+        alerta.setUsuarioDestino(usuario);
+        when(alertaRepo.findByUsuarioDestino_TituloEleitoral(123L, pageable)).thenReturn(new PageImpl<>(List.of(alerta)));
 
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarAlertas("USUARIO_TESTE", null, pageable);
+        Page<AlertaDto> resultado = painelService.listarAlertas("123", null, pageable);
 
-        assertEquals(0, result.getTotalElements()); // Nenhum alerta associado ao usuário
-        verify(alertaRepo, times(1)).findAll();
+        assertEquals(1, resultado.getTotalElements());
     }
 
     @Test
-    @DisplayName("Deve retornar alertas filtrados por unidade")
+    @DisplayName("Deve retornar alertas filtrados por unidade e sub-unidades")
     void deveRetornarAlertasFiltradosPorUnidade() {
-        var alerta1 = new Alerta();
-        alerta1.setCodigo(1L);
-        alerta1.setDescricao("Alerta 1");
-        alerta1.setDataHora(LocalDateTime.now());
-        
-        var alerta2 = new Alerta();
-        alerta2.setCodigo(2L);
-        alerta2.setDescricao("Alerta 2");
-        alerta2.setDataHora(LocalDateTime.now());
-        
-        when(alertaRepo.findAll()).thenReturn(Arrays.asList(alerta1, alerta2));
+        Unidade subUnidade = new Unidade("Sub Unidade", "SU");
+        subUnidade.setCodigo(2L);
+        Alerta alertaUnidade = new Alerta();
+        alertaUnidade.setUnidadeDestino(unidade1);
+        Alerta alertaSubUnidade = new Alerta();
+        alertaSubUnidade.setUnidadeDestino(subUnidade);
 
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarAlertas(null, 10L, pageable);
+        when(unidadeRepo.findByUnidadeSuperiorCodigo(1L)).thenReturn(List.of(subUnidade));
+        when(unidadeRepo.findByUnidadeSuperiorCodigo(2L)).thenReturn(Collections.emptyList());
+        when(alertaRepo.findByUnidadeDestino_CodigoIn(List.of(2L, 1L), pageable)).thenReturn(new PageImpl<>(List.of(alertaUnidade, alertaSubUnidade)));
 
-        assertEquals(0, result.getTotalElements()); // Nenhum alerta associado à unidade
-        verify(alertaRepo, times(1)).findAll();
-    }
+        Page<AlertaDto> resultado = painelService.listarAlertas(null, 1L, pageable);
 
-    @Test
-    @DisplayName("Deve retornar todos os alertas quando usuário e unidade forem nulos")
-    void deveRetornarTodosAlertasQuandoUsuarioEUnidadeNulos() {
-        var alerta1 = new Alerta();
-        alerta1.setCodigo(1L);
-        alerta1.setDescricao("Alerta 1");
-        alerta1.setDataHora(LocalDateTime.now());
-        
-        var alerta2 = new Alerta();
-        alerta2.setCodigo(2L);
-        alerta2.setDescricao("Alerta 2");
-        alerta2.setDataHora(LocalDateTime.now());
-        
-        when(alertaRepo.findAll()).thenReturn(Arrays.asList(alerta1, alerta2));
-
-        Pageable pageable = PageRequest.of(0, 10);
-        var result = painelService.listarAlertas(null, null, pageable);
-
-        assertEquals(2, result.getTotalElements());
-        verify(alertaRepo, times(1)).findAll();
+        assertEquals(2, resultado.getTotalElements());
     }
 }

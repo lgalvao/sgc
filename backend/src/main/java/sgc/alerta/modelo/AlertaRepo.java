@@ -11,4 +11,6 @@ import java.util.List;
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     Page<Alerta> findByUnidadeDestino_Codigo(Long unidadeCodigo, Pageable pageable);
     List<Alerta> findByProcessoCodigo(Long processoCodigo);
+    Page<Alerta> findByUsuarioDestino_TituloEleitoral(Long tituloEleitoral, Pageable pageable);
+    Page<Alerta> findByUnidadeDestino_CodigoIn(List<Long> unidadeCodigos, Pageable pageable);
 }

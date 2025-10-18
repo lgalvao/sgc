@@ -18,4 +18,6 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
 
     @Query("SELECT u.sigla FROM Unidade u WHERE u.codigo IN :codigos")
     List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
+
+    List<Unidade> findByUnidadeSuperiorCodigo(Long unidadeSuperiorCodigo);
 }
