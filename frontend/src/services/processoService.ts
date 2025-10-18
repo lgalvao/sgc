@@ -18,6 +18,16 @@ export async function criarProcesso(request: CriarProcessoRequest): Promise<Proc
   }
 }
 
+export async function fetchProcessosFinalizados(): Promise<Processo[]> {
+  try {
+    const response = await apiClient.get<any[]>('/processos/finalizados');
+    return response.data.map(mapProcessoDtoToFrontend);
+  } catch (error) {
+    console.error('Erro ao buscar processos finalizados:', error);
+    throw error;
+  }
+}
+
 export async function iniciarProcesso(id: number, tipo: string, unidadesIds: number[]): Promise<void> {
   try {
     await apiClient.post(`/processos/${id}/iniciar?tipo=${tipo}`, unidadesIds);

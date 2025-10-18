@@ -45,19 +45,11 @@ const asc = ref(true)
 const processosFinalizados = ref<Processo[]>([]);
 
 onMounted(async () => {
-  // TODO: Implementar a busca de processos finalizados do backend
-  // Por enquanto, vamos usar os processos do painel e filtrar
-  await processosStore.fetchProcessosPainel(perfil.perfilSelecionado || '', Number(perfil.unidadeSelecionada) || 0, 0, 100); // Buscar um número maior para simular todos
-  processosFinalizados.value = processosStore.processosPainel.filter(p => p.situacao === 'FINALIZADO').map(p => ({
-    ...p,
-    id: p.codigo,
-    dataFinalizacao: p.dataFinalizacao ? new Date(p.dataFinalizacao) : null,
-    dataLimite: new Date(p.dataLimite),
-  }));
+  await processosStore.fetchProcessosFinalizados();
 });
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFinalizados.value].sort((a: Processo, b: Processo) => {
+  return [...processosStore.processosFinalizados].sort((a: Processo, b: Processo) => {
 
     if (criterio.value === 'unidades') {
       // TODO: Implementar lógica de ordenação por unidades

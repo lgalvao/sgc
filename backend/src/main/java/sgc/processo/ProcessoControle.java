@@ -53,6 +53,12 @@ public class ProcessoControle {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/finalizados")
+    @Operation(summary = "Lista todos os processos com situação FINALIZADO")
+    public ResponseEntity<List<ProcessoDto>> listarFinalizados() {
+        return ResponseEntity.ok(processoService.listarFinalizados());
+    }
+
     /**
      * Retorna os detalhes completos de um processo, incluindo unidades snapshot e resumo de subprocessos.
      * Este endpoint delega para ProcessoService.obterDetalhes e aplica tratamento de autorização.
