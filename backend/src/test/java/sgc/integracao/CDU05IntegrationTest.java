@@ -14,6 +14,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
@@ -22,13 +28,14 @@ import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.modelo.TipoProcesso;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,20 +65,45 @@ public class CDU05IntegrationTest {
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
 
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+
     private Unidade unidade;
+    private Mapa mapaOriginal;
+    private Competencia competenciaOriginal;
+    private Atividade atividadeOriginal;
+    private Conhecimento conhecimentoOriginal;
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade();
-        unidade.setNome("Test Unit");
-        unidade.setSigla("TU");
+        unidade = new Unidade("Test Unit", "TU");
         unidadeRepo.save(unidade);
 
-        Mapa mapa = new Mapa();
-        mapaRepo.save(mapa);
+        // Cria um mapa detalhado para ser copiado
+        mapaOriginal = new Mapa();
+        mapaRepo.save(mapaOriginal);
 
+        competenciaOriginal = new Competencia("Competencia Original", mapaOriginal);
+        competenciaRepo.save(competenciaOriginal);
+
+        atividadeOriginal = new Atividade(mapaOriginal, "Atividade Original");
+        atividadeRepo.save(atividadeOriginal);
+
+        conhecimentoOriginal = new Conhecimento("Conhecimento Original", atividadeOriginal);
+        conhecimentoRepo.save(conhecimentoOriginal);
+
+        // Define o mapa como vigente para a unidade
         UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo());
-        unidadeMapa.setMapaVigenteCodigo(mapa.getCodigo());
+        unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
         unidadeMapaRepo.save(unidadeMapa);
     }
 
@@ -103,14 +135,36 @@ public class CDU05IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
                 .andExpect(status().isOk());
+
+        // 3. Buscar o subprocesso criado e verificar a cópia do mapa
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
+        assertThat(subprocessos).hasSize(1);
+        Subprocesso subprocessoCriado = subprocessos.get(0);
+        Mapa mapaCopiado = subprocessoCriado.getMapa();
+
+        // 3.1. Verificar se o mapa copiado é uma nova instância (ID diferente)
+        assertThat(mapaCopiado.getCodigo()).isNotNull();
+        assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
+
+        // 3.2. Verificar se o conteúdo foi copiado
+        List<Competencia> competenciasCopiadas = competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        assertThat(competenciasCopiadas).hasSize(1);
+        assertThat(competenciasCopiadas.get(0).getDescricao()).isEqualTo(competenciaOriginal.getDescricao());
+
+        List<Atividade> atividadesCopiadas = atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
+        assertThat(atividadesCopiadas).hasSize(1);
+        assertThat(atividadesCopiadas.get(0).getDescricao()).isEqualTo(atividadeOriginal.getDescricao());
+
+        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.get(0).getCodigo());
+        assertThat(conhecimentosCopiados).hasSize(1);
+        assertThat(conhecimentosCopiados.get(0).getDescricao()).isEqualTo(conhecimentoOriginal.getDescricao());
     }
+
 
     @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
         // 1. Criar uma unidade e um processo sem associar um mapa vigente
-        Unidade unidadeSemMapa = new Unidade();
-        unidadeSemMapa.setNome("Unidade Sem Mapa");
-        unidadeSemMapa.setSigla("USM");
+        Unidade unidadeSemMapa = new Unidade("Unidade Sem Mapa", "USM");
         unidadeRepo.save(unidadeSemMapa);
 
         List<Long> unidades = new ArrayList<>();

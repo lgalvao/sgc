@@ -144,7 +144,6 @@ class CopiaMapaServiceTest {
         when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapaFonte));
         when(repositorioUnidade.findById(10L)).thenReturn(Optional.of(unidadeDestino));
         when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
-        when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.emptyList());
         when(repositorioMapa.save(any(Mapa.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // Act
