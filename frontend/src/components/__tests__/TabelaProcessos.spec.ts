@@ -56,15 +56,17 @@ describe('TabelaProcessos.vue', () => {
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockProcessos.length);
 
-    expect(rows[0].text()).toContain('Processo Alpha');
-    expect(rows[0].text()).toContain('Mapeamento');
-    expect(rows[0].text()).toContain('UNID1, UNID2');
-    expect(rows[0].text()).toContain('Em andamento');
+    const cells = rows[0].findAll('td');
+    expect(cells[0].text()).toBe('Processo Alpha');
+    expect(cells[1].text()).toBe('MAPEAMENTO');
+    expect(cells[2].text()).toBe('UNID1, UNID2');
+    expect(cells[3].text()).toBe('EM_ANDAMENTO');
 
-    expect(rows[1].text()).toContain('Processo Beta');
-    expect(rows[1].text()).toContain('Revisão');
-    expect(rows[1].text()).toContain('UNID3');
-    expect(rows[1].text()).toContain('Finalizado');
+    const cells2 = rows[1].findAll('td');
+    expect(cells2[0].text()).toBe('Processo Beta');
+    expect(cells2[1].text()).toBe('REVISAO');
+    expect(cells2[2].text()).toBe('UNID3');
+    expect(cells2[3].text()).toBe('FINALIZADO');
   });
 
   it('deve emitir o evento ordenar ao clicar nos cabeçalhos', async () => {
