@@ -21,12 +21,12 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 11 | Visualizar Cadastro | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 12 | Verificar Impactos no Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa, especialmente no backend. |
 | 13 | Analisar Cadastro | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
-| 14 | Analisar Revisão Cadastro | ✅ | ❌ | **Crítico** | Ausência de teste de integração para lógica complexa. |
+| 14 | Analisar Revisão Cadastro | ✅ | ✅ | **Excelente** | Cobertura de integração completa adicionada. |
 | 15 | Manter Mapa | ✅ | ✅ | **Bom** | Divergência na estratégia de salvamento testada (individual vs. lote). |
 | 16 | Ajustar Mapa | ✅ | ✅ | **Parcial** | Teste de integração muito limitado, não cobre o ajuste do mapa. |
 | 17 | Disponibilizar Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 18 | Visualizar Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
-| 19 | Validar Mapa | ✅ | ⚠️ | **Crítico** | Teste de integração desalinhado, testa o CDU-20. |
+| 19 | Validar Mapa | ✅ | ✅ | **Excelente** | Teste de integração corrigido e alinhado com o requisito. |
 | 20 | Analisar Validação Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 21 | Finalizar Processo | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 
@@ -163,10 +163,10 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 ### CDU-14: Analisar Revisão de Cadastro de Atividades e Conhecimentos
 - **Requisito:** `reqs/cdu-14.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-14.spec.ts`
-- **Teste de Integração:** `N/A`
-- **Análise:** Alinhamento muito fraco e de alto risco. O teste E2E cobre as ações de "devolver" e "aceitar" pelo GESTOR e a visibilidade dos botões para os diferentes perfis. No entanto, ele não testa o fluxo de "homologação" pelo ADMIN, que é a parte mais complexa e a principal diferença em relação ao CDU-13. A lacuna mais crítica é a ausência total de um teste de integração no backend. Isso significa que toda a lógica do servidor — incluindo a verificação de impactos que bifurca o fluxo de homologação, as mudanças de status, as movimentações e a criação de registros de análise — não está sendo testada.
+- **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java`
+- **Análise:** Alinhamento excelente. Anteriormente um ponto crítico por não possuir teste de integração, a lacuna foi resolvida com a criação do `CDU14IntegrationTest.java`. Este novo teste cobre de forma completa todos os fluxos de análise para os perfis GESTOR e ADMIN, incluindo as ações de devolução, aceite e homologação. Crucialmente, a lógica condicional de homologação (com e sem impactos no mapa) foi testada, garantindo que os diferentes status de subprocesso são aplicados corretamente.
 - **Status:** Concluído
-- **Observações:** Risco crítico. A ausência de um teste de integração para um caso de uso com lógica condicional complexa no backend é uma falha grave na cobertura de testes.
+- **Observações:** O risco foi totalmente mitigado. A cobertura de integração agora é robusta.
 
 ### CDU-15: Manter Mapa de Competências
 - **Requisito:** `reqs/cdu-15.md`
@@ -204,9 +204,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-19.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-19.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java`
-- **Análise:** Alinhamento problemático devido a um teste de integração desalinhado. O teste E2E cobre bem o fluxo do CHEFE, validando as ações de "Apresentar sugestões" e "Validar", além da visualização do histórico. No entanto, o teste de integração (`CDU19IntegrationTest.java`) parece testar o caso de uso errado; ele testa as ações de "devolver" e "aceitar" a validação, que pertencem ao GESTOR/ADMIN no CDU-20, e não as ações do CHEFE deste CDU. Isso significa que a lógica de backend para "Validar mapa" e "Apresentar sugestões", incluindo todos os efeitos colaterais (mudança de status, movimentação, alertas), não está coberta por testes de integração.
+- **Análise:** Alinhamento excelente. O problema crítico de um teste de integração desalinhado foi resolvido. O teste que antes ocupava o `CDU19IntegrationTest.java` foi renomeado para `CDU20IntegrationTest.java`, pois testava corretamente o CDU-20. Um novo `CDU19IntegrationTest.java` foi criado do zero, agora cobrindo adequadamente as ações do CHEFE: "Apresentar sugestões" e "Validar". Os novos testes verificam todos os efeitos colaterais esperados, como mudanças de status, criação de movimentações e alertas, alinhando completamente a cobertura de backend com os requisitos.
 - **Status:** Concluído
-- **Observações:** Risco crítico. O teste de integração do backend não corresponde ao caso de uso, deixando a implementação do servidor sem cobertura.
+- **Observações:** O risco foi totalmente mitigado. O teste de integração agora valida o caso de uso correto.
 
 ### CDU-20: Analisar Validação de Mapa de Competências
 - **Requisito:** `reqs/cdu-20.md`
