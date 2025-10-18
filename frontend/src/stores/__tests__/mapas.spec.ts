@@ -6,9 +6,9 @@ import {MapaAjuste, MapaCompleto, ImpactoMapa} from "@/types/tipos";
 
 vi.mock('@/services/subprocessoService', () => ({
     obterMapaCompleto: vi.fn(),
-    salvarMapa: vi.fn(),
+    salvarMapaCompleto: vi.fn(),
     obterMapaAjuste: vi.fn(),
-    salvarAjustes: vi.fn(),
+    salvarMapaAjuste: vi.fn(),
     verificarImpactosMapa: vi.fn(),
 }));
 
@@ -52,12 +52,12 @@ describe('useMapasStore', () => {
     describe('salvarMapa', () => {
         it('should call service and update state on success', async () => {
             const request = {competencias: []};
-            const mockResponse: MapaCompleto = {id: 1, competencias: [{id: 1, descricao: 'Nova'}]};
-            vi.mocked(SubprocessoService.salvarMapa).mockResolvedValue(mockResponse);
+            const mockResponse: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: [{codigo: 1, descricao: 'Nova'}]};
+            vi.mocked(SubprocessoService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
             await store.salvarMapa(idSubprocesso, request);
 
-            expect(SubprocessoService.salvarMapa).toHaveBeenCalledWith(idSubprocesso, request);
+            expect(SubprocessoService.salvarMapaCompleto).toHaveBeenCalledWith(idSubprocesso, request);
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
     });
@@ -76,12 +76,12 @@ describe('useMapasStore', () => {
 
     describe('salvarAjustes', () => {
         it('should call service successfully', async () => {
-            const request = {competencias: [], atividades: []};
-            vi.mocked(SubprocessoService.salvarAjustes).mockResolvedValue(undefined);
+            const request = {competencias: [], sugestoes: ''};
+            vi.mocked(SubprocessoService.salvarMapaAjuste).mockResolvedValue(undefined);
 
             await store.salvarAjustes(idSubprocesso, request);
 
-            expect(SubprocessoService.salvarAjustes).toHaveBeenCalledWith(idSubprocesso, request);
+            expect(SubprocessoService.salvarMapaAjuste).toHaveBeenCalledWith(idSubprocesso, request);
         });
     });
 

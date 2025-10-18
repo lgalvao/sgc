@@ -31,7 +31,7 @@ export const useMapasStore = defineStore('mapas', {
         async salvarMapa(idSubprocesso: number, request: SalvarMapaRequest) {
             const notificacoes = useNotificacoesStore()
             try {
-                this.mapaCompleto = await SubprocessoService.salvarMapa(idSubprocesso, request);
+                this.mapaCompleto = await SubprocessoService.salvarMapaCompleto(idSubprocesso, request);
                 notificacoes.sucesso('Mapa salvo', 'O mapa de competências foi salvo com sucesso.');
             } catch (error) {
                 notificacoes.erro('Erro ao salvar', 'Não foi possível salvar o mapa de competências.');
@@ -51,7 +51,7 @@ export const useMapasStore = defineStore('mapas', {
         async salvarAjustes(idSubprocesso: number, request: SalvarAjustesRequest) {
             const notificacoes = useNotificacoesStore()
             try {
-                await SubprocessoService.salvarAjustes(idSubprocesso, request);
+                await SubprocessoService.salvarMapaAjuste(idSubprocesso, request);
                 notificacoes.sucesso('Ajustes salvos', 'Os ajustes no mapa foram salvos com sucesso.');
             } catch (error) {
                 notificacoes.erro('Erro ao salvar ajustes', 'Não foi possível salvar os ajustes.');
