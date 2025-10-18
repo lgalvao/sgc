@@ -170,7 +170,7 @@ const atividadesParaImportar = ref<Atividade[]>([])
 const atividadesSelecionadas = ref<any[]>([])
 
 const processosDisponiveis = computed<ProcessoResumo[]>(() => {
-  return processosStore.processosPainel.filter(p =>
+  return (processosStore.processosPainel.value || []).filter(p =>
       (p.tipo === TipoProcesso.MAPEAMENTO || p.tipo === TipoProcesso.REVISAO) && p.situacao === 'FINALIZADO'
   )
 })
