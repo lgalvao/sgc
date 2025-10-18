@@ -1,15 +1,12 @@
 import apiClient from "@/axios-setup";
-import type { Analise } from "@/types/types";
+import type { AnaliseCadastro, AnaliseValidacao } from "@/types/tipos";
 
-export const fetchAnalises = async (subprocessoId: number): Promise<Analise[]> => {
-    const response = await apiClient.get(`/subprocessos/${subprocessoId}/analises`);
+export const listarAnalisesCadastro = async (subprocessoId: number): Promise<AnaliseCadastro[]> => {
+    const response = await apiClient.get(`/subprocessos/${subprocessoId}/historico-cadastro`);
     return response.data;
 };
 
-export const aprovarAnalise = async (analiseId: number): Promise<void> => {
-    await apiClient.post(`/analises/${analiseId}/aprovar`);
-};
-
-export const reprovarAnalise = async (analiseId: number, observacao: string): Promise<void> => {
-    await apiClient.post(`/analises/${analiseId}/reprovar`, { observacao });
+export const listarAnalisesValidacao = async (subprocessoId: number): Promise<AnaliseValidacao[]> => {
+    const response = await apiClient.get(`/subprocessos/${subprocessoId}/historico-validacao`);
+    return response.data;
 };

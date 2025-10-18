@@ -13,37 +13,33 @@ vi.mock('@/stores/processos');
 vi.mock('@/stores/revisao');
 
 describe('Impacto Store Logic', () => {
-    let mapasStore: ReturnType<typeof useMapasStore>;
-    let unidadesStore: ReturnType<typeof useUnidadesStore>;
-    let processosStore: ReturnType<typeof useProcessosStore>;
-    let revisaoStore: ReturnType<typeof useRevisaoStore>;
+    let mapasStore: any;
+    let unidadesStore: any;
+    let processosStore: any;
+    let revisaoStore: any;
 
     beforeEach(() => {
         setActivePinia(createPinia());
 
-        mapasStore = useMapasStore();
-        unidadesStore = useUnidadesStore();
-        processosStore = useProcessosStore();
-        revisaoStore = useRevisaoStore();
-
-        // Setup mock implementations
-        vi.mocked(useMapasStore).mockReturnValue({
-            ...mapasStore,
+        mapasStore = {
             getMapaByUnidadeId: vi.fn().mockReturnValue({competencias: []}),
-        });
-        vi.mocked(useUnidadesStore).mockReturnValue({
-            ...unidadesStore,
+        };
+        unidadesStore = {
             pesquisarUnidade: vi.fn().mockReturnValue(mockUnidade),
-        });
-        vi.mocked(useProcessosStore).mockReturnValue({
-            ...processosStore,
+        };
+        processosStore = {
             fetchProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
             processoDetalhe: mockProcessoDetalhe,
-        });
-        vi.mocked(useRevisaoStore).mockReturnValue({
-            ...revisaoStore,
+        };
+        revisaoStore = {
             mudancasParaImpacto: [],
-        });
+        };
+
+        vi.mocked(useMapasStore).mockReturnValue(mapasStore);
+        vi.mocked(useUnidadesStore).mockReturnValue(unidadesStore);
+        vi.mocked(useProcessosStore).mockReturnValue(processosStore);
+        vi.mocked(useRevisaoStore).mockReturnValue(revisaoStore);
+
 
         vi.clearAllMocks();
     });
