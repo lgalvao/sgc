@@ -98,10 +98,11 @@ export async function editarConhecimento(page: Page, nomeAtividade: string, nome
     await linhaConhecimento.hover();
     await linhaConhecimento.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click();
 
-    await page.getByTestId('input-conhecimento-modal').waitFor({state: 'visible'});
-    await page.getByTestId('input-conhecimento-modal').fill(nomeEditado);
-    await page.getByTestId('btn-salvar-conhecimento-modal').click();
-    await page.getByTestId('input-conhecimento-modal').waitFor({state: 'hidden'});
+    const inputModal = page.getByTestId(SELETORES.INPUT_EDITAR_CONHECIMENTO);
+    await inputModal.waitFor({ state: 'visible' });
+    await inputModal.fill(nomeEditado);
+    await page.getByTestId(SELETORES.BTN_SALVAR_EDICAO_CONHECIMENTO).click();
+    await inputModal.waitFor({ state: 'hidden' });
 }
 
 /**
