@@ -9,6 +9,12 @@ vi.mock('@/services/analiseService', () => ({
     listarAnalisesValidacao: vi.fn(),
 }));
 
+vi.mock('@/stores/notificacoes', () => ({
+    useNotificacoesStore: vi.fn(() => ({
+        erro: vi.fn(),
+    })),
+}));
+
 describe('useAnalisesStore', () => {
     let store: ReturnType<typeof useAnalisesStore>;
 
@@ -31,8 +37,8 @@ describe('useAnalisesStore', () => {
 
         it('getAnalisesPorSubprocesso should return the correct analyses for a given subprocess', () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
-                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1'},
-                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2'},
+                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1'},
+                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2', acao: 'DEVOLUCAO', unidadeSigla: 'DEF', analista: 'Analista 2'},
             ];
             const idSubprocesso = 123;
             store.analisesPorSubprocesso.set(idSubprocesso, mockAnalises);

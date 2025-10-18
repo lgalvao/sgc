@@ -1,49 +1,53 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     clicarUnidadeNaTabelaDetalhes,
+    criarProcessoCompleto,
     disponibilizarCadastro,
     gerarNomeUnico,
     loginComoChefe,
     navegarParaProcessoPorId,
     SELETORES_CSS,
+    verificarAlerta,
     verificarAtividadeVisivel,
     verificarConhecimentoVisivel,
     verificarMensagemSucesso,
     verificarUrlDoPainel,
 } from './helpers';
-import * as processoService from '../../src/services/processoService';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
 
-    async function setupProcessoIniciado() {
-        const nomeProcesso = `PROCESSO DISPONIBILIZAR TESTE - ${Date.now()}`;
-        const processo = await processoService.criarProcesso({
-            descricao: nomeProcesso,
-            tipo: 'MAPEAMENTO',
-            dataLimiteEtapa1: '2025-12-31T00:00:00',
-            unidades: [2] // Unidade 2 = STIC
-        });
-        await processoService.iniciarProcesso(processo.codigo, 'MAPEAMENTO', [2]);
-        return { nomeProcesso, processo };
-    }
-
-    test('deve disponibilizar o cadastro com sucesso', async ({ page }) => {
-        const { processo } = await setupProcessoIniciado();
+    test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar com sucesso', async ({ page }) => {
+        const { processo } = await criarProcessoCompleto(gerarNomeUnico('PROCESSO CDU-09'));
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
-        const nomeAtividade = gerarNomeUnico('Atividade para Disponibilizar');
-        await adicionarAtividade(page, nomeAtividade);
-        await verificarAtividadeVisivel(page, nomeAtividade);
+        // Adiciona uma atividade sem conhecimento
+        const nomeAtividadeIncompleta = gerarNomeUnico('Atividade Incompleta');
+        await adicionarAtividade(page, nomeAtividadeIncompleta);
+        await verificarAtividadeVisivel(page, nomeAtividadeIncompleta);
 
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
-        const nomeConhecimento = gerarNomeUnico('Conhecimento para Disponibilizar');
-        await adicionarConhecimento(cardAtividade, nomeConhecimento);
-        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
+        // Tenta disponibilizar e verifica o alerta
+        await page.click(SELETORES_CSS.BTN_DISPONIBILIZAR);
+        await verificarAlerta(page, 'Atividades Incompletas');
+        await page.click('.btn-close'); // Fecha o alerta para continuar
 
+        // Adiciona uma atividade completa
+        const nomeAtividadeCompleta = gerarNomeUnico('Atividade Completa');
+        await adicionarAtividade(page, nomeAtividadeCompleta);
+        await verificarAtividadeVisivel(page, nomeAtividadeCompleta);
+        const cardAtividadeCompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeCompleta });
+        const nomeConhecimento = gerarNomeUnico('Conhecimento');
+        await adicionarConhecimento(cardAtividadeCompleta, nomeConhecimento);
+        await verificarConhecimentoVisivel(cardAtividadeCompleta, nomeConhecimento);
+
+        // Adiciona conhecimento à atividade que estava incompleta
+        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeIncompleta });
+        await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
+
+        // Disponibiliza com sucesso
         await disponibilizarCadastro(page);
 
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');

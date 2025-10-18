@@ -33,6 +33,14 @@ export async function esperarMensagemErro(page: Page, mensagem: string): Promise
 }
 
 /**
+ * Verifica uma notificação de alerta (warning/info)
+ */
+export async function verificarAlerta(page: Page, texto: string): Promise<void> {
+    const alerta = page.locator('.notification.notification-warn', { hasText: texto });
+    await expect(alerta).toBeVisible();
+}
+
+/**
  * Espera um texto ficar visível na página
  */
 export async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {

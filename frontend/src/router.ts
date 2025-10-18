@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
+import {createRouter, createWebHistory, createMemoryHistory, RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -153,7 +153,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: typeof window === 'undefined' ? createMemoryHistory() : createWebHistory(),
     routes,
 });
 

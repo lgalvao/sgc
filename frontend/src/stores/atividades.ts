@@ -27,19 +27,18 @@ export const useAtividadesStore = defineStore('atividades', {
         },
 
         async adicionarAtividade(idSubprocesso: number, request: CriarAtividadeRequest) {
+            const notificacoes = useNotificacoesStore();
             try {
-                // FIXME: O endpoint de criar atividade não a associa a um subprocesso/mapa.
-                // Isso é um problema do backend. Por enquanto, a atividade será criada
-                // mas não aparecerá na lista até que o backend seja ajustado e a lista recarregada.
-                const novaAtividade = await atividadeService.criarAtividade(request);
+                // Passa o idSubprocesso para o serviço, que o adicionará ao DTO
+                const novaAtividade = await atividadeService.criarAtividade(request, idSubprocesso);
                 const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
                 atividades.push(novaAtividade);
                 this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
-                useNotificacoesStore().sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
-                 // Recarregar para garantir consistência com o backend
+                notificacoes.sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
+                // Opcional: recarregar para garantir consistência total, mas a adição otimista já ajuda.
                 await this.fetchAtividadesParaSubprocesso(idSubprocesso);
             } catch (error) {
-                useNotificacoesStore().erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
+                notificacoes.erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
             }
         },
 

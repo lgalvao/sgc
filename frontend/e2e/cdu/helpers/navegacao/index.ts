@@ -30,6 +30,7 @@ export {
     loginComoChefeSedia,
     loginComoServidor,
     login,
+    loginComo,
     navegarParaHome,
     clicarBotaoEntrar,
     clicarBotaoSair
