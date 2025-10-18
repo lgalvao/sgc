@@ -32,7 +32,7 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
         await verificarPaginaCadastroProcesso(page);
 
         await abrirModalInicializacaoProcesso(page);
-        await verificarModalConfirmacaoInicializacao(page);
+        await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'Mapeamento', 1);
         await confirmarInicializacaoNoModal(page);
 
         await verificarProcessoInicializadoComSucesso(page);
@@ -52,7 +52,7 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
         await verificarPaginaCadastroProcesso(page);
 
         await abrirModalInicializacaoProcesso(page);
-        await verificarModalConfirmacaoInicializacao(page);
+        await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'Mapeamento', 1);
         await cancelarNoModal(page);
 
         await verificarModalFechado(page);

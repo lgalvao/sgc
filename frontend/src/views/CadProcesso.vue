@@ -185,6 +185,10 @@
             />
           </div>
           <div class="modal-body">
+            <p><strong>Descrição:</strong> {{ descricao }}</p>
+            <p><strong>Tipo:</strong> {{ tipo }}</p>
+            <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
+            <hr>
             <p>Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
               serão notificadas por e-mail.</p>
           </div>
