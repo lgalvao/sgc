@@ -5,7 +5,7 @@ import {
   mapCriarAtividadeRequestToDto,
   mapCriarConhecimentoRequestToDto
 } from '@/mappers/atividades';
-import type { Atividade, Conhecimento } from '@/types/tipos';
+import type { Atividade, Conhecimento, CriarConhecimentoRequest } from '@/types/tipos';
 
 export async function listarAtividades(): Promise<Atividade[]> {
   try {

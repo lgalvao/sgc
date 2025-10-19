@@ -60,13 +60,14 @@ export interface Responsavel {
 export interface PerfilUnidade {
     perfil: Perfil;
     unidade: Unidade;
+    siglaUnidade: string;
 }
 
 /**
  * Representa a requisição para entrar no sistema.
  */
 export interface EntrarRequest {
-    tituloEleitoral: string;
+    tituloEleitoral: number;
     perfil: Perfil;
     unidadeCodigo: number;
 }
@@ -149,12 +150,11 @@ export interface ProcessoResumo {
     codigo: number;
     descricao: string;
     situacao: SituacaoProcesso;
-    tipo: string;
+    tipo: TipoProcesso;
     dataLimite: string;
     dataCriacao: string;
     unidadeCodigo: number;
     unidadeNome: string;
-    unidades: Unidade[];
     dataFinalizacao?: string;
 }
 
@@ -210,6 +210,17 @@ export interface AnaliseValidacao {
     idSubprocesso: number;
 }
 
+export interface AnaliseCadastro {
+    codigo: number;
+    dataHora: string;
+    analista: string;
+    unidadeSigla: string;
+    acao: string;
+    observacoes: string;
+    resultado: string;
+    idSubprocesso: number;
+}
+
 export interface AtribuicaoTemporaria {
     codigo: number;
     servidor: Servidor;
@@ -217,6 +228,7 @@ export interface AtribuicaoTemporaria {
     dataInicio: string;
     dataFim: string;
     dataTermino: string;
+    justificativa: string;
 }
 
 export interface UnidadeSnapshot {
@@ -275,6 +287,9 @@ export interface ProcessoDetalhe {
     dataFinalizacao?: string;
     unidades: UnidadeParticipante[];
     resumoSubprocessos: Subprocesso[];
+    podeFinalizar: boolean;
+    podeHomologarCadastro: boolean;
+    podeHomologarMapa: boolean;
 }
 
 export interface ConhecimentoVisualizacao {
@@ -336,11 +351,13 @@ export interface SalvarAjustesRequest {
         codigo: number;
         descricao: string;
     }[];
+    sugestoes: string;
 }
 
 export interface MapaCompleto {
     codigo: number;
-    descricao: string;
+    subprocessoCodigo: number;
+    observacoes: string;
     competencias: Competencia[];
 }
 
@@ -353,5 +370,12 @@ export interface MapaAjuste {
 
 export interface ImpactoMapa {
     temImpactos: boolean;
-    // Adicionar outras propriedades se houver, como a lista de impactos
+    totalAtividadesInseridas: number;
+    totalAtividadesRemovidas: number;
+    totalAtividadesAlteradas: number;
+    totalCompetenciasImpactadas: number;
+    atividadesInseridas: Atividade[];
+    atividadesRemovidas: Atividade[];
+    atividadesAlteradas: Atividade[];
+    competenciasImpactadas: Competencia[];
 }

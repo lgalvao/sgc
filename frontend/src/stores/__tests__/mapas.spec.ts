@@ -30,7 +30,7 @@ describe('useMapasStore', () => {
 
     describe('fetchMapaCompleto', () => {
         it('should call service and update state on success', async () => {
-            const mockMapa: MapaCompleto = {id: 1, competencias: []};
+            const mockMapa: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: []};
             vi.mocked(SubprocessoService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
             await store.fetchMapaCompleto(idSubprocesso);
@@ -52,7 +52,7 @@ describe('useMapasStore', () => {
     describe('salvarMapa', () => {
         it('should call service and update state on success', async () => {
             const request = {competencias: []};
-            const mockResponse: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: [{codigo: 1, descricao: 'Nova'}]};
+            const mockResponse: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}]};
             vi.mocked(SubprocessoService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
             await store.salvarMapa(idSubprocesso, request);
@@ -64,7 +64,7 @@ describe('useMapasStore', () => {
 
     describe('fetchMapaAjuste', () => {
         it('should call service and update state on success', async () => {
-            const mockMapa: MapaAjuste = {id: 1, competenciasSugeridas: [], atividadesSugeridas: []};
+            const mockMapa: MapaAjuste = {codigo: 1, descricao: 'teste', competencias: []};
             vi.mocked(SubprocessoService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
             await store.fetchMapaAjuste(idSubprocesso);
@@ -76,7 +76,7 @@ describe('useMapasStore', () => {
 
     describe('salvarAjustes', () => {
         it('should call service successfully', async () => {
-            const request = {competencias: [], sugestoes: ''};
+            const request = {competencias: [], atividades: [], sugestoes: ''};
             vi.mocked(SubprocessoService.salvarMapaAjuste).mockResolvedValue(undefined);
 
             await store.salvarAjustes(idSubprocesso, request);
@@ -87,7 +87,7 @@ describe('useMapasStore', () => {
 
     describe('fetchImpactoMapa', () => {
         it('should call service and update state on success', async () => {
-            const mockImpacto: ImpactoMapa = { temImpacto: true, competencias: [] };
+            const mockImpacto: ImpactoMapa = { temImpactos: true, competencias: [] };
             vi.mocked(SubprocessoService.verificarImpactosMapa).mockResolvedValue(mockImpacto);
 
             await store.fetchImpactoMapa(idSubprocesso);

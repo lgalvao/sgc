@@ -6,16 +6,16 @@ import {useServidoresStore} from '../servidores';
 vi.mock('../../mocks/servidores.json', () => ({
     default: [
         {
-            "id": 1,
+            "codigo": 1,
             "nome": "Ana Paula Souza",
-            "unidade": "SESEL",
+            "unidade": { "codigo": 1, "nome": "Seção de Seleção", "sigla": "SESEL" },
             "email": "ana.souza@tre-pe.jus.br",
             "ramal": "1234"
         },
         {
-            "id": 2,
+            "codigo": 2,
             "nome": "Carlos Henrique Lima",
-            "unidade": "SGP",
+            "unidade": { "codigo": 2, "nome": "Seção de Gestão de Pessoas", "sigla": "SGP" },
             "email": "carlos.lima@tre-pe.jus.br",
             "ramal": "2345"
         }
@@ -32,16 +32,16 @@ describe('useServidoresStore', () => {
         servidoresStore.$patch({
             servidores: [
                 {
-                    "id": 1,
+                    "codigo": 1,
                     "nome": "Ana Paula Souza",
-                    "unidade": "SESEL",
+                    "unidade": { "codigo": 1, "nome": "Seção de Seleção", "sigla": "SESEL" },
                     "email": "ana.souza@tre-pe.jus.br",
                     "ramal": "1234"
                 },
                 {
-                    "id": 2,
+                    "codigo": 2,
                     "nome": "Carlos Henrique Lima",
-                    "unidade": "SGP",
+                    "unidade": { "codigo": 2, "nome": "Seção de Gestão de Pessoas", "sigla": "SGP" },
                     "email": "carlos.lima@tre-pe.jus.br",
                     "ramal": "2345"
                 }
@@ -51,14 +51,14 @@ describe('useServidoresStore', () => {
 
     it('should initialize with mock servidores', () => {
         expect(servidoresStore.servidores.length).toBe(2); // Directly use the expected length
-        expect(servidoresStore.servidores[0].id).toBe(1);
+        expect(servidoresStore.servidores[0].codigo).toBe(1);
     });
 
     describe('getters', () => {
         it('getServidorById should return the correct servidor by ID', () => {
             const servidor = servidoresStore.getServidorById(1);
             expect(servidor).toBeDefined();
-            expect(servidor?.id).toBe(1);
+            expect(servidor?.codigo).toBe(1);
             expect(servidor?.nome).toBe('Ana Paula Souza');
         });
 

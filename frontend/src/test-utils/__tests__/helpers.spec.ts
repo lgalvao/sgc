@@ -60,8 +60,8 @@ describe('test-utils/uiHelpers', () => {
   it('selecionarProcessoEUnidade should set select values', async () => {
     const wrapper = mount(TestComponent)
     await selecionarProcessoEUnidade(wrapper, 1, 1)
-    expect(wrapper.find('select#processo-select').element.value).toBe('1')
-    expect(wrapper.find('select#unidade-select').element.value).toBe('1')
+    expect((wrapper.find('select#processo-select').element as HTMLSelectElement).value).toBe('1')
+    expect((wrapper.find('select#unidade-select').element as HTMLSelectElement).value).toBe('1')
   })
 
   it('expectImportButtonDisabled should assert disabled attribute', () => {
@@ -77,7 +77,7 @@ describe('test-utils/uiHelpers', () => {
   it('selectFirstCheckbox should check the first checkbox', async () => {
     const wrapper = mount(TestComponent)
     await selectFirstCheckbox(wrapper)
-    expect(wrapper.find('.form-check-input').element.checked).toBe(true)
+    expect((wrapper.find('.form-check-input').element as HTMLInputElement).checked).toBe(true)
   })
 
   it('assertUnidadeOptions should check select options', () => {
@@ -88,7 +88,7 @@ describe('test-utils/uiHelpers', () => {
   it('navigateAndAssertBreadcrumbs should work correctly', async () => {
     const routes = [{ path: '/', component: TestComponent }]
     const router = createRouter({ history: createWebHistory(), routes })
-    const mountFn = () => mount(TestComponent, { global: { plugins: [router] } })
+    const mountFn = async () => mount(TestComponent, { global: { plugins: [router] } })
     await navigateAndAssertBreadcrumbs(router, mountFn, '/', ['Page'])
   })
 

@@ -1,6 +1,6 @@
 import apiClient from '@/axios-setup';
 import { mapMapaDtoToModel } from '@/mappers/mapas';
-import type { Mapa } from '@/types/tipos';
+import type { Mapa, SalvarMapaRequest } from '@/types/tipos';
 
 export const listarMapas = async (): Promise<Mapa[]> => {
     const response = await apiClient.get('/mapas');
@@ -12,7 +12,7 @@ export const obterMapa = async (id: number): Promise<Mapa> => {
     return mapMapaDtoToModel(response.data);
 };
 
-export const criarMapa = async (mapa: Omit<Mapa, 'codigo'>): Promise<Mapa> => {
+export const criarMapa = async (mapa: SalvarMapaRequest): Promise<Mapa> => {
     const response = await apiClient.post('/mapas', mapa);
     return mapMapaDtoToModel(response.data);
 };
