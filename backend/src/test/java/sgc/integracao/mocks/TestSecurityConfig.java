@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 @TestConfiguration
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestSecurityConfig {
 

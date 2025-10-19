@@ -164,9 +164,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-14.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-14.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU14IntegrationTest.java`
-- **Análise:** Alinhamento excelente. Anteriormente um ponto crítico por não possuir teste de integração, a lacuna foi resolvida com a criação do `CDU14IntegrationTest.java`. Este novo teste cobre de forma completa todos os fluxos de análise para os perfis GESTOR e ADMIN, incluindo as ações de devolução, aceite e homologação. Crucialmente, a lógica condicional de homologação (com e sem impactos no mapa) foi testada, garantindo que os diferentes status de subprocesso são aplicados corretamente.
+- **Análise:** O alinhamento agora é **excelente**, mas exigiu correções significativas. A análise inicial indicava cobertura completa, mas uma inspeção aprofundada revelou que o teste de integração (`CDU14IntegrationTest.java`) estava desalinhado com os requisitos. Os testes de homologação usavam o perfil incorreto (GESTOR em vez de ADMIN) e não validavam adequadamente a lógica condicional de mudança de status baseada nos impactos do mapa. A lógica no `SubprocessoWorkflowService` também estava incorreta, pois não movia o subprocesso para a unidade correta após o aceite do GESTOR. O teste foi reestruturado, os perfis foram corrigidos, e a lógica de serviço foi ajustada para garantir que a homologação pelo ADMIN resulte em `MAPA_HOMOLOGADO` (sem impactos) ou `REVISAO_CADASTRO_HOMOLOGADA` (com impactos), conforme especificado.
 - **Status:** Concluído
-- **Observações:** O risco foi totalmente mitigado. A cobertura de integração agora é robusta.
+- **Observações:** A cobertura de integração agora é robusta e valida corretamente o fluxo de trabalho complexo e as regras de autorização.
 
 ### CDU-15: Manter Mapa de Competências
 - **Requisito:** `reqs/cdu-15.md`

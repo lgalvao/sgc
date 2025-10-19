@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -156,6 +157,7 @@ public class SubprocessoCadastroControle {
 
     @PostMapping("/{id}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
+    @PreAuthorize("hasRole('ADMIN')")
     public void homologarRevisaoCadastro(
             @PathVariable Long id,
             @Valid @RequestBody HomologarCadastroReq request,
