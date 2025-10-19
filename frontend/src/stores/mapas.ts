@@ -17,6 +17,17 @@ export const useMapasStore = defineStore('mapas', {
         impactoMapa: null as ImpactoMapa | null,
     }),
 
+    getters: {
+        getMapaByUnidadeId: (state) => (unidadeId: number) => {
+            // Lógica de exemplo: filtrar mapas ou encontrar um mapa específico
+            // Esta lógica precisa ser ajustada com base na estrutura real do estado
+            if (state.mapaCompleto && state.mapaCompleto.unidade.codigo === unidadeId) {
+                return state.mapaCompleto;
+            }
+            return null;
+        }
+    },
+
     actions: {
         async fetchMapaCompleto(idSubprocesso: number) {
             const notificacoes = useNotificacoesStore()

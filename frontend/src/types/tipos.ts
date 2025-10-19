@@ -163,6 +163,8 @@ export interface Subprocesso {
     unidade: Unidade;
     situacao: SituacaoSubprocesso;
     dataLimite: string;
+    dataFimEtapa1: string;
+    dataLimiteEtapa2: string;
     atividades: Atividade[];
     codUnidade: number;
 }
@@ -215,6 +217,7 @@ export interface AtribuicaoTemporaria {
     dataInicio: string;
     dataFim: string;
     dataTermino: string;
+    idServidor?: number;
 }
 
 export interface UnidadeSnapshot {
@@ -259,6 +262,8 @@ export interface UnidadeParticipante {
     codUnidade: number;
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
+    situacao: SituacaoSubprocesso;
+    sugestoes: string;
     dataLimite: string;
     filhos: UnidadeParticipante[];
 }
@@ -296,4 +301,60 @@ export interface MapaVisualizacao {
     codigo: number;
     descricao: string;
     competencias: CompetenciaVisualizacao[];
+}
+
+export interface AceitarCadastroRequest {
+    observacoes?: string;
+}
+
+export interface DevolverCadastroRequest {
+    observacoes: string;
+}
+
+export interface HomologarCadastroRequest {
+    observacoes?: string;
+}
+
+export interface SalvarMapaRequest {
+    competencias: {
+        codigo?: number;
+        descricao: string;
+        atividades: {
+            codigo?: number;
+            descricao: string;
+            conhecimentos: {
+                codigo?: number;
+                descricao: string;
+            }[];
+        }[];
+    }[];
+}
+
+export interface SalvarAjustesRequest {
+    competencias: {
+        codigo: number;
+        descricao: string;
+    }[];
+    atividades: {
+        codigo: number;
+        descricao: string;
+    }[];
+}
+
+export interface MapaCompleto {
+    codigo: number;
+    descricao: string;
+    competencias: Competencia[];
+}
+
+export interface MapaAjuste {
+    // Definindo uma estrutura similar ao MapaCompleto, pode ser ajustada conforme a necessidade
+    codigo: number;
+    descricao: string;
+    competencias: Competencia[];
+}
+
+export interface ImpactoMapa {
+    temImpacto: boolean;
+    // Adicionar outras propriedades se houver, como a lista de impactos
 }
