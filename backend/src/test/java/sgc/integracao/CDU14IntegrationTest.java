@@ -5,11 +5,13 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.atividade.modelo.Atividade;
@@ -46,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-14: Analisar Revisão de Cadastro")
+@Import(TestSecurityConfig.class)
 class CDU14IntegrationTest {
 
     @Autowired
@@ -76,6 +79,7 @@ class CDU14IntegrationTest {
     private Processo processo;
     private Subprocesso subprocesso;
     private Unidade unidade, unidadeGestor, unidadeAdmin;
+    private Usuario gestor;
 
     @BeforeEach
     void setUp() {
@@ -89,7 +93,7 @@ class CDU14IntegrationTest {
         unidadeGestor = new Unidade("GESTOR-UNIT", "GESTOR-UNIT");
         unidadeGestor.setUnidadeSuperior(unidadeAdmin);
         unidadeRepo.save(unidadeGestor);
-        Usuario gestor = usuarioRepo.save(new Usuario(222222222222L, "Gestor", "gestor@email.com", "2222", unidadeGestor, Set.of(Perfil.GESTOR)));
+        gestor = usuarioRepo.save(new Usuario(222222222222L, "Gestor", "gestor@email.com", "2222", unidadeGestor, Set.of(Perfil.GESTOR)));
         unidadeGestor.setTitular(gestor);
         unidadeRepo.save(unidadeGestor);
 
@@ -151,7 +155,7 @@ class CDU14IntegrationTest {
     @DisplayName("Testes para o fluxo de 'Registrar Aceite'")
     class AceitarCadastroTest {
         @Test
-        @DisplayName("GESTOR deve aceitar revisão do cadastro, registrar análise, movimentação e alerta")
+        @DisplayName("GESTOR deve aceitar revisão do cadastro, registrar análise, e mover para unidade superior")
         @WithMockGestor
         void testGestorAceitaRevisaoCadastro() throws Exception {
             // Ação
@@ -172,12 +176,12 @@ class CDU14IntegrationTest {
 
             var movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(2);
-            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
-            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeGestor.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeGestor.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
 
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
-            assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeGestor.getSigla());
+            assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
             assertThat(alertas.getFirst().getDescricao()).contains("Revisão do cadastro de atividades e conhecimentos da unidade SUB-UNIT submetida para análise");
         }
     }
@@ -185,21 +189,16 @@ class CDU14IntegrationTest {
     @Nested
     @DisplayName("Testes para o fluxo de 'Homologar'")
     class HomologarCadastroTest {
-
-        private Usuario gestor;
-
         @BeforeEach
-        void setUp() {
-            gestor = usuarioRepo.findByTituloEleitoral(222222222222L).orElseThrow();
+        void setup() {
+            // Mover o subprocesso para a unidade do ADMIN para que a homologação seja possível
+            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), "", gestor);
         }
 
         @Test
-        @DisplayName("GESTOR deve homologar revisão e alterar status para MAPA_HOMOLOGADO quando não há impactos")
-        @WithMockGestor
-        void testGestorHomologaRevisaoSemImpactos() throws Exception {
-            // Pré-condição: GESTOR aceita a revisão
-            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), "", gestor);
-
+        @DisplayName("ADMIN deve homologar revisão e alterar status para MAPA_HOMOLOGADO quando não há impactos")
+        @WithMockAdmin
+        void testAdminHomologaRevisaoSemImpactos() throws Exception {
             // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocesso.getCodigo())
                     .with(csrf())
@@ -213,12 +212,9 @@ class CDU14IntegrationTest {
         }
 
         @Test
-        @DisplayName("GESTOR deve homologar revisão e alterar status para MAPA_HOMOLOGADO mesmo quando há impactos (BUG)")
-        @WithMockGestor
-        void testGestorHomologaRevisaoComImpactos() throws Exception {
-            // Pré-condição: GESTOR aceita a revisão
-            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), "", gestor);
-
+        @DisplayName("ADMIN deve homologar revisão e alterar status para REVISAO_CADASTRO_HOMOLOGADA quando há impactos")
+        @WithMockAdmin
+        void testAdminHomologaRevisaoComImpactos() throws Exception {
             // Cenário: Adicionar uma atividade para simular impacto
             atividadeRepo.save(new Atividade(subprocesso.getMapa(), "Nova Atividade"));
 
@@ -230,11 +226,8 @@ class CDU14IntegrationTest {
                 .andExpect(status().isOk());
 
             // Verificação
-            // NOTA: A lógica de verificação de impactos não está funcionando como esperado.
-            // O sistema deveria mudar o status para REVISAO_CADASTRO_HOMOLOGADA, mas está mudando para MAPA_HOMOLOGADO.
-            // O teste foi ajustado para refletir o comportamento atual (com bug).
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
     }
 }

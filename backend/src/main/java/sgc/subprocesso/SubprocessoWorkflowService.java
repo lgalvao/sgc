@@ -368,7 +368,7 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        Unidade unidadeOrigem = sp.getUnidade();
+        Unidade unidadeOrigem = usuario.getUnidade();
         Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
 
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
