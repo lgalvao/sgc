@@ -12,7 +12,7 @@
       :responsavel-nome="responsavelDetalhes?.nome || ''"
       :responsavel-ramal="responsavelDetalhes?.ramal || ''"
       :responsavel-email="responsavelDetalhes?.email || ''"
-      :unidade-atual="SubprocessoDetalhes?.unidadeAtual || ''"
+      :unidade-atual="unidadeOriginal?.sigla || ''"
       :perfil-usuario="perfilStore.perfilSelecionado"
       :is-subprocesso-em-andamento="isSubprocessoEmAndamento"
       @alterar-data-limite="abrirModalAlterarDataLimite"
@@ -56,7 +56,7 @@
         <tbody>
           <tr
             v-for="movement in movements"
-            :key="movement.id"
+            :key="movement.codigo"
           >
             <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
             <td>{{ movement.unidadeOrigem }}</td>
@@ -70,7 +70,7 @@
 
   <SubprocessoModal
     :mostrar-modal="mostrarModalAlterarDataLimite"
-    :data-limite-atual="dataLimiteAtual"
+    :data-limite-atual="dataLimiteAtual || new Date()"
     :etapa-atual="etapaAtual"
     :situacao-etapa-atual="SubprocessoDetalhes?.situacao || 'Não informado'"
     @fechar-modal="fecharModalAlterarDataLimite"
@@ -95,6 +95,7 @@ import {
   Processo,
   Servidor,
   Subprocesso,
+  SituacaoSubprocesso,
   TipoProcesso,
   TipoResponsabilidade,
   Unidade
@@ -118,7 +119,7 @@ const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
-const {processos} = storeToRefs(processosStore)
+const { processosPainel } = storeToRefs(processosStore)
 
 // Estados reativos para o modal de alteração de data limite
 const mostrarModalAlterarDataLimite = ref(false)
@@ -168,15 +169,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 
   if (atribuicaoVigente) {
     // Retorna uma nova unidade com o responsável da atribuição temporária
-    return {
-      ...unidade,
-      responsavel: {
-        idServidor: atribuicaoVigente.idServidor,
-        tipo: TipoResponsabilidade.ATRIBUICAO, // Usar o enum
-        dataInicio: new Date(atribuicaoVigente.dataInicio),
-        dataFim: new Date(atribuicaoVigente.dataTermino),
-      }
-    };
+    return { ...unidade, responsavel: atribuicaoVigente.servidor };
   }
 
   // Se não houver atribuição temporária vigente, retorna a unidade original
@@ -191,10 +184,10 @@ const titularDetalhes = computed<Servidor | null>(() => {
 });
 
 const responsavelDetalhes = computed<Servidor | null>(() => {
-  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.idServidor) {
+  if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel) {
     return null;
   }
-  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.idServidor) || null;
+  return unidadeComResponsavelDinamico.value.responsavel;
 });
 
 const situacaoUnidadeNoProcesso = computed<string>(() => {
@@ -203,7 +196,14 @@ const situacaoUnidadeNoProcesso = computed<string>(() => {
 
 const mapa = computed<Mapa | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !processoAtual.value) return null;
-  return mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.sigla, processoAtual.value.codigo) || null;
+  const mapaEncontrado = mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.codigo);
+  if (mapaEncontrado) {
+    return {
+      ...mapaEncontrado,
+      unidade: unidadeComResponsavelDinamico.value
+    };
+  }
+  return null;
 });
 
 // Computed para verificar se o subprocesso está em andamento
@@ -225,12 +225,12 @@ const etapaAtual = computed(() => {
   if (!SubprocessoDetalhes.value) return null;
 
   // Se etapa 1 ainda não terminou, é a etapa 1
-  if (!SubprocessoDetalhes.value.unidade.dataFimEtapa1) {
+  if (!SubprocessoDetalhes.value.dataFimEtapa1) {
     return 1;
   }
 
   // Se etapa 1 terminou mas etapa 2 não começou ou não terminou, é a etapa 2
-  if (SubprocessoDetalhes.value.unidade.dataLimiteEtapa2 && !SubprocessoDetalhes.value.unidade.dataFimEtapa2) {
+  if (SubprocessoDetalhes.value.dataLimiteEtapa2) {
     return 2;
   }
 
@@ -238,16 +238,16 @@ const etapaAtual = computed(() => {
   return null;
 });
 
-const dataLimiteAtual = computed(() => {
-  if (!SubprocessoDetalhes.value || !etapaAtual.value) return null;
+const dataLimiteAtual = computed<Date>(() => {
+  if (!SubprocessoDetalhes.value || !etapaAtual.value) return new Date();
 
   if (etapaAtual.value === 1) {
-    return SubprocessoDetalhes.value.unidade.dataLimiteEtapa1;
+    return new Date(SubprocessoDetalhes.value.dataLimite);
   } else if (etapaAtual.value === 2) {
-    return SubprocessoDetalhes.value.unidade.dataLimiteEtapa2;
+    return new Date(SubprocessoDetalhes.value.dataLimiteEtapa2);
   }
 
-  return null;
+  return new Date();
 });
 
 // Computed properties movidos para os componentes específicos
@@ -311,7 +311,7 @@ function fecharModalAlterarDataLimite() {
 }
 
 async function confirmarAlteracaoDataLimite(novaData: string) {
-  if (!novaData || !SubprocessoDetalhes.value) {
+  if (!novaData || !SubprocessoDetalhes.value || !unidadeOriginal.value) {
     return;
   }
 
@@ -319,7 +319,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     // Chamar a store para atualizar a data limite
     await processosStore.alterarDataLimiteSubprocesso({
       idProcesso: processoAtual.value?.codigo || 0,
-      unidade: SubprocessoDetalhes.value.unidade,
+      unidade: unidadeOriginal.value.sigla,
       etapa: etapaAtual.value || 1,
       novaDataLimite: parseDate(novaData) || new Date()
     });

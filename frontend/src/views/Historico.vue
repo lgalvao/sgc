@@ -29,10 +29,10 @@ import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
 import {Perfil} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {type Processo, type ProcessoResumo} from '@/types/tipos';
+import {type ProcessoResumo} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
 
-type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';
+type SortCriteria = keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -42,46 +42,30 @@ const perfil = usePerfilStore()
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
-const processosFinalizados = ref<Processo[]>([]);
+const processosFinalizados = ref<ProcessoResumo[]>([]);
 
 onMounted(async () => {
   await processosStore.fetchProcessosFinalizados();
 });
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosStore.processosFinalizados].sort((a: Processo, b: Processo) => {
-
+  return [...processosStore.processosFinalizados].sort((a: ProcessoResumo, b: ProcessoResumo) => {
     if (criterio.value === 'unidades') {
-      // TODO: Implementar lógica de ordenação por unidades
-      return 0;
+      // Lógica de ordenação para 'unidades'
+      const aUnidades = a.unidades ? a.unidades.length : 0;
+      const bUnidades = b.unidades ? b.unidades.length : 0;
+      return (aUnidades - bUnidades) * (asc.value ? 1 : -1);
     } else if (criterio.value === 'dataFinalizacao') {
-      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : null;
-      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : null;
-
-      if (dateA === null && dateB === null) return 0;
-      if (dateA === null) return asc.value ? -1 : 1;
-      if (dateB === null) return asc.value ? 1 : -1;
+      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : 0;
+      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : 0;
       return (dateA - dateB) * (asc.value ? 1 : -1);
-    } else if (criterio.value === 'descricao') {
-      const valA = String(a.descricao);
-      const valB = String(b.descricao);
+    } else {
+      const valA = String(a[criterio.value as keyof ProcessoResumo]);
+      const valB = String(b[criterio.value as keyof ProcessoResumo]);
       if (valA < valB) return asc.value ? -1 : 1;
       if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
-    } else if (criterio.value === 'tipo') {
-      const valA = String(a.tipo);
-      const valB = String(b.tipo);
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
-    } else if (criterio.value === 'situacao') {
-      const valA = String(a.situacao);
-      const valB = String(b.situacao);
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
     }
-    return 0; // Fallback para garantir que todos os caminhos retornem um valor
+    return 0;
   });
 });
 

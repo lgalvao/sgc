@@ -217,7 +217,6 @@ export interface AtribuicaoTemporaria {
     dataInicio: string;
     dataFim: string;
     dataTermino: string;
-    idServidor?: number;
 }
 
 export interface UnidadeSnapshot {
@@ -262,8 +261,6 @@ export interface UnidadeParticipante {
     codUnidade: number;
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
-    situacao: SituacaoSubprocesso;
-    sugestoes: string;
     dataLimite: string;
     filhos: UnidadeParticipante[];
 }
@@ -355,6 +352,6 @@ export interface MapaAjuste {
 }
 
 export interface ImpactoMapa {
-    temImpacto: boolean;
+    temImpactos: boolean;
     // Adicionar outras propriedades se houver, como a lista de impactos
 }
