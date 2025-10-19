@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
@@ -106,14 +107,14 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoSeguranca.checarAcesso(authentication, #idProcesso)")
-    public ProcessoDetalheDto obterDetalhes(Long idProcesso) {
+    public ProcessoDetalheDto obterDetalhes(Long idProcesso, Authentication authentication) {
         Processo processo = processoRepo.findById(idProcesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", idProcesso));
 
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByProcessoCodigo(idProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(idProcesso);
 
-        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
+        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos, authentication);
     }
 
     @Transactional(readOnly = true)
