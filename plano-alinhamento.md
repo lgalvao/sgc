@@ -23,7 +23,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 13 | Analisar Cadastro | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 14 | Analisar Revisão Cadastro | ✅ | ✅ | **Excelente** | Cobertura de integração completa adicionada. |
 | 15 | Manter Mapa | ✅ | ✅ | **Bom** | Divergência na estratégia de salvamento testada (individual vs. lote). |
-| 16 | Ajustar Mapa | ✅ | ✅ | **Parcial** | Teste de integração muito limitado, não cobre o ajuste do mapa. |
+| 16 | Ajustar Mapa | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para a lógica de ajuste (CRUD) do mapa. |
 | 17 | Disponibilizar Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 18 | Visualizar Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 19 | Validar Mapa | ✅ | ✅ | **Excelente** | Teste de integração corrigido e alinhado com o requisito. |
@@ -180,9 +180,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-16.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-16.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU16IntegrationTest.java`
-- **Análise:** A cobertura é parcial. O teste E2E é bom, cobrindo a visibilidade do botão de "Impactos", o CRUD de competências no contexto de um ajuste e a ação final de "Disponibilizar". Contudo, o teste de integração do backend é muito limitado: ele testa apenas a etapa final de submissão do mapa ajustado, validando a mudança de status para 'MAPA_DISPONIBILIZADO'. Ele não testa o processo de ajuste em si (as operações de CRUD no mapa) nem a verificação de impactos no contexto deste caso de uso.
+- **Análise:** O alinhamento agora é excelente. A lacuna no teste de integração foi resolvida adicionando uma suíte de testes completa que cobre as operações de CRUD (criação, edição, remoção) de competências e suas associações durante o ajuste do mapa. Os novos testes garantem que a lógica de negócio principal do caso de uso está validada, complementando o teste E2E e o teste já existente para a submissão final.
 - **Status:** Concluído
-- **Observações:** A principal lacuna está no teste de integração, que não valida a lógica central de ajuste do mapa, dependendo implicitamente da cobertura do CDU-15.
+- **Observações:** A cobertura de integração agora é robusta e alinhada com os requisitos.
 
 ### CDU-17: Disponibilizar Mapa de Competências
 - **Requisito:** `reqs/cdu-17.md`
