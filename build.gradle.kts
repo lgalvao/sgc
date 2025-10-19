@@ -23,9 +23,6 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_21
     }
 
-    tasks.withType<BootJar> {
-        enabled = false
-    }
 
     tasks.withType<BootRun> {
     }
