@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
@@ -67,8 +66,8 @@ public class ProcessoControle {
      * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
      */
     @GetMapping("/{id}/detalhes")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id, Authentication authentication) {
-        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id, authentication);
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id) {
+        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id);
         return ResponseEntity.ok(detalhes);
     }
 

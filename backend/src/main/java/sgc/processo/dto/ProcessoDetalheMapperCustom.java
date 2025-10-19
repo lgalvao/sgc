@@ -1,19 +1,19 @@
 package sgc.processo.dto;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
-import sgc.sgrh.Usuario;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementação customizada para mapeamento complexo de Processo para ProcessoDetalheDto.
@@ -24,11 +24,9 @@ import java.util.Map;
 public class ProcessoDetalheMapperCustom {
 
     private final ProcessoDetalheMapperInterface processoDetalheMapperInterface;
-    private final UnidadeRepo unidadeRepo;
 
-    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface, UnidadeRepo unidadeRepo) {
+    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
         this.processoDetalheMapperInterface = processoDetalheMapperInterface;
-        this.unidadeRepo = unidadeRepo;
     }
 
     /**
@@ -37,44 +35,11 @@ public class ProcessoDetalheMapperCustom {
      */
     public ProcessoDetalheDto toDetailDTO(Processo p,
                                          List<UnidadeProcesso> unidadesProcesso,
-                                         List<Subprocesso> subprocessos,
-                                         Authentication authentication) {
+                                         List<Subprocesso> subprocessos) {
         if (p == null) return null;
 
         // Mapeia os dados básicos do processo usando MapStruct
         ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
-
-        // Lógica de controle de tela
-        boolean isGestor = authentication.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"));
-
-        boolean podeFinalizar = authentication.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        boolean podeHomologarCadastro = false;
-        boolean podeHomologarMapa = false;
-
-        if (isGestor) {
-            Usuario usuario = (Usuario) authentication.getPrincipal();
-            Long unidadeGestorId = usuario.getUnidade().getCodigo();
-
-            List<Long> unidadesSubordinadasIds = unidadeRepo.findByUnidadeSuperiorCodigo(unidadeGestorId)
-                .stream()
-                .map(Unidade::getCodigo)
-                .toList();
-
-            if (!unidadesSubordinadasIds.isEmpty()) {
-                podeHomologarCadastro = subprocessos.stream()
-                    .filter(sp -> unidadesSubordinadasIds.contains(sp.getUnidade().getCodigo()))
-                    .anyMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
-                                   sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-
-                podeHomologarMapa = subprocessos.stream()
-                    .filter(sp -> unidadesSubordinadasIds.contains(sp.getUnidade().getCodigo()))
-                    .anyMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_VALIDADO ||
-                                   sp.getSituacao() == SituacaoSubprocesso.MAPA_COM_SUGESTOES);
-            }
-        }
 
         Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
 
@@ -127,6 +92,32 @@ public class ProcessoDetalheMapperCustom {
                 resumoSubprocessos.add(resumoDto);
             }
         }
+
+        // Lógica para os botões condicionais
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean allSubprocessosHomologados = subprocessos != null && !subprocessos.isEmpty() && subprocessos.stream()
+                .allMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_HOMOLOGADO);
+
+        boolean podeFinalizar = isAdmin
+                && p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO
+                && allSubprocessosHomologados;
+
+        final Set<SituacaoSubprocesso> situacoesHomologacaoCadastro = Set.of(
+            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
+            SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+        );
+        boolean podeHomologarCadastro = subprocessos != null && subprocessos.stream()
+                .anyMatch(sp -> situacoesHomologacaoCadastro.contains(sp.getSituacao()));
+
+        final Set<SituacaoSubprocesso> situacoesHomologacaoMapa = Set.of(
+            SituacaoSubprocesso.MAPA_VALIDADO,
+            SituacaoSubprocesso.MAPA_COM_SUGESTOES
+        );
+        boolean podeHomologarMapa = subprocessos != null && subprocessos.stream()
+                .anyMatch(sp -> situacoesHomologacaoMapa.contains(sp.getSituacao()));
 
         return ProcessoDetalheDto.builder()
             .codigo(dto.getCodigo())

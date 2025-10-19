@@ -20,8 +20,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
         UnidadeRepo unidadeRepo = BeanUtil.getBean(UnidadeRepo.class);
+        // A responsabilidade de criar a Unidade agora é do próprio teste.
         Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
-                .orElseThrow(() -> new IllegalStateException("Unidade de teste não encontrada com ID: " + customUser.unidadeId()));
+                .orElseThrow(() -> new IllegalStateException("A Unidade de teste com ID " + customUser.unidadeId() + " não foi encontrada. Certifique-se de que ela foi criada no método @BeforeEach do teste."));
 
         Usuario principal = new Usuario(
                 customUser.tituloEleitoral(),
