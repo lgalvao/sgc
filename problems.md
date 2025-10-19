@@ -1,17 +1,16 @@
-# Resumo dos Problemas nos Testes Unitários
+# E2E Test Timeout Issue
 
-Durante a execução dos testes unitários, foram identificados problemas persistentes em dois arquivos de teste principais, que parecem estar relacionados a uma configuração fundamental incorreta no ambiente de teste.
+## Problem
 
-## 1. `frontend/src/stores/__tests__/subprocessos.spec.ts`
+The E2E tests are consistently timing out, preventing any tests from running to completion. This appears to be caused by a communication failure between the frontend and backend during the test execution.
 
-- **Erro Recorrente**: `AssertionError: expected "spy" to be called with arguments: [ 1 ]`
-- **Causa Provável**: Os testes para as ações da `useSubprocessosStore` (ex: `disponibilizarCadastro`, `devolverCadastro`, etc.) dependem do estado de outra store, a `useProcessosStore`. Especificamente, eles precisam acessar `processosStore.processoDetalhe.codigo` para chamar a ação `fetchProcessoDetalhe` com o ID correto. As tentativas de mockar essa dependência não foram bem-sucedidas, pois o spy para `fetchProcessoDetalhe` nunca é chamado com o argumento esperado. Isso sugere que o estado mockado da `processosStore` não está sendo injetado ou lido corretamente dentro das ações da `subprocessosStore` no ambiente de teste.
+## Debugging Steps Taken
 
-## 2. `frontend/src/stores/__tests__/impacto.spec.ts`
+1.  **Corrected Vite Proxy Port:** The `vite.config.js` file was updated to proxy API requests to port `10000`, matching the backend's configured port.
+2.  **Removed Timeouts from Playwright Config:** As an initial test, all timeouts were removed from `playwright.config.ts`. This did not resolve the issue.
+3.  **Manual Server Startup:** The backend and frontend servers were started manually to ensure they were running before the E2E tests were executed. This also resulted in a timeout.
+4.  **Process Management:** Confirmed that there were no orphaned processes running on the required ports (10000 and 5173) before running the tests.
 
-- **Erro Recorrente**: `TypeError: Cannot read properties of undefined (reading 'fetchProcessoDetalhe')`
-- **Causa Provável**: Similar ao problema anterior, os testes para a lógica de impacto dependem de múltiplas stores (`useProcessosStore`, `useMapasStore`, etc.). O erro indica que a instância da `processosStore` está `undefined` no momento em que o teste tenta acessá-la. Isso aponta para um problema na forma como as stores mockadas são injetadas e disponibilizadas para outras stores durante a execução dos testes do Vitest. A configuração do `beforeEach` parece estar correta, mas a injeção de dependência entre as stores no Pinia não está funcionando como esperado no ambiente de teste.
+## Conclusion
 
-## Conclusão
-
-Ambos os problemas indicam uma falha na configuração do ambiente de teste do Vitest para lidar com a injeção de dependências entre stores Pinia. A abordagem de mock para as stores precisa ser reavaliada para garantir que o estado e as ações de uma store mockada estejam acessíveis para outra store que dependa dela.
+Despite these efforts, the E2E tests continue to time out. This suggests a deeper configuration or environmental issue that is preventing the frontend and backend from communicating effectively within the test environment.
