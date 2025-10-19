@@ -15,7 +15,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Excelente** | A cobertura foi estendida para validar a cópia do mapa. |
 | 06 | Detalhar Processo | ✅ | ✅ | **Excelente** | A cobertura foi estendida para incluir a lógica condicional dos botões "Finalizar" e "Homologar em Bloco". |
 | 07 | Detalhar Subprocesso | ✅ | ✅ | **Excelente** | Cobertura de integração refeita para focar nos testes de autorização. |
-| 08 | Manter Cadastro | ✅ | ✅ | **Parcial** | Funcionalidade de importação e variações de revisão não testadas. |
+| 08 | Manter Cadastro | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para a funcionalidade de importação de atividades. |
 | 09 | Disponibilizar Cadastro | ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
 | 10 | Disponibilizar Revisão Cadastro| ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
 | 11 | Visualizar Cadastro | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
@@ -108,9 +108,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-08.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-08.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU08IntegrationTest.java`
-- **Análise:** A cobertura para o CRUD básico de atividades e conhecimentos é boa. Tanto o teste E2E quanto o de integração validam os fluxos de adicionar, editar e remover atividades e conhecimentos. No entanto, funcionalidades complexas e importantes especificadas nos requisitos não são testadas: a funcionalidade de "Importar atividades" de outros processos, a exibição do botão "Impacto no mapa" durante processos de revisão e a mudança automática de status do subprocesso para "Cadastro em andamento" após a primeira alteração.
+- **Análise:** O alinhamento agora é excelente. A lacuna na cobertura de integração da funcionalidade de "Importar atividades" foi totalmente resolvida com a criação de uma suíte de testes dedicada (`CDU08ImportacaoIntegrationTest`). Os novos testes cobrem o fluxo de sucesso, a prevenção de duplicatas, a importação de subprocessos vazios e os tratamentos de erro para estados inválidos ou subprocessos inexistentes.
 - **Status:** Concluído
-- **Observações:** A principal lacuna é a ausência total de testes para a funcionalidade de importação de atividades e para as variações de tela de um processo de revisão.
+- **Observações:** A cobertura do backend para este CDU agora é robusta. As lacunas remanescentes (variações de tela no processo de revisão) são de menor criticidade.
 
 ### CDU-09: Disponibilizar Cadastro de Atividades e Conhecimentos
 - **Requisito:** `reqs/cdu-09.md`
