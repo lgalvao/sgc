@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useMapasStore} from '../mapas';
 import {useUnidadesStore} from '../unidades';
@@ -7,64 +7,61 @@ import {useRevisaoStore} from '../revisao';
 import {mockUnidade, mockProcessoDetalhe} from "@/test-utils/mocks";
 
 // Mock the stores
-vi.mock('@/stores/mapas');
-vi.mock('@/stores/unidades');
-vi.mock('@/stores/processos');
-vi.mock('@/stores/revisao');
+const mockMapasStore = {
+    getMapaByUnidadeId: vi.fn().mockReturnValue({competencias: []}),
+};
+const mockUnidadesStore = {
+    pesquisarUnidade: vi.fn().mockReturnValue(mockUnidade),
+};
+const mockProcessosStore = {
+    fetchProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
+    processoDetalhe: mockProcessoDetalhe,
+};
+const mockRevisaoStore = {
+    mudancasParaImpacto: [],
+};
+
+vi.mock('@/stores/mapas', () => ({ useMapasStore: vi.fn(() => mockMapasStore) }));
+vi.mock('@/stores/unidades', () => ({ useUnidadesStore: vi.fn(() => mockUnidadesStore) }));
+vi.mock('@/stores/processos', () => ({ useProcessosStore: vi.fn(() => mockProcessosStore) }));
+vi.mock('@/stores/revisao', () => ({ useRevisaoStore: vi.fn(() => mockRevisaoStore) }));
 
 describe('Impacto Store Logic', () => {
-    let mapasStore: any;
-    let unidadesStore: any;
-    let processosStore: any;
-    let revisaoStore: any;
-
     beforeEach(() => {
         setActivePinia(createPinia());
+    });
 
-        mapasStore = {
-            getMapaByUnidadeId: vi.fn().mockReturnValue({competencias: []}),
-        };
-        unidadesStore = {
-            pesquisarUnidade: vi.fn().mockReturnValue(mockUnidade),
-        };
-        processosStore = {
-            fetchProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
-            processoDetalhe: mockProcessoDetalhe,
-        };
-        revisaoStore = {
-            mudancasParaImpacto: [],
-        };
-
-        vi.mocked(useMapasStore).mockReturnValue(mapasStore);
-        vi.mocked(useUnidadesStore).mockReturnValue(unidadesStore);
-        vi.mocked(useProcessosStore).mockReturnValue(processosStore);
-        vi.mocked(useRevisaoStore).mockReturnValue(revisaoStore);
-
-
+    afterEach(() => {
         vi.clearAllMocks();
+        mockRevisaoStore.mudancasParaImpacto = []; // Reset state
     });
 
     it('should fetch process details', async () => {
+        const processosStore = useProcessosStore();
         await processosStore.fetchProcessoDetalhe(1);
-        expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
+        expect(mockProcessosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
     });
 
     it('should get mapa by unidade id', () => {
+        const mapasStore = useMapasStore();
         mapasStore.getMapaByUnidadeId(1);
-        expect(mapasStore.getMapaByUnidadeId).toHaveBeenCalledWith(1);
+        expect(mockMapasStore.getMapaByUnidadeId).toHaveBeenCalledWith(1);
     });
 
     it('should search for a unit', () => {
+        const unidadesStore = useUnidadesStore();
         unidadesStore.pesquisarUnidade('UNID');
-        expect(unidadesStore.pesquisarUnidade).toHaveBeenCalledWith('UNID');
+        expect(mockUnidadesStore.pesquisarUnidade).toHaveBeenCalledWith('UNID');
     });
 
     it('should have no impact when there are no changes', () => {
+        const revisaoStore = useRevisaoStore();
         expect(revisaoStore.mudancasParaImpacto).toEqual([]);
     });
 
     it('should have impact when there are changes', () => {
-        revisaoStore.mudancasParaImpacto = [
+        const revisaoStore = useRevisaoStore();
+        mockRevisaoStore.mudancasParaImpacto = [
             {
                 codigo: 1,
                 tipo: 'AtividadeAdicionada',
