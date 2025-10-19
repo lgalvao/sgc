@@ -8,6 +8,7 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
@@ -31,6 +32,7 @@ public class SubprocessoMapaService {
     private final AtividadeRepo atividadeRepo;
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    private final CompetenciaRepo competenciaRepo;
 
     @Transactional
     public void salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, Long usuarioTituloEleitoral) {
@@ -38,28 +40,34 @@ public class SubprocessoMapaService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
-                sp.getSituacao() != SituacaoSubprocesso.MAPA_DISPONIBILIZADO &&
                 sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
             throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: " + sp.getSituacao());
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", idSubprocesso);
 
+        // Atualiza as descrições
         for (CompetenciaAjusteDto compDto : competencias) {
-            List<CompetenciaAtividade> linksExistentes = competenciaAtividadeRepo.findByCompetenciaCodigo(compDto.getCompetenciaId());
-            if (linksExistentes != null && !linksExistentes.isEmpty()) {
-                competenciaAtividadeRepo.deleteAll(linksExistentes);
+            competenciaRepo.findById(compDto.getCompetenciaId()).ifPresent(c -> c.setDescricao(compDto.getNome()));
+            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
+                atividadeRepo.findById(ativDto.getAtividadeId()).ifPresent(a -> a.setDescricao(ativDto.getNome()));
             }
         }
 
+        // Recria os Vínculos
+        competenciaAtividadeRepo.deleteByCompetenciaMapaCodigo(sp.getMapa().getCodigo());
+
         for (CompetenciaAjusteDto compDto : competencias) {
+            var competencia = competenciaRepo.findById(compDto.getCompetenciaId())
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada: " + compDto.getCompetenciaId()));
+
             for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                boolean deveVincular = ativDto.getConhecimentos().stream().anyMatch(ConhecimentoAjusteDto::isIncluido);
-                if (deveVincular) {
-                    CompetenciaAtividade novoLink = new CompetenciaAtividade();
-                    novoLink.setId(new CompetenciaAtividade.Id(compDto.getCompetenciaId(), ativDto.getAtividadeId()));
-                    competenciaAtividadeRepo.save(novoLink);
-                }
+                var atividade = atividadeRepo.findById(ativDto.getAtividadeId())
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Atividade não encontrada: " + ativDto.getAtividadeId()));
+
+                var id = new CompetenciaAtividade.Id(ativDto.getAtividadeId(), compDto.getCompetenciaId());
+                CompetenciaAtividade novoLink = new CompetenciaAtividade(id, competencia, atividade);
+                competenciaAtividadeRepo.save(novoLink);
             }
         }
 
