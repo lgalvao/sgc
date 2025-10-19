@@ -8,7 +8,7 @@ export default defineConfig({
     timeout: 12000,
     testDir: './e2e',
     fullyParallel: true,
-    reporter: "dot",
+    reporter: [['html']],
     webServer: {
         command: 'npm run dev',
         url: 'http://localhost:5173/',
