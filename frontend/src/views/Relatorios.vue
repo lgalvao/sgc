@@ -145,10 +145,7 @@
                 <thead>
                   <tr>
                     <th>Unidade</th>
-                    <th>Processo</th>
                     <th>Competências</th>
-                    <th>Data Criação</th>
-                    <th>Situação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,10 +154,7 @@
                     :key="mapa.id"
                   >
                     <td>{{ mapa.unidade }}</td>
-                    <td>{{ mapa.idProcesso }}</td>
                     <td>{{ mapa.competencias?.length || 0 }}</td>
-                    <td>{{ formatarData(mapa.dataCriacao) }}</td>
-                    <td>{{ mapa.situacao }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -360,10 +354,10 @@ const mapasVigentes = computed(() => {
   const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === SituacaoProcesso.FINALIZADO)
   const idsProcessosFinalizados = processosFinalizados.map(p => p.codigo)
 
-  if (mapasStore.mapaCompleto && idsProcessosFinalizados.includes(mapasStore.mapaCompleto.idProcesso) && mapasStore.mapaCompleto.competencias && mapasStore.mapaCompleto.competencias.length > 0) {
+  if (mapasStore.mapaCompleto && mapasStore.mapaCompleto.competencias && mapasStore.mapaCompleto.competencias.length > 0) {
     return [{
-      ...mapasStore.mapaCompleto,
-      unidade: mapasStore.mapaCompleto.unidade.sigla,
+      ...(mapasStore.mapaCompleto as any),
+      unidade: (mapasStore.mapaCompleto as any).unidade.sigla,
       id: mapasStore.mapaCompleto.codigo
     }]
   }
@@ -464,7 +458,7 @@ const calcularPercentualConcluido = (processo: ProcessoResumo) => {
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
   const total = processo.unidades?.length || 0;
   if (total === 0) return 0;
-  const concluidos = processo.unidades?.filter(u => u.situacaoSubprocesso === SituacaoSubprocesso.CONCLUIDO).length || 0;
+  const concluidos = processo.unidades?.filter(u => (u as any).situacaoSubprocesso === SituacaoSubprocesso.CONCLUIDO).length || 0;
   return Math.round((concluidos / total) * 100);
 }
 
@@ -483,10 +477,7 @@ const abrirModalAndamentoGeral = () => {
 const exportarMapasVigentes = () => {
   const dados = mapasVigentes.value.map(mapa => ({
     Unidade: mapa.unidade,
-    Processo: mapa.idProcesso,
-    Competencias: mapa.competencias?.length || 0,
-    'Data Criacao': formatarData(new Date(mapa.dataCriacao)),
-    Situacao: mapa.situacao
+    Competencias: mapa.competencias?.length || 0
   }))
 
   const csv = gerarCSV(dados)

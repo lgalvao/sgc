@@ -12,7 +12,7 @@ export const useServidoresStore = defineStore('servidores', {
     getters: {
         getServidorById: (state) => (id: number): Servidor | undefined => {
             // O mock e o tipo real podem estar em conflito (id vs codigo). O teste usa 'id'.
-            return state.servidores.find(s => (s.codigo || s.id) === id);
+            return state.servidores.find(s => s.codigo === id);
         }
     },
     actions: {}

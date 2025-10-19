@@ -72,7 +72,7 @@
     :mostrar-modal="mostrarModalAlterarDataLimite"
     :data-limite-atual="dataLimiteAtual || new Date()"
     :etapa-atual="etapaAtual"
-    :situacao-etapa-atual="SubprocessoDetalhes?.situacao || 'Não informado'"
+    :situacao-etapa-atual="SubprocessoDetalhes?.situacao as any || 'Não informado'"
     @fechar-modal="fecharModalAlterarDataLimite"
     @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
@@ -101,7 +101,6 @@ import {
   Unidade
 } from "@/types/tipos";
 import {formatDateTimeBR, parseDate} from '@/utils';
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
@@ -190,18 +189,15 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
   return unidadeComResponsavelDinamico.value.responsavel;
 });
 
-const situacaoUnidadeNoProcesso = computed<string>(() => {
-  return SubprocessoDetalhes.value?.situacao || SITUACOES_SUBPROCESSO.NAO_INICIADO;
+const situacaoUnidadeNoProcesso = computed(() => {
+  return SubprocessoDetalhes.value?.situacao || SituacaoSubprocesso.NAO_INICIADO;
 });
 
 const mapa = computed<Mapa | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !processoAtual.value) return null;
   const mapaEncontrado = mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.codigo);
   if (mapaEncontrado) {
-    return {
-      ...mapaEncontrado,
-      unidade: unidadeComResponsavelDinamico.value
-    };
+    return mapaEncontrado as any;
   }
   return null;
 });

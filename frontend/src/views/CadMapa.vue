@@ -168,9 +168,9 @@
                 >
                   <div class="card-body d-flex align-items-center">
                     <input
-                      :id="`atv-${atividade.id}`"
+                      :id="`atv-${atividade.codigo}`"
                       v-model="atividadesSelecionadas"
-                      :value="atividade.id"
+                      :value="atividade.codigo"
                       class="form-check-input me-2"
                       data-testid="atividade-checkbox"
                       hidden
@@ -393,13 +393,12 @@ import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAlertasStore} from '@/stores/alertas'
-import {Atividade, Competencia, Perfil, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Competencia, Perfil, SalvarMapaRequest, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 const route = useRoute()
 const mapasStore = useMapasStore()
-const {mapas} = storeToRefs(mapasStore)
+const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
 const notificacoesStore = useNotificacoesStore()
 const perfilStore = usePerfilStore()
@@ -424,7 +423,7 @@ const podeVerImpacto = computed(() => {
   const situacao = subprocesso.value.situacaoSubprocesso;
 
   const isPermittedProfile = perfil === Perfil.ADMIN;
-  const isCorrectSituation = situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA || situacao === SITUACOES_SUBPROCESSO.MAPA_AJUSTADO;
+  const isCorrectSituation = situacao === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS || situacao === SituacaoSubprocesso.MAPA_AJUSTADO;
 
   return isPermittedProfile && isCorrectSituation;
 });
@@ -479,22 +478,24 @@ const atividades = computed<Atividade[]>(() => {
   }
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
-const mapa = computed(() => mapas.value.find(m => m.unidade === siglaUnidade.value && m.idProcesso === idProcesso.value))
-const competencias = ref<Competencia[]>([])
-watch(mapa, (novoMapa) => {
+const mapaEmEdicao = ref<SalvarMapaRequest>({ competencias: [] });
+const competencias = ref<Competencia[]>([]);
+
+watch(mapaCompleto, (novoMapa) => {
   if (novoMapa) {
-    competencias.value = [...novoMapa.competencias];
+    competencias.value = JSON.parse(JSON.stringify(novoMapa.competencias));
+    mapaEmEdicao.value.competencias = JSON.parse(JSON.stringify(novoMapa.competencias));
   }
-}, {immediate: true});
+}, { immediate: true, deep: true });
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
-function toggleAtividade(id: number) {
-  const index = atividadesSelecionadas.value.indexOf(id);
+function toggleAtividade(codigo: number) {
+  const index = atividadesSelecionadas.value.indexOf(codigo);
   if (index > -1) {
     atividadesSelecionadas.value.splice(index, 1);
   } else {
-    atividadesSelecionadas.value.push(id);
+    atividadesSelecionadas.value.push(codigo);
   }
 }
 
@@ -544,13 +545,13 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 
-function descricaoAtividade(id: number): string {
-  const atv = atividades.value.find(a => a.id === id)
+function descricaoAtividade(codigo: number): string {
+  const atv = atividades.value.find(a => a.codigo === codigo)
   return atv ? atv.descricao : 'Atividade não encontrada'
 }
 
 function getConhecimentosTooltip(atividadeId: number): string {
-  const atividade = atividades.value.find(a => a.id === atividadeId)
+  const atividade = atividades.value.find(a => a.codigo === atividadeId)
   if (!atividade || !atividade.conhecimentos.length) {
     return 'Nenhum conhecimento cadastrado'
   }
@@ -562,8 +563,8 @@ function getConhecimentosTooltip(atividadeId: number): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }
 
-function getAtividadeCompleta(id: number): Atividade | undefined {
-  return atividades.value.find(a => a.id === id)
+function getAtividadeCompleta(codigo: number): Atividade | undefined {
+  return atividades.value.find(a => a.codigo === codigo)
 }
 
 function getConhecimentosModal(atividade: Atividade): string {
@@ -582,41 +583,27 @@ function adicionarOuAtualizarCompetencia() {
   if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
 
   if (competenciaSendoEditada.value) {
-    const index = competencias.value.findIndex(c => c.codigo === competenciaSendoEditada.value!.codigo);
+    const index = mapaEmEdicao.value.competencias.findIndex(c => c.codigo === competenciaSendoEditada.value!.codigo);
     if (index !== -1) {
-      competencias.value[index].descricao = novaCompetencia.value.descricao;
-      competencias.value[index].atividadesAssociadas = [...atividadesSelecionadas.value];
+      mapaEmEdicao.value.competencias[index].descricao = novaCompetencia.value.descricao;
+      (mapaEmEdicao.value.competencias[index] as any).atividadesAssociadas = [...atividadesSelecionadas.value];
     }
   } else {
-    competencias.value.push({
-      codigo: Date.now(),
+    mapaEmEdicao.value.competencias.push({
       descricao: novaCompetencia.value.descricao,
-      atividadesAssociadas: [...atividadesSelecionadas.value]
+      atividades: atividades.value.filter(a => atividadesSelecionadas.value.includes(a.codigo)).map(a => ({
+        descricao: a.descricao,
+        conhecimentos: a.conhecimentos.map(c => ({ descricao: c.descricao }))
+      }))
     });
   }
 
-  // Persistir as mudanças no mapaStore
-  if (mapa.value) {
-    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
-  } else {
-    // Se não houver mapa, cria um novo.
-    const novoMapa = {
-      id: Date.now(),
-      unidade: siglaUnidade.value,
-      idProcesso: idProcesso.value,
-      competencias: competencias.value,
-      situacao: 'em_andamento',
-      dataCriacao: new Date(),
-      dataDisponibilizacao: null,
-      dataFinalizacao: null,
-    };
-    mapas.value.push(novoMapa);
-    mapasStore.adicionarMapa(novoMapa);
+  if (idSubprocesso.value) {
+    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
   }
-  
-  // 10. Se a situação do subprocesso ainda for 'Cadastro homologado', alterar para 'Mapa criado'
-  if (subprocesso.value && subprocesso.value.situacaoSubprocesso === SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO) {
-    subprocesso.value.situacaoSubprocesso = SITUACOES_SUBPROCESSO.MAPA_CRIADO;
+
+  if (subprocesso.value && subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS) {
+    subprocesso.value.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_EM_ANDAMENTO;
   }
 
   novaCompetencia.value.descricao = '';
@@ -630,20 +617,8 @@ function adicionarCompetenciaEFecharModal() {
 }
 
 function finalizarEdicao() {
-  if (mapa.value) {
-    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value})
-  } else {
-    const novoMapa = {
-      id: Date.now(),
-      unidade: siglaUnidade.value,
-      idProcesso: idProcesso.value,
-      competencias: competencias.value,
-      situacao: 'em_andamento',
-      dataCriacao: new Date(),
-      dataDisponibilizacao: null,
-      dataFinalizacao: null,
-    };
-    mapas.value.push(novoMapa);
+  if (idSubprocesso.value) {
+    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
   }
   mostrarModalDisponibilizar.value = true;
   dataLimiteValidacao.value = '';
@@ -661,9 +636,9 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    competencias.value = competencias.value.filter(comp => comp.codigo !== competenciaParaExcluir.value!.codigo);
-    if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.codigo, {competencias: competencias.value});
+    mapaEmEdicao.value.competencias = mapaEmEdicao.value.competencias.filter(comp => comp.codigo !== competenciaParaExcluir.value!.codigo);
+    if (idSubprocesso.value) {
+      mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
     }
     fecharModalExcluirCompetencia();
   }
@@ -675,12 +650,12 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competenciaIndex = competencias.value.findIndex(comp => comp.codigo === competenciaId);
+  const competenciaIndex = mapaEmEdicao.value.competencias.findIndex(comp => comp.codigo === competenciaId);
   if (competenciaIndex !== -1) {
-    const competencia = competencias.value[competenciaIndex];
-    competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
-    if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.codigo, {competencias: competencias.value});
+    const competencia = mapaEmEdicao.value.competencias[competenciaIndex] as any;
+    competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter((id: number) => id !== atividadeId);
+    if (idSubprocesso.value) {
+      mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
     }
   }
 }
@@ -692,23 +667,22 @@ function formatarData(data: string): string {
 }
 
 function disponibilizarMapa() {
-  if (!mapa.value || !unidade.value) {
+  if (!mapaEmEdicao.value || !unidade.value) {
     notificacaoDisponibilizacao.value = 'Erro: Mapa ou unidade não encontrados.'
     return
   }
 
-  const currentMapa = mapa.value;
   const currentUnidade = unidade.value;
 
   // Validações conforme plano
-  const competenciasSemAtividades = competencias.value.filter(comp => comp.atividadesAssociadas.length === 0);
+  const competenciasSemAtividades = mapaEmEdicao.value.competencias.filter(comp => (comp as any).atividadesAssociadas.length === 0);
   if (competenciasSemAtividades.length > 0) {
     notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
     return;
   }
 
-  const atividadesIds = atividades.value.map(a => a.id);
-  const atividadesAssociadas = competencias.value.flatMap(comp => comp.atividadesAssociadas);
+  const atividadesIds = atividades.value.map(a => a.codigo);
+  const atividadesAssociadas = mapaEmEdicao.value.competencias.flatMap(comp => (comp as any).atividadesAssociadas);
   const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
 
   if (atividadesNaoAssociadas.length > 0) {
@@ -720,7 +694,7 @@ function disponibilizarMapa() {
   // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
   const sub = subprocesso.value;
   if (sub) {
-    sub.situacaoSubprocesso = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
+    sub.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO;
     sub.dataLimite = dataLimiteValidacao.value;
     if (observacoesDisponibilizacao.value) {
       // O DTO não tem mais um campo de observações direto, isso precisaria ser tratado
@@ -729,19 +703,17 @@ function disponibilizarMapa() {
 
     // Registrar movimentação
     processosStore.addMovement({
-      idSubprocesso: sub.codUnidade,
-    unidadeOrigem: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
-    unidadeDestino: currentUnidade,
+      usuario: `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`,
+      unidadeOrigem: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'
     });
   }
 
   // Atualizar mapa
-mapasStore.salvarMapa(currentMapa.id, {
-  ...currentMapa,
-    situacao: 'disponivel_validacao',
-    dataDisponibilizacao: new Date(),
-  });
+  if (idSubprocesso.value) {
+    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
+  }
 
   // Simular notificações por e-mail
   const notificacoesStore = useNotificacoesStore();

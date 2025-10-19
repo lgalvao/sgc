@@ -428,7 +428,7 @@
                   <td>{{ item.data }}</td>
                   <td>{{ item.unidade }}</td>
                   <td>{{ item.resultado }}</td>
-                  <td>{{ item.observacao }}</td>
+                  <td>{{ item.observacoes }}</td>
                 </tr>
               </tbody>
             </table>
@@ -461,7 +461,7 @@ import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {Atividade, Competencia, Conhecimento, Subprocesso, Unidade} from '@/types/tipos';
+import {Atividade, Competencia, Conhecimento, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -534,16 +534,16 @@ const subprocesso = computed(() => {
 // Computed para determinar quais botões mostrar baseado no perfil e situação
 const podeValidar = computed(() => {
   return perfilSelecionado.value === 'CHEFE' &&
-      subprocesso.value?.situacaoSubprocesso === 'MAPA_DISPONIBILIZADO'
+      subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
 })
 
 const podeAnalisar = computed(() => {
   return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
-      (subprocesso.value?.situacaoSubprocesso === 'MAPA_VALIDADO' || subprocesso.value?.situacaoSubprocesso === 'MAPA_COM_SUGESTOES')
+      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_VALIDADO || subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
 })
 
 const podeVerSugestoes = computed(() => {
-  return subprocesso.value?.situacaoSubprocesso === 'MAPA_COM_SUGESTOES'
+  return subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
 })
 
 const temHistoricoAnalise = computed(() => {
@@ -581,8 +581,8 @@ function fecharModalAceitar() {
 
 function abrirModalSugestoes() {
   // Pré-preencher com sugestões existentes se houver
-  if (mapa.value?.sugestoes) {
-    sugestoes.value = mapa.value.sugestoes
+  if ((mapa.value as any)?.sugestoes) {
+    sugestoes.value = (mapa.value as any).sugestoes
   }
   mostrarModalSugestoes.value = true
 }
@@ -624,7 +624,7 @@ function fecharModalHistorico() {
 
 function verSugestoes() {
   // Buscar sugestões do subprocesso
-  const sugestoes = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  const sugestoes = (mapa.value as any)?.sugestoes || "Nenhuma sugestão registrada.";
 
   // Mostrar modal de visualização com sugestões
   mostrarModalVerSugestoes.value = true;

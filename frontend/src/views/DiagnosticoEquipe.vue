@@ -179,6 +179,7 @@ import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
+import {usePerfilStore} from '@/stores/perfil'
 import {Competencia, Mapa, Processo} from '@/types/tipos'
 
 const route = useRoute()
@@ -188,6 +189,7 @@ const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
 const alertasStore = useAlertasStore()
+const perfilStore = usePerfilStore()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
@@ -212,7 +214,7 @@ onMounted(async () => {
 
 const mapa = computed<Mapa | null>(() => {
   if (unidade.value?.codigo) {
-    return mapasStore.getMapaByUnidadeId(unidade.value.codigo) || null
+    return mapasStore.getMapaByUnidadeId(unidade.value.codigo) as any || null
   }
   return null
 })
@@ -264,9 +266,10 @@ function confirmarFinalizacao() {
 
   // Registrar movimentação
   const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
-  if (subprocesso) {
+  if (subprocesso && unidade.value) {
+    const usuario = `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`;
     processosStore.addMovement({
-      idSubprocesso: subprocesso.codUnidade,
+      usuario: usuario,
       unidadeOrigem: unidade.value,
       unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
       descricao: 'Diagnóstico da equipe finalizado'

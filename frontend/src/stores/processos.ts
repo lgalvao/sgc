@@ -9,6 +9,7 @@ import {
   CriarProcessoRequest,
   ProcessoDetalhe,
   ProcessoResumo,
+  SituacaoSubprocesso,
   TipoProcesso
 } from '@/types/tipos'
 
@@ -48,7 +49,7 @@ export const useProcessosStore = defineStore('processos', {
             return [];
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.movements.filter(m => m.idSubprocesso === idSubprocesso).sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
+            return state.movements.filter(m => (m as any).idSubprocesso === idSubprocesso).sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
         }
     },
     actions: {
@@ -103,9 +104,9 @@ export const useProcessosStore = defineStore('processos', {
                     const unidadeParticipante = (this.processoDetalhe?.unidades || []).find(up => up.sigla === siglaUnidade);
                     if (unidadeParticipante) {
                         if (tipoAcao === 'aceitar') {
-                            unidadeParticipante.situacaoSubprocesso = 'MAPA_VALIDADO';
+                            unidadeParticipante.situacaoSubprocesso = SituacaoSubprocesso.MAPA_VALIDADO;
                         } else {
-                            unidadeParticipante.situacaoSubprocesso = 'MAPA_HOMOLOGADO';
+                            unidadeParticipante.situacaoSubprocesso = SituacaoSubprocesso.MAPA_HOMOLOGADO;
                         }
                     }
                 });
