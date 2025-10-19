@@ -28,10 +28,10 @@ public class ProcessoSeguranca {
         }
 
         String username = authentication.getName();
-        boolean isGestor = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"));
+        boolean isGestorOuChefe = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR") || a.getAuthority().equals("ROLE_CHEFE"));
 
-        if (!isGestor) {
+        if (!isGestorOuChefe) {
             return false;
         }
 
