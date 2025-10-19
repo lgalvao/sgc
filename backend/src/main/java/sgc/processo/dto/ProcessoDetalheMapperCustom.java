@@ -1,9 +1,14 @@
 package sgc.processo.dto;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
+import sgc.sgrh.Usuario;
+import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +24,11 @@ import java.util.Map;
 public class ProcessoDetalheMapperCustom {
 
     private final ProcessoDetalheMapperInterface processoDetalheMapperInterface;
+    private final UnidadeRepo unidadeRepo;
 
-    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
+    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface, UnidadeRepo unidadeRepo) {
         this.processoDetalheMapperInterface = processoDetalheMapperInterface;
+        this.unidadeRepo = unidadeRepo;
     }
 
     /**
@@ -30,11 +37,44 @@ public class ProcessoDetalheMapperCustom {
      */
     public ProcessoDetalheDto toDetailDTO(Processo p,
                                          List<UnidadeProcesso> unidadesProcesso,
-                                         List<Subprocesso> subprocessos) {
+                                         List<Subprocesso> subprocessos,
+                                         Authentication authentication) {
         if (p == null) return null;
-        
+
         // Mapeia os dados básicos do processo usando MapStruct
         ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
+
+        // Lógica de controle de tela
+        boolean isGestor = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"));
+
+        boolean podeFinalizar = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean podeHomologarCadastro = false;
+        boolean podeHomologarMapa = false;
+
+        if (isGestor) {
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+            Long unidadeGestorId = usuario.getUnidade().getCodigo();
+
+            List<Long> unidadesSubordinadasIds = unidadeRepo.findByUnidadeSuperiorCodigo(unidadeGestorId)
+                .stream()
+                .map(Unidade::getCodigo)
+                .toList();
+
+            if (!unidadesSubordinadasIds.isEmpty()) {
+                podeHomologarCadastro = subprocessos.stream()
+                    .filter(sp -> unidadesSubordinadasIds.contains(sp.getUnidade().getCodigo()))
+                    .anyMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO ||
+                                   sp.getSituacao() == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+                podeHomologarMapa = subprocessos.stream()
+                    .filter(sp -> unidadesSubordinadasIds.contains(sp.getUnidade().getCodigo()))
+                    .anyMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_VALIDADO ||
+                                   sp.getSituacao() == SituacaoSubprocesso.MAPA_COM_SUGESTOES);
+            }
+        }
 
         Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
 
@@ -98,6 +138,9 @@ public class ProcessoDetalheMapperCustom {
             .dataFinalizacao(dto.getDataFinalizacao())
             .unidades(unidades)
             .resumoSubprocessos(resumoSubprocessos)
+            .podeFinalizar(podeFinalizar)
+            .podeHomologarCadastro(podeHomologarCadastro)
+            .podeHomologarMapa(podeHomologarMapa)
             .build();
     }
 }

@@ -24,6 +24,11 @@ public class ProcessoDetalheDto {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
 
+    // Campos de controle de tela
+    private boolean podeFinalizar;
+    private boolean podeHomologarCadastro;
+    private boolean podeHomologarMapa;
+
     @Builder.Default
     private List<UnidadeParticipanteDto> unidades = new ArrayList<>();
 

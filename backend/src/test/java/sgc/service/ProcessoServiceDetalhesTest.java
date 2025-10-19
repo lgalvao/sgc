@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -124,7 +125,7 @@ public class ProcessoServiceDetalhesTest {
         when(unidadeProcessoRepo.findByProcessoCodigo(1L)).thenReturn(List.of(up));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
-        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p), anyList(), anyList()))
+        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p), anyList(), anyList(), any()))
                 .thenReturn(processoDetalheDTO);
 
         // This test needs to be updated to mock the security context

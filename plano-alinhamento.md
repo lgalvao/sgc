@@ -13,7 +13,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 03 | Manter Processo | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 04 | Iniciar Processo de Mapeamento | ✅ | ✅ | **Excelente** | Cobertura sólida e completa dos efeitos colaterais. |
 | 05 | Iniciar Processo de Revisão | ✅ | ✅ | **Excelente** | A cobertura foi estendida para validar a cópia do mapa. |
-| 06 | Detalhar Processo | ✅ | ✅ | **Parcial** | Faltam testes para ações condicionais (finalizar, homologar). |
+| 06 | Detalhar Processo | ✅ | ✅ | **Excelente** | A cobertura foi estendida para incluir a lógica condicional dos botões "Finalizar" e "Homologar em Bloco". |
 | 07 | Detalhar Subprocesso | ✅ | ✅ | **Excelente** | Cobertura de integração refeita para focar nos testes de autorização. |
 | 08 | Manter Cadastro | ✅ | ✅ | **Parcial** | Funcionalidade de importação e variações de revisão não testadas. |
 | 09 | Disponibilizar Cadastro | ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
@@ -92,9 +92,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-06.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-06.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU06IntegrationTest.java`
-- **Análise:** A cobertura deste caso de uso é parcial. Os testes E2E e de integração validam o fluxo básico de visualização dos detalhes de um processo e de suas unidades participantes. No entanto, funcionalidades importantes especificadas no requisito não são testadas: a visibilidade do botão "Finalizar processo" para o perfil ADMIN e, mais criticamente, a lógica de exibição dos botões de "Aceitar/Homologar em bloco" para o perfil GESTOR, que depende do estado dos subprocessos.
+- **Análise:** O alinhamento agora é excelente. O teste de integração (`CDU06IntegrationTest`) foi significativamente expandido para cobrir todas as lógicas condicionais da tela. Novos testes garantem que o botão "Finalizar processo" só é visível para o perfil ADMIN. Além disso, a lógica de exibição dos botões "Aceitar/Homologar em bloco" (tanto para cadastro quanto para mapa) foi validada em múltiplos cenários, assegurando que eles apareçam apenas quando existem subprocessos de unidades subordinadas nos estados corretos, conforme especificado nos requisitos.
 - **Status:** Concluído
-- **Observações:** A principal lacuna é a ausência de testes para as ações condicionais disponíveis na tela de detalhes (finalizar e homologar em bloco).
+- **Observações:** Todas as lacunas de teste identificadas anteriormente foram resolvidas.
 
 ### CDU-07: Detalhar Subprocesso
 - **Requisito:** `reqs/cdu-07.md`
