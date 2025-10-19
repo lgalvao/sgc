@@ -86,6 +86,7 @@ export {
     verificarColunasTabelaAlertas,
     verificarAlertasOrdenadosPorDataHora,
     verificarBotaoHistoricoAnaliseVisivel,
+    verificarModalHistoricoAnalise,
     verificarModalHistoricoAnaliseAberto,
     verificarAcoesAnaliseGestor,
     verificarAcaoHomologarVisivel,

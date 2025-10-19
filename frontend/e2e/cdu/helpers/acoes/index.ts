@@ -24,6 +24,7 @@ export {
     registrarAceiteRevisao,
     homologarCadastro,
     devolverParaAjustes,
+    devolverCadastro,
     iniciarProcesso,
     removerProcessoComConfirmacao,
     cancelarRemocaoProcesso,

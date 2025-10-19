@@ -53,4 +53,32 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');
         await verificarUrlDoPainel(page);
     });
+
+    test('deve exibir o histórico de análise após devolução', async ({page}) => {
+        const processo = await criarProcessoMapeamentoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), '2025-12-31');
+        await iniciarProcesso(page);
+        await verificarMensagemSucesso(page, 'Processo iniciado');
+
+        // Chefe da unidade STIC acessa e preenche o cadastro
+        await loginComoChefe(page);
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
+        const atividade = gerarNomeUnico('Atividade');
+        const conhecimento = gerarNomeUnico('Conhecimento');
+        await adicionarAtividade(page, atividade);
+        await adicionarConhecimento(page.locator(SELETORES_CSS.CARD_ATIVIDADE).first(), conhecimento);
+        await disponibilizarCadastro(page);
+        await verificarMensagemSucesso(page, 'Disponibilização solicitada');
+
+        // Gestor da unidade SEDES devolve o cadastro
+        await devolverCadastro(page, processo, 'STIC', 'Favor revisar o item X.');
+
+        // Chefe da STIC verifica o botão de histórico
+        await loginComoChefe(page);
+        await navegarParaProcessoPorId(page, processo.codigo);
+        await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
+        await verificarBotaoHistoricoAnaliseVisivel(page);
+        await clicarBotaoHistoricoAnalise(page);
+        await verificarModalHistoricoAnalise(page, 'Favor revisar o item X.');
+    });
 });

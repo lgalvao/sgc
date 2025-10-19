@@ -16,7 +16,7 @@ A análise será realizada para cada um dos 21 casos de uso definidos, verifican
 | 06 | Detalhar Processo | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para validar a visibilidade condicional dos botões de ação. |
 | 07 | Detalhar Subprocesso | ✅ | ✅ | **Excelente** | Cobertura de integração refeita para focar nos testes de autorização. |
 | 08 | Manter Cadastro | ✅ | ✅ | **Excelente** | Cobertura de integração adicionada para a funcionalidade de importação de atividades. |
-| 09 | Disponibilizar Cadastro | ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
+| 09 | Disponibilizar Cadastro | ✅ | ✅ | **Excelente** | O teste E2E foi estendido para cobrir a exibição do histórico de análise. |
 | 10 | Disponibilizar Revisão Cadastro| ✅ | ✅ | **Bom** | Não testa a exibição do histórico de análise. |
 | 11 | Visualizar Cadastro | ✅ | ✅ | **Excelente** | Cobertura sólida e completa. |
 | 12 | Verificar Impactos no Mapa | ✅ | ✅ | **Excelente** | Cobertura sólida e completa, especialmente no backend. |
@@ -116,9 +116,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-09.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-09.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU09IntegrationTest.java`
-- **Análise:** Alinhamento muito bom. O teste E2E valida a regra de negócio principal (não permitir disponibilizar com atividades sem conhecimentos). O teste de integração do backend é robusto, cobrindo o fluxo de sucesso com todos os seus efeitos (mudança de status, movimentação, alerta, notificação), o caso de falha de validação e um teste de segurança para garantir que apenas o chefe da unidade correta pode executar a ação. A única lacuna identificada é a ausência de um teste para a exibição do botão "Histórico de análise" quando um cadastro é devolvido.
+- **Análise:** O alinhamento agora é excelente. O teste E2E, que já validava a regra de negócio principal, foi estendido com um novo cenário que cobre o fluxo de devolução. O novo teste simula um GESTOR devolvendo um cadastro e, em seguida, verifica se o CHEFE da unidade original visualiza corretamente o botão "Histórico de análise" e seu conteúdo. A cobertura de integração já era robusta.
 - **Status:** Concluído
-- **Observações:** Cobertura sólida, com exceção da funcionalidade de visualização do histórico de análises.
+- **Observações:** A lacuna de cobertura foi totalmente resolvida.
 
 ### CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos
 - **Requisito:** `reqs/cdu-10.md`

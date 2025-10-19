@@ -331,6 +331,16 @@ export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<
     await expect(modal.getByText(/observa/i).first()).toBeVisible();
 }
 
+/**
+ * Verifica se o modal de histórico de análise contém uma observação específica.
+ */
+export async function verificarModalHistoricoAnalise(page: Page, observacao: string): Promise<void> {
+    await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', {name: /Histórico de Análises?/i})).toBeVisible();
+    await expect(modal.locator('tbody tr').first()).toContainText(observacao);
+}
 
 /**
  * Verifica se a mensagem "Nenhum impacto no mapa da unidade" está visível.
