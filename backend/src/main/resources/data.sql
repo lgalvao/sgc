@@ -1,81 +1,46 @@
--- Unidades
+-- Deletes para garantir a limpeza do banco antes de inserir novos dados
+DELETE FROM SGC.USUARIO_PERFIL;
+DELETE FROM SGC.USUARIO;
+DELETE FROM SGC.UNIDADE;
+
+-- Unidade Raiz (Tribunal)
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES
-(2, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', NULL),
-(3, 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 2),
-(4, 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 3),
-(5, 'Seção Magistrados e Requisitados', 'SEMARE', 'OPERACIONAL', 4),
-(6, 'Coordenadoria de Sistemas', 'COSIS', 'INTERMEDIARIA', 2),
-(7, 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIARIA', 2),
-(8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 6),
-(9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 6),
-(10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 6),
-(11, 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 7),
-(14, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 2),
-(12, 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 14),
-(13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 14);
+(1, 'TRIBUNAL REGIONAL ELEITORAL DE PERNAMBUCO', 'TRE-PE', 'INTEROPERACIONAL', NULL);
+
+-- Unidades Principais
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES
+(2, 'Secretaria de Gestão de Pessoas', 'SGP', 'INTERMEDIARIA', 1),
+(3, 'Secretaria de Tecnologia da Informação', 'STIC', 'INTERMEDIARIA', 1);
+
+-- Subunidades da SGP
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES
+(4, 'Coordenadoria de Desenvolvimento', 'CODES', 'OPERACIONAL', 2),
+(5, 'Seção de Lotação e Desempenho', 'SELDES', 'OPERACIONAL', 4);
+
+-- Subunidades da STIC
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES
+(6, 'Coordenadoria de Sistemas', 'COSIS', 'OPERACIONAL', 3),
+(7, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 6),
+(8, 'Seção de Desenvolvimento', 'SEDES', 'OPERACIONAL', 6),
+(9, 'Seção de Dados e IA', 'SEDIA', 'OPERACIONAL', 6);
 
 -- Usuários
+-- Adicionando um usuário ADMIN para a unidade raiz e GESTOR para STIC
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
-(1, 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10),
-(2, 'Carlos Henrique Lima', 'carlos.lima@tre-pe.jus.br', '2345', 3),
-(3, 'Fernanda Oliveira', 'fernanda.oliveira@tre-pe.jus.br', '3456', 8),
-(4, 'João Batista Silva', 'joao.silva@tre-pe.jus.br', '4567', 10),
-(5, 'Marina Dias', 'marina.dias@tre-pe.jus.br', '5678', 5),
-(6, 'Ricardo Alves', 'ricardo.alves@tre-pe.jus.br', '6789', 2),
-(7, 'Zeca Silva', 'zeca.gado@tre-pe.jus.br', '7001', 2),
-(8, 'Paulo Horta', 'paulo.horta@tre-pe.jus.br', '7002', 8),
-(9, 'Giuseppe Corleone', 'giuseppe.corleone@tre-pe.jus.br', '7003', 8),
-(10, 'Paula Gonçalves', 'paula.goncalves@tre-pe.jus.br', '7004', 9),
-(11, 'Herman Greely', 'herman.greely@tre-pe.jus.br', '7005', 10),
-(12, 'Taís Condida', 'tais.condida@tre-pe.jus.br', '7006', 11),
-(13, 'Mike Smith', 'mike.smith@tre-pe.jus.br', '7007', 11),
-(14, 'Maroca Silva', 'maroca.silva@tre-pe.jus.br', '7008', 2),
-(15, 'Roberto Santos', 'roberto.santos@tre-pe.jus.br', '7009', 14),
-(16, 'Luciana Pereira', 'luciana.pereira@tre-pe.jus.br', '7010', 6),
-(17, 'Fernando Costa', 'fernando.costa@tre-pe.jus.br', '7011', 10),
-(18, 'Amanda Rodrigues', 'amanda.rodrigues@tre-pe.jus.br', '7012', 14),
-(19, 'Diego Fernandes', 'diego.fernandes@tre-pe.jus.br', '7013', 6),
-(20, 'Juliana Almeida', 'juliana.almeida@tre-pe.jus.br', '7014', 2),
-(21, 'Rafael Moreira', 'rafael.moreira@tre-pe.jus.br', '7015', 2),
-(22, 'Camila Barbosa', 'camila.barbosa@tre-pe.jus.br', '7016', 10),
-(23, 'Thiago Carvalho', 'thiago.carvalho@tre-pe.jus.br', '7017', 14),
-(24, 'Patrícia Lima', 'patricia.lima@tre-pe.jus.br', '7018', 6),
-(25, 'Lucas Mendes', 'lucas.mendes@tre-pe.jus.br', '7019', 2),
-(26, 'Beatriz Santos', 'beatriz.santos@tre-pe.jus.br', '7020', 2),
-(27, 'Gustavo Oliveira', 'gustavo.oliveira@tre-pe.jus.br', '7021', 10),
-(28, 'Carolina Souza', 'carolina.souza@tre-pe.jus.br', '7022', 14),
-(29, 'Bruno Rodrigues', 'bruno.rodrigues@tre-pe.jus.br', '7023', 6),
-(30, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 2);
+(1, 'Admin Geral', 'admin.geral@tre-pe.jus.br', '0001', 1),
+(2, 'Gestor STIC', 'gestor.stic@tre-pe.jus.br', '0002', 3),
+(3, 'Chefe CODES', 'chefe.codes@tre-pe.jus.br', '0003', 4),
+(4, 'Servidor SELDES', 'servidor.seldes@tre-pe.jus.br', '0004', 5),
+(5, 'Chefe SESEL', 'chefe.sesel@tre-pe.jus.br', '0005', 7),
+(6, 'Servidor SEDES', 'servidor.sedes@tre-pe.jus.br', '0006', 8),
+(7, 'Chefe SEDIA', 'chefe.sedia@tre-pe.jus.br', '0007', 9);
 
--- Perfis
+-- Perfis dos Usuários
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
-(1, 'SERVIDOR'),
-(2, 'CHEFE'),
+(1, 'ADMIN'),
+(2, 'GESTOR'),
 (3, 'CHEFE'),
-(4, 'CHEFE'),
+(4, 'SERVIDOR'),
 (5, 'CHEFE'),
-(6, 'CHEFE'),
-(7, 'CHEFE'),
-(8, 'GESTOR'),
-(9, 'CHEFE'),
-(10, 'CHEFE'),
-(11, 'SERVIDOR'),
-(12, 'CHEFE'),
-(13, 'GESTOR'),
-(14, 'SERVIDOR'),
-(15, 'CHEFE'),
-(16, 'CHEFE'),
-(17, 'CHEFE'),
-(18, 'SERVIDOR'),
-(19, 'SERVIDOR'),
-(20, 'SERVIDOR'),
-(21, 'SERVIDOR'),
-(22, 'SERVIDOR'),
-(23, 'SERVIDOR'),
-(24, 'SERVIDOR'),
-(25, 'SERVIDOR'),
-(26, 'SERVIDOR'),
-(27, 'SERVIDOR'),
-(28, 'SERVIDOR'),
-(29, 'SERVIDOR'),
-(30, 'SERVIDOR');
+(6, 'SERVIDOR'),
+(7, 'CHEFE');

@@ -1,17 +1,32 @@
-# Resumo dos Problemas nos Testes Unitários
+# E2E Test and Frontend Server Issues
 
-Durante a execução dos testes unitários, foram identificados problemas persistentes em dois arquivos de teste principais, que parecem estar relacionados a uma configuração fundamental incorreta no ambiente de teste.
+## Summary
 
-## 1. `frontend/src/stores/__tests__/subprocessos.spec.ts`
+The primary goal of running all test suites (backend, frontend unit, frontend E2E) could not be fully completed due to a persistent issue causing the frontend development server to hang. While the backend and frontend unit tests all pass, the E2E tests are blocked by this server problem.
 
-- **Erro Recorrente**: `AssertionError: expected "spy" to be called with arguments: [ 1 ]`
-- **Causa Provável**: Os testes para as ações da `useSubprocessosStore` (ex: `disponibilizarCadastro`, `devolverCadastro`, etc.) dependem do estado de outra store, a `useProcessosStore`. Especificamente, eles precisam acessar `processosStore.processoDetalhe.codigo` para chamar a ação `fetchProcessoDetalhe` com o ID correto. As tentativas de mockar essa dependência não foram bem-sucedidas, pois o spy para `fetchProcessoDetalhe` nunca é chamado com o argumento esperado. Isso sugere que o estado mockado da `processosStore` não está sendo injetado ou lido corretamente dentro das ações da `subprocessosStore` no ambiente de teste.
+## Problems Identified and Actions Taken
 
-## 2. `frontend/src/stores/__tests__/impacto.spec.ts`
+### 1. Backend `data.sql` Inconsistencies (FIXED)
 
-- **Erro Recorrente**: `TypeError: Cannot read properties of undefined (reading 'fetchProcessoDetalhe')`
-- **Causa Provável**: Similar ao problema anterior, os testes para a lógica de impacto dependem de múltiplas stores (`useProcessosStore`, `useMapasStore`, etc.). O erro indica que a instância da `processosStore` está `undefined` no momento em que o teste tenta acessá-la. Isso aponta para um problema na forma como as stores mockadas são injetadas e disponibilizadas para outras stores durante a execução dos testes do Vitest. A configuração do `beforeEach` parece estar correta, mas a injeção de dependência entre as stores no Pinia não está funcionando como esperado no ambiente de teste.
+*   **Problem:** The initial E2E test failures were caused by errors on the backend, which were traced to an inconsistent `data.sql` seeding script. The script was missing key data, had incorrect foreign key references, and used invalid enum values (`RAIZ` for `TipoUnidade`).
+*   **Action Taken:** The `data.sql` script was completely rewritten to provide a clean, consistent, and valid dataset for the test environment.
+*   **Status:** This issue is resolved. The backend tests pass, and the backend server now starts and runs correctly with the new data.
 
-## Conclusão
+### 2. Frontend E2E Test Runner Timeouts (UNRESOLVED)
 
-Ambos os problemas indicam uma falha na configuração do ambiente de teste do Vitest para lidar com a injeção de dependências entre stores Pinia. A abordagem de mock para as stores precisa ser reavaliada para garantir que o estado e as ações de uma store mockada estejam acessíveis para outra store que dependa dela.
+*   **Problem:** The `npm run test:e2e` command consistently times out without completing.
+*   **Investigation:**
+    *   Initially, the problem was believed to be a misconfigured Vite proxy or an issue with managing the backend server process. These were corrected, but the timeouts persisted.
+    *   Further investigation isolated the root cause: the `npm run dev` command, which starts the Vite development server, hangs indefinitely and never becomes ready. The E2E tests time out because they are waiting for this server to start.
+    *   Attempts to debug the Vite startup process using `npm run dev -- --debug` also resulted in a timeout, providing no useful logs.
+    *   Simplifying the `vite.config.js` by removing the `test` configuration block was attempted as a diagnostic step, but this also did not resolve the hanging issue.
+
+## Root Cause
+
+The fundamental issue is that the **Vite development server (`npm run dev`) fails to start**. The reason for this failure is unknown, as even debugging commands are timing out. This prevents the Playwright E2E test suite from running.
+
+## Recommendations for Next Steps
+
+1.  **Deep Dive into Vite Configuration:** The `vite.config.js` and its imported dependencies (`@vitejs/plugin-vue`, `vite-tsconfig-paths`) should be investigated for potential version incompatibilities or misconfigurations that could cause an infinite loop or hang during startup.
+2.  **Dependency Audit:** An audit of the frontend `package.json` dependencies should be performed. There may be a known issue with one of the packages that is affecting the Vite server.
+3.  **Local Reproduction:** The issue should be reproduced in a local development environment outside of this tool's sandbox to see if more informative error messages are produced.
