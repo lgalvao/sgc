@@ -189,6 +189,22 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
 }
 
 /**
+ * Orquestra o fluxo de devolução de um cadastro por um GESTOR.
+ */
+export async function devolverCadastro(page: Page, processo: {
+    codigo: any;
+    descricao: string
+}, nomeUnidade: string, observacao: string): Promise<void> {
+    const {loginComoGestor, navegarParaProcessoPorId} = await import("../navegacao");
+    await loginComoGestor(page);
+    await navegarParaProcessoPorId(page, processo.codigo);
+    const {acessarAnaliseRevisaoComoGestor} = await import("../navegacao");
+    await acessarAnaliseRevisaoComoGestor(page, nomeUnidade);
+    await devolverParaAjustes(page, observacao);
+}
+
+
+/**
  * Aceita um cadastro, preenchendo a observação se fornecida.
  */
 export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
