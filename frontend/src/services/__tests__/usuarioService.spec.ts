@@ -21,7 +21,7 @@ describe('usuarioService', () => {
     })
 
     it('autenticar should post request and return boolean', async () => {
-        const request = { tituloEleitoral: '123' }
+        const request = { tituloEleitoral: '123', senha: '123' }
         mockApi.post.mockResolvedValue({ data: true })
 
         const result = await service.autenticar(request)
@@ -46,7 +46,7 @@ describe('usuarioService', () => {
     })
 
     it('entrar should post the request', async () => {
-        const request = { perfil: 'GESTOR', unidadeId: 1 }
+        const request = { tituloEleitoral: 123, perfil: 'GESTOR', unidadeCodigo: 1 }
         mockApi.post.mockResolvedValue({})
 
         await service.entrar(request)
@@ -56,7 +56,7 @@ describe('usuarioService', () => {
 
     // Error handling
     it('autenticar should throw error on failure', async () => {
-        const request = { tituloEleitoral: '123' }
+        const request = { tituloEleitoral: '123', senha: '123' }
         mockApi.post.mockRejectedValue(new Error('Failed'))
         await expect(service.autenticar(request)).rejects.toThrow()
     })

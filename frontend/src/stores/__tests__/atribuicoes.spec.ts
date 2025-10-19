@@ -19,10 +19,10 @@ describe('useAtribuicaoTemporariaStore', () => {
     describe('actions', () => {
         it('criarAtribuicao should add a new atribuicao to the store', () => {
             const novaAtribuicao: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
+                unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' },
+                servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' }, email: '', ramal: '' },
+                dataInicio: '2025-01-01',
+                dataTermino: '2025-01-31',
                 justificativa: 'Teste de criação'
             };
             const initialLength = atribuicaoTemporariaStore.atribuicoes.length;
@@ -33,26 +33,26 @@ describe('useAtribuicaoTemporariaStore', () => {
             expect(atribuicaoTemporariaStore.atribuicoes[0]).toEqual(novaAtribuicao);
         });
 
-        it('getAtribuicoesPorServidor should filter atribuicoes by idServidor', () => {
+        it('getAtribuicoesPorServidor should filter atribuicoes by servidor.codigo', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
+                unidade: { codigo: 1, nome: 'A', sigla: 'A' },
+                servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 1, nome: 'A', sigla: 'A' }, email: '', ramal: '' },
+                dataInicio: '2025-01-01',
+                dataTermino: '2025-01-31',
                 justificativa: 'J1'
             };
             const atribuicao2: AtribuicaoTemporaria = {
-                unidade: 'B',
-                idServidor: 2,
-                dataInicio: new Date('2025-02-01'),
-                dataTermino: new Date('2025-02-28'),
+                unidade: { codigo: 2, nome: 'B', sigla: 'B' },
+                servidor: { codigo: 2, nome: 'Servidor 2', tituloEleitoral: '456', unidade: { codigo: 2, nome: 'B', sigla: 'B' }, email: '', ramal: '' },
+                dataInicio: '2025-02-01',
+                dataTermino: '2025-02-28',
                 justificativa: 'J2'
             };
             const atribuicao3: AtribuicaoTemporaria = {
-                unidade: 'C',
-                idServidor: 1,
-                dataInicio: new Date('2025-03-01'),
-                dataTermino: new Date('2025-03-31'),
+                unidade: { codigo: 3, nome: 'C', sigla: 'C' },
+                servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 3, nome: 'C', sigla: 'C' }, email: '', ramal: '' },
+                dataInicio: '2025-03-01',
+                dataTermino: '2025-03-31',
                 justificativa: 'J3'
             };
 
@@ -60,15 +60,15 @@ describe('useAtribuicaoTemporariaStore', () => {
                 atribuicoes: [atribuicao1, atribuicao2, atribuicao3]
             });
 
-            const manuallyFiltered = atribuicaoTemporariaStore.atribuicoes.filter(a => Number(a.idServidor) === 1);
+            const manuallyFiltered = atribuicaoTemporariaStore.atribuicoes.filter(a => a.servidor.codigo === 1);
             expect(manuallyFiltered.length).toBe(2);
             expect(manuallyFiltered[0]).toEqual(atribuicao1);
             expect(manuallyFiltered[1]).toEqual(atribuicao3);
         });
 
-        it('getAtribuicoesPorServidor should return an empty array if no matching idServidor', () => {
+        it('getAtribuicoesPorServidor should return an empty array if no matching servidor.codigo', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'A', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
+                unidade: { codigo: 1, nome: 'A', sigla: 'A' }, servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 1, nome: 'A', sigla: 'A' }, email: '', ramal: '' }, dataInicio: '2025-01-01', dataTermino: '2025-01-31', justificativa: 'J1'
             };
             atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
 
@@ -80,24 +80,24 @@ describe('useAtribuicaoTemporariaStore', () => {
     describe('getters', () => {
         it('getAtribuicoesPorUnidade should filter atribuicoes by unidade', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 1,
-                dataInicio: new Date('2025-01-01'),
-                dataTermino: new Date('2025-01-31'),
+                unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' },
+                servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' }, email: '', ramal: '' },
+                dataInicio: '2025-01-01',
+                dataTermino: '2025-01-31',
                 justificativa: 'J1'
             };
             const atribuicao2: AtribuicaoTemporaria = {
-                unidade: 'SESEL',
-                idServidor: 2,
-                dataInicio: new Date('2025-02-01'),
-                dataTermino: new Date('2025-02-28'),
+                unidade: { codigo: 2, nome: 'SESEL', sigla: 'SESEL' },
+                servidor: { codigo: 2, nome: 'Servidor 2', tituloEleitoral: '456', unidade: { codigo: 2, nome: 'SESEL', sigla: 'SESEL' }, email: '', ramal: '' },
+                dataInicio: '2025-02-01',
+                dataTermino: '2025-02-28',
                 justificativa: 'J2'
             };
             const atribuicao3: AtribuicaoTemporaria = {
-                unidade: 'COSIS',
-                idServidor: 3,
-                dataInicio: new Date('2025-03-01'),
-                dataTermino: new Date('2025-03-31'),
+                unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' },
+                servidor: { codigo: 3, nome: 'Servidor 3', tituloEleitoral: '789', unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' }, email: '', ramal: '' },
+                dataInicio: '2025-03-01',
+                dataTermino: '2025-03-31',
                 justificativa: 'J3'
             };
 
@@ -113,7 +113,7 @@ describe('useAtribuicaoTemporariaStore', () => {
 
         it('getAtribuicoesPorUnidade should return an empty array if no matching unidade', () => {
             const atribuicao1: AtribuicaoTemporaria = {
-                unidade: 'COSIS', idServidor: 1, dataInicio: new Date(), dataTermino: new Date(), justificativa: 'J1'
+                unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' }, servidor: { codigo: 1, nome: 'Servidor 1', tituloEleitoral: '123', unidade: { codigo: 1, nome: 'COSIS', sigla: 'COSIS' }, email: '', ramal: '' }, dataInicio: '2025-01-01', dataTermino: '2025-01-31', justificativa: 'J1'
             };
             atribuicaoTemporariaStore.criarAtribuicao(atribuicao1);
 

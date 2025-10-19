@@ -63,7 +63,7 @@ describe('useProcessosStore', () => {
 
         it('fetchProcessosPainel should call painelService and update state', async () => {
             const mockPage = {
-                content: [{codigo: 1, descricao: 'Teste', tipo: 'MAPEAMENTO', situacao: 'EM_ANDAMENTO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE'}],
+                content: [{codigo: 1, descricao: 'Teste', tipo: 'MAPEAMENTO', situacao: SituacaoProcesso.EM_ANDAMENTO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE', unidades: []}],
                 totalPages: 1,
                 totalElements: 1,
                 number: 0,
@@ -89,7 +89,7 @@ describe('useProcessosStore', () => {
         });
 
         it('fetchProcessosFinalizados should update state on success', async () => {
-            const mockProcessos = [{codigo: 2, descricao: 'Finalizado', tipo: 'DIAGNOSTICO', situacao: 'FINALIZADO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE'}];
+            const mockProcessos = [{codigo: 2, descricao: 'Finalizado', tipo: TipoProcesso.DIAGNOSTICO, situacao: SituacaoProcesso.FINALIZADO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidades: [], resumoSubprocessos: []}];
             processoService.fetchProcessosFinalizados.mockResolvedValue(mockProcessos);
             await processosStore.fetchProcessosFinalizados();
             expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
@@ -106,8 +106,8 @@ describe('useProcessosStore', () => {
             const mockDetalhe = {
                 codigo: 1,
                 descricao: 'Detalhe Teste',
-                tipo: 'MAPEAMENTO',
-                situacao: 'EM_ANDAMENTO',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.EM_ANDAMENTO,
                 dataLimite: '2025-12-31',
                 dataCriacao: '2025-01-01',
                 dataFinalizacao: '2025-12-31',
@@ -131,11 +131,11 @@ describe('useProcessosStore', () => {
         it('criarProcesso should call processoService', async () => {
             const payload = {
                 descricao: 'Novo Processo',
-                tipo: 'MAPEAMENTO',
+                tipo: TipoProcesso.MAPEAMENTO,
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.criarProcesso.mockResolvedValue({ codigo: 2, descricao: 'Novo Processo', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-02-01', dataFinalizacao: '' });
+            processoService.criarProcesso.mockResolvedValue({ codigo: 2, descricao: 'Novo Processo', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.CRIADO, dataLimite: '2025-12-31', dataCriacao: '2025-02-01', dataFinalizacao: '', unidades: [], resumoSubprocessos: [] });
 
             await processosStore.criarProcesso(payload);
 
@@ -143,7 +143,7 @@ describe('useProcessosStore', () => {
         });
 
         it('criarProcesso should throw error on service failure', async () => {
-            const payload = { descricao: 'Novo Processo', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            const payload = { descricao: 'Novo Processo', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] };
             processoService.criarProcesso.mockRejectedValue(error);
             await expect(processosStore.criarProcesso(payload)).rejects.toThrow(error);
         });
@@ -152,11 +152,11 @@ describe('useProcessosStore', () => {
             const payload = {
                 codigo: 1,
                 descricao: 'Processo Atualizado',
-                tipo: 'MAPEAMENTO',
+                tipo: TipoProcesso.MAPEAMENTO,
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.atualizarProcesso.mockResolvedValue({ codigo: 1, descricao: 'Processo Atualizado', tipo: 'MAPEAMENTO', situacao: 'CRIADO', dataLimite: '2025-12-31', dataCriacao: '2025-01-01', dataFinalizacao: '' });
+            processoService.atualizarProcesso.mockResolvedValue({ codigo: 1, descricao: 'Processo Atualizado', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.CRIADO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', dataFinalizacao: '', unidades: [], resumoSubprocessos: [] });
 
             await processosStore.atualizarProcesso(1, payload);
 
@@ -164,7 +164,7 @@ describe('useProcessosStore', () => {
         });
 
         it('atualizarProcesso should throw error on service failure', async () => {
-            const payload = { codigo: 1, descricao: 'Processo Atualizado', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            const payload = { codigo: 1, descricao: 'Processo Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] };
             processoService.atualizarProcesso.mockRejectedValue(error);
             await expect(processosStore.atualizarProcesso(1, payload)).rejects.toThrow(error);
         });
@@ -188,16 +188,16 @@ describe('useProcessosStore', () => {
             processoService.obterDetalhesProcesso.mockResolvedValue({} as any);
             const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
 
-            await processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20]);
+            await processosStore.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10, 20]);
 
-            expect(processoService.iniciarProcesso).toHaveBeenCalledWith(1, 'MAPEAMENTO', [10, 20]);
+            expect(processoService.iniciarProcesso).toHaveBeenCalledWith(1, TipoProcesso.MAPEAMENTO, [10, 20]);
             expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
         });
 
         it('iniciarProcesso should throw error and not reload details on failure', async () => {
             processoService.iniciarProcesso.mockRejectedValue(error);
             const fetchDetalheSpy = vi.spyOn(processosStore, 'fetchProcessoDetalhe');
-            await expect(processosStore.iniciarProcesso(1, 'MAPEAMENTO', [10, 20])).rejects.toThrow(error);
+            await expect(processosStore.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10, 20])).rejects.toThrow(error);
             expect(fetchDetalheSpy).not.toHaveBeenCalled();
         });
 
@@ -222,10 +222,16 @@ describe('useProcessosStore', () => {
         it('processarCadastroBloco should update subprocesso statuses', () => {
             processosStore.processoDetalhe = {
                 codigo: 1,
+                descricao: 'Teste',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.EM_ANDAMENTO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-01-01',
                 unidades: [
-                    { sigla: 'A', situacaoSubprocesso: 'AGUARDANDO_ACEITE' },
-                    { sigla: 'B', situacaoSubprocesso: 'AGUARDANDO_ACEITE' },
-                ]
+                    { sigla: 'A', situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_ACEITE, nome: 'Unidade A', codUnidade: 1, dataLimite: '2025-12-31', filhos: [] },
+                    { sigla: 'B', situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_ACEITE, nome: 'Unidade B', codUnidade: 2, dataLimite: '2025-12-31', filhos: [] },
+                ],
+                resumoSubprocessos: []
             };
 
             processosStore.processarCadastroBloco({
@@ -236,16 +242,16 @@ describe('useProcessosStore', () => {
             });
 
             const unidadeA = processosStore.processoDetalhe.unidades.find(u => u.sigla === 'A');
-            expect(unidadeA.situacaoSubprocesso).toBe('MAPA_VALIDADO');
+            expect(unidadeA.situacaoSubprocesso).toBe(SituacaoSubprocesso.MAPA_VALIDADO);
         });
 
         it('addMovement should add a new movement with a generated id and date', () => {
             const initialMovementsCount = processosStore.movements.length;
             processosStore.addMovement({
-                idSubprocesso: 1,
-                responsavel: 'user',
-                acao: 'Teste',
-                detalhes: {}
+                descricao: 'Teste',
+                usuario: 'user',
+                unidadeOrigem: { codigo: 1, nome: 'A', sigla: 'A' },
+                unidadeDestino: { codigo: 2, nome: 'B', sigla: 'B' },
             });
             expect(processosStore.movements.length).toBe(initialMovementsCount + 1);
             const lastMovement = processosStore.movements[processosStore.movements.length - 1];
@@ -259,10 +265,16 @@ describe('useProcessosStore', () => {
         beforeEach(() => {
             processosStore.processoDetalhe = {
                 codigo: 1,
+                descricao: 'Teste',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.EM_ANDAMENTO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-01-01',
+                unidades: [],
                 resumoSubprocessos: [
-                    { unidade: { sigla: 'A' } },
-                    { unidade: { sigla: 'B' } },
-                    { unidade: { sigla: 'A' } },
+                    { codigo: 1, unidade: { sigla: 'A', nome: 'Unidade A', codigo: 1 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 1 },
+                    { codigo: 2, unidade: { sigla: 'B', nome: 'Unidade B', codigo: 2 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 2 },
+                    { codigo: 3, unidade: { sigla: 'A', nome: 'Unidade A', codigo: 1 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 1 },
                 ]
             };
         });

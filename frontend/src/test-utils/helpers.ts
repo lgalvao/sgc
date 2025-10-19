@@ -8,22 +8,19 @@ import type {Atividade} from '@/types/tipos';
 export function getMockAtividadesData(): Atividade[] {
     return [
         {
-            id: 1,
+            codigo: 1,
             descricao: "Manutenção de sistemas administrativos criados pela unidade",
-            idSubprocesso: 3,
-            conhecimentos: [{id: 1, descricao: "Criação de testes de integração em Cypress"}]
+            conhecimentos: [{codigo: 1, descricao: "Criação de testes de integração em Cypress"}]
         },
         {
-            id: 2,
+            codigo: 2,
             descricao: "Especificação de sistemas administrativos",
-            idSubprocesso: 3,
-            conhecimentos: [{id: 6, descricao: "Modelagem de dados"}]
+            conhecimentos: [{codigo: 6, descricao: "Modelagem de dados"}]
         },
         {
-            id: 3,
+            codigo: 3,
             descricao: "Implantação de sistemas externos",
-            idSubprocesso: 1,
-            conhecimentos: [{id: 40, descricao: "Conhecimento em configuração de APIs de terceiros"}]
+            conhecimentos: [{codigo: 40, descricao: "Conhecimento em configuração de APIs de terceiros"}]
         }
     ];
 }
@@ -43,7 +40,7 @@ export async function prepareFreshAtividadesStore() {
         ...a,
         conhecimentos: a.conhecimentos.map((c: any) => ({...c}))
     }));
-    store.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.id, ...a.conhecimentos.map((c: any) => c.id)])) + 1;
+    store.nextId = Math.max(...initialAtividades.flatMap((a: Atividade) => [a.codigo, ...a.conhecimentos.map((c: any) => c.codigo)])) + 1;
     return store;
 }
 

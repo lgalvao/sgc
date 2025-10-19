@@ -326,7 +326,7 @@
                     :key="analise.codigo"
                   >
                     <td>{{ formatarData(analise.dataHora) }}</td>
-                    <td>{{ analise.unidade }}</td>
+                    <td>{{ 'unidade' in analise ? analise.unidade : analise.unidadeSigla }}</td>
                     <td>{{ analise.resultado }}</td>
                     <td>{{ analise.observacoes || '-' }}</td>
                   </tr>
@@ -354,7 +354,7 @@
     <!-- Modal de Edição de Conhecimento -->
     <EditarConhecimentoModal
       :mostrar="mostrarModalEdicaoConhecimento"
-      :conhecimento="conhecimentoSendoEditado"
+      :conhecimento="conhecimentoSendoEditado as Conhecimento"
       @fechar="fecharModalEdicaoConhecimento"
       @salvar="salvarEdicaoConhecimento"
     />
@@ -485,7 +485,7 @@ const mostrarModalEdicaoConhecimento = ref(false)
 const conhecimentoSendoEditado = ref<Conhecimento | null>(null)
 
 function abrirModalEdicaoConhecimento(conhecimento: Conhecimento) {
-  conhecimentoSendoEditado.value = {...conhecimento};
+  conhecimentoSendoEditado.value = { ...conhecimento };
   mostrarModalEdicaoConhecimento.value = true
 }
 
@@ -531,7 +531,8 @@ function cancelarEdicaoAtividade() {
   atividadeEditada.value = ''
 }
 
-async function handleImportAtividades(idSubprocessoOrigem: number) {
+async function handleImportAtividades() {
+  const idSubprocessoOrigem = unidadeSelecionada.value?.codUnidade
   if (idSubprocesso.value !== undefined && idSubprocessoOrigem) {
     await atividadesStore.importarAtividades(idSubprocesso.value, idSubprocessoOrigem);
   }
@@ -549,7 +550,7 @@ const subprocesso = computed(() => {
 
 const podeVerImpacto = computed(() => {
   if (!isChefe.value || !subprocesso.value) return false;
-  return subprocesso.value.situacao === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+  return subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
 });
 
 const processoSelecionado = ref<ProcessoResumo | null>(null)
@@ -618,7 +619,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu
   if (unidadePu) {
-    await atividadesStore.fetchAtividadesPorSubprocesso(unidadePu.codUnidade)
+    await atividadesStore.fetchAtividadesParaSubprocesso(unidadePu.codUnidade)
     const atividadesDaOutraUnidade = atividadesStore.getAtividadesPorSubprocesso(unidadePu.codUnidade)
     atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : []
   } else {
@@ -651,7 +652,7 @@ function disponibilizarCadastro() {
   const sub = subprocesso.value;
   const situacaoEsperada = isRevisao.value ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO : SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO;
 
-  if (!sub || sub.situacao !== situacaoEsperada) {
+  if (!sub || sub.situacaoSubprocesso !== situacaoEsperada) {
     notificacoesStore.erro('Ação não permitida', `Ação permitida apenas na situação: "${situacaoEsperada}".`);
     return;
   }
@@ -659,7 +660,7 @@ function disponibilizarCadastro() {
   atividadesSemConhecimento.value = validarAtividades();
   if (atividadesSemConhecimento.value.length > 0) {
     const atividadesDescricoes = atividadesSemConhecimento.value.map(a => `- ${a.descricao}`).join('\n');
-    notificacoesStore.alerta('Atividades Incompletas', `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`);
+    notificacoesStore.aviso('Atividades Incompletas', `As seguintes atividades não têm conhecimentos associados:\n${atividadesDescricoes}`);
   }
 
   mostrarModalConfirmacao.value = true;

@@ -82,7 +82,7 @@ describe('usePerfilStore', () => {
         });
 
         it('loginCompleto should authenticate, fetch profiles, and auto-select if one profile', async () => {
-            const perfilUnidade = { perfil: 'CHEFE', unidade: { codigo: 1, sigla: 'UT' } };
+            const perfilUnidade = { perfil: Perfil.CHEFE, unidade: { codigo: 1, sigla: 'UT', nome: 'Unidade UT' }, siglaUnidade: 'UT' };
             mockUsuarioService.autenticar.mockResolvedValue(true);
             mockUsuarioService.autorizar.mockResolvedValue([perfilUnidade]);
             mockUsuarioService.entrar.mockResolvedValue(undefined);
@@ -92,13 +92,13 @@ describe('usePerfilStore', () => {
             expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({ tituloEleitoral: 123, senha: 'pass' });
             expect(mockUsuarioService.autorizar).toHaveBeenCalledWith(123);
             expect(mockUsuarioService.entrar).toHaveBeenCalled();
-            expect(perfilStore.perfilSelecionado).toBe('CHEFE');
+            expect(perfilStore.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(perfilStore.unidadeSelecionada).toBe('UT');
             expect(result).toBe(true);
         });
 
         it('loginCompleto should not auto-select if multiple profiles', async () => {
-            const perfis = [{ perfil: 'CHEFE' }, { perfil: 'GESTOR' }];
+            const perfis = [{ perfil: Perfil.CHEFE, unidade: {codigo: 1, nome: 'Unidade 1', sigla: 'U1'}, siglaUnidade: 'U1'}, { perfil: Perfil.GESTOR, unidade: {codigo: 2, nome: 'Unidade 2', sigla: 'U2'}, siglaUnidade: 'U2' }];
             mockUsuarioService.autenticar.mockResolvedValue(true);
             mockUsuarioService.autorizar.mockResolvedValue(perfis);
 
@@ -109,17 +109,17 @@ describe('usePerfilStore', () => {
         });
 
         it('selecionarPerfilUnidade should call entrar and set profile', async () => {
-            const perfilUnidade = { perfil: 'GESTOR', unidade: { codigo: 2, sigla: 'XYZ' } };
+            const perfilUnidade = { perfil: Perfil.GESTOR, unidade: { codigo: 2, sigla: 'XYZ', nome: 'Unidade XYZ' }, siglaUnidade: 'XYZ' };
             mockUsuarioService.entrar.mockResolvedValue(undefined);
 
             await perfilStore.selecionarPerfilUnidade(456, perfilUnidade);
 
             expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
                 tituloEleitoral: 456,
-                perfil: 'GESTOR',
+                perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
             });
-            expect(perfilStore.perfilSelecionado).toBe('GESTOR');
+            expect(perfilStore.perfilSelecionado).toBe(Perfil.GESTOR);
             expect(perfilStore.unidadeSelecionada).toBe('XYZ');
             expect(perfilStore.servidorId).toBe(456);
         });

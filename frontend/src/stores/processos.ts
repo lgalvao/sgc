@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {Movimentacao, Subprocesso} from '@/types/tipos'
+import {Movimentacao, Processo, Subprocesso} from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
 import {Page} from '../services/painelService'
@@ -18,7 +18,7 @@ export const useProcessosStore = defineStore('processos', {
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
         processoDetalhe: null as ProcessoDetalhe | null, // Para armazenar o processo detalhado
-        processosFinalizados: [] as ProcessoResumo[],
+        processosFinalizados: [] as Processo[],
         // As propriedades abaixo serão tratadas em etapas futuras ou removidas se não forem mais necessárias
         // processos: [] as Processo[], // Removido
         // subprocessos: [] as Subprocesso[], // Removido
