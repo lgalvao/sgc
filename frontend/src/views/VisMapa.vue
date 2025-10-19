@@ -518,7 +518,12 @@ const atividades = computed<Atividade[]>(() => {
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
-const mapa = computed(() => mapaStore.mapas.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
+const mapa = computed(() => {
+  if (unidade.value?.codigo) {
+    return mapaStore.getMapaByUnidadeId(unidade.value.codigo);
+  }
+  return null;
+})
 const competencias = computed<Competencia[]>(() => mapa.value ? mapa.value.competencias : [])
 
 const subprocesso = computed(() => {
@@ -529,16 +534,16 @@ const subprocesso = computed(() => {
 // Computed para determinar quais botões mostrar baseado no perfil e situação
 const podeValidar = computed(() => {
   return perfilSelecionado.value === 'CHEFE' &&
-      subprocesso.value?.situacao === 'Mapa disponibilizado'
+      subprocesso.value?.situacaoSubprocesso === 'MAPA_DISPONIBILIZADO'
 })
 
 const podeAnalisar = computed(() => {
   return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
-      (subprocesso.value?.situacao === 'Mapa validado' || subprocesso.value?.situacao === 'Mapa com sugestões')
+      (subprocesso.value?.situacaoSubprocesso === 'MAPA_VALIDADO' || subprocesso.value?.situacaoSubprocesso === 'MAPA_COM_SUGESTOES')
 })
 
 const podeVerSugestoes = computed(() => {
-  return subprocesso.value?.situacao === 'Mapa com sugestões'
+  return subprocesso.value?.situacaoSubprocesso === 'MAPA_COM_SUGESTOES'
 })
 
 const temHistoricoAnalise = computed(() => {
@@ -576,8 +581,8 @@ function fecharModalAceitar() {
 
 function abrirModalSugestoes() {
   // Pré-preencher com sugestões existentes se houver
-  if (subprocesso.value?.sugestoes) {
-    sugestoes.value = subprocesso.value.sugestoes
+  if (mapa.value?.sugestoes) {
+    sugestoes.value = mapa.value.sugestoes
   }
   mostrarModalSugestoes.value = true
 }
@@ -619,7 +624,7 @@ function fecharModalHistorico() {
 
 function verSugestoes() {
   // Buscar sugestões do subprocesso
-  const sugestoes = subprocesso.value?.sugestoes || "Nenhuma sugestão registrada.";
+  const sugestoes = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
 
   // Mostrar modal de visualização com sugestões
   mostrarModalVerSugestoes.value = true;

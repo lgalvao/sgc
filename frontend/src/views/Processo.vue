@@ -227,8 +227,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
-import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, ProcessoResumo, SituacaoProcesso } from '../mappers/processos'
-import { Unidade } from '../mappers/sgrh'
+import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, SituacaoProcesso, Unidade, ProcessoResumo } from '../types/tipos'
 import {ensureValidDate} from '@/utils'
 import * as processoService from '@/services/processoService';
 

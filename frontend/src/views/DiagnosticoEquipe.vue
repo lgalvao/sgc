@@ -211,7 +211,10 @@ onMounted(async () => {
 });
 
 const mapa = computed<Mapa | null>(() => {
-  return mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value) || null
+  if (unidade.value?.codigo) {
+    return mapasStore.getMapaByUnidadeId(unidade.value.codigo) || null
+  }
+  return null
 })
 
 const competencias = computed<Competencia[]>(() => {
@@ -264,8 +267,8 @@ function confirmarFinalizacao() {
   if (subprocesso) {
     processosStore.addMovement({
       idSubprocesso: subprocesso.codUnidade,
-      unidadeOrigem: siglaUnidade.value,
-      unidadeDestino: 'SEDOC',
+      unidadeOrigem: unidade.value,
+      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
       descricao: 'Diagnóstico da equipe finalizado'
     });
   }

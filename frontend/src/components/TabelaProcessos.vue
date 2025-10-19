@@ -73,17 +73,17 @@
 </template>
 
 <script lang="ts" setup>
-import {Processo} from '@/types/tipos';
+import {ProcessoResumo} from '@/types/tipos';
 
 defineProps<{
-  processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
-  criterioOrdenacao: keyof Processo | 'unidades' | 'dataFinalizacao';
+  processos: (ProcessoResumo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
+  criterioOrdenacao: keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', campo: keyof Processo | 'unidades' | 'dataFinalizacao'): void;
-  (e: 'selecionarProcesso', processo: Processo): void;
+  (e: 'ordenar', campo: keyof ProcessoResumo | 'unidades' | 'dataFinalizacao'): void;
+  (e: 'selecionarProcesso', processo: ProcessoResumo): void;
 }>();
 </script>

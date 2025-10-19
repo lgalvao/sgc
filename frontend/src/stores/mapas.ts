@@ -7,7 +7,8 @@ import {
     MapaAjuste,
     MapaCompleto,
     SalvarAjustesRequest,
-    SalvarMapaRequest
+    SalvarMapaRequest,
+    Unidade
 } from "@/types/tipos";
 
 export const useMapasStore = defineStore('mapas', {
@@ -19,13 +20,11 @@ export const useMapasStore = defineStore('mapas', {
 
     getters: {
         getMapaByUnidadeId: (state) => (unidadeId: number) => {
-            // Lógica de exemplo: filtrar mapas ou encontrar um mapa específico
-            // Esta lógica precisa ser ajustada com base na estrutura real do estado
             if (state.mapaCompleto && state.mapaCompleto.unidade.codigo === unidadeId) {
                 return state.mapaCompleto;
             }
             return null;
-        }
+        },
     },
 
     actions: {

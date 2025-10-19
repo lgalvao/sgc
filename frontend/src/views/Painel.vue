@@ -115,7 +115,7 @@ onMounted(() => {
   }
 });
 
-const processosOrdenados = computed<ProcessoResumo[]>(() => {
+const processosOrdenados = computed(() => {
   return [...processosPainel.value].sort((a, b) => {
     let valA: unknown = a[criterio.value]
     let valB: unknown = b[criterio.value]
@@ -126,7 +126,10 @@ const processosOrdenados = computed<ProcessoResumo[]>(() => {
     if (valAString < valBString) return asc.value ? -1 : 1;
     if (valAString > valBString) return asc.value ? 1 : -1;
     return 0
-  })
+  }).map(p => ({
+    ...p,
+    unidadesFormatadas: p.unidades ? p.unidades.map(u => u.sigla).join(', ') : ''
+  }));
 })
 
 function ordenarPor(campo: keyof ProcessoResumo) {

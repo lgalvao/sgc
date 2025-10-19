@@ -730,14 +730,15 @@ function disponibilizarMapa() {
     // Registrar movimentação
     processosStore.addMovement({
       idSubprocesso: sub.codUnidade,
-      unidadeOrigem: 'SEDOC',
-      unidadeDestino: siglaUnidade.value,
+    unidadeOrigem: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+    unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'
     });
   }
 
   // Atualizar mapa
-  mapasStore.editarMapa(currentMapa.id, {
+mapasStore.salvarMapa(currentMapa.id, {
+  ...currentMapa,
     situacao: 'disponivel_validacao',
     dataDisponibilizacao: new Date(),
   });

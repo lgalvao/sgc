@@ -30,8 +30,8 @@
         </p>
         <template
           v-if="unidadeComResponsavelDinamico.responsavel &&
-            unidadeComResponsavelDinamico.responsavel.idServidor &&
-            unidadeComResponsavelDinamico.responsavel.idServidor !== unidadeComResponsavelDinamico.idServidorTitular"
+            unidadeComResponsavelDinamico.responsavel.codigo &&
+            unidadeComResponsavelDinamico.responsavel.codigo !== unidadeComResponsavelDinamico.idServidorTitular"
         >
           <p><strong>Responsável:</strong> {{ responsavelDetalhes?.nome }}</p>
           <p class="ms-3">
@@ -131,7 +131,12 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
   return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
 });
 
-const mapaVigente = computed<Mapa | undefined>(() => mapasStore.getMapaVigentePorUnidade(sigla.value))
+const mapaVigente = computed<Mapa | null>(() => {
+  if (unidadeOriginal.value?.codigo) {
+    return mapasStore.getMapaByUnidadeId(unidadeOriginal.value.codigo);
+  }
+  return null;
+})
 
 function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${sigla.value}/atribuicao`})

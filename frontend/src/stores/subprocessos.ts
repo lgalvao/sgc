@@ -141,49 +141,46 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             this.subprocessoDetalhe = null;
         },
 
-        async homologarValidacao(idSubprocesso: number, req: any) {
+        async homologarValidacao(idSubprocesso: number, req: HomologarCadastroRequest) {
             const notificacoes = useNotificacoesStore();
-            console.log('homologarValidacao', idSubprocesso, req);
-            // try {
-            //     await subprocessoService.homologarValidacao(idSubprocesso, req);
-            //     notificacoes.sucesso('Validação homologada', 'A validação foi homologada com sucesso.');
-            //     const processosStore = useProcessosStore();
-            //     if (processosStore.processoDetalhe) {
-            //         await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-            //     }
-            // } catch (error) {
-            //     notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
-            // }
+            try {
+                await subprocessoService.homologarValidacao(idSubprocesso, req);
+                notificacoes.sucesso('Validação homologada', 'A validação foi homologada com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
+            }
         },
 
-        async aceitarValidacao(idSubprocesso: number, req: any) {
+        async aceitarValidacao(idSubprocesso: number, req: AceitarCadastroRequest) {
             const notificacoes = useNotificacoesStore();
-            console.log('aceitarValidacao', idSubprocesso, req);
-            // try {
-            //     await subprocessoService.aceitarValidacao(idSubprocesso, req);
-            //     notificacoes.sucesso('Validação aceita', 'A análise da validação foi registrada com sucesso.');
-            //     const processosStore = useProcessosStore();
-            //     if (processosStore.processoDetalhe) {
-            //         await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-            //     }
-            // } catch (error) {
-            //     notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
-            // }
+            try {
+                await subprocessoService.aceitarValidacao(idSubprocesso, req);
+                notificacoes.sucesso('Validação aceita', 'A análise da validação foi registrada com sucesso.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
+            }
         },
 
-        async devolverValidacao(idSubprocesso: number, req: any) {
+        async devolverValidacao(idSubprocesso: number, req: DevolverCadastroRequest) {
             const notificacoes = useNotificacoesStore();
-            console.log('devolverValidacao', idSubprocesso, req);
-            // try {
-            //     await subprocessoService.devolverValidacao(idSubprocesso, req);
-            //     notificacoes.sucesso('Validação devolvida', 'A validação foi devolvida para ajustes.');
-            //     const processosStore = useProcessosStore();
-            //     if (processosStore.processoDetalhe) {
-            //         await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-            //     }
-            // } catch (error) {
-            //     notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
-            // }
+            try {
+                await subprocessoService.devolverValidacao(idSubprocesso, req);
+                notificacoes.sucesso('Validação devolvida', 'A validação foi devolvida para ajustes.');
+                const processosStore = useProcessosStore();
+                if (processosStore.processoDetalhe) {
+                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                }
+            } catch (error) {
+                notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
+            }
         }
     }
 });

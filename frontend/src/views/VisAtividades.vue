@@ -145,48 +145,6 @@
       </div>
     </div>
 
-    <!-- Modal de Homologação Sem Impacto -->
-    <div
-      v-if="mostrarModalHomologacaoSemImpacto"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Homologação do mapa de competências
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalHomologacaoSemImpacto"
-            />
-          </div>
-          <div class="modal-body">
-            <p>A revisão do cadastro não produziu nenhum impacto no mapa de competência da unidade. Confirma a manutenção do mapa de competências vigente?</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalHomologacaoSemImpacto"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              @click="confirmarHomologacaoSemImpacto"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal de Devolução -->
     <div
       v-if="mostrarModalDevolver"
@@ -244,7 +202,7 @@
     </div>
 
     <div
-      v-if="mostrarModalValidar || mostrarModalDevolver || mostrarModalHomologacaoSemImpacto"
+      v-if="mostrarModalValidar || mostrarModalDevolver"
       class="modal-backdrop fade show"
     />
   </div>
@@ -318,15 +276,15 @@ const subprocesso = computed(() => {
 
 const isHomologacao = computed(() => {
     if (!subprocesso.value) return false;
-    const {situacao} = subprocesso.value;
-    return perfilSelecionado.value === Perfil.ADMIN && (situacao === 'Cadastro em homologação' || situacao === 'Revisão do cadastro em homologação');
+    const {situacaoSubprocesso} = subprocesso.value;
+    return perfilSelecionado.value === Perfil.ADMIN && (situacaoSubprocesso === 'CADASTRO_EM_HOMOLOGACAO' || situacaoSubprocesso === 'REVISAO_CADASTRO_EM_HOMOLOGACAO');
 });
 
 const podeVerImpacto = computed(() => {
   if (!subprocesso.value || !perfilSelecionado.value) return false;
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacao === 'Revisão do cadastro disponibilizada';
+  const situacaoCorreta = subprocesso.value.situacaoSubprocesso === 'REVISAO_CADASTRO_DISPONIBILIZADA';
   return podeVer && situacaoCorreta;
 });
 
@@ -360,7 +318,6 @@ async function confirmarValidacao() {
 
   const commonRequest = {
     observacoes: observacaoValidacao.value,
-    analista: perfilSelecionado.value,
   };
 
   if (isHomologacao.value) {
@@ -387,7 +344,6 @@ async function confirmarDevolucao() {
   if (!idSubprocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
     observacoes: observacaoDevolucao.value,
-    analista: perfilSelecionado.value,
   };
 
   if (isRevisao.value) {

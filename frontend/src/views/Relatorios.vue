@@ -313,7 +313,7 @@ import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
-
+import { SituacaoProcesso, TipoProcesso, ProcessoResumo, SituacaoSubprocesso } from '@/types/tipos';
 import {formatDateBR} from '@/utils'
 
 // Definição de tipo para os dados do CSV
@@ -360,10 +360,14 @@ const mapasVigentes = computed(() => {
   const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === SituacaoProcesso.FINALIZADO)
   const idsProcessosFinalizados = processosFinalizados.map(p => p.codigo)
 
-  return mapasStore.mapas.filter(m =>
-    idsProcessosFinalizados.includes(m.idProcesso) &&
-    m.competencias && m.competencias.length > 0
-  )
+  if (mapasStore.mapaCompleto && idsProcessosFinalizados.includes(mapasStore.mapaCompleto.idProcesso) && mapasStore.mapaCompleto.competencias && mapasStore.mapaCompleto.competencias.length > 0) {
+    return [{
+      ...mapasStore.mapaCompleto,
+      unidade: mapasStore.mapaCompleto.unidade.sigla,
+      id: mapasStore.mapaCompleto.codigo
+    }]
+  }
+  return []
 })
 
 const diagnosticosGaps = computed(() => {
@@ -460,7 +464,7 @@ const calcularPercentualConcluido = (processo: ProcessoResumo) => {
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
   const total = processo.unidades?.length || 0;
   if (total === 0) return 0;
-  const concluidos = processo.unidades?.filter(u => u.situacao === SituacaoSubprocesso.CONCLUIDO).length || 0;
+  const concluidos = processo.unidades?.filter(u => u.situacaoSubprocesso === SituacaoSubprocesso.CONCLUIDO).length || 0;
   return Math.round((concluidos / total) * 100);
 }
 
@@ -481,7 +485,7 @@ const exportarMapasVigentes = () => {
     Unidade: mapa.unidade,
     Processo: mapa.idProcesso,
     Competencias: mapa.competencias?.length || 0,
-    'Data Criacao': formatarData(mapa.dataCriacao),
+    'Data Criacao': formatarData(new Date(mapa.dataCriacao)),
     Situacao: mapa.situacao
   }))
 
