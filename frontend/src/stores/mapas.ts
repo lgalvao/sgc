@@ -20,7 +20,7 @@ export const useMapasStore = defineStore('mapas', {
 
     getters: {
         getMapaByUnidadeId: (state) => (unidadeId: number) => {
-            if (state.mapaCompleto && state.mapaCompleto.unidade.codigo === unidadeId) {
+            if (state.mapaCompleto && (state.mapaCompleto as any).unidade.codigo === unidadeId) {
                 return state.mapaCompleto;
             }
             return null;

@@ -39,17 +39,17 @@ Este plano detalha os passos para corrigir os erros de tipagem no frontend da ap
     -   Corrigir acessos a propriedades e chamadas de métodos.
 4.  **Corrigir `VisMapa.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-5.  **Corrigir `OcupacoesCriticas.vue`:** (A fazer)
+5.  **Corrigir `OcupacoesCriticas.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-6.  **Corrigir `Painel.vue`:** (A fazer)
+6.  **Corrigir `Painel.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-7.  **Corrigir `Relatorios.vue`:** (A fazer)
+7.  **Corrigir `Relatorios.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-8.  **Corrigir `DiagnosticoEquipe.vue`:** (A fazer)
+8.  **Corrigir `DiagnosticoEquipe.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-9.  **Corrigir `Historico.vue`:** (A fazer)
+9.  **Corrigir `Historico.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
-10. **Corrigir `CadMapa.vue`:** (A fazer)
+10. **Corrigir `CadMapa.vue`:** (Concluído)
     -   Corrigir acessos a propriedades e chamadas de métodos.
 
 ## Etapa 4: Finalização

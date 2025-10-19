@@ -222,6 +222,7 @@ import {
   DevolverCadastroRequest,
   HomologarCadastroRequest,
   Perfil,
+  SituacaoSubprocesso,
   TipoProcesso,
   Unidade
 } from '@/types/tipos';
@@ -277,14 +278,14 @@ const subprocesso = computed(() => {
 const isHomologacao = computed(() => {
     if (!subprocesso.value) return false;
     const {situacaoSubprocesso} = subprocesso.value;
-    return perfilSelecionado.value === Perfil.ADMIN && (situacaoSubprocesso === 'CADASTRO_EM_HOMOLOGACAO' || situacaoSubprocesso === 'REVISAO_CADASTRO_EM_HOMOLOGACAO');
+    return perfilSelecionado.value === Perfil.ADMIN && (situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_ATIVIDADES || situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_MAPA);
 });
 
 const podeVerImpacto = computed(() => {
   if (!subprocesso.value || !perfilSelecionado.value) return false;
   const perfil = perfilSelecionado.value;
   const podeVer = perfil === Perfil.GESTOR || perfil === Perfil.ADMIN;
-  const situacaoCorreta = subprocesso.value.situacaoSubprocesso === 'REVISAO_CADASTRO_DISPONIBILIZADA';
+  const situacaoCorreta = subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.ATIVIDADES_REVISADAS;
   return podeVer && situacaoCorreta;
 });
 

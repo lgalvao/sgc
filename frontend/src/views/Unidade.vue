@@ -133,7 +133,7 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
 
 const mapaVigente = computed<Mapa | null>(() => {
   if (unidadeOriginal.value?.codigo) {
-    return mapasStore.getMapaByUnidadeId(unidadeOriginal.value.codigo);
+    return mapasStore.getMapaByUnidadeId(unidadeOriginal.value.codigo) as any;
   }
   return null;
 })
