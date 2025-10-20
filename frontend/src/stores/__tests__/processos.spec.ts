@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi, Mocked} from 'vitest';
 import {useProcessosStore} from '../processos';
-import {SituacaoProcesso, Subprocesso, TipoProcesso} from '@/types/tipos';
+import {SituacaoProcesso, SituacaoSubprocesso, Subprocesso, TipoProcesso} from '@/types/tipos';
 import {useNotificacoesStore} from '../notificacoes';
 import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'; // Adicionado
 import {initPinia} from '@/test-utils/helpers';
@@ -63,7 +63,16 @@ describe('useProcessosStore', () => {
 
         it('fetchProcessosPainel should call painelService and update state', async () => {
             const mockPage = {
-                content: [{codigo: 1, descricao: 'Teste', tipo: 'MAPEAMENTO', situacao: SituacaoProcesso.EM_ANDAMENTO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidadeCodigo: 1, unidadeNome: 'TESTE', unidades: []}],
+                content: [{
+                    codigo: 1,
+                    descricao: 'Teste',
+                    tipo: TipoProcesso.MAPEAMENTO,
+                    situacao: SituacaoProcesso.EM_ANDAMENTO,
+                    dataLimite: '2025-12-31',
+                    dataCriacao: '2025-01-01',
+                    unidadeCodigo: 1,
+                    unidadeNome: 'TESTE'
+                }],
                 totalPages: 1,
                 totalElements: 1,
                 number: 0,
@@ -89,7 +98,16 @@ describe('useProcessosStore', () => {
         });
 
         it('fetchProcessosFinalizados should update state on success', async () => {
-            const mockProcessos = [{codigo: 2, descricao: 'Finalizado', tipo: TipoProcesso.DIAGNOSTICO, situacao: SituacaoProcesso.FINALIZADO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', unidades: [], resumoSubprocessos: []}];
+            const mockProcessos = [{
+                codigo: 2,
+                descricao: 'Finalizado',
+                tipo: TipoProcesso.DIAGNOSTICO,
+                situacao: SituacaoProcesso.FINALIZADO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-01-01',
+                unidadeCodigo: 1,
+                unidadeNome: 'TESTE'
+            }];
             processoService.fetchProcessosFinalizados.mockResolvedValue(mockProcessos);
             await processosStore.fetchProcessosFinalizados();
             expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
@@ -112,7 +130,10 @@ describe('useProcessosStore', () => {
                 dataCriacao: '2025-01-01',
                 dataFinalizacao: '2025-12-31',
                 unidades: [],
-                resumoSubprocessos: []
+                resumoSubprocessos: [],
+                podeFinalizar: false,
+                podeHomologarCadastro: false,
+                podeHomologarMapa: false
             };
             processoService.obterDetalhesProcesso.mockResolvedValue(mockDetalhe);
 
@@ -135,7 +156,17 @@ describe('useProcessosStore', () => {
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.criarProcesso.mockResolvedValue({ codigo: 2, descricao: 'Novo Processo', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.CRIADO, dataLimite: '2025-12-31', dataCriacao: '2025-02-01', dataFinalizacao: '', unidades: [], resumoSubprocessos: [] });
+            processoService.criarProcesso.mockResolvedValue({
+                codigo: 2,
+                descricao: 'Novo Processo',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.CRIADO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-02-01',
+                dataFinalizacao: '',
+                unidades: [],
+                resumoSubprocessos: [],
+            });
 
             await processosStore.criarProcesso(payload);
 
@@ -156,7 +187,17 @@ describe('useProcessosStore', () => {
                 dataLimiteEtapa1: '2025-12-31',
                 unidades: [1]
             };
-            processoService.atualizarProcesso.mockResolvedValue({ codigo: 1, descricao: 'Processo Atualizado', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.CRIADO, dataLimite: '2025-12-31', dataCriacao: '2025-01-01', dataFinalizacao: '', unidades: [], resumoSubprocessos: [] });
+            processoService.atualizarProcesso.mockResolvedValue({
+                codigo: 1,
+                descricao: 'Processo Atualizado',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.CRIADO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-01-01',
+                dataFinalizacao: '',
+                unidades: [],
+                resumoSubprocessos: [],
+            });
 
             await processosStore.atualizarProcesso(1, payload);
 
@@ -228,10 +269,13 @@ describe('useProcessosStore', () => {
                 dataLimite: '2025-12-31',
                 dataCriacao: '2025-01-01',
                 unidades: [
-                    { sigla: 'A', situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_ACEITE, nome: 'Unidade A', codUnidade: 1, dataLimite: '2025-12-31', filhos: [] },
-                    { sigla: 'B', situacaoSubprocesso: SituacaoSubprocesso.AGUARDANDO_ACEITE, nome: 'Unidade B', codUnidade: 2, dataLimite: '2025-12-31', filhos: [] },
+                    { sigla: 'A', situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO, nome: 'Unidade A', codUnidade: 1, dataLimite: '2025-12-31', filhos: [] },
+                    { sigla: 'B', situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO, nome: 'Unidade B', codUnidade: 2, dataLimite: '2025-12-31', filhos: [] },
                 ],
-                resumoSubprocessos: []
+                resumoSubprocessos: [],
+                podeFinalizar: false,
+                podeHomologarCadastro: false,
+                podeHomologarMapa: false,
             };
 
             processosStore.processarCadastroBloco({
@@ -272,10 +316,40 @@ describe('useProcessosStore', () => {
                 dataCriacao: '2025-01-01',
                 unidades: [],
                 resumoSubprocessos: [
-                    { codigo: 1, unidade: { sigla: 'A', nome: 'Unidade A', codigo: 1 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 1 },
-                    { codigo: 2, unidade: { sigla: 'B', nome: 'Unidade B', codigo: 2 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 2 },
-                    { codigo: 3, unidade: { sigla: 'A', nome: 'Unidade A', codigo: 1 }, situacao: SituacaoSubprocesso.AGUARDANDO_ACEITE, dataLimite: '2025-12-31', dataFimEtapa1: '', dataLimiteEtapa2: '', atividades: [], codUnidade: 1 },
-                ]
+                    {
+                        codigo: 1,
+                        unidadeNome: 'A',
+                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        dataLimite: '2025-12-31',
+                        descricao: 'Subprocesso A',
+                        tipo: TipoProcesso.MAPEAMENTO,
+                        dataCriacao: '2025-01-01',
+                        unidadeCodigo: 1
+                    },
+                    {
+                        codigo: 2,
+                        unidadeNome: 'B',
+                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        dataLimite: '2025-12-31',
+                        descricao: 'Subprocesso B',
+                        tipo: TipoProcesso.MAPEAMENTO,
+                        dataCriacao: '2025-01-01',
+                        unidadeCodigo: 2
+                    },
+                    {
+                        codigo: 3,
+                        unidadeNome: 'A',
+                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        dataLimite: '2025-12-31',
+                        descricao: 'Subprocesso C',
+                        tipo: TipoProcesso.MAPEAMENTO,
+                        dataCriacao: '2025-01-01',
+                        unidadeCodigo: 1
+                    },
+                ],
+                podeFinalizar: false,
+                podeHomologarCadastro: false,
+                podeHomologarMapa: false,
             };
         });
 

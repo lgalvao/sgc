@@ -32,7 +32,7 @@ import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {type ProcessoResumo} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
 
-type SortCriteria = keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
+type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
@@ -49,13 +49,8 @@ onMounted(async () => {
 });
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosStore.processosFinalizados].sort((a: ProcessoResumo, b: ProcessoResumo) => {
-    if (criterio.value === 'unidades') {
-      // Lógica de ordenação para 'unidades'
-      const aUnidades = a.unidades ? a.unidades.length : 0;
-      const bUnidades = b.unidades ? b.unidades.length : 0;
-      return (aUnidades - bUnidades) * (asc.value ? 1 : -1);
-    } else if (criterio.value === 'dataFinalizacao') {
+  return [...processosStore.processosFinalizados].sort((a, b) => {
+    if (criterio.value === 'dataFinalizacao') {
       const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : 0;
       const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : 0;
       return (dateA - dateB) * (asc.value ? 1 : -1);
@@ -72,7 +67,6 @@ const processosFinalizadosOrdenados = computed(() => {
 const processosFinalizadosOrdenadosComFormatacao = computed(() => {
   return processosFinalizadosOrdenados.value.map(p => ({
     ...p,
-    unidadesFormatadas: 'N/A', // TODO: Obter unidades do processo detalhe
     dataFinalizacaoFormatada: p.dataFinalizacao ? formatDateTimeBR(new Date(p.dataFinalizacao)) : null
   }));
 });

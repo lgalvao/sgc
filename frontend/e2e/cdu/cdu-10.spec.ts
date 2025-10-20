@@ -17,7 +17,7 @@ import {
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
 
     test('deve disponibilizar a revisão com sucesso após corrigir atividades incompletas', async ({ page }) => {
-        const { processo } = await criarProcessoCompleto(gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO');
+        const { processo } = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');

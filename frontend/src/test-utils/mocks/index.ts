@@ -11,11 +11,14 @@ import { SituacaoSubprocesso } from "@/types/tipos";
 
 export const mockProcessoDetalhe: ProcessoDetalhe = {
     codigo: 1,
+    descricao: 'Teste',
     tipo: TipoProcesso.MAPEAMENTO,
     situacao: SituacaoProcesso.EM_ANDAMENTO,
-    unidades: [{...mockUnidade, codUnidade: 1, situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO, dataLimite: '2025-12-31', filhos: []}],
-    unidadesParticipantes: [{...mockUnidade, codUnidade: 1, situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO, dataLimite: '2025-12-31', filhos: []}],
+    dataLimite: '2025-12-31',
     dataCriacao: '2024-01-01',
-    dataFinalizacao: null,
-    subprocessos: [],
+    unidades: [],
+    resumoSubprocessos: [],
+    podeFinalizar: false,
+    podeHomologarCadastro: false,
+    podeHomologarMapa: false,
 };

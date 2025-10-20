@@ -125,7 +125,7 @@ const mostrarModalAlterarDataLimite = ref(false)
 
 const SubprocessoDetalhes = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.resumoSubprocessos.find(u => u.unidade.sigla === siglaParam.value);
+  return processosStore.processoDetalhe.resumoSubprocessos.find(u => u.unidadeNome === siglaParam.value);
 });
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -135,7 +135,7 @@ onMounted(async () => {
 });
 
 const sigla = computed<string | undefined>(() => {
-  return SubprocessoDetalhes.value?.unidade.sigla;
+  return SubprocessoDetalhes.value?.unidadeNome;
 });
 
 const unidadeOriginal = computed<Unidade | null>(() => {
@@ -211,39 +211,33 @@ const isSubprocessoEmAndamento = computed(() => {
     SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
     SituacaoSubprocesso.MAPA_HOMOLOGADO,
     SituacaoSubprocesso.NAO_INICIADO
-  ] as const;
+  ];
 
-  return !situacoesFinalizadas.includes(situacao as (typeof situacoesFinalizadas)[number]);
+  return !situacoesFinalizadas.includes(situacao as any);
 });
 
 // Computed para identificar a etapa atual e sua data limite
 const etapaAtual = computed(() => {
   if (!SubprocessoDetalhes.value) return null;
 
-  // Se etapa 1 ainda não terminou, é a etapa 1
-  if (!SubprocessoDetalhes.value.dataFimEtapa1) {
+  // Lógica simplificada: se a situação não for finalizada, consideramos etapa 1.
+  const situacao = SubprocessoDetalhes.value.situacao;
+  const situacoesFinalizadas = [
+    SituacaoSubprocesso.CONCLUIDO,
+    SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS,
+    SituacaoSubprocesso.MAPA_HOMOLOGADO,
+  ];
+
+  if (!situacoesFinalizadas.includes(situacao as any)) {
     return 1;
   }
 
-  // Se etapa 1 terminou mas etapa 2 não começou ou não terminou, é a etapa 2
-  if (SubprocessoDetalhes.value.dataLimiteEtapa2) {
-    return 2;
-  }
-
-  // Se ambas as etapas terminaram, não há etapa em andamento
   return null;
 });
 
 const dataLimiteAtual = computed<Date>(() => {
   if (!SubprocessoDetalhes.value || !etapaAtual.value) return new Date();
-
-  if (etapaAtual.value === 1) {
-    return new Date(SubprocessoDetalhes.value.dataLimite);
-  } else if (etapaAtual.value === 2) {
-    return new Date(SubprocessoDetalhes.value.dataLimiteEtapa2);
-  }
-
-  return new Date();
+  return new Date(SubprocessoDetalhes.value.dataLimite);
 });
 
 // Computed properties movidos para os componentes específicos

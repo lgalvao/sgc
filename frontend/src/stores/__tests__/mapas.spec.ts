@@ -30,7 +30,7 @@ describe('useMapasStore', () => {
 
     describe('fetchMapaCompleto', () => {
         it('should call service and update state on success', async () => {
-            const mockMapa: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: []};
+            const mockMapa: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: []};
             vi.mocked(SubprocessoService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
             await store.fetchMapaCompleto(idSubprocesso);
@@ -52,7 +52,7 @@ describe('useMapasStore', () => {
     describe('salvarMapa', () => {
         it('should call service and update state on success', async () => {
             const request = {competencias: []};
-            const mockResponse: MapaCompleto = {codigo: 1, descricao: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}]};
+            const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}]};
             vi.mocked(SubprocessoService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
             await store.salvarMapa(idSubprocesso, request);
@@ -87,7 +87,17 @@ describe('useMapasStore', () => {
 
     describe('fetchImpactoMapa', () => {
         it('should call service and update state on success', async () => {
-            const mockImpacto: ImpactoMapa = { temImpactos: true, competencias: [] };
+            const mockImpacto: ImpactoMapa = {
+                temImpactos: true,
+                totalAtividadesInseridas: 0,
+                totalAtividadesRemovidas: 0,
+                totalAtividadesAlteradas: 0,
+                totalCompetenciasImpactadas: 0,
+                atividadesInseridas: [],
+                atividadesRemovidas: [],
+                atividadesAlteradas: [],
+                competenciasImpactadas: []
+            };
             vi.mocked(SubprocessoService.verificarImpactosMapa).mockResolvedValue(mockImpacto);
 
             await store.fetchImpactoMapa(idSubprocesso);

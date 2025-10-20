@@ -276,7 +276,7 @@
                     <th>Tipo</th>
                     <th>Situação</th>
                     <th>Data Limite</th>
-                    <th>Unidades Participantes</th>
+                    <th>Unidade</th>
                     <th>% Concluído</th>
                   </tr>
                 </thead>
@@ -289,7 +289,7 @@
                     <td>{{ processo.tipo }}</td>
                     <td>{{ processo.situacao }}</td>
                     <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
-                    <td>{{ processo.unidades?.length || 0 }}</td>
+                    <td>{{ processo.unidadeNome }}</td>
                     <td>{{ calcularPercentualConcluido(processo) }}%</td>
                   </tr>
                 </tbody>
@@ -456,10 +456,7 @@ const formatarData = (data: Date) => {
 const calcularPercentualConcluido = (processo: ProcessoResumo) => {
   // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
-  const total = processo.unidades?.length || 0;
-  if (total === 0) return 0;
-  const concluidos = processo.unidades?.filter(u => (u as any).situacaoSubprocesso === SituacaoSubprocesso.CONCLUIDO).length || 0;
-  return Math.round((concluidos / total) * 100);
+  return 0;
 }
 
 const abrirModalMapasVigentes = () => {
@@ -506,7 +503,7 @@ const exportarAndamentoGeral = () => {
     Tipo: processo.tipo,
     Situacao: processo.situacao,
     'Data Limite': formatarData(new Date(processo.dataLimite)),
-    'Unidades Participantes': processo.unidades?.length || 0,
+    'Unidade': processo.unidadeNome,
     '% Concluido': calcularPercentualConcluido(processo)
   }))
 

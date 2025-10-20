@@ -148,7 +148,7 @@
         <div class="mt-3 ms-3">
           <div
             v-for="(conhecimento, cidx) in atividade.conhecimentos"
-            :key="conhecimento.codigo"
+            :key="conhecimento.id"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
           >
             <span data-testid="conhecimento-descricao">{{ conhecimento.descricao }}</span>
@@ -477,7 +477,7 @@ async function removerConhecimento(idx: number, cidx: number) {
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm('Confirma a remoção deste conhecimento?')) {
-    await atividadesStore.removerConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoRemovido.codigo);
+    await atividadesStore.removerConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoRemovido.id);
   }
 }
 
@@ -496,9 +496,9 @@ function fecharModalEdicaoConhecimento() {
 
 async function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
   if (!idSubprocesso.value) return;
-  const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.codigo === conhecimentoId));
+  const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.id === conhecimentoId));
   if (atividade) {
-    const conhecimento = atividade.conhecimentos.find(c => c.codigo === conhecimentoId);
+    const conhecimento = atividade.conhecimentos.find(c => c.id === conhecimentoId);
     if (conhecimento) {
       const conhecimentoAtualizado: Conhecimento = {...conhecimento, descricao: novaDescricao};
       await atividadesStore.atualizarConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoId, conhecimentoAtualizado);

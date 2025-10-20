@@ -70,12 +70,12 @@ export async function acessarAnaliseRevisaoCadastro(page: Page, idProcesso: numb
 /**
  * Realiza o login como gestor e acessa a análise de revisão do cadastro.
  */
-export async function acessarAnaliseRevisaoComoGestor(page: Page): Promise<void> {
+export async function acessarAnaliseRevisaoComoGestor(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await loginComoGestor(page);
     await acessarAnaliseRevisaoCadastro(
         page,
-        DADOS_TESTE.PROCESSOS.REVISAO_STIC.id,
-        DADOS_TESTE.UNIDADES.SESEL
+        idProcesso,
+        unidade
     );
 }
 
@@ -244,14 +244,13 @@ export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR'
 /**
  * Realiza login com um perfil e unidade específicos.
  */
-export async function loginComo(page: Page, perfil: Perfil, unidadeId: number): Promise<void> {
+export async function loginComo(page: Page, perfil: Perfil, tituloEleitoral: string): Promise<void> {
     const credenciais = {
-        tituloEleitoral: DADOS_LOGIN.CHEFE.tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
+        tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
         senha: DADOS_LOGIN.CHEFE.senha,
         perfil,
-        unidadeId,
     };
-    await login(page, credenciais);
+    await login(page, credenciais.tituloEleitoral, credenciais.senha);
 }
 
 /**

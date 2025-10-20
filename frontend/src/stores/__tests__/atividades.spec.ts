@@ -29,7 +29,7 @@ const mockMapa: MapaVisualizacao = {
                 {
                     codigo: 100,
                     descricao: 'Atividade 1',
-                    conhecimentos: [{ codigo: 1000, descricao: 'Conhecimento 1' }],
+                    conhecimentos: [{ id: 1000, descricao: 'Conhecimento 1' }],
                 },
             ],
         },
@@ -100,7 +100,7 @@ describe('useAtividadesStore', () => {
         const idSubprocesso = 1;
         const idAtividade = 100;
         const request: CriarConhecimentoRequest = { descricao: 'Novo Conhecimento' };
-        const novoConhecimento: Conhecimento = { codigo: 2000, descricao: 'Novo Conhecimento' };
+        const novoConhecimento: Conhecimento = { id: 2000, descricao: 'Novo Conhecimento' };
         store.atividadesPorSubprocesso.set(idSubprocesso, [
             { codigo: 100, descricao: 'Atividade 1', conhecimentos: [] },
         ]);
@@ -122,7 +122,7 @@ describe('useAtividadesStore', () => {
             {
                 codigo: 100,
                 descricao: 'Atividade 1',
-                conhecimentos: [{ codigo: 1000, descricao: 'Conhecimento 1' }],
+                conhecimentos: [{ id: 1000, descricao: 'Conhecimento 1' }],
             },
         ]);
         vi.spyOn(atividadeService, 'excluirConhecimento').mockResolvedValue();
@@ -177,7 +177,7 @@ describe('useAtividadesStore', () => {
     it('adicionarConhecimento should not update local state if atividade not found', async () => {
         const store = useAtividadesStore();
         const request: CriarConhecimentoRequest = { descricao: 'Novo Conhecimento' };
-        const novoConhecimento: Conhecimento = { codigo: 2000, descricao: 'Novo Conhecimento' };
+        const novoConhecimento: Conhecimento = { id: 2000, descricao: 'Novo Conhecimento' };
         vi.spyOn(atividadeService, 'criarConhecimento').mockResolvedValue(novoConhecimento);
         await store.adicionarConhecimento(1, 999, request); // 999 = Non-existent ID
         expect(atividadeService.criarConhecimento).toHaveBeenCalledWith(999, request);
@@ -233,8 +233,8 @@ describe('useAtividadesStore', () => {
     describe('atualizarConhecimento', () => {
         it('should call service and update state on success', async () => {
             const store = useAtividadesStore();
-            const conhecimentoAtualizado: Conhecimento = { codigo: 1000, descricao: 'Conhecimento Atualizado' };
-            store.atividadesPorSubprocesso.set(1, [{ codigo: 100, descricao: 'Atividade', conhecimentos: [{ codigo: 1000, descricao: 'Original' }] }]);
+            const conhecimentoAtualizado: Conhecimento = { id: 1000, descricao: 'Conhecimento Atualizado' };
+            store.atividadesPorSubprocesso.set(1, [{ codigo: 100, descricao: 'Atividade', conhecimentos: [{ id: 1000, descricao: 'Original' }] }]);
             vi.spyOn(atividadeService, 'atualizarConhecimento').mockResolvedValue(conhecimentoAtualizado);
             await store.atualizarConhecimento(1, 100, 1000, conhecimentoAtualizado);
             expect(atividadeService.atualizarConhecimento).toHaveBeenCalledWith(100, 1000, conhecimentoAtualizado);
@@ -244,7 +244,7 @@ describe('useAtividadesStore', () => {
 
         it('should not update state if atividade is not found', async () => {
             const store = useAtividadesStore();
-            const conhecimentoAtualizado: Conhecimento = { codigo: 1000, descricao: 'Conhecimento Atualizado' };
+            const conhecimentoAtualizado: Conhecimento = { id: 1000, descricao: 'Conhecimento Atualizado' };
             vi.spyOn(atividadeService, 'atualizarConhecimento').mockResolvedValue(conhecimentoAtualizado);
             await store.atualizarConhecimento(1, 999, 1000, conhecimentoAtualizado);
             expect(store.getAtividadesPorSubprocesso(1)).toEqual([]);
