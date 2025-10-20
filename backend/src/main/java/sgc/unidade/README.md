@@ -33,10 +33,11 @@ graph TD
 ```
 
 ## Componentes Principais
-- **`Unidade`**: A entidade JPA que representa uma unidade organizacional. Seus campos mais importantes são:
-  - `unidadeSuperior`: Auto-relacionamento que define a hierarquia.
-  - `tipo`: Um enum que classifica a unidade (ex: `OPERACIONAL`), usado para direcionar a lógica em outros módulos.
+- **`Unidade`**: A entidade JPA principal que representa uma unidade organizacional.
 - **`UnidadeRepo`**: O repositório Spring Data JPA para acessar a entidade `Unidade`.
+- **`AtribuicaoTemporaria` / `VinculacaoUnidade`**: Entidades relacionadas que modelam outras características da estrutura organizacional.
+- **`TipoUnidade`**: Enum que classifica a unidade (ex: `OPERACIONAL`, `INTERMEDIARIA`), usado para direcionar a lógica em outros módulos.
+- **`SituacaoUnidade`**: Enum que define a situação de uma unidade (ex: `ATIVA`, `EXTINTA`).
 
 ## Como os Dados são Gerenciados?
 - **Leitura:** Diversos serviços (`ProcessoService`, `SubprocessoService`, etc.) utilizam o `UnidadeRepo` para buscar informações sobre a estrutura organizacional.

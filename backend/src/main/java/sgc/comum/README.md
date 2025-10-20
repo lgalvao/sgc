@@ -1,12 +1,12 @@
 # Pacote Comum
 
 ## Visão Geral
-O pacote `comum` é a fundação da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de todos os outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência em toda a base de código.
+O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência.
 
-Este pacote **não contém lógica de negócio**. Seus componentes são utilitários, configurações e abstrações.
+Embora seu propósito principal seja abrigar código de suporte sem lógica de negócio, ele atualmente também contém os componentes do `Painel` (dashboard), que possuem lógica de negócio específica.
 
 ## Arquitetura e Subpacotes
-O `comum` fornece a infraestrutura básica sobre a qual os módulos de negócio são construídos.
+O `comum` fornece infraestrutura básica, como o tratamento de erros e modelos de dados compartilhados.
 
 ```mermaid
 graph TD
@@ -19,49 +19,46 @@ graph TD
 
     subgraph "Pacote Comum"
         direction LR
-        Config(config)
+        Painel(PainelControle/Service)
         Erros(erros)
         ModeloBase(modelo)
+        BeanUtil
     end
 
     Services -- Lançam --> Erros
     Controllers -- Capturam exceções via --> Erros
     Models -- Herdam de --> ModeloBase
 
-    subgraph "Spring Framework"
-        Spring
-    end
-
-    Spring -- Carrega --> Config
-
+    Painel -- Agrega dados de --> Services
 ```
 
-### 1. `config`
-- **Responsabilidade:** Contém classes de configuração do Spring Framework.
-- **Componentes Notáveis:**
-  - `WebConfig`: Configurações globais da aplicação web, como CORS.
-  - `ThymeleafConfig`: Configura o motor de templates para e-mails.
-  - `OpenApiConfig`: Configurações relacionadas à geração da documentação OpenAPI (Swagger).
-
-### 2. `erros`
+### 1. `erros`
 - **Responsabilidade:** Define a hierarquia de exceções customizadas e o tratador global de erros.
 - **Componentes Notáveis:**
   - `RestExceptionHandler`: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte em respostas JSON padronizadas para a API.
   - `ErroDominioNaoEncontrado`: Exceção padrão para ser lançada quando uma entidade não é encontrada (resulta em HTTP 404).
-  - `ErroAcessoNegado`: Exceção para violações de segurança (resulta em HTTP 403).
   - `ApiError`: Classe que modela a resposta de erro JSON padrão.
 
-### 3. `modelo`
+### 2. `modelo`
 - **Responsabilidade:** Contém modelos de dados compartilhados.
 - **Componentes Notáveis:**
   - `EntidadeBase`: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) padronizado para a maioria das entidades JPA do sistema.
 
-## Propósito e Uso
-As classes deste pacote são, em sua maioria, usadas de forma implícita pelo framework ou de forma explícita pelos outros módulos.
+### 3. Componentes de Painel
+- **Responsabilidade:** Fornece endpoints para o dashboard da aplicação, agregando dados de processos e alertas.
+- **Componentes Notáveis:**
+  - `PainelControle`: Expõe a API REST para o painel.
+  - `PainelService`: Contém a lógica de negócio para buscar e agregar os dados.
 
-- **Configurações (`config`)**: Carregadas automaticamente pelo Spring na inicialização.
+### 4. Utilitários
+- **Responsabilidade:** Fornece classes de utilidade diversas.
+- **Componentes Notáveis:**
+  - `BeanUtil`: Permite o acesso a beans gerenciados pelo Spring em contextos não gerenciados.
+
+## Propósito e Uso
 - **Exceções (`erros`)**: Lançadas pelos serviços para sinalizar um erro de negócio ou técnico. O `RestExceptionHandler` cuida do resto.
 - **Modelo (`modelo`)**: A `EntidadeBase` é estendida por outras entidades para padronizar a chave primária.
+- **Painel**: Consumido pelo frontend para exibir uma visão geral do estado da aplicação.
 
 **Exemplo de uso de uma exceção:**
 ```java
