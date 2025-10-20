@@ -54,14 +54,42 @@ describe('processoService', () => {
             await service.finalizarProcesso(1)
             expect(postSpy).toHaveBeenCalledWith('/processos/1/finalizar');})
 
-
-
-
-
     it('excluirProcesso should call delete', async () => {
             deleteSpy.mockResolvedValue({})
             await service.excluirProcesso(1)
             expect(deleteSpy).toHaveBeenCalledWith('/processos/1');})
+
+    it('fetchProcessosFinalizados should get from the correct endpoint', async () => {
+        getSpy.mockResolvedValue({ data: [] });
+        await service.fetchProcessosFinalizados();
+        expect(getSpy).toHaveBeenCalledWith('/processos/finalizados');
+    });
+
+    it('obterProcessoPorId should get from the correct endpoint', async () => {
+        getSpy.mockResolvedValue({ data: {} });
+        await service.obterProcessoPorId(1);
+        expect(getSpy).toHaveBeenCalledWith('/processos/1');
+    });
+
+    it('atualizarProcesso should put to the correct endpoint', async () => {
+        const request: AtualizarProcessoRequest = { descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
+        putSpy.mockResolvedValue({ data: {} });
+        await service.atualizarProcesso(1, request);
+        expect(putSpy).toHaveBeenCalledWith('/processos/1', request);
+    });
+
+    it('obterDetalhesProcesso should get from the correct endpoint', async () => {
+        getSpy.mockResolvedValue({ data: {} });
+        await service.obterDetalhesProcesso(1);
+        expect(getSpy).toHaveBeenCalledWith('/processos/1/detalhes');
+    });
+
+    it('processarAcaoEmBloco should post to the correct endpoint', async () => {
+        const payload = { idProcesso: 1, unidades: ['A'], tipoAcao: 'aceitar' as 'aceitar' | 'homologar', unidadeUsuario: 'B' };
+        postSpy.mockResolvedValue({});
+        await service.processarAcaoEmBloco(payload);
+        expect(postSpy).toHaveBeenCalledWith('/processos/1/acoes-em-bloco', payload);
+    });
 
 
 

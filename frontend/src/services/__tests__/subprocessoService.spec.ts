@@ -90,6 +90,83 @@ describe('subprocessoService', () => {
         expect(mockApi.put).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-ajuste`, data)
     })
 
+    it('fetchSubprocessoDetalhe should call the correct endpoint', async () => {
+        mockApi.get.mockResolvedValue({ data: {} });
+        await service.fetchSubprocessoDetalhe(1, 'perfil', 123);
+        expect(mockApi.get).toHaveBeenCalledWith('/subprocessos/1', {
+            params: {
+                perfil: 'perfil',
+                unidadeUsuario: 123,
+            },
+        });
+    });
+
+    it('disponibilizarCadastro should call the correct endpoint', async () => {
+        mockApi.post.mockResolvedValue({});
+        await service.disponibilizarCadastro(1);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar');
+    });
+
+    it('disponibilizarRevisaoCadastro should call the correct endpoint', async () => {
+        mockApi.post.mockResolvedValue({});
+        await service.disponibilizarRevisaoCadastro(1);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-revisao');
+    });
+
+    it('devolverCadastro should call the correct endpoint', async () => {
+        const dados = { motivo: 'motivo', observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.devolverCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/devolver-cadastro', dados);
+    });
+
+    it('aceitarCadastro should call the correct endpoint', async () => {
+        const dados = { observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.aceitarCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-cadastro', dados);
+    });
+
+    it('homologarCadastro should call the correct endpoint', async () => {
+        const dados = { observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.homologarCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/homologar-cadastro', dados);
+    });
+
+    it('devolverRevisaoCadastro should call the correct endpoint', async () => {
+        const dados = { motivo: 'motivo', observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.devolverRevisaoCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/devolver-revisao-cadastro', dados);
+    });
+
+    it('aceitarRevisaoCadastro should call the correct endpoint', async () => {
+        const dados = { observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.aceitarRevisaoCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-revisao-cadastro', dados);
+    });
+
+    it('homologarRevisaoCadastro should call the correct endpoint', async () => {
+        const dados = { observacoes: 'obs' };
+        mockApi.post.mockResolvedValue({});
+        await service.homologarRevisaoCadastro(1, dados);
+        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/homologar-revisao-cadastro', dados);
+    });
+
+    it('verificarMapaVigente should return true on success', async () => {
+        mockApi.get.mockResolvedValue({ data: { temMapaVigente: true } });
+        const result = await service.verificarMapaVigente(1);
+        expect(result).toBe(true);
+    });
+
+    it('verificarMapaVigente should return false on failure', async () => {
+        mockApi.get.mockRejectedValue(new Error('Failed'));
+        const result = await service.verificarMapaVigente(1);
+        expect(result).toBe(false);
+    });
+
     // Error handling
     it('importarAtividades should throw error on failure', async () => {
         mockApi.post.mockRejectedValue(new Error('Failed'))

@@ -34,7 +34,7 @@ const mockAtribuicoes: AtribuicaoTemporaria[] = [
     }
 ];
 
-vi.mock('@/services/AtribuicaoTemporariaService', () => ({
+vi.mock('@/services/atribuicaoTemporariaService', () => ({
     AtribuicaoTemporariaService: {
         buscarTodasAtribuicoes: vi.fn(() => Promise.resolve({ data: mockAtribuicoes }))
     }
@@ -43,20 +43,32 @@ vi.mock('@/services/AtribuicaoTemporariaService', () => ({
 describe('useAtribuicaoTemporariaStore', () => {
     let atribuicaoTemporariaStore: ReturnType<typeof useAtribuicaoTemporariaStore>;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         initPinia();
         atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
+        atribuicaoTemporariaStore.atribuicoes = mockAtribuicoes;
         vi.clearAllMocks();
-        await atribuicaoTemporariaStore.fetchAtribuicoes();
     });
 
     it('should initialize with mock atribuicoes', () => {
         expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
         expect(atribuicaoTemporariaStore.atribuicoes[0].codigo).toBe(1);
-        expect(AtribuicaoTemporariaService.buscarTodasAtribuicoes).toHaveBeenCalledTimes(1);
     });
 
     describe('actions', () => {
+        it('fetchAtribuicoes should fetch and set atribuicoes', async () => {
+            atribuicaoTemporariaStore.atribuicoes = [];
+            await atribuicaoTemporariaStore.fetchAtribuicoes();
+            expect(AtribuicaoTemporariaService.buscarTodasAtribuicoes).toHaveBeenCalledTimes(1);
+            expect(atribuicaoTemporariaStore.atribuicoes.length).toBe(3);
+        });
+
+        it('fetchAtribuicoes should handle errors', async () => {
+            (AtribuicaoTemporariaService.buscarTodasAtribuicoes as any).mockRejectedValue(new Error('Failed'));
+            await atribuicaoTemporariaStore.fetchAtribuicoes();
+            expect(atribuicaoTemporariaStore.error).toContain('Falha ao carregar atribuições');
+        });
+
         it('criarAtribuicao should add a new atribuicao to the store', () => {
             const novaAtribuicao: AtribuicaoTemporaria = {
                 codigo: 4,
