@@ -5,15 +5,16 @@ Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subproce
 
 A principal responsabilidade deste módulo é garantir que as transições de estado (`situacao`) sigam as regras de negócio e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimentacao`).
 
-Para melhor organização e desacoplamento, o `SubprocessoControle` original foi dividido em três controladores especializados: `SubprocessoCrudControle`, `SubprocessoMapaControle` e `SubprocessoValidacaoControle`. Além disso, um novo serviço, `SubprocessoMapaWorkflowService`, foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
+Para melhor organização e desacoplamento, o `SubprocessoControle` original foi dividido em múltiplos controladores especializados.
 
-## Arquitetura de Serviços (Padrão Fachada)
-A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa, usando o padrão **Service Facade**. O `SubprocessoService` atua como o ponto de entrada para operações de CRUD, enquanto os novos controladores delegam a lógica para serviços mais especializados.
+## Arquitetura de Serviços
+A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService` atua como uma fachada apenas para operações de CRUD, enquanto os controladores de workflow interagem diretamente com os serviços especializados.
 
 ```mermaid
 graph TD
     subgraph "Frontend"
         ControleCrud(SubprocessoCrudControle)
+        ControleCadastro(SubprocessoCadastroControle)
         ControleMapa(SubprocessoMapaControle)
         ControleValidacao(SubprocessoValidacaoControle)
     end
@@ -23,6 +24,7 @@ graph TD
 
         subgraph "Serviços Especializados"
             Workflow(SubprocessoWorkflowService)
+            Consulta(SubprocessoConsultaService)
             DtoBuilder(SubprocessoDtoService)
             Mapa(SubprocessoMapaService)
             MapaWorkflow(SubprocessoMapaWorkflowService)
@@ -33,34 +35,36 @@ graph TD
     end
 
     ControleCrud -- Utiliza --> Facade
+    ControleCadastro -- Utiliza --> Workflow & DtoBuilder
     ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder
     ControleValidacao -- Utiliza --> Workflow & DtoBuilder
 
-    Facade -- Orquestra e delega para --> Repos
-    Workflow & DtoBuilder & Mapa & MapaWorkflow & Notificacao -- Acessam --> Repos
+    Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao -- Acessam --> Repos
 ```
 
 ## Componentes Principais
 
 ### Controladores REST
-- **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD (criar, ler, atualizar, excluir) para a entidade `Subprocesso`.
-- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências dentro de um subprocesso, incluindo visualização, salvamento e verificação de impactos.
-- **`SubprocessoValidacaoControle`**: Lida com as ações de workflow e validação do subprocesso, como disponibilizar o mapa, apresentar sugestões, validar, devolver e homologar.
+- **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD.
+- **`SubprocessoCadastroControle`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver, aceitar, etc.).
+- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências.
+- **`SubprocessoValidacaoControle`**: Lida com as ações de workflow da etapa de validação.
 
 ### Camada de Fachada
-- **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD do subprocesso, delegando para os repositórios.
+- **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD.
 
 ### Serviços Especializados
-- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado, validando a situação atual, atualizando-a e criando o registro de `Movimentacao`.
-- **`SubprocessoDtoService`**: Responsável por construir os DTOs de visualização complexos (ex: `SubprocessoCadastroDto`), que agregam dados de múltiplas fontes.
-- **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação entre o subprocesso e o mapa de competências.
-- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow do subprocesso, incluindo a atualização do estado do subprocesso.
-- **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações (e-mails, alertas) específicas para os eventos do subprocesso.
+- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado.
+- **`SubprocessoConsultaService`**: Centraliza as consultas complexas e a lógica de busca de subprocessos.
+- **`SubprocessoDtoService`**: Responsável por construir os DTOs de visualização complexos.
+- **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação com o mapa.
+- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow.
+- **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações específicas do subprocesso.
 - **`modelo/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
 - **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
 
 ## Diagrama da Máquina de Estados
-O fluxo de trabalho do subprocesso segue o diagrama de estados abaixo:
+O fluxo de trabalho do subprocesso segue o diagrama de estados abaixo. Note que existem fluxos paralelos para "cadastro" e "revisão de cadastro".
 
 ```mermaid
 stateDiagram-v2
@@ -68,17 +72,20 @@ stateDiagram-v2
 
     [*] --> PENDENTE_CADASTRO: Processo iniciado
 
-    PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
-    CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
-    PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+    state "Fluxo de Cadastro Inicial" {
+        PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+        CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
+        PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+        CADASTRO_DISPONIBILIZADO --> REVISAO_CADASTRO_HOMOLOGADA: aceitarCadastro()
+    }
 
-    CADASTRO_DISPONIBILIZADO --> MAPA_EM_ANALISE: aceitarCadastro()
-    MAPA_EM_ANALISE --> MAPA_AJUSTADO: submeterMapaAjustado()
+    state "Fluxo de Ajuste/Revisão" {
+         REVISAO_CADASTRO_HOMOLOGADA --> MAPA_AJUSTADO: submeterMapaAjustado()
+         MAPA_AJUSTADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
+         PENDENTE_AJUSTES_MAPA --> MAPA_AJUSTADO: submeterMapaAjustado()
+         MAPA_AJUSTADO --> MAPA_VALIDADO: validarMapa()
+    }
 
-    MAPA_AJUSTADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
-    PENDENTE_AJUSTES_MAPA --> MAPA_AJUSTADO: submeterMapaAjustado()
-
-    MAPA_AJUSTADO --> MAPA_VALIDADO: validarMapa()
     MAPA_VALIDADO --> MAPA_HOMOLOGADO: homologarMapa()
     MAPA_HOMOLOGADO --> [*]: Processo finalizado
 ```

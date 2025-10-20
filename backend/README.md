@@ -52,7 +52,7 @@ graph TD
 - **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros módulos, mantendo o sistema desacoplado.
 
 ### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
-- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (operações de workflow e validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
+- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoCadastroControle` (ações de workflow da etapa de cadastro), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (ações de workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
 
 ### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
 - **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
@@ -73,8 +73,11 @@ graph TD
 - **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica de negócio.
 - **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar dados de um sistema de RH externo (atualmente simulado).
 
-### 7. `comum` (Componentes Transversais)
-- **Responsabilidade:** Contém código de suporte utilizado por toda a aplicação, como o tratador global de exceções (`RestExceptionHandler`), classes de erro, e a `EntidadeBase` para entidades JPA.
+### 7. `comum`, `config` e `util` (Componentes Transversais)
+- **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
+- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro, a `EntidadeBase` para entidades JPA e a lógica do `Painel`.
+- **`config`**: Fornece classes de configuração do Spring, como `SecurityConfig` e `ThymeleafConfig`.
+- **`util`**: Contém classes de utilidade, como `HtmlUtils`.
 
 ## Como Construir e Executar
 Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da raiz do repositório:
