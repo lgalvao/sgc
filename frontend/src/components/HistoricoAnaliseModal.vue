@@ -43,9 +43,9 @@
                   :key="index"
                 >
                   <td>{{ formatarData(analise.dataHora) }}</td>
-                  <td>{{ analise.unidade }}</td>
+                  <td>{{ (analise as AnaliseValidacao).unidade || (analise as AnaliseCadastro).unidadeSigla }}</td>
                   <td>{{ analise.resultado }}</td>
-                  <td>{{ analise.observacao || '-' }}</td>
+                  <td>{{ analise.observacoes || '-' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -72,11 +72,12 @@
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
-
 import {useAnalisesStore} from '@/stores/analises';
-import {AnaliseValidacao} from '@/types/tipos';
+import type {AnaliseValidacao, AnaliseCadastro} from '@/types/tipos';
 import {format} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
+
+type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   mostrar: boolean;
@@ -85,17 +86,20 @@ const props = defineProps<{
 
 const emit = defineEmits(['fechar']);
 
-
 const analisesStore = useAnalisesStore();
-const analises = ref<AnaliseValidacao[]>([]);
+const analises = ref<Analise[]>([]);
 
-watch(() => props.mostrar, (newVal) => {
-  if (newVal && props.idSubprocesso) {
-    analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
-  }
-}, { immediate: true });
+watch(
+  () => props.mostrar,
+  newVal => {
+    if (newVal && props.idSubprocesso) {
+      analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
+    }
+  },
+  { immediate: true },
+);
 
-function formatarData(data: Date): string {
+function formatarData(data: string): string {
   return format(new Date(data), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR });
 }
 </script>

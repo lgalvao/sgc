@@ -316,15 +316,16 @@ export interface MapaVisualizacao {
 }
 
 export interface AceitarCadastroRequest {
-    observacoes?: string;
+    observacoes: string;
 }
 
 export interface DevolverCadastroRequest {
+    motivo: string;
     observacoes: string;
 }
 
 export interface HomologarCadastroRequest {
-    observacoes?: string;
+    observacoes: string;
 }
 
 export interface SalvarMapaRequest {

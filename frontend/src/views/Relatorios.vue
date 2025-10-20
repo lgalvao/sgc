@@ -306,8 +306,7 @@
 import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
-import { SituacaoProcesso, TipoProcesso, ProcessoResumo, SituacaoSubprocesso } from '@/types/tipos';
+import {ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import {formatDateBR} from '@/utils'
 
 // Definição de tipo para os dados do CSV

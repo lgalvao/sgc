@@ -2,7 +2,6 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useSubprocessosStore} from '../subprocessos';
 import * as subprocessoService from '@/services/subprocessoService';
-import {useProcessosStore} from "@/stores/processos";
 import {mockProcessoDetalhe} from "@/test-utils/mocks";
 
 const mockProcessosStore = {
@@ -74,14 +73,14 @@ describe('useSubprocessosStore', () => {
         });
 
         it('devolverCadastro should call service and refresh process details', async () => {
-            const req = {observacoes: 'test'};
+            const req = {motivo: 'motivo de teste', observacoes: 'test'};
             await store.devolverCadastro(idSubprocesso, req);
             expect(subprocessoService.devolverCadastro).toHaveBeenCalledWith(idSubprocesso, req);
             expect(mockProcessosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
         });
 
         it('aceitarCadastro should call service and refresh process details', async () => {
-            const req = {observacoes: 'test'};
+            const req = {motivo: 'motivo de teste', observacoes: 'test'};
             await store.aceitarCadastro(idSubprocesso, req);
             expect(subprocessoService.aceitarCadastro).toHaveBeenCalledWith(idSubprocesso, req);
             expect(mockProcessosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
@@ -95,7 +94,7 @@ describe('useSubprocessosStore', () => {
         });
 
         it('devolverRevisaoCadastro should call service and refresh process details', async () => {
-            const req = {observacoes: 'test'};
+            const req = {motivo: 'motivo de teste', observacoes: 'test'}; // Adicionar motivo
             await store.devolverRevisaoCadastro(idSubprocesso, req);
             expect(subprocessoService.devolverRevisaoCadastro).toHaveBeenCalledWith(idSubprocesso, req);
             expect(mockProcessosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);

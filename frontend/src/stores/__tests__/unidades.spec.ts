@@ -1,20 +1,180 @@
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useUnidadesStore} from '../unidades';
 import {initPinia} from '@/test-utils/helpers';
 import {expectContainsAll} from '@/test-utils/uiHelpers';
+import {UnidadesService} from "@/services/unidadesService";
+import type {Unidade} from "@/types/tipos";
+
+const mockUnidades: Unidade[] = [
+    {
+        "sigla": "SEDOC",
+        "nome": "Seção de Desenvolvimento Organizacional e Capacitação",
+        "tipo": "ADMINISTRATIVA",
+        "idServidorTitular": 7,
+        "responsavel": null,
+        "codigo": 1,
+        "filhas": [
+            {
+                "sigla": "SGP",
+                "nome": "Secretaria de Gestao de Pessoas",
+                "tipo": "INTERMEDIARIA",
+                "idServidorTitular": 2,
+                "responsavel": {
+                    "codigo": 13,
+                    "nome": "Servidor Responsável 13",
+                    "unidade": { "codigo": 1, "nome": "Unidade", "sigla": "UN" },
+                    "email": "servidor13@email.com",
+                    "ramal": "1313",
+                    "tituloEleitoral": "1313131313"
+                },
+                "filhas": [
+                    {
+                        "sigla": "COEDE",
+                        "nome": "Coordenadoria de Educação Especial",
+                        "tipo": "INTERMEDIARIA",
+                        "idServidorTitular": 3,
+                        "responsavel": null,
+                        "filhas": [
+                            {
+                                "sigla": "SEMARE",
+                                "nome": "Seção Magistrados e Requisitados",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 4,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 5
+                            }
+                        ],
+                        "codigo": 4
+                    }
+                ],
+                "codigo": 3
+            },
+            {
+                "sigla": "STIC",
+                "nome": "Secretaria de Informática e Comunicações",
+                "tipo": "INTEROPERACIONAL",
+                "idServidorTitular": 5,
+                "responsavel": null,
+                "codigo": 2,
+                "filhas": [
+                    {
+                        "sigla": "COSIS",
+                        "nome": "Coordenadoria de Sistemas",
+                        "tipo": "INTERMEDIARIA",
+                        "idServidorTitular": 6,
+                        "responsavel": null,
+                        "filhas": [
+                            {
+                                "sigla": "SEDESENV",
+                                "nome": "Seção de Desenvolvimento de Sistemas",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 7,
+                                "responsavel": {
+                                    "codigo": 8,
+                                    "nome": "Servidor Responsável 8",
+                                    "unidade": { "codigo": 1, "nome": "Unidade", "sigla": "UN" },
+                                    "email": "servidor8@email.com",
+                                    "ramal": "8888",
+                                    "tituloEleitoral": "888888888"
+                                },
+                                "filhas": [],
+                                "codigo": 8
+                            },
+                            {
+                                "sigla": "SEDIA",
+                                "nome": "Seção de Dados e Inteligência Artificial",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 9,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 9
+                            },
+                            {
+                                "sigla": "SESEL",
+                                "nome": "Seção de Sistemas Eleitorais",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 10,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 10
+                            }
+                        ],
+                        "codigo": 6
+                    },
+                    {
+                        "sigla": "COSINF",
+                        "nome": "Coordenadoria de Suporte e Infraestrutura",
+                        "tipo": "INTERMEDIARIA",
+                        "idServidorTitular": 12,
+                        "responsavel": null,
+                        "filhas": [
+                            {
+                                "sigla": "SENIC",
+                                "nome": "Seção de Infraestrutura",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 13,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 11
+                            }
+                        ],
+                        "codigo": 7
+                    },
+                    {
+                        "sigla": "COJUR",
+                        "nome": "Coordenadoria Jurídica",
+                        "tipo": "INTERMEDIARIA",
+                        "idServidorTitular": 15,
+                        "responsavel": null,
+                        "filhas": [
+                            {
+                                "sigla": "SEJUR",
+                                "nome": "Seção Jurídica",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 16,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 12
+                            },
+                            {
+                                "sigla": "SEPRO",
+                                "nome": "Seção de Processos",
+                                "tipo": "OPERACIONAL",
+                                "idServidorTitular": 17,
+                                "responsavel": null,
+                                "filhas": [],
+                                "codigo": 13
+                            }
+                        ],
+                        "codigo": 14
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+vi.mock('@/services/UnidadesService', () => ({
+    UnidadesService: {
+        buscarTodasUnidades: vi.fn(() => Promise.resolve({ data: mockUnidades }))
+    }
+}));
 
 describe('useUnidadesStore', () => {
     let unidadesStore: ReturnType<typeof useUnidadesStore>;
 
-  
-    beforeEach(() => {
-          initPinia();
-          unidadesStore = useUnidadesStore();
-      });
+    beforeEach(async () => {
+        initPinia();
+        unidadesStore = useUnidadesStore();
+        vi.clearAllMocks();
+        await unidadesStore.fetchUnidades();
+    });
 
     it('should initialize with mock unidades', () => {
         expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         expect(unidadesStore.unidades[0].sigla).toBeDefined();
+        expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
     });
 
     describe('actions', () => {

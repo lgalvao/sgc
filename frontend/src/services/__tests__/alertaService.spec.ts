@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { marcarComoLido } from '../alertaService'
+import {describe, expect, it, vi} from 'vitest'
+import {marcarComoLido} from '../alertaService'
 import api from '@/axios-setup'
 
 vi.mock('@/axios-setup')

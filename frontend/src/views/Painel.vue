@@ -91,10 +91,9 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil} from '@/types/tipos'
+import {Perfil, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {formatDateTimeBR} from '@/utils';
-import {type ProcessoResumo} from '@/types/tipos';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()

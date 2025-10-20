@@ -138,8 +138,8 @@ export async function verificarModalDisponibilizacaoVisivel(page: Page): Promise
     const modal = page.locator('[aria-labelledby="disponibilizarModalLabel"], .modal.show');
     if ((await modal.count()) > 0) {
         // botão com test-id
-        if ((await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).count()) > 0) {
-            await expect(modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first()).toBeVisible();
+        if ((await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).count()) > 0) {
+            await expect(modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).first()).toBeVisible();
             return;
         }
         // input de data com test-id
@@ -157,8 +157,8 @@ export async function verificarModalDisponibilizacaoVisivel(page: Page): Promise
     }
 
     // Fallback global por test-id do botão
-    if ((await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR).count()) > 0) {
-        await expect(page.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first()).toBeVisible();
+    if ((await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).count()) > 0) {
+        await expect(page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).first()).toBeVisible();
         return;
     }
 
@@ -193,7 +193,7 @@ export async function verificarCampoObservacoesValor(page: Page, valorEsperado: 
  */
 export async function verificarBotaoDisponibilizarHabilitado(page: Page, habilitado: boolean = true): Promise<void> {
     // Priorizar test-id do botão (mais confiável entre variações de UI)
-    const btnTestId = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR);
+    const btnTestId = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE);
     if ((await btnTestId.count()) > 0) {
         const btn = btnTestId.first();
         if (habilitado) {

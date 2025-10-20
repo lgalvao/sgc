@@ -1,6 +1,6 @@
 import apiClient from '@/axios-setup';
-import { mapMapaDtoToModel } from '@/mappers/mapas';
-import type { Mapa, SalvarMapaRequest } from '@/types/tipos';
+import {mapMapaDtoToModel} from '@/mappers/mapas';
+import type {Mapa, SalvarMapaRequest} from '@/types/tipos';
 
 export const listarMapas = async (): Promise<Mapa[]> => {
     const response = await apiClient.get('/mapas');

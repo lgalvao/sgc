@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.modelo.MapaRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.mapa.MapaService;

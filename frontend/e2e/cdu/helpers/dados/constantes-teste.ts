@@ -18,7 +18,6 @@ export const SELETORES = {
     BTN_FECHAR: 'btn-fechar',
     // Test-ids específicos para modais e ações críticas
     BTN_MODAL_FECHAR: 'btn-modal-fechar',
-    BTN_DISPONIBILIZAR: 'btn-disponibilizar',
     BTN_DISPONIBILIZAR_PAGE: 'btn-disponibilizar-page',
     BTN_REGISTRAR_ACEITE: 'btn-registrar-aceite',
     BTN_DEVOLVER: 'btn-devolver',
@@ -240,4 +239,5 @@ export const SELETORES_CSS = {
     CAMPO_TIPO: '#tipo',
     CAMPO_DATA_LIMITE: '#dataLimite',
     CHECKBOX_STIC: '#chk-STIC',
+    BTN_DISPONIBILIZAR: '[data-testid="btn-disponibilizar"]',
 } as const;

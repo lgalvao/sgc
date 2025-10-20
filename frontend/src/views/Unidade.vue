@@ -77,7 +77,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useServidoresStore} from '@/stores/servidores'
 import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
-import {Mapa, Servidor, TipoResponsabilidade, Unidade} from '@/types/tipos';
+import {Mapa, Servidor, Unidade, MapaCompleto} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
 const props = defineProps<{ siglaUnidade: string }>();
@@ -131,11 +131,8 @@ const responsavelDetalhes = computed<Servidor | null>(() => {
   return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
 });
 
-const mapaVigente = computed<Mapa | null>(() => {
-  if (unidadeOriginal.value?.codigo) {
-    return mapasStore.getMapaByUnidadeId(unidadeOriginal.value.codigo) as any;
-  }
-  return null;
+const mapaVigente = computed<MapaCompleto | null>(() => {
+  return mapasStore.mapaCompleto;
 })
 
 function irParaCriarAtribuicao() {
@@ -180,7 +177,7 @@ function visualizarMapa() {
     router.push({
       name: 'SubprocessoVisMapa',
       params: {
-        idProcesso: mapaVigente.value.idProcesso,
+        idProcesso: mapaVigente.value.subprocessoCodigo,
         siglaUnidade: sigla.value
       }
     });

@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class SubprocessoWorkflowService {
-
     private final SubprocessoRepo repositorioSubprocesso;
     private final MovimentacaoRepo repositorioMovimentacao;
     private final ApplicationEventPublisher publicadorDeEventos;

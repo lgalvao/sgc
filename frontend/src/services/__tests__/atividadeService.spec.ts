@@ -1,10 +1,19 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import * as service from '../atividadeService'
-import api from '@/axios-setup'
 import * as mappers from '@/mappers/atividades'
-import { Atividade, Conhecimento } from '@/types/tipos'
+import {Atividade, Conhecimento} from '@/types/tipos'
 
-vi.mock('@/axios-setup')
+// Manual mock for axios-setup
+const mockApi = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn(),
+}
+vi.mock('@/axios-setup', () => ({
+  default: mockApi,
+}))
+
 vi.mock('@/mappers/atividades', () => ({
   mapAtividadeDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
   mapConhecimentoDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
@@ -13,9 +22,6 @@ vi.mock('@/mappers/atividades', () => ({
 }))
 
 describe('atividadeService', () => {
-  const mockApi = vi.mocked(api)
-  const mockMappers = vi.mocked(mappers)
-
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -27,8 +33,8 @@ describe('atividadeService', () => {
     const result = await service.listarAtividades()
 
     expect(mockApi.get).toHaveBeenCalledWith('/atividades')
-    expect(mockMappers.mapAtividadeDtoToModel).toHaveBeenCalled()
-    expect(mockMappers.mapAtividadeDtoToModel.mock.calls[0][0]).toEqual(dtoList[0])
+    expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalled()
+    expect((mappers.mapAtividadeDtoToModel as any).mock.calls[0][0]).toEqual(dtoList[0])
     expect(result[0]).toHaveProperty('mapped', true)
   })
 
@@ -39,7 +45,7 @@ describe('atividadeService', () => {
     const result = await service.obterAtividadePorId(1)
 
     expect(mockApi.get).toHaveBeenCalledWith('/atividades/1')
-    expect(mockMappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(dto)
+    expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(dto)
     expect(result).toHaveProperty('mapped', true)
   })
 
@@ -51,21 +57,21 @@ describe('atividadeService', () => {
 
     const result = await service.criarAtividade(request, 123)
 
-    expect(mockMappers.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 123)
+    expect(mappers.mapCriarAtividadeRequestToDto).toHaveBeenCalledWith(request, 123)
     expect(mockApi.post).toHaveBeenCalledWith('/atividades', requestDto)
-    expect(mockMappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto)
+    expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
   it('atualizarAtividade should put and map response', async () => {
-    const request: Atividade = { id: 1, descricao: 'Atividade Atualizada' }
+    const request: Atividade = { codigo: 1, descricao: 'Atividade Atualizada', conhecimentos: [] }
     const responseDto = { ...request }
     mockApi.put.mockResolvedValue({ data: responseDto })
 
     const result = await service.atualizarAtividade(1, request)
 
     expect(mockApi.put).toHaveBeenCalledWith('/atividades/1', request)
-    expect(mockMappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto)
+    expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
@@ -82,8 +88,8 @@ describe('atividadeService', () => {
     const result = await service.listarConhecimentos(1)
 
     expect(mockApi.get).toHaveBeenCalledWith('/atividades/1/conhecimentos')
-    expect(mockMappers.mapConhecimentoDtoToModel).toHaveBeenCalled()
-    expect(mockMappers.mapConhecimentoDtoToModel.mock.calls[0][0]).toEqual(dtoList[0])
+    expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalled()
+    expect((mappers.mapConhecimentoDtoToModel as any).mock.calls[0][0]).toEqual(dtoList[0])
     expect(result[0]).toHaveProperty('mapped', true)
   })
 
@@ -95,9 +101,9 @@ describe('atividadeService', () => {
 
     const result = await service.criarConhecimento(1, request)
 
-    expect(mockMappers.mapCriarConhecimentoRequestToDto).toHaveBeenCalledWith(request)
+    expect(mappers.mapCriarConhecimentoRequestToDto).toHaveBeenCalledWith(request)
     expect(mockApi.post).toHaveBeenCalledWith('/atividades/1/conhecimentos', requestDto)
-    expect(mockMappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto)
+    expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
@@ -109,7 +115,7 @@ describe('atividadeService', () => {
     const result = await service.atualizarConhecimento(1, 1, request)
 
     expect(mockApi.put).toHaveBeenCalledWith('/atividades/1/conhecimentos/1', request)
-    expect(mockMappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto)
+    expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
@@ -137,7 +143,7 @@ describe('atividadeService', () => {
   })
 
   it('atualizarAtividade should throw error on failure', async () => {
-    const request: Atividade = { id: 1, descricao: 'Atividade Atualizada' }
+    const request: Atividade = { codigo: 1, descricao: 'Atividade Atualizada', conhecimentos: [] }
     mockApi.put.mockRejectedValue(new Error('Failed'))
     await expect(service.atualizarAtividade(1, request)).rejects.toThrow('Failed')
   })

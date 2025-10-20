@@ -1,12 +1,12 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
+    aguardarProcessoNoPainel,
     clicarUnidadeNaTabelaDetalhes,
-    loginComoAdmin,
     criarProcessoCompleto,
+    loginComoAdmin,
     navegarParaProcessoNaTabela,
     verificarElementosDetalhesProcessoVisiveis,
-    verificarNavegacaoPaginaSubprocesso,
-    aguardarProcessoNoPainel
+    verificarNavegacaoPaginaSubprocesso
 } from './helpers';
 
 test.describe('CDU-06: Detalhar processo', () => {

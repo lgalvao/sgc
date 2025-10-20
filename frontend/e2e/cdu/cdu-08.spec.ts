@@ -1,22 +1,22 @@
-import { test, expect } from '@playwright/test';
+import {test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
+    editarAtividade,
+    editarConhecimento,
     gerarNomeUnico,
     loginComoChefe,
     navegarParaProcessoPorId,
+    removerAtividade,
+    removerConhecimento,
     SELETORES_CSS,
+    verificarAtividadeNaoVisivel,
     verificarAtividadeVisivel,
+    verificarConhecimentoNaoVisivel,
     verificarConhecimentoVisivel,
     verificarPaginaCadastroAtividades,
-    editarConhecimento,
-    removerConhecimento,
-    verificarConhecimentoNaoVisivel,
-    editarAtividade,
-    removerAtividade,
-    verificarAtividadeNaoVisivel,
 } from './helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
@@ -43,11 +43,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const nomeConhecimentoEditado = gerarNomeUnico('Conhecimento Editado');
         await editarConhecimento(page, nomeAtividade, nomeConhecimento, nomeConhecimentoEditado);
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimentoEditado);
-        await verificarConhecimentoNaoVisivel(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoNaoVisivel(page, nomeAtividade, nomeConhecimento);
 
         // Remove conhecimento
         await removerConhecimento(page, nomeAtividade, nomeConhecimentoEditado);
-        await verificarConhecimentoNaoVisivel(cardAtividade, nomeConhecimentoEditado);
+        await verificarConhecimentoNaoVisivel(page, nomeAtividade, nomeConhecimentoEditado);
 
         // Edita atividade
         const nomeAtividadeEditado = gerarNomeUnico('Atividade Editada');

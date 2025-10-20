@@ -180,7 +180,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {usePerfilStore} from '@/stores/perfil'
-import {Competencia, Mapa, Processo} from '@/types/tipos'
+import {Competencia, Mapa, MapaCompleto} from '@/types/tipos'
 
 const route = useRoute()
 const router = useRouter()
@@ -201,6 +201,8 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como idSubprocesso
+  await mapasStore.fetchMapaCompleto(idProcesso.value);
   competencias.value.forEach(comp => {
     if (!avaliacoes.value[comp.codigo]) {
       avaliacoes.value[comp.codigo] = {
@@ -212,11 +214,8 @@ onMounted(async () => {
   })
 });
 
-const mapa = computed<Mapa | null>(() => {
-  if (unidade.value?.codigo) {
-    return mapasStore.getMapaByUnidadeId(unidade.value.codigo) as any || null
-  }
-  return null
+const mapa = computed<MapaCompleto | null>(() => {
+  return mapasStore.mapaCompleto;
 })
 
 const competencias = computed<Competencia[]>(() => {

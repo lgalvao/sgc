@@ -1,15 +1,7 @@
 import {defineStore} from 'pinia'
 import {useNotificacoesStore} from './notificacoes'
-import * as MapaService from '@/services/mapaService'
 import * as SubprocessoService from '@/services/subprocessoService'
-import {
-    ImpactoMapa,
-    MapaAjuste,
-    MapaCompleto,
-    SalvarAjustesRequest,
-    SalvarMapaRequest,
-    Unidade
-} from "@/types/tipos";
+import {ImpactoMapa, MapaAjuste, MapaCompleto, SalvarAjustesRequest, SalvarMapaRequest} from "@/types/tipos";
 
 export const useMapasStore = defineStore('mapas', {
     state: () => ({
@@ -19,12 +11,6 @@ export const useMapasStore = defineStore('mapas', {
     }),
 
     getters: {
-        getMapaByUnidadeId: (state) => (unidadeId: number) => {
-            if (state.mapaCompleto && (state.mapaCompleto as any).unidade.codigo === unidadeId) {
-                return state.mapaCompleto;
-            }
-            return null;
-        },
     },
 
     actions: {

@@ -1,12 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import { navegarParaCriacaoProcesso } from '../navegacao';
-
-/**
- * AÇÕES ESPECÍFICAS PARA PROCESSOS
- * Funções para gerenciamento de processos em testes
- */
+import {navegarParaCriacaoProcesso} from '../navegacao';
 
 /**
  * Seleciona unidades na árvore de hierarquia com base em seus IDs.
@@ -17,7 +12,7 @@ export async function selecionarUnidadesPorId(page: Page, unidades: number[]): P
     for (const id of unidades) {
         // O seletor assume que cada checkbox tem um `id` no formato `chk-unidade-${id}`
         const seletorCheckbox = `#chk-unidade-${id}`;
-        await page.waitForSelector(seletorCheckbox, { state: 'visible' });
+        await page.waitForSelector(seletorCheckbox, {state: 'visible'});
         await page.check(seletorCheckbox);
     }
 }
@@ -83,11 +78,15 @@ export async function criarProcessoCompleto(
     tipo: string,
     dataLimite: string,
     unidades: number[]
-): Promise<void> {
+): Promise<{ processo: { codigo: number; descricao: string; } }> {
     await navegarParaCriacaoProcesso(page);
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarUnidadesPorId(page, unidades);
-    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
+    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
+    await page.waitForURL(/\/processo\/\d+$/);
+    const url = page.url();
+    const id = Number(url.split('/').pop());
+    return {processo: {codigo: id, descricao}};
 }
 
 /**
@@ -117,7 +116,7 @@ export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso:
  */
 export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
     await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, novaDescricao);
-    await page.getByRole('button', { name: TEXTOS.SALVAR }).click();
+    await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
 }
 
 /**
@@ -288,17 +287,17 @@ export async function iniciarProcesso(page: Page): Promise<void> {
     await clicarBotaoIniciarProcesso(page);
     const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
  * Remover processo com confirmação
  */
 export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
-    await page.getByRole('button', { name: TEXTOS.REMOVER }).click();
+    await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
     const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
-    await modal.getByRole('button', { name: TEXTOS.CONFIRMAR }).click();
+    await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
 /**
@@ -331,4 +330,11 @@ export async function removerProcessoConfirmandoNoModal(page: Page): Promise<voi
 export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: string): Promise<void> {
     const unidadeRow = page.locator(SELETORES.LINHA_TABELA_ARVORE).filter({hasText: nomeUnidade}).first();
     await unidadeRow.click();
+}
+
+/**
+ * Clica no botão de histórico de análise.
+ */
+export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
+    await page.getByTestId(SELETORES.BTN_HISTORICO_ANALISE).click();
 }

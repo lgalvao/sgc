@@ -4,14 +4,13 @@ import {
     cancelarNoModal,
     clicarBotao,
     clicarProcessoNaTabela,
-    confirmarInicializacaoNoModal,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     preencherFormularioProcesso,
     selecionarPrimeiraUnidade,
+    verificarMensagemSucesso,
     verificarModalConfirmacaoInicializacao,
     verificarModalFechado,
-    verificarMensagemSucesso,
     verificarPaginaCadastroProcesso,
     verificarProcessoInicializadoComSucesso
 } from './helpers';
@@ -34,8 +33,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarPaginaCadastroProcesso(page);
 
         await abrirModalInicializacaoProcesso(page);
-        await verificarModalConfirmacaoInicializacao(page);
-        await confirmarInicializacaoNoModal(page);
+await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'REVISAO', 1);
 
         await verificarProcessoInicializadoComSucesso(page);
     });
@@ -55,7 +53,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await verificarPaginaCadastroProcesso(page);
 
         await abrirModalInicializacaoProcesso(page);
-        await verificarModalConfirmacaoInicializacao(page);
+        await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'REVISAO', 1);
         await cancelarNoModal(page);
 
         await verificarModalFechado(page);

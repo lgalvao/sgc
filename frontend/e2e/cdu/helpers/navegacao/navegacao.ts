@@ -1,5 +1,6 @@
 import {expect, Page} from '@playwright/test';
 import {DADOS_TESTE, ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {Perfil} from '@/types/tipos';
 
 /**
  * FUNÇÕES DE NAVEGAÇÃO E LOGIN
@@ -82,12 +83,12 @@ export async function acessarAnaliseRevisaoComoGestor(page: Page, idProcesso: nu
 /**
  * Realiza o login como administrador e acessa a análise de revisão do cadastro.
  */
-export async function acessarAnaliseRevisaoComoAdmin(page: Page): Promise<void> {
+export async function acessarAnaliseRevisaoComoAdmin(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await loginComoAdmin(page);
     await acessarAnaliseRevisaoCadastro(
         page,
-        DADOS_TESTE.PROCESSOS.REVISAO_STIC.id,
-        DADOS_TESTE.UNIDADES.SESEL
+        idProcesso,
+        unidade
     );
 }
 
@@ -242,18 +243,6 @@ export const loginComoChefeSedia = (page: Page) => fazerLoginComo(page, 'CHEFE_S
 export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR');
 
 /**
- * Realiza login com um perfil e unidade específicos.
- */
-export async function loginComo(page: Page, perfil: Perfil, tituloEleitoral: string): Promise<void> {
-    const credenciais = {
-        tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
-        senha: DADOS_LOGIN.CHEFE.senha,
-        perfil,
-    };
-    await login(page, credenciais.tituloEleitoral, credenciais.senha);
-}
-
-/**
  * Realiza o login pela UI, preenchendo título e senha.
  * Não clica em "Entrar", permitindo interações adicionais na tela de login.
  */
@@ -263,6 +252,18 @@ export async function login(page: Page, idServidor: string, senha: string): Prom
 
     await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
     await page.getByLabel(ROTULOS.SENHA).fill(senha);
+}
+
+/**
+ * Realiza login com um perfil e unidade específicos.
+ */
+export async function loginComo(page: Page, perfil: Perfil, tituloEleitoral: string): Promise<void> {
+    const credenciais = {
+        tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
+        senha: DADOS_TESTE.PERFIS.CHEFE.senha,
+        perfil,
+    };
+    await login(page, credenciais.tituloEleitoral, credenciais.senha);
 }
 
 /**

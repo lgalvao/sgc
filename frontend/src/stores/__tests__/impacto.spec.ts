@@ -4,11 +4,11 @@ import {useMapasStore} from '../mapas';
 import {useUnidadesStore} from '../unidades';
 import {useProcessosStore} from '../processos';
 import {useRevisaoStore} from '../revisao';
-import {mockUnidade, mockProcessoDetalhe} from "@/test-utils/mocks";
+import {mockProcessoDetalhe, mockUnidade} from "@/test-utils/mocks";
 
 // Mock the stores
 const mockMapasStore = {
-    getMapaByUnidadeId: vi.fn().mockReturnValue({competencias: []}),
+    mapaCompleto: {competencias: []},
 };
 const mockUnidadesStore = {
     pesquisarUnidade: vi.fn().mockReturnValue(mockUnidade),
@@ -40,12 +40,6 @@ describe('Impacto Store Logic', () => {
         const processosStore = useProcessosStore();
         await processosStore.fetchProcessoDetalhe(1);
         expect(mockProcessosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
-    });
-
-    it('should get mapa by unidade id', () => {
-        const mapasStore = useMapasStore();
-        mapasStore.getMapaByUnidadeId(1);
-        expect(mockMapasStore.getMapaByUnidadeId).toHaveBeenCalledWith(1);
     });
 
     it('should search for a unit', () => {

@@ -5,32 +5,32 @@
     <form class="mt-4 col-md-6 col-sm-8 col-12">
       <div class="mb-3">
         <label
-            class="form-label"
-            for="descricao"
+          class="form-label"
+          for="descricao"
         >Descrição</label>
         <input
-            id="descricao"
-            v-model="descricao"
-            class="form-control"
-            placeholder="Descreva o processo"
-            type="text"
+          id="descricao"
+          v-model="descricao"
+          class="form-control"
+          placeholder="Descreva o processo"
+          type="text"
         >
       </div>
 
       <div class="mb-3">
         <label
-            class="form-label"
-            for="tipo"
+          class="form-label"
+          for="tipo"
         >Tipo</label>
         <select
-            id="tipo"
-            v-model="tipo"
-            class="form-select"
+          id="tipo"
+          v-model="tipo"
+          class="form-select"
         >
           <option
-              v-for="tipoOption in TipoProcesso"
-              :key="tipoOption"
-              :value="tipoOption"
+            v-for="tipoOption in TipoProcesso"
+            :key="tipoOption"
+            :value="tipoOption"
           >
             {{ tipoOption }}
           </option>
@@ -42,74 +42,74 @@
         <div class="border rounded p-3">
           <div>
             <template
-                v-for="unidade in unidadesStore.unidades"
-                :key="unidade.sigla"
+              v-for="unidade in unidadesStore.unidades"
+              :key="unidade.sigla"
             >
               <div
-                  :style="{ marginLeft: '0' }"
-                  class="form-check"
+                :style="{ marginLeft: '0' }"
+                class="form-check"
               >
                 <!--suppress HtmlUnknownAttribute -->
                 <input
-                    :id="`chk-${unidade.sigla}`"
-                    :checked="getEstadoSelecao(unidade) === true"
-                    class="form-check-input"
-                    type="checkbox"
-                    :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-                    @change="() => toggleUnidade(unidade)"
+                  :id="`chk-${unidade.sigla}`"
+                  :checked="getEstadoSelecao(unidade) === true"
+                  class="form-check-input"
+                  type="checkbox"
+                  :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
+                  @change="() => toggleUnidade(unidade)"
                 >
                 <label
-                    :for="`chk-${unidade.sigla}`"
-                    class="form-check-label ms-2"
+                  :for="`chk-${unidade.sigla}`"
+                  class="form-check-label ms-2"
                 >
                   <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
                 </label>
               </div>
               <div
-                  v-if="unidade.filhas && unidade.filhas.length"
-                  class="ms-4"
+                v-if="unidade.filhas && unidade.filhas.length"
+                class="ms-4"
               >
                 <template
-                    v-for="filha in unidade.filhas"
-                    :key="filha.sigla"
+                  v-for="filha in unidade.filhas"
+                  :key="filha.sigla"
                 >
                   <div class="form-check">
                     <!--suppress HtmlUnknownAttribute -->
                     <input
-                        :id="`chk-${filha.sigla}`"
-                        :checked="getEstadoSelecao(filha) === true"
-                        class="form-check-input"
-                        type="checkbox"
-                        :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                        @change="() => toggleUnidade(filha)"
+                      :id="`chk-${filha.sigla}`"
+                      :checked="getEstadoSelecao(filha) === true"
+                      class="form-check-input"
+                      type="checkbox"
+                      :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
+                      @change="() => toggleUnidade(filha)"
                     >
                     <label
-                        :for="`chk-${filha.sigla}`"
-                        class="form-check-label ms-2"
+                      :for="`chk-${filha.sigla}`"
+                      class="form-check-label ms-2"
                     >
                       <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
                     </label>
                   </div>
 
                   <div
-                      v-if="filha.filhas && filha.filhas.length"
-                      class="ms-4"
+                    v-if="filha.filhas && filha.filhas.length"
+                    class="ms-4"
                   >
                     <div
-                        v-for="neta in filha.filhas"
-                        :key="neta.sigla"
-                        class="form-check"
+                      v-for="neta in filha.filhas"
+                      :key="neta.sigla"
+                      class="form-check"
                     >
                       <input
-                          :id="`chk-${neta.sigla}`"
-                          :checked="isChecked(neta.codigo)"
-                          class="form-check-input"
-                          type="checkbox"
-                          @change="() => toggleUnidade(neta)"
+                        :id="`chk-${neta.sigla}`"
+                        :checked="isChecked(neta.codigo)"
+                        class="form-check-input"
+                        type="checkbox"
+                        @change="() => toggleUnidade(neta)"
                       >
                       <label
-                          :for="`chk-${neta.sigla}`"
-                          class="form-check-label ms-2"
+                        :for="`chk-${neta.sigla}`"
+                        class="form-check-label ms-2"
                       >
                         <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
                       </label>
@@ -124,42 +124,42 @@
 
       <div class="mb-3">
         <label
-            class="form-label"
-            for="dataLimite"
+          class="form-label"
+          for="dataLimite"
         >Data limite</label>
         <input
-            id="dataLimite"
-            v-model="dataLimite"
-            class="form-control"
-            type="date"
+          id="dataLimite"
+          v-model="dataLimite"
+          class="form-control"
+          type="date"
         >
       </div>
       <button
-          class="btn btn-primary"
-          type="button"
-          @click="salvarProcesso"
+        class="btn btn-primary"
+        type="button"
+        @click="salvarProcesso"
       >
         Salvar
       </button>
       <button
-          class="btn btn-success ms-2"
-          data-testid="btn-iniciar-processo"
-          type="button"
-          @click="abrirModalConfirmacao"
+        class="btn btn-success ms-2"
+        data-testid="btn-iniciar-processo"
+        type="button"
+        @click="abrirModalConfirmacao"
       >
         Iniciar processo
       </button>
       <button
-          v-if="processoEditando"
-          class="btn btn-danger ms-2"
-          type="button"
-          @click="abrirModalRemocao"
+        v-if="processoEditando"
+        class="btn btn-danger ms-2"
+        type="button"
+        @click="abrirModalRemocao"
       >
         Remover
       </button>
       <router-link
-          class="btn btn-secondary ms-2"
-          to="/painel"
+        class="btn btn-secondary ms-2"
+        to="/painel"
       >
         Cancelar
       </router-link>
@@ -167,10 +167,10 @@
 
     <!-- Modal de confirmação CDU-05 -->
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalConfirmacao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog">
         <div class="modal-content">
@@ -179,9 +179,9 @@
               Iniciar processo
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn-close"
+              @click="fecharModalConfirmacao"
             />
           </div>
           <div class="modal-body">
@@ -189,21 +189,23 @@
             <p><strong>Tipo:</strong> {{ tipo }}</p>
             <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
             <hr>
-            <p>Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
-              serão notificadas por e-mail.</p>
+            <p>
+              Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
+              serão notificadas por e-mail.
+            </p>
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalConfirmacao"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalConfirmacao"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-primary"
-                @click="confirmarIniciarProcesso"
+              type="button"
+              class="btn btn-primary"
+              @click="confirmarIniciarProcesso"
             >
               Confirmar
             </button>
@@ -212,16 +214,16 @@
       </div>
     </div>
     <div
-        v-if="mostrarModalConfirmacao"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalConfirmacao"
+      class="modal-backdrop fade show"
     />
 
     <!-- Modal de confirmação de remoção -->
     <div
-        v-if="mostrarModalRemocao"
-        class="modal fade show"
-        style="display: block;"
-        tabindex="-1"
+      v-if="mostrarModalRemocao"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
     >
       <div class="modal-dialog">
         <div class="modal-content">
@@ -230,9 +232,9 @@
               Iniciar processo
             </h5>
             <button
-                type="button"
-                class="btn-close"
-                @click="fecharModalRemocao"
+              type="button"
+              class="btn-close"
+              @click="fecharModalRemocao"
             />
           </div>
           <div class="modal-body">
@@ -240,16 +242,16 @@
           </div>
           <div class="modal-footer">
             <button
-                type="button"
-                class="btn btn-secondary"
-                @click="fecharModalRemocao"
+              type="button"
+              class="btn btn-secondary"
+              @click="fecharModalRemocao"
             >
               Cancelar
             </button>
             <button
-                type="button"
-                class="btn btn-danger"
-                @click="confirmarRemocao"
+              type="button"
+              class="btn btn-danger"
+              @click="confirmarRemocao"
             >
               Remover
             </button>
@@ -258,8 +260,8 @@
       </div>
     </div>
     <div
-        v-if="mostrarModalRemocao"
-        class="modal-backdrop fade show"
+      v-if="mostrarModalRemocao"
+      class="modal-backdrop fade show"
     />
   </div>
 </template>
@@ -273,11 +275,11 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useAlertasStore} from '@/stores/alertas'
 import {
-  TipoProcesso,
-  type Unidade,
-  type Processo as ProcessoModel,
+  type AtualizarProcessoRequest,
   type CriarProcessoRequest,
-  type AtualizarProcessoRequest
+  type Processo as ProcessoModel,
+  TipoProcesso,
+  type Unidade
 } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';

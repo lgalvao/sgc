@@ -3,14 +3,11 @@ package sgc.mapa;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.mapa.dto.CompetenciaMapaDto;
-import sgc.mapa.dto.MapaCompletoDto;
 
 import java.util.List;
 

@@ -76,7 +76,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
         // confirmar disponibilização (usar test-id dentro do modal para evitar ambiguidade)
         await verificarBotaoDisponibilizarHabilitado(page, true);
-        await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR).first().click();
+        await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).first().click();
     });
 
     test('deve cancelar disponibilização', async ({page}) => {

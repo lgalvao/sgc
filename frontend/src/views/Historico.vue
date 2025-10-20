@@ -27,9 +27,8 @@ import {useRouter} from 'vue-router'
 
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {Perfil} from '@/types/tipos'
+import {Perfil, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {type ProcessoResumo} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
 
 type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';

@@ -1,4 +1,4 @@
-export * from "@/types/tipos";
+import type { Processo, ProcessoDetalhe, ProcessoResumo, UnidadeParticipante } from '@/types/tipos';
 
 
 export function mapProcessoResumoDtoToFrontend(dto: any): ProcessoResumo {

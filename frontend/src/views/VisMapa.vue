@@ -450,7 +450,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 import {useMapasStore} from '@/stores/mapas'
@@ -503,8 +503,6 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-import {onMounted} from 'vue'
-
 const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
@@ -518,9 +516,15 @@ const atividades = computed<Atividade[]>(() => {
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
 
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como idSubprocesso
+  await mapaStore.fetchMapaCompleto(idProcesso.value);
+});
+
 const mapa = computed(() => {
   if (unidade.value?.codigo) {
-    return mapaStore.getMapaByUnidadeId(unidade.value.codigo);
+    return mapaStore.mapaCompleto;
   }
   return null;
 })
@@ -698,9 +702,9 @@ async function confirmarAceitacao(observacoes?: string) {
   const isHomologacao = perfil === 'ADMIN';
 
   if (isHomologacao) {
-    await subprocessosStore.homologarValidacao(idSubprocesso.value, { observacoes });
+    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, { observacoes: observacoes || '' }); // Adicionar observacoes
   } else {
-    await subprocessosStore.aceitarValidacao(idSubprocesso.value, { observacoes });
+    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, { observacoes: observacoes || '' }); // Adicionar observacoes
   }
 
   fecharModalAceitar();
@@ -712,7 +716,8 @@ async function confirmarAceitacao(observacoes?: string) {
 async function confirmarDevolucao() {
   if (!idSubprocesso.value) return;
 
-  await subprocessosStore.devolverValidacao(idSubprocesso.value, {
+  await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, {
+    motivo: '', // Adicionar motivo
     observacoes: observacaoDevolucao.value,
   });
 

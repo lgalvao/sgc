@@ -1,20 +1,16 @@
-import { describe, it, expect, vi } from 'vitest'
+import {describe, expect, it} from 'vitest'
+import {getMockAtividadesData, initPinia, prepareFreshAtividadesStore,} from '../helpers'
 import {
-  getMockAtividadesData,
-  prepareFreshAtividadesStore,
-  initPinia,
-} from '../helpers'
-import {
-  selecionarProcessoEUnidade,
-  expectImportButtonDisabled,
-  expectImportButtonEnabled,
-  selectFirstCheckbox,
-  assertUnidadeOptions,
-  navigateAndAssertBreadcrumbs,
-  expectContainsAll,
+    assertUnidadeOptions,
+    expectContainsAll,
+    expectImportButtonDisabled,
+    expectImportButtonEnabled,
+    navigateAndAssertBreadcrumbs,
+    selecionarProcessoEUnidade,
+    selectFirstCheckbox,
 } from '../uiHelpers'
-import { mount } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
+import {mount} from '@vue/test-utils'
+import {createRouter, createWebHistory} from 'vue-router'
 
 describe('test-utils/helpers', () => {
   it('getMockAtividadesData should return a non-empty array', () => {

@@ -3,7 +3,7 @@ import router from './router';
 import {useNotificacoesStore} from './stores/notificacoes';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api', // URL base da sua API Spring Boot
+  baseURL: 'http://localhost:10000/api',
   headers: {
     'Content-type': 'application/json',
   },
@@ -16,7 +16,7 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response;
       if (status === 401) {
-        notificacoesStore.erro('Não Autorizado', 'Sua sessão expirou ou você não está autenticado. Por favor, faça login novamente.');
+        notificacoesStore.erro('Não Autorizado', 'Sua sessão expirou ou você não está autenticado. Faça login novamente.');
         router.push('/login');
       } else if (data && data.message) {
         notificacoesStore.erro('Erro na Requisição', data.message);

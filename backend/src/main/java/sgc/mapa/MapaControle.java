@@ -7,14 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.sgrh.Usuario;
 
 import java.net.URI;
 import java.util.List;

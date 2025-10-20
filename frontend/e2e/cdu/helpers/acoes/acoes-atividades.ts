@@ -128,7 +128,7 @@ export async function clicarBotaoDisponibilizar(page: Page): Promise<void> {
     await clicarElemento([
         page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE),
         page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}),
-        page.getByTestId(SELETORES.BTN_DISPONIBILIZAR),
+        page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE),
     ]);
 }
 
@@ -189,7 +189,7 @@ export async function disponibilizarMapaComData(page: Page, dataLimite: string, 
 
     // Confirmar disponibilização (pode usar texto "Disponibilizar" ou "Confirmar")
     await clicarElemento([
-        modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR),
+        modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE),
         modal.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}),
         modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
     ]);

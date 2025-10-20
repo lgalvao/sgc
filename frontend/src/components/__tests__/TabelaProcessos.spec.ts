@@ -1,28 +1,31 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
-import {Processo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 // Mock de dados de processo
-const mockProcessos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[] = [
+const mockProcessos: ProcessoResumo[] = [
   {
-    id: 1,
+    codigo: 1,
     descricao: 'Processo Alpha',
-      tipo: TipoProcesso.MAPEAMENTO,
-    unidadesFormatadas: 'UNID1, UNID2',
-      situacao: SituacaoProcesso.EM_ANDAMENTO,
-    dataLimite: new Date(),
+    tipo: TipoProcesso.MAPEAMENTO,
+    unidadeCodigo: 1,
+    unidadeNome: 'UNID1, UNID2',
+    situacao: SituacaoProcesso.EM_ANDAMENTO,
+    dataLimite: new Date().toISOString(),
+    dataCriacao: new Date().toISOString(),
     dataFinalizacao: null,
   },
   {
-    id: 2,
+    codigo: 2,
     descricao: 'Processo Beta',
-      tipo: TipoProcesso.REVISAO,
-    unidadesFormatadas: 'UNID3',
-      situacao: SituacaoProcesso.FINALIZADO,
-    dataLimite: new Date(),
-    dataFinalizacao: new Date('2024-08-26'),
-    dataFinalizacaoFormatada: '26/08/2024',
+    tipo: TipoProcesso.REVISAO,
+    unidadeCodigo: 3,
+    unidadeNome: 'UNID3',
+    situacao: SituacaoProcesso.FINALIZADO,
+    dataLimite: new Date().toISOString(),
+    dataCriacao: new Date().toISOString(),
+    dataFinalizacao: new Date('2024-08-26').toISOString(),
   },
 ];
 
@@ -174,7 +177,7 @@ describe('TabelaProcessos.vue', () => {
     const wrapperUnidades = mount(TabelaProcessos, {
       props: {
         processos: [],
-        criterioOrdenacao: 'unidades',
+        criterioOrdenacao: 'unidadeNome',
         direcaoOrdenacaoAsc: false,
       },
     });

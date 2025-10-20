@@ -1,17 +1,17 @@
 import {defineStore} from 'pinia'
-import {Movimentacao, Processo, Subprocesso} from '@/types/tipos'
+import {
+    AtualizarProcessoRequest,
+    CriarProcessoRequest,
+    Movimentacao,
+    ProcessoDetalhe,
+    ProcessoResumo,
+    SituacaoSubprocesso,
+    TipoProcesso
+} from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
-import {Page} from '../services/painelService'
+import {Page} from '@/services/painelService'
 import * as processoService from '../services/processoService'
-import {
-  AtualizarProcessoRequest,
-  CriarProcessoRequest,
-  ProcessoDetalhe,
-  ProcessoResumo,
-  SituacaoSubprocesso,
-  TipoProcesso
-} from '@/types/tipos'
 
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
@@ -19,9 +19,6 @@ export const useProcessosStore = defineStore('processos', {
         processosPainelPage: {} as Page<ProcessoResumo>,
         processoDetalhe: null as ProcessoDetalhe | null, // Para armazenar o processo detalhado
         processosFinalizados: [] as ProcessoResumo[],
-        // As propriedades abaixo serão tratadas em etapas futuras ou removidas se não forem mais necessárias
-        // processos: [] as Processo[], // Removido
-        // subprocessos: [] as Subprocesso[], // Removido
         movements: [] as Movimentacao[] // Manter se ainda for usado para mocks internos ou outras lógicas
     }),
     getters: {
@@ -49,7 +46,8 @@ export const useProcessosStore = defineStore('processos', {
             return [];
         },
         getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.movements.filter(m => (m as any).idSubprocesso === idSubprocesso).sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
+            return state.movements.filter(m => (m as any).idSubprocesso === idSubprocesso)
+                .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
         }
     },
     actions: {
@@ -59,8 +57,7 @@ export const useProcessosStore = defineStore('processos', {
             this.processosPainelPage = response;
         },
         async fetchProcessosFinalizados() {
-            const response = await processoService.fetchProcessosFinalizados();
-            this.processosFinalizados = response;
+            this.processosFinalizados = await processoService.fetchProcessosFinalizados();
         },
         async fetchProcessoDetalhe(idProcesso: number) {
             this.processoDetalhe = await processoService.obterDetalhesProcesso(idProcesso);
@@ -90,13 +87,7 @@ export const useProcessosStore = defineStore('processos', {
             tipoAcao: 'aceitar' | 'homologar',
             unidadeUsuario: string
         }) {
-            // Esta lógica deve ser movida para o backend.
-            // Por enquanto, vamos simular a chamada ao serviço se houver um endpoint para isso.
-            // Se não houver, esta action precisará ser refeita para chamar o backend.
             console.warn('processarCadastroBloco: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.processarCadastroBloco(payload);
-
             // Lógica de simulação temporária (remover quando o backend estiver pronto)
             const {idProcesso, unidades, tipoAcao, unidadeUsuario} = payload;
             if (this.processoDetalhe && this.processoDetalhe.codigo === idProcesso) {

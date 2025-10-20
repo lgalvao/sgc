@@ -1,8 +1,6 @@
-import {beforeEach, describe, expect, it, vi, Mocked} from 'vitest';
+import {beforeEach, describe, expect, it, Mocked, vi} from 'vitest';
 import {useProcessosStore} from '../processos';
-import {SituacaoProcesso, SituacaoSubprocesso, Subprocesso, TipoProcesso} from '@/types/tipos';
-import {useNotificacoesStore} from '../notificacoes';
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'; // Adicionado
+import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import {initPinia} from '@/test-utils/helpers';
 
 // Mock dos serviços
@@ -174,7 +172,12 @@ describe('useProcessosStore', () => {
         });
 
         it('criarProcesso should throw error on service failure', async () => {
-            const payload = { descricao: 'Novo Processo', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            const payload = {
+                descricao: 'Novo Processo',
+                tipo: TipoProcesso.MAPEAMENTO,
+                dataLimiteEtapa1: '2025-12-31',
+                unidades: [1]
+            };
             processoService.criarProcesso.mockRejectedValue(error);
             await expect(processosStore.criarProcesso(payload)).rejects.toThrow(error);
         });
@@ -205,7 +208,13 @@ describe('useProcessosStore', () => {
         });
 
         it('atualizarProcesso should throw error on service failure', async () => {
-            const payload = { codigo: 1, descricao: 'Processo Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] };
+            const payload = {
+                codigo: 1,
+                descricao: 'Processo Atualizado',
+                tipo: TipoProcesso.MAPEAMENTO,
+                dataLimiteEtapa1: '2025-12-31',
+                unidades: [1]
+            };
             processoService.atualizarProcesso.mockRejectedValue(error);
             await expect(processosStore.atualizarProcesso(1, payload)).rejects.toThrow(error);
         });
@@ -269,8 +278,22 @@ describe('useProcessosStore', () => {
                 dataLimite: '2025-12-31',
                 dataCriacao: '2025-01-01',
                 unidades: [
-                    { sigla: 'A', situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO, nome: 'Unidade A', codUnidade: 1, dataLimite: '2025-12-31', filhos: [] },
-                    { sigla: 'B', situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO, nome: 'Unidade B', codUnidade: 2, dataLimite: '2025-12-31', filhos: [] },
+                    {
+                        sigla: 'A',
+                        situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        nome: 'Unidade A',
+                        codUnidade: 1,
+                        dataLimite: '2025-12-31',
+                        filhos: []
+                    },
+                    {
+                        sigla: 'B',
+                        situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        nome: 'Unidade B',
+                        codUnidade: 2,
+                        dataLimite: '2025-12-31',
+                        filhos: []
+                    },
                 ],
                 resumoSubprocessos: [],
                 podeFinalizar: false,
@@ -294,8 +317,8 @@ describe('useProcessosStore', () => {
             processosStore.addMovement({
                 descricao: 'Teste',
                 usuario: 'user',
-                unidadeOrigem: { codigo: 1, nome: 'A', sigla: 'A' },
-                unidadeDestino: { codigo: 2, nome: 'B', sigla: 'B' },
+                unidadeOrigem: {codigo: 1, nome: 'A', sigla: 'A'},
+                unidadeDestino: {codigo: 2, nome: 'B', sigla: 'B'},
             });
             expect(processosStore.movements.length).toBe(initialMovementsCount + 1);
             const lastMovement = processosStore.movements[processosStore.movements.length - 1];
@@ -319,7 +342,7 @@ describe('useProcessosStore', () => {
                     {
                         codigo: 1,
                         unidadeNome: 'A',
-                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+situacao: SituacaoProcesso.EM_ANDAMENTO,
                         dataLimite: '2025-12-31',
                         descricao: 'Subprocesso A',
                         tipo: TipoProcesso.MAPEAMENTO,
@@ -329,7 +352,7 @@ describe('useProcessosStore', () => {
                     {
                         codigo: 2,
                         unidadeNome: 'B',
-                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+situacao: SituacaoProcesso.EM_ANDAMENTO,
                         dataLimite: '2025-12-31',
                         descricao: 'Subprocesso B',
                         tipo: TipoProcesso.MAPEAMENTO,
@@ -339,7 +362,7 @@ describe('useProcessosStore', () => {
                     {
                         codigo: 3,
                         unidadeNome: 'A',
-                        situacao: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        situacao: SituacaoProcesso.EM_ANDAMENTO,
                         dataLimite: '2025-12-31',
                         descricao: 'Subprocesso C',
                         tipo: TipoProcesso.MAPEAMENTO,

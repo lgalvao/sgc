@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import {Perfil} from "@/types/tipos";
 import * as usuarioService from '../services/usuarioService';
-import {PerfilUnidade} from '../mappers/sgrh';
+import {PerfilUnidade} from '@/mappers/sgrh';
 
 export const usePerfilStore = defineStore('perfil', {
     state: () => ({
@@ -27,6 +27,7 @@ export const usePerfilStore = defineStore('perfil', {
             if (autenticado) {
                 const perfisUnidades = await usuarioService.autorizar(tituloEleitoralNum);
                 this.perfisUnidades = perfisUnidades;
+
                 // Se houver apenas uma opção, seleciona automaticamente
                 if (perfisUnidades.length === 1) {
                     const perfilUnidadeSelecionado = perfisUnidades[0];
@@ -42,6 +43,7 @@ export const usePerfilStore = defineStore('perfil', {
             }
             return false;
         },
+
         async selecionarPerfilUnidade(tituloEleitoral: number, perfilUnidade: PerfilUnidade) {
             await usuarioService.entrar({
                 tituloEleitoral: tituloEleitoral,

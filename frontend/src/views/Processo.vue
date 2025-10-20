@@ -215,7 +215,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch, onMounted} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
@@ -224,12 +224,9 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {useMapasStore} from '@/stores/mapas'
-import {EMAIL_TEMPLATES} from '@/constants'
 
 import TreeTable from '@/components/TreeTable.vue'
-import { ProcessoDetalhe, UnidadeParticipante, SituacaoSubprocesso, SituacaoProcesso, Unidade, ProcessoResumo } from '../types/tipos'
-import {ensureValidDate} from '@/utils'
-import * as processoService from '@/services/processoService';
+import {ProcessoDetalhe, SituacaoProcesso, Unidade, UnidadeParticipante} from '../types/tipos'
 
 interface TreeTableItem {
   id: number | string;

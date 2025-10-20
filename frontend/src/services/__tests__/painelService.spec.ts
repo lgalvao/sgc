@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import {afterEach, describe, expect, it, vi, type Mocked} from 'vitest'
 import * as service from '../painelService'
 import api from '@/axios-setup'
 import * as processoMappers from '@/mappers/processos'
@@ -13,7 +13,7 @@ vi.mock('@/mappers/alertas', () => ({
 }))
 
 describe('painelService', () => {
-  const mockApi = vi.mocked(api)
+  const mockApi = api as Mocked<typeof api>
   const mockProcessoMappers = vi.mocked(processoMappers)
   const mockAlertaMappers = vi.mocked(alertaMappers)
 
@@ -34,7 +34,7 @@ describe('painelService', () => {
         last: true,
         empty: false,
       }
-      mockApi.get.mockResolvedValue({ data: responseData })
+      mockApi.get.mockResolvedValueOnce({ data: responseData })
 
       const result = await service.listarProcessos('CHEFE', 1)
 
@@ -48,7 +48,7 @@ describe('painelService', () => {
     })
 
     it('should handle different pagination', async () => {
-        mockApi.get.mockResolvedValue({ data: { content: [] } })
+        mockApi.get.mockResolvedValueOnce({ data: { content: [] } })
         await service.listarProcessos('GESTOR', undefined, 2, 10)
         expect(mockApi.get).toHaveBeenCalledWith('/painel/processos', {
             params: { perfil: 'GESTOR', unidade: undefined, page: 2, size: 10 },
@@ -56,7 +56,7 @@ describe('painelService', () => {
     })
 
     it('should throw an error on failure', async () => {
-      mockApi.get.mockRejectedValue(new Error('Failed'))
+      mockApi.get.mockRejectedValueOnce(new Error('Failed'))
       await expect(service.listarProcessos('CHEFE')).rejects.toThrow()
     })
   })
@@ -74,7 +74,7 @@ describe('painelService', () => {
             last: true,
             empty: false,
           }
-        mockApi.get.mockResolvedValue({ data: responseData })
+        mockApi.get.mockResolvedValueOnce({ data: responseData })
 
         const result = await service.listarAlertas('123', 1)
 
@@ -88,7 +88,7 @@ describe('painelService', () => {
       })
 
       it('should throw an error on failure', async () => {
-        mockApi.get.mockRejectedValue(new Error('Failed'))
+        mockApi.get.mockRejectedValueOnce(new Error('Failed'))
         await expect(service.listarAlertas('123')).rejects.toThrow()
       })
   })

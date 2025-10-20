@@ -1,13 +1,11 @@
-import { SituacaoProcesso, TipoProcesso } from "@/types/tipos";
-import type { ProcessoDetalhe, Unidade } from "@/types/tipos";
+import type {ProcessoDetalhe, Unidade} from "@/types/tipos";
+import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 
 export const mockUnidade: Unidade = {
     codigo: 1,
     nome: 'Unidade Mock',
     sigla: 'UNID',
 };
-
-import { SituacaoSubprocesso } from "@/types/tipos";
 
 export const mockProcessoDetalhe: ProcessoDetalhe = {
     codigo: 1,

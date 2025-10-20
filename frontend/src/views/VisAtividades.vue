@@ -214,7 +214,6 @@ import {usePerfilStore} from '@/stores/perfil';
 import {useAtividadesStore} from '@/stores/atividades';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
-import {useNotificacoesStore} from '@/stores/notificacoes';
 import {useRouter} from 'vue-router';
 import {
   AceitarCadastroRequest,
@@ -344,6 +343,7 @@ async function confirmarValidacao() {
 async function confirmarDevolucao() {
   if (!idSubprocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
+    motivo: '', // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 

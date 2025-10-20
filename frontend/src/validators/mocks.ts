@@ -102,7 +102,6 @@ export const alertaServidorItemSchema = z.object({
 }).catchall(z.unknown());
 export const alertasServidorSchema = z.array(alertaServidorItemSchema);
 
-// Mapeamento de arquivo -> schema exportado para reuso
 /**
  * Carrega e parseia um mock JSON do diretório informado.
  */

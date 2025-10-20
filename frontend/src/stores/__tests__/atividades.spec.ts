@@ -1,9 +1,15 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useAtividadesStore } from '../atividades';
+import {createPinia, setActivePinia} from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useAtividadesStore} from '../atividades';
 import * as subprocessoService from '@/services/subprocessoService';
 import * as atividadeService from '@/services/atividadeService';
-import type { MapaVisualizacao, CriarAtividadeRequest, CriarConhecimentoRequest, Atividade, Conhecimento } from '@/types/tipos';
+import type {
+    Atividade,
+    Conhecimento,
+    CriarAtividadeRequest,
+    CriarConhecimentoRequest,
+    MapaVisualizacao
+} from '@/types/tipos';
 
 // Mocking services
 vi.mock('@/services/subprocessoService');

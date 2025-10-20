@@ -1,7 +1,23 @@
 import {describe, expect, it} from 'vitest';
-import { mapAlertaDtoToFrontend } from '../alertas';
+import {mapAlertaDtoToFrontend} from '../alertas';
 import {mapVWUsuariosArray, mapVWUsuarioToServidor} from '@/mappers/servidores';
 import {mapUnidade, mapUnidadesArray, mapUnidadeSnapshot} from '@/mappers/unidades';
+import {
+    mapAtividadeDtoToModel,
+    mapConhecimentoDtoToModel,
+    mapCriarAtividadeRequestToDto,
+    mapCriarConhecimentoRequestToDto,
+} from '../atividades';
+import {
+    mapImpactoMapaDtoToModel,
+    mapMapaAjusteDtoToModel,
+    mapMapaCompletoDtoToModel,
+    mapMapaDtoToModel,
+    mapMapaVisualizacaoToAtividades,
+} from '../mapas';
+import {Mapa, MapaAjuste, MapaVisualizacao} from '@/types/tipos';
+import {mapProcessoDetalheDtoToFrontend, mapProcessoDtoToFrontend, mapProcessoResumoDtoToFrontend,} from '../processos';
+import {mapPerfilUnidadeToFrontend, mapUsuarioToFrontend} from '../sgrh';
 
 describe('mappers/alertas', () => {
     it('mapAlertaDtoToFrontend should map all fields correctly', () => {
@@ -27,31 +43,24 @@ describe('mappers/alertas', () => {
     });
 });
 
-import {
-    mapAtividadeDtoToModel,
-    mapConhecimentoDtoToModel,
-    mapCriarAtividadeRequestToDto,
-    mapCriarConhecimentoRequestToDto,
-} from '../atividades';
-
 describe('mappers/atividades', () => {
     it('mapAtividadeDtoToModel should map correctly', () => {
         const dto = {
             codigo: 1,
             descricao: 'Atividade Teste',
-            conhecimentos: [{ codigo: 101, descricao: 'Conhecimento Teste' }],
+            conhecimentos: [{ id: 101, descricao: 'Conhecimento Teste' }],
         };
         const model = mapAtividadeDtoToModel(dto);
         expect(model.codigo).toBe(1);
         expect(model.descricao).toBe('Atividade Teste');
         expect(model.conhecimentos).toHaveLength(1);
-        expect(model.conhecimentos[0].codigo).toBe(101);
+        expect(model.conhecimentos[0].id).toBe(101);
     });
 
     it('mapConhecimentoDtoToModel should map correctly', () => {
-        const dto = { codigo: 101, descricao: 'Conhecimento Teste' };
+        const dto = { id: 101, descricao: 'Conhecimento Teste' };
         const model = mapConhecimentoDtoToModel(dto);
-        expect(model.codigo).toBe(101);
+        expect(model.id).toBe(101);
         expect(model.descricao).toBe('Conhecimento Teste');
     });
 
@@ -69,20 +78,14 @@ describe('mappers/atividades', () => {
     });
 });
 
-import {
-    mapMapaVisualizacaoToAtividades,
-    mapMapaDtoToModel,
-    mapMapaCompletoDtoToModel,
-    mapImpactoMapaDtoToModel,
-    mapMapaAjusteDtoToModel,
-} from '../mapas';
-
 describe('mappers/mapas', () => {
     it('mapMapaVisualizacaoToAtividades should extract and map all activities', () => {
-        const dto = {
+        const dto: MapaVisualizacao = {
+            codigo: 1,
+            descricao: 'mapa',
             competencias: [
-                { atividades: [{ codigo: 1, descricao: 'A1', conhecimentos: [] }] },
-                { atividades: [{ codigo: 2, descricao: 'A2', conhecimentos: [] }, { codigo: 3, descricao: 'A3', conhecimentos: [] }] },
+                { codigo: 1, descricao: "c1", atividades: [{ codigo: 1, descricao: 'A1', conhecimentos: [] }] },
+                { codigo: 2, descricao: "c2", atividades: [{ codigo: 2, descricao: 'A2', conhecimentos: [] }, { codigo: 3, descricao: 'A3', conhecimentos: [] }] },
             ]
         };
         const atividades = mapMapaVisualizacaoToAtividades(dto);
@@ -93,77 +96,68 @@ describe('mappers/mapas', () => {
 
     it('mapMapaDtoToModel should map fields and handle dates', () => {
         const dto = {
-            id: 1,
+            codigo: 1,
             dataCriacao: '2025-01-01T00:00:00Z',
             dataDisponibilizacao: '2025-01-02T00:00:00Z',
             competencias: [],
         };
-        const model = mapMapaDtoToModel(dto);
-        expect(model.id).toBe(1);
-        expect(model.dataCriacao).toBeInstanceOf(Date);
-        expect(model.dataDisponibilizacao).toBeInstanceOf(Date);
-        expect(model.dataFinalizacao).toBeNull();
+        const model: Mapa = mapMapaDtoToModel(dto);
+        expect(model.codigo).toBe(1);
+        expect(model.dataCriacao).toBe('2025-01-01T00:00:00Z');
+        expect(model.dataDisponibilizacao).toBe('2025-01-02T00:00:00Z');
+        expect(model.dataFinalizacao).toBeUndefined();
     });
 
     it('mapMapaCompletoDtoToModel should map nested structures', () => {
         const dto = {
             codigo: 1,
-            competencias: [{ codigo: 10, atividades: [{ codigo: 100, conhecimentos: [{ codigo: 1000 }] }] }],
+            competencias: [{ codigo: 10, atividades: [{ codigo: 100, conhecimentos: [{ id: 1000 }] }] }],
         };
         const model = mapMapaCompletoDtoToModel(dto);
-        expect(model.competencias[0].atividades[0].conhecimentos[0].codigo).toBe(1000);
+        expect((model.competencias[0] as any).atividades[0].conhecimentos[0].id).toBe(1000);
     });
 
     it('mapImpactoMapaDtoToModel should map impact fields', () => {
         const dto = {
-            temImpacto: true,
-            competencias: [{ id: 1, atividadesAdicionadas: ['A1'] }],
+            temImpactos: true,
+            competenciasImpactadas: [{ codigo: 1, atividadesAssociadas: ['A1'] }],
         };
         const model = mapImpactoMapaDtoToModel(dto);
-        expect(model.temImpacto).toBe(true);
-        expect(model.competencias[0].atividadesAdicionadas).toContain('A1');
+        expect(model.temImpactos).toBe(true);
+        expect(model.competenciasImpactadas[0].atividadesAssociadas).toContain('A1');
     });
 
     it('mapMapaAjusteDtoToModel should map ajuste fields', () => {
-        const dto = { competencias: [1, 2], sugestoes: 'N/A' };
-        const model = mapMapaAjusteDtoToModel(dto);
+        const dto = { codigo: 1, descricao: "mapa", competencias: [1, 2] };
+        const model: MapaAjuste = mapMapaAjusteDtoToModel(dto);
         expect(model.competencias).toHaveLength(2);
-        expect(model.sugestoes).toBe('N/A');
     });
 });
 
-import {
-    mapProcessoResumoDtoToFrontend,
-    mapProcessoDtoToFrontend,
-    mapProcessoDetalheDtoToFrontend,
-} from '../processos';
-
 describe('mappers/processos', () => {
     it('mapProcessoResumoDtoToFrontend should copy all properties', () => {
-        const dto = { id: 1, tipo: 'MAPEAMENTO', situacao: 'EM_ANDAMENTO' };
+        const dto = { codigo: 1, tipo: 'MAPEAMENTO', situacao: 'EM_ANDAMENTO' };
         const model = mapProcessoResumoDtoToFrontend(dto);
         expect(model).toEqual(dto);
     });
 
     it('mapProcessoDtoToFrontend should copy all properties', () => {
-        const dto = { id: 1, tipo: 'REVISAO', situacao: 'INICIADO', responsavel: 'user' };
+        const dto = { codigo: 1, tipo: 'REVISAO', situacao: 'INICIADO', responsavel: 'user' };
         const model = mapProcessoDtoToFrontend(dto);
         expect(model).toEqual(dto);
     });
 
     it('mapProcessoDetalheDtoToFrontend should map nested structures', () => {
         const dto = {
-            id: 1,
-            unidades: [{ id: 10, filhos: [{ id: 11 }] }],
-            resumoSubprocessos: [{ id: 100 }],
+            codigo: 1,
+            unidades: [{ codigo: 10, filhos: [{ codigo: 11 }] }],
+            resumoSubprocessos: [{ codigo: 100 }],
         };
         const model = mapProcessoDetalheDtoToFrontend(dto);
-        expect(model.unidades[0].filhos[0].id).toBe(11);
-        expect(model.resumoSubprocessos[0].id).toBe(100);
+        expect(model.unidades[0].filhos[0].codUnidade).toBe(11);
+        expect(model.resumoSubprocessos[0].codigo).toBe(100);
     });
 });
-
-import { mapPerfilUnidadeToFrontend, mapUsuarioToFrontend } from '../sgrh';
 
 describe('mappers/sgrh', () => {
     it('mapPerfilUnidadeToFrontend should map correctly', () => {
@@ -196,37 +190,37 @@ describe('mappers/sgrh', () => {
 });
 
 describe('mappers/servidores', () => {
-  it('mapVWUsuarioToServidor maps numeric titulo to id and fields', () => {
+  it('mapVWUsuarioToServidor maps numeric titulo to codigo and fields', () => {
     const vw = { titulo: '42', nome: 'Fulano', unidade: 'SESEL', email: 'f@t.br', ramal: '123' };
     const s = mapVWUsuarioToServidor(vw);
-    expect(s.id).toBe(42);
+    expect(s.codigo).toBe(42);
     expect(s.nome).toBe('Fulano');
     expect(s.unidade).toBe('SESEL');
     expect(s.email).toBe('f@t.br');
     expect(s.ramal).toBe('123');
   });
 
-  it('mapVWUsuarioToServidor uses id when provided and defaults missing fields', () => {
-    const vw = { id: 7, nome: 'Beltrano' };
+  it('mapVWUsuarioToServidor uses codigo when provided and defaults missing fields', () => {
+    const vw = { codigo: 7, nome: 'Beltrano' };
     const s = mapVWUsuarioToServidor(vw);
-    expect(s.id).toBe(7);
+    expect(s.codigo).toBe(7);
     expect(s.nome).toBe('Beltrano');
     expect(s.unidade).toBe('');
   });
 
   it('mapVWUsuariosArray maps array', () => {
-    const arr = [{ id: 1, nome: 'A' }, { titulo: '2', nome: 'B' }];
+    const arr = [{ codigo: 1, nome: 'A' }, { titulo: '2', nome: 'B' }];
     const res = mapVWUsuariosArray(arr);
     expect(res.length).toBe(2);
-    expect(res[0].id).toBe(1);
-    expect(res[1].id).toBe(2);
+    expect(res[0].codigo).toBe(1);
+    expect(res[1].codigo).toBe(2);
   });
 });
 
 describe('mappers/unidades', () => {
   it('mapUnidade maps fields and responsavel, and recursive filhas', () => {
     const u = {
-      id: 10,
+      codigo: 10,
       sigla: 'SETEST',
       nome: 'Seção Teste',
       tipo: 'OPERACIONAL',
@@ -238,19 +232,19 @@ describe('mappers/unidades', () => {
         dataFim: null
       },
       filhas: [
-        { id: 11, sigla: 'FILHA', nome: 'Filha', tipo: 'OPERACIONAL', filhas: [] }
+        { codigo: 11, sigla: 'FILHA', nome: 'Filha', tipo: 'OPERACIONAL', filhas: [] }
       ]
     };
 
     const mapped = mapUnidade(u);
-    expect(mapped.id).toBe(10);
+    expect(mapped.codigo).toBe(10);
     expect(mapped.sigla).toBe('SETEST');
     expect(mapped.nome).toBe('Seção Teste');
     expect(mapped.idServidorTitular).toBe(99);
     expect(mapped.responsavel).not.toBeNull();
-    expect(mapped.responsavel!.idServidor).toBe(100);
+    expect((mapped.responsavel as any)!.idServidor).toBe(100);
     expect(Array.isArray(mapped.filhas)).toBe(true);
-    expect(mapped.filhas[0].id).toBe(11);
+    expect(mapped.filhas[0].codigo).toBe(11);
   });
 
   it('mapUnidadeSnapshot maps simple snapshot structure recursively', () => {
@@ -262,7 +256,7 @@ describe('mappers/unidades', () => {
   });
 
   it('mapUnidadesArray maps arrays', () => {
-    const arr = [{ id: 1, sigla: 'A' }, { id: 2, sigla: 'B' }];
+    const arr = [{ codigo: 1, sigla: 'A' }, { codigo: 2, sigla: 'B' }];
     const res = mapUnidadesArray(arr);
     expect(res.length).toBe(2);
     expect(res[0].sigla).toBe('A');

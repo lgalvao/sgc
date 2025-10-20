@@ -1,10 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import {
-  listarAnalisesCadastro,
-  listarAnalisesValidacao,
-} from '../analiseService'
+import {describe, expect, it, vi} from 'vitest'
+import {listarAnalisesCadastro, listarAnalisesValidacao,} from '../analiseService'
 import api from '@/axios-setup'
-import { AnaliseCadastro, AnaliseValidacao } from '@/types/tipos'
+import {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos'
 
 vi.mock('@/axios-setup')
 
@@ -12,7 +9,7 @@ describe('analiseService', () => {
   describe('listarAnalisesCadastro', () => {
     it('should fetch analysis history for registration', async () => {
       const subprocessoId = 1
-      const responseData: AnaliseCadastro[] = [{ id: 1, dataHora: new Date(), observacoes: 'Obs', acao: 'ACEITE', unidadeSigla: 'Unidade', usuarioNome: 'Usuario' }]
+      const responseData: AnaliseCadastro[] = [{ codigo: 1, dataHora: new Date().toISOString(), observacoes: 'Obs', acao: 'ACEITE', unidadeSigla: 'Unidade', analista: 'Usuario', resultado: 'APROVADO', idSubprocesso: 1 }]
       vi.mocked(api.get).mockResolvedValue({ data: responseData })
 
       const result = await listarAnalisesCadastro(subprocessoId)
@@ -35,7 +32,7 @@ describe('analiseService', () => {
   describe('listarAnalisesValidacao', () => {
     it('should fetch analysis history for validation', async () => {
       const subprocessoId = 1
-      const responseData: AnaliseValidacao[] = [{ id: 1, dataHora: new Date(), observacoes: 'Obs', acao: 'DEVOLUCAO', unidadeSigla: 'Unidade', usuarioNome: 'Usuario' }]
+      const responseData: AnaliseValidacao[] = [{ codigo: 1, dataHora: new Date().toISOString(), observacoes: 'Obs', acao: 'DEVOLUCAO', unidade: 'Unidade', analista: 'Usuario', resultado: 'REPROVADO', idSubprocesso: 1 }]
       vi.mocked(api.get).mockResolvedValue({ data: responseData })
 
       const result = await listarAnalisesValidacao(subprocessoId)

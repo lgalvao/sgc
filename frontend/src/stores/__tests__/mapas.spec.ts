@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useMapasStore} from '../mapas';
 import * as SubprocessoService from '@/services/subprocessoService';
-import {MapaAjuste, MapaCompleto, ImpactoMapa} from "@/types/tipos";
+import {ImpactoMapa, MapaAjuste, MapaCompleto} from "@/types/tipos";
 
 vi.mock('@/services/subprocessoService', () => ({
     obterMapaCompleto: vi.fn(),

@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import * as service from '../processoService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/processos'
+import {AtualizarProcessoRequest, CriarProcessoRequest, TipoProcesso} from '@/types/tipos';
 
-import { vi } from 'vitest';
 vi.mock('@/axios-setup', () => {
     return {
         default: {
@@ -17,22 +17,22 @@ vi.mock('@/axios-setup', () => {
 vi.mock('@/mappers/processos', async (importOriginal) => {
     const original = await importOriginal()
     return {
-        ...original,
+        ...(original as any),
         mapProcessoDtoToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
         mapProcessoDetalheDtoToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
     }
 })
 
 describe('processoService', () => {
-    const mockApi = vi.mocked(api)
-    const mockMappers = vi.mocked(mappers)
+    const mockApi = api as any;
+    const mockMappers = mappers as any;
 
     afterEach(() => {
         vi.clearAllMocks()
     })
 
     it('criarProcesso should post and map response', async () => {
-        const request = { descricao: 'teste', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] }
+        const request: CriarProcessoRequest = { descricao: 'teste', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] }
         const responseDto = { id: 1, ...request }
         mockApi.post.mockResolvedValue({ data: responseDto })
 
@@ -57,7 +57,7 @@ describe('processoService', () => {
 
     it('iniciarProcesso should post with correct params', async () => {
         mockApi.post.mockResolvedValue({})
-        await service.iniciarProcesso(1, 'REVISAO', [10, 20])
+        await service.iniciarProcesso(1, TipoProcesso.REVISAO, [10, 20])
         expect(mockApi.post).toHaveBeenCalledWith('/processos/1/iniciar?tipo=REVISAO', [10, 20])
     })
 
@@ -79,7 +79,7 @@ describe('processoService', () => {
     })
 
     it('atualizarProcesso should put and map response', async () => {
-        const request = { nome: 'Processo Atualizado' }
+        const request: AtualizarProcessoRequest = { codigo: 1, descricao: 'Processo Atualizado', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] }
         const responseDto = { id: 1, ...request }
         mockApi.put.mockResolvedValue({ data: responseDto })
 
@@ -109,7 +109,7 @@ describe('processoService', () => {
 
     // Error handling
     it('criarProcesso should throw error on failure', async () => {
-        const request = { tipo: 'MAPEAMENTO' }
+        const request: CriarProcessoRequest = { descricao: 'teste', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] }
         mockApi.post.mockRejectedValue(new Error('Failed'))
         await expect(service.criarProcesso(request)).rejects.toThrow()
     })

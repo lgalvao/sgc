@@ -14,7 +14,6 @@ import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.ConhecimentoAjusteDto;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;

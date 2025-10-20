@@ -88,18 +88,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {
-  Mapa,
-  Movimentacao,
-  Perfil,
-  Processo,
-  Servidor,
-  Subprocesso,
-  SituacaoSubprocesso,
-  TipoProcesso,
-  TipoResponsabilidade,
-  Unidade
-} from "@/types/tipos";
+import {Mapa, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade, MapaCompleto} from "@/types/tipos";
 import {formatDateTimeBR, parseDate} from '@/utils';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
@@ -193,13 +182,15 @@ const situacaoUnidadeNoProcesso = computed(() => {
   return SubprocessoDetalhes.value?.situacao || SituacaoSubprocesso.NAO_INICIADO;
 });
 
-const mapa = computed<Mapa | null>(() => {
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como idSubprocesso
+  await mapaStore.fetchMapaCompleto(idProcesso.value);
+});
+
+const mapa = computed<MapaCompleto | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !processoAtual.value) return null;
-  const mapaEncontrado = mapaStore.getMapaByUnidadeId(unidadeComResponsavelDinamico.value.codigo);
-  if (mapaEncontrado) {
-    return mapaEncontrado as any;
-  }
-  return null;
+  return mapaStore.mapaCompleto;
 });
 
 // Computed para verificar se o subprocesso está em andamento

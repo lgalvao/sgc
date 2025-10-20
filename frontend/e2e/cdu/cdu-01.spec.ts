@@ -20,7 +20,7 @@ test.describe('CDU-01: Realizar login e exibir estrutura das telas', () => {
     });
 
     test('deve exibir erro para usuário não encontrado', async ({page}) => {
-        await login(page, 111111111111, 'senha-qualquer'); // ID de usuário que não existe
+        await login(page, '111111111111', 'senha-qualquer'); // ID de usuário que não existe
         await clicarBotaoEntrar(page);
         await esperarNotificacaoLoginInvalido(page);
     });

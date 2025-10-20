@@ -143,11 +143,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch, onMounted} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
-import { SituacaoProcesso, TipoProcesso, type Atividade } from '@/types/tipos'
-import {ProcessoResumo, UnidadeParticipante} from "@/mappers/processos";
+import {type Atividade, TipoProcesso, type ProcessoResumo, type UnidadeParticipante} from '@/types/tipos'
 
 const props = defineProps<{
   mostrar: boolean

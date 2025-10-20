@@ -15,8 +15,6 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +47,7 @@ public class MapaService {
 
         List<CompetenciaMapaDto> competenciasDto = competencias.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getAtividadeCodigo()).collect(Collectors.toList());
+                    List<Long> idsAtividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getAtividadeCodigo()).toList();
 
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
@@ -119,7 +117,7 @@ public class MapaService {
         List<Competencia> competenciasFinais = repositorioCompetencia.findByMapaCodigo(idMapa);
         List<CompetenciaMapaDto> competenciasDtoFinais = competenciasFinais.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getAtividadeCodigo()).collect(Collectors.toList());
+                    List<Long> idsAtividades = repositorioCompetenciaAtividade.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getAtividadeCodigo()).toList();
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
                             c.getDescricao(),

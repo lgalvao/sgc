@@ -1,10 +1,6 @@
 import apiClient from '../axios-setup';
-import type { MapaVisualizacao, ImpactoMapa, MapaCompleto, MapaAjuste } from '@/types/tipos';
-import {
-    mapImpactoMapaDtoToModel,
-    mapMapaCompletoDtoToModel,
-    mapMapaAjusteDtoToModel,
-} from '@/mappers/mapas';
+import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from '@/mappers/mapas';
 
 interface ImportarAtividadesRequest {
   subprocessoOrigemId: number;

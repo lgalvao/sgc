@@ -2,7 +2,6 @@
  * ÍNDICE DE NAVEGAÇÃO E LOGIN
  * Re-exporta todas as funções de navegação e login
  */
-
 export {
     navegarParaCriacaoProcesso,
     navegarParaDetalhesProcesso,

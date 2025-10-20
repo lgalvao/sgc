@@ -1,28 +1,23 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import {afterEach, describe, expect, it, vi, type Mocked} from 'vitest'
 import * as service from '../usuarioService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/sgrh'
 
 vi.mock('@/axios-setup')
-vi.mock('@/mappers/sgrh', async (importOriginal) => {
-    const original = await importOriginal()
-    return {
-        ...original,
-        mapPerfilUnidadeToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
-    }
-})
+vi.mock('@/mappers/sgrh', () => ({
+    mapPerfilUnidadeToFrontend: vi.fn((dto) => ({ ...dto, mapped: true })),
+}))
 
 describe('usuarioService', () => {
-    const mockApi = vi.mocked(api)
+    const mockApi = api as Mocked<typeof api>
     const mockMappers = vi.mocked(mappers)
 
     afterEach(() => {
         vi.clearAllMocks()
     })
-
     it('autenticar should post request and return boolean', async () => {
-        const request = { tituloEleitoral: '123', senha: '123' }
-        mockApi.post.mockResolvedValue({ data: true })
+        const request = { tituloEleitoral: 123, senha: '123' }
+        mockApi.post.mockResolvedValueOnce({ data: true })
 
         const result = await service.autenticar(request)
 
@@ -33,7 +28,7 @@ describe('usuarioService', () => {
     it('autorizar should post, map, and return response', async () => {
         const tituloEleitoral = 123
         const responseDto = [{ perfil: 'CHEFE', unidade: 'UNIT' }]
-        mockApi.post.mockResolvedValue({ data: responseDto })
+        mockApi.post.mockResolvedValueOnce({ data: responseDto })
 
         const result = await service.autorizar(tituloEleitoral)
 
@@ -47,7 +42,7 @@ describe('usuarioService', () => {
 
     it('entrar should post the request', async () => {
         const request = { tituloEleitoral: 123, perfil: 'GESTOR', unidadeCodigo: 1 }
-        mockApi.post.mockResolvedValue({})
+        mockApi.post.mockResolvedValueOnce({})
 
         await service.entrar(request)
 
@@ -56,8 +51,8 @@ describe('usuarioService', () => {
 
     // Error handling
     it('autenticar should throw error on failure', async () => {
-        const request = { tituloEleitoral: '123', senha: '123' }
-        mockApi.post.mockRejectedValue(new Error('Failed'))
+        const request = { tituloEleitoral: 123, senha: '123' }
+        mockApi.post.mockRejectedValueOnce(new Error('Failed'))
         await expect(service.autenticar(request)).rejects.toThrow()
     })
 })

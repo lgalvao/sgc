@@ -372,15 +372,15 @@ import {useMapasStore} from '@/stores/mapas'
 import {useAnalisesStore} from '@/stores/analises'
 import {useSubprocessosStore} from '@/stores/subprocessos'
 import {
-  Perfil,
-  SituacaoSubprocesso,
-  TipoProcesso,
-  Unidade,
   type Atividade,
   type Conhecimento,
   type CriarAtividadeRequest,
   type CriarConhecimentoRequest,
+  Perfil,
   type ProcessoResumo,
+  SituacaoSubprocesso,
+  TipoProcesso,
+  Unidade,
   type UnidadeParticipante
 } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'

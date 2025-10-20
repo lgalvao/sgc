@@ -35,7 +35,7 @@ export const useRevisaoStore = defineStore('revisao', {
         obterIdsCompetenciasImpactadas(atividadeId: number, siglaUnidade: string, idProcesso: number): number[] {
             const mapasStore = useMapasStore();
             const idsImpactados: number[] = [];
-            const mapaAtual = mapasStore.getMapaByUnidadeId(idProcesso);
+            const mapaAtual = mapasStore.mapaCompleto;
 
             if (mapaAtual) {
                 (mapaAtual as any).competencias.forEach((comp: any) => {

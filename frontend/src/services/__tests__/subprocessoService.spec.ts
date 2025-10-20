@@ -1,14 +1,23 @@
-import { describe, it, expect, vi } from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import * as service from '../subprocessoService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/mapas'
-import { MapaVisualizacao } from '@/types/tipos'
+import {MapaVisualizacao} from '@/types/tipos'
 
-vi.mock('@/axios-setup')
+vi.mock('@/axios-setup', () => {
+    return {
+        default: {
+            get: vi.fn(),
+            post: vi.fn(),
+            put: vi.fn(),
+            delete: vi.fn(),
+        },
+    };
+});
 vi.mock('@/mappers/mapas', async (importOriginal) => {
     const original = await importOriginal()
     return {
-        ...original,
+        ...(original as any),
         mapImpactoMapaDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
         mapMapaCompletoDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
         mapMapaAjusteDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
@@ -16,8 +25,8 @@ vi.mock('@/mappers/mapas', async (importOriginal) => {
 })
 
 describe('subprocessoService', () => {
-    const mockApi = vi.mocked(api)
-    const mockMappers = vi.mocked(mappers)
+    const mockApi = api as any;
+    const mockMappers = mappers as any;
     const id = 1
 
     it('importarAtividades should post to the correct endpoint', async () => {
@@ -30,7 +39,7 @@ describe('subprocessoService', () => {
     })
 
     it('obterMapaVisualizacao should fetch data', async () => {
-        const responseData: MapaVisualizacao = { id: 1, nome: 'Viz', competencias: [] }
+        const responseData: MapaVisualizacao = { codigo: 1, descricao: 'Viz', competencias: [] }
         mockApi.get.mockResolvedValue({ data: responseData })
         const result = await service.obterMapaVisualizacao(id)
         expect(mockApi.get).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-visualizacao`)

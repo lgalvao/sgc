@@ -3,9 +3,7 @@ import {
     abrirDialogoRemocaoProcesso,
     aguardarProcessoNoPainel,
     cancelarNoModal,
-    clicarIniciarProcesso,
     clicarPrimeiroProcessoTabela,
-    confirmarNoModal,
     criarProcessoCompleto,
     criarProcessoSemUnidades,
     editarDescricaoProcesso,
@@ -13,12 +11,12 @@ import {
     navegarParaCriacaoProcesso,
     navegarParaProcessoNaTabela,
     preencherFormularioProcesso,
+    removerProcessoComConfirmacao,
     selecionarPrimeiraUnidade,
     tentarSalvarProcessoVazio,
     verificarCamposObrigatoriosFormulario,
     verificarComportamentoCheckboxInteroperacional,
     verificarComportamentoMarcacaoCheckbox,
-    verificarConfirmacaoInicializacao,
     verificarDialogoConfirmacaoFechado,
     verificarDialogoConfirmacaoRemocao,
     verificarNavegacaoPaginaDetalhesProcesso,
@@ -26,9 +24,8 @@ import {
     verificarPaginaEdicaoProcesso,
     verificarPermanenciaFormularioEdicao,
     verificarProcessoEditado,
-    verificarProcessoIniciadoComSucesso,
-    verificarSelecaoArvoreCheckboxes,
-    verificarProcessoRemovidoComSucesso
+    verificarProcessoRemovidoComSucesso,
+    verificarSelecaoArvoreCheckboxes
 } from './helpers';
 
 test.describe('CDU-03: Manter processo', () => {

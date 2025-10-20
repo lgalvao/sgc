@@ -1,17 +1,26 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import * as service from '../mapaService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/mapas'
-import { Mapa } from '@/types/tipos'
+import {Mapa, SalvarMapaRequest} from '@/types/tipos'
 
-vi.mock('@/axios-setup')
+vi.mock('@/axios-setup', () => {
+    return {
+        default: {
+            get: vi.fn(),
+            post: vi.fn(),
+            put: vi.fn(),
+            delete: vi.fn(),
+        },
+    };
+});
 vi.mock('@/mappers/mapas', () => ({
   mapMapaDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
 }))
 
 describe('mapaService', () => {
-  const mockApi = vi.mocked(api)
-  const mockMappers = vi.mocked(mappers)
+  const mockApi = api as any;
+  const mockMappers = mappers as any;
 
   afterEach(() => {
     vi.clearAllMocks()
@@ -41,7 +50,7 @@ describe('mapaService', () => {
   })
 
   it('criarMapa should post and map response', async () => {
-    const request: Omit<Mapa, 'id'> = { nome: 'Novo Mapa', tipo: 'MAPEAMENTO' }
+    const request: SalvarMapaRequest = { competencias: [] }
     const responseDto = { id: 2, ...request }
     mockApi.post.mockResolvedValue({ data: responseDto })
 
@@ -53,7 +62,7 @@ describe('mapaService', () => {
   })
 
   it('atualizarMapa should put and map response', async () => {
-    const request: Mapa = { id: 1, nome: 'Mapa Atualizado', tipo: 'MAPEAMENTO' }
+    const request: Mapa = { codigo: 1, descricao: 'Mapa Atualizado', competencias: [], dataCriacao: '2025-01-01', idProcesso: 1, situacao: 'EM_ELABORACAO', unidade: null as any }
     const responseDto = { ...request }
     mockApi.put.mockResolvedValue({ data: responseDto })
 

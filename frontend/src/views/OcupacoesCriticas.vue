@@ -210,7 +210,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -218,7 +218,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {useAlertasStore} from '@/stores/alertas'
 import {usePerfilStore} from '@/stores/perfil'
-import {Competencia, Mapa, Processo} from '@/types/tipos'
+import {Competencia, Mapa, MapaCompleto} from '@/types/tipos'
 
 const route = useRoute()
 const router = useRouter()
@@ -235,19 +235,16 @@ const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
-import {onMounted} from 'vue'
-
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como idSubprocesso
+  await mapasStore.fetchMapaCompleto(idProcesso.value);
 });
 
-const mapa = computed<Mapa | null>(() => {
-  if (unidade.value?.codigo) {
-    return mapasStore.getMapaByUnidadeId(unidade.value.codigo) as any || null
-  }
-  return null
+const mapa = computed<MapaCompleto | null>(() => {
+  return mapasStore.mapaCompleto;
 })
 
 const competencias = computed<Competencia[]>(() => {

@@ -1,18 +1,23 @@
-import { test, expect } from '@playwright/test';
+import {test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    clicarBotaoHistoricoAnalise,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
+    devolverCadastro,
     disponibilizarCadastro,
     gerarNomeUnico,
+    iniciarProcesso,
     loginComoChefe,
     navegarParaProcessoPorId,
     SELETORES_CSS,
     verificarAlerta,
     verificarAtividadeVisivel,
+    verificarBotaoHistoricoAnaliseVisivel,
     verificarConhecimentoVisivel,
     verificarMensagemSucesso,
+    verificarModalHistoricoAnalise,
     verificarUrlDoPainel,
 } from './helpers';
 
@@ -55,7 +60,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
     });
 
     test('deve exibir o histórico de análise após devolução', async ({page}) => {
-        const processo = await criarProcessoMapeamentoCompleto(gerarNomeUnico('PROCESSO-CDU-09'));
+        const { processo } = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), 'Mapeamento', '2025-12-31', [1]);
         await iniciarProcesso(page);
         await verificarMensagemSucesso(page, 'Processo iniciado');
 
