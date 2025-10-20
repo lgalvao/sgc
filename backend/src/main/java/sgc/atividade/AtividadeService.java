@@ -29,6 +29,11 @@ public class AtividadeService {
     private final SubprocessoRepo subprocessoRepo;
     private final UsuarioRepo usuarioRepo;
 
+    /**
+     * Retorna uma lista de todas as atividades.
+     *
+     * @return Uma {@link List} de {@link AtividadeDto}.
+     */
     public List<AtividadeDto> listar() {
         return atividadeRepo.findAll()
                 .stream()
@@ -36,12 +41,29 @@ public class AtividadeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca uma atividade pelo seu ID.
+     *
+     * @param idAtividade O ID da atividade.
+     * @return O {@link AtividadeDto} correspondente.
+     * @throws ErroDominioNaoEncontrado se a atividade não for encontrada.
+     */
     public AtividadeDto obterPorId(Long idAtividade) {
         return atividadeRepo.findById(idAtividade)
                 .map(atividadeMapper::toDTO)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Atividade", idAtividade));
     }
 
+    /**
+     * Cria uma nova atividade, realizando validações de segurança e de estado do subprocesso.
+     *
+     * @param atividadeDto O DTO com os dados da nova atividade.
+     * @param username     O nome de usuário (título de eleitor) do usuário que está criando a atividade.
+     * @return O {@link AtividadeDto} da atividade criada.
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou o usuário não forem encontrados.
+     * @throws ErroDominioAccessoNegado se o usuário não for o titular da unidade do subprocesso.
+     * @throws IllegalStateException se o subprocesso já estiver finalizado.
+     */
     public AtividadeDto criar(AtividadeDto atividadeDto, String username) {
         var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo())
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.mapaCodigo())));
@@ -61,6 +83,14 @@ public class AtividadeService {
         return atividadeMapper.toDTO(salvo);
     }
 
+    /**
+     * Atualiza uma atividade existente.
+     *
+     * @param id           O ID da atividade a ser atualizada.
+     * @param atividadeDto O DTO com os novos dados da atividade.
+     * @return O {@link AtividadeDto} da atividade atualizada.
+     * @throws ErroDominioNaoEncontrado se a atividade não for encontrada.
+     */
     public AtividadeDto atualizar(Long id, AtividadeDto atividadeDto) {
         return atividadeRepo.findById(id)
                 .map(existente -> {
@@ -74,6 +104,12 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Atividade", id));
     }
 
+    /**
+     * Exclui uma atividade e todos os seus conhecimentos associados.
+     *
+     * @param idAtividade O ID da atividade a ser excluída.
+     * @throws ErroDominioNaoEncontrado se a atividade não for encontrada.
+     */
     public void excluir(Long idAtividade) {
         atividadeRepo.findById(idAtividade).ifPresentOrElse(atividade -> {
             var conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
@@ -84,6 +120,13 @@ public class AtividadeService {
         });
     }
 
+    /**
+     * Lista todos os conhecimentos associados a uma atividade específica.
+     *
+     * @param idAtividade O ID da atividade.
+     * @return Uma {@link List} de {@link ConhecimentoDto}.
+     * @throws ErroDominioNaoEncontrado se a atividade não for encontrada.
+     */
     public List<ConhecimentoDto> listarConhecimentos(Long idAtividade) {
         if (!atividadeRepo.existsById(idAtividade)) {
             throw new ErroDominioNaoEncontrado("Atividade", idAtividade);
@@ -94,6 +137,14 @@ public class AtividadeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cria um novo conhecimento e o associa a uma atividade existente.
+     *
+     * @param idAtividade     O ID da atividade à qual o conhecimento será associado.
+     * @param conhecimentoDto O DTO com os dados do novo conhecimento.
+     * @return O {@link ConhecimentoDto} do conhecimento criado.
+     * @throws ErroDominioNaoEncontrado se a atividade não for encontrada.
+     */
     public ConhecimentoDto criarConhecimento(Long idAtividade, ConhecimentoDto conhecimentoDto) {
         return atividadeRepo.findById(idAtividade)
                 .map(atividade -> {
@@ -105,6 +156,15 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Atividade", idAtividade));
     }
 
+    /**
+     * Atualiza um conhecimento existente, verificando se ele pertence à atividade especificada.
+     *
+     * @param idAtividade     O ID da atividade pai.
+     * @param idConhecimento  O ID do conhecimento a ser atualizado.
+     * @param conhecimentoDto O DTO com os novos dados do conhecimento.
+     * @return O {@link ConhecimentoDto} do conhecimento atualizado.
+     * @throws ErroDominioNaoEncontrado se o conhecimento não for encontrado ou não pertencer à atividade.
+     */
     public ConhecimentoDto atualizarConhecimento(Long idAtividade, Long idConhecimento, ConhecimentoDto conhecimentoDto) {
         return conhecimentoRepo.findById(idConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(idAtividade))
@@ -117,6 +177,13 @@ public class AtividadeService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Conhecimento", idConhecimento));
     }
 
+    /**
+     * Exclui um conhecimento, verificando se ele pertence à atividade especificada.
+     *
+     * @param idAtividade    O ID da atividade pai.
+     * @param idConhecimento O ID do conhecimento a ser excluído.
+     * @throws ErroDominioNaoEncontrado se o conhecimento não for encontrado ou não pertencer à atividade.
+     */
     public void excluirConhecimento(Long idAtividade, Long idConhecimento) {
         conhecimentoRepo.findById(idConhecimento)
                 .filter(conhecimento -> conhecimento.getCodigoAtividade().equals(idAtividade))

@@ -31,6 +31,19 @@ public class PainelService {
     private final UnidadeProcessoRepo unidadeProcessoRepo;
     private final UnidadeRepo unidadeRepo;
 
+    /**
+     * Lista processos com base no perfil e na unidade do usuário.
+     * <p>
+     * - Se o perfil for 'ADMIN', todos os processos são retornados.
+     * - Para outros perfis, os processos são filtrados pela unidade do usuário e
+     *   suas subordinadas. Processos no estado 'CRIADO' são omitidos.
+     *
+     * @param perfil        O perfil do usuário (obrigatório).
+     * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
+     * @param pageable      As informações de paginação.
+     * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
+     * @throws IllegalArgumentException se o perfil for nulo or em branco.
+     */
     public Page<ProcessoResumoDto> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
         if (perfil == null || perfil.isBlank()) {
             throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
@@ -64,6 +77,18 @@ public class PainelService {
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
 
+    /**
+     * Lista alertas com base no usuário ou na unidade.
+     * <p>
+     * A busca prioriza o título do usuário. Se não for fornecido, busca pela
+     * unidade e suas subordinadas. Se nenhum dos dois for fornecido, retorna
+     * todos os alertas.
+     *
+     * @param usuarioTitulo Título de eleitor do usuário.
+     * @param codigoUnidade Código da unidade.
+     * @param pageable      As informações de paginação.
+     * @return Uma página {@link Page} de {@link AlertaDto}.
+     */
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
             return alertaRepo.findByUsuarioDestino_TituloEleitoral(Long.parseLong(usuarioTitulo), pageable)

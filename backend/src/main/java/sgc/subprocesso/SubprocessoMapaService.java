@@ -33,6 +33,27 @@ public class SubprocessoMapaService {
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final CompetenciaRepo competenciaRepo;
 
+    /**
+     * Salva os ajustes realizados em um mapa de competências após a fase de validação.
+     * <p>
+     * Este método executa as seguintes ações:
+     * <ul>
+     *     <li>Valida se o subprocesso está em uma situação que permite ajustes.</li>
+     *     <li>Atualiza as descrições das competências e atividades conforme os dados recebidos.</li>
+     *     <li>Remove todos os vínculos existentes entre competências e atividades do mapa.</li>
+     *     <li>Recria os vínculos com base na nova estrutura fornecida.</li>
+     *     <li>Altera a situação do subprocesso para 'MAPA_AJUSTADO'.</li>
+     * </ul>
+     *
+     * @param idSubprocesso        O ID do subprocesso cujo mapa está sendo ajustado.
+     * @param competencias         A lista de competências com suas atividades aninhadas,
+     *                             representando o estado final do mapa.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que realiza a operação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou alguma das entidades
+     *                                  (competência, atividade) não forem encontradas.
+     * @throws IllegalStateException se o subprocesso não estiver na situação correta
+     *                               para permitir o ajuste.
+     */
     @Transactional
     public void salvarAjustesMapa(Long idSubprocesso, List<CompetenciaAjusteDto> competencias, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -74,6 +95,20 @@ public class SubprocessoMapaService {
         repositorioSubprocesso.save(sp);
     }
 
+    /**
+     * Importa atividades de um subprocesso de origem para um subprocesso de destino.
+     * <p>
+     * A importação clona as atividades e seus respectivos conhecimentos. Uma
+     * atividade só é importada se uma outra com a mesma descrição ainda não
+     * existir no mapa de destino.
+     *
+     * @param idSubprocessoDestino O ID do subprocesso para o qual as atividades serão importadas.
+     * @param idSubprocessoOrigem  O ID do subprocesso do qual as atividades serão copiadas.
+     * @throws ErroDominioNaoEncontrado se um dos subprocessos não for encontrado.
+     * @throws IllegalStateException se o subprocesso de destino não estiver na
+     *                               situação 'CADASTRO_EM_ANDAMENTO', ou se um
+     *                               dos subprocessos não tiver um mapa associado.
+     */
     @Transactional
     public void importarAtividades(Long idSubprocessoDestino, Long idSubprocessoOrigem) {
         Subprocesso spDestino = repositorioSubprocesso.findById(idSubprocessoDestino)

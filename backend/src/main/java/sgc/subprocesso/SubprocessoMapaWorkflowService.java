@@ -19,6 +19,24 @@ public class SubprocessoMapaWorkflowService {
     private final CompetenciaRepo repositorioCompetencia;
     private final MapaService mapaService;
 
+    /**
+     * Salva o mapa de um subprocesso e atualiza o estado do workflow.
+     * <p>
+     * Este método primeiro valida se o subprocesso está em uma situação que permite
+     * a edição do mapa. Em seguida, delega a operação de salvar o mapa para o
+     * {@link MapaService}. Se for a primeira vez que competências estão sendo
+     * adicionadas a um mapa (ou seja, o mapa estava vazio), e o subprocesso
+     * estava na situação 'CADASTRO_HOMOLOGADO', o estado do subprocesso é
+     * avançado para 'MAPA_CRIADO'.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param request              O DTO com os dados completos do mapa a serem salvos.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que está realizando a operação.
+     * @return O {@link MapaCompletoDto} representando o estado salvo do mapa.
+     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o subprocesso ou seu mapa não forem encontrados.
+     * @throws IllegalStateException se o subprocesso não estiver em uma situação
+     *                               válida para a edição do mapa.
+     */
     public MapaCompletoDto salvarMapaSubprocesso(Long idSubprocesso, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
         log.info("Salvando mapa do subprocesso: idSubprocesso={}, usuario={}", idSubprocesso, usuarioTituloEleitoral);
 

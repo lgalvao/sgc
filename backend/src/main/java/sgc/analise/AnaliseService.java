@@ -20,6 +20,14 @@ public class AnaliseService {
     private final AnaliseRepo analiseRepo;
     private final SubprocessoRepo subprocessoRepo;
 
+    /**
+     * Lista todas as análises de um determinado tipo para um subprocesso específico.
+     *
+     * @param codSubprocesso O código do subprocesso.
+     * @param tipo           O tipo de análise a ser filtrada (e.g., CADASTRO, VALIDACAO).
+     * @return Uma lista de {@link Analise} ordenada pela data e hora em ordem decrescente.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional(readOnly = true)
     public List<Analise> listarPorSubprocesso(Long codSubprocesso, TipoAnalise tipo) {
         if (subprocessoRepo.findById(codSubprocesso).isEmpty()) {
@@ -31,6 +39,13 @@ public class AnaliseService {
             .toList();
     }
 
+    /**
+     * Cria e persiste uma nova análise com base nos dados fornecidos.
+     *
+     * @param request O DTO contendo todas as informações necessárias para criar a análise.
+     * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
+     * @throws ErroDominioNaoEncontrado se o subprocesso associado à análise não for encontrado.
+     */
     @Transactional
     public Analise criarAnalise(CriarAnaliseRequestDto request) {
 
@@ -50,6 +65,14 @@ public class AnaliseService {
         return analiseRepo.save(a);
     }
 
+    /**
+     * Remove todas as análises associadas a um subprocesso específico.
+     * <p>
+     * Este método é útil para cenários de limpeza de dados, como a exclusão
+     * de um subprocesso, garantindo que suas análises dependentes também sejam removidas.
+     *
+     * @param subprocessoCodigo O código do subprocesso cujas análises serão removidas.
+     */
     @Transactional
     public void removerPorSubprocesso(Long subprocessoCodigo) {
         analiseRepo.deleteBySubprocessoCodigo(subprocessoCodigo);

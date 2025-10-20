@@ -40,6 +40,22 @@ public class ProcessoIniciacaoService {
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ApplicationEventPublisher publicadorDeEventos;
 
+    /**
+     * Inicia um processo de mapeamento de competências.
+     * <p>
+     * Este método valida se o processo está apto a ser iniciado, verifica se as
+     * unidades participantes não estão em outros processos ativos e, em seguida,
+     * cria os subprocessos de mapeamento para cada uma. Ao final, atualiza o
+     * status do processo principal para 'EM_ANDAMENTO' e publica um evento de
+     * processo iniciado.
+     *
+     * @param id              O ID do processo a ser iniciado.
+     * @param codigosUnidades A lista de IDs das unidades que participarão do mapeamento.
+     * @throws ErroDominioNaoEncontrado se o processo ou uma das unidades não forem encontrados.
+     * @throws IllegalStateException se o processo não estiver na situação 'CRIADO'.
+     * @throws IllegalArgumentException se a lista de unidades for nula ou vazia.
+     * @throws ErroProcesso se alguma das unidades já estiver participando de outro processo ativo.
+     */
     @Transactional
     public void iniciarProcessoMapeamento(Long id, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(id)
@@ -75,6 +91,21 @@ public class ProcessoIniciacaoService {
         log.info("Processo de mapeamento {} iniciado para {} unidades.", id, codigosUnidades.size());
     }
 
+    /**
+     * Inicia um processo de revisão de competências.
+     * <p>
+     * Este método é semelhante ao de mapeamento, mas com validações adicionais
+     * para garantir que todas as unidades participantes já possuam um mapa vigente
+     * a ser revisado. Ele copia o mapa vigente de cada unidade para um novo mapa
+     * associado ao subprocesso de revisão.
+     *
+     * @param id              O ID do processo a ser iniciado.
+     * @param codigosUnidades A lista de IDs das unidades que participarão da revisão.
+     * @throws ErroDominioNaoEncontrado se o processo ou uma das unidades não forem encontrados.
+     * @throws IllegalStateException se o processo não estiver na situação 'CRIADO'.
+     * @throws IllegalArgumentException se a lista de unidades for nula ou vazia.
+     * @throws ErroProcesso se alguma unidade não possuir mapa vigente ou já estiver em outro processo ativo.
+     */
     @Transactional
     public void iniciarProcessoRevisao(Long id, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(id)

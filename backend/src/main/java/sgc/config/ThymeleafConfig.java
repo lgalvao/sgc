@@ -9,6 +9,14 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 @Configuration
 public class ThymeleafConfig {
 
+    /**
+     * Configura o motor de templates do Thymeleaf.
+     * <p>
+     * Este bean registra o resolvedor de templates de email para que o Thymeleaf
+     * possa processar os templates localizados no classpath.
+     *
+     * @return a instância configurada do {@link SpringTemplateEngine}.
+     */
     @Bean
     public SpringTemplateEngine springTemplateEngine() {
         SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
@@ -16,6 +24,15 @@ public class ThymeleafConfig {
         return springTemplateEngine;
     }
 
+    /**
+     * Configura o resolvedor de templates para emails.
+     * <p>
+     * Este método define a localização dos templates de email (dentro de
+     * 'resources/templates/email/'), o sufixo dos arquivos ('.html'), o modo
+     * do template (HTML5) e a codificação de caracteres (UTF-8).
+     *
+     * @return o {@link ClassLoaderTemplateResolver} configurado para os emails.
+     */
     public ClassLoaderTemplateResolver emailTemplateResolver() {
         ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();
         emailTemplateResolver.setPrefix("/templates/email/");

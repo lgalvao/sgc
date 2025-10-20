@@ -34,6 +34,24 @@ public class ProcessoFinalizacaoService {
     private final ApplicationEventPublisher publicadorDeEventos;
     private final ProcessoNotificacaoService processoNotificacaoService;
 
+    /**
+     * Finaliza um processo, realizando todas as validações e atualizações necessárias.
+     * <p>
+     * O processo de finalização inclui:
+     * <ul>
+     *     <li>Verificar se o processo está na situação 'EM_ANDAMENTO'.</li>
+     *     <li>Validar se todos os seus subprocessos estão com a situação 'MAPA_HOMOLOGADO'.</li>
+     *     <li>Tornar os mapas de cada subprocesso como o mapa vigente para a respectiva unidade.</li>
+     *     <li>Atualizar a situação e a data de finalização do processo.</li>
+     *     <li>Enviar notificações de finalização.</li>
+     *     <li>Publicar um evento {@link ProcessoFinalizadoEvento}.</li>
+     * </ul>
+     *
+     * @param id O ID do processo a ser finalizado.
+     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws ErroProcesso se o processo não puder ser finalizado devido à sua
+     *                      situação atual ou à de seus subprocessos.
+     */
     @Transactional
     public void finalizar(Long id) {
         log.info("Iniciando finalização do processo: código={}", id);

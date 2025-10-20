@@ -31,6 +31,17 @@ public class SubprocessoValidacaoControle {
     private final sgc.analise.AnaliseService analiseService;
     private final AnaliseMapper analiseMapper;
 
+    /**
+     * Disponibiliza o mapa de competências de um subprocesso para as unidades
+     * envolvidas iniciarem a etapa de validação.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo observações e a data limite para a etapa.
+     * @param usuario O usuário autenticado (administrador) que realiza a ação.
+     * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
+     */
     @PostMapping("/{id}/disponibilizar-mapa")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -50,6 +61,13 @@ public class SubprocessoValidacaoControle {
         return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado com sucesso."));
     }
 
+    /**
+     * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo o texto das sugestões.
+     * @param usuario O usuário autenticado que está enviando as sugestões.
+     */
     @PostMapping("/{id}/apresentar-sugestoes")
     @Transactional
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
@@ -66,6 +84,12 @@ public class SubprocessoValidacaoControle {
         );
     }
 
+    /**
+     * Registra a validação de um mapa de competências pelo responsável da unidade.
+     *
+     * @param id      O ID do subprocesso.
+     * @param usuario O usuário autenticado (chefe da unidade) que está validando.
+     */
     @PostMapping("/{id}/validar-mapa")
     @Transactional
     @Operation(summary = "Valida o mapa de competências da unidade")
@@ -73,11 +97,23 @@ public class SubprocessoValidacaoControle {
         subprocessoWorkflowService.validarMapa(id, usuario.getTituloEleitoral());
     }
 
+    /**
+     * Obtém as sugestões de melhoria que foram apresentadas para o mapa de um subprocesso.
+     *
+     * @param id O ID do subprocesso.
+     * @return Um {@link SugestoesDto} contendo as sugestões.
+     */
     @GetMapping("/{id}/sugestoes")
     public SugestoesDto obterSugestoes(@PathVariable Long id) {
         return subprocessoDtoService.obterSugestoes(id);
     }
 
+    /**
+     * Obtém o histórico de análises da fase de validação de um subprocesso.
+     *
+     * @param id O ID do subprocesso.
+     * @return Uma {@link List} de {@link AnaliseValidacaoHistoricoDto} com o histórico.
+     */
     @GetMapping("/{id}/historico-validacao")
     public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long id) {
         return analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO)
@@ -86,6 +122,14 @@ public class SubprocessoValidacaoControle {
                 .toList();
     }
 
+    /**
+     * Devolve a validação de um mapa para a unidade de negócio responsável para
+     * que sejam feitos ajustes.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo a justificativa da devolução.
+     * @param usuario O usuário autenticado que está realizando a devolução.
+     */
     @PostMapping("/{id}/devolver-validacao")
     @Transactional
     @Operation(summary = "Devolve a validação do mapa para a unidade de negócio")
@@ -103,6 +147,13 @@ public class SubprocessoValidacaoControle {
         );
     }
 
+    /**
+     * Aceita a validação de um mapa, movendo o subprocesso para a próxima etapa
+     * de análise hierárquica.
+     *
+     * @param id      O ID do subprocesso.
+     * @param usuario O usuário autenticado que está aceitando a validação.
+     */
     @PostMapping("/{id}/aceitar-validacao")
     @Transactional
     @Operation(summary = "Aceita a validação do mapa")
@@ -110,6 +161,14 @@ public class SubprocessoValidacaoControle {
         subprocessoWorkflowService.aceitarValidacao(id, usuario);
     }
 
+    /**
+     * Homologa a validação de um mapa, finalizando o fluxo de aprovações.
+     * <p>
+     * Ação restrita a usuários com perfil 'ADMIN'.
+     *
+     * @param id      O ID do subprocesso.
+     * @param usuario O usuário autenticado (administrador) que realiza a homologação.
+     */
     @PostMapping("/{id}/homologar-validacao")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -118,6 +177,13 @@ public class SubprocessoValidacaoControle {
         subprocessoWorkflowService.homologarValidacao(id);
     }
 
+    /**
+     * Submete a versão ajustada de um mapa para uma nova rodada de validação.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as observações e a nova data limite da etapa.
+     * @param usuario O usuário autenticado que está submetendo os ajustes.
+     */
     @PostMapping("/{id}/submeter-mapa-ajustado")
     @Transactional
     @Operation(summary = "Submete o mapa ajustado para nova validação")

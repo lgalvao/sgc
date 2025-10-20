@@ -31,6 +31,14 @@ public class ProcessoService {
     private final ProcessoMapper processoMapper;
     private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
 
+    /**
+     * Cria um novo processo de mapeamento de competências.
+     *
+     * @param requisicao DTO contendo os dados para a criação do processo.
+     * @return DTO do processo criado.
+     * @throws ConstraintViolationException se a descrição ou as unidades participantes não forem fornecidas.
+     * @throws ErroDominioNaoEncontrado se alguma das unidades especificadas não existir (para tipos REVISAO ou DIAGNOSTICO).
+     */
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
         if (requisicao.descricao() == null || requisicao.descricao().isBlank()) {
@@ -63,6 +71,17 @@ public class ProcessoService {
         return processoMapper.toDTO(processoSalvo);
     }
 
+    /**
+     * Atualiza os dados de um processo existente.
+     * <p>
+     * A atualização só é permitida se o processo estiver na situação 'CRIADO'.
+     *
+     * @param id         O ID do processo a ser atualizado.
+     * @param requisicao DTO contendo os novos dados do processo.
+     * @return DTO do processo atualizado.
+     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws IllegalStateException se o processo não estiver na situação 'CRIADO'.
+     */
     @Transactional
     public ProcessoDto atualizar(Long id, AtualizarProcessoReq requisicao) {
         Processo processo = processoRepo.findById(id)
@@ -82,6 +101,15 @@ public class ProcessoService {
         return processoMapper.toDTO(processoAtualizado);
     }
 
+    /**
+     * Remove um processo do sistema.
+     * <p>
+     * A remoção só é permitida se o processo estiver na situação 'CRIADO'.
+     *
+     * @param id O ID do processo a ser removido.
+     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws IllegalStateException se o processo não estiver na situação 'CRIADO'.
+     */
     @Transactional
     public void apagar(Long id) {
         Processo processo = processoRepo.findById(id)
@@ -95,11 +123,30 @@ public class ProcessoService {
         log.info("Processo {} removido com sucesso.", id);
     }
 
+    /**
+     * Busca um processo pelo seu ID.
+     *
+     * @param id O ID do processo.
+     * @return Um {@link Optional} contendo o {@link ProcessoDto} se encontrado,
+     *         ou vazio caso contrário.
+     */
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long id) {
         return processoRepo.findById(id).map(processoMapper::toDTO);
     }
 
+    /**
+     * Obtém os detalhes completos de um processo, incluindo suas unidades
+     * participantes e o estado de seus subprocessos.
+     * <p>
+     * O acesso a este método é protegido e requer que o usuário seja 'ADMIN' ou
+     * tenha acesso à unidade participante do processo, conforme verificado por
+     * {@link ProcessoSeguranca#checarAcesso(Authentication, Long)}.
+     *
+     * @param idProcesso O ID do processo a ser detalhado.
+     * @return DTO com os detalhes completos do processo.
+     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     */
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoSeguranca.checarAcesso(authentication, #idProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long idProcesso) {
@@ -112,6 +159,11 @@ public class ProcessoService {
         return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
     }
 
+    /**
+     * Retorna uma lista de todos os processos que estão na situação 'FINALIZADO'.
+     *
+     * @return Uma {@link List} de {@link ProcessoDto}.
+     */
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
         return processoRepo.findBySituacao(SituacaoProcesso.FINALIZADO)

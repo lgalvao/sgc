@@ -19,12 +19,17 @@ public class AlertaControle {
     private final AlertaService alertaService;
 
     /**
-     * Marca um alerta como lido para o usuário atual.
-     * CDU-02
+     * Marca um alerta específico como lido para o usuário autenticado.
+     * <p>
+     * Este método corresponde ao CDU-02: Visualizar alertas. A ação de marcar como
+     * lido é uma parte fundamental deste caso de uso.
+     *
+     * @param id O identificador único do alerta a ser marcado como lido.
+     * @return Uma resposta HTTP 200 OK com uma mensagem de confirmação.
      */
     @PostMapping("/{id}/marcar-como-lido")
     @Operation(summary = "Marca um alerta como lido (CDU-02)")
-    public ResponseEntity<?> marcarComoLido(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long id) {
         String usuarioTitulo = "USUARIO_ATUAL"; // Exemplo
         alertaService.marcarComoLido(usuarioTitulo, id);
         return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));

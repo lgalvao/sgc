@@ -25,6 +25,18 @@ public class ProcessoNotificacaoService {
     private final NotificacaoModeloEmailService notificacaoModeloEmailService;
     private final SgrhService sgrhService;
 
+    /**
+     * Orquestra o envio de emails de notificação para todas as unidades participantes
+     * na finalização de um processo.
+     * <p>
+     * O método busca os responsáveis e seus emails em lote para otimizar a comunicação
+     * com o serviço SGRH. Em seguida, itera sobre as unidades participantes,
+     * determinando o tipo de email a ser enviado com base no tipo da unidade
+     * (OPERACIONAL, INTERMEDIARIA, etc.).
+     *
+     * @param processo              O processo que foi finalizado.
+     * @param unidadesParticipantes A lista de unidades que participaram do processo.
+     */
     public void enviarNotificacoesDeFinalizacao(Processo processo, List<UnidadeProcesso> unidadesParticipantes) {
         log.info("Enviando notificações de finalização para o processo {}", processo.getCodigo());
 

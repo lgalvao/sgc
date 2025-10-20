@@ -38,6 +38,15 @@ public class SubprocessoService {
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final SubprocessoMapper subprocessoMapper;
 
+    /**
+     * Busca, dentro de um subprocesso, todas as atividades que ainda não possuem
+     * nenhum conhecimento associado.
+     *
+     * @param idSubprocesso O ID do subprocesso a ser verificado.
+     * @return Uma {@link List} de {@link Atividade}s que não têm conhecimentos.
+     *         Retorna uma lista vazia se o subprocesso não for encontrado ou
+     *         não tiver um mapa associado.
+     */
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long idSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -61,6 +70,20 @@ public class SubprocessoService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Valida a integridade das associações de um mapa de competências.
+     * <p>
+     * Garante que não hajam competências ou atividades "órfãs" dentro do mapa.
+     * A validação verifica duas condições:
+     * <ol>
+     *     <li>Se todas as competências do mapa estão associadas a, no mínimo, uma atividade.</li>
+     *     <li>Se todas as atividades do mapa estão associadas a, no mínimo, uma competência.</li>
+     * </ol>
+     *
+     * @param mapaId O ID do mapa a ser validado.
+     * @throws ErroValidacao se alguma das condições de integridade não for atendida.
+     *                       A exceção contém detalhes sobre as entidades problemáticas.
+     */
     public void validarAssociacoesMapa(Long mapaId) {
         // 1. Verificar se todas as competências estão associadas a pelo menos uma atividade
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapaId);
@@ -90,6 +113,12 @@ public class SubprocessoService {
     }
 
 
+    /**
+     * Cria um novo subprocesso.
+     *
+     * @param subprocessoDto O DTO com os dados do subprocesso a ser criado.
+     * @return O {@link SubprocessoDto} da entidade criada.
+     */
     @Transactional
     public SubprocessoDto criar(SubprocessoDto subprocessoDto) {
         var entity = subprocessoMapper.toEntity(subprocessoDto);
@@ -97,6 +126,14 @@ public class SubprocessoService {
         return subprocessoMapper.toDTO(salvo);
     }
 
+    /**
+     * Atualiza um subprocesso existente.
+     *
+     * @param id             O ID do subprocesso a ser atualizado.
+     * @param subprocessoDto O DTO com os novos dados.
+     * @return O {@link SubprocessoDto} da entidade atualizada.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public SubprocessoDto atualizar(Long id, SubprocessoDto subprocessoDto) {
         return repositorioSubprocesso.findById(id)
@@ -136,6 +173,12 @@ public class SubprocessoService {
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + id));
     }
 
+    /**
+     * Exclui um subprocesso.
+     *
+     * @param id O ID do subprocesso a ser excluído.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void excluir(Long id) {
         if (!repositorioSubprocesso.existsById(id)) {

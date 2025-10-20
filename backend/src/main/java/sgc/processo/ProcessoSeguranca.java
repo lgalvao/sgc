@@ -15,12 +15,21 @@ public class ProcessoSeguranca {
     private final SgrhService sgrhService;
 
     /**
-     * Verifica se o usuário autenticado tem permissão para acessar um processo.
-     * A permissão é concedida se o usuário for um GESTOR de uma unidade que participa do processo.
+     * Verifica se o usuário autenticado tem permissão para acessar os detalhes de um processo.
+     * <p>
+     * A regra de acesso é a seguinte:
+     * <ul>
+     *     <li>O usuário deve estar autenticado.</li>
+     *     <li>O usuário deve possuir o perfil 'GESTOR' ou 'CHEFE'.</li>
+     *     <li>Pelo menos uma das unidades associadas ao usuário (via SGRH) deve ser
+     *         participante do processo (ou seja, deve existir um subprocesso
+     *         vinculando a unidade ao processo).</li>
+     * </ul>
      *
-     * @param authentication O objeto de autenticação do Spring Security.
-     * @param idProcesso     O ID do processo a ser verificado.
-     * @return a verificação de acesso do usuário ao processo.
+     * @param authentication O objeto de autenticação do Spring Security, contendo os
+     *                       detalhes do usuário logado.
+     * @param idProcesso     O ID do processo cujo acesso está sendo verificado.
+     * @return {@code true} se o acesso for permitido, {@code false} caso contrário.
      */
     public boolean checarAcesso(Authentication authentication, Long idProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {

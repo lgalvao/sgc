@@ -40,18 +40,24 @@ public class ImpactoMapaService {
     private final ImpactoCompetenciaService impactoCompetenciaService;
 
     /**
-     * Verifica impactos no mapa de competências comparando o cadastro atual
-     * do subprocesso com o mapa vigente da unidade.
+     * Realiza a verificação de impactos no mapa de competências, comparando o mapa
+     * em revisão de um subprocesso com o mapa vigente da unidade.
      * <p>
-     * Detecta:
-     * - Atividades inseridas (estão no cadastro atual mas não no mapa vigente)
-     * - Atividades removidas (estavam no mapa vigente mas não no cadastro atual)
-     * - Atividades alteradas (mesmo código mas descrição diferente)
-     * - Competências impactadas pelas mudanças
+     * Este método implementa a lógica do CDU-12. Ele analisa as diferenças entre
+     * os dois mapas, identificando atividades inseridas, removidas ou alteradas,
+     * e as competências que são afetadas por essas mudanças.
+     * <p>
+     * O acesso a esta funcionalidade é restrito por perfil e pela situação atual
+     * do subprocesso para garantir que a análise de impacto seja feita no momento
+     * correto do fluxo de trabalho.
      *
-     * @param idSubprocesso Código do subprocesso a verificar
-     * @param usuario       O usuário autenticado que está realizando a operação.
-     * @return ImpactoMapaDto com análise completa dos impactos
+     * @param idSubprocesso O ID do subprocesso cujo mapa será analisado.
+     * @param usuario       O usuário autenticado que realiza a operação.
+     * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos encontrados.
+     *         Retorna um DTO sem impactos se a unidade não possuir um mapa vigente.
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou seu mapa não forem encontrados.
+     * @throws ErroDominioAccessoNegado se o usuário não tiver permissão para executar
+     *                                  a operação na situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
     public ImpactoMapaDto verificarImpactos(Long idSubprocesso, Usuario usuario) {
