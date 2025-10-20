@@ -1,27 +1,26 @@
 import apiClient from '../axios-setup';
-import {
+import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
-    mapProcessoDetalheDtoToFrontend,
-    mapProcessoDtoToFrontend,
     Processo,
     ProcessoDetalhe,
-} from '../mappers/processos';
+    ProcessoResumo,
+} from '../types/tipos';
 
 export async function criarProcesso(request: CriarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.post<any>('/processos', request);
-    return mapProcessoDtoToFrontend(response.data);
+    const response = await apiClient.post<Processo>('/processos', request);
+    return response.data;
   } catch (error) {
     console.error('Erro ao criar processo:', error);
     throw error;
   }
 }
 
-export async function fetchProcessosFinalizados(): Promise<Processo[]> {
+export async function fetchProcessosFinalizados(): Promise<ProcessoResumo[]> {
   try {
-    const response = await apiClient.get<any[]>('/processos/finalizados');
-    return response.data.map(mapProcessoDtoToFrontend);
+    const response = await apiClient.get<ProcessoResumo[]>('/processos/finalizados');
+    return response.data;
   } catch (error) {
     console.error('Erro ao buscar processos finalizados:', error);
     throw error;
@@ -48,8 +47,8 @@ export async function finalizarProcesso(id: number): Promise<void> {
 
 export async function obterProcessoPorId(id: number): Promise<Processo> {
   try {
-    const response = await apiClient.get<any>(`/processos/${id}`);
-    return mapProcessoDtoToFrontend(response.data);
+    const response = await apiClient.get<Processo>(`/processos/${id}`);
+    return response.data;
   } catch (error) {
     console.error(`Erro ao obter processo ${id}:`, error);
     throw error;
@@ -58,8 +57,8 @@ export async function obterProcessoPorId(id: number): Promise<Processo> {
 
 export async function atualizarProcesso(id: number, request: AtualizarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.put<any>(`/processos/${id}`, request);
-    return mapProcessoDtoToFrontend(response.data);
+    const response = await apiClient.put<Processo>(`/processos/${id}`, request);
+    return response.data;
   } catch (error) {
     console.error(`Erro ao atualizar processo ${id}:`, error);
     throw error;
@@ -77,8 +76,8 @@ export async function excluirProcesso(id: number): Promise<void> {
 
 export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe> {
   try {
-    const response = await apiClient.get<any>(`/processos/${id}/detalhes`);
-    return mapProcessoDetalheDtoToFrontend(response.data);
+    const response = await apiClient.get<ProcessoDetalhe>(`/processos/${id}/detalhes`);
+    return response.data;
   } catch (error) {
     console.error(`Erro ao obter detalhes do processo ${id}:`, error);
     throw error;

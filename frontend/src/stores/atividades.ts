@@ -75,7 +75,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
                 const atividade = atividades.find(a => a.codigo === atividadeId);
                 if (atividade) {
-                    atividade.conhecimentos = atividade.conhecimentos.filter(c => c.codigo !== conhecimentoId);
+                    atividade.conhecimentos = atividade.conhecimentos.filter(c => c.id !== conhecimentoId);
                     this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
                 useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido com sucesso.');
@@ -119,7 +119,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 const atividades = this.atividadesPorSubprocesso.get(idSubprocesso) || [];
                 const atividade = atividades.find(a => a.codigo === atividadeId);
                 if (atividade) {
-                    const index = atividade.conhecimentos.findIndex(c => c.codigo === conhecimentoId);
+                    const index = atividade.conhecimentos.findIndex(c => c.id === conhecimentoId);
                     if (index !== -1) {
                         atividade.conhecimentos[index] = conhecimentoAtualizado;
                         this.atividadesPorSubprocesso.set(idSubprocesso, atividades);

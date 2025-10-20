@@ -21,7 +21,7 @@ test.describe('CDU-21: Finalizar processo', () => {
     async function setupProcessoEmAndamento(page) {
         const nomeProcesso = `PROCESSO FINALIZAR TESTE - ${Date.now()}`;
         const processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]); // Unidade 1 = SEDOC
-        await processoService.iniciarProcesso(processo.codigo, 'MAPEAMENTO', [1]);
+        await processoService.iniciarProcesso(page, processo.codigo, 'MAPEAMENTO', [1]);
         // Simular a homologação para permitir a finalização
         // Esta é uma simplificação. Em um cenário real, seria necessário um setup mais complexo no backend.
         // Por agora, assumimos que o backend permitirá a finalização após o início.

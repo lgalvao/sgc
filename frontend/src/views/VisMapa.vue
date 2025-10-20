@@ -121,7 +121,7 @@
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
                       v-for="conhecimento in getConhecimentosAtividade(atvId)"
-                      :key="conhecimento.codigo"
+                      :key="conhecimento.id"
                       class="me-3 mb-1"
                       data-testid="conhecimento-item"
                     >
@@ -556,7 +556,7 @@ const historicoAnalise = computed(() => {
   return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
     codigo: analise.codigo,
     data: new Date(analise.dataHora).toLocaleString('pt-BR'),
-    unidade: analise.unidade,
+    unidade: (analise as any).unidadeSigla || (analise as any).unidade,
     resultado: analise.resultado,
     observacoes: analise.observacoes || ''
   }))

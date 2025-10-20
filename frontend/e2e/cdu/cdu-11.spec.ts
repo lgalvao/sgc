@@ -26,7 +26,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
 
     test.beforeAll(async () => {
         // Setup: Cria um processo, adiciona dados e disponibiliza o cadastro
-        const context = await criarProcessoCompleto(gerarNomeUnico('PROCESSO CDU-11'));
+        const context = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-11'), 'MAPEAMENTO', '2025-12-31', [1]);
         processo = context.processo;
 
         // Adiciona uma atividade e conhecimento via UI para simular o fluxo real
@@ -65,8 +65,8 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
 
     test('CHEFE de outra unidade não deve ver os botões de edição', async ({ page }) => {
         // Loga como chefe de uma unidade que não é a STIC, mas está no processo
-        await criarProcessoCompleto(gerarNomeUnico('PROCESSO CDU-11 OUTRA UNIDADE'), 'MAPEAMENTO', [3]); // Adiciona a unidade 3 (SESEL)
-        await loginComo(page, Perfil.CHEFE, 3); // Chefe da SESEL
+        await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-11 OUTRA UNIDADE'), 'MAPEAMENTO', '2025-12-31', [3]); // Adiciona a unidade 3 (SESEL)
+        await loginComo(page, Perfil.CHEFE, '111111111111'); // Chefe da SESEL
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 

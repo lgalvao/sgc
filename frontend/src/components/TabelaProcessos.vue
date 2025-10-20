@@ -23,14 +23,6 @@
             <span v-if="criterioOrdenacao === 'tipo'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
           </th>
           <th
-            data-testid="coluna-unidades"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'unidades')"
-          >
-            Unidades participantes
-            <span v-if="criterioOrdenacao === 'unidades'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
             v-if="showDataFinalizacao"
             data-testid="coluna-data-finalizacao"
             style="cursor:pointer"
@@ -61,9 +53,8 @@
             {{ processo.descricao }}
           </td>
           <td>{{ processo.tipo }}</td>
-          <td>{{ processo.unidadesFormatadas }}</td>
           <td v-if="showDataFinalizacao">
-            {{ processo.dataFinalizacaoFormatada }}
+            {{ (processo as any).dataFinalizacaoFormatada }}
           </td>
           <td>{{ processo.situacao }}</td>
         </tr>
@@ -76,14 +67,14 @@
 import {ProcessoResumo} from '@/types/tipos';
 
 defineProps<{
-  processos: (ProcessoResumo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
-  criterioOrdenacao: keyof ProcessoResumo | 'unidades' | 'dataFinalizacao';
+  processos: ProcessoResumo[];
+  criterioOrdenacao: keyof ProcessoResumo | 'dataFinalizacao';
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', campo: keyof ProcessoResumo | 'unidades' | 'dataFinalizacao'): void;
+  (e: 'ordenar', campo: keyof ProcessoResumo | 'dataFinalizacao'): void;
   (e: 'selecionarProcesso', processo: ProcessoResumo): void;
 }>();
 </script>

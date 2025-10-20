@@ -199,7 +199,7 @@ export async function devolverCadastro(page: Page, processo: {
     await loginComoGestor(page);
     await navegarParaProcessoPorId(page, processo.codigo);
     const {acessarAnaliseRevisaoComoGestor} = await import("../navegacao");
-    await acessarAnaliseRevisaoComoGestor(page, nomeUnidade);
+    await acessarAnaliseRevisaoComoGestor(page, processo.codigo, nomeUnidade);
     await devolverParaAjustes(page, observacao);
 }
 

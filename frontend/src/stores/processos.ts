@@ -18,14 +18,14 @@ export const useProcessosStore = defineStore('processos', {
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
         processoDetalhe: null as ProcessoDetalhe | null, // Para armazenar o processo detalhado
-        processosFinalizados: [] as Processo[],
+        processosFinalizados: [] as ProcessoResumo[],
         // As propriedades abaixo serão tratadas em etapas futuras ou removidas se não forem mais necessárias
         // processos: [] as Processo[], // Removido
         // subprocessos: [] as Subprocesso[], // Removido
         movements: [] as Movimentacao[] // Manter se ainda for usado para mocks internos ou outras lógicas
     }),
     getters: {
-        getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
+        getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoResumo[] => {
             // Se o processoDetalhe estiver carregado e for o processo correto, usar seus subprocessos
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
                 return state.processoDetalhe.resumoSubprocessos;
@@ -36,7 +36,7 @@ export const useProcessosStore = defineStore('processos', {
         // Subprocessos elegíveis para aceitação em bloco (GESTOR)
         getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                return state.processoDetalhe.resumoSubprocessos.filter(s => s.unidade.sigla === siglaUnidadeUsuario);
+                return state.processoDetalhe.resumoSubprocessos.filter(s => s.unidadeNome === siglaUnidadeUsuario);
             }
             return [];
         },

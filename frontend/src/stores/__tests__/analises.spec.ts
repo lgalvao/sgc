@@ -37,8 +37,8 @@ describe('useAnalisesStore', () => {
 
         it('getAnalisesPorSubprocesso should return the correct analyses for a given subprocess', () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
-                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1'},
-                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2', acao: 'DEVOLUCAO', unidadeSigla: 'DEF', analista: 'Analista 2'},
+                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', idSubprocesso: 123},
+                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', idSubprocesso: 123},
             ];
             const idSubprocesso = 123;
             store.analisesPorSubprocesso.set(idSubprocesso, mockAnalises);
@@ -51,10 +51,10 @@ describe('useAnalisesStore', () => {
     describe('actions', () => {
         const idSubprocesso = 123;
         const mockAnalisesCadastro: AnaliseCadastro[] = [
-            {codigo: 1, dataHora: '2023-01-01T10:00:00Z', observacoes: 'Cadastro 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1'},
+            {codigo: 1, dataHora: '2023-01-01T10:00:00Z', observacoes: 'Cadastro 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', idSubprocesso: 123},
         ];
         const mockAnalisesValidacao: AnaliseValidacao[] = [
-            {codigo: 2, dataHora: '2023-01-02T10:00:00Z', observacoes: 'Validacao 1', acao: 'DEVOLUCAO', unidadeSigla: 'DEF', analista: 'Analista 2'},
+            {codigo: 2, dataHora: '2023-01-02T10:00:00Z', observacoes: 'Validacao 1', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', idSubprocesso: 123},
         ];
 
         it('fetchAnalisesCadastro should call the service and update the state', async () => {

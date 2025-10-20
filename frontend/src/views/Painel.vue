@@ -126,10 +126,7 @@ const processosOrdenados = computed(() => {
     if (valAString < valBString) return asc.value ? -1 : 1;
     if (valAString > valBString) return asc.value ? 1 : -1;
     return 0
-  }).map(p => ({
-    ...p,
-    unidadesFormatadas: p.unidades ? p.unidades.map(u => u.sigla).join(', ') : ''
-  }));
+  });
 })
 
 function ordenarPor(campo: keyof ProcessoResumo) {

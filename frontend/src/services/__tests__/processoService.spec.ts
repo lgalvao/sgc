@@ -3,7 +3,17 @@ import * as service from '../processoService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/processos'
 
-vi.mock('@/axios-setup')
+import { vi } from 'vitest';
+vi.mock('@/axios-setup', () => {
+    return {
+        default: {
+            get: vi.fn(),
+            post: vi.fn(),
+            put: vi.fn(),
+            delete: vi.fn(),
+        },
+    };
+});
 vi.mock('@/mappers/processos', async (importOriginal) => {
     const original = await importOriginal()
     return {
@@ -22,7 +32,7 @@ describe('processoService', () => {
     })
 
     it('criarProcesso should post and map response', async () => {
-        const request = { tipo: 'MAPEAMENTO' }
+        const request = { descricao: 'teste', tipo: 'MAPEAMENTO', dataLimiteEtapa1: '2025-12-31', unidades: [1] }
         const responseDto = { id: 1, ...request }
         mockApi.post.mockResolvedValue({ data: responseDto })
 

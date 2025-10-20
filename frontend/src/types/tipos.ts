@@ -106,14 +106,14 @@ export enum SituacaoSubprocesso {
 }
 
 export interface Conhecimento {
-    codigo: number;
+    id: number;
     descricao: string;
 }
 
 export interface Atividade {
     codigo: number;
     descricao: string;
-    conhecimentos: Conhecimento[];
+    conhecimentos: { id: number; descricao: string; }[];
 }
 
 export interface Competencia {
@@ -286,14 +286,14 @@ export interface ProcessoDetalhe {
     dataCriacao: string;
     dataFinalizacao?: string;
     unidades: UnidadeParticipante[];
-    resumoSubprocessos: Subprocesso[];
+    resumoSubprocessos: ProcessoResumo[];
     podeFinalizar: boolean;
     podeHomologarCadastro: boolean;
     podeHomologarMapa: boolean;
 }
 
 export interface ConhecimentoVisualizacao {
-    codigo: number;
+    id: number;
     descricao: string;
 }
 
@@ -335,7 +335,7 @@ export interface SalvarMapaRequest {
             codigo?: number;
             descricao: string;
             conhecimentos: {
-                codigo?: number;
+                id?: number;
                 descricao: string;
             }[];
         }[];
