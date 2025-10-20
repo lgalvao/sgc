@@ -12,7 +12,8 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 (11, 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 7),
 (14, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 2),
 (12, 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 14),
-(13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 14);
+(13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 14),
+(15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 2);
 
 -- Usuários
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
@@ -30,7 +31,7 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 (12, 'Taís Condida', 'tais.condida@tre-pe.jus.br', '7006', 11),
 (13, 'Mike Smith', 'mike.smith@tre-pe.jus.br', '7007', 11),
 (14, 'Maroca Silva', 'maroca.silva@tre-pe.jus.br', '7008', 2),
-(15, 'Roberto Santos', 'roberto.santos@tre-pe.jus.br', '7009', 14),
+(15, 'Roberto Santos', 'roberto.santos@tre-pe.jus.br', '7009', 2),
 (16, 'Luciana Pereira', 'luciana.pereira@tre-pe.jus.br', '7010', 6),
 (17, 'Fernando Costa', 'fernando.costa@tre-pe.jus.br', '7011', 10),
 (18, 'Amanda Rodrigues', 'amanda.rodrigues@tre-pe.jus.br', '7012', 14),
@@ -54,7 +55,7 @@ INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (3, 'CHEFE'),
 (4, 'CHEFE'),
 (5, 'CHEFE'),
-(6, 'CHEFE'),
+(6, 'ADMIN'),
 (7, 'CHEFE'),
 (8, 'GESTOR'),
 (9, 'CHEFE'),
@@ -63,7 +64,7 @@ INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (12, 'CHEFE'),
 (13, 'GESTOR'),
 (14, 'SERVIDOR'),
-(15, 'CHEFE'),
+(15, 'SERVIDOR'),
 (16, 'CHEFE'),
 (17, 'CHEFE'),
 (18, 'SERVIDOR'),
