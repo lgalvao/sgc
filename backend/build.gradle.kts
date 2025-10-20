@@ -7,6 +7,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     java
     pmd
+    jacoco
 }
 
 java {
@@ -331,4 +332,13 @@ tasks.named("pmdTest") {
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     jvmArgs = listOf("-Djdk.internal.vm.debug=release")
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        csv.required.set(true)
+        html.required.set(true)
+    }
 }

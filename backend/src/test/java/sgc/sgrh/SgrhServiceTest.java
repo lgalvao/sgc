@@ -10,6 +10,7 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,5 +144,27 @@ class SgrhServiceTest {
         
         List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "GESTOR");
         assertTrue(gestorUnits.contains(2L) || gestorUnits.contains(3L));
+    }
+
+    @Test
+    void testBuscarResponsaveisUnidades() {
+        List<Long> unidades = List.of(1L, 2L);
+        Map<Long, ResponsavelDto> result = sgrhService.buscarResponsaveisUnidades(unidades);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey(1L));
+        assertTrue(result.containsKey(2L));
+    }
+
+    @Test
+    void testBuscarUsuariosPorTitulos() {
+        List<String> titulos = List.of(TITULO, "987654321098");
+        Map<String, UsuarioDto> result = sgrhService.buscarUsuariosPorTitulos(titulos);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey(TITULO));
+        assertTrue(result.containsKey("987654321098"));
     }
 }
