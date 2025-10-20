@@ -126,20 +126,13 @@ import {computed, nextTick, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';
 import {useServidoresStore} from '@/stores/servidores';
-import {useUnidadesStore} from '@/stores/unidades';
 import {usePerfil} from '@/composables/usePerfil';
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
 const servidoresStore = useServidoresStore();
-const unidadesStore = useUnidadesStore();
 
-const { servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor } = usePerfil();
-
-const unidadeSelecionadaCompleta = computed(() => {
-  if (!unidadeSelecionada.value) return null;
-  return unidadesStore.pesquisarUnidade(unidadeSelecionada.value);
-});
+const {servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor} = usePerfil();
 
 const isEditingProfile = ref(false);
 const profileSelect = ref<HTMLSelectElement | null>(null);

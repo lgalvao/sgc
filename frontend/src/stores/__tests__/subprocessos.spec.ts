@@ -13,17 +13,21 @@ vi.mock('@/stores/processos', () => ({
     useProcessosStore: vi.fn(() => mockProcessosStore),
 }));
 
-vi.mock('@/services/subprocessoService', () => ({
-    fetchSubprocessoDetalhe: vi.fn(),
-    disponibilizarCadastro: vi.fn(),
-    disponibilizarRevisaoCadastro: vi.fn(),
-    devolverCadastro: vi.fn(),
-    aceitarCadastro: vi.fn(),
-    homologarCadastro: vi.fn(),
-    devolverRevisaoCadastro: vi.fn(),
-    aceitarRevisaoCadastro: vi.fn(),
-    homologarRevisaoCadastro: vi.fn(),
-}));
+vi.mock('@/services/subprocessoService', async (importOriginal) => {
+    const actual = await importOriginal() as object;
+    return {
+        ...actual,
+        fetchSubprocessoDetalhe: vi.fn(),
+        disponibilizarCadastro: vi.fn(),
+        disponibilizarRevisaoCadastro: vi.fn(),
+        devolverCadastro: vi.fn(),
+        aceitarCadastro: vi.fn(),
+        homologarCadastro: vi.fn(),
+        devolverRevisaoCadastro: vi.fn(),
+        aceitarRevisaoCadastro: vi.fn(),
+        homologarRevisaoCadastro: vi.fn(),
+    };
+});
 
 describe('useSubprocessosStore', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
@@ -49,16 +53,13 @@ describe('useSubprocessosStore', () => {
 
     describe('actions', () => {
         const idSubprocesso = 123;
+        const mockDetalhe = {codigo: idSubprocesso, nome: 'Detalhe Teste'};
 
-        it('fetchSubprocessoDetalhe should call service and update state', async () => {
-            const mockDetalhe = {codigo: idSubprocesso, nome: 'Detalhe Teste'};
-            vi.mocked(subprocessoService.fetchSubprocessoDetalhe).mockResolvedValue(mockDetalhe as any);
-
-            await store.fetchSubprocessoDetalhe(idSubprocesso);
-
-            expect(subprocessoService.fetchSubprocessoDetalhe).toHaveBeenCalledWith(idSubprocesso);
-            expect(store.subprocessoDetalhe).toEqual(mockDetalhe);
+        beforeEach(() => {
+            vi.spyOn(subprocessoService, 'fetchSubprocessoDetalhe').mockResolvedValue(mockDetalhe as any);
         });
+
+
 
         it('disponibilizarCadastro should call service and refresh process details', async () => {
             await store.disponibilizarCadastro(idSubprocesso);

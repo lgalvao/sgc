@@ -77,7 +77,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useServidoresStore} from '@/stores/servidores'
 import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
-import {Mapa, Servidor, Unidade, MapaCompleto} from '@/types/tipos';
+import {MapaCompleto, Servidor, Unidade} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
 const props = defineProps<{ siglaUnidade: string }>();

@@ -461,7 +461,7 @@ import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {Atividade, Competencia, Conhecimento, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos';
+import {Atividade, Competencia, Conhecimento, SituacaoSubprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -475,7 +475,7 @@ const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
 const analisesStore = useAnalisesStore()
 const subprocessosStore = useSubprocessosStore()
-const {perfilSelecionado, unidadeSelecionada} = usePerfil()
+const {perfilSelecionado} = usePerfil()
 
 // Estados reativos para o modal
 const mostrarModalAceitar = ref(false)
@@ -642,11 +642,7 @@ function verHistorico() {
 
 async function confirmarSugestoes() {
   try {
-    await processosStore.apresentarSugestoes({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value,
-      sugestoes: sugestoes.value
-    })
+    await processosStore.apresentarSugestoes()
 
     fecharModalSugestoes()
 
@@ -670,10 +666,7 @@ async function confirmarSugestoes() {
 
 async function confirmarValidacao() {
   try {
-    await processosStore.validarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value
-    })
+    await processosStore.validarMapa()
 
     fecharModalValidar()
 
@@ -702,15 +695,14 @@ async function confirmarAceitacao(observacoes?: string) {
   const isHomologacao = perfil === 'ADMIN';
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, { observacoes: observacoes || '' }); // Adicionar observacoes
+    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, { observacoes: observacoes || '' }); // Adicionar observacoes
+    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   }
 
   fecharModalAceitar();
-  await router.push({ name: 'Painel' });
+  await router.push({name: 'Painel'});
 }
-
 
 
 async function confirmarDevolucao() {
@@ -722,7 +714,7 @@ async function confirmarDevolucao() {
   });
 
   fecharModalDevolucao();
-  await router.push({ name: 'Painel' });
+  await router.push({name: 'Painel'});
 }
 </script>
 

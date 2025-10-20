@@ -6,23 +6,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
 import sgc.sgrh.Perfil;
 import sgc.sgrh.SgrhService;
 import sgc.sgrh.Usuario;
@@ -50,21 +46,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
 public class CDU06IntegrationTest {
-
     private static final long TEST_USER_ID = 123456789L;
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ProcessoRepo processoRepo;
+
     @Autowired
     private UnidadeRepo unidadeRepo;
+
     @Autowired
     private SubprocessoRepo subprocessoRepo;
+
     @Autowired
     private UnidadeProcessoRepo unidadeProcessoRepo;
 
-    @MockBean
+    @MockitoBean
     private SgrhService sgrhService;
 
     private Processo processo;
@@ -82,9 +81,9 @@ public class CDU06IntegrationTest {
 
     private void setupSecurityContext(Unidade unidade, Perfil perfil) {
         Usuario principal = new Usuario(
-            TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123",
-            unidade,
-            Collections.singletonList(perfil)
+                TEST_USER_ID, "Usuario Teste", "teste@teste.com", "123",
+                unidade,
+                Collections.singletonList(perfil)
         );
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -93,7 +92,7 @@ public class CDU06IntegrationTest {
 
         // Mock crucial para a verificação de segurança
         when(sgrhService.buscarPerfisUsuario(anyString()))
-            .thenReturn(List.of(new PerfilDto(String.valueOf(TEST_USER_ID), unidade.getCodigo(), unidade.getNome(), perfil.name())));
+                .thenReturn(List.of(new PerfilDto(String.valueOf(TEST_USER_ID), unidade.getCodigo(), unidade.getNome(), perfil.name())));
     }
 
     private UnidadeProcesso createUnidadeProcesso(Unidade unidade, Processo processo) {
@@ -114,8 +113,8 @@ public class CDU06IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
     }
 
     @Test
@@ -123,7 +122,7 @@ public class CDU06IntegrationTest {
     @DisplayName("Deve retornar 404 para processo inexistente")
     void testDetalharProcesso_naoEncontrado() throws Exception {
         mockMvc.perform(get("/api/processos/{id}/detalhes", 9999L))
-            .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -135,8 +134,8 @@ public class CDU06IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.podeFinalizar").value(true));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(true));
     }
 
     @Test
@@ -148,8 +147,8 @@ public class CDU06IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.podeFinalizar").value(false));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeFinalizar").value(false));
     }
 
     @Test
@@ -161,8 +160,8 @@ public class CDU06IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
     }
 
     @Test
@@ -174,7 +173,7 @@ public class CDU06IntegrationTest {
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.podeHomologarMapa").value(true));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.podeHomologarMapa").value(true));
     }
 }

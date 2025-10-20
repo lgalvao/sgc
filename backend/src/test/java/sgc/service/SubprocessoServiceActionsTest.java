@@ -221,10 +221,18 @@ public class SubprocessoServiceActionsTest {
         void deveHomologarRevisaoComSucessoSemImpactos() {
             Processo processo = criarProcesso(TipoProcesso.REVISAO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            // Primeiro, aceitar a revisão para que a situação mude para AGUARDANDO_HOMOLOGACAO_CADASTRO
+            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
+
+            // Recarregar o subprocesso do repositório para garantir que o estado esteja atualizado
+            Subprocesso subprocessoAposAceite = subprocessoRepo.findById(subprocesso.getCodigo())
+                    .orElseThrow(() -> new AssertionError("Subprocesso não encontrado após aceite da revisão."));
+
             when(impactoMapaService.verificarImpactos(anyLong(), any(Usuario.class)))
                     .thenReturn(ImpactoMapaDto.semImpacto());
 
-            subprocessoWorkflowService.homologarRevisaoCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
+            subprocessoWorkflowService.homologarRevisaoCadastro(subprocessoAposAceite.getCodigo(), OBSERVACOES, usuario);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação da revisão."));
             assertEquals(SituacaoSubprocesso.MAPA_HOMOLOGADO, spAtualizado.getSituacao());

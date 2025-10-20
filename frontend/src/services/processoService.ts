@@ -5,7 +5,7 @@ import type {
     Processo,
     ProcessoDetalhe,
     ProcessoResumo,
-} from '../types/tipos';
+} from '@/types/tipos';
 
 export async function criarProcesso(request: CriarProcessoRequest): Promise<Processo> {
   try {
@@ -82,4 +82,18 @@ export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe
     console.error(`Erro ao obter detalhes do processo ${id}:`, error);
     throw error;
   }
+}
+
+export async function processarAcaoEmBloco(payload: {
+    idProcesso: number,
+    unidades: string[],
+    tipoAcao: 'aceitar' | 'homologar',
+    unidadeUsuario: string
+}): Promise<void> {
+    try {
+        await apiClient.post(`/processos/${payload.idProcesso}/acoes-em-bloco`, payload);
+    } catch (error) {
+        console.error(`Erro ao processar ação em bloco para o processo ${payload.idProcesso}:`, error);
+        throw error;
+    }
 }

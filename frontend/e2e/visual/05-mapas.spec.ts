@@ -11,7 +11,7 @@ import {
     loginComoGestor,
     navegarParaCadastroAtividades,
     TEXTOS
-} from "~/cdu/helpers";
+} from "~/helpers";
 
 test.describe('Captura de Telas - Mapas', () => {
     test('30 - Mapa de Competências - Edição (ADMIN)', async ({page}) => {

@@ -16,6 +16,7 @@ export function mapProcessoDtoToFrontend(dto: any): Processo {
 export function mapUnidadeParticipanteDtoToFrontend(dto: any): UnidadeParticipante {
     return {
         ...dto,
+        codUnidade: dto.codigo, // Mapear 'codigo' do DTO para 'codUnidade' no frontend
         filhos: dto.filhos ? dto.filhos.map(mapUnidadeParticipanteDtoToFrontend) : [],
     };
 }

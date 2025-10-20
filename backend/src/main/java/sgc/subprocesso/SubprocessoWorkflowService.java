@@ -373,6 +373,9 @@ public class SubprocessoWorkflowService {
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
 
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeDestino);
+
+        sp.setSituacao(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
+        repositorioSubprocesso.save(sp);
     }
 
     @Transactional
@@ -380,8 +383,8 @@ public class SubprocessoWorkflowService {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: " + idSubprocesso));
 
-        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
-            throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro disponibilizadas.");
+        if (sp.getSituacao() != SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO) {
+            throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro aguardando homologação.");
         }
 
         var impactos = impactoMapaService.verificarImpactos(idSubprocesso, usuario);

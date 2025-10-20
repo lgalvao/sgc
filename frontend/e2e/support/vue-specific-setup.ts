@@ -1,4 +1,4 @@
-import {ErrorReporter} from './utils/error-reporter';
+import {ErrorReporter} from './error-reporter';
 import {Page, test} from '@playwright/test'; // Importar test diretamente
 import {parseDate} from '@/utils';
 import {existsSync, mkdirSync, writeFileSync} from 'fs'; // Importar fs

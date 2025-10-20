@@ -93,8 +93,7 @@ class UsuarioServiceTest {
         long tituloEleitoral = 123456789L;
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeMock);
 
-        // Apenas verifica se o método executa sem lançar exceções,
-        // já que a implementação atual apenas loga a informação.
+        // Apenas verifica se o metodo executa sem lançar exceções, já que a implementação atual apenas loga a informação.
         usuarioService.entrar(tituloEleitoral, perfilUnidade);
     }
 }

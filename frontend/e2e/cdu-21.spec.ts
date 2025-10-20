@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     abrirModalFinalizacaoProcesso,
     cancelarNoModal,
@@ -22,10 +22,6 @@ test.describe('CDU-21: Finalizar processo', () => {
         const processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]); // Unidade 1 = SEDOC
         await processoService.iniciarProcesso(processo.processo.codigo, 'MAPEAMENTO', [1]);
 
-        // TODO não tem mais porque simular nada. O backend já era para ter essa lógica. Se nao tiver, criar.
-        // Simular a homologação para permitir a finalização
-        // Esta é uma simplificação. Em um cenário real, seria necessário um setup mais complexo no backend.
-        // Por agora, assumimos que o backend permitirá a finalização após o início.
         return {nomeProcesso, processo};
     }
 

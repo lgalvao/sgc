@@ -1,9 +1,7 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
 ## Visão Geral
-Este diretório contém o código-fonte do backend do SGC, uma aplicação Spring Boot (Java 21) que serve como a espinha dorsal para o gerenciamento de competências e seus fluxos de trabalho associados. Ele fornece uma API REST modular para ser consumida pelo frontend.
-
-A arquitetura é organizada em pacotes que representam domínios de negócio específicos, promovendo alta coesão e baixo acoplamento. A comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio, o que garante a separação de responsabilidades.
+Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST modular para ser consumida pelo frontend. A arquitetura é organizada em pacotes que representam domínios de negócio específicos, promovendo alta coesão e baixo acoplamento. A comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio, o que garante a separação de responsabilidades.
 
 ## Diagrama de Arquitetura
 O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências principais entre os pacotes.

@@ -1,5 +1,5 @@
 import {test} from '@playwright/test';
-import {loginComoAdmin} from "~/cdu/helpers";
+import {loginComoAdmin} from "~/helpers";
 
 test.describe('Captura de Telas - Navegação', () => {
     test('54 - Breadcrumbs - Processo > Unidade > Mapa', async ({page}) => {

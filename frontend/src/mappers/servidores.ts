@@ -18,6 +18,7 @@ import {Servidor} from '@/types/tipos';
 export function mapVWUsuarioToServidor(vw: any): Servidor {
   const candidateId =
     vw?.id ??
+    vw?.codigo ?? // Adicionado para considerar vw.codigo
     (typeof vw?.titulo === 'string' && /^\d+$/.test(vw.titulo) ? Number(vw.titulo) : undefined) ??
     undefined;
   const codigo = Number(candidateId ?? 0);

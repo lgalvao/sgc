@@ -14,9 +14,6 @@ spring:
     init:
       # Ensure data.sql is always run for the local profile
       mode: always
-sgrh:
-  mock:
-    enabled: true
 logging:
   level:
     sgc: DEBUG

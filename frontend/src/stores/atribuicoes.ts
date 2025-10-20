@@ -21,15 +21,14 @@ export const useAtribuicaoTemporariaStore = defineStore('atribuicaoTemporaria', 
             this.isLoading = true;
             this.error = null;
             try {
-                // TODO: Substituir pela chamada real da API
                 const response = await AtribuicaoTemporariaService.buscarTodasAtribuicoes();
                 this.atribuicoes = (response as any).data.map(a => ({
                     ...a,
                     dataInicio: new Date(a.dataInicio).toISOString(),
                     dataFim: new Date(a.dataTermino).toISOString(),
                     dataTermino: new Date(a.dataTermino).toISOString(),
-                    servidor: { codigo: a.idServidor },
-                    unidade: { sigla: a.unidade }
+                    servidor: a.servidor,
+                    unidade: a.unidade
                 })) as unknown as AtribuicaoTemporaria[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar atribuições: ' + err.message;

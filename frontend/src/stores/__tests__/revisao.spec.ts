@@ -4,7 +4,21 @@ import {TipoMudanca, useRevisaoStore} from '../revisao';
 
 // Mock the mapas store before importing the revisao store
 const mockMapasStore = {
-    getMapaByUnidadeId: vi.fn()
+    getMapaByUnidadeId: vi.fn(),
+    mapaCompleto: {
+        id: 1,
+        unidade: 'SESEL',
+        idProcesso: 1,
+        situacao: 'em_andamento',
+        competencias: [
+            { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
+            { codigo: 2, descricao: 'Competência 2', atividadesAssociadas: [30] },
+            { codigo: 3, descricao: 'Competência 3', atividadesAssociadas: [10, 40] }
+        ],
+        dataCriacao: new Date(),
+        dataDisponibilizacao: null,
+        dataFinalizacao: null
+    }
 };
 
 vi.mock('../mapas', () => ({
@@ -19,6 +33,7 @@ describe('useRevisaoStore', () => {
         revisaoStore = useRevisaoStore();
         revisaoStore.limparMudancas();
         revisaoStore.setMudancasParaImpacto([]);
+        mockMapasStore.mapaCompleto = null; // Resetar o mapaCompleto para cada teste
     });
 
     it('should initialize with empty mudancas arrays', () => {
@@ -112,28 +127,22 @@ describe('useRevisaoStore', () => {
 
     describe('obterIdsCompetenciasImpactadas', () => {
         it('should return IDs of competencies that have the activity associated', () => {
-            // Configure the mock behavior
-            mockMapasStore.getMapaByUnidadeId.mockImplementation((unidadeId: string, idProcesso: number) => {
-                if (unidadeId === 'SESEL' && idProcesso === 1) {
-                    return {
-                        id: 1,
-                        unidade: 'SESEL',
-                        idProcesso: 1,
-                        situacao: 'em_andamento',
-                        competencias: [
-                            { id: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
-                            { id: 2, descricao: 'Competência 2', atividadesAssociadas: [30] },
-                            { id: 3, descricao: 'Competência 3', atividadesAssociadas: [10, 40] }
-                        ],
-                        dataCriacao: new Date(),
-                        dataDisponibilizacao: null,
-                        dataFinalizacao: null
-                    };
-                }
-                return undefined;
-            });
+            mockMapasStore.mapaCompleto = {
+                id: 1,
+                unidade: 'SESEL',
+                idProcesso: 1,
+                situacao: 'em_andamento',
+                competencias: [
+                    { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
+                    { codigo: 2, descricao: 'Competência 2', atividadesAssociadas: [30] },
+                    { codigo: 3, descricao: 'Competência 3', atividadesAssociadas: [10, 40] }
+                ],
+                dataCriacao: new Date(),
+                dataDisponibilizacao: null,
+                dataFinalizacao: null
+            } as any;
 
-            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10);
 
             expect(idsImpactados).toEqual([1, 3]); // Competências 1 e 3 têm a atividade 10 associada
         });
@@ -142,35 +151,33 @@ describe('useRevisaoStore', () => {
             // Configure the mock to return undefined
             mockMapasStore.getMapaByUnidadeId.mockReturnValue(undefined);
 
-            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'NONEXISTENT', 999);
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10);
 
             expect(idsImpactados).toEqual([]);
         });
 
         it('should return empty array when map exists but no competencies have the activity associated', () => {
-            // Configure the mock to return a map with competencies that don't have the activity
-            mockMapasStore.getMapaByUnidadeId.mockReturnValue({
+            mockMapasStore.mapaCompleto = {
                 id: 1,
                 unidade: 'SESEL',
                 idProcesso: 1,
                 situacao: 'em_andamento',
                 competencias: [
-                    { id: 1, descricao: 'Competência 1', atividadesAssociadas: [20, 30] },
-                    { id: 2, descricao: 'Competência 2', atividadesAssociadas: [40] }
+                    { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [20] },
+                    { codigo: 2, descricao: 'Competência 2', atividadesAssociadas: [30] },
+                    { codigo: 3, descricao: 'Competência 3', atividadesAssociadas: [40] }
                 ],
                 dataCriacao: new Date(),
                 dataDisponibilizacao: null,
                 dataFinalizacao: null
-            });
-
-            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+            } as any;
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10);
 
             expect(idsImpactados).toEqual([]); // Nenhuma competência tem a atividade 10 associada
         });
 
         it('should return empty array when map exists but has no competencies', () => {
-            // Configure the mock to return a map with no competencies
-            mockMapasStore.getMapaByUnidadeId.mockReturnValue({
+            mockMapasStore.mapaCompleto = {
                 id: 1,
                 unidade: 'SESEL',
                 idProcesso: 1,
@@ -179,9 +186,9 @@ describe('useRevisaoStore', () => {
                 dataCriacao: new Date(),
                 dataDisponibilizacao: null,
                 dataFinalizacao: null
-            });
+            } as any;
 
-            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10, 'SESEL', 1);
+            const idsImpactados = revisaoStore.obterIdsCompetenciasImpactadas(10);
 
             expect(idsImpactados).toEqual([]);
         });

@@ -32,7 +32,20 @@ export function mapUnidade(obj: any): Unidade {
     tipo: obj.tipo ?? obj.tipo_unidade ?? '',
     nome: obj.nome ?? obj.nome_unidade ?? '',
     idServidorTitular: obj.idServidorTitular ?? obj.id_servidor_titular ?? obj.titular_id ?? 0,
-    responsavel: mapVWUsuarioToServidor(obj.responsavel ?? obj.responsavel_titulo ?? null),
+    responsavel: obj.responsavel ? {
+      codigo: obj.responsavel.codigo ?? 0,
+      nome: obj.responsavel.nome ?? '',
+      tituloEleitoral: obj.responsavel.tituloEleitoral ?? '',
+      unidade: obj.responsavel.unidade ?? {} as Unidade,
+      email: obj.responsavel.email ?? '',
+      ramal: obj.responsavel.ramal ?? '',
+      usuarioTitulo: obj.responsavel.usuarioTitulo ?? '',
+      unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
+      idServidor: obj.responsavel.idServidorResponsavel ?? 0,
+      tipo: obj.responsavel.tipo ?? '',
+      dataInicio: obj.responsavel.dataInicio ?? '',
+      dataFim: obj.responsavel.dataFim ?? null,
+    } : null,
     filhas: Array.isArray(obj.filhas) ? obj.filhas.map(mapUnidade) : []
   };
 }

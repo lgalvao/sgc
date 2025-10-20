@@ -1,11 +1,10 @@
 // noinspection JSUnusedGlobalSymbols
-
 import {defineConfig, devices} from '@playwright/test';
 import {vueTest} from '~/support/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 12000,
+    timeout: 5000,
     testDir: './e2e',
     fullyParallel: true,
     reporter: [['html']],

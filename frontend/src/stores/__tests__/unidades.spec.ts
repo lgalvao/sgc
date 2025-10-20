@@ -22,10 +22,13 @@ const mockUnidades: Unidade[] = [
                 "responsavel": {
                     "codigo": 13,
                     "nome": "Servidor Responsável 13",
+                    "tituloEleitoral": "1313131313",
                     "unidade": { "codigo": 1, "nome": "Unidade", "sigla": "UN" },
                     "email": "servidor13@email.com",
                     "ramal": "1313",
-                    "tituloEleitoral": "1313131313"
+                    "usuarioTitulo": "Servidor Responsável 13",
+                    "unidadeCodigo": 1,
+                    "tipo": "SERVIDOR"
                 },
                 "filhas": [
                     {
@@ -73,10 +76,13 @@ const mockUnidades: Unidade[] = [
                                 "responsavel": {
                                     "codigo": 8,
                                     "nome": "Servidor Responsável 8",
+                                    "tituloEleitoral": "888888888",
                                     "unidade": { "codigo": 1, "nome": "Unidade", "sigla": "UN" },
                                     "email": "servidor8@email.com",
                                     "ramal": "8888",
-                                    "tituloEleitoral": "888888888"
+                                    "usuarioTitulo": "Servidor Responsável 8",
+                                    "unidadeCodigo": 1,
+                                    "tipo": "SERVIDOR"
                                 },
                                 "filhas": [],
                                 "codigo": 8

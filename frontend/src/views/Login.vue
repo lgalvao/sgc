@@ -103,7 +103,7 @@ import {computed, ref, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {PerfilUnidade} from '../mappers/sgrh';
+import {PerfilUnidade} from '@/mappers/sgrh';
 
 const router = useRouter()
 const perfilStore = usePerfilStore()

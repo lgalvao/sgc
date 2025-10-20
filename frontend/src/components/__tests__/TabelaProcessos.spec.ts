@@ -26,6 +26,7 @@ const mockProcessos: ProcessoResumo[] = [
     dataLimite: new Date().toISOString(),
     dataCriacao: new Date().toISOString(),
     dataFinalizacao: new Date('2024-08-26').toISOString(),
+    dataFinalizacaoFormatada: '26/08/2024',
   },
 ];
 
@@ -42,7 +43,6 @@ describe('TabelaProcessos.vue', () => {
     expect(wrapper.find('table').exists()).toBe(true);
     expect(wrapper.find('[data-testid="coluna-descricao"]').text()).toContain('Descrição');
     expect(wrapper.find('[data-testid="coluna-tipo"]').text()).toContain('Tipo');
-    expect(wrapper.find('[data-testid="coluna-unidades"]').text()).toContain('Unidades participantes');
     expect(wrapper.find('[data-testid="coluna-situacao"]').text()).toContain('Situação');
     expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false); // Não deve existir por padrão
   });
@@ -62,14 +62,12 @@ describe('TabelaProcessos.vue', () => {
     const cells = rows[0].findAll('td');
     expect(cells[0].text()).toBe('Processo Alpha');
     expect(cells[1].text()).toBe('MAPEAMENTO');
-    expect(cells[2].text()).toBe('UNID1, UNID2');
-    expect(cells[3].text()).toBe('EM_ANDAMENTO');
+    expect(cells[2].text()).toBe('EM_ANDAMENTO');
 
     const cells2 = rows[1].findAll('td');
     expect(cells2[0].text()).toBe('Processo Beta');
     expect(cells2[1].text()).toBe('REVISAO');
-    expect(cells2[2].text()).toBe('UNID3');
-    expect(cells2[3].text()).toBe('FINALIZADO');
+    expect(cells2[2].text()).toBe('FINALIZADO');
   });
 
   it('deve emitir o evento ordenar ao clicar nos cabeçalhos', async () => {
@@ -172,16 +170,6 @@ describe('TabelaProcessos.vue', () => {
       },
     });
     expect(wrapperTipo.find('[data-testid="coluna-tipo"] span').text()).toBe('↑');
-
-    // Teste para critério 'unidades'
-    const wrapperUnidades = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'unidadeNome',
-        direcaoOrdenacaoAsc: false,
-      },
-    });
-    expect(wrapperUnidades.find('[data-testid="coluna-unidades"] span').text()).toBe('↓');
 
     // Teste para critério 'situacao'
     const wrapperSituacao = mount(TabelaProcessos, {

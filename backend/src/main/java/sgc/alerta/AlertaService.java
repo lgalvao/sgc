@@ -60,7 +60,7 @@ public class AlertaService {
             String descricao,
             LocalDateTime dataLimite) {
 
-        log.debug("Criando alerta tipo={} para unidade={}", tipoAlerta, codUnidadeDestino);
+        log.debug("Criando alerta tipo={} para unidade.", tipoAlerta);
 
         Unidade unidadeDestino = unidadeRepo.findById(codUnidadeDestino)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codUnidadeDestino));
@@ -70,11 +70,11 @@ public class AlertaService {
         alerta.setDataHora(LocalDateTime.now());
         alerta.setUnidadeOrigem(null); // SEDOC não tem registro como unidade
         alerta.setUnidadeDestino(unidadeDestino);
-        alerta.setDescricao(descricao);
+        alerta.setDescricao(sanitizeHtml(descricao));
 
         Alerta alertaSalvo = repositorioAlerta.save(alerta);
         log.info("Alerta criado: código={}, tipo={}, unidade={}",
-                alertaSalvo.getCodigo(), tipoAlerta, unidadeDestino.getSigla());
+                alertaSalvo.getCodigo(), tipoAlerta, unidadeDestino.getNome());
 
         // Buscar responsável da unidade via SGRH
         try {
@@ -86,10 +86,10 @@ public class AlertaService {
                     criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codUnidadeDestino);
                 }
             } else {
-                log.warn("Responsável não encontrado para a unidade {}", codUnidadeDestino);
+                log.warn("Responsável não encontrado para a unidade.");
             }
         } catch (Exception e) {
-            log.error("Erro ao buscar responsável da unidade {}: {}", codUnidadeDestino, e.getMessage(), e);
+            log.error("Erro ao buscar responsável da unidade {}: {}", codUnidadeDestino, e.getClass().getSimpleName(), e);
             // Não interrompe o fluxo se não conseguir buscar o responsável
         }
         return alertaSalvo;
@@ -192,7 +192,7 @@ public class AlertaService {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codUnidade);
                 }
             } catch (Exception e) {
-                log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getMessage(), e);
+                log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
             }
         }
 
@@ -278,7 +278,7 @@ public class AlertaService {
             alertaUsuarioRepo.save(alertaUsuario);
             log.debug("AlertaUsuario criado: alerta={}, usuario={}", alerta.getCodigo(), titulo);
         } catch (Exception e) {
-            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), tituloStr, e.getMessage(), e);
+            log.error("Erro ao criar AlertaUsuario para o alerta={}, usuario={}: {}", alerta.getCodigo(), tituloStr, e.getClass().getSimpleName(), e);
         }
     }
 
@@ -286,6 +286,14 @@ public class AlertaService {
         return data != null
                 ? String.format("%02d/%02d/%d", data.getDayOfMonth(), data.getMonthValue(), data.getYear())
                 : "Data não definida";
+    }
+
+    private String sanitizeHtml(String input) {
+        if (input == null) {
+            return null;
+        }
+        // Remove tags HTML básicas para uma sanitização simples
+        return input.replaceAll("<[^>]*>", "");
     }
 
     /**

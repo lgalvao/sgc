@@ -392,7 +392,6 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useAlertasStore} from '@/stores/alertas'
 import {Atividade, Competencia, Perfil, SalvarMapaRequest, SituacaoSubprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
@@ -405,7 +404,6 @@ const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const unidadesStore = useUnidadesStore()
-const alertasStore = useAlertasStore()
 const {unidades} = storeToRefs(unidadesStore)
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
@@ -463,6 +461,9 @@ const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  if (idSubprocesso.value) {
+    await mapasStore.fetchMapaCompleto(idSubprocesso.value as number);
+  }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -478,7 +479,7 @@ const atividades = computed<Atividade[]>(() => {
   }
   return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
 })
-const mapaEmEdicao = ref<SalvarMapaRequest>({ competencias: [] });
+const mapaEmEdicao = ref<SalvarMapaRequest>({competencias: []});
 const competencias = ref<Competencia[]>([]);
 
 watch(mapaCompleto, (novoMapa) => {
@@ -486,7 +487,7 @@ watch(mapaCompleto, (novoMapa) => {
     competencias.value = JSON.parse(JSON.stringify(novoMapa.competencias));
     mapaEmEdicao.value.competencias = JSON.parse(JSON.stringify(novoMapa.competencias));
   }
-}, { immediate: true, deep: true });
+}, {immediate: true, deep: true});
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
@@ -593,7 +594,7 @@ function adicionarOuAtualizarCompetencia() {
       descricao: novaCompetencia.value.descricao,
       atividades: atividades.value.filter(a => atividadesSelecionadas.value.includes(a.codigo)).map(a => ({
         descricao: a.descricao,
-        conhecimentos: a.conhecimentos.map(c => ({ descricao: c.descricao }))
+        conhecimentos: a.conhecimentos.map(c => ({descricao: c.descricao}))
       }))
     });
   }
@@ -704,7 +705,7 @@ function disponibilizarMapa() {
     // Registrar movimentação
     processosStore.addMovement({
       usuario: `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`,
-      unidadeOrigem: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'
     });

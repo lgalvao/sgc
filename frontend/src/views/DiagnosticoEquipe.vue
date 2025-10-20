@@ -178,9 +178,8 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {useAlertasStore} from '@/stores/alertas'
 import {usePerfilStore} from '@/stores/perfil'
-import {Competencia, Mapa, MapaCompleto} from '@/types/tipos'
+import {Competencia, MapaCompleto} from '@/types/tipos'
 
 const route = useRoute()
 const router = useRouter()
@@ -188,7 +187,6 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const alertasStore = useAlertasStore()
 const perfilStore = usePerfilStore()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
@@ -270,7 +268,7 @@ function confirmarFinalizacao() {
     processosStore.addMovement({
       usuario: usuario,
       unidadeOrigem: unidade.value,
-      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      unidadeDestino: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       descricao: 'Diagnóstico da equipe finalizado'
     });
   }
@@ -278,8 +276,8 @@ function confirmarFinalizacao() {
   // A criação de alertas agora é responsabilidade do backend
 
   notificacoesStore.sucesso(
-    'Diagnóstico finalizado',
-    'O diagnóstico da equipe foi concluído com sucesso!'
+      'Diagnóstico finalizado',
+      'O diagnóstico da equipe foi concluído com sucesso!'
   )
 
   fecharModalConfirmacao()
@@ -293,6 +291,6 @@ function confirmarFinalizacao() {
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

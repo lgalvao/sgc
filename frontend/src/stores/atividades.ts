@@ -21,7 +21,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 const mapa = await subprocessoService.obterMapaVisualizacao(idSubprocesso);
                 const atividades = mapMapaVisualizacaoToAtividades(mapa);
                 this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao buscar atividades', 'Não foi possível carregar as atividades do subprocesso.');
             }
         },
@@ -37,7 +37,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 notificacoes.sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
                 // Opcional: recarregar para garantir consistência total, mas a adição otimista já ajuda.
                 await this.fetchAtividadesParaSubprocesso(idSubprocesso);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
             }
         },
@@ -49,7 +49,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 atividades = atividades.filter(a => a.codigo !== atividadeId);
                 this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 useNotificacoesStore().sucesso('Atividade removida', 'A atividade foi removida com sucesso.');
-            } catch (error) {
+            } catch {
                 useNotificacoesStore().erro('Erro ao remover atividade', 'Não foi possível remover a atividade.');
             }
         },
@@ -64,7 +64,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
                  useNotificacoesStore().sucesso('Conhecimento adicionado', 'O novo conhecimento foi adicionado com sucesso.');
-            } catch (error) {
+            } catch {
                 useNotificacoesStore().erro('Erro ao adicionar conhecimento', 'Não foi possível salvar o novo conhecimento.');
             }
         },
@@ -79,7 +79,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
                 useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido com sucesso.');
-            } catch (error) {
+            } catch {
                 useNotificacoesStore().erro('Erro ao remover conhecimento', 'Não foi possível remover o conhecimento.');
             }
         },
@@ -91,7 +91,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 notificacoes.sucesso('Atividades importadas', 'As atividades foram importadas com sucesso.');
                 // Recarregar as atividades do subprocesso de destino para refletir a importação
                 await this.fetchAtividadesParaSubprocesso(idSubprocessoDestino);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao importar', 'Não foi possível importar as atividades.');
             }
         },
@@ -107,7 +107,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
                 }
                 notificacoes.sucesso('Atividade atualizada', 'A atividade foi atualizada com sucesso.');
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar a atividade.');
             }
         },
@@ -126,7 +126,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     }
                 }
                 notificacoes.sucesso('Conhecimento atualizado', 'O conhecimento foi atualizado com sucesso.');
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar o conhecimento.');
             }
         }

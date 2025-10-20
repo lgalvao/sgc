@@ -32,7 +32,7 @@ export const useRevisaoStore = defineStore('revisao', {
         };
     },
     actions: {
-        obterIdsCompetenciasImpactadas(atividadeId: number, siglaUnidade: string, idProcesso: number): number[] {
+        obterIdsCompetenciasImpactadas(atividadeId: number): number[] {
             const mapasStore = useMapasStore();
             const idsImpactados: number[] = [];
             const mapaAtual = mapasStore.mapaCompleto;

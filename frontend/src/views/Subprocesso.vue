@@ -81,15 +81,14 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {Mapa, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade, MapaCompleto} from "@/types/tipos";
-import {formatDateTimeBR, parseDate} from '@/utils';
+import {MapaCompleto, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade, Responsavel} from "@/types/tipos";
+import {formatDateTimeBR} from '@/utils';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
@@ -107,9 +106,7 @@ const servidoresStore = useServidoresStore()
 const processosStore = useProcessosStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
-const { processosPainel } = storeToRefs(processosStore)
 
-// Estados reativos para o modal de alteração de data limite
 const mostrarModalAlterarDataLimite = ref(false)
 
 const SubprocessoDetalhes = computed(() => {
@@ -119,17 +116,12 @@ const SubprocessoDetalhes = computed(() => {
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
-onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-});
-
 const sigla = computed<string | undefined>(() => {
   return SubprocessoDetalhes.value?.unidadeNome;
 });
 
 const unidadeOriginal = computed<Unidade | null>(() => {
   if (!sigla.value) {
-
     return null;
   }
   const unidadeEncontrada = unidadesStore.pesquisarUnidade(sigla.value);
@@ -182,10 +174,13 @@ const situacaoUnidadeNoProcesso = computed(() => {
   return SubprocessoDetalhes.value?.situacao || SituacaoSubprocesso.NAO_INICIADO;
 });
 
+const idSubprocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
+
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
-  await mapaStore.fetchMapaCompleto(idProcesso.value);
+  if (idSubprocesso.value) {
+    await mapaStore.fetchMapaCompleto(idSubprocesso.value as number);
+  }
 });
 
 const mapa = computed<MapaCompleto | null>(() => {
@@ -298,12 +293,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   try {
     // Chamar a store para atualizar a data limite
-    await processosStore.alterarDataLimiteSubprocesso({
-      idProcesso: processoAtual.value?.codigo || 0,
-      unidade: unidadeOriginal.value.sigla,
-      etapa: etapaAtual.value || 1,
-      novaDataLimite: parseDate(novaData) || new Date()
-    });
+    await processosStore.alterarDataLimiteSubprocesso();
 
     // Fechar modal
     fecharModalAlterarDataLimite();

@@ -79,12 +79,12 @@ public class EventoProcessoListener {
                 try {
                     enviarEmailDeProcessoIniciado(processo, subprocesso);
                 } catch (Exception e) {
-                    log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getMessage(), e);
+                    log.error("Erro ao enviar e-mail para o subprocesso {}: {}", subprocesso.getCodigo(), e.getClass().getSimpleName(), e);
                 }
             }
             log.info("Processamento de evento concluído para o processo {}", processo.getCodigo());
         } catch (Exception e) {
-            log.error("Erro ao processar evento de processo iniciado: {}", e.getMessage(), e);
+            log.error("Erro ao processar evento de processo iniciado: {}", e.getClass().getSimpleName(), e);
         }
     }
 
@@ -102,15 +102,15 @@ public class EventoProcessoListener {
 
             Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
             if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {
-                log.warn("Responsável não encontrado para a unidade {} ({})",
-                        unidade.nome(), codigoUnidade);
+                log.warn("Responsável não encontrado para a unidade {}.",
+                        unidade.nome());
                 return;
             }
 
             UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavelOpt.get().titularTitulo()).orElse(null);
             if (titular == null || titular.email() == null || titular.email().isBlank()) {
-                log.warn("E-mail não encontrado para o titular {} da unidade {}",
-                        responsavelOpt.get().titularTitulo(), unidade.nome());
+                log.warn("E-mail não encontrado para o titular da unidade {}.",
+                        unidade.nome());
                 return;
             }
 
@@ -149,15 +149,15 @@ public class EventoProcessoListener {
             }
 
             notificacaoService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-            log.info("E-mail enviado para a unidade {} ({}) - Destinatário: {} ({})",
-                    unidade.sigla(), tipoUnidade, titular.nome(), titular.email());
+            log.info("E-mail enviado para a unidade {} ({})",
+                    unidade.sigla(), tipoUnidade);
 
             if (responsavelOpt.get().substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavelOpt.get().substitutoTitulo(), assunto, corpoHtml, unidade.nome());
             }
 
         } catch (Exception e) {
-            log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getMessage(), e);
+            log.error("Erro ao enviar e-mail para a unidade {}: {}", codigoUnidade, e.getClass().getSimpleName(), e);
         }
     }
 
@@ -167,11 +167,11 @@ public class EventoProcessoListener {
             UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
                 notificacaoService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para o substituto da unidade {} - Destinatário: {} ({})",
-                        nomeUnidade, substituto.nome(), substituto.email());
+                log.info("E-mail enviado para o substituto da unidade {}.",
+                        nomeUnidade);
             }
         } catch (Exception e) {
-            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getMessage());
+            log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getClass().getSimpleName());
         }
     }
 }

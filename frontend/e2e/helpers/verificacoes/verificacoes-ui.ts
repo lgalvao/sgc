@@ -1,6 +1,6 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
-import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/cdu/helpers';
+import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/helpers';
 
 /**
  * VERIFICAÇÕES DE INTERFACE DE USUÁRIO

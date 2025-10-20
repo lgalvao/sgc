@@ -175,7 +175,6 @@ const processosDisponiveis = computed<ProcessoResumo[]>(() => {
 })
 
 onMounted(() => {
-  // Carregar processos quando o componente for montado
   processosStore.fetchProcessosPainel('ADMIN', 0, 0, 1000); // Usar um perfil e unidade genéricos para obter todos os processos
 });
 

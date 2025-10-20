@@ -14,7 +14,7 @@ export function mapAtividadeDtoToModel(dto: any): Atividade {
 
 export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
   return {
-    id: dto.codigo,
+    id: dto.id,
     descricao: dto.descricao,
   };
 }

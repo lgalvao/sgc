@@ -59,6 +59,39 @@ describe('useProcessosStore', () => {
     describe('actions', () => {
         const error = new Error('Service failed');
 
+        beforeEach(() => {
+            processoService.obterDetalhesProcesso.mockResolvedValue({
+                codigo: 1,
+                descricao: 'Teste',
+                tipo: TipoProcesso.MAPEAMENTO,
+                situacao: SituacaoProcesso.EM_ANDAMENTO,
+                dataLimite: '2025-12-31',
+                dataCriacao: '2025-01-01',
+                unidades: [
+                    {
+                        sigla: 'A',
+                        situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        nome: 'Unidade A',
+                        codUnidade: 1,
+                        dataLimite: '2025-12-31',
+                        filhos: []
+                    },
+                    {
+                        sigla: 'B',
+                        situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        nome: 'Unidade B',
+                        codUnidade: 2,
+                        dataLimite: '2025-12-31',
+                        filhos: []
+                    },
+                ],
+                resumoSubprocessos: [],
+                podeFinalizar: false,
+                podeHomologarCadastro: false,
+                podeHomologarMapa: false,
+            });
+        });
+
         it('fetchProcessosPainel should call painelService and update state', async () => {
             const mockPage = {
                 content: [{
@@ -269,8 +302,10 @@ describe('useProcessosStore', () => {
             expect(fetchDetalheSpy).not.toHaveBeenCalled();
         });
 
-        it('processarCadastroBloco should update subprocesso statuses', () => {
-            processosStore.processoDetalhe = {
+        it('processarCadastroBloco should update subprocesso statuses', async () => { // Adicionado async
+            processoService.processarAcaoEmBloco.mockResolvedValue(undefined);
+            // Mockar o retorno de obterDetalhesProcesso para simular a atualização
+            processoService.obterDetalhesProcesso.mockResolvedValue({
                 codigo: 1,
                 descricao: 'Teste',
                 tipo: TipoProcesso.MAPEAMENTO,
@@ -280,7 +315,7 @@ describe('useProcessosStore', () => {
                 unidades: [
                     {
                         sigla: 'A',
-                        situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
+                        situacaoSubprocesso: SituacaoSubprocesso.MAPA_VALIDADO, // Estado esperado após a ação
                         nome: 'Unidade A',
                         codUnidade: 1,
                         dataLimite: '2025-12-31',
@@ -299,9 +334,12 @@ describe('useProcessosStore', () => {
                 podeFinalizar: false,
                 podeHomologarCadastro: false,
                 podeHomologarMapa: false,
-            };
+            });
 
-            processosStore.processarCadastroBloco({
+            // Chamar fetchProcessoDetalhe para inicializar o processoDetalhe na store
+            await processosStore.fetchProcessoDetalhe(1);
+
+            await processosStore.processarCadastroBloco({
                 idProcesso: 1,
                 unidades: ['A'],
                 tipoAcao: 'aceitar',

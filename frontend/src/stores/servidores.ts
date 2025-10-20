@@ -18,7 +18,6 @@ export const useServidoresStore = defineStore('servidores', {
             this.isLoading = true;
             this.error = null;
             try {
-                // TODO: Substituir pela chamada real da API
                 const response = await ServidoresService.buscarTodosServidores();
                 this.servidores = (response as any).data.map(s => ({
                     ...s,

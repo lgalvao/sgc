@@ -113,6 +113,9 @@ describe('BarraNavegacao.vue', () => {
         unidade: {} as Unidade,
         email: 'a@a.com',
         ramal: '123',
+        usuarioTitulo: 'Fulano',
+        unidadeCodigo: 1,
+        tipo: 'Tipo',
       },
       filhas: [],
     }));
@@ -247,7 +250,7 @@ describe('BarraNavegacao.vue', () => {
       expect(breadcrumbItems.length).toBe(3);
       expect(breadcrumbItems[0].find('[data-testid="breadcrumb-home-icon"]').exists()).toBe(true);
       expect(breadcrumbItems[1].text()).toBe('XYZ');
-      const routerLink = wrapper.findComponent(RouterLinkStub);
+      const routerLink = breadcrumbItems[1].findComponent(RouterLinkStub);
       expect(routerLink.props().to).toEqual({ name: 'Unidade', params: { siglaUnidade: 'XYZ' } });
       expect(breadcrumbItems[2].text()).toBe('Atribuição');
       expect(breadcrumbItems[2].find('a').exists()).toBe(false); // Last crumb is not a link
@@ -290,23 +293,13 @@ describe('BarraNavegacao.vue', () => {
     });
 
     it('deve evitar duplicação de breadcrumbs quando currentPageLabel é igual ao último crumb', async () => {
-      // Criar uma rota onde o breadcrumb da meta seria igual ao último crumb
-      const duplicateRoute = {
-        path: '/processo/123',
-        name: 'Processo',
-        component: { template: '<div>Processo</div>' },
-        meta: { breadcrumb: 'Processo' }, // Isso seria duplicado com o crumb de processo
-      };
-
-      router.addRoute('Processo', duplicateRoute);
-      await router.push('/processo/123');
+      // Simular uma rota onde o breadcrumb da meta seria igual ao último crumb
+      await router.push('/processo/123'); // Rota que já adiciona 'Processo' como crumb
       const wrapper = await mountComponent();
 
       // Verificar que não há duplicação
       const breadcrumbItems = wrapper.findAll('[data-testid="breadcrumb-item"]');
       expect(breadcrumbItems.length).toBe(2); // Home + Processo (não duplicado)
-
-      router.removeRoute('Processo');
     });
   });
 });

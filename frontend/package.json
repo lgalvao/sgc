@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "test:unit": "vitest",
+    "test:unit": "vitest --run",
     "test:e2e": "playwright test",
     "coverage": "npm run coverage:unit && npm run coverage:e2e",
     "coverage:unit": "vitest run --coverage",

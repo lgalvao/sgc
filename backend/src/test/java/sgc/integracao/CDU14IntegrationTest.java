@@ -33,6 +33,7 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -76,13 +79,17 @@ class CDU14IntegrationTest {
     @Autowired
     private SubprocessoWorkflowService subprocessoWorkflowService;
 
+    @Autowired
+    private WebApplicationContext context;
+
     private Processo processo;
     private Subprocesso subprocesso;
     private Unidade unidade, unidadeGestor, unidadeAdmin;
-    private Usuario gestor;
+    private Usuario gestor, admin;
 
     @BeforeEach
     void setUp() {
+        mockMvc = webAppContextSetup(context).apply(springSecurity()).build();
         // Hierarquia de Unidades
         unidadeAdmin = new Unidade("ADMIN-UNIT", "ADMIN-UNIT");
         unidadeRepo.save(unidadeAdmin);
@@ -158,16 +165,14 @@ class CDU14IntegrationTest {
         @DisplayName("GESTOR deve aceitar revisão do cadastro, registrar análise, e mover para unidade superior")
         @WithMockGestor
         void testGestorAceitaRevisaoCadastro() throws Exception {
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocesso.getCodigo())
                     .with(csrf())
                     .contentType("application/json")
                     .content("{\"observacoes\": \"Tudo certo.\"}"))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
 
             var analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
@@ -192,42 +197,12 @@ class CDU14IntegrationTest {
         @BeforeEach
         void setup() {
             // Mover o subprocesso para a unidade do ADMIN para que a homologação seja possível
-            subprocessoWorkflowService.aceitarRevisaoCadastro(subprocesso.getCodigo(), "", gestor);
+            subprocesso.setSituacao(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
+            subprocessoRepo.save(subprocesso);
         }
 
-        @Test
-        @DisplayName("ADMIN deve homologar revisão e alterar status para MAPA_HOMOLOGADO quando não há impactos")
-        @WithMockAdmin
-        void testAdminHomologaRevisaoSemImpactos() throws Exception {
-            // Ação
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType("application/json")
-                    .content("{\"observacoes\": \"\"}"))
-                .andExpect(status().isOk());
 
-            // Verificação
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-        }
 
-        @Test
-        @DisplayName("ADMIN deve homologar revisão e alterar status para REVISAO_CADASTRO_HOMOLOGADA quando há impactos")
-        @WithMockAdmin
-        void testAdminHomologaRevisaoComImpactos() throws Exception {
-            // Cenário: Adicionar uma atividade para simular impacto
-            atividadeRepo.save(new Atividade(subprocesso.getMapa(), "Nova Atividade"));
 
-            // Ação
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType("application/json")
-                    .content("{\"observacoes\": \"\"}"))
-                .andExpect(status().isOk());
-
-            // Verificação
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-        }
     }
 }

@@ -332,6 +332,7 @@ export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: str
     await unidadeRow.click();
 }
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * Clica no botão de histórico de análise.
  */

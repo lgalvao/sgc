@@ -8,7 +8,7 @@ import {
     navegarParaProcessoNaTabela,
     TEXTOS,
     URLS
-} from "~/cdu/helpers";
+} from "~/helpers";
 
 test.describe('Captura de Telas - Processos', () => {
     const nomeProcesso = 'Processo para Screenshots';

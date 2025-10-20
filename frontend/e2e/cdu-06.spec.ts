@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     aguardarProcessoNoPainel,
     clicarUnidadeNaTabelaDetalhes,

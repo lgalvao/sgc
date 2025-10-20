@@ -18,7 +18,7 @@ export const useMapasStore = defineStore('mapas', {
             const notificacoes = useNotificacoesStore()
             try {
                 this.mapaCompleto = await SubprocessoService.obterMapaCompleto(idSubprocesso);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao buscar mapa', 'Não foi possível carregar o mapa de competências.');
                 this.mapaCompleto = null;
             }
@@ -29,7 +29,7 @@ export const useMapasStore = defineStore('mapas', {
             try {
                 this.mapaCompleto = await SubprocessoService.salvarMapaCompleto(idSubprocesso, request);
                 notificacoes.sucesso('Mapa salvo', 'O mapa de competências foi salvo com sucesso.');
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao salvar', 'Não foi possível salvar o mapa de competências.');
             }
         },
@@ -38,7 +38,7 @@ export const useMapasStore = defineStore('mapas', {
             const notificacoes = useNotificacoesStore()
             try {
                 this.mapaAjuste = await SubprocessoService.obterMapaAjuste(idSubprocesso);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao buscar mapa para ajuste', 'Não foi possível carregar as informações para o ajuste.');
                 this.mapaAjuste = null;
             }
@@ -49,7 +49,7 @@ export const useMapasStore = defineStore('mapas', {
             try {
                 await SubprocessoService.salvarMapaAjuste(idSubprocesso, request);
                 notificacoes.sucesso('Ajustes salvos', 'Os ajustes no mapa foram salvos com sucesso.');
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao salvar ajustes', 'Não foi possível salvar os ajustes.');
             }
         },
@@ -58,7 +58,7 @@ export const useMapasStore = defineStore('mapas', {
             const notificacoes = useNotificacoesStore()
             try {
                 this.impactoMapa = await SubprocessoService.verificarImpactosMapa(idSubprocesso);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao verificar impactos', 'Não foi possível carregar os impactos no mapa.');
                 this.impactoMapa = null;
             }

@@ -35,13 +35,10 @@ type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
-
 const perfil = usePerfilStore()
 
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
-
-const processosFinalizados = ref<ProcessoResumo[]>([]);
 
 onMounted(async () => {
   await processosStore.fetchProcessosFinalizados();
@@ -83,7 +80,7 @@ function ordenarPor(campo: SortCriteria) {
 function abrirProcesso(processo: ProcessoResumo) {
   const perfilUsuario = perfil.perfilSelecionado;
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.codigo.toString()}}); 
+    router.push({name: 'Processo', params: {idProcesso: processo.codigo.toString()}});
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {

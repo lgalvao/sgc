@@ -1,6 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
-import {useMapasStore} from '../mapas';
 import {useUnidadesStore} from '../unidades';
 import {useProcessosStore} from '../processos';
 import {useRevisaoStore} from '../revisao';

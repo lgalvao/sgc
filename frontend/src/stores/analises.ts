@@ -22,7 +22,7 @@ export const useAnalisesStore = defineStore('analises', {
                 const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
                 const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
                 this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro', 'Erro ao buscar histórico de análises de cadastro.');
             }
         },
@@ -34,7 +34,7 @@ export const useAnalisesStore = defineStore('analises', {
                 const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
                 const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
                 this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro', 'Erro ao buscar histórico de análises de validação.');
             }
         },

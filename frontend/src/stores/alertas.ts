@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
-import {Alerta} from '../mappers/alertas';
+import {Alerta} from '@/mappers/alertas';
 import * as painelService from '../services/painelService';
-import {Page} from '../services/painelService';
+import {Page} from '@/services/painelService';
 import * as alertaService from '../services/alertaService';
 import {usePerfilStore} from './perfil';
 

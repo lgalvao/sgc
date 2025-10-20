@@ -29,7 +29,7 @@ public class UsuarioService {
      * @return Sempre `true` para simular sucesso.
      */
     public boolean autenticar(long tituloEleitoral, String senha) {
-        log.info("Simulando autenticação para: {}/{}", tituloEleitoral, senha);
+        log.info("Simulando autenticação para: {}", tituloEleitoral);
         // Em um cenário real, aqui haveria a chamada para o AcessoAD.
         // Para esta simulação, consideramos sempre autenticado com sucesso.
         return true;
@@ -42,7 +42,7 @@ public class UsuarioService {
      * @return Uma lista de `PerfilUnidade` representando as opções de login.
      */
     public List<PerfilUnidade> autorizar(long tituloEleitoral) {
-        log.info("Buscando autorizações (perfis e unidades) para o título: {}", tituloEleitoral);
+        log.info("Buscando autorizações (perfis e unidades) para o usuário.");
         List<PerfilDto> perfisDto = sgrhService.buscarPerfisUsuario(String.valueOf(tituloEleitoral));
 
         return perfisDto.stream()
@@ -64,8 +64,8 @@ public class UsuarioService {
     public void entrar(long tituloEleitoral, PerfilUnidade pu) {
         // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
         // Para esta simulação, apenas registramos a escolha.
-        log.info("Usuário com título {} entrou com sucesso. Perfil: {}, Unidade: {}",
-            tituloEleitoral, pu.getPerfil(), pu.getSiglaUnidade());
+        log.info("Usuário entrou com sucesso. Perfil: {}, Unidade: {}",
+            pu.getPerfil(), pu.getSiglaUnidade());
     }
 
     public void entrar(EntrarRequest request) {

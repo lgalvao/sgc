@@ -88,3 +88,13 @@ export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
 export const salvarMapaAjuste = async (id: number, data: any): Promise<void> => {
     await apiClient.put(`/subprocessos/${id}/mapa-ajuste`, data);
 };
+
+export async function verificarMapaVigente(codigoUnidade: number): Promise<boolean> {
+    try {
+        const response = await apiClient.get(`/unidades/${codigoUnidade}/mapa-vigente`);
+        return response.data.temMapaVigente; // Assumindo que o backend retorna um objeto com a propriedade 'temMapaVigente'
+    } catch (error) {
+        console.error(`Erro ao verificar mapa vigente para a unidade ${codigoUnidade}:`, error);
+        return false; // Em caso de erro, assume que não há mapa vigente
+    }
+}

@@ -93,12 +93,12 @@ describe('Navbar.vue', () => {
 
       mockServidorLogadoRef.value = { codigo: 1, nome: 'Teste Admin' } as Servidor;
       mockPerfilSelecionadoRef.value = Perfil.ADMIN;
-      mockUnidadeSelecionadaRef.value = { sigla: 'ABC' } as Unidade;
+      mockUnidadeSelecionadaRef.value = 'ABC' as any;
     });
 
     it('deve exibir o perfil e unidade selecionados', async () => {
       const wrapper = await mountComponent();
-      expect(wrapper.text()).toContain(`${Perfil.ADMIN} - ABC`);
+      expect(wrapper.find('span.nav-link[style="cursor: pointer;"]').text()).toContain(`${Perfil.ADMIN} - ABC`);
       expect(wrapper.find('select').exists()).toBe(false);
     });
 
@@ -138,7 +138,7 @@ describe('Navbar.vue', () => {
     beforeEach(() => {
       mockServidorLogadoRef.value = { codigo: 1, nome: 'Teste User' } as Servidor;
       mockPerfilSelecionadoRef.value = Perfil.SERVIDOR;
-      mockUnidadeSelecionadaRef.value = { sigla: 'ABC' } as Unidade;
+      mockUnidadeSelecionadaRef.value = 'ABC' as any;
     });
 
     it('deve definir sessionStorage e navegar corretamente ao usar navigateFromNavbar', async () => {

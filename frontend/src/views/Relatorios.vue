@@ -8,13 +8,13 @@
     <div class="row mb-4">
       <div class="col-md-4">
         <label
-          for="filtroTipo"
-          class="form-label"
+            for="filtroTipo"
+            class="form-label"
         >Tipo de Processo</label>
         <select
-          id="filtroTipo"
-          v-model="filtroTipo"
-          class="form-select"
+            id="filtroTipo"
+            v-model="filtroTipo"
+            class="form-select"
         >
           <option value="">
             Todos
@@ -32,26 +32,26 @@
       </div>
       <div class="col-md-4">
         <label
-          for="filtroDataInicio"
-          class="form-label"
+            for="filtroDataInicio"
+            class="form-label"
         >Data Início</label>
         <input
-          id="filtroDataInicio"
-          v-model="filtroDataInicio"
-          type="date"
-          class="form-control"
+            id="filtroDataInicio"
+            v-model="filtroDataInicio"
+            type="date"
+            class="form-control"
         >
       </div>
       <div class="col-md-4">
         <label
-          for="filtroDataFim"
-          class="form-label"
+            for="filtroDataFim"
+            class="form-label"
         >Data Fim</label>
         <input
-          id="filtroDataFim"
-          v-model="filtroDataFim"
-          type="date"
-          class="form-control"
+            id="filtroDataFim"
+            v-model="filtroDataFim"
+            type="date"
+            class="form-control"
         >
       </div>
     </div>
@@ -59,9 +59,9 @@
     <div class="row">
       <div class="col-md-4 mb-4">
         <div
-          class="card h-100"
-          style="cursor: pointer;"
-          @click="abrirModalMapasVigentes"
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalMapasVigentes"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -76,9 +76,9 @@
       </div>
       <div class="col-md-4 mb-4">
         <div
-          class="card h-100"
-          style="cursor: pointer;"
-          @click="abrirModalDiagnosticosGaps"
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalDiagnosticosGaps"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -93,9 +93,9 @@
       </div>
       <div class="col-md-4 mb-4">
         <div
-          class="card h-100"
-          style="cursor: pointer;"
-          @click="abrirModalAndamentoGeral"
+            class="card h-100"
+            style="cursor: pointer;"
+            @click="abrirModalAndamentoGeral"
         >
           <div class="card-body">
             <h5 class="card-title">
@@ -112,11 +112,11 @@
 
     <!-- Modal Mapas Vigentes -->
     <div
-      id="modalMapasVigentes"
-      class="modal fade"
-      :class="{ show: mostrarModalMapasVigentes }"
-      :style="{ display: mostrarModalMapasVigentes ? 'block' : 'none' }"
-      tabindex="-1"
+        id="modalMapasVigentes"
+        class="modal fade"
+        :class="{ show: mostrarModalMapasVigentes }"
+        :style="{ display: mostrarModalMapasVigentes ? 'block' : 'none' }"
+        tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -125,37 +125,37 @@
               Mapas Vigentes
             </h5>
             <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalMapasVigentes = false"
+                type="button"
+                class="btn-close"
+                @click="mostrarModalMapasVigentes = false"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-mapas"
-                @click="exportarMapasVigentes"
+                  class="btn btn-outline-primary btn-sm"
+                  data-testid="export-csv-mapas"
+                  @click="exportarMapasVigentes"
               >
-                <i class="bi bi-download" /> Exportar CSV
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
               <table class="table table-striped">
                 <thead>
-                  <tr>
-                    <th>Unidade</th>
-                    <th>Competências</th>
-                  </tr>
+                <tr>
+                  <th>Unidade</th>
+                  <th>Competências</th>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr
+                <tr
                     v-for="mapa in mapasVigentes"
                     :key="mapa.id"
-                  >
-                    <td>{{ mapa.unidade }}</td>
-                    <td>{{ mapa.competencias?.length || 0 }}</td>
-                  </tr>
+                >
+                  <td>{{ mapa.unidade }}</td>
+                  <td>{{ mapa.competencias?.length || 0 }}</td>
+                </tr>
                 </tbody>
               </table>
             </div>
@@ -166,11 +166,11 @@
 
     <!-- Modal Diagnósticos de Gaps -->
     <div
-      id="modalDiagnosticosGaps"
-      class="modal fade"
-      :class="{ show: mostrarModalDiagnosticosGaps }"
-      :style="{ display: mostrarModalDiagnosticosGaps ? 'block' : 'none' }"
-      tabindex="-1"
+        id="modalDiagnosticosGaps"
+        class="modal fade"
+        :class="{ show: mostrarModalDiagnosticosGaps }"
+        :style="{ display: mostrarModalDiagnosticosGaps ? 'block' : 'none' }"
+        tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -179,57 +179,57 @@
               Diagnósticos de Gaps
             </h5>
             <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalDiagnosticosGaps = false"
+                type="button"
+                class="btn-close"
+                @click="mostrarModalDiagnosticosGaps = false"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-diagnosticos"
-                @click="exportarDiagnosticosGaps"
+                  class="btn btn-outline-primary btn-sm"
+                  data-testid="export-csv-diagnosticos"
+                  @click="exportarDiagnosticosGaps"
               >
-                <i class="bi bi-download" /> Exportar CSV
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
               <table class="table table-striped">
                 <thead>
-                  <tr>
-                    <th>Processo</th>
-                    <th>Unidade</th>
-                    <th>Gaps Identificados</th>
-                    <th>Importância Média</th>
-                    <th>Dominio Médio</th>
-                    <th>Competências Críticas</th>
-                    <th>Status</th>
-                    <th>Data Diagnóstico</th>
-                  </tr>
+                <tr>
+                  <th>Processo</th>
+                  <th>Unidade</th>
+                  <th>Gaps Identificados</th>
+                  <th>Importância Média</th>
+                  <th>Dominio Médio</th>
+                  <th>Competências Críticas</th>
+                  <th>Status</th>
+                  <th>Data Diagnóstico</th>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr
+                <tr
                     v-for="diagnostico in diagnosticosGapsFiltrados"
                     :key="diagnostico.id"
-                  >
-                    <td>{{ diagnostico.processo }}</td>
-                    <td>{{ diagnostico.unidade }}</td>
-                    <td>{{ diagnostico.gaps }}</td>
-                    <td>{{ diagnostico.importanciaMedia }}/5</td>
-                    <td>{{ diagnostico.dominioMedio }}/5</td>
-                    <td>
-                      <small class="text-muted">
-                        {{ diagnostico.competenciasCriticas.join(', ') }}
-                      </small>
-                    </td>
-                    <td>
+                >
+                  <td>{{ diagnostico.processo }}</td>
+                  <td>{{ diagnostico.unidade }}</td>
+                  <td>{{ diagnostico.gaps }}</td>
+                  <td>{{ diagnostico.importanciaMedia }}/5</td>
+                  <td>{{ diagnostico.dominioMedio }}/5</td>
+                  <td>
+                    <small class="text-muted">
+                      {{ diagnostico.competenciasCriticas.join(', ') }}
+                    </small>
+                  </td>
+                  <td>
                       <span :class="getClasseStatus(diagnostico.status)">
                         {{ diagnostico.status }}
                       </span>
-                    </td>
-                    <td>{{ formatarData(diagnostico.data) }}</td>
-                  </tr>
+                  </td>
+                  <td>{{ formatarData(diagnostico.data) }}</td>
+                </tr>
                 </tbody>
               </table>
             </div>
@@ -240,11 +240,11 @@
 
     <!-- Modal Andamento Geral -->
     <div
-      id="modalAndamentoGeral"
-      class="modal fade"
-      :class="{ show: mostrarModalAndamentoGeral }"
-      :style="{ display: mostrarModalAndamentoGeral ? 'block' : 'none' }"
-      tabindex="-1"
+        id="modalAndamentoGeral"
+        class="modal fade"
+        :class="{ show: mostrarModalAndamentoGeral }"
+        :style="{ display: mostrarModalAndamentoGeral ? 'block' : 'none' }"
+        tabindex="-1"
     >
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -253,45 +253,45 @@
               Andamento Geral dos Processos
             </h5>
             <button
-              type="button"
-              class="btn-close"
-              @click="mostrarModalAndamentoGeral = false"
+                type="button"
+                class="btn-close"
+                @click="mostrarModalAndamentoGeral = false"
             />
           </div>
           <div class="modal-body">
             <div class="mb-3">
               <button
-                class="btn btn-outline-primary btn-sm"
-                data-testid="export-csv-andamento"
-                @click="exportarAndamentoGeral"
+                  class="btn btn-outline-primary btn-sm"
+                  data-testid="export-csv-andamento"
+                  @click="exportarAndamentoGeral"
               >
-                <i class="bi bi-download" /> Exportar CSV
+                <i class="bi bi-download"/> Exportar CSV
               </button>
             </div>
             <div class="table-responsive">
               <table class="table table-striped">
                 <thead>
-                  <tr>
-                    <th>Descrição</th>
-                    <th>Tipo</th>
-                    <th>Situação</th>
-                    <th>Data Limite</th>
-                    <th>Unidade</th>
-                    <th>% Concluído</th>
-                  </tr>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Tipo</th>
+                  <th>Situação</th>
+                  <th>Data Limite</th>
+                  <th>Unidade</th>
+                  <th>% Concluído</th>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr
+                <tr
                     v-for="processo in processosFiltrados"
                     :key="processo.codigo"
-                  >
-                    <td>{{ processo.descricao }}</td>
-                    <td>{{ processo.tipo }}</td>
-                    <td>{{ processo.situacao }}</td>
-                    <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
-                    <td>{{ processo.unidadeNome }}</td>
-                    <td>{{ calcularPercentualConcluido(processo) }}%</td>
-                  </tr>
+                >
+                  <td>{{ processo.descricao }}</td>
+                  <td>{{ processo.tipo }}</td>
+                  <td>{{ processo.situacao }}</td>
+                  <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+                  <td>{{ processo.unidadeNome }}</td>
+                  <td>{{ calcularPercentualConcluido }}%</td>
+                </tr>
                 </tbody>
               </table>
             </div>
@@ -306,23 +306,18 @@
 import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
-import {ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {TipoProcesso} from '@/types/tipos';
 import {formatDateBR} from '@/utils'
 
-// Definição de tipo para os dados do CSV
 type CSVData = Record<string, string | number | undefined>;
 
-// Stores
 const processosStore = useProcessosStore()
 const mapasStore = useMapasStore()
 
-
-// Filtros reativos
 const filtroTipo = ref('')
 const filtroDataInicio = ref('')
 const filtroDataFim = ref('')
 
-// Refs para controle dos modais
 const mostrarModalMapasVigentes = ref(false)
 const mostrarModalDiagnosticosGaps = ref(false)
 const mostrarModalAndamentoGeral = ref(false)
@@ -350,9 +345,6 @@ const processosFiltrados = computed(() => {
 
 const mapasVigentes = computed(() => {
   // Filtrar mapas vigentes (aqueles com processos finalizados)
-  const processosFinalizados = processosStore.processosPainel.filter(p => p.situacao === SituacaoProcesso.FINALIZADO)
-  const idsProcessosFinalizados = processosFinalizados.map(p => p.codigo)
-
   if (mapasStore.mapaCompleto && mapasStore.mapaCompleto.competencias && mapasStore.mapaCompleto.competencias.length > 0) {
     return [{
       ...(mapasStore.mapaCompleto as any),
@@ -447,12 +439,11 @@ const getClasseStatus = (status: string) => {
   }
 }
 
-// Metodos
 const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
 
-const calcularPercentualConcluido = (processo: ProcessoResumo) => {
+const calcularPercentualConcluido = () => {
   // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
   // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
   return 0;
@@ -467,7 +458,6 @@ const abrirModalDiagnosticosGaps = () => {
 const abrirModalAndamentoGeral = () => {
   mostrarModalAndamentoGeral.value = true;
 }
-
 
 
 const exportarMapasVigentes = () => {
@@ -503,7 +493,7 @@ const exportarAndamentoGeral = () => {
     Situacao: processo.situacao,
     'Data Limite': formatarData(new Date(processo.dataLimite)),
     'Unidade': processo.unidadeNome,
-    '% Concluido': calcularPercentualConcluido(processo)
+    '% Concluido': calcularPercentualConcluido()
   }))
 
   const csv = gerarCSV(dados)
@@ -515,14 +505,14 @@ const gerarCSV = (dados: CSVData[]) => {
 
   const headers = Object.keys(dados[0])
   const linhas = dados.map(item =>
-    headers.map(header => `"${item[header]}"`).join(',')
+      headers.map(header => `"${item[header]}"`).join(',')
   )
 
   return [headers.join(','), ...linhas].join('\n')
 }
 
 const downloadCSV = (csv: string, nomeArquivo: string) => {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'})
   const link = document.createElement('a')
 
   if (link.download !== undefined) {

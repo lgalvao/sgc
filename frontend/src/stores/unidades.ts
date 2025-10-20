@@ -14,7 +14,6 @@ export const useUnidadesStore = defineStore('unidades', {
             this.isLoading = true;
             this.error = null;
             try {
-                // TODO: Substituir pela chamada real da API
                 const response = await UnidadesService.buscarTodasUnidades();
                 this.unidades = mapUnidadesArray((response as any).data as any) as Unidade[];
             } catch (err: any) {

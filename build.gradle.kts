@@ -1,6 +1,3 @@
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.boot.gradle.tasks.run.BootRun
-
 plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
@@ -18,13 +15,8 @@ allprojects {
 
 subprojects {
     apply(plugin = "java")
-
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_21
-    }
-
-
-    tasks.withType<BootRun> {
     }
 }
 

@@ -1,4 +1,4 @@
-import {vueTest as test} from '../support/vue-specific-setup';
+import {vueTest as test} from './support/vue-specific-setup';
 import {clicarPrimeiroProcesso, esperarElementoVisivel, loginComoChefe, SELETORES, verificarUrl} from './helpers';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {

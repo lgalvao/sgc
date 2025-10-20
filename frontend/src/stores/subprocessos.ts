@@ -43,7 +43,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 } else {
                     notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Informações de perfil ou unidade não disponíveis.');
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Não foi possível carregar as informações.');
             }
         },
@@ -58,7 +58,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
             }
         },
@@ -72,7 +72,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
             }
         },
@@ -86,7 +86,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
             }
         },
@@ -100,7 +100,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
             }
         },
@@ -114,7 +114,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
             }
         },
@@ -128,7 +128,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
             }
         },
@@ -142,7 +142,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
             }
         },
@@ -156,7 +156,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 if (processosStore.processoDetalhe) {
                     await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
                 }
-            } catch (error) {
+            } catch {
                 notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
             }
         },

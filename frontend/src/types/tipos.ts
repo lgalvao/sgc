@@ -34,6 +34,15 @@ export enum Perfil {
 /**
  * Representa uma unidade organizacional.
  */
+export interface UnidadeResponsavel extends Servidor {
+    usuarioTitulo?: string;
+    unidadeCodigo?: number;
+    tipo?: string;
+    idServidor?: number;
+    dataInicio?: string;
+    dataFim?: string | null;
+}
+
 export interface Unidade {
     codigo: number;
     nome: string;
@@ -42,7 +51,7 @@ export interface Unidade {
     filhas?: Unidade[];
     tipo?: string;
     idServidorTitular?: number;
-    responsavel?: Servidor;
+    responsavel?: UnidadeResponsavel;
 }
 
 /**
@@ -52,6 +61,11 @@ export interface Responsavel {
     usuarioTitulo: string;
     unidadeCodigo: number;
     tipo: string;
+    idServidor?: number;
+    dataInicio?: string;
+    dataFim?: string | null;
+    codigo?: number;
+    nome?: string;
 }
 
 /**
@@ -142,8 +156,8 @@ export interface Processo {
     dataLimite: string;
     dataCriacao: string;
     dataFinalizacao?: string;
-    unidades: Unidade[];
-    resumoSubprocessos: Subprocesso[];
+    unidades: UnidadeParticipante[];
+    resumoSubprocessos: ProcessoResumo[];
 }
 
 export interface ProcessoResumo {
@@ -156,6 +170,7 @@ export interface ProcessoResumo {
     unidadeCodigo: number;
     unidadeNome: string;
     dataFinalizacao?: string;
+    dataFinalizacaoFormatada?: string;
 }
 
 export interface Subprocesso {

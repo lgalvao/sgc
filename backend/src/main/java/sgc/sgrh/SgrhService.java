@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SgrhService {
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
-        log.warn("MOCK SGRH: Buscando usuário por título: {}", titulo);
+        log.warn("MOCK SGRH: Buscando usuário por título.");
         return Optional.of(new UsuarioDto(
                 titulo,
                 "Usuário Mock " + titulo,
@@ -70,7 +70,7 @@ public class SgrhService {
      * @return Optional com dados da unidade se encontrada
      */
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
-        log.warn("MOCK SGRH: Buscando unidade por código: {}", codigo);
+        log.warn("MOCK SGRH: Buscando unidade por código.");
         Map<Long, UnidadeDto> unidadesMock = criarUnidadesMock();
         return Optional.ofNullable(unidadesMock.get(codigo));
     }
@@ -92,7 +92,7 @@ public class SgrhService {
      * @return Lista de subunidades
      */
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
-        log.warn("MOCK SGRH: Buscando subunidades de: {}", codigoPai);
+        log.warn("MOCK SGRH: Buscando subunidades.");
         return criarUnidadesMock().values().stream()
                 .filter(u -> codigoPai.equals(u.codigoPai()))
                 .collect(Collectors.toList());
@@ -148,7 +148,7 @@ public class SgrhService {
      * @return Optional com dados do responsável se encontrado
      */
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Buscando responsável da unidade: {}", unidadeCodigo);
+        log.warn("MOCK SGRH: Buscando responsável da unidade.");
 
         return Optional.of(new ResponsavelDto(
                 unidadeCodigo,
@@ -208,7 +208,7 @@ public class SgrhService {
      * @return Lista de códigos de unidades onde é responsável
      */
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
-        log.warn("MOCK SGRH: Buscando unidades onde {} é responsável", titulo);
+        log.warn("MOCK SGRH: Buscando unidades onde o usuário é responsável.");
         // Mock: retorna algumas unidades
         return List.of(1L, 2L, 10L);
     }
@@ -220,7 +220,7 @@ public class SgrhService {
      * @return Lista de perfis com unidades associadas
      */
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        log.warn("MOCK SGRH: Buscando perfis do usuário: {}", titulo);
+        log.warn("MOCK SGRH: Buscando perfis do usuário.");
 
         return List.of(
                 new PerfilDto(titulo, 1L, "SEDOC - Secretaria de Documentação", "ADMIN"),
@@ -237,7 +237,7 @@ public class SgrhService {
      * @return true se usuário tem o perfil na unidade
      */
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
-        log.warn("MOCK SGRH: Verificando se {} tem perfil {} na unidade {}", titulo, perfil, unidadeCodigo);
+        log.warn("MOCK SGRH: Verificando se o usuário tem perfil na unidade.");
 
         // Mock: retorna true para alguns casos
         return "ADMIN".equals(perfil) && unidadeCodigo == 1L;
@@ -251,7 +251,7 @@ public class SgrhService {
      * @return Lista de códigos de unidades
      */
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
-        log.warn("MOCK SGRH: Buscando unidades onde {} tem perfil {}", titulo, perfil);
+        log.warn("MOCK SGRH: Buscando unidades onde o usuário tem perfil.");
 
         return switch (perfil) {
             case "ADMIN" -> List.of(1L);

@@ -1,12 +1,7 @@
-import unidadesMock from '../mocks/unidades.json';
+import apiClient from '../axios-setup';
 
 export const UnidadesService = {
     async buscarTodasUnidades() {
-        // Simula uma chamada de API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({ data: unidadesMock });
-            }, 500);
-        });
+        return await apiClient.get('/unidades');
     }
 };

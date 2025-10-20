@@ -219,14 +219,11 @@ import {computed, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useProcessosStore} from '@/stores/processos'
-import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {useAlertasStore} from '@/stores/alertas'
-import {useMapasStore} from '@/stores/mapas'
 
 import TreeTable from '@/components/TreeTable.vue'
-import {ProcessoDetalhe, SituacaoProcesso, Unidade, UnidadeParticipante} from '../types/tipos'
+import {ProcessoDetalhe, SituacaoProcesso, UnidadeParticipante} from '@/types/tipos'
 
 interface TreeTableItem {
   id: number | string;
@@ -245,13 +242,9 @@ const route = useRoute()
 const router = useRouter()
 const processosStore = useProcessosStore()
 const {processoDetalhe} = storeToRefs(processosStore)
-const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
-const alertasStore = useAlertasStore()
-const mapasStore = useMapasStore()
 
-// Dados reativos para o CDU-14
 const mostrarBotoesBloco = ref(false)
 const mostrarModalBloco = ref(false)
 const tipoAcaoBloco = ref<'aceitar' | 'homologar'>('aceitar')
@@ -261,9 +254,8 @@ const unidadesSelecionadasBloco = ref<Array<{
   situacao: string,
   selecionada: boolean
 }>>([])
-const mostrarAlertaSucesso = ref(false)
 
-// Dados reativos para modal de finalização CDU-21
+const mostrarAlertaSucesso = ref(false)
 const mostrarModalFinalizacao = ref(false)
 
 const idProcesso = computed(() =>
@@ -282,35 +274,20 @@ const unidadesParticipantes = computed<UnidadeParticipante[]>(() => {
   return processo.value?.unidades || [];
 })
 
-// Computed para identificar subprocessos elegíveis
 const subprocessosElegiveis = computed(() => {
   if (!idProcesso.value || !processo.value) return []
 
-  // TODO: Implementar lógica de filtro com base em UnidadeParticipante
+  if (perfilStore.perfilSelecionado === 'GESTOR') {
+    return processosStore.getSubprocessosElegiveisAceiteBloco(idProcesso.value, perfilStore.unidadeSelecionada || '');
+  } else if (perfilStore.perfilSelecionado === 'ADMIN') {
+    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value);
+  }
   return [];
 })
 
-function filtrarHierarquiaPorParticipantes(unidades: UnidadeParticipante[], participantes: UnidadeParticipante[]): UnidadeParticipante[] {
-  return unidades
-      .map((unidade): UnidadeParticipante | null => {
-        let filhasFiltradas: UnidadeParticipante[] = []
-        if (unidade.filhos && unidade.filhos.length) {
-          filhasFiltradas = filtrarHierarquiaPorParticipantes(unidade.filhos, participantes)
-        }
-        const isParticipante = participantes.some(p => p.codUnidade === unidade.codUnidade)
-        if (isParticipante || filhasFiltradas.length > 0) {
-          return {
-            ...unidade,
-            filhos: filhasFiltradas
-          }
-        }
-        return null
-      })
-      .filter((u): u is UnidadeParticipante => u !== null)
-}
 
 const participantesHierarquia = computed<UnidadeParticipante[]>(() => {
-  // TODO: Ajustar para usar a hierarquia de unidades do processoDetalhe
+  // A propriedade 'unidades' de processoDetalhe já vem hierarquizada, então unidadesParticipantes.value já contém a hierarquia.
   return unidadesParticipantes.value;
 })
 
@@ -356,7 +333,6 @@ function formatarDadosParaArvore(dados: UnidadeParticipante[], idProcesso: numbe
   })
 }
 
- 
 function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
@@ -372,9 +348,6 @@ function abrirDetalhesUnidade(item: any) {
 
 async function finalizarProcesso() {
   if (!processo.value) return;
-
-  // A validação se o processo pode ser finalizado é responsabilidade do backend.
-  // O frontend apenas tenta a ação e exibe o resultado.
   abrirModalFinalizacao();
 }
 
@@ -385,10 +358,6 @@ async function executarFinalizacao() {
 
   try {
     await processosStore.finalizarProcesso(processoAtual.codigo);
-
-    // TODO: Definir mapas vigentes para as unidades participantes (se necessário, o backend deve cuidar disso)
-    // TODO: Enviar notificações por e-mail (o backend deve cuidar disso)
-    // TODO: Criar alertas para todas as unidades participantes (o backend deve cuidar disso)
 
     notificacoesStore.sucesso(
         'Processo finalizado',
@@ -406,12 +375,6 @@ async function executarFinalizacao() {
   }
 }
 
-// Funções auxiliares para agrupar unidades por superior hierárquica (não mais necessárias aqui, backend deve cuidar)
-// function agruparUnidadesPorSuperior(subprocessos: Subprocesso[]): Map<string, string[]> {
-//   return new Map();
-// }
-
-// Funções para controle do modal (CDU-14)
 function abrirModalAceitarBloco() {
   tipoAcaoBloco.value = 'aceitar'
   prepararUnidadesParaBloco()
@@ -426,11 +389,10 @@ function abrirModalHomologarBloco() {
 
 function prepararUnidadesParaBloco() {
   unidadesSelecionadasBloco.value = subprocessosElegiveis.value.map(pu => {
-    // TODO: Ajustar para a nova estrutura de UnidadeParticipante
     return {
-      sigla: '',
-      nome: '',
-      situacao: '',
+      sigla: pu.unidadeNome,
+      nome: pu.unidadeNome,
+      situacao: pu.situacao || 'Não iniciado',
       selecionada: true // Por padrão, todas selecionadas
     }
   })
@@ -440,7 +402,6 @@ function fecharModalBloco() {
   mostrarModalBloco.value = false
 }
 
-// Funções para modal de finalização CDU-21
 function abrirModalFinalizacao() {
   mostrarModalFinalizacao.value = true
 }
@@ -466,21 +427,16 @@ async function confirmarAcaoBloco() {
       return;
     }
 
-    // TODO: Chamar o serviço de backend para processar ações em bloco
-    // await processosStore.processarCadastroBloco({
-    //   idProcesso: idProcesso.value,
-    //   unidades: unidadesSelecionadas,
-    //   tipoAcao: tipoAcaoBloco.value,
-    //   unidadeUsuario: perfilStore.unidadeSelecionada || ''
-    // })
+    await processosStore.processarCadastroBloco({
+      idProcesso: idProcesso.value,
+      unidades: unidadesSelecionadas,
+      tipoAcao: tipoAcaoBloco.value,
+      unidadeUsuario: perfilStore.unidadeSelecionada || ''
+    })
 
-    // Mostrar mensagem de sucesso
     mostrarAlertaSucesso.value = true
-
-    // Fechar modal
     fecharModalBloco()
 
-    // Recarregar dados
     // Forçar atualização dos dados
     setTimeout(() => {
       mostrarAlertaSucesso.value = false

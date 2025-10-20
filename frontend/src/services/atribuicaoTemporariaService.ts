@@ -1,12 +1,8 @@
-import atribuicoesMock from '../mocks/atribuicoes.json';
+import apiClient from '../axios-setup'; // Importar a instância configurada do axios
 
 export const AtribuicaoTemporariaService = {
     async buscarTodasAtribuicoes() {
-        // Simula uma chamada de API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({ data: atribuicoesMock });
-            }, 500);
-        });
+         // Usar apiClient e o endpoint correto
+        return await apiClient.get('/atribuicoes'); // Retornar a resposta completa do axios
     }
 };

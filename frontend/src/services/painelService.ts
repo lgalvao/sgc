@@ -1,7 +1,7 @@
 import apiClient from '../axios-setup';
-import {mapProcessoResumoDtoToFrontend} from '../mappers/processos';
+import {mapProcessoResumoDtoToFrontend} from '@/mappers/processos';
 import type { ProcessoResumo } from '@/types/tipos';
-import {Alerta, mapAlertaDtoToFrontend} from '../mappers/alertas';
+import {Alerta, mapAlertaDtoToFrontend} from '@/mappers/alertas';
 
 export interface Page<T> {
   content: T[];
