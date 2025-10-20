@@ -161,7 +161,7 @@ const mockUnidades: Unidade[] = [
     }
 ];
 
-vi.mock('@/services/UnidadesService', () => ({
+vi.mock('@/services/unidadesService', () => ({
     UnidadesService: {
         buscarTodasUnidades: vi.fn(() => Promise.resolve({ data: mockUnidades }))
     }
@@ -170,20 +170,25 @@ vi.mock('@/services/UnidadesService', () => ({
 describe('useUnidadesStore', () => {
     let unidadesStore: ReturnType<typeof useUnidadesStore>;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         initPinia();
         unidadesStore = useUnidadesStore();
+        unidadesStore.unidades = mockUnidades;
         vi.clearAllMocks();
-        await unidadesStore.fetchUnidades();
     });
 
     it('should initialize with mock unidades', () => {
         expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         expect(unidadesStore.unidades[0].sigla).toBeDefined();
-        expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
     });
 
     describe('actions', () => {
+        it('should fetch and set unidades', async () => {
+            unidadesStore.unidades = [];
+            await unidadesStore.fetchUnidades();
+            expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
+            expect(unidadesStore.unidades.length).toBeGreaterThan(0);
+        });
         it('pesquisarUnidade should find SEDOC unit by sigla', () => {
             const unidade = unidadesStore.pesquisarUnidade('SEDOC');
             expect(unidade).toBeDefined();

@@ -23,7 +23,7 @@ const mockServidores: Servidor[] = [
     }
 ];
 
-vi.mock('@/services/ServidoresService', () => ({
+vi.mock('@/services/servidoresService', () => ({
     ServidoresService: {
         buscarTodosServidores: vi.fn(() => Promise.resolve({ data: mockServidores }))
     }
@@ -32,17 +32,31 @@ vi.mock('@/services/ServidoresService', () => ({
 describe('useServidoresStore', () => {
     let servidoresStore: ReturnType<typeof useServidoresStore>;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         initPinia();
         servidoresStore = useServidoresStore();
+        servidoresStore.servidores = mockServidores;
         vi.clearAllMocks();
-        await servidoresStore.fetchServidores();
     });
 
     it('should initialize with mock servidores', () => {
         expect(servidoresStore.servidores.length).toBe(2);
         expect(servidoresStore.servidores[0].codigo).toBe(1);
-        expect(ServidoresService.buscarTodosServidores).toHaveBeenCalledTimes(1);
+    });
+
+    describe('actions', () => {
+        it('fetchServidores should fetch and set servidores', async () => {
+            servidoresStore.servidores = [];
+            await servidoresStore.fetchServidores();
+            expect(ServidoresService.buscarTodosServidores).toHaveBeenCalledTimes(1);
+            expect(servidoresStore.servidores.length).toBe(2);
+        });
+
+        it('fetchServidores should handle errors', async () => {
+            (ServidoresService.buscarTodosServidores as any).mockRejectedValue(new Error('Failed'));
+            await servidoresStore.fetchServidores();
+            expect(servidoresStore.error).toContain('Falha ao carregar servidores');
+        });
     });
 
     describe('getters', () => {
