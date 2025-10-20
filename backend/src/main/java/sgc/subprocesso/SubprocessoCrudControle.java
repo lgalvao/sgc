@@ -20,11 +20,24 @@ public class SubprocessoCrudControle {
     private final SubprocessoService subprocessoService;
     private final SubprocessoDtoService subprocessoDtoService;
 
+    /**
+     * Lista todos os subprocessos.
+     *
+     * @return Uma {@link List} de {@link SubprocessoDto}.
+     */
     @GetMapping
     public List<SubprocessoDto> listar() {
         return subprocessoDtoService.listar();
     }
 
+    /**
+     * Obtém os detalhes de um subprocesso específico.
+     *
+     * @param id             O ID do subprocesso.
+     * @param perfil         O perfil do usuário que faz a requisição (opcional).
+     * @param unidadeUsuario O ID da unidade do usuário (opcional).
+     * @return Um {@link SubprocessoDetalheDto} com os detalhes do subprocesso.
+     */
     @GetMapping("/{id}")
     public SubprocessoDetalheDto obterPorId(@PathVariable Long id,
                                               @RequestParam(required = false) String perfil,
@@ -32,6 +45,13 @@ public class SubprocessoCrudControle {
         return subprocessoDtoService.obterDetalhes(id, perfil, unidadeUsuario);
     }
 
+    /**
+     * Cria um novo subprocesso.
+     *
+     * @param subprocessoDto O DTO com os dados do subprocesso a ser criado.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
+     *         subprocesso e o {@link SubprocessoDto} criado no corpo da resposta.
+     */
     @PostMapping
     public ResponseEntity<SubprocessoDto> criar(@Valid @RequestBody SubprocessoDto subprocessoDto) {
         var salvo = subprocessoService.criar(subprocessoDto);
@@ -39,12 +59,25 @@ public class SubprocessoCrudControle {
         return ResponseEntity.created(uri).body(salvo);
     }
 
+    /**
+     * Atualiza um subprocesso existente.
+     *
+     * @param id             O ID do subprocesso a ser atualizado.
+     * @param subprocessoDto O DTO com os novos dados do subprocesso.
+     * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<SubprocessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody SubprocessoDto subprocessoDto) {
         var atualizado = subprocessoService.atualizar(id, subprocessoDto);
         return ResponseEntity.ok(atualizado);
     }
 
+    /**
+     * Exclui um subprocesso.
+     *
+     * @param id O ID do subprocesso a ser excluído.
+     * @return Um {@link ResponseEntity} com status 204 No Content.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         subprocessoService.excluir(id);

@@ -42,11 +42,29 @@ public class NotificacaoService {
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
+    /**
+     * Envia um email de texto simples.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para    O endereço de email do destinatário.
+     * @param assunto O assunto do email.
+     * @param corpo   O corpo do email em texto simples.
+     */
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpo, false));
     }
 
+    /**
+     * Envia um email com conteúdo HTML.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para      O endereço de email do destinatário.
+     * @param assunto   O assunto do email.
+     * @param corpoHtml O corpo do email em formato HTML.
+     */
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpoHtml, true));
@@ -83,6 +101,17 @@ public class NotificacaoService {
         }
     }
 
+    /**
+     * Tenta enviar um email de forma assíncrona, com uma política de retentativas.
+     * <p>
+     * Este método é executado em uma thread separada. Ele tentará enviar o email
+     * até {@code MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre
+     * as tentativas.
+     *
+     * @param emailDto O DTO contendo os detalhes do email a ser enviado.
+     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
+     *         email for enviado com sucesso, ou {@code false} caso contrário.
+     */
     @Async("executorDeTarefasDeEmail")
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         Exception excecaoFinal = null;

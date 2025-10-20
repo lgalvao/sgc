@@ -20,6 +20,16 @@ public class ImpactoCompetenciaService {
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 
+    /**
+     * Analisa as atividades removidas e alteradas para identificar quais competências
+     * do mapa vigente são impactadas.
+     *
+     * @param mapaVigente O mapa original contra o qual a comparação é feita.
+     * @param removidas   A lista de atividades que foram removidas.
+     * @param alteradas   A lista de atividades que foram alteradas.
+     * @return Uma lista de {@link CompetenciaImpactadaDto} detalhando cada competência
+     *         impactada e as razões do impacto.
+     */
     public List<CompetenciaImpactadaDto> identificarCompetenciasImpactadas(
             Mapa mapaVigente,
             List<AtividadeImpactadaDto> removidas,
@@ -80,6 +90,14 @@ public class ImpactoCompetenciaService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * Obtém as descrições de todas as competências associadas a uma atividade
+     * dentro do escopo de um mapa específico.
+     *
+     * @param idAtividade O ID da atividade.
+     * @param mapaVigente O mapa ao qual as competências devem pertencer.
+     * @return Uma lista das descrições das competências associadas.
+     */
     public List<String> obterCompetenciasDaAtividade(Long idAtividade, Mapa mapaVigente) {
         return repositorioCompetenciaAtividade
                 .findByAtividadeCodigo(idAtividade)

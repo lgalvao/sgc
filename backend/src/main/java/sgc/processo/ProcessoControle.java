@@ -27,6 +27,13 @@ public class ProcessoControle {
     private final ProcessoIniciacaoService processoIniciacaoService;
     private final ProcessoFinalizacaoService processoFinalizacaoService;
 
+    /**
+     * Cria um novo processo.
+     *
+     * @param requisicao O DTO com os dados para a criação do processo.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
+     *         processo e o {@link ProcessoDto} criado no corpo da resposta.
+     */
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
         ProcessoDto criado = processoService.criar(requisicao);
@@ -34,6 +41,12 @@ public class ProcessoControle {
         return ResponseEntity.created(uri).body(criado);
     }
 
+    /**
+     * Busca e retorna um processo pelo seu ID.
+     *
+     * @param id O ID do processo a ser buscado.
+     * @return Um {@link ResponseEntity} contendo o {@link ProcessoDto} ou status 404 Not Found.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long id) {
         return processoService.obterPorId(id)
@@ -41,18 +54,36 @@ public class ProcessoControle {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Atualiza um processo existente.
+     *
+     * @param id         O ID do processo a ser atualizado.
+     * @param requisicao O DTO com os novos dados do processo.
+     * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarProcessoReq requisicao) {
         ProcessoDto atualizado = processoService.atualizar(id, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
+    /**
+     * Exclui um processo.
+     *
+     * @param id O ID do processo a ser excluído.
+     * @return Um {@link ResponseEntity} com status 204 No Content.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         processoService.apagar(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Lista todos os processos que estão com a situação 'FINALIZADO'.
+     *
+     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto} finalizados.
+     */
     @GetMapping("/finalizados")
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
     public ResponseEntity<List<ProcessoDto>> listarFinalizados() {
@@ -60,10 +91,11 @@ public class ProcessoControle {
     }
 
     /**
-     * Retorna os detalhes completos de um processo, incluindo unidades snapshot e resumo de subprocessos.
-     * Este endpoint delega para ProcessoService.obterDetalhes e aplica tratamento de autorização.
-     * <p>
-     * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
+     * Retorna os detalhes completos de um processo, incluindo as unidades participantes
+     * e o resumo de seus respectivos subprocessos.
+     *
+     * @param id O ID do processo a ser detalhado.
+     * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
      */
     @GetMapping("/{id}/detalhes")
     public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id) {
@@ -72,8 +104,16 @@ public class ProcessoControle {
     }
 
     /**
-     * Inicia um processo. O parâmetro `tipo` indica fluxo esperado (MAPEAMENTO, REVISAO, DIAGNOSTICO).
-     * O corpo opcional pode conter uma lista de unidades (IDs) que participam do início.
+     * Inicia um processo, disparando a criação dos subprocessos e notificações.
+     * <p>
+     * Corresponde ao CDU-03. O comportamento varia com base no tipo de processo:
+     * 'MAPEAMENTO' ou 'REVISAO'.
+     *
+     * @param id       O ID do processo a ser iniciado.
+     * @param tipo     O tipo de processo ('MAPEAMENTO' ou 'REVISAO').
+     * @param unidades Uma lista opcional de IDs de unidades para restringir o início
+     *                 do processo a um subconjunto dos participantes.
+     * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{id}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
@@ -92,14 +132,13 @@ public class ProcessoControle {
     }
 
     /**
-     * CDU-21 - Finalizar processo
-     * POST /api/processos/{id}/finalizar
-     * <p> <p>
-     * Finaliza um processo de mapeamento ou revisão, tornando os mapas vigentes
-     * e notificando todas as unidades participantes.
+     * Finaliza um processo, tornando os mapas de seus subprocessos homologados
+     * como os novos mapas vigentes para as respectivas unidades.
+     * <p>
+     * Corresponde ao CDU-21.
      *
-     * @param id ID do processo a ser finalizado
-     * @return ProcessoDto com dados do processo finalizado
+     * @param id O ID do processo a ser finalizado.
+     * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/{id}/finalizar")
     @Operation(summary = "Finaliza um processo (CDU-21)")

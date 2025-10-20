@@ -34,13 +34,17 @@ public class CopiaMapaService {
     private final CompetenciaRepo competenciaRepo;
 
     /**
-     * Copia o mapa identificado por sourceMapaId para a unidade targetUnidadeId.
-     * Retorna o Mapa recém-criado (com novo id).
+     * Realiza uma cópia profunda de um mapa para uma nova unidade.
+     * <p>
+     * Este método cria uma nova instância de {@link Mapa} para a unidade de destino
+     * e, em seguida, clona todas as suas {@link Competencia}s, {@link Atividade}s e
+     * {@link Conhecimento}s associados, garantindo que as novas entidades estejam
+     * corretamente vinculadas ao novo mapa.
      *
-     * @param idMapaFonte    id do mapa vigente a ser copiado
-     * @param idUnidadeDestino id da unidade que receberá o mapa copiado
-     * @return novo Mapa salvo
-     * @throws IllegalArgumentException se o mapa fonte ou unidade alvo não existirem
+     * @param idMapaFonte      O ID do mapa a ser copiado.
+     * @param idUnidadeDestino O ID da unidade para a qual o mapa será copiado.
+     * @return O novo {@link Mapa} criado e persistido.
+     * @throws IllegalArgumentException se o mapa de origem ou a unidade de destino não forem encontrados.
      */
     @Transactional
     public Mapa copiarMapaParaUnidade(Long idMapaFonte, Long idUnidadeDestino) {

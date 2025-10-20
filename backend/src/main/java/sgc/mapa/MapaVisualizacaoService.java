@@ -32,10 +32,15 @@ public class MapaVisualizacaoService {
     private final sgc.conhecimento.modelo.ConhecimentoRepo repositorioConhecimento;
 
     /**
-     * Obtém um mapa completo formatado para visualização, conforme CDU-18.
+     * Monta uma estrutura de dados aninhada de um mapa para fins de visualização.
+     * <p>
+     * Este método, correspondente ao CDU-18, busca um subprocesso e seu mapa
+     * associado, e então constrói um DTO que representa a hierarquia completa:
+     * Mapa -> Competências -> Atividades -> Conhecimentos.
      *
-     * @param subprocessoId O ID do subprocesso.
-     * @return Um DTO com os dados do mapa prontos para exibição.
+     * @param subprocessoId O ID do subprocesso a partir do qual o mapa será obtido.
+     * @return Um {@link MapaVisualizacaoDto} com a estrutura completa do mapa.
+     * @throws ErroDominioNaoEncontrado se o subprocesso ou o mapa associado não forem encontrados.
      */
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long subprocessoId) {
         log.debug("Obtendo mapa para visualização do subprocesso: id={}", subprocessoId);

@@ -36,6 +36,15 @@ public class MapaService {
     private final MapaVinculoService mapaVinculoService;
     private final MapaIntegridadeService mapaIntegridadeService;
 
+    /**
+     * Obtém uma visão completa de um mapa, incluindo suas competências e as
+     * atividades vinculadas a cada uma.
+     *
+     * @param idMapa        O ID do mapa a ser buscado.
+     * @param idSubprocesso O ID do subprocesso associado (usado para compor o DTO de retorno).
+     * @return Um {@link MapaCompletoDto} com todos os detalhes do mapa.
+     * @throws ErroDominioNaoEncontrado se o mapa não for encontrado.
+     */
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long idMapa, Long idSubprocesso) {
         log.debug("Obtendo mapa completo: id={}, idSubprocesso={}", idMapa, idSubprocesso);
@@ -65,6 +74,26 @@ public class MapaService {
         );
     }
 
+    /**
+     * Salva o estado completo de um mapa.
+     * <p>
+     * Este método realiza uma operação de "upsert" para as competências e seus
+     * vínculos com atividades. Ele compara o estado recebido com o estado atual
+     * no banco de dados para:
+     * <ul>
+     *     <li>Criar novas competências.</li>
+     *     <li>Atualizar competências existentes.</li>
+     *     <li>Remover competências que não estão na requisição.</li>
+     *     <li>Atualizar os vínculos entre competências e atividades.</li>
+     * </ul>
+     * Ao final, executa uma validação de integridade.
+     *
+     * @param idMapa                 O ID do mapa a ser salvo.
+     * @param request                O DTO com o estado completo do mapa.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que está realizando a operação.
+     * @return Um {@link MapaCompletoDto} representando o estado final do mapa salvo.
+     * @throws ErroDominioNaoEncontrado se o mapa ou uma competência a ser atualizada não forem encontrados.
+     */
     public MapaCompletoDto salvarMapaCompleto(Long idMapa, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: id={}, usuario={}", idMapa, usuarioTituloEleitoral);
 

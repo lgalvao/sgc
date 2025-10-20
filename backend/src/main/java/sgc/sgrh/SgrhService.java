@@ -21,6 +21,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
+    /**
+     * Busca um usuário pelo seu título de eleitor.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna sempre um usuário de exemplo com os dados
+     * baseados no título fornecido.
+     *
+     * @param titulo O título de eleitor do usuário.
+     * @return Um {@link Optional} contendo o {@link UsuarioDto} do usuário mockado.
+     */
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
         log.warn("MOCK SGRH: Buscando usuário por título.");
         return Optional.of(new UsuarioDto(
@@ -32,10 +41,13 @@ public class SgrhService {
     }
 
     /**
-     * Busca usuário por email.
+     * Busca um usuário pelo seu endereço de email.
+     * <p>
+     * <b>Implementação Mock:</b> Gera um usuário de exemplo a partir do nome de
+     * usuário extraído do email.
      *
-     * @param email Email do servidor
-     * @return Optional com dados do usuário se encontrado
+     * @param email O email do usuário.
+     * @return Um {@link Optional} contendo o {@link UsuarioDto} mockado.
      */
     public Optional<UsuarioDto> buscarUsuarioPorEmail(String email) {
         String titulo = email.split("@")[0];
@@ -48,9 +60,11 @@ public class SgrhService {
     }
 
     /**
-     * Lista todos os usuários ativos.
+     * Retorna uma lista de todos os usuários ativos no sistema.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna uma lista fixa de três usuários de exemplo.
      *
-     * @return Lista de usuários ativos
+     * @return Uma {@link List} de {@link UsuarioDto}.
      */
     public List<UsuarioDto> buscarUsuariosAtivos() {
         log.warn("MOCK SGRH: Listando usuários ativos");
@@ -64,10 +78,13 @@ public class SgrhService {
     }
 
     /**
-     * Busca unidade por código.
+     * Busca uma unidade organizacional pelo seu código.
+     * <p>
+     * <b>Implementação Mock:</b> Busca a unidade em um mapa de unidades de exemplo.
      *
-     * @param codigo Código da unidade
-     * @return Optional com dados da unidade se encontrada
+     * @param codigo O código da unidade.
+     * @return Um {@link Optional} contendo o {@link UnidadeDto} se a unidade for
+     *         encontrada, ou vazio caso contrário.
      */
     public Optional<UnidadeDto> buscarUnidadePorCodigo(Long codigo) {
         log.warn("MOCK SGRH: Buscando unidade por código.");
@@ -76,9 +93,11 @@ public class SgrhService {
     }
 
     /**
-     * Lista todas as unidades ativas.
+     * Retorna uma lista de todas as unidades organizacionais ativas.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna uma lista fixa de unidades de exemplo.
      *
-     * @return Lista de unidades ativas
+     * @return Uma {@link List} de {@link UnidadeDto}.
      */
     public List<UnidadeDto> buscarUnidadesAtivas() {
         log.warn("MOCK SGRH: Listando unidades ativas");
@@ -86,10 +105,13 @@ public class SgrhService {
     }
 
     /**
-     * Busca subunidades de uma unidade pai.
+     * Busca as subunidades diretas de uma unidade pai.
+     * <p>
+     * <b>Implementação Mock:</b> Filtra a lista de unidades de exemplo para
+     * encontrar aquelas cujo {@code codigoPai} corresponde ao ID fornecido.
      *
-     * @param codigoPai Código da unidade pai
-     * @return Lista de subunidades
+     * @param codigoPai O código da unidade pai.
+     * @return Uma {@link List} de {@link UnidadeDto} representando as subunidades diretas.
      */
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
         log.warn("MOCK SGRH: Buscando subunidades.");
@@ -99,10 +121,14 @@ public class SgrhService {
     }
 
     /**
-     * Constrói árvore hierárquica completa de unidades.
-     * Retorna as unidades raiz com suas subunidades aninhadas.
+     * Constrói a árvore hierárquica completa de unidades organizacionais.
+     * <p>
+     * <b>Implementação Mock:</b> Monta uma estrutura aninhada a partir da lista
+     * de unidades de exemplo, identificando as unidades raiz e associando
+     * recursivamente suas subunidades.
      *
-     * @return Lista de unidades raiz com hierarquia completa
+     * @return Uma {@link List} de {@link UnidadeDto} representando as unidades
+     *         raiz, com suas subunidades aninhadas.
      */
     public List<UnidadeDto> construirArvoreHierarquica() {
         log.warn("MOCK SGRH: Construindo árvore hierárquica de unidades");
@@ -142,10 +168,12 @@ public class SgrhService {
     }
 
     /**
-     * Busca responsável (titular e substituto) de uma unidade.
+     * Busca os responsáveis (titular e substituto) por uma unidade específica.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna um DTO com dados de exemplo fixos.
      *
-     * @param unidadeCodigo Código da unidade
-     * @return Optional com dados do responsável se encontrado
+     * @param unidadeCodigo O código da unidade.
+     * @return Um {@link Optional} contendo o {@link ResponsavelDto} mockado.
      */
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {
         log.warn("MOCK SGRH: Buscando responsável da unidade.");
@@ -159,10 +187,13 @@ public class SgrhService {
     }
 
     /**
-     * Busca responsáveis (titular e substituto) de uma lista de unidades.
+     * Busca os responsáveis por uma lista de unidades em uma única chamada.
+     * <p>
+     * <b>Implementação Mock:</b> Gera dados de exemplo para cada código de unidade fornecido.
      *
-     * @param unidadesCodigos Lista de códigos de unidade
-     * @return Mapa de código da unidade para dados do responsável
+     * @param unidadesCodigos A {@link List} de códigos das unidades.
+     * @return Um {@link Map} onde a chave é o código da unidade e o valor é o
+     *         {@link ResponsavelDto} correspondente.
      */
     public Map<Long, ResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         log.warn("MOCK SGRH: Buscando responsáveis de {} unidades em lote", unidadesCodigos.size());
@@ -180,10 +211,13 @@ public class SgrhService {
     }
 
     /**
-     * Busca uma lista de usuários por seus títulos (CPFs).
+     * Busca múltiplos usuários por seus títulos de eleitor em uma única chamada.
+     * <p>
+     * <b>Implementação Mock:</b> Gera um usuário de exemplo para cada título fornecido.
      *
-     * @param titulos Lista de títulos (CPFs)
-     * @return Mapa de título para dados do usuário
+     * @param titulos A {@link List} de títulos de eleitor.
+     * @return Um {@link Map} onde a chave é o título de eleitor e o valor é o
+     *         {@link UsuarioDto} correspondente.
      */
     public Map<String, UsuarioDto> buscarUsuariosPorTitulos(List<String> titulos) {
         log.warn("MOCK SGRH: Buscando {} usuários por título em lote", titulos.size());
@@ -202,10 +236,12 @@ public class SgrhService {
     }
 
     /**
-     * Busca unidades onde o servidor é responsável (titular ou substituto).
+     * Busca os códigos de todas as unidades onde um usuário é responsável (titular ou substituto).
+     * <p>
+     * <b>Implementação Mock:</b> Retorna uma lista fixa de códigos de unidade.
      *
-     * @param titulo CPF/título do servidor
-     * @return Lista de códigos de unidades onde é responsável
+     * @param titulo O título de eleitor do usuário.
+     * @return Uma {@link List} de códigos de unidade.
      */
     public List<Long> buscarUnidadesOndeEhResponsavel(String titulo) {
         log.warn("MOCK SGRH: Buscando unidades onde o usuário é responsável.");
@@ -214,10 +250,12 @@ public class SgrhService {
     }
 
     /**
-     * Busca todos os perfis de um usuário.
+     * Busca todos os perfis de um usuário, incluindo as unidades associadas a cada perfil.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna uma lista fixa de perfis de exemplo.
      *
-     * @param titulo CPF/título do servidor
-     * @return Lista de perfis com unidades associadas
+     * @param titulo O título de eleitor do usuário.
+     * @return Uma {@link List} de {@link PerfilDto}.
      */
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         log.warn("MOCK SGRH: Buscando perfis do usuário.");
@@ -229,12 +267,15 @@ public class SgrhService {
     }
 
     /**
-     * Verifica se usuário tem perfil específico em uma unidade.
+     * Verifica se um usuário possui um perfil específico em uma determinada unidade.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna {@code true} apenas para a combinação
+     * específica de perfil 'ADMIN' e unidade com código 1.
      *
-     * @param titulo        CPF/título do servidor
-     * @param perfil        Nome do perfil (ADMIN, GESTOR, CHEFE, SERVIDOR)
-     * @param unidadeCodigo Código da unidade
-     * @return true se usuário tem o perfil na unidade
+     * @param titulo        O título de eleitor do usuário.
+     * @param perfil        O nome do perfil a ser verificado (e.g., "ADMIN").
+     * @param unidadeCodigo O código da unidade.
+     * @return {@code true} se o usuário tiver o perfil na unidade, {@code false} caso contrário.
      */
     public boolean usuarioTemPerfil(String titulo, String perfil, Long unidadeCodigo) {
         log.warn("MOCK SGRH: Verificando se o usuário tem perfil na unidade.");
@@ -244,11 +285,14 @@ public class SgrhService {
     }
 
     /**
-     * Busca unidades onde usuário tem perfil específico.
+     * Busca os códigos de todas as unidades onde um usuário possui um perfil específico.
+     * <p>
+     * <b>Implementação Mock:</b> Retorna listas fixas de códigos de unidade com
+     * base no perfil solicitado.
      *
-     * @param titulo CPF/título do servidor
-     * @param perfil Nome do perfil
-     * @return Lista de códigos de unidades
+     * @param titulo O título de eleitor do usuário.
+     * @param perfil O nome do perfil.
+     * @return Uma {@link List} de códigos de unidade.
      */
     public List<Long> buscarUnidadesPorPerfil(String titulo, String perfil) {
         log.warn("MOCK SGRH: Buscando unidades onde o usuário tem perfil.");

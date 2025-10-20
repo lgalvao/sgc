@@ -37,6 +37,19 @@ public class SubprocessoWorkflowService {
     private final SubprocessoNotificacaoService subprocessoNotificacaoService;
     private final ImpactoMapaService impactoMapaService;
 
+    /**
+     * Disponibiliza o cadastro de atividades de um subprocesso para análise.
+     * <p>
+     * Altera a situação do subprocesso para {@code CADASTRO_DISPONIBILIZADO},
+     * registra a movimentação e dispara notificações.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param usuario       O usuário (chefe da unidade) que está realizando a ação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroDominioAccessoNegado se o usuário não for o chefe da unidade.
+     * @throws ErroValidacao se existirem atividades sem conhecimentos.
+     * @throws IllegalStateException se o subprocesso não tiver um mapa associado.
+     */
     @Transactional
     public void disponibilizarCadastro(Long idSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -57,6 +70,19 @@ public class SubprocessoWorkflowService {
         publicadorDeEventos.publishEvent(new SubprocessoDisponibilizadoEvento(sp.getCodigo()));
     }
 
+    /**
+     * Disponibiliza a revisão do cadastro de um subprocesso para análise.
+     * <p>
+     * Altera a situação para {@code REVISAO_CADASTRO_DISPONIBILIZADA}, limpa as
+     * análises anteriores e dispara as notificações correspondentes.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param usuario       O usuário (chefe da unidade) que está realizando a ação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroDominioAccessoNegado se o usuário não for o chefe da unidade.
+     * @throws ErroValidacao se existirem atividades sem conhecimentos.
+     * @throws IllegalStateException se o subprocesso não tiver um mapa associado.
+     */
     @Transactional
     public void disponibilizarRevisao(Long idSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -89,6 +115,22 @@ public class SubprocessoWorkflowService {
         }
     }
 
+    /**
+     * Disponibiliza o mapa de competências para a etapa de validação.
+     * <p>
+     * Esta ação, restrita ao ADMIN, valida a integridade das associações do mapa,
+     * limpa dados históricos (sugestões, análises), atualiza a situação do
+     * subprocesso para {@code MAPA_DISPONIBILIZADO} e notifica os envolvidos.
+     *
+     * @param idSubprocesso   O ID do subprocesso.
+     * @param observacoes     Observações a serem registradas no mapa.
+     * @param dataLimiteEtapa2 A nova data limite para a próxima etapa.
+     * @param usuario         O usuário (administrador) que está realizando a ação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se o subprocesso não estiver em um estado válido
+     *                               para esta ação, ou se não tiver um mapa associado.
+     * @throws ErroValidacao se o mapa apresentar inconsistências de associação.
+     */
     @Transactional
     public void disponibilizarMapa(Long idSubprocesso, String observacoes, LocalDateTime dataLimiteEtapa2, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -127,6 +169,18 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarDisponibilizacaoMapa(sp);
     }
 
+    /**
+     * Registra as sugestões de melhoria para um mapa e avança o workflow.
+     * <p>
+     * Atualiza o mapa com as sugestões, altera a situação do subprocesso para
+     * {@code MAPA_COM_SUGESTOES}, limpa análises anteriores e notifica a
+     * unidade superior.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param sugestoes            O texto com as sugestões.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que apresenta as sugestões.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void apresentarSugestoes(Long idSubprocesso, String sugestoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -143,6 +197,16 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarSugestoes(sp);
     }
 
+    /**
+     * Valida um mapa de competências e avança o workflow.
+     * <p>
+     * Altera a situação do subprocesso para {@code MAPA_VALIDADO}, registra a
+     * movimentação, limpa análises anteriores e notifica a unidade superior.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que valida o mapa.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void validarMapa(Long idSubprocesso, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -157,6 +221,18 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarValidacao(sp);
     }
 
+    /**
+     * Devolve uma validação de mapa para a unidade de origem para ajustes.
+     * <p>
+     * Cria um registro de análise com a devolução, reverte a situação do
+     * subprocesso para {@code MAPA_DISPONIBILIZADO}, registra a movimentação
+     * e notifica a unidade correspondente.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param justificativa A justificativa para a devolução.
+     * @param usuario       O usuário que está realizando a devolução.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void devolverValidacao(Long idSubprocesso, String justificativa, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -187,6 +263,17 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarDevolucao(sp, unidadeDevolucao);
     }
 
+    /**
+     * Aceita a validação de um mapa e o encaminha para a próxima etapa hierárquica,
+     * ou finaliza a homologação se não houver mais níveis.
+     * <p>
+     * Cria um registro de análise de aceite. Se houver uma unidade superior,
+     * move o processo para ela. Caso contrário, considera o mapa homologado.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param usuario       O usuário que está aceitando a validação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void aceitarValidacao(Long idSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -216,6 +303,14 @@ public class SubprocessoWorkflowService {
         }
     }
 
+    /**
+     * Homologa a validação de um mapa.
+     * <p>
+     * Altera a situação do subprocesso diretamente para {@code MAPA_HOMOLOGADO}.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void homologarValidacao(Long idSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -225,6 +320,18 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
     }
 
+    /**
+     * Submete um mapa ajustado para uma nova rodada de validação.
+     * <p>
+     * Valida as associações do mapa, redefine a situação do subprocesso para
+     * {@code MAPA_DISPONIBILIZADO}, atualiza a data limite e dispara as notificações.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param request              O DTO com os dados da submissão.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que está submetendo.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroValidacao se o mapa apresentar inconsistências de associação.
+     */
     @Transactional
     public void submeterMapaAjustado(Long idSubprocesso, SubmeterMapaAjustadoReq request, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -242,6 +349,19 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarDisponibilizacaoMapa(sp);
     }
 
+    /**
+     * Devolve o cadastro de um subprocesso para a unidade de origem para ajustes.
+     * <p>
+     * Cria um registro de análise com a devolução, reverte a situação do subprocesso
+     * para {@code CADASTRO_EM_ANDAMENTO}, registra a movimentação e notifica
+     * a unidade correspondente.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param motivo        O motivo da devolução.
+     * @param observacoes   Observações detalhadas sobre a devolução.
+     * @param usuario       O usuário que está realizando a devolução.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     */
     @Transactional
     public void devolverCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -266,6 +386,19 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarDevolucaoCadastro(sp, unidadeDevolucao, motivo);
     }
 
+    /**
+     * Aceita o cadastro de um subprocesso e o encaminha para a unidade superior.
+     * <p>
+     * Cria um registro de análise de aceite, registra a movimentação para a
+     * unidade superior e atualiza a situação do subprocesso para
+     * {@code CADASTRO_HOMOLOGADO}.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param observacoes          Observações sobre o aceite.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário que está aceitando.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se não for possível identificar a unidade superior.
+     */
     @Transactional
     public void aceitarCadastro(Long idSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -297,6 +430,19 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
     }
 
+    /**
+     * Homologa o cadastro de um subprocesso.
+     * <p>
+     * Válido apenas para subprocessos na situação {@code CADASTRO_DISPONIBILIZADO}.
+     * Altera a situação para {@code CADASTRO_HOMOLOGADO} e registra a movimentação.
+     *
+     * @param idSubprocesso        O ID do subprocesso.
+     * @param observacoes          Observações da homologação.
+     * @param usuarioTituloEleitoral O título de eleitor do usuário (ADMIN) que homologa.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se o subprocesso não estiver na situação correta
+     *                               ou se a unidade 'SEDOC' não for encontrada.
+     */
     @Transactional
     public void homologarCadastro(Long idSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -315,6 +461,19 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
     }
 
+    /**
+     * Devolve a revisão de um cadastro para a unidade de origem para ajustes.
+     * <p>
+     * Ação válida apenas se o subprocesso estiver em {@code REVISAO_CADASTRO_DISPONIBILIZADA}.
+     * Reverte a situação para {@code REVISAO_CADASTRO_EM_ANDAMENTO} e notifica a unidade.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param motivo        O motivo da devolução.
+     * @param observacoes   Observações detalhadas.
+     * @param usuario       O usuário que realiza a devolução.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se o subprocesso não estiver na situação correta.
+     */
     @Transactional
     public void devolverRevisaoCadastro(Long idSubprocesso, String motivo, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -348,6 +507,19 @@ public class SubprocessoWorkflowService {
         subprocessoNotificacaoService.notificarDevolucaoRevisaoCadastro(sp, unidadeAnalise, unidadeDestino);
     }
 
+    /**
+     * Aceita a revisão de um cadastro e a encaminha para a etapa de homologação.
+     * <p>
+     * Válido apenas para subprocessos em {@code REVISAO_CADASTRO_DISPONIBILIZADA}.
+     * Altera a situação para {@code AGUARDANDO_HOMOLOGACAO_CADASTRO} e notifica
+     * a unidade superior.
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param observacoes   Observações sobre o aceite.
+     * @param usuario       O usuário que está aceitando a revisão.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se o subprocesso não estiver na situação correta.
+     */
     @Transactional
     public void aceitarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)
@@ -378,6 +550,22 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
     }
 
+    /**
+     * Homologa a revisão de um cadastro, concluindo a etapa de revisão.
+     * <p>
+     * Válido para subprocessos em {@code AGUARDANDO_HOMOLOGACAO_CADASTRO}.
+     * O método verifica se a revisão resultou em impactos no mapa. Se não houver
+     * impactos, o mapa é diretamente homologado ({@code MAPA_HOMOLOGADO}).
+     * Se houver impactos, o processo avança para a etapa de ajuste
+     * ({@code REVISAO_CADASTRO_HOMOLOGADA}).
+     *
+     * @param idSubprocesso O ID do subprocesso.
+     * @param observacoes   Observações da homologação.
+     * @param usuario       O usuário (ADMIN) que realiza a homologação.
+     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws IllegalStateException se o subprocesso não estiver na situação correta
+     *                               ou se a unidade 'SEDOC' não for encontrada.
+     */
     @Transactional
     public void homologarRevisaoCadastro(Long idSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(idSubprocesso)

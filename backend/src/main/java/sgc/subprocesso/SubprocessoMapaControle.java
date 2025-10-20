@@ -34,23 +34,55 @@ public class SubprocessoMapaControle {
     private final SubprocessoMapaWorkflowService subprocessoMapaWorkflowService;
     private final SubprocessoConsultaService subprocessoConsultaService;
 
+    /**
+     * Analisa e retorna os impactos de uma revisão de mapa de competências.
+     * <p>
+     * Compara o mapa em elaboração no subprocesso com o mapa vigente da unidade
+     * para identificar atividades inseridas, removidas ou alteradas, e as
+     * competências afetadas.
+     *
+     * @param id      O ID do subprocesso em revisão.
+     * @param usuario O usuário autenticado que realiza a verificação.
+     * @return Um {@link ImpactoMapaDto} com o detalhamento dos impactos.
+     */
     @GetMapping("/{id}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
     public ImpactoMapaDto verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         return impactoMapaService.verificarImpactos(id, usuario);
     }
 
+    /**
+     * Obtém a estrutura completa de um mapa associado a um subprocesso.
+     *
+     * @param id O ID do subprocesso.
+     * @return Um {@link MapaCompletoDto} com as competências e atividades do mapa.
+     */
     @GetMapping("/{id}/mapa")
     public MapaCompletoDto obterMapa(@PathVariable Long id) {
         Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(id);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
     }
 
+    /**
+     * Obtém uma representação aninhada e formatada do mapa de um subprocesso,
+     * ideal para telas de visualização.
+     *
+     * @param subprocessoId O ID do subprocesso.
+     * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
+     */
     @GetMapping("/{id}/mapa-visualizacao")
     public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("id") Long subprocessoId) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocessoId);
     }
 
+    /**
+     * Salva as alterações feitas no mapa de um subprocesso.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as alterações do mapa.
+     * @param usuario O usuário autenticado que está salvando o mapa.
+     * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
+     */
     @PutMapping("/{id}/mapa")
     @Transactional
     public MapaCompletoDto salvarMapa(
@@ -61,11 +93,24 @@ public class SubprocessoMapaControle {
         return subprocessoMapaWorkflowService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
     }
 
+    /**
+     * Obtém os dados de um mapa para a tela de ajuste pós-validação.
+     *
+     * @param id O ID do subprocesso.
+     * @return Um {@link MapaAjusteDto} com os dados necessários para o ajuste.
+     */
     @GetMapping("/{id}/mapa-ajuste")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long id) {
         return subprocessoDtoService.obterMapaParaAjuste(id);
     }
 
+    /**
+     * Salva os ajustes realizados em um mapa após a fase de validação.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as competências ajustadas.
+     * @param usuario O usuário autenticado que está salvando os ajustes.
+     */
     @PutMapping("/{id}/mapa-ajuste")
     @Transactional
     public void salvarAjustesMapa(
@@ -81,8 +126,13 @@ public class SubprocessoMapaControle {
     }
 
     /**
-     * CDU-15 - Obter mapa completo com competências e atividades aninhadas.
-     * GET /api/subprocessos/{id}/mapa-completo
+     * Obtém a estrutura completa de um mapa, incluindo competências e as
+     * atividades associadas a cada uma.
+     * <p>
+     * Corresponde ao CDU-15.
+     *
+     * @param id O ID do subprocesso.
+     * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto}.
      */
     @GetMapping("/{id}/mapa-completo")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
@@ -93,8 +143,15 @@ public class SubprocessoMapaControle {
     }
 
     /**
-     * CDU-15 - Salvar mapa completo (criar/editar competências + vínculos).
-     * PUT /api/subprocessos/{id}/mapa-completo
+     * Salva a estrutura completa de um mapa, incluindo a criação/edição de
+     * competências e a atualização de seus vínculos com atividades.
+     * <p>
+     * Corresponde ao CDU-15.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO com a estrutura completa do mapa a ser salvo.
+     * @param usuario O usuário autenticado que realiza a operação.
+     * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
     @PutMapping("/{id}/mapa-completo")
     @Transactional

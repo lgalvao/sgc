@@ -43,10 +43,15 @@ public class EventoProcessoListener {
     private final SubprocessoRepo repoSubprocesso;
 
     /**
-     * Processa o evento de processo iniciado.
-     * Cria alertas diferenciados e envia e-mails para as unidades.
+     * Escuta e processa o evento {@link ProcessoIniciadoEvento}, disparado quando
+     * um novo processo de mapeamento ou revisão é iniciado.
+     * <p>
+     * Este método orquestra a criação de alertas e o envio de emails para todos
+     * os participantes do processo. A lógica diferencia o conteúdo das notificações
+     * com base no tipo de unidade (Operacional, Intermediária, etc.), garantindo
+     * que cada participante receba instruções relevantes para sua função.
      *
-     * @param evento Evento contendo os dados do processo iniciado
+     * @param evento O evento contendo os detalhes do processo que foi iniciado.
      */
     @EventListener
     @Transactional

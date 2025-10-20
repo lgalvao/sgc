@@ -17,6 +17,14 @@ public class SubprocessoNotificacaoService {
     private final AlertaRepo repositorioAlerta;
     private final UnidadeRepo unidadeRepo;
 
+    /**
+     * Envia notificações (email e alerta) sobre a disponibilização de um mapa para validação.
+     * <p>
+     * Corresponde aos itens 10.10, 10.11 e 10.12 do CDU-17. Notifica a própria
+     * unidade, suas unidades superiores hierarquicamente e a SEDOC.
+     *
+     * @param sp O subprocesso cujo mapa foi disponibilizado.
+     */
     public void notificarDisponibilizacaoMapa(Subprocesso sp) {
         Unidade unidade = sp.getUnidade();
         if (unidade == null) return;
@@ -61,6 +69,11 @@ public class SubprocessoNotificacaoService {
         repositorioAlerta.save(alerta);
     }
 
+    /**
+     * Notifica a unidade superior sobre a apresentação de sugestões em um mapa.
+     *
+     * @param sp O subprocesso no qual as sugestões foram feitas.
+     */
     public void notificarSugestoes(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
@@ -80,6 +93,11 @@ public class SubprocessoNotificacaoService {
         }
     }
 
+    /**
+     * Notifica a unidade superior sobre a submissão de uma validação de mapa para análise.
+     *
+     * @param sp O subprocesso cuja validação foi submetida.
+     */
     public void notificarValidacao(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
         if (unidadeSuperior != null) {
@@ -99,6 +117,12 @@ public class SubprocessoNotificacaoService {
         }
     }
 
+    /**
+     * Notifica uma unidade sobre a devolução da validação do seu mapa para ajustes.
+     *
+     * @param sp               O subprocesso relacionado.
+     * @param unidadeDevolucao A unidade que receberá a notificação de devolução.
+     */
     public void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
         notificacaoService.enviarEmail(
                 unidadeDevolucao.getSigla(),
@@ -115,6 +139,12 @@ public class SubprocessoNotificacaoService {
         repositorioAlerta.save(alerta);
     }
 
+    /**
+     * Notifica a unidade superior hierárquica sobre o aceite de uma validação,
+     * submetendo-a para a próxima etapa de análise.
+     *
+     * @param sp O subprocesso cuja validação foi aceita.
+     */
     public void notificarAceite(Subprocesso sp) {
         Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior();
         if (unidadeSuperior != null) {
@@ -134,6 +164,14 @@ public class SubprocessoNotificacaoService {
         }
     }
 
+    /**
+     * Notifica a unidade responsável sobre a devolução do seu cadastro de atividades
+     * para ajustes.
+     *
+     * @param sp               O subprocesso cujo cadastro foi devolvido.
+     * @param unidadeDevolucao A unidade que receberá a notificação.
+     * @param motivo           O motivo da devolução.
+     */
     public void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
         notificacaoService.enviarEmail(
                 unidadeDevolucao.getSigla(),
@@ -150,6 +188,15 @@ public class SubprocessoNotificacaoService {
         repositorioAlerta.save(alerta);
     }
 
+    /**
+     * Notifica a unidade de destino sobre o aceite de um cadastro, submetendo-o
+     * para a próxima fase de análise.
+     * <p>
+     * Corresponde aos itens 10.7 e 10.8 do CDU-13.
+     *
+     * @param sp             O subprocesso cujo cadastro foi aceito.
+     * @param unidadeDestino A unidade que realizará a próxima análise.
+     */
     public void notificarAceiteCadastro(Subprocesso sp, Unidade unidadeDestino) {
         if (unidadeDestino == null || sp.getUnidade() == null) return;
 
@@ -178,6 +225,16 @@ public class SubprocessoNotificacaoService {
         repositorioAlerta.save(alerta);
     }
 
+    /**
+     * Notifica a unidade responsável sobre a devolução da revisão de seu cadastro
+     * para ajustes.
+     * <p>
+     * Corresponde aos itens 10.9 e 10.10 do CDU-14.
+     *
+     * @param sp               O subprocesso cuja revisão foi devolvida.
+     * @param unidadeAnalise   A unidade que realizou a análise e devolução.
+     * @param unidadeDevolucao A unidade que receberá a notificação para ajustar o cadastro.
+     */
     public void notificarDevolucaoRevisaoCadastro(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
         String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
         String descricaoProcesso = sp.getProcesso().getDescricao();
@@ -204,6 +261,15 @@ public class SubprocessoNotificacaoService {
         repositorioAlerta.save(alerta);
     }
 
+    /**
+     * Notifica a unidade de destino sobre o aceite da revisão de um cadastro,
+     * submetendo-o para a próxima fase de análise.
+     * <p>
+     * Corresponde aos itens 11.7 e 11.8 do CDU-14.
+     *
+     * @param sp             O subprocesso cuja revisão de cadastro foi aceita.
+     * @param unidadeDestino A unidade que realizará a próxima análise.
+     */
     public void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
         if (unidadeDestino == null || sp.getUnidade() == null) return;
 

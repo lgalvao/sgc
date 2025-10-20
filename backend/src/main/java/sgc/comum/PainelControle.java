@@ -22,8 +22,15 @@ public class PainelControle {
     private final PainelService painelService;
 
     /**
-     * GET /api/painel/processos?perfil={perfil}&unidade={id}&page=&size=
-     * perfil é obrigatório e determina regras de visibilidade.
+     * Lista os processos a serem exibidos no painel do usuário.
+     * <p>
+     * A visibilidade dos processos é determinada pelo perfil do usuário e,
+     * opcionalmente, pela unidade selecionada.
+     *
+     * @param perfil   O perfil do usuário (e.g., 'ADMIN', 'GESTOR'), que define as regras de acesso.
+     * @param unidade  O ID da unidade para filtrar os processos (opcional).
+     * @param pageable As informações de paginação.
+     * @return Um {@link ResponseEntity} contendo uma página {@link Page} de {@link ProcessoResumoDto}.
      */
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no perfil e unidade")
@@ -37,8 +44,16 @@ public class PainelControle {
     }
 
     /**
-     * GET /api/painel/alertas?usuarioTitulo={titulo}&unidade={id}&page=&size=
-     * Se usuário/unidade não forem informados, retorna todos (uso administrativo/testes).
+     * Lista os alertas a serem exibidos no painel.
+     * <p>
+     * Os alertas podem ser filtrados pelo título de eleitor do usuário ou pelo ID da unidade.
+     * Se nenhum filtro for fornecido, todos os alertas são retornados (comportamento
+     * destinado a administradores ou testes).
+     *
+     * @param usuarioTitulo Título de eleitor do usuário para filtrar os alertas (opcional).
+     * @param unidade       ID da unidade para filtrar os alertas (opcional).
+     * @param pageable      As informações de paginação.
+     * @return Um {@link ResponseEntity} contendo uma página {@link Page} de {@link AlertaDto}.
      */
     @GetMapping("/alertas")
     @Operation(summary = "Lista alertas para o painel com base no usuário e unidade")

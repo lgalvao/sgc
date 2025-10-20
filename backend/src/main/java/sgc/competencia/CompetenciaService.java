@@ -31,6 +31,11 @@ public class CompetenciaService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
+    /**
+     * Retorna uma lista de todas as competências.
+     *
+     * @return Uma {@link List} de {@link CompetenciaDto}.
+     */
     public List<CompetenciaDto> listarCompetencias() {
         return competenciaRepo.findAll()
                 .stream()
@@ -38,12 +43,25 @@ public class CompetenciaService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca uma competência pelo seu ID.
+     *
+     * @param id O ID da competência.
+     * @return O {@link CompetenciaDto} correspondente.
+     * @throws ErroDominioNaoEncontrado se a competência não for encontrada.
+     */
     public CompetenciaDto obterCompetencia(Long id) {
         return competenciaRepo.findById(id)
                 .map(competenciaMapper::toDTO)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada: ", id));
     }
 
+    /**
+     * Cria uma nova competência, sanitizando a descrição para remover HTML.
+     *
+     * @param competenciaDto O DTO com os dados da nova competência.
+     * @return O {@link CompetenciaDto} da competência criada.
+     */
     public CompetenciaDto criarCompetencia(CompetenciaDto competenciaDto) {
         var sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(competenciaDto.getDescricao());
         var sanitizedCompetenciaDto = new CompetenciaDto(
@@ -56,6 +74,14 @@ public class CompetenciaService {
         return competenciaMapper.toDTO(salvo);
     }
 
+    /**
+     * Atualiza uma competência existente, sanitizando a nova descrição.
+     *
+     * @param idCompetencia  O ID da competência a ser atualizada.
+     * @param competenciaDto O DTO com os novos dados.
+     * @return O {@link CompetenciaDto} da competência atualizada.
+     * @throws ErroDominioNaoEncontrado se a competência não for encontrada.
+     */
     public CompetenciaDto atualizarCompetencia(Long idCompetencia, CompetenciaDto competenciaDto) {
         return competenciaRepo.findById(idCompetencia)
                 .map(existing -> {
@@ -74,6 +100,12 @@ public class CompetenciaService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada", idCompetencia));
     }
 
+    /**
+     * Exclui uma competência.
+     *
+     * @param id O ID da competência a ser excluída.
+     * @throws ErroDominioNaoEncontrado se a competência não for encontrada.
+     */
     public void excluirCompetencia(Long id) {
         if (!competenciaRepo.existsById(id)) {
             throw new ErroDominioNaoEncontrado("Competência não encontrada", id);
@@ -81,6 +113,13 @@ public class CompetenciaService {
         competenciaRepo.deleteById(id);
     }
 
+    /**
+     * Lista todos os vínculos de atividades para uma competência específica.
+     *
+     * @param idCompetencia O ID da competência.
+     * @return Uma {@link List} de {@link CompetenciaAtividade}.
+     * @throws ErroDominioNaoEncontrado se a competência não for encontrada.
+     */
     public List<CompetenciaAtividade> listarAtividadesVinculadas(Long idCompetencia) {
         if (!competenciaRepo.existsById(idCompetencia)) {
             throw new ErroDominioNaoEncontrado("Competência não encontrada", idCompetencia);
@@ -91,6 +130,15 @@ public class CompetenciaService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cria um vínculo entre uma competência e uma atividade.
+     *
+     * @param idCompetencia O ID da competência.
+     * @param idAtividade   O ID da atividade.
+     * @return A entidade {@link CompetenciaAtividade} que representa o vínculo.
+     * @throws ErroDominioNaoEncontrado se a competência ou a atividade não forem encontradas.
+     * @throws IllegalStateException se o vínculo já existir.
+     */
     public CompetenciaAtividade vincularAtividade(Long idCompetencia, Long idAtividade) {
         Competencia competencia = competenciaRepo.findById(idCompetencia)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada", idCompetencia));
@@ -111,6 +159,13 @@ public class CompetenciaService {
         return competenciaAtividadeRepo.save(vinculo);
     }
 
+    /**
+     * Remove o vínculo entre uma competência e uma atividade.
+     *
+     * @param idCompetencia O ID da competência.
+     * @param idAtividade   O ID da atividade.
+     * @throws ErroDominioNaoEncontrado se o vínculo não for encontrado.
+     */
     public void desvincularAtividade(Long idCompetencia, Long idAtividade) {
         Id id = new Id(idAtividade, idCompetencia);
         if (!competenciaAtividadeRepo.existsById(id)) {

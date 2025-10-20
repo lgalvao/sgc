@@ -44,6 +44,11 @@ public class MapaControle {
                 .build();
     }
 
+    /**
+     * Retorna uma lista com todos os mapas de competências.
+     *
+     * @return Uma {@link List} de {@link MapaDto}.
+     */
     @GetMapping
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
@@ -53,6 +58,12 @@ public class MapaControle {
                 .toList();
     }
 
+    /**
+     * Busca e retorna um mapa de competências específico pelo seu ID.
+     *
+     * @param id O ID do mapa a ser buscado.
+     * @return Um {@link ResponseEntity} contendo o {@link MapaDto} correspondente.
+     */
     @GetMapping("/{id}")
     @Operation(summary = "Obtém um mapa pelo ID")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
@@ -60,6 +71,15 @@ public class MapaControle {
         return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
+    /**
+     * Cria um novo mapa de competências.
+     * <p>
+     * Os campos de texto do DTO são sanitizados para remover HTML antes da persistência.
+     *
+     * @param mapaDto O DTO com os dados do mapa a ser criado.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa
+     *         e o {@link MapaDto} criado no corpo da resposta.
+     */
     @PostMapping
     @Operation(summary = "Cria um novo mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
@@ -71,6 +91,15 @@ public class MapaControle {
         return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
     }
 
+    /**
+     * Atualiza um mapa de competências existente.
+     * <p>
+     * Os campos de texto do DTO são sanitizados para remover HTML antes da atualização.
+     *
+     * @param id      O ID do mapa a ser atualizado.
+     * @param mapaDto O DTO com os novos dados do mapa.
+     * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
+     */
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
@@ -81,6 +110,12 @@ public class MapaControle {
         return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
     }
 
+    /**
+     * Exclui um mapa de competências.
+     *
+     * @param id O ID do mapa a ser excluído.
+     * @return Um {@link ResponseEntity} com status 204 No Content.
+     */
     @DeleteMapping("/{id}")
     @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {

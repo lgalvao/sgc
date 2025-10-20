@@ -15,6 +15,22 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @Profile("!test")
 public class SecurityConfig {
 
+    /**
+     * Configura a cadeia de filtros de segurança para a aplicação.
+     * <p>
+     * Esta configuração define as seguintes regras:
+     * <ul>
+     *     <li>Permite acesso anônimo aos endpoints de autenticação.</li>
+     *     <li>Exige autenticação para todos os outros endpoints sob '/api/'.</li>
+     *     <li>Permite acesso a qualquer outra requisição (ex: frontend estático).</li>
+     *     <li>Desabilita CSRF, HTTP Basic e formulário de login, adequando-se a uma API RESTful.</li>
+     *     <li>Retorna status 401 Unauthorized para tentativas de acesso não autenticadas a endpoints protegidos.</li>
+     * </ul>
+     *
+     * @param http o construtor {@link HttpSecurity} para configurar a segurança.
+     * @return o {@link SecurityFilterChain} configurado.
+     * @throws Exception se ocorrer um erro durante a configuração.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

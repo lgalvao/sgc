@@ -38,6 +38,12 @@ public class SubprocessoCadastroControle {
     private final AnaliseMapper analiseMapper;
     private final SubprocessoMapaService subprocessoMapaService;
 
+    /**
+     * Obtém o histórico de análises da fase de cadastro de um subprocesso.
+     *
+     * @param id O ID do subprocesso.
+     * @return Uma {@link List} de {@link AnaliseHistoricoDto} com o histórico.
+     */
     @GetMapping("/{id}/historico-cadastro")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long id) {
         return analiseService.listarPorSubprocesso(id, TipoAnalise.CADASTRO)
@@ -46,6 +52,14 @@ public class SubprocessoCadastroControle {
                 .toList();
     }
 
+    /**
+     * Disponibiliza o cadastro de atividades de um subprocesso para a próxima
+     * etapa de análise.
+     *
+     * @param subprocessoId O ID do subprocesso.
+     * @param usuario       O usuário autenticado que está realizando a ação.
+     * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
+     */
     @PostMapping("/{id}/disponibilizar")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
@@ -56,6 +70,17 @@ public class SubprocessoCadastroControle {
         return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }
 
+    /**
+     * Disponibiliza a revisão do cadastro de atividades para a próxima etapa de análise.
+     * <p>
+     * Antes de disponibilizar, o método valida se todas as atividades do subprocesso
+     * possuem pelo menos um conhecimento associado.
+     *
+     * @param id      O ID do subprocesso.
+     * @param usuario O usuário autenticado que está realizando a ação.
+     * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
+     * @throws ErroValidacao se existirem atividades sem conhecimentos.
+     */
     @PostMapping("/{id}/disponibilizar-revisao")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
@@ -71,11 +96,25 @@ public class SubprocessoCadastroControle {
         return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
     }
 
+    /**
+     * Obtém os dados de cadastro de um subprocesso.
+     *
+     * @param id O ID do subprocesso.
+     * @return Um {@link SubprocessoCadastroDto} com os dados do cadastro.
+     */
     @GetMapping("/{id}/cadastro")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long id) {
         return subprocessoDtoService.obterCadastro(id);
     }
 
+    /**
+     * Devolve o cadastro de um subprocesso para o responsável pela unidade para
+     * que sejam feitos ajustes.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo o motivo e as observações da devolução.
+     * @param usuario O usuário autenticado (analista) que está realizando a devolução.
+     */
     @PostMapping("/{id}/devolver-cadastro")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
@@ -93,6 +132,14 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo
+     * de trabalho.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as observações da aceitação.
+     * @param usuario O usuário autenticado (analista) que está aceitando o cadastro.
+     */
     @PostMapping("/{id}/aceitar-cadastro")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
@@ -108,6 +155,13 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Homologa o cadastro de um subprocesso.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as observações da homologação.
+     * @param usuario O usuário autenticado (gestor) que está homologando o cadastro.
+     */
     @PostMapping("/{id}/homologar-cadastro")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
@@ -123,6 +177,14 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Devolve a revisão de um cadastro de subprocesso para o responsável pela unidade
+     * para que sejam feitos ajustes.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo o motivo e as observações da devolução.
+     * @param usuario O usuário autenticado (analista) que está realizando a devolução.
+     */
     @PostMapping("/{id}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     public void devolverRevisaoCadastro(
@@ -140,6 +202,13 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Aceita a revisão do cadastro de um subprocesso.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as observações da aceitação.
+     * @param usuario O usuário autenticado (analista) que está aceitando a revisão.
+     */
     @PostMapping("/{id}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
     public void aceitarRevisaoCadastro(
@@ -155,6 +224,15 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Homologa a revisão do cadastro de um subprocesso.
+     * <p>
+     * Esta ação é restrita a usuários com o perfil 'ADMIN'.
+     *
+     * @param id      O ID do subprocesso.
+     * @param request O DTO contendo as observações da homologação.
+     * @param usuario O usuário autenticado (administrador) que está homologando.
+     */
     @PostMapping("/{id}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
     @PreAuthorize("hasRole('ADMIN')")
@@ -171,6 +249,13 @@ public class SubprocessoCadastroControle {
         );
     }
 
+    /**
+     * Importa atividades de um subprocesso de origem para o subprocesso de destino.
+     *
+     * @param id      O ID do subprocesso de destino.
+     * @param request O DTO contendo o ID do subprocesso de origem.
+     * @return Um {@link Map} com uma mensagem de sucesso.
+     */
     @PostMapping("/{id}/importar-atividades")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")

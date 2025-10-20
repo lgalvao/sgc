@@ -20,6 +20,17 @@ public class MapaIntegridadeService {
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
+    /**
+     * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
+     * <p>
+     * Este método loga avisos (warnings) para:
+     * <ul>
+     *     <li>Atividades que não estão vinculadas a nenhuma competência.</li>
+     *     <li>Competências que não estão vinculadas a nenhuma atividade.</li>
+     * </ul>
+     *
+     * @param idMapa O ID do mapa a ser validado.
+     */
     public void validarIntegridadeMapa(Long idMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(idMapa);
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(idMapa);
