@@ -164,9 +164,9 @@ Para cada Caso de Uso (CDU), a seguinte estrutura será utilizada:
 - **Requisito:** `reqs/cdu-15.md`
 - **Teste E2E:** `frontend/e2e/cdu/cdu-15.spec.ts`
 - **Teste de Integração:** `backend/src/test/java/sgc/integracao/CDU15IntegrationTest.java`
-- **Análise:** O alinhamento é bom, com uma observação sobre a estratégia de implementação. O teste E2E valida corretamente o fluxo de CRUD (criar, editar, excluir) de competências individuais, conforme descrito nos requisitos. O teste de integração do backend, por outro lado, testa uma abordagem de "salvar o mapa inteiro" de uma vez, em vez de operações individuais. Embora as abordagens sejam diferentes, o resultado funcional (manter o mapa) é coberto. Ambos os testes verificam a criação, edição e remoção. O teste de integração também valida a mudança de Situação do subprocesso para 'MAPA_CRIADO' e a validação de segurança para estados inválidos.
+- **Análise:** O alinhamento é **bom**, mas com uma divergência significativa entre o requisito e a implementação. O requisito especifica um fluxo de CRUD (criar, editar, excluir) para competências individuais. No entanto, a implementação do backend, validada pelo teste de integração, utiliza uma abordagem de "salvar o mapa inteiro" de uma vez. Além disso, o teste E2E correspondente a este caso de uso não foi encontrado, indicando uma lacuna na cobertura de ponta a ponta.
 - **Situação:** Concluído
-- **Observações:** A cobertura funcional é boa. A principal observação é a aparente divergência entre a abordagem de salvamento individual (testada no E2E) e a de salvamento em lote (testada no backend).
+- **Observações:** A principal lacuna é a ausência do teste E2E e a divergência na estratégia de salvamento, que não segue o padrão de operações individuais descrito nos requisitos.
 
 ### CDU-16: Ajustar Mapa de Competências
 - **Requisito:** `reqs/cdu-16.md`
