@@ -72,7 +72,7 @@ public class AtividadeControle {
     /**
      * Atualiza os dados de uma atividade existente.
      *
-     * @param id           O ID da atividade a ser atualizada.
+     * @param codAtividade O ID da atividade a ser atualizada.
      * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
      * @return Um {@link ResponseEntity} com status 200 OK e a {@link AtividadeDto} atualizada.
      */
@@ -89,7 +89,7 @@ public class AtividadeControle {
      * Se a atividade não for encontrada, o serviço lançará uma exceção que
      * resultará em uma resposta 404 Not Found.
      *
-     * @param id O ID da atividade a ser excluída.
+     * @param codAtividade O ID da atividade a ser excluída.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codAtividade}/excluir")
@@ -131,8 +131,8 @@ public class AtividadeControle {
     /**
      * Atualiza um conhecimento existente dentro de uma atividade.
      *
-     * @param atividadeId     O ID da atividade pai.
-     * @param conhecimentoId  O ID do conhecimento a ser atualizado.
+     * @param codAtividade    O ID da atividade pai.
+     * @param codConhecimento O ID do conhecimento a ser atualizado.
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ConhecimentoDto} atualizado.
      */
@@ -146,8 +146,8 @@ public class AtividadeControle {
     /**
      * Exclui um conhecimento de uma atividade.
      *
-     * @param atividadeId    O ID da atividade pai.
-     * @param conhecimentoId O ID do conhecimento a ser excluído.
+     * @param codAtividade    O ID da atividade pai.
+     * @param codConhecimento O ID do conhecimento a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")

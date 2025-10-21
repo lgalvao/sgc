@@ -3,7 +3,9 @@ package sgc.sgrh;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.unidade.modelo.UnidadeRepo;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -18,11 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class SgrhServiceTest {
     private static final String TITULO = "123456789012";
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
+
     private SgrhService sgrhService;
 
     @BeforeEach
     void setUp() {
-        sgrhService = new SgrhService();
+        sgrhService = new SgrhService(unidadeRepo);
     }
 
     @Test
