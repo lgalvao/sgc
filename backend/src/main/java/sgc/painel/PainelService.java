@@ -1,4 +1,4 @@
-package sgc.comum;
+package sgc.painel;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

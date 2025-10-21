@@ -3,7 +3,7 @@
 ## Visão Geral
 O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência.
 
-Embora seu propósito principal seja abrigar código de suporte sem lógica de negócio, ele atualmente também contém os componentes do `Painel` (dashboard), que possuem lógica de negócio específica.
+Este pacote abriga exclusivamente código de suporte sem lógica de negócio.
 
 ## Arquitetura e Subpacotes
 O `comum` fornece infraestrutura básica, como o tratamento de erros e modelos de dados compartilhados.
@@ -19,7 +19,6 @@ graph TD
 
     subgraph "Pacote Comum"
         direction LR
-        Painel(PainelControle/Service)
         Erros(erros)
         ModeloBase(modelo)
         BeanUtil
@@ -28,8 +27,6 @@ graph TD
     Services -- Lançam --> Erros
     Controllers -- Capturam exceções via --> Erros
     Models -- Herdam de --> ModeloBase
-
-    Painel -- Agrega dados de --> Services
 ```
 
 ### 1. `erros`
@@ -44,13 +41,7 @@ graph TD
 - **Componentes Notáveis:**
   - `EntidadeBase`: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) padronizado para a maioria das entidades JPA do sistema.
 
-### 3. Componentes de Painel
-- **Responsabilidade:** Fornece endpoints para o dashboard da aplicação, agregando dados de processos e alertas.
-- **Componentes Notáveis:**
-  - `PainelControle`: Expõe a API REST para o painel.
-  - `PainelService`: Contém a lógica de negócio para buscar e agregar os dados.
-
-### 4. Utilitários
+### 3. Utilitários
 - **Responsabilidade:** Fornece classes de utilidade diversas.
 - **Componentes Notáveis:**
   - `BeanUtil`: Permite o acesso a beans gerenciados pelo Spring em contextos não gerenciados.
@@ -58,7 +49,6 @@ graph TD
 ## Propósito e Uso
 - **Exceções (`erros`)**: Lançadas pelos serviços para sinalizar um erro de negócio ou técnico. O `RestExceptionHandler` cuida do resto.
 - **Modelo (`modelo`)**: A `EntidadeBase` é estendida por outras entidades para padronizar a chave primária.
-- **Painel**: Consumido pelo frontend para exibir uma visão geral do estado da aplicação.
 
 **Exemplo de uso de uma exceção:**
 ```java

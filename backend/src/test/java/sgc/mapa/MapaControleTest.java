@@ -41,9 +41,6 @@ public class MapaControleTest {
     private MapaService mapaService;
 
     @Mock
-    private MapaCrudService mapaCrudService;
-
-    @Mock
     private MapaMapper mapaMapper;
 
     @InjectMocks
@@ -78,7 +75,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(mapaCrudService.listar()).thenReturn(List.of(mapa));
+        when(mapaService.listar()).thenReturn(List.of(mapa));
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS))
@@ -92,7 +89,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(mapaCrudService.obterPorId(1L)).thenReturn(mapa);
+        when(mapaService.obterPorId(1L)).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
@@ -102,7 +99,7 @@ public class MapaControleTest {
 
     @Test
     void obterPorId_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        when(mapaCrudService.obterPorId(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
+        when(mapaService.obterPorId(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isNotFound());
@@ -115,7 +112,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
 
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(mapaCrudService.criar(any(Mapa.class))).thenReturn(mapa);
+        when(mapaService.criar(any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS)
@@ -131,7 +128,7 @@ public class MapaControleTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
 
-        when(mapaCrudService.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
+        when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
@@ -146,7 +143,7 @@ public class MapaControleTest {
     void atualizar_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(mapaCrudService.atualizar(eq(1L), any(Mapa.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
+        when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(new Mapa());
 
         mockMvc.perform(put(API_MAPAS_1)
@@ -157,17 +154,17 @@ public class MapaControleTest {
 
     @Test
     void excluir_QuandoMapaExiste_DeveRetornarNoContent() throws Exception {
-        doNothing().when(mapaCrudService).excluir(1L);
+        doNothing().when(mapaService).excluir(1L);
 
         mockMvc.perform(delete(API_MAPAS_1))
                 .andExpect(status().isNoContent());
 
-        verify(mapaCrudService, times(1)).excluir(1L);
+        verify(mapaService, times(1)).excluir(1L);
     }
 
     @Test
     void excluir_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(mapaCrudService).excluir(1L);
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(mapaService).excluir(1L);
 
         mockMvc.perform(delete(API_MAPAS_1))
                 .andExpect(status().isNotFound());
