@@ -1,4 +1,4 @@
-package sgc.comum;
+package sgc.painel;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +49,7 @@ class PainelServiceTest {
     private UnidadeRepo unidadeRepo;
 
     @InjectMocks
-    private PainelService painelService;
+    private sgc.painel.PainelService painelService;
 
     private Processo processo1, processo2, processoCriado;
     private Unidade unidade1;

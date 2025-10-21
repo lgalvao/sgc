@@ -9,6 +9,7 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.notificacao.NotificacaoService;
+import sgc.processo.ProcessoNotificacaoService;
 import sgc.processo.ProcessoService;
 import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoDetalheDto;
@@ -28,6 +29,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -36,31 +42,40 @@ import static org.mockito.Mockito.when;
 /**
  * Testes unitários para ProcessoService.obterDetalhes(...).
  */
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceDetalhesTest {
     private static final String DIRETORIA_X = "Diretoria X";
+    @Mock
     private ProcessoRepo processoRepo;
+    @Mock
+    private UnidadeRepo unidadeRepo;
+    @Mock
     private UnidadeProcessoRepo unidadeProcessoRepo;
+    @Mock
     private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private ApplicationEventPublisher publicadorDeEventos;
+    @Mock
+    private ProcessoMapper processoMapper;
+    @Mock
     private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Mock
+    private CopiaMapaService copiaMapaService;
+    @Mock
+    private ProcessoNotificacaoService processoNotificacaoService;
 
-    @BeforeEach
-    public void setup() {
-        processoRepo = mock(ProcessoRepo.class);
-        unidadeProcessoRepo = mock(UnidadeProcessoRepo.class);
-        subprocessoRepo = mock(SubprocessoRepo.class);
-        ApplicationEventPublisher publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        ProcessoMapper processoMapper = mock(ProcessoMapper.class);
-        processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
-
-        new ProcessoService(
-                processoRepo,
-                mock(UnidadeRepo.class),
-                unidadeProcessoRepo,
-                subprocessoRepo,
-                publicadorDeEventos,
-                processoMapper,
-                processoDetalheMapperCustom);
-    }
+    @InjectMocks
+    private ProcessoService processoService;
 
     @Test
     public void obterDetalhes_deveRetornarDtoCompleto_quandoFluxoNormal() {

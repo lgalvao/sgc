@@ -25,6 +25,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -32,34 +37,39 @@ import static org.mockito.Mockito.*;
 /**
  * Testes unitários para ProcessoService, cobrindo o fluxo de criação e validações.
  */
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessoServiceTest {
+    @Mock
     private ProcessoRepo processoRepo;
+    @Mock
     private UnidadeRepo unidadeRepo;
+    @Mock
+    private UnidadeProcessoRepo unidadeProcessoRepo;
+    @Mock
+    private SubprocessoRepo subprocessoRepo;
+    @Mock
     private ApplicationEventPublisher publicadorDeEventos;
+    @Mock
     private ProcessoMapper processoMapper;
+    @Mock
+    private ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+    @Mock
+    private UnidadeMapaRepo unidadeMapaRepo;
+    @Mock
+    private CopiaMapaService copiaMapaService;
+    @Mock
+    private ProcessoNotificacaoService processoNotificacaoService;
 
+    @InjectMocks
     private ProcessoService processoService;
-
-    @BeforeEach
-    public void setup() {
-        processoRepo = mock(ProcessoRepo.class);
-        unidadeRepo = mock(UnidadeRepo.class);
-        UnidadeProcessoRepo unidadeProcessoRepo = mock(UnidadeProcessoRepo.class);
-        SubprocessoRepo subprocessoRepo = mock(SubprocessoRepo.class);
-        publicadorDeEventos = mock(ApplicationEventPublisher.class);
-        processoMapper = mock(ProcessoMapper.class);
-        ProcessoDetalheMapperCustom processoDetalheMapperCustom = mock(ProcessoDetalheMapperCustom.class);
-
-        processoService = new ProcessoService(
-                processoRepo,
-                unidadeRepo,
-                unidadeProcessoRepo,
-                subprocessoRepo,
-                publicadorDeEventos,
-                processoMapper,
-                processoDetalheMapperCustom
-        );
-    }
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
@@ -73,9 +83,6 @@ public class ProcessoServiceTest {
         u2.setCodigo(2L);
         u2.setNome("Unidade 2");
         u2.setSigla("U2");
-
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
-        when(unidadeRepo.findById(2L)).thenReturn(Optional.of(u2));
 
         when(processoRepo.save(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);

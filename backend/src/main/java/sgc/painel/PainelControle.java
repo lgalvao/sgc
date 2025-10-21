@@ -1,4 +1,4 @@
-package sgc.comum;
+package sgc.painel;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ import sgc.processo.dto.ProcessoResumoDto;
 @RequiredArgsConstructor
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 public class PainelControle {
-    private final PainelService painelService;
+    private final sgc.painel.PainelService painelService;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.

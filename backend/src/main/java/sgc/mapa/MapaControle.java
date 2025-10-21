@@ -27,7 +27,6 @@ public class MapaControle {
             .toFactory();
 
     private final MapaService mapaService;
-    private final MapaCrudService mapaCrudService;
     private final MapaMapper mapaMapper;
 
     private MapaDto sanitizarEMapearMapaDto(MapaDto mapaDto) {
@@ -52,7 +51,7 @@ public class MapaControle {
     @GetMapping
     @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
-        return mapaCrudService.listar()
+        return mapaService.listar()
                 .stream()
                 .map(mapaMapper::toDTO)
                 .toList();
@@ -67,7 +66,7 @@ public class MapaControle {
     @GetMapping("/{id}")
     @Operation(summary = "Obtém um mapa pelo ID")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
-        var mapa = mapaCrudService.obterPorId(id);
+        var mapa = mapaService.obterPorId(id);
         return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
@@ -86,7 +85,7 @@ public class MapaControle {
         var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
         var entidade = mapaMapper.toEntity(sanitizedMapaDto);
-        var salvo = mapaCrudService.criar(entidade);
+        var salvo = mapaService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
     }
@@ -106,7 +105,7 @@ public class MapaControle {
         var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
         var entidade = mapaMapper.toEntity(sanitizedMapaDto);
-        var atualizado = mapaCrudService.atualizar(id, entidade);
+        var atualizado = mapaService.atualizar(id, entidade);
         return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
     }
 
@@ -119,7 +118,7 @@ public class MapaControle {
     @DeleteMapping("/{id}")
     @Operation(summary = "Exclui um mapa")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        mapaCrudService.excluir(id);
+        mapaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 

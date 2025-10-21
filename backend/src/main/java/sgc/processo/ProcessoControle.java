@@ -24,8 +24,6 @@ import java.util.List;
 @Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoControle {
     private final ProcessoService processoService;
-    private final ProcessoIniciacaoService processoIniciacaoService;
-    private final ProcessoFinalizacaoService processoFinalizacaoService;
 
     /**
      * Cria um novo processo.
@@ -123,10 +121,10 @@ public class ProcessoControle {
             @RequestBody(required = false) List<Long> unidades) {
 
         if ("REVISAO".equalsIgnoreCase(tipo)) {
-            processoIniciacaoService.iniciarProcessoRevisao(id, unidades);
+            processoService.iniciarProcessoRevisao(id, unidades);
         } else {
             // por padrão, inicia mapeamento
-            processoIniciacaoService.iniciarProcessoMapeamento(id, unidades);
+            processoService.iniciarProcessoMapeamento(id, unidades);
         }
         return ResponseEntity.ok().build();
     }
@@ -143,7 +141,7 @@ public class ProcessoControle {
     @PostMapping("/{id}/finalizar")
     @Operation(summary = "Finaliza um processo (CDU-21)")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        processoFinalizacaoService.finalizar(id);
+        processoService.finalizar(id);
         return ResponseEntity.ok().build();
     }
 }
