@@ -18,15 +18,29 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Representa um alerta ou notificação dentro do sistema.
+ * <p>
+ * Alertas são gerados em resposta a eventos importantes no sistema,
+ * como o início de um processo, e são direcionados a unidades ou usuários específicos.
+ */
 public class Alerta extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
 
+    /**
+     * Retorna uma cópia defensiva do processo associado.
+     * @return Uma nova instância de {@link Processo} ou {@code null}.
+     */
     public Processo getProcesso() {
         return (this.processo == null) ? null : new Processo(this.processo);
     }
 
+    /**
+     * Define o processo associado a partir de uma cópia do objeto fornecido.
+     * @param processo O processo a ser associado.
+     */
     public void setProcesso(Processo processo) {
         this.processo = (processo == null) ? null : new Processo(processo);
     }

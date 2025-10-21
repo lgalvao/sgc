@@ -10,6 +10,11 @@ import java.util.List;
  * nas atividades durante a revisão do cadastro.
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
+ *
+ * @param codigo             O código da competência.
+ * @param descricao          A descrição da competência.
+ * @param atividadesAfetadas Lista com as descrições das atividades que causaram o impacto.
+ * @param tipoImpacto        O tipo de impacto sofrido pela competência (e.g., nova atividade associada).
  */
 public record CompetenciaImpactadaDto(
     Long codigo,

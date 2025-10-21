@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Tabela de associação que conecta um {@link Alerta} a um {@link Usuario} específico.
+ * <p>
+ * Esta entidade rastreia quais usuários receberam um alerta e quando o leram.
+ * Utiliza uma chave primária composta ({@link Chave}) para identificar a relação.
+ */
 public class AlertaUsuario implements Serializable {
     @Embeddable
     @Getter
@@ -20,6 +26,9 @@ public class AlertaUsuario implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
+    /**
+     * Chave primária composta para a entidade {@link AlertaUsuario}.
+     */
     public static class Chave implements Serializable {
         private Long alertaCodigo;
         private Long usuarioTituloEleitoral;

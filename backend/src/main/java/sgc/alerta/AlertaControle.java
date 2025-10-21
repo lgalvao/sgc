@@ -15,6 +15,9 @@ import java.util.Map;
 @RequestMapping("/api/alertas")
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Endpoints para gerenciamento de alertas")
+/**
+ * Controlador REST para gerenciar alertas.
+ */
 public class AlertaControle {
     private final AlertaService alertaService;
 

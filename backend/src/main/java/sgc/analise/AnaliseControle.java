@@ -16,6 +16,12 @@ import java.util.Map;
 @RequestMapping("/api/subprocessos/{id}")
 @RequiredArgsConstructor
 @Tag(name = "Análises", description = "Endpoints para gerenciar as análises de cadastro e validação de subprocessos")
+/**
+ * Controlador REST para gerenciar as análises de subprocessos.
+ * <p>
+ * Fornece endpoints para criar e listar análises relacionadas às fases de
+ * cadastro e validação de um subprocesso.
+ */
 public class AnaliseControle {
     private final AnaliseService analiseService;
 

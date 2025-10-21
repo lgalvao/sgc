@@ -15,6 +15,12 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Representa um administrador do sistema.
+ * <p>
+ * A entidade Administrador estende as informações de um {@link Usuario},
+ * marcando-o com privilégios de administrador no sistema SGC.
+ */
 public class Administrador implements Serializable {
     @Id
     @Column(name = "usuario_titulo", length = 12)

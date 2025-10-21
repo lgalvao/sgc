@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+/**
+ * Serviço para gerenciar a lógica de negócios de Atividades e Conhecimentos.
+ */
 public class AtividadeService {
 
     private final AtividadeRepo atividadeRepo;

@@ -21,6 +21,9 @@ import java.util.List;
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
 @Tag(name = "Atividades", description = "Endpoints para gerenciamento de atividades e seus conhecimentos associados")
+/**
+ * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
+ */
 public class AtividadeControle {
     private final AtividadeService atividadeService;
 
