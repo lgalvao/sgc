@@ -13,6 +13,13 @@ import org.springframework.stereotype.Component;
  * (como as factories de anotações de segurança) acessem beans de serviço.
  */
 @Component
+/**
+ * Utilitário para acesso estático a beans gerenciados pelo Spring.
+ * <p>
+ * Esta classe implementa {@link ApplicationContextAware} para obter uma referência
+ * ao contexto da aplicação Spring, permitindo que classes não gerenciadas
+ * (como as factories de anotações de segurança) acessem beans de serviço.
+ */
 public class BeanUtil implements ApplicationContextAware {
 
     private static ApplicationContext context;

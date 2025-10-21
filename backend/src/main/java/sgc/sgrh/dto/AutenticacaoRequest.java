@@ -10,6 +10,12 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @AllArgsConstructor
 @Jacksonized
+/**
+ * DTO para a requisição de autenticação de um usuário.
+ *
+ * @param tituloEleitoral O título de eleitor do usuário.
+ * @param senha A senha do usuário.
+ */
 public class AutenticacaoRequest {
     @NotNull(message = "O título eleitoral é obrigatório.")
     Long tituloEleitoral;

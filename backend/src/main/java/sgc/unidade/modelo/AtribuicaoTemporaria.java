@@ -16,6 +16,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Representa a atribuição temporária de um usuário a uma unidade,
+ * por exemplo, para cobrir férias ou licenças.
+ */
 public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_codigo")

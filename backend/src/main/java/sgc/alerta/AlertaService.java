@@ -107,11 +107,12 @@ public class AlertaService {
      * Para cada unidade, o método determina seu tipo (OPERACIONAL, INTERMEDIARIA,
      * INTEROPERACIONAL) consultando o serviço SGRH e gera alertas com descrições
      * adequadas à sua função no processo.
-     * <ul>
-     *     <li><b>OPERACIONAL:</b> Recebe um alerta para iniciar o preenchimento do mapa.</li>
-     *     <li><b>INTERMEDIARIA:</b> Recebe um alerta para aguardar o envio dos mapas das unidades subordinadas.</li>
-     *     <li><b>INTEROPERACIONAL:</b> Recebe ambos os tipos de alertas.</li>
-     * </ul>
+     * <p>
+     * OPERACIONAL: Recebe um alerta para iniciar o preenchimento do mapa.
+     * <p>
+     * INTERMEDIARIA: Recebe um alerta para aguardar o envio dos mapas das unidades subordinadas.
+     * <p>
+     * INTEROPERACIONAL: Recebe ambos os tipos de alertas.
      *
      * @param processo        O processo que foi iniciado.
      * @param codigosUnidades A lista de códigos das unidades participantes.

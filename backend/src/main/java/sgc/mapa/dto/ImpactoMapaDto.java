@@ -7,6 +7,15 @@ import java.util.List;
  * no mapa de competências devido a alterações no cadastro de atividades.
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
+ * @param temImpactos               Indica se há algum impacto.
+ * @param totalAtividadesInseridas  Total de atividades inseridas.
+ * @param totalAtividadesRemovidas  Total de atividades removidas.
+ * @param totalAtividadesAlteradas  Total de atividades alteradas.
+ * @param totalCompetenciasImpactadas Total de competências impactadas.
+ * @param atividadesInseridas       Lista de atividades inseridas.
+ * @param atividadesRemovidas       Lista de atividades removidas.
+ * @param atividadesAlteradas       Lista de atividades alteradas.
+ * @param competenciasImpactadas    Lista de competências impactadas.
  */
 public record ImpactoMapaDto(
     boolean temImpactos,

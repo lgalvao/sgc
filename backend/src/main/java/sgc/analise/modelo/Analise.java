@@ -16,6 +16,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Representa um registro de análise realizado em um subprocesso.
+ * <p>
+ * Esta entidade funciona como um log de auditoria para as diversas etapas de
+ * análise (e.g., análise de cadastro, análise de validação), registrando a ação,
+ * o analista, as observações e o resultado.
+ */
 public class Analise extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")

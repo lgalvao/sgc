@@ -16,6 +16,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Serviço para gerenciar as análises de subprocessos.
+ */
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
     private final SubprocessoRepo subprocessoRepo;

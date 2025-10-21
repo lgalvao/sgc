@@ -4,6 +4,10 @@ import sgc.subprocesso.modelo.Subprocesso;
 
 /**
  * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).
+ *
+ * @param sugestoes O texto das sugestões.
+ * @param sugestoesApresentadas Indica se foram apresentadas sugestões.
+ * @param unidadeNome O nome da unidade que apresentou as sugestões.
  */
 public record SugestoesDto(
     String sugestoes,
