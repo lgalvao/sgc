@@ -183,7 +183,7 @@ export async function verificarEstruturaServidor(page: Page): Promise<void> {
     const navBar = page.getByRole('navigation');
     await expect(navBar.getByRole('link', {name: 'Painel'})).toBeVisible();
     await expect(navBar.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
-    await expect(page.getByText('SERVIDOR - STIC')).toBeVisible();
+    await expect(page.getByText('SERVIDOR - SESEL')).toBeVisible();
     await expect(page.locator('a[title="Configurações do sistema"]')).not.toBeVisible();
     await expect(page.locator('a[title="Sair"]')).toBeVisible();
 }
@@ -192,7 +192,7 @@ export async function verificarEstruturaServidor(page: Page): Promise<void> {
  * Verifica a estrutura da barra de navegação para o perfil ADMIN.
  */
 export async function verificarEstruturaAdmin(page: Page): Promise<void> {
-    await expect(page.getByText('ADMIN - SEDOC')).toBeVisible();
+    await expect(page.getByText('ADMIN - STIC')).toBeVisible();
     await expect(page.locator('a[title="Configurações do sistema"]')).toBeVisible();
 }
 
