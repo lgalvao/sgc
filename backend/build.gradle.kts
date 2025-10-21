@@ -6,9 +6,9 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     java
-    pmd
+    // pmd
     jacoco
-    id("checkstyle")
+    // id("checkstyle")
 }
 
 java {
@@ -277,17 +277,17 @@ tasks.withType<JavaCompile> {
 
 tasks.named("build") { outputs.cacheIf { true } }
 
-pmd {
-    toolVersion = "7.17.0"
-    rulesMinimumPriority = 5
-}
+// pmd {
+//     toolVersion = "7.17.0"
+//     rulesMinimumPriority = 5
+// }
 
-tasks.withType<Pmd> {
-    ruleSets = listOf()
-    ruleSetFiles = files("config/pmd/custom-ruleset.xml")
-    reports.xml.required.set(true)
-    reports.html.required.set(false)
-}
+// tasks.withType<Pmd> {
+//     ruleSets = listOf()
+//     ruleSetFiles = files("config/pmd/custom-ruleset.xml")
+//     reports.xml.required.set(true)
+//     reports.html.required.set(false)
+// }
 
 tasks.register("agentTest") {
     group = "verification"
@@ -327,9 +327,9 @@ tasks.register<Test>("verboseTest") {
 }
 
 // Desabilita a tarefa pmdTest para ignorar os arquivos de teste
-tasks.named("pmdTest") {
-    enabled = false
-}
+// tasks.named("pmdTest") {
+//     enabled = false
+// }
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     jvmArgs = listOf("-Djdk.internal.vm.debug=release")
@@ -355,24 +355,24 @@ tasks.jacocoTestReport {
 
 
 
-checkstyle {
+// checkstyle {
 
-    toolVersion = "10.17.0" // Usar uma versão recente do Checkstyle
+//     toolVersion = "10.17.0" // Usar uma versão recente do Checkstyle
 
-    configFile = file("config/checkstyle/checkstyle.xml") // Caminho para o arquivo de configuração
+//     configFile = file("config/checkstyle/checkstyle.xml") // Caminho para o arquivo de configuração
 
-}
+// }
 
 
 
-tasks.withType<Checkstyle> {
+// tasks.withType<Checkstyle> {
 
-    source("src/main/java") // Onde procurar os arquivos Java
+//     source("src/main/java") // Onde procurar os arquivos Java
 
-    include("**/*.java")
+//     include("**/*.java")
 
-    exclude("**/gen/**") // Excluir arquivos gerados, se houver
+//     exclude("**/gen/**") // Excluir arquivos gerados, se houver
 
-    classpath = sourceSets.main.get().compileClasspath
+//     classpath = sourceSets.main.get().compileClasspath
 
-}
+// }

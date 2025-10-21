@@ -213,13 +213,15 @@ export const DADOS_TESTE = {
         SEDIA: 'SEDIA',
         SEMARE: 'SEMARE',
         SEDOC: 'SEDOC',
+        SGP: 'SGP',
+        SEDESENV: 'SEDESENV',
     },
     PERFIS: {
-        ADMIN: {idServidor: '6', perfil: 'ADMIN', unidade: 'SEDOC', senha: '123456'},
-        GESTOR: {idServidor: '1', perfil: 'GESTOR', unidade: 'SESEL', senha: '123456'},
-        CHEFE: {idServidor: '14', perfil: 'CHEFE', unidade: 'STIC', senha: '123456'},
-        CHEFE_SEDIA: {idServidor: '14', perfil: 'CHEFE', unidade: 'SEDIA', senha: '123456'},
-        SERVIDOR: {idServidor: '15', perfil: 'SERVIDOR', unidade: 'STIC', senha: '123456'},
+        ADMIN: {idServidor: '6', perfil: 'ADMIN', unidade: 'STIC', senha: '123'},
+        GESTOR: {idServidor: '8', perfil: 'GESTOR', unidade: 'SGP', senha: '123'},
+        CHEFE: {idServidor: '2', perfil: 'CHEFE', unidade: 'SGP', senha: '123'},
+        CHEFE_SEDIA: {idServidor: '10', perfil: 'CHEFE', unidade: 'SEDIA', senha: '123'},
+        SERVIDOR: {idServidor: '1', perfil: 'SERVIDOR', unidade: 'SESEL', senha: '123'},
     },
 } as const;
 

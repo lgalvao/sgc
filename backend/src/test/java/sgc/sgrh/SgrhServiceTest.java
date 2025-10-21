@@ -65,11 +65,11 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarUnidadePorCodigo() {
-        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(1L);
+        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(2L);
 
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().codigo());
-        assertEquals("SEDOC - Secretaria de Documentação", result.get().nome());
+        assertEquals(2L, result.get().codigo());
+        assertEquals("Secretaria de Informática e Comunicações", result.get().nome());
     }
 
     @Test
@@ -83,13 +83,13 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarSubunidades() {
-        List<UnidadeDto> result = sgrhService.buscarSubunidades(1L); // SEDOC
+        List<UnidadeDto> result = sgrhService.buscarSubunidades(2L); // STIC
 
         assertNotNull(result);
-        // Should return COP and CGC (the direct children of SEDOC)
-        assertTrue(result.size() >= 2);
+        // Should return SGP, COSIS, COSINF, COJUR (the direct children of STIC)
+        assertTrue(result.size() >= 4);
         for (UnidadeDto unidade : result) {
-            assertEquals(1L, unidade.codigoPai()); // All should have SEDOC as parent
+            assertEquals(2L, unidade.codigoPai()); // All should have STIC as parent
         }
     }
 

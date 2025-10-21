@@ -273,9 +273,9 @@ public class SgrhService {
         log.warn("MOCK SGRH: Buscando perfis do usuário.");
 
         return List.of(
-                new PerfilDto(titulo, 1L, "SEDOC - Secretaria de Documentação", "ADMIN"),
-                new PerfilDto(titulo, 2L, "CGC - Coordenadoria de Gestão de Competências", "GESTOR"),
-                new PerfilDto(titulo, 10L, "SETEC - Secretaria de Tecnologia", "SERVIDOR"));
+                new PerfilDto(titulo, 2L, "STIC - Secretaria de Informática e Comunicações", "ADMIN"),
+                new PerfilDto(titulo, 3L, "SGP - Secretaria de Gestao de Pessoas", "GESTOR"),
+                new PerfilDto(titulo, 10L, "SESEL - Seção de Sistemas Eleitorais", "SERVIDOR"));
     }
 
     /**
@@ -324,16 +324,27 @@ public class SgrhService {
         Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
 
         // Unidade raiz
-        unidadesDto.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "INTERMEDIARIA"));
+        unidadesDto.put(2L, new UnidadeDto(2L, "Secretaria de Informática e Comunicações", "STIC", null, "INTEROPERACIONAL"));
 
         // Nível 1
-        unidadesDto.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
-        unidadesDto.put(3L, new UnidadeDto(3L, "COP - Coordenadoria Operacional", "COP", 1L, "INTERMEDIARIA"));
+        unidadesDto.put(3L, new UnidadeDto(3L, "Secretaria de Gestao de Pessoas", "SGP", 2L, "INTERMEDIARIA"));
+        unidadesDto.put(6L, new UnidadeDto(6L, "Coordenadoria de Sistemas", "COSIS", 2L, "INTERMEDIARIA"));
+        unidadesDto.put(7L, new UnidadeDto(7L, "Coordenadoria de Suporte e Infraestrutura", "COSINF", 2L, "INTERMEDIARIA"));
+        unidadesDto.put(14L, new UnidadeDto(14L, "Coordenadoria Jurídica", "COJUR", 2L, "INTERMEDIARIA"));
 
         // Nível 2
-        unidadesDto.put(10L, new UnidadeDto(10L, "SETEC - Secretaria de Tecnologia", "SETEC", 2L, "OPERACIONAL"));
-        unidadesDto.put(11L, new UnidadeDto(11L, "SEPES - Secretaria de Pessoal", "SEPES", 2L, "OPERACIONAL"));
-        unidadesDto.put(12L, new UnidadeDto(12L, "SEADM - Secretaria Administrativa", "SEADM", 3L, "OPERACIONAL"));
+        unidadesDto.put(4L, new UnidadeDto(4L, "Coordenadoria de Educação Especial", "COEDE", 3L, "INTERMEDIARIA"));
+        unidadesDto.put(8L, new UnidadeDto(8L, "Seção de Desenvolvimento de Sistemas", "SEDESENV", 6L, "OPERACIONAL"));
+        unidadesDto.put(9L, new UnidadeDto(9L, "Seção de Dados e Inteligência Artificial", "SEDIA", 6L, "OPERACIONAL"));
+        unidadesDto.put(10L, new UnidadeDto(10L, "Seção de Sistemas Eleitorais", "SESEL", 6L, "OPERACIONAL"));
+        unidadesDto.put(11L, new UnidadeDto(11L, "Seção de Infraestrutura", "SENIC", 7L, "OPERACIONAL"));
+        unidadesDto.put(12L, new UnidadeDto(12L, "Seção Jurídica", "SEJUR", 14L, "OPERACIONAL"));
+        unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL"));
+        unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL"));
+
+        // Nível 3
+        unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL"));
+
 
         // Salvar as unidades no repositório
         unidadesDto.values().forEach(dto -> {
