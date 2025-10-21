@@ -78,19 +78,19 @@ public class SubprocessoMapaControle {
     /**
      * Salva as alterações feitas no mapa de um subprocesso.
      *
-     * @param id      O ID do subprocesso.
+     * @param codSubprocesso O ID do subprocesso.
      * @param request O DTO contendo as alterações do mapa.
      * @param usuario O usuário autenticado que está salvando o mapa.
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
-    @PutMapping("/{id}/mapa")
+    @PostMapping("/{codSubprocesso}/mapa/atualizar")
     @Transactional
     public MapaCompletoDto salvarMapa(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
+        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codSubprocesso, request, usuario.getTituloEleitoral());
     }
 
     /**
@@ -107,19 +107,19 @@ public class SubprocessoMapaControle {
     /**
      * Salva os ajustes realizados em um mapa após a fase de validação.
      *
-     * @param id      O ID do subprocesso.
+     * @param codSubprocesso O ID do subprocesso.
      * @param request O DTO contendo as competências ajustadas.
      * @param usuario O usuário autenticado que está salvando os ajustes.
      */
-    @PutMapping("/{id}/mapa-ajuste")
+    @PostMapping("/{codSubprocesso}/mapa-ajuste/atualizar")
     @Transactional
     public void salvarAjustesMapa(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid SalvarAjustesReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
         subprocessoMapaService.salvarAjustesMapa(
-                id,
+                codSubprocesso,
                 request.competencias(),
                 usuario.getTituloEleitoral()
         );
@@ -148,20 +148,20 @@ public class SubprocessoMapaControle {
      * <p>
      * Corresponde ao CDU-15.
      *
-     * @param id      O ID do subprocesso.
+     * @param codSubprocesso O ID do subprocesso.
      * @param request O DTO com a estrutura completa do mapa a ser salvo.
      * @param usuario O usuário autenticado que realiza a operação.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
-    @PutMapping("/{id}/mapa-completo")
+    @PostMapping("/{codSubprocesso}/mapa-completo/atualizar")
     @Transactional
     @Operation(summary = "Salva um mapa completo com competências e atividades (CDU-15)")
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(id, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codSubprocesso, request, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 }

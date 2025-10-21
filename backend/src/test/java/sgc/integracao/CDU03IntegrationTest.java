@@ -176,7 +176,7 @@ public class CDU03IntegrationTest {
                 LocalDateTime.now().plusDays(40) // Nova data limite
         );
 
-        mockMvc.perform(put(API_PROCESSOS_ID, processoId)
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
@@ -196,7 +196,7 @@ public class CDU03IntegrationTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        mockMvc.perform(put(API_PROCESSOS_ID, 999L) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", 999L) // ID que não existe
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
@@ -222,7 +222,7 @@ public class CDU03IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Remover o processo
-        mockMvc.perform(delete(API_PROCESSOS_ID, processoId))
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
 
         // 3. Tentar buscar o processo removido para confirmar que não existe mais
@@ -232,7 +232,7 @@ public class CDU03IntegrationTest {
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(delete(API_PROCESSOS_ID, 999L)) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L)) // ID que não existe
                 .andExpect(status().isNotFound());
     }
 }

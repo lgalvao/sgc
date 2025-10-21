@@ -76,11 +76,11 @@ public class AtividadeControle {
      * @param atividadeDto O DTO com os novos dados da atividade. A descrição será sanitizada.
      * @return Um {@link ResponseEntity} com status 200 OK e a {@link AtividadeDto} atualizada.
      */
-    @PutMapping("/{id}")
+    @PostMapping("/{codAtividade}/atualizar")
     @Operation(summary = "Atualiza uma atividade existente")
-    public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtividadeDto atividadeDto) {
+    public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long codAtividade, @Valid @RequestBody AtividadeDto atividadeDto) {
         var sanitizedAtividadeDto = atividadeDto.sanitize();
-        return ResponseEntity.ok(atividadeService.atualizar(id, sanitizedAtividadeDto));
+        return ResponseEntity.ok(atividadeService.atualizar(codAtividade, sanitizedAtividadeDto));
     }
 
     /**
@@ -92,10 +92,10 @@ public class AtividadeControle {
      * @param id O ID da atividade a ser excluída.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{id}")
+    @PostMapping("/{codAtividade}/excluir")
     @Operation(summary = "Exclui uma atividade")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        atividadeService.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long codAtividade) {
+        atividadeService.excluir(codAtividade);
         return ResponseEntity.noContent().build();
     }
 
@@ -136,11 +136,11 @@ public class AtividadeControle {
      * @param conhecimentoDto O DTO com os novos dados do conhecimento.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ConhecimentoDto} atualizado.
      */
-    @PutMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")
+    @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
-    public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long atividadeId, @PathVariable Long conhecimentoId, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
+    public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         var sanitizedConhecimentoDto = conhecimentoDto.sanitize();
-        return ResponseEntity.ok(atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, sanitizedConhecimentoDto));
+        return ResponseEntity.ok(atividadeService.atualizarConhecimento(codAtividade, codConhecimento, sanitizedConhecimentoDto));
     }
 
     /**
@@ -150,10 +150,10 @@ public class AtividadeControle {
      * @param conhecimentoId O ID do conhecimento a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{atividadeId}/conhecimentos/{conhecimentoId}")
+    @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
-    public ResponseEntity<Void> excluirConhecimento(@PathVariable Long atividadeId, @PathVariable Long conhecimentoId) {
-        atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+    public ResponseEntity<Void> excluirConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento) {
+        atividadeService.excluirConhecimento(codAtividade, codConhecimento);
         return ResponseEntity.noContent().build();
     }
 }

@@ -38,22 +38,22 @@ export async function criarAtividade(request: any, idSubprocesso: number): Promi
     }
 }
 
-export async function atualizarAtividade(id: number, request: Atividade): Promise<Atividade> {
+export async function atualizarAtividade(codAtividade: number, request: Atividade): Promise<Atividade> {
     try {
         // Para a atualização, podemos enviar o objeto completo
-        const response = await apiClient.put<any>(`/atividades/${id}`, request);
+        const response = await apiClient.post<any>(`/atividades/${codAtividade}/atualizar`, request);
         return mapAtividadeDtoToModel(response.data);
     } catch (error) {
-        console.error(`Erro ao atualizar atividade ${id}:`, error);
+        console.error(`Erro ao atualizar atividade ${codAtividade}:`, error);
         throw error;
     }
 }
 
-export async function excluirAtividade(id: number): Promise<void> {
+export async function excluirAtividade(codAtividade: number): Promise<void> {
   try {
-    await apiClient.delete(`/atividades/${id}`);
+    await apiClient.post(`/atividades/${codAtividade}/excluir`);
   } catch (error) {
-    console.error(`Erro ao excluir atividade ${id}:`, error);
+    console.error(`Erro ao excluir atividade ${codAtividade}:`, error);
     throw error;
   }
 }
@@ -79,21 +79,21 @@ export async function criarConhecimento(atividadeId: number, request: CriarConhe
     }
 }
 
-export async function atualizarConhecimento(atividadeId: number, conhecimentoId: number, request: Conhecimento): Promise<Conhecimento> {
+export async function atualizarConhecimento(codAtividade: number, codConhecimento: number, request: Conhecimento): Promise<Conhecimento> {
     try {
-        const response = await apiClient.put<any>(`/atividades/${atividadeId}/conhecimentos/${conhecimentoId}`, request);
+        const response = await apiClient.post<any>(`/atividades/${codAtividade}/conhecimentos/${codConhecimento}/atualizar`, request);
         return mapConhecimentoDtoToModel(response.data);
     } catch (error) {
-        console.error(`Erro ao atualizar conhecimento ${conhecimentoId}:`, error);
+        console.error(`Erro ao atualizar conhecimento ${codConhecimento}:`, error);
         throw error;
     }
 }
 
-export async function excluirConhecimento(atividadeId: number, conhecimentoId: number): Promise<void> {
+export async function excluirConhecimento(codAtividade: number, codConhecimento: number): Promise<void> {
     try {
-        await apiClient.delete(`/atividades/${atividadeId}/conhecimentos/${conhecimentoId}`);
+        await apiClient.post(`/atividades/${codAtividade}/conhecimentos/${codConhecimento}/excluir`);
     } catch (error) {
-        console.error(`Erro ao excluir conhecimento ${conhecimentoId}:`, error);
+        console.error(`Erro ao excluir conhecimento ${codConhecimento}:`, error);
         throw error;
     }
 }

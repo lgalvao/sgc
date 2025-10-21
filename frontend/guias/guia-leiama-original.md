@@ -1,13 +1,6 @@
 # Sobre o projeto
 
-Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, **desenvolvido** em Vue 3 e Vite, com TypeScript, Vue Router, Bootstrap 5 e Pinia. O objetivo do sistema será gerir os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE, centralizando todos os dados no front-end via mocks em JSON. O sistema está em desenvolvimento ativo, com muitas funcionalidades já implementadas e outras em andamento.
-
-## Antes de qualquer coisa
-
-- Este é um **protótipo**. Não vamos nos preocupar com desempenho ou reuso; o foco é no funcionamento da UX/UI do sistema.
-- **Não** antecipe otimizações e abstrações; faça só o necessário para o momento.
-- O código deve ser simples e direto, seguindo as convenções do Vue e do Bootstrap, mas sem complexidade desnecessária.
-- O código, comentários e dados devem estar sempre em **português do Brasil**.
+Este projeto é um protótipo de Sistema de Gestão de Competências (SGC) para o TRE-PE, **desenvolvido** em Vue 3 e Vite, com TypeScript, Vue Router, Bootstrap 5 e Pinia. O objetivo do sistema será gerir os fluxos de mapeamento, revisão e diagnóstico de competências das unidades do TRE-PE. O sistema está em desenvolvimento ativo, com muitas funcionalidades já implementadas e outras em andamento.
 
 ## Testes e Qualidade de Código
 
@@ -30,22 +23,22 @@ Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no c�
 
 ### Comandos
 
-- **Executar testes unitários**:
+- **Executar testes unitários do frontend**:
   
   ```bash
   npm run test:unit
   ```
-- **Executar testes end-to-end**:
+- **Executar testes end-to-end do playwright**:
   
   ```bash
   npm run test:e2e
   ```
-- **Verificar o estilo do código (Lint)**:
+- **Verificar o estilo do código do frontend (Lint)**:
   
   ```bash
   npm run lint
   ```
-- **Verificar os tipos do TypeScript**:
+- **Verificar os tipos do TypeScript do frontend**:
   
   ```bash
   npm run typecheck
@@ -56,7 +49,6 @@ Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no c�
 - `/src/components/`: Componentes Vue reutilizáveis
 - `/src/views/`: Páginas/rotas da aplicação
 - `/src/stores/`: Gerenciamento de estado com Pinia
-- `/src/mocks/`: Dados simulados em JSON
 - `/src/composables/`: Lógica reutilizável
 - `/src/constants/`: Constantes e enums centralizados
 - `/src/utils/`: Utilitários auxiliares para funcionalidades comuns
@@ -64,7 +56,6 @@ Esta estrutura é reforçada pelo uso extensivo de atributos `data-testid` no c�
 
 ## Visão geral de design
 
-- **Dados Centralizados**: Todos os dados (processos, unidades, atividades, etc.) são mantidos em stores Pinia, alimentados por arquivos JSON em `src/mocks`. Não há backend; toda manipulação é local.
 - **Perfis de Usuário**: O perfil (`ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`) é determinado dinamicamente com base na lotação do servidor logado, através do composable `usePerfil`. O `idServidor` logado é gerenciado pela store `perfil.ts` e persistido no localStorage.
 - **Login**: A tela de login permite ao usuário "logar" como qualquer servidor cadastrado, com um seletor para pares "perfil - unidade" quando houver múltiplas opções.
 

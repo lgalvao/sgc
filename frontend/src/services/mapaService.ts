@@ -17,11 +17,11 @@ export const criarMapa = async (mapa: SalvarMapaRequest): Promise<Mapa> => {
     return mapMapaDtoToModel(response.data);
 };
 
-export const atualizarMapa = async (id: number, mapa: Mapa): Promise<Mapa> => {
-    const response = await apiClient.put(`/mapas/${id}`, mapa);
+export const atualizarMapa = async (codMapa: number, mapa: Mapa): Promise<Mapa> => {
+    const response = await apiClient.post(`/mapas/${codMapa}/atualizar`, mapa);
     return mapMapaDtoToModel(response.data);
 };
 
-export const excluirMapa = async (id: number): Promise<void> => {
-    await apiClient.delete(`/mapas/${id}`);
+export const excluirMapa = async (codMapa: number): Promise<void> => {
+    await apiClient.post(`/mapas/${codMapa}/excluir`);
 };

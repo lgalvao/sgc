@@ -62,25 +62,25 @@ public class SubprocessoCrudControle {
     /**
      * Atualiza um subprocesso existente.
      *
-     * @param id             O ID do subprocesso a ser atualizado.
+     * @param codSubprocesso O ID do subprocesso a ser atualizado.
      * @param subprocessoDto O DTO com os novos dados do subprocesso.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link SubprocessoDto} atualizado.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<SubprocessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody SubprocessoDto subprocessoDto) {
-        var atualizado = subprocessoService.atualizar(id, subprocessoDto);
+    @PostMapping("/{codSubprocesso}/atualizar")
+    public ResponseEntity<SubprocessoDto> atualizar(@PathVariable Long codSubprocesso, @Valid @RequestBody SubprocessoDto subprocessoDto) {
+        var atualizado = subprocessoService.atualizar(codSubprocesso, subprocessoDto);
         return ResponseEntity.ok(atualizado);
     }
 
     /**
      * Exclui um subprocesso.
      *
-     * @param id O ID do subprocesso a ser excluído.
+     * @param codSubprocesso O ID do subprocesso a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        subprocessoService.excluir(id);
+    @PostMapping("/{codSubprocesso}/excluir")
+    public ResponseEntity<Void> excluir(@PathVariable Long codSubprocesso) {
+        subprocessoService.excluir(codSubprocesso);
         return ResponseEntity.noContent().build();
     }
 }

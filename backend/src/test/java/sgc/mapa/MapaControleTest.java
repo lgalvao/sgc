@@ -33,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MapaControleTest {
     private static final String API_MAPAS = "/api/mapas";
     private static final String API_MAPAS_1 = "/api/mapas/1";
+    private static final String API_MAPAS_1_ATUALIZAR = "/api/mapas/1/atualizar";
+    private static final String API_MAPAS_1_EXCLUIR = "/api/mapas/1/excluir";
     private static final String API_MAPAS_1_COMPLETO = "/api/mapas/1/completo";
     private static final String CODIGO_JSON_PATH = "$.codigo";
     private static final String OBS = "Obs";
@@ -132,7 +134,7 @@ public class MapaControleTest {
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
-        mockMvc.perform(put(API_MAPAS_1)
+        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isOk())
@@ -146,7 +148,7 @@ public class MapaControleTest {
         when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(new Mapa());
 
-        mockMvc.perform(put(API_MAPAS_1)
+        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isNotFound());
@@ -156,7 +158,7 @@ public class MapaControleTest {
     void excluir_QuandoMapaExiste_DeveRetornarNoContent() throws Exception {
         doNothing().when(mapaService).excluir(1L);
 
-        mockMvc.perform(delete(API_MAPAS_1))
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNoContent());
 
         verify(mapaService, times(1)).excluir(1L);
@@ -166,7 +168,7 @@ public class MapaControleTest {
     void excluir_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(mapaService).excluir(1L);
 
-        mockMvc.perform(delete(API_MAPAS_1))
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNotFound());
     }
 

@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -109,7 +110,7 @@ class CDU15IntegrationTest {
         );
 
         // When & Then
-        mockMvc.perform(put(API_SUBPROCESSO_MAPA, subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -131,7 +132,7 @@ class CDU15IntegrationTest {
             "Observações",
             List.of(new CompetenciaMapaDto(null, "Competência Original", List.of(atividade1.getCodigo())))
         );
-        String responseBody = mockMvc.perform(put(API_SUBPROCESSO_MAPA, subprocesso.getCodigo())
+        String responseBody = mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(initialRequest)))
@@ -149,7 +150,7 @@ class CDU15IntegrationTest {
             )
         );
 
-        mockMvc.perform(put(API_SUBPROCESSO_MAPA, subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
@@ -170,7 +171,7 @@ class CDU15IntegrationTest {
         var request = new SalvarMapaRequest("Obs", List.of());
 
         // When & Then
-        mockMvc.perform(put(API_SUBPROCESSO_MAPA, subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -186,7 +187,7 @@ class CDU15IntegrationTest {
             "Observações",
             List.of(new CompetenciaMapaDto(null, "Competência para GET", List.of(atividade1.getCodigo())))
         );
-        mockMvc.perform(put(API_SUBPROCESSO_MAPA, subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/mapa/atualizar", subprocesso.getCodigo())
             .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)));

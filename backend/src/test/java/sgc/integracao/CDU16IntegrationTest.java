@@ -58,7 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-16: Ajustar mapa de competências")
 @WithMockAdmin
 public class CDU16IntegrationTest {
-    private static final String API_SUBPROCESSO_MAPA_AJUSTE = "/api/subprocessos/{id}/mapa-ajuste";
+    private static final String API_SUBPROCESSO_MAPA_AJUSTE = "/api/subprocessos/{codSubprocesso}/mapa-ajuste/atualizar";
     @Autowired
     private MockMvc mockMvc;
 
@@ -170,7 +170,7 @@ public class CDU16IntegrationTest {
                     .build()
             ));
 
-            mockMvc.perform(put(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
+            mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -192,7 +192,7 @@ public class CDU16IntegrationTest {
 
             var request = new SalvarAjustesReq(List.of());
 
-            mockMvc.perform(put(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
+            mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))

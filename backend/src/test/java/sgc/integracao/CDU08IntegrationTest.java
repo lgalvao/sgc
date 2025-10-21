@@ -128,14 +128,14 @@ class CDU08IntegrationTest {
 
             // 3. Atualizar Conhecimento
             var conhecimentoAtualizadoDto = new ConhecimentoDto(conhecimentoId, atividadeId, "Legislação Específica");
-            mockMvc.perform(put("/api/atividades/{id}/conhecimentos/{cid}", atividadeId, conhecimentoId).with(csrf())
+            mockMvc.perform(post("/api/atividades/{id}/conhecimentos/{cid}/atualizar", atividadeId, conhecimentoId).with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(conhecimentoAtualizadoDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricao", is("Legislação Específica")));
 
             // 4. Remover Conhecimento
-            mockMvc.perform(delete("/api/atividades/{id}/conhecimentos/{cid}", atividadeId, conhecimentoId).with(csrf()))
+            mockMvc.perform(post("/api/atividades/{id}/conhecimentos/{cid}/excluir", atividadeId, conhecimentoId).with(csrf()))
                 .andExpect(status().isNoContent());
 
             // Verificar se a lista de conhecimentos está vazia

@@ -31,6 +31,15 @@ public class Unidade extends EntidadeBase {
         this.unidadeSuperior = unidadeSuperior;
     }
 
+    public Unidade(Long codigo, String nome, String sigla, TipoUnidade tipo, SituacaoUnidade situacao) {
+        super();
+        super.setCodigo(codigo);
+        this.nome = nome;
+        this.sigla = sigla;
+        this.tipo = tipo;
+        this.situacao = situacao;
+    }
+
     public Unidade(Unidade unidade) {
         if (unidade != null) {
             super.setCodigo(unidade.getCodigo());

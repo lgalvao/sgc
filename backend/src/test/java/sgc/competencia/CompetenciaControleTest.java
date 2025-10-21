@@ -28,6 +28,8 @@ class CompetenciaControleTest {
     private static final String TEST_DESC = "Test Desc";
     private static final String TESTUSER = "testuser";
     private static final String API_COMPETENCIAS_1 = "/api/competencias/1";
+    private static final String API_COMPETENCIAS_1_ATUALIZAR = "/api/competencias/1/atualizar";
+    private static final String API_COMPETENCIAS_1_EXCLUIR = "/api/competencias/1/excluir";
 
     @Autowired
     private MockMvc mockMvc;
@@ -99,7 +101,7 @@ class CompetenciaControleTest {
 
         when(competenciaService.atualizarCompetencia(eq(1L), any(CompetenciaDto.class))).thenReturn(updatedDto);
 
-        mockMvc.perform(put(API_COMPETENCIAS_1)
+        mockMvc.perform(post(API_COMPETENCIAS_1_ATUALIZAR)
                         .with(user(TESTUSER)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -112,7 +114,7 @@ class CompetenciaControleTest {
         doNothing().when(competenciaService).excluirCompetencia(1L);
 
         // When & Then
-        mockMvc.perform(delete(API_COMPETENCIAS_1).with(user(TESTUSER)).with(csrf()))
+        mockMvc.perform(post(API_COMPETENCIAS_1_EXCLUIR).with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -143,7 +145,7 @@ class CompetenciaControleTest {
 
         doNothing().when(competenciaService).desvincularAtividade(idCompetencia, idAtividade);
 
-        mockMvc.perform(delete("/api/competencias/{idCompetencia}/atividades/{idAtividade}", idCompetencia, idAtividade)
+        mockMvc.perform(post("/api/competencias/{idCompetencia}/atividades/{idAtividade}/desvincular", idCompetencia, idAtividade)
                         .with(user(TESTUSER)).with(csrf()))
                 .andExpect(status().isNoContent());
     }

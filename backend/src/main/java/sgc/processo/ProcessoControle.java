@@ -55,25 +55,25 @@ public class ProcessoControle {
     /**
      * Atualiza um processo existente.
      *
-     * @param id         O ID do processo a ser atualizado.
+     * @param codProcesso O ID do processo a ser atualizado.
      * @param requisicao O DTO com os novos dados do processo.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarProcessoReq requisicao) {
-        ProcessoDto atualizado = processoService.atualizar(id, requisicao);
+    @PostMapping("/{codProcesso}/atualizar")
+    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long codProcesso, @Valid @RequestBody AtualizarProcessoReq requisicao) {
+        ProcessoDto atualizado = processoService.atualizar(codProcesso, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
     /**
      * Exclui um processo.
      *
-     * @param id O ID do processo a ser excluído.
+     * @param codProcesso O ID do processo a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        processoService.apagar(id);
+    @PostMapping("/{codProcesso}/excluir")
+    public ResponseEntity<Void> excluir(@PathVariable Long codProcesso) {
+        processoService.apagar(codProcesso);
         return ResponseEntity.noContent().build();
     }
 

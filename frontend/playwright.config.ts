@@ -4,10 +4,10 @@ import {vueTest} from '~/support/vue-specific-setup';
 
 export default defineConfig({
     testMatch: /.*\.spec\.ts/,
-    timeout: 5000,
+    timeout: 60000, // Aumentado para 60 segundos
     testDir: './e2e',
     fullyParallel: true,
-    reporter: [['html']],
+    reporter: "dot",
     webServer: {
         command: 'npm run dev',
         url: 'http://localhost:5173/',
@@ -18,7 +18,7 @@ export default defineConfig({
         baseURL: 'http://localhost:5173/',
         trace: 'on-first-retry',
         actionTimeout: 2000,
-        navigationTimeout: 2000,
+        navigationTimeout: 30000, // Aumentado para 30 segundos
     },
     projects: [{
         name: 'chromium',

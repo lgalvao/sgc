@@ -221,9 +221,20 @@ async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFI
     await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(dadosUsuario.idServidor);
     await page.waitForLoadState('networkidle');
     await page.getByLabel(ROTULOS.SENHA).fill(dadosUsuario.senha);
-    await clicarBotaoEntrar(page);
-
-    // Verifica se há múltiplas opções de perfil/unidade
+                    await page.route('**/api/usuarios/entrar', async route => {
+                        const response = await route.fetch();
+                        console.log('Requisição /api/usuarios/entrar interceptada. Status:', response.status());
+                        if (!response.ok()) {
+                            const responseBody = await response.text();
+                            console.error('Corpo da resposta /api/usuarios/entrar (erro):', responseBody);
+                        }
+                        route.fulfill({ response });
+                    });
+                
+                    await clicarBotaoEntrar(page); // Clica no botão de login
+                    await page.waitForLoadState('networkidle'); // Espera a rede ficar ociosa
+                
+                    console.log('URL atual após clicar em Entrar (antes de esperar resposta):', page.url());    // Verifica se há múltiplas opções de perfil/unidade
     const seletorPerfilUnidade = page.getByTestId(SELETORES.SELECT_PERFIL_UNIDADE);
     if (await seletorPerfilUnidade.isVisible()) {
         await seletorPerfilUnidade.selectOption({
@@ -232,8 +243,15 @@ async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFI
         await clicarBotaoEntrar(page);
     }
 
+    const erroLoginInvalido = page.getByText(TEXTOS.ERRO_LOGIN_INVALIDO);
+    if (await erroLoginInvalido.isVisible()) {
+        console.error('Erro de login: Título ou senha inválidos.');
+        throw new Error('Login falhou: Título ou senha inválidos.');
+    }
+
     await page.waitForURL(URLS.PAINEL);
     await expect(page).toHaveURL(/\/painel/);
+
 }
 
 export const loginComoAdmin = (page: Page) => fazerLoginComo(page, 'ADMIN');

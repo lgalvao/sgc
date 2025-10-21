@@ -74,11 +74,6 @@ await clicarElemento([
 ]);
 ```
 
-### Dados Mockados
-
-- Entenda os mocks em `src/mocks/` antes de escrever asserções.
-- Garanta que os mocks suportam o cenário de teste. Se um botão depende de uma condição, o mock deve simular essa condição.
-
 ## 4. Correção e Depuração de Testes
 
 1.  **Reproduza Localmente:** Use `npx playwright test <arquivo> --headed` para ver o teste rodando.

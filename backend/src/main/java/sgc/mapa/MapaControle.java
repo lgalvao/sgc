@@ -95,30 +95,30 @@ public class MapaControle {
      * <p>
      * Os campos de texto do DTO são sanitizados para remover HTML antes da atualização.
      *
-     * @param id      O ID do mapa a ser atualizado.
+     * @param codMapa O ID do mapa a ser atualizado.
      * @param mapaDto O DTO com os novos dados do mapa.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
      */
-    @PutMapping("/{id}")
+    @PostMapping("/{codMapa}/atualizar")
     @Operation(summary = "Atualiza um mapa existente")
-    public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
+    public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
         var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
         var entidade = mapaMapper.toEntity(sanitizedMapaDto);
-        var atualizado = mapaService.atualizar(id, entidade);
+        var atualizado = mapaService.atualizar(codMapa, entidade);
         return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
     }
 
     /**
      * Exclui um mapa de competências.
      *
-     * @param id O ID do mapa a ser excluído.
+     * @param codMapa O ID do mapa a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{id}")
+    @PostMapping("/{codMapa}/excluir")
     @Operation(summary = "Exclui um mapa")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        mapaService.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long codMapa) {
+        mapaService.excluir(codMapa);
         return ResponseEntity.noContent().build();
     }
 

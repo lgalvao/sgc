@@ -24,25 +24,17 @@ Exemplos rápidos
 - snake_case JSON: `{ "codigo": 1, "nome": "X", "data_hora": "01/01/2020" }`
 - Depois do mapper: `{ id: 1, nome: "X", dataHora: "2020-01-01T00:00:00.000Z" }` (convertido para Date no frontend)
 
-Validação e transformação de mocks
-- Validar: execute `node scripts/validar-mocks.js` (usa schemas Zod em [`src/validators/mocks.ts`](src/validators/mocks.ts:1)).
-- Transformar (dry-run): `node scripts/transformar-mocks-para-formato-frontend.js --dry`
-- Aplicar transformações: `node scripts/transformar-mocks-para-formato-frontend.js --apply`
-- Os backups são gerados em `src/mocks/backups/<timestamp>/` antes de sobrescrever.
-
 Checklist de qualidade antes de merge
 1. Rodar lint: `npm run lint`
 2. Rodar typecheck: `npm run typecheck`
 3. Rodar testes unitários: `npm run test:unit`
 4. Rodar testes E2E: `npx playwright test` (quando aplicável)
-5. Validar mocks: `node scripts/validar-mocks.js`
 
 Como adicionar um novo mapper
 - Criar função em `src/mappers/*` seguindo padrões existentes.
 - Tratar chaves alternativas (codigo/id; data_hora/dataHora).
 - Usar `parseDate` de `src/utils` para normalizar datas.
 - Adicionar testes unitários em `src/mappers/__tests__/`.
-- Atualizar stores para consumir o mapper em vez de manipular raw mocks.
 
 Política de identificadores (detalhes)
 - Preferir trabalhar com `id: number` internamente.
@@ -55,8 +47,3 @@ Notas sobre enums e situações
 
 Passos operacionais para este repositório
 - Quando alterar mappers: atualizar e executar os testes unitários que cobrem os converters.
-- Se aplicar transformações nos mocks, revisar diffs do backup vs novo mock.
-
-Histórico e contato
-- Mudanças principais: mappers implementados, validação Zod adicionada, transformador de mocks criado.
-- Para dúvidas, contate o autor do PR ou mantenedor do repositório.

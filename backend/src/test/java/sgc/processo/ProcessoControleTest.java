@@ -141,7 +141,7 @@ public class ProcessoControleTest {
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(put(API_PROCESSOS_1)
+        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -159,7 +159,7 @@ public class ProcessoControleTest {
 
         doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put(API_PROCESSOS_999)
+        mockMvc.perform(post(API_PROCESSOS + "/999/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound());
@@ -171,7 +171,7 @@ public class ProcessoControleTest {
 
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put(API_PROCESSOS_1)
+        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict());
@@ -179,7 +179,7 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoExiste_RetornaNoContent() throws Exception {
-        mockMvc.perform(delete(API_PROCESSOS_1))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir"))
                 .andExpect(status().isNoContent());
 
         verify(processoService).apagar(1L);
@@ -189,7 +189,7 @@ public class ProcessoControleTest {
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
         doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
 
-        mockMvc.perform(delete(API_PROCESSOS_999))
+        mockMvc.perform(post(API_PROCESSOS + "/999/excluir"))
                 .andExpect(status().isNotFound());
     }
 
@@ -197,7 +197,7 @@ public class ProcessoControleTest {
     void excluir_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
         doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
 
-        mockMvc.perform(delete(API_PROCESSOS_1))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir"))
                 .andExpect(status().isConflict());
     }
 

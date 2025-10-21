@@ -55,21 +55,21 @@ export async function obterProcessoPorId(id: number): Promise<Processo> {
   }
 }
 
-export async function atualizarProcesso(id: number, request: AtualizarProcessoRequest): Promise<Processo> {
+export async function atualizarProcesso(codProcesso: number, request: AtualizarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.put<Processo>(`/processos/${id}`, request);
+    const response = await apiClient.post<Processo>(`/processos/${codProcesso}/atualizar`, request);
     return response.data;
   } catch (error) {
-    console.error(`Erro ao atualizar processo ${id}:`, error);
+    console.error(`Erro ao atualizar processo ${codProcesso}:`, error);
     throw error;
   }
 }
 
-export async function excluirProcesso(id: number): Promise<void> {
+export async function excluirProcesso(codProcesso: number): Promise<void> {
   try {
-    await apiClient.delete(`/processos/${id}`);
+    await apiClient.post(`/processos/${codProcesso}/excluir`);
   } catch (error) {
-    console.error(`Erro ao excluir processo ${id}:`, error);
+    console.error(`Erro ao excluir processo ${codProcesso}:`, error);
     throw error;
   }
 }

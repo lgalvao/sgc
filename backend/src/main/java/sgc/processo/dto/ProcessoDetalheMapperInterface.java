@@ -13,6 +13,9 @@ import sgc.subprocesso.modelo.Subprocesso;
 public interface ProcessoDetalheMapperInterface {
     @Mapping(target = "unidades", ignore = true) // Mapeamento customizado necessário
     @Mapping(target = "resumoSubprocessos", ignore = true)
+    @Mapping(target = "podeFinalizar", ignore = true)
+    @Mapping(target = "podeHomologarCadastro", ignore = true)
+    @Mapping(target = "podeHomologarMapa", ignore = true)
 
     // Mapeamento customizado
     ProcessoDetalheDto toDetailDTO(Processo processo);

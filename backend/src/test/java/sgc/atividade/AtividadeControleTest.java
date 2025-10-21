@@ -32,6 +32,8 @@ class AtividadeControleTest {
     private static final String ATIVIDADE_TESTE = "Atividade Teste";
     private static final String API_ATIVIDADES = "/api/atividades";
     private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
+    private static final String API_ATIVIDADES_ID_ATUALIZAR = "/api/atividades/{id}/atualizar";
+    private static final String API_ATIVIDADES_ID_EXCLUIR = "/api/atividades/{id}/excluir";
     private static final String API_ATIVIDADES_1 = "/api/atividades/1";
     private static final String API_ATIVIDADES_99 = "/api/atividades/99";
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
@@ -153,7 +155,7 @@ class AtividadeControleTest {
 
             when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
-            mockMvc.perform(put(API_ATIVIDADES_1).with(csrf())
+            mockMvc.perform(post("/api/atividades/1/atualizar").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
@@ -167,7 +169,7 @@ class AtividadeControleTest {
 
             when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
-            mockMvc.perform(put(API_ATIVIDADES_99).with(csrf())
+            mockMvc.perform(post("/api/atividades/99/atualizar").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
@@ -183,7 +185,7 @@ class AtividadeControleTest {
         void deveExcluirAtividade() throws Exception {
             doNothing().when(atividadeService).excluir(1L);
 
-            mockMvc.perform(delete(API_ATIVIDADES_1).with(csrf()))
+            mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluir(1L);
@@ -194,7 +196,7 @@ class AtividadeControleTest {
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(atividadeService).excluir(99L);
 
-            mockMvc.perform(delete(API_ATIVIDADES_99).with(csrf()))
+            mockMvc.perform(post("/api/atividades/99/excluir").with(csrf()))
                     .andExpect(status().isNotFound());
         }
     }
@@ -206,6 +208,8 @@ class AtividadeControleTest {
         private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
         private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{id}";
         private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
+        private static final String API_CONHECIMENTOS_1_ATUALIZAR = "/api/atividades/1/conhecimentos/1/atualizar";
+        private static final String API_CONHECIMENTOS_1_EXCLUIR = "/api/atividades/1/conhecimentos/1/excluir";
         private static final String NOVO_CONHECIMENTO = "Novo Conhecimento";
 
         @Test
@@ -243,7 +247,7 @@ class AtividadeControleTest {
 
             when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
 
-            mockMvc.perform(put(API_CONHECIMENTOS_1).with(csrf())
+            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(conhecimentoDto)))
                 .andExpect(status().isOk())
@@ -255,7 +259,7 @@ class AtividadeControleTest {
         void deveExcluirConhecimento() throws Exception {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
-            mockMvc.perform(delete(API_CONHECIMENTOS_1).with(csrf()))
+            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
                 .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);

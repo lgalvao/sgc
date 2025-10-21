@@ -8,7 +8,13 @@ import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 
-import java.util.*;
+import sgc.unidade.modelo.SituacaoUnidade;
+import sgc.unidade.modelo.TipoUnidade;
+import sgc.unidade.modelo.Unidade;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +27,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
+
+    private final UnidadeRepo unidadeRepo;
     /**
      * Busca um usuário pelo seu título de eleitor.
      * <p>
@@ -309,20 +317,32 @@ public class SgrhService {
      * Cria unidades MOCK para testes.
      */
     private Map<Long, UnidadeDto> criarUnidadesMock() {
-        Map<Long, UnidadeDto> unidades = new HashMap<>();
+        Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
 
         // Unidade raiz
-        unidades.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "ADMINISTRATIVA"));
+        unidadesDto.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "ADMINISTRATIVA"));
 
         // Nível 1
-        unidades.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
-        unidades.put(3L, new UnidadeDto(3L, "COP - Coordenadoria Operacional", "COP", 1L, "INTERMEDIARIA"));
+        unidadesDto.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
+        unidadesDto.put(3L, new UnidadeDto(3L, "COP - Coordenadoria Operacional", "COP", 1L, "INTERMEDIARIA"));
 
         // Nível 2
-        unidades.put(10L, new UnidadeDto(10L, "SETEC - Secretaria de Tecnologia", "SETEC", 2L, "OPERACIONAL"));
-        unidades.put(11L, new UnidadeDto(11L, "SEPES - Secretaria de Pessoal", "SEPES", 2L, "OPERACIONAL"));
-        unidades.put(12L, new UnidadeDto(12L, "SEADM - Secretaria Administrativa", "SEADM", 3L, "OPERACIONAL"));
+        unidadesDto.put(10L, new UnidadeDto(10L, "SETEC - Secretaria de Tecnologia", "SETEC", 2L, "OPERACIONAL"));
+        unidadesDto.put(11L, new UnidadeDto(11L, "SEPES - Secretaria de Pessoal", "SEPES", 2L, "OPERACIONAL"));
+        unidadesDto.put(12L, new UnidadeDto(12L, "SEADM - Secretaria Administrativa", "SEADM", 3L, "OPERACIONAL"));
 
-        return unidades;
+        // Salvar as unidades no repositório
+        unidadesDto.values().forEach(dto -> {
+            Unidade unidade = new Unidade(
+                dto.codigo(),
+                dto.nome(),
+                dto.sigla(),
+                TipoUnidade.valueOf(dto.tipo()),
+                SituacaoUnidade.ATIVA // Assumindo que todas as unidades mockadas estão ativas
+            );
+            unidadeRepo.save(unidade);
+        });
+
+        return unidadesDto;
     }
 }

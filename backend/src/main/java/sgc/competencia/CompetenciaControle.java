@@ -65,26 +65,26 @@ public class CompetenciaControle {
     /**
      * Atualiza uma competência existente.
      *
-     * @param id             O ID da competência a ser atualizada.
+     * @param codCompetencia O ID da competência a ser atualizada.
      * @param competenciaDto O DTO com os novos dados da competência.
      * @return Um {@link ResponseEntity} com status 200 OK e a {@link CompetenciaDto} atualizada.
      */
-    @PutMapping("/{id}")
+    @PostMapping("/{codCompetencia}/atualizar")
     @Operation(summary = "Atualiza uma competência existente")
-    public ResponseEntity<CompetenciaDto> atualizarCompetencia(@PathVariable Long id, @Valid @RequestBody CompetenciaDto competenciaDto) {
-        return ResponseEntity.ok(competenciaService.atualizarCompetencia(id, competenciaDto));
+    public ResponseEntity<CompetenciaDto> atualizarCompetencia(@PathVariable Long codCompetencia, @Valid @RequestBody CompetenciaDto competenciaDto) {
+        return ResponseEntity.ok(competenciaService.atualizarCompetencia(codCompetencia, competenciaDto));
     }
 
     /**
      * Exclui uma competência.
      *
-     * @param id O ID da competência a ser excluída.
+     * @param codCompetencia O ID da competência a ser excluída.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{id}")
+    @PostMapping("/{codCompetencia}/excluir")
     @Operation(summary = "Exclui uma competência")
-    public ResponseEntity<Void> excluirCompetencia(@PathVariable Long id) {
-        competenciaService.excluirCompetencia(id);
+    public ResponseEntity<Void> excluirCompetencia(@PathVariable Long codCompetencia) {
+        competenciaService.excluirCompetencia(codCompetencia);
         return ResponseEntity.noContent().build();
     }
 
@@ -119,14 +119,14 @@ public class CompetenciaControle {
     /**
      * Remove o vínculo entre uma competência e uma atividade.
      *
-     * @param idCompetencia O ID da competência.
-     * @param idAtividade   O ID da atividade.
+     * @param codCompetencia O ID da competência.
+     * @param codAtividade   O ID da atividade.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @DeleteMapping("/{idCompetencia}/atividades/{idAtividade}")
+    @PostMapping("/{codCompetencia}/atividades/{codAtividade}/desvincular")
     @Operation(summary = "Desvincula uma atividade de uma competência")
-    public ResponseEntity<?> desvincularAtividade(@PathVariable Long idCompetencia, @PathVariable Long idAtividade) {
-        competenciaService.desvincularAtividade(idCompetencia, idAtividade);
+    public ResponseEntity<?> desvincularAtividade(@PathVariable Long codCompetencia, @PathVariable Long codAtividade) {
+        competenciaService.desvincularAtividade(codCompetencia, codAtividade);
         return ResponseEntity.noContent().build();
     }
 

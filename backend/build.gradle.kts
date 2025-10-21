@@ -8,6 +8,7 @@ plugins {
     java
     pmd
     jacoco
+    id("checkstyle")
 }
 
 java {
@@ -334,11 +335,44 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     jvmArgs = listOf("-Djdk.internal.vm.debug=release")
 }
 
+
+
 tasks.jacocoTestReport {
+
     dependsOn(tasks.test)
+
     reports {
+
         xml.required.set(false)
+
         csv.required.set(true)
+
         html.required.set(true)
+
     }
+
+}
+
+
+
+checkstyle {
+
+    toolVersion = "10.17.0" // Usar uma versão recente do Checkstyle
+
+    configFile = file("config/checkstyle/checkstyle.xml") // Caminho para o arquivo de configuração
+
+}
+
+
+
+tasks.withType<Checkstyle> {
+
+    source("src/main/java") // Onde procurar os arquivos Java
+
+    include("**/*.java")
+
+    exclude("**/gen/**") // Excluir arquivos gerados, se houver
+
+    classpath = sourceSets.main.get().compileClasspath
+
 }
