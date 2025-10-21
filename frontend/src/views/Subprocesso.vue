@@ -87,7 +87,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {MapaCompleto, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade, Responsavel} from "@/types/tipos";
+import {MapaCompleto, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
 import {formatDateTimeBR} from '@/utils';
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
@@ -149,7 +149,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 
   if (atribuicaoVigente) {
     // Retorna uma nova unidade com o responsável da atribuição temporária
-    return { ...unidade, responsavel: atribuicaoVigente.servidor };
+    return {...unidade, responsavel: atribuicaoVigente.servidor};
   }
 
   // Se não houver atribuição temporária vigente, retorna a unidade original

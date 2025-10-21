@@ -2,8 +2,10 @@ import {test} from '@playwright/test';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    clicarBotaoHistoricoAnalise,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
+    devolverCadastro,
     disponibilizarCadastro,
     gerarNomeUnico,
     loginComoChefe,
@@ -11,17 +13,14 @@ import {
     SELETORES_CSS,
     verificarAlerta,
     verificarMensagemSucesso,
-    verificarUrlDoPainel,
-    loginComoGestor,
-    devolverCadastro,
-    clicarBotaoHistoricoAnalise,
     verificarModalHistoricoAnalise,
+    verificarUrlDoPainel,
 } from './helpers';
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
 
-    test('deve disponibilizar a revisão com sucesso após corrigir atividades incompletas', async ({ page }) => {
-        const { processo } = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
+    test('deve disponibilizar a revisão com sucesso após corrigir atividades incompletas', async ({page}) => {
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
@@ -36,7 +35,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         await page.locator('.modal-dialog .btn-secondary').click(); // Clica em Cancelar no modal de confirmação
 
         // Adiciona conhecimento à atividade que estava incompleta
-        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeIncompleta });
+        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividadeIncompleta});
         await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
         // Disponibiliza com sucesso
@@ -46,9 +45,9 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         await verificarUrlDoPainel(page);
     });
 
-    test('deve exibir o histórico de análise após a devolução de um cadastro em revisão', async ({ page }) => {
+    test('deve exibir o histórico de análise após a devolução de um cadastro em revisão', async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO REVISAO COM DEVOLUCAO');
-        const { processo } = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, nomeProcesso, 'REVISAO', '2025-12-31', [1]);
         const nomeUnidade = 'STIC';
         const motivoDevolucao = 'Motivo da devolução pelo Gestor para teste CDU-10';
 

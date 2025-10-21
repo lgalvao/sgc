@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UsuarioService {
-
     private final SgrhService sgrhService;
     private final UnidadeRepo unidadeRepo;
 

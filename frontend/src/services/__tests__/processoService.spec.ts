@@ -72,7 +72,7 @@ describe('processoService', () => {
     });
 
     it('atualizarProcesso should put to the correct endpoint', async () => {
-        const request: AtualizarProcessoRequest = { descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
+        const request: AtualizarProcessoRequest = { codigo: 1, tipo: TipoProcesso.MAPEAMENTO, unidades: [], descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
         putSpy.mockResolvedValue({ data: {} });
         await service.atualizarProcesso(1, request);
         expect(putSpy).toHaveBeenCalledWith('/processos/1', request);
