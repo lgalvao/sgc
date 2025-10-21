@@ -10,8 +10,12 @@ import sgc.sgrh.dto.UsuarioDto;
 
 import sgc.unidade.modelo.SituacaoUnidade;
 import sgc.unidade.modelo.TipoUnidade;
+import sgc.unidade.modelo.UnidadeRepo;
 import sgc.unidade.modelo.Unidade;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -320,7 +324,7 @@ public class SgrhService {
         Map<Long, UnidadeDto> unidadesDto = new HashMap<>();
 
         // Unidade raiz
-        unidadesDto.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "ADMINISTRATIVA"));
+        unidadesDto.put(1L, new UnidadeDto(1L, "SEDOC - Secretaria de Documentação", "SEDOC", null, "INTERMEDIARIA"));
 
         // Nível 1
         unidadesDto.put(2L, new UnidadeDto(2L, "CGC - Coordenadoria de Gestão de Competências", "CGC", 1L, "INTERMEDIARIA"));
