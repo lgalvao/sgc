@@ -13,12 +13,7 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 (14, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 2),
 (12, 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 14),
 (13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 14),
-(15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 2),
--- Unidades para CDU14IntegrationTest
-(100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL),
-(101, 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 100),
-(102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 101);
-
+(15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 2);
 
 -- Usuários
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
@@ -51,12 +46,7 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 (27, 'Gustavo Oliveira', 'gustavo.oliveira@tre-pe.jus.br', '7021', 10),
 (28, 'Carolina Souza', 'carolina.souza@tre-pe.jus.br', '7022', 14),
 (29, 'Bruno Rodrigues', 'bruno.rodrigues@tre-pe.jus.br', '7023', 6),
-(30, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 2),
--- Usuarios para CDU14IntegrationTest
-(111111111111, 'Admin Teste', 'admin.teste@tre-pe.jus.br', '1111', 100),
-(222222222222, 'Gestor Teste', 'gestor.teste@tre-pe.jus.br', '2222', 101),
-(333333333333, 'Chefe Teste', 'chefe.teste@tre-pe.jus.br', '3333', 102);
-
+(30, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 2);
 
 -- Perfis
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
@@ -89,8 +79,4 @@ INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (27, 'SERVIDOR'),
 (28, 'SERVIDOR'),
 (29, 'SERVIDOR'),
-(30, 'SERVIDOR'),
--- Perfis para CDU14IntegrationTest
-(111111111111, 'ADMIN'),
-(222222222222, 'GESTOR'),
-(333333333333, 'CHEFE');
+(30, 'SERVIDOR');

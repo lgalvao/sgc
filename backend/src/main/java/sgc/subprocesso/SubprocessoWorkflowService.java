@@ -548,12 +548,12 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        Unidade unidadeOrigem = unidadeRepo.findById(usuario.getUnidade().getCodigo())
+        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem não encontrada."));
-        Unidade unidadeDestino = unidadeRepo.findById(unidadeOrigem.getUnidadeSuperior().getCodigo())
+        Unidade unidadeDestino = unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de destino não encontrada."));
 
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
 
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeDestino);
 

@@ -181,23 +181,9 @@ tasks.withType<Test> {
         private fun filterStackTrace(exception: Throwable?): List<String> {
             if (exception == null) return emptyList()
 
-            return exception.stackTrace
-                .filter { element ->
-                    val className = element.className
-                    (className.startsWith("sgc") ||
-                            className.startsWith("org.springframework.web") ||
-                            className.startsWith("org.springframework.data") ||
-                            className.startsWith("org.hibernate") ||
-                            className.startsWith("org.springframework.security") ||
-                            (className.startsWith("org.springframework.boot") && !className.contains(".test."))) &&
-                            !className.contains("gradle") &&
-                            !className.contains("junit") &&
-                            !className.contains("mockito")
-                }
-                .take(15)
-                .map { element ->
-                    "    ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
-                }
+            return exception.stackTrace.map { element ->
+                "    ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
+            }
         }
 
         private fun outputAgentSummary(
