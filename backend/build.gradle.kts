@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -6,9 +7,8 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     java
-    // pmd
     jacoco
-    // id("checkstyle")
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 java {
@@ -66,8 +66,8 @@ dependencies {
 
     // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
     implementation("org.apache.commons:commons-lang3:3.19.0")
-    implementation("ch.qos.logback:logback-classic:1.5.19")
-    implementation("ch.qos.logback:logback-core:1.5.19")
+    implementation("ch.qos.logback:logback-classic:1.5.20")
+    implementation("ch.qos.logback:logback-core:1.5.20")
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -275,19 +275,19 @@ tasks.withType<JavaCompile> {
     )
 }
 
+tasks.withType<DependencyUpdatesTask> {
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    return !stableKeyword && !version.matches(regex)
+}
+
 tasks.named("build") { outputs.cacheIf { true } }
-
-// pmd {
-//     toolVersion = "7.17.0"
-//     rulesMinimumPriority = 5
-// }
-
-// tasks.withType<Pmd> {
-//     ruleSets = listOf()
-//     ruleSetFiles = files("config/pmd/custom-ruleset.xml")
-//     reports.xml.required.set(true)
-//     reports.html.required.set(false)
-// }
 
 tasks.register("agentTest") {
     group = "verification"
@@ -326,53 +326,9 @@ tasks.register<Test>("verboseTest") {
     classpath = tasks.test.get().classpath
 }
 
-// Desabilita a tarefa pmdTest para ignorar os arquivos de teste
-// tasks.named("pmdTest") {
-//     enabled = false
-// }
-
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     jvmArgs = listOf("-Djdk.internal.vm.debug=release")
 }
 
 
 
-tasks.jacocoTestReport {
-
-    dependsOn(tasks.test)
-
-    reports {
-
-        xml.required.set(false)
-
-        csv.required.set(true)
-
-        html.required.set(true)
-
-    }
-
-}
-
-
-
-// checkstyle {
-
-//     toolVersion = "10.17.0" // Usar uma versão recente do Checkstyle
-
-//     configFile = file("config/checkstyle/checkstyle.xml") // Caminho para o arquivo de configuração
-
-// }
-
-
-
-// tasks.withType<Checkstyle> {
-
-//     source("src/main/java") // Onde procurar os arquivos Java
-
-//     include("**/*.java")
-
-//     exclude("**/gen/**") // Excluir arquivos gerados, se houver
-
-//     classpath = sourceSets.main.get().compileClasspath
-
-// }

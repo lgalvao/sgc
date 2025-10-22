@@ -15,7 +15,6 @@ import java.util.Set;
 
 @Component
 public class WithMockAdminSecurityContextFactory implements WithSecurityContextFactory<WithMockAdmin> {
-
     private final UsuarioRepo usuarioRepo;
 
     @Autowired

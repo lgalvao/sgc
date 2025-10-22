@@ -298,4 +298,30 @@ public class SubprocessoNotificacaoService {
         alerta.setUnidadeDestino(unidadeDestino);
         repositorioAlerta.save(alerta);
     }
+
+    public void notificarHomologacaoMapa(Subprocesso sp) {
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+
+        // Notificação por e-mail
+        String assunto = String.format("SGC: Mapa de competências do processo %s homologado", descricaoProcesso);
+        String corpo = String.format(
+                "Prezado(a) responsável pela SEDOC,%n" +
+                        "O mapa de competências do processo %s foi homologado.%n" +
+                        "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
+                descricaoProcesso
+        );
+        notificacaoService.enviarEmail(sedoc.getSigla(), assunto, corpo);
+
+        // Alerta interno
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Mapa de competências do processo %s homologado", descricaoProcesso));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sedoc);
+        alerta.setUnidadeDestino(sedoc); // O alerta é para a própria SEDOC
+        repositorioAlerta.save(alerta);
+    }
 }

@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Component
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
-
     @Autowired
     private UsuarioRepo usuarioRepo;
 

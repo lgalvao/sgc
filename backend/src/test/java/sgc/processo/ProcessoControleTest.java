@@ -298,11 +298,11 @@ public class ProcessoControleTest {
     }
 
     @Test
-    void finalizar_ValidacaoFalhou_RetornaUnprocessableEntity() throws Exception {
+    void finalizar_ValidacaoFalhou_RetornaConflict() throws Exception {
         doThrow(new ErroProcesso("Subprocessos não homologados")).when(processoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
     }
 }

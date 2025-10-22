@@ -14,15 +14,18 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
-
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
         UnidadeRepo unidadeRepo = BeanUtil.getBean(UnidadeRepo.class);
+
         // A responsabilidade de criar a Unidade agora é do próprio teste.
         Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
-                .orElseThrow(() -> new IllegalStateException("A Unidade de teste com ID " + customUser.unidadeId() + " não foi encontrada. Certifique-se de que ela foi criada no método @BeforeEach do teste."));
+                .orElseThrow(() -> new IllegalStateException(
+                        "A Unidade de teste com ID %d não foi encontrada. Garanta quefoi criada no @BeforeEach do teste."
+                        .formatted(customUser.unidadeId()))
+                );
 
         Usuario principal = new Usuario(
                 customUser.tituloEleitoral(),

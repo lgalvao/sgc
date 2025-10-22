@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.ImpactoMapaService;
@@ -41,46 +41,46 @@ public class SubprocessoMapaControle {
      * para identificar atividades inseridas, removidas ou alteradas, e as
      * competências afetadas.
      *
-     * @param id      O ID do subprocesso em revisão.
+     * @param codigo  O código do subprocesso em revisão.
      * @param usuario O usuário autenticado que realiza a verificação.
      * @return Um {@link ImpactoMapaDto} com o detalhamento dos impactos.
      */
-    @GetMapping("/{id}/impactos-mapa")
+    @GetMapping("/{codigo}/impactos-mapa")
     @Operation(summary = "Verifica os impactos da revisão no mapa de competências")
-    public ImpactoMapaDto verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return impactoMapaService.verificarImpactos(id, usuario);
+    public ImpactoMapaDto verificarImpactos(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        return impactoMapaService.verificarImpactos(codigo, usuario);
     }
 
     /**
      * Obtém a estrutura completa de um mapa associado a um subprocesso.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Um {@link MapaCompletoDto} com as competências e atividades do mapa.
      */
-    @GetMapping("/{id}/mapa")
-    public MapaCompletoDto obterMapa(@PathVariable Long id) {
-        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(id);
-        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
+    @GetMapping("/{codigo}/mapa")
+    public MapaCompletoDto obterMapa(@PathVariable Long codigo) {
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
+        return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
     }
 
     /**
      * Obtém uma representação aninhada e formatada do mapa de um subprocesso,
      * ideal para telas de visualização.
      *
-     * @param subprocessoId O ID do subprocesso.
+     * @param codSubprocesso O código do subprocesso.
      * @return Um {@link MapaVisualizacaoDto} com a estrutura hierárquica completa do mapa.
      */
-    @GetMapping("/{id}/mapa-visualizacao")
-    public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("id") Long subprocessoId) {
-        return mapaVisualizacaoService.obterMapaParaVisualizacao(subprocessoId);
+    @GetMapping("/{codigo}/mapa-visualizacao")
+    public MapaVisualizacaoDto obterMapaVisualizacao(@PathVariable("codigo") Long codSubprocesso) {
+        return mapaVisualizacaoService.obterMapaParaVisualizacao(codSubprocesso);
     }
 
     /**
      * Salva as alterações feitas no mapa de um subprocesso.
      *
-     * @param codSubprocesso O ID do subprocesso.
-     * @param request O DTO contendo as alterações do mapa.
-     * @param usuario O usuário autenticado que está salvando o mapa.
+     * @param codSubprocesso O código do subprocesso.
+     * @param request        O DTO contendo as alterações do mapa.
+     * @param usuario        O usuário autenticado que está salvando o mapa.
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
     @PostMapping("/{codSubprocesso}/mapa/atualizar")
@@ -96,20 +96,20 @@ public class SubprocessoMapaControle {
     /**
      * Obtém os dados de um mapa para a tela de ajuste pós-validação.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Um {@link MapaAjusteDto} com os dados necessários para o ajuste.
      */
-    @GetMapping("/{id}/mapa-ajuste")
-    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long id) {
-        return subprocessoDtoService.obterMapaParaAjuste(id);
+    @GetMapping("/{codigo}/mapa-ajuste")
+    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codigo) {
+        return subprocessoDtoService.obterMapaParaAjuste(codigo);
     }
 
     /**
      * Salva os ajustes realizados em um mapa após a fase de validação.
      *
-     * @param codSubprocesso O ID do subprocesso.
-     * @param request O DTO contendo as competências ajustadas.
-     * @param usuario O usuário autenticado que está salvando os ajustes.
+     * @param codSubprocesso O código do subprocesso.
+     * @param request        O DTO contendo as competências ajustadas.
+     * @param usuario        O usuário autenticado que está salvando os ajustes.
      */
     @PostMapping("/{codSubprocesso}/mapa-ajuste/atualizar")
     @Transactional
@@ -131,14 +131,14 @@ public class SubprocessoMapaControle {
      * <p>
      * Corresponde ao CDU-15.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo código do subprocesso.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto}.
      */
-    @GetMapping("/{id}/mapa-completo")
+    @GetMapping("/{codigo}/mapa-completo")
     @Operation(summary = "Obtém um mapa completo com competências e atividades (CDU-15)")
-    public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long id) {
-        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(id);
-        MapaCompletoDto mapa = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), id);
+    public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codigo) {
+        Subprocesso subprocesso = subprocessoConsultaService.getSubprocessoComMapa(codigo);
+        MapaCompletoDto mapa = mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codigo);
         return ResponseEntity.ok(mapa);
     }
 
@@ -148,14 +148,14 @@ public class SubprocessoMapaControle {
      * <p>
      * Corresponde ao CDU-15.
      *
-     * @param codSubprocesso O ID do subprocesso.
-     * @param request O DTO com a estrutura completa do mapa a ser salvo.
-     * @param usuario O usuário autenticado que realiza a operação.
+     * @param codSubprocesso O código do subprocesso.
+     * @param request        O DTO com a estrutura completa do mapa a ser salvo.
+     * @param usuario        O usuário autenticado que realiza a operação.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
     @PostMapping("/{codSubprocesso}/mapa-completo/atualizar")
     @Transactional
-    @Operation(summary = "Salva um mapa completo com competências e atividades (CDU-15)")
+    @Operation(summary = "Salva um mapa completo com competências e atividades")
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
             @PathVariable Long codSubprocesso,
             @RequestBody @Valid SalvarMapaRequest request,

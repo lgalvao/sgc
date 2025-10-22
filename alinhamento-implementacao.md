@@ -171,7 +171,7 @@ O alinhamento para este CDU é **excelente**.
 | Arquivo | Análise |
 |---|---|
 | `reqs/cdu-07.md` | O requisito detalha a tela de visualização de um subprocesso e as regras de visibilidade para os **cards de ação** (ex: "Cadastro de atividades", "Mapa de competências"). |
-| `frontend/e2e/cdu-07.spec.ts` | O teste E2E é **muito básico**. Ele apenas confirma que a página de detalhes do subprocesso é carregada, mas não valida a presença ou ausência dos cards de ação. |
+| `frontend/e2e/cdu-07.spec.ts` | O teste E2E foi **expandido** e agora valida a lógica de visibilidade dos cards de ação para diferentes perfis e situações de subprocesso. |
 | `backend/src/test/java/sgc/integracao/CDU07IntegrationTest.java` | O teste de integração foca na **autorização de acesso** ao endpoint, não na lógica de visualização dos cards. Ele valida que um usuário só pode acessar o subprocesso de sua própria unidade. |
 
 ### Detalhamento
@@ -183,16 +183,8 @@ O alinhamento para este CDU é **excelente**, com uma clara separação de respo
     - Confirma que o `ADMIN` pode ver qualquer subprocesso.
     - Confirma que um `CHEFE` pode ver o subprocesso de sua própria unidade.
     - Confirma que um `CHEFE` recebe um erro `403 Forbidden` ao tentar acessar o subprocesso de outra unidade.
--   **Frontend (E2E):** O teste E2E (`cdu-07.spec.ts`) está **fraco**. Ele não valida a lógica de negócio mais importante do lado do cliente: a exibição condicional dos cards de ação com base na situação do subprocesso e no perfil do usuário.
+-   **Frontend (E2E):** O teste E2E (`cdu-07.spec.ts`) foi **expandido** e agora valida a lógica de negócio mais importante do lado do cliente: a exibição condicional dos cards de ação com base na situação do subprocesso e no perfil do usuário. Ele verifica a presença e ausência dos cards para diferentes perfis e situações.
 
-**Pontos de atenção:**
-
--   A lógica de segurança crítica do backend está bem coberta.
--   A lógica de UI do frontend não está sendo validada pelo teste E2E.
-
-**Recomendações:**
-
--   Expandir o teste E2E (`cdu-07.spec.ts`) para incluir cenários que verifiquem a presença ou ausência dos cards de ação para diferentes perfis e em diferentes situações de subprocesso.
 
 ## CDU-08: Manter cadastro de atividades e conhecimentos
 
@@ -384,7 +376,7 @@ O alinhamento para este CDU é **Bom**, mas com lacunas significativas na cobert
     -   **Requisito:** O requisito especifica uma lógica condicional crucial:
         1.  Se **não houver impactos** no mapa, o status do subprocesso deve mudar para `MAPA_HOMOLOGADO`.
         2.  Se **houver impactos**, o status deve mudar para `REVISAO_CADASTRO_HOMOLOGADA` (para que o mapa possa ser ajustado posteriormente).
-    -   **Teste de Integração:** O teste de integração `CDU14IntegrationTest.java` estava **desalinhado**. Ele tentava homologar com o perfil GESTOR (incorreto, deveria ser ADMIN) e não validava a lógica condicional de mudança de status. A análise aprofundada revelou que a implementação no `SubprocessoWorkflowService` também estava parcialmente incorreta.
+    -   **Teste de Integração:** O teste de integração `CDU14IntegrationTest.java` foi **corrigido e expandido**. Ele agora valida os fluxos de devolução e aceite, e, crucialmente, inclui dois cenários claros de homologação pelo ADMIN: um sem impactos (esperando `MAPA_HOMOLOGADO`) e outro com impactos (esperando `REVISAO_CADASTRO_HOMOLOGADA` e a criação da movimentação).
     -   **Teste E2E:** O teste E2E não possui um cenário para a homologação pelo ADMIN.
 
 **Pontos de atenção:**
@@ -488,23 +480,7 @@ A implementação do backend para o CDU-15 se distancia do fluxo de trabalho des
 | Arquivo | Análise |
 |---|---|
 | `reqs/cdu-18.md` | O requisito descreve a tela de visualização **somente leitura** do mapa de competências, com sua estrutura aninhada (Competência -> Atividade -> Conhecimento). |
-| `frontend/e2e/cdu-18.spec.ts` | Teste E2E **não encontrado**. |
-| `backend/src/test/java/sgc/integracao/CDU18IntegrationTest.java` | O teste de integração valida que a API (`GET /api/subprocessos/{id}/mapa-visualizacao`) retorna um DTO com a estrutura de dados aninhada exata, pronta para ser consumida pela interface. |
-
-### Detalhamento
-
-O alinhamento para este CDU é **excelente** no backend, mas com uma lacuna de testes no frontend.
-
--   **Backend (Integração):** A implementação do backend está perfeitamente alinhada com os requisitos. Ele fornece um endpoint dedicado que retorna um DTO (`MapaVisualizacaoDto`) especificamente formatado para esta visualização. O teste de integração (`CDU18IntegrationTest.java`) é muito robusto, utilizando JSONPath para fazer asserções detalhadas sobre toda a estrutura aninhada do mapa, garantindo que as competências, atividades e conhecimentos estão corretamente agrupados.
--   **Frontend (E2E):** Não existe um teste E2E para este caso de uso. Isso significa que, embora o backend forneça os dados corretos, não há uma verificação automatizada de que a interface do usuário está renderizando esses dados conforme especificado.
-
-**Pontos de atenção:**
-
--   A principal lacuna é a ausência de um teste E2E para validar a camada de apresentação.
-
-**Recomendações:**
-
--   Criar um teste E2E (`cdu-18.spec.ts`) para validar que a tela de visualização do mapa de competências renderiza corretamente a estrutura de dados fornecida pelo backend.
+| `frontend/e2e/cdu-18.spec.ts` | O teste E2E foi **criado** e agora valida que a tela de visualização do mapa de competências renderiza corretamente a estrutura de dados fornecida pelo backend. |
 
 ## CDU-19: Validar mapa de competências
 
@@ -514,7 +490,7 @@ O alinhamento para este CDU é **excelente** no backend, mas com uma lacuna de t
 |---|---|
 | `reqs/cdu-19.md` | O requisito descreve dois fluxos para o CHEFE: "Apresentar sugestões" e "Validar" o mapa. Ambos devem gerar alertas e movimentações para a unidade superior. |
 | `frontend/e2e/cdu-19.spec.ts` | Teste E2E **não encontrado**. |
-| `backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java` | O teste de integração cobre os dois fluxos, mas revela uma **divergência**: o fluxo "Apresentar sugestões" cria um alerta, mas não a `Movimentacao` esperada. O fluxo "Validar" está correto. |
+| `backend/src/test/java/sgc/integracao/CDU19IntegrationTest.java` | O teste de integração cobre os dois fluxos, e agora valida corretamente a criação de `Movimentacao` e `Alerta` para ambos os fluxos. |
 
 ### Detalhamento
 
@@ -522,19 +498,18 @@ O alinhamento para este CDU é **bom**, mas com uma divergência de implementaç
 
 -   **Backend (Integração):** O teste de integração (`CDU19IntegrationTest.java`) valida os dois endpoints principais:
     -   **`POST .../validar-mapa`:** Este fluxo está **perfeitamente alinhado**. O teste confirma que a situação do subprocesso muda para `MAPA_VALIDADO` e que tanto a `Movimentacao` quanto o `Alerta` são criados corretamente para a unidade superior.
-    -   **`POST .../apresentar-sugestoes`:** Este fluxo apresenta uma **divergência**. O teste valida que a situação muda para `MAPA_COM_SUGESTOES`, que as sugestões são salvas e que um `Alerta` é criado. No entanto, o teste também faz uma asserção explícita de que **nenhuma `Movimentacao` é criada** (`assertThat(movimentacoes).isEmpty()`). Isso contradiz o item 6 do requisito, que afirma que uma movimentação deve ser criada em ambos os casos.
+    -   **`POST .../apresentar-sugestoes`:** Este fluxo foi **corrigido**. O teste agora valida que a situação muda para `MAPA_COM_SUGESTOES`, que as sugestões são salvas, e que tanto a `Movimentacao` quanto o `Alerta` são criados conforme especificado no requisito.
 -   **Frontend (E2E):** Não existe um teste E2E para este caso de uso, o que impede a verificação do fluxo completo do usuário, incluindo a exibição do histórico de análises e a interação com os modais de sugestões e validação.
 
 **Pontos de atenção:**
 
--   **Divergência Crítica:** A ausência da `Movimentacao` no fluxo "Apresentar sugestões" é uma divergência clara em relação à especificação e pode impactar a rastreabilidade do processo.
 -   A funcionalidade "Histórico de análise" não é explicitamente coberta pelos testes de backend.
 -   Falta cobertura de teste E2E.
 
 **Recomendações:**
 
--   **Corrigir a Implementação:** Investigar o serviço backend para o fluxo "Apresentar sugestões" e garantir que ele crie a `Movimentacao` conforme especificado no requisito. O teste de integração correspondente deve ser atualizado para refletir essa correção.
 -   **Criar Teste E2E:** Desenvolver o teste `cdu-19.spec.ts` para validar os dois fluxos de ponta a ponta.
+-   **Expandir o Teste de Integração:** Adicionar testes para cobrir a funcionalidade "Histórico de análise" no backend.
 
 ## CDU-20: Analisar validação de mapa de competências
 
@@ -544,18 +519,13 @@ O alinhamento para este CDU é **bom**, mas com uma divergência de implementaç
 |---|---|
 | `reqs/cdu-20.md` | O requisito detalha o complexo fluxo de análise do mapa, com três ações possíveis: Devolver, Aceitar (GESTOR) e Homologar (ADMIN), além da visualização do histórico de análises. |
 | `frontend/e2e/cdu-20.spec.ts` | Teste E2E **não encontrado**. |
-| `backend/src/test/java/sgc/integracao/CDU20IntegrationTest.java` | O teste de integração valida o ciclo "Devolver -> Revalidar -> Aceitar" e a consulta ao histórico de análises. No entanto, **não cobre o fluxo de Homologação** pelo ADMIN. |
+| `backend/src/test/java/sgc/integracao/CDU20IntegrationTest.java` | O teste de integração foi **expandido e aprimorado**, cobrindo o ciclo completo de devolução, revalidação, aceite e homologação, com verificação de `Movimentacao` e `Alerta`. |
 
 ### Detalhamento
 
 O alinhamento para este CDU é **parcial**. O fluxo principal de análise está implementado, mas a etapa final de homologação não é coberta pelos testes.
 
--   **Backend (Integração):** O teste de integração (`CDU20IntegrationTest.java`) executa um cenário de ponta a ponta muito relevante:
-    1.  Simula uma **devolução** da validação.
-    2.  Verifica se o **histórico de análise** (`GET .../historico-validacao`) reflete corretamente a devolução.
-    3.  Simula uma nova validação e, em seguida, um **aceite**.
-    4.  Verifica novamente o histórico para confirmar o registro do aceite.
-    -   Esta abordagem valida de forma eficaz a lógica de negócio dos fluxos de devolução e aceite, bem como a funcionalidade de histórico.
+-   **Backend (Integração):** O teste de integração (`CDU20IntegrationTest.java`) foi **expandido e aprimorado**. Ele agora executa um cenário de ponta a ponta que inclui devolução, revalidação e aceite, e, crucialmente, um novo teste para o fluxo de **Homologação** pelo ADMIN, verificando a mudança de status para `MAPA_HOMOLOGADO`. Além disso, os testes existentes foram **reforçados** com asserções explícitas para a criação de `Movimentacao` e `Alerta` nos fluxos de devolução e aceite.
 -   **Lacunas no Backend:**
     -   O fluxo de **Homologação** pelo ADMIN, que é o passo final e conclusivo do processo, não é testado. Não há nenhuma chamada a um endpoint como `/homologar-validacao`.
     -   O teste foca no histórico de `Analise` e não verifica explicitamente a criação de `Movimentacao` e `Alerta`, que são efeitos colaterais importantes descritos no requisito.
@@ -563,13 +533,10 @@ O alinhamento para este CDU é **parcial**. O fluxo principal de análise está 
 
 **Pontos de atenção:**
 
--   A funcionalidade de homologação do mapa pelo ADMIN é a principal lacuna na cobertura de testes.
--   Os efeitos colaterais (movimentações e alertas) não são validados no teste de integração existente.
+-   Falta cobertura de teste E2E.
 
 **Recomendações:**
 
--   **Expandir o Teste de Integração:** Adicionar um novo cenário de teste em `CDU20IntegrationTest.java` para validar o fluxo de homologação pelo ADMIN. Este teste deve verificar a mudança final de status do subprocesso para `MAPA_HOMOLOGADO`.
--   **Reforçar Asserções:** Melhorar os testes existentes para verificar também a criação de `Movimentacao` e `Alerta` nos fluxos de devolução e aceite.
 -   **Criar Teste E2E:** Desenvolver o teste `cdu-20.spec.ts` para cobrir todo o ciclo de vida da análise, incluindo as ações do GESTOR e do ADMIN.
 
 ## CDU-21: Finalizar processo de mapeamento ou de revisão
@@ -580,7 +547,7 @@ O alinhamento para este CDU é **parcial**. O fluxo principal de análise está 
 |---|---|
 | `reqs/cdu-21.md` | O requisito descreve o fluxo de finalização de um processo pelo ADMIN, que inclui: uma validação (todos os subprocessos devem estar homologados), a atualização dos mapas vigentes e o envio de notificações diferenciadas por tipo de unidade. |
 | `frontend/e2e/cdu-21.spec.ts` | Teste E2E **não encontrado**. |
-| `backend/src/test/java/sgc/integracao/CDU21IntegrationTest.java` | O teste de integração valida **excelentemente** o fluxo de sucesso, verificando a mudança de status, a atualização dos mapas vigentes e o conteúdo detalhado das notificações. No entanto, **não cobre o cenário de falha** (tentar finalizar um processo com subprocessos pendentes). |
+| `backend/src/test/java/sgc/integracao/CDU21IntegrationTest.java` | O teste de integração valida **excelentemente** o fluxo de sucesso e agora também cobre o cenário de falha (tentar finalizar um processo com subprocessos pendentes). |
 
 ### Detalhamento
 
@@ -590,16 +557,15 @@ O alinhamento para este CDU é **excelente** para o fluxo de sucesso, mas com la
     1.  Valida que o status do processo é alterado para `FINALIZADO`.
     2.  Verifica a lógica de negócio mais crítica: que o mapa de cada subprocesso se torna o **mapa vigente** da sua respectiva unidade.
     3.  Usa um `ArgumentCaptor` para inspecionar os e-mails enviados, confirmando que as unidades operacionais recebem a notificação correta e que a unidade intermediária recebe a notificação consolidada com a lista de unidades subordinadas, exatamente como especificado no requisito.
+-   **Backend (Integração - Cenário de Falha):** Foi adicionado um novo teste que simula a tentativa de finalizar um processo com um subprocesso não homologado e garante que a operação falhe com um status de erro adequado (`409 Conflict`), e que o status do processo principal não é alterado.
 -   **Lacunas na Cobertura de Testes:**
     -   **Cenário de Falha (Backend):** A validação principal — impedir a finalização se nem todos os subprocessos estiverem no estado `MAPA_HOMOLOGADO` — não é testada. Falta um teste que prepare um cenário com um subprocesso pendente e confirme que a API retorna um erro apropriado.
     -   **Teste E2E:** Não existe um teste E2E para este caso de uso, o que impede a validação da interação do usuário com o botão "Finalizar processo" e a exibição das mensagens de erro ou sucesso.
 
 **Pontos de atenção:**
 
--   A implementação do fluxo de sucesso parece estar perfeitamente alinhada e é muito bem testada.
--   A principal fraqueza é a falta de um teste para o cenário de validação/erro, que é uma regra de negócio explícita e importante.
+-   Falta cobertura de teste E2E.
 
 **Recomendações:**
 
--   **Adicionar Teste de Integração (Cenário de Falha):** Criar um novo teste em `CDU21IntegrationTest.java` para simular a tentativa de finalizar um processo com um subprocesso não homologado e garantir que a operação falhe com um status de erro adequado (e.g., 409 Conflict).
 -   **Criar Teste E2E:** Desenvolver o teste `cdu-21.spec.ts` para validar o fluxo completo do ponto de vista do usuário.

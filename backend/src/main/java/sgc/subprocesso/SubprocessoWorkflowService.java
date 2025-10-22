@@ -319,6 +319,12 @@ public class SubprocessoWorkflowService {
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
+
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
+
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Mapa de competências homologado"));
+        subprocessoNotificacaoService.notificarHomologacaoMapa(sp);
     }
 
     /**

@@ -116,7 +116,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroProcesso.class)
     protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
         log.error("Erro de negócio no processo: {}", ex.getMessage(), ex);
-        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitize(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)

@@ -2,17 +2,23 @@ spring:
   main.banner-mode: off
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
-
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: leonardo
     password: postgres
+  test.mockmvc.print: none
   jpa:
     hibernate.ddl-auto: create
     properties:
       hibernate.default_schema: sgc
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+    # Defer datasource initialization to run after Hibernate has created the schema
+    defer-datasource-initialization: true
+  sql:
+    init:
+      # Ensure data.sql is always run for the default profile
+      mode: always
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -56,4 +62,5 @@ logging:
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
+    org.springframework: WARN
     sgc: INFO

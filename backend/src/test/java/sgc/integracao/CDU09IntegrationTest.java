@@ -59,7 +59,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU09IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired
@@ -111,7 +110,6 @@ class CDU09IntegrationTest {
     @Nested
     @DisplayName("Testes para Disponibilizar Cadastro")
     class DisponibilizarCadastro {
-
         @Test
         @DisplayName("Deve disponibilizar o cadastro com sucesso quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {

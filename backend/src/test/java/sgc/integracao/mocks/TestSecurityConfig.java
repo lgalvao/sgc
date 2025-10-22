@@ -9,7 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @TestConfiguration
 @EnableMethodSecurity(prePostEnabled = true)
-@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestSecurityConfig {
 
     @Bean
