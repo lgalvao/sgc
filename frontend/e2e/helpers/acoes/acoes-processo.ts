@@ -339,3 +339,10 @@ export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: str
 export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
     await page.getByTestId(SELETORES.BTN_HISTORICO_ANALISE).click();
 }
+
+/**
+ * Homologa a revisão de um cadastro, preenchendo a observação se fornecida.
+ */
+export async function homologarRevisaoCadastro(page: Page, observacao?: string): Promise<void> {
+    await homologarCadastro(page, observacao);
+}

@@ -193,6 +193,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Sugestões apresentadas para o mapa de competências"));
         analiseService.removerPorSubprocesso(sp.getCodigo());
         subprocessoNotificacaoService.notificarSugestoes(sp);
     }

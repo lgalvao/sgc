@@ -111,9 +111,11 @@ class CDU19IntegrationTest {
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
 
-            // A implementação do serviço não cria movimentação, mas cria um alerta.
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-            assertThat(movimentacoes).isEmpty();
+            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Sugestões apresentadas para o mapa de competências");
+            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
             List<Alerta> alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
         }

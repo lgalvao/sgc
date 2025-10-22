@@ -64,6 +64,15 @@ public class CDU20IntegrationTest {
 
     @BeforeEach
     void setUp() {
+        Unidade sedoc = unidadeRepo.save(new Unidade("Secretaria de Documentação", "SEDOC"));
+        Usuario adminMock = new Usuario();
+        adminMock.setTituloEleitoral(111111111111L);
+        adminMock.setPerfis(java.util.Set.of(Perfil.ADMIN));
+        adminMock.setUnidade(sedoc);
+        usuarioRepo.save(adminMock);
+        sedoc.setTitular(adminMock);
+        unidadeRepo.save(sedoc);
+
         Unidade unidadeSuperiorSuperior = unidadeRepo.save(new Unidade("Unidade Superior Superior", "UNISUPSUP"));
         Unidade unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
         unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
@@ -121,6 +130,18 @@ public class CDU20IntegrationTest {
         assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
         assertThat(historicoDevolucao.getFirst().observacoes()).isEqualTo("Justificativa da devolução");
 
+        // Adicionar verificação de Movimentacao e Alerta após devolução
+        List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoesDevolucao).hasSize(1);
+        assertThat(movimentacoesDevolucao.getFirst().getDescricao()).isEqualTo("Devolução da validação do mapa de competências para ajustes");
+        assertThat(movimentacoesDevolucao.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoesDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
+
+        List<Alerta> alertasDevolucao = alertaRepo.findAll();
+        assertThat(alertasDevolucao).hasSize(1);
+        assertThat(alertasDevolucao.getFirst().getDescricao()).contains("Mapa de competências devolvido para ajustes");
+        assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
+
         // Unidade inferior valida o mapa novamente
         mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
                         .with(csrf()))
@@ -142,5 +163,45 @@ public class CDU20IntegrationTest {
         assertThat(historicoAceite).hasSize(1);
         assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
         assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
+
+        // Adicionar verificação de Movimentacao e Alerta após aceite
+        List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoesAceite).hasSize(2); // Movimentação de devolução + movimentação de aceite
+        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+
+        List<Alerta> alertasAceite = alertaRepo.findAll();
+        assertThat(alertasAceite).hasSize(2); // Alerta de devolução + alerta de aceite
+        assertThat(alertasAceite.getFirst().getDescricao()).contains("Mapa de competências da UNISUB submetido para análise");
+        assertThat(alertasAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
     }
-}
+
+    @Test
+    @DisplayName("ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta")
+    @WithMockAdmin
+    void testHomologarValidacao_Sucesso() throws Exception {
+        // Cenário: Subprocesso já validado e pronto para homologação
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+        subprocessoRepo.save(subprocesso);
+
+        // Ação
+        mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        // Verificações
+        Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoes).hasSize(1); // Apenas a movimentação de homologação
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
+
+        List<Alerta> alertas = alertaRepo.findAll();
+        assertThat(alertas).hasSize(1);
+        assertThat(alertas.getFirst().getDescricao()).contains("Mapa de competências homologado");
+        assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
+    }}

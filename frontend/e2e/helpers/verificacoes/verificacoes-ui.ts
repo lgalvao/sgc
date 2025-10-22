@@ -442,3 +442,63 @@ export async function verificarCabecalhoUnidade(page: Page, siglaEsperada: strin
     await expect(page.getByTestId(SELETORES.INFO_UNIDADE)).toBeVisible();
     await expect(page.getByTestId(SELETORES.INFO_UNIDADE)).toContainText(siglaEsperada);
 }
+
+/**
+ * Verifica se uma competência com a descrição fornecida está visível no mapa.
+ */
+export async function verificarCompetenciaExiste(page: Page, descricao: string): Promise<void> {
+    await expect(page.locator('.competencia-card', {hasText: descricao})).toBeVisible();
+}
+
+/**
+ * Verifica que uma competência com a descrição fornecida NÃO está visível/no DOM.
+ */
+export async function verificarCompetenciaNaoExiste(page: Page, descricao: string): Promise<void> {
+    await expect(page.locator('.competencia-card', {hasText: descricao})).not.toBeVisible();
+}
+
+/**
+ * Verifica se uma competência possui as atividades associadas corretas.
+ */
+export async function verificarAtividadesAssociadas(page: Page, descricaoCompetencia: string, atividadesEsperadas: string[]): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
+    for (const atividade of atividadesEsperadas) {
+        await expect(competenciaCard.locator('.atividade-associada-card-item', {hasText: atividade})).toBeVisible();
+    }
+}
+
+/**
+ * Verifica a descrição de uma competência.
+ */
+export async function verificarDescricaoCompetencia(page: Page, descricaoCompetencia: string, descricaoEsperada: string): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
+    await expect(competenciaCard.getByTestId('competencia-descricao')).toHaveText(descricaoEsperada);
+}
+
+/**
+ * Verifica se um card de ação com o título fornecido está visível.
+ */
+export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): Promise<void> {
+    await expect(page.locator('.card-acao', {hasText: tituloCard})).toBeVisible();
+}
+
+/**
+ * Verifica se um card de ação com o título fornecido NÃO está visível.
+ */
+export async function verificarCardAcaoInvisivel(page: Page, tituloCard: string): Promise<void> {
+    await expect(page.locator('.card-acao', {hasText: tituloCard})).not.toBeVisible();
+}
+
+/**
+ * Verifica se um card de ação com o título fornecido está visível.
+ */
+export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): Promise<void> {
+    await expect(page.locator('.card-acao', {hasText: tituloCard})).toBeVisible();
+}
+
+/**
+ * Verifica se um card de ação com o título fornecido NÃO está visível.
+ */
+export async function verificarCardAcaoInvisivel(page: Page, tituloCard: string): Promise<void> {
+    await expect(page.locator('.card-acao', {hasText: tituloCard})).not.toBeVisible();
+}

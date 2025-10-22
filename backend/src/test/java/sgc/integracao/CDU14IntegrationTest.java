@@ -201,8 +201,55 @@ class CDU14IntegrationTest {
             subprocessoRepo.save(subprocesso);
         }
 
+        @Test
+        @DisplayName("ADMIN deve homologar revisão do cadastro SEM impactos, alterando status para MAPA_HOMOLOGADO")
+        @WithMockAdmin
+        void testHomologarRevisaoCadastro_SemImpactos() throws Exception {
+            // Cenário: Garantir que não há atividades que causem impactos
+            atividadeRepo.deleteAll(); // Limpa quaisquer atividades existentes para garantir que não há impactos
 
+            // Ação
+            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType("application/json")
+                    .content("{"observacoes": "Homologado sem impactos"}"))
+                .andExpect(status().isOk());
 
+            // Verificações
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
 
+            // Deve haver apenas a movimentação inicial
+            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Disponibilização da revisão do cadastro");
+        }
+
+        @Test
+        @DisplayName("ADMIN deve homologar revisão do cadastro COM impactos, alterando status para REVISAO_CADASTRO_HOMOLOGADA e criando movimentação")
+        @WithMockAdmin
+        void testHomologarRevisaoCadastro_ComImpactos() throws Exception {
+            // Cenário: Adicionar atividades para simular impactos
+            Atividade atividade = new Atividade("Atividade com impacto", "Descrição", subprocesso.getMapa());
+            atividadeRepo.save(atividade);
+
+            // Ação
+            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType("application/json")
+                    .content("{"observacoes": "Homologado com impactos"}"))
+                .andExpect(status().isOk());
+
+            // Verificações
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+            // Deve haver a movimentação inicial e a de homologação
+            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+            assertThat(movimentacoes).hasSize(2);
+            assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos homologado");
+            assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeAdmin.getSigla());
+            assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
+        }
     }
 }

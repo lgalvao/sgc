@@ -14,7 +14,9 @@ import {
     verificarCadastroDevolvidoComSucesso,
     verificarModalFechado,
     verificarModalHistoricoAnaliseAberto,
+    homologarRevisaoCadastro,
 } from './helpers';
+import {esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
 
 test.describe('CDU-14: Analisar revisão de cadastro de atividades e conhecimentos', () => {
     let processo: any;
@@ -50,4 +52,14 @@ test.describe('CDU-14: Analisar revisão de cadastro de atividades e conheciment
         await cancelarModal(page);
         await verificarModalFechado(page);
     });
-});
+
+    test('ADMIN deve homologar revisão do cadastro', async ({page}) => {
+        // Primeiro, o gestor precisa aceitar para que o ADMIN possa homologar
+        await acessarAnaliseRevisaoComoGestor(page, processo.processo.codigo, 'STIC');
+        await registrarAceiteRevisao(page, 'Aceite para homologação.');
+        await verificarAceiteRegistradoComSucesso(page);
+
+        // Agora o ADMIN pode homologar
+        await acessarAnaliseRevisaoComoAdmin(page, processo.processo.codigo, 'STIC');
+        await homologarRevisaoCadastro(page, 'Homologado pelo ADMIN.');
+        await esperarUrl(page, new RegExp(`/processo/${processo.processo.codigo}/STIC

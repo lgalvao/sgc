@@ -110,6 +110,13 @@ export async function irParaVisualizacaoMapa(page: Page, idProcesso: number, uni
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-mapa`));
 }
 
+export async function navegarParaEdicaoMapa(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
+    await page.goto(`/processo/${idProcesso}/${siglaUnidade}/mapa`);
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${siglaUnidade}/mapa`));
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
+}
+
 /**
  * Navega para subprocesso específico
  */

@@ -1,41 +1,51 @@
-import {expect, Page} from '@playwright/test';
-
-/**
- * Valida um mapa de competências
- */
-export async function validarMapa(page: Page, sugestoes?: string): Promise<void> {
-    await page.getByTestId('validar-btn').click();
-    await expect(page.getByTestId('modal-validar')).toBeVisible();
-
-    if (sugestoes) {
-        await page.fill('textarea[placeholder*="sugestões"]', sugestoes);
-    }
-
-    await page.getByTestId('modal-validar-confirmar').click();
-}
-
-/**
- * Apresenta sugestões para o mapa (ação composta: abrir modal, preencher e confirmar).
- * Fica na camada de ações porque descreve a intenção de negócio "apresentar sugestões".
- */
-export async function apresentarSugestoes(page: Page, sugestao: string): Promise<void> {
-    await page.getByTestId('apresentar-sugestoes-btn').click();
-    // O modal pode demorar a aparecer; usar expectation simples para estabilidade
-    await expect(page.getByTestId('modal-apresentar-sugestoes')).toBeVisible();
-    await page.getByTestId('sugestoes-textarea').fill(sugestao);
-    await page.getByTestId('modal-apresentar-sugestoes-confirmar').click();
-}
-
-/**
- * Clica no botão "Impactos no mapa" para abrir o modal de impactos.
- */
-export async function clicarBotaoImpactosMapa(page: Page): Promise<void> {
-    await page.getByTestId('impactos-mapa-button').click();
-}
-
-/**
- * Fecha o modal de impactos no mapa.
- */
 export async function fecharModalImpactos(page: Page): Promise<void> {
     await page.getByTestId('fechar-impactos-mapa-button').click();
+}
+
+/**
+ * Cria uma nova competência através do modal.
+ */
+export async function criarCompetencia(page: Page, descricao: string, atividades: string[]): Promise<void> {
+    await page.getByTestId('btn-abrir-criar-competencia').click();
+    await expect(page.getByTestId('input-nova-competencia')).toBeVisible();
+    await page.getByTestId('input-nova-competencia').fill(descricao);
+
+    for (const atividade of atividades) {
+        await page.locator('.atividade-card-item').filter({hasText: atividade}).click();
+    }
+
+    await page.getByTestId('btn-criar-competencia').click();
+    await expect(page.getByTestId('input-nova-competencia')).not.toBeVisible(); // Modal deve fechar
+}
+
+/**
+ * Edita uma competência existente através do modal.
+ */
+export async function editarCompetencia(page: Page, descricaoOriginal: string, novaDescricao: string, novasAtividades: string[]): Promise<void> {
+    await page.locator('.competencia-card').filter({hasText: descricaoOriginal}).getByTestId('btn-editar-competencia').click();
+    await expect(page.getByTestId('input-nova-competencia')).toBeVisible();
+    await page.getByTestId('input-nova-competencia').fill(novaDescricao);
+
+    // Desmarcar atividades antigas e marcar novas
+    const atividadesAtuais = await page.locator('.atividade-card-item.checked').allTextContents();
+    for (const atividade of atividadesAtuais) {
+        await page.locator('.atividade-card-item').filter({hasText: atividade}).click();
+    }
+
+    for (const atividade of novasAtividades) {
+        await page.locator('.atividade-card-item').filter({hasText: atividade}).click();
+    }
+
+    await page.getByTestId('btn-criar-competencia').click();
+    await expect(page.getByTestId('input-nova-competencia')).not.toBeVisible(); // Modal deve fechar
+}
+
+/**
+ * Exclui uma competência existente através do modal de confirmação.
+ */
+export async function excluirCompetencia(page: Page, descricao: string): Promise<void> {
+    await page.locator('.competencia-card').filter({hasText: descricao}).getByTestId('btn-excluir-competencia').click();
+    await expect(page.getByText(`Confirma a exclusão da competência "${descricao}"?`)).toBeVisible();
+    await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
+    await expect(page.getByText(`Confirma a exclusão da competência "${descricao}"?`)).not.toBeVisible(); // Modal deve fechar
 }

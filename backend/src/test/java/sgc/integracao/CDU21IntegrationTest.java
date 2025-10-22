@@ -194,4 +194,35 @@ class CDU21IntegrationTest {
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP1</li>");
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP2</li>");
     }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Não deve finalizar processo se houver subprocessos pendentes e deve retornar 409 Conflict")
+    void finalizarProcesso_ComSubprocessoPendente_DeveRetornarConflito() throws Exception {
+        // Arrange: Alterar um dos subprocessos para um estado não homologado
+        Subprocesso spPendente = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
+                .filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo()))
+                .findFirst().orElseThrow();
+        spPendente.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocessoRepo.save(spPendente);
+
+        // Act
+        mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isConflict()); // Espera status 409 Conflict
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert: Verificar que o status do processo principal não foi alterado
+        Processo processoNaoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        assertThat(processoNaoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+
+        // Verificar que nenhum mapa se tornou vigente
+        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo())).isEmpty();
+        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo())).isEmpty();
+
+        // Verificar que nenhuma notificação foi enviada
+        verify(notificacaoService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
+    }
 }
