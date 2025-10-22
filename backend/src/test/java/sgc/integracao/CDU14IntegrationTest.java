@@ -9,10 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sgc.alerta.modelo.AlertaRepo;
+import java.util.logging.Logger;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
@@ -53,7 +57,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Import(sgc.integracao.mocks.TestSecurityConfig.class)
-class CDU14IntegrationTest {    @Autowired
+@Sql("/create-test-data.sql")
+@Transactional
+class CDU14IntegrationTest {
+    private static final Logger logger = Logger.getLogger(CDU14IntegrationTest.class.getName());
+    @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
@@ -84,19 +92,11 @@ class CDU14IntegrationTest {    @Autowired
     void setUp() throws Exception {
         mockMvc = webAppContextSetup(context).apply(springSecurity()).build();
 
-        // Limpeza de dados
-        subprocessoRepo.deleteAll();
-        mapaRepo.deleteAll();
-        atividadeRepo.deleteAll();
-        unidadeMapaRepo.deleteAll();
-        alertaRepo.deleteAll();
-        analiseRepo.deleteAll();
-
         // Hierarquia de Unidades e Usuários (carregados do data.sql)
-        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
-        unidade = unidadeRepo.findById(102L).orElseThrow();
-        chefe = usuarioRepo.findById(333333333333L).orElseThrow();
+        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow(() -> new IllegalStateException("Unidade Admin não encontrada"));
+        unidadeGestor = unidadeRepo.findById(101L).orElseThrow(() -> new IllegalStateException("Unidade Gestor não encontrada"));
+        unidade = unidadeRepo.findById(102L).orElseThrow(() -> new IllegalStateException("Unidade não encontrada"));
+        chefe = usuarioRepo.findById(333333333333L).orElseThrow(() -> new IllegalStateException("Chefe não encontrado"));
 
         // Mapa Vigente e suas atividades (setup manual, pois não há API para isso)
         Mapa mapaVigente = criarMapa();
@@ -115,6 +115,7 @@ class CDU14IntegrationTest {    @Autowired
 
         var processoResult = mockMvc.perform(post("/api/processos")
                 .with(csrf())
+                .with(user("222222222222"))
                 .contentType("application/json")
                 .content(criarProcessoJson))
             .andExpect(status().isCreated())
@@ -136,6 +137,12 @@ class CDU14IntegrationTest {    @Autowired
             .filter(s -> s.getUnidadeCodigo().equals(unidade.getCodigo()))
             .findFirst().orElseThrow()
             .getCodigo();
+
+        // Iniciar o subprocesso de cadastro (ação do Chefe)
+        mockMvc.perform(post("/api/subprocessos/{id}/iniciar-revisao-cadastro", this.subprocessoId)
+                .with(csrf())
+                .with(user(chefe.getTituloEleitoral().toString())))
+            .andExpect(status().isOk());
 
         // Disponibilizar o cadastro para análise (ação do Chefe)
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", this.subprocessoId)
@@ -213,21 +220,18 @@ class CDU14IntegrationTest {    @Autowired
     @Nested
     @DisplayName("Testes para o fluxo de 'Homologar'")
     class HomologarCadastroTest {
-        @BeforeEach
-        void setup() {
-            // Este setup anula o setup da classe pai para criar um subprocesso
-            // diretamente no estado AGUARDANDO_HOMOLOGACAO_CADASTRO.
-            // A lógica para chegar a este estado via API já foi testada no `AceitarCadastroTest`.
-            // Para manter o teste de homologação focado, criamos o estado manualmente.
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            sp.setSituacao(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
-            subprocessoRepo.save(sp);
-        }
-
         @Test
         @DisplayName("ADMIN deve homologar revisão do cadastro SEM impactos, alterando status para MAPA_HOMOLOGADO")
         @WithMockAdmin
         void testHomologarRevisaoCadastro_SemImpactos() throws Exception {
+            // Leva o subprocesso para o estado de aguardando homologação
+            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                    .with(csrf())
+                    .with(user("222222222222"))
+                    .contentType("application/json")
+                    .content("{\"observacoes\": \"Tudo certo.\"}"))
+                .andExpect(status().isOk());
+
             // Cenário: Garantir que o mapa do subprocesso seja idêntico ao mapa vigente
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             Mapa mapaVigente = mapaRepo.findById(unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo()).orElseThrow().getMapaVigenteCodigo()).orElseThrow();
@@ -260,6 +264,14 @@ class CDU14IntegrationTest {    @Autowired
         @DisplayName("ADMIN deve homologar revisão do cadastro COM impactos, alterando status para REVISAO_CADASTRO_HOMOLOGADA e criando movimentação")
         @WithMockAdmin
         void testHomologarRevisaoCadastro_ComImpactos() throws Exception {
+            // Leva o subprocesso para o estado de aguardando homologação
+            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                    .with(csrf())
+                    .with(user("222222222222"))
+                    .contentType("application/json")
+                    .content("{\"observacoes\": \"Tudo certo.\"}"))
+                .andExpect(status().isOk());
+
             // Cenário: Adicionar uma atividade extra para simular impacto
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             atividadeRepo.save(new Atividade(sp.getMapa(), "Atividade com impacto extra"));
