@@ -500,8 +500,10 @@ public class SubprocessoWorkflowService {
                 .motivo(motivo)
                 .build());
 
-        Unidade unidadeAnalise = usuario.getUnidade();
-        Unidade unidadeDestino = sp.getUnidade(); // A devolução é para a unidade do subprocesso
+        Unidade unidadeAnalise = unidadeRepo.findById(usuario.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de análise não encontrada."));
+        Unidade unidadeDestino = unidadeRepo.findById(sp.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de destino não encontrada."));
 
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Devolução do cadastro de atividades e conhecimentos para ajustes"));
 
@@ -546,8 +548,10 @@ public class SubprocessoWorkflowService {
                 .motivo(null)
                 .build());
 
-        Unidade unidadeOrigem = usuario.getUnidade();
-        Unidade unidadeDestino = unidadeOrigem.getUnidadeSuperior();
+        Unidade unidadeOrigem = unidadeRepo.findById(usuario.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem não encontrada."));
+        Unidade unidadeDestino = unidadeRepo.findById(unidadeOrigem.getUnidadeSuperior().getCodigo())
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de destino não encontrada."));
 
         repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
 
