@@ -30,3 +30,11 @@ A solução acima corrigiu o problema de carregamento do `ApplicationContext`, m
 - `sgc.integracao.CDU20IntegrationTest` (2 testes)
 - `sgc.subprocesso.SubprocessoWorkflowServiceTest` (2 testes)
 - `sgc.integracao.CDU14IntegrationTest` (4 testes)
+
+**Tentativas de Correção:**
+- Adição da anotação `@Sql` para carregar dados de teste específicos para `CDU14IntegrationTest`.
+- Uso da anotação `@DirtiesContext` para forçar a recriação do contexto de aplicação entre os testes.
+- Refatoração de `CDU14IntegrationTest` para usar `@WebMvcTest` com dependências mockadas.
+- Adição da anotação `@Transactional` para garantir o rollback das transações de teste.
+
+Nenhuma das tentativas acima resolveu o problema, que parece estar relacionado a um problema mais profundo de configuração de teste e isolamento de dados.
