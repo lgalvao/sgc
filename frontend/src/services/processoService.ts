@@ -57,7 +57,7 @@ export async function obterProcessoPorId(id: number): Promise<Processo> {
 
 export async function atualizarProcesso(codProcesso: number, request: AtualizarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.post<Processo>(`/processos/${codProcesso}/atualizar`, request);
+    const response = await apiClient.put<Processo>(`/processos/${codProcesso}`, request);
     return response.data;
   } catch (error) {
     console.error(`Erro ao atualizar processo ${codProcesso}:`, error);
@@ -67,7 +67,7 @@ export async function atualizarProcesso(codProcesso: number, request: AtualizarP
 
 export async function excluirProcesso(codProcesso: number): Promise<void> {
   try {
-    await apiClient.post(`/processos/${codProcesso}/excluir`);
+    await apiClient.delete(`/processos/${codProcesso}`);
   } catch (error) {
     console.error(`Erro ao excluir processo ${codProcesso}:`, error);
     throw error;

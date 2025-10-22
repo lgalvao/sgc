@@ -208,6 +208,7 @@
     <!-- Modais -->
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
+      :id-subprocesso-destino="idSubprocesso"
       @fechar="mostrarModalImportar = false"
       @importar="handleImportAtividades"
     />
@@ -532,11 +533,10 @@ function cancelarEdicaoAtividade() {
 }
 
 async function handleImportAtividades() {
-  const idSubprocessoOrigem = unidadeSelecionada.value?.codUnidade
-  if (idSubprocesso.value !== undefined && idSubprocessoOrigem) {
-    await atividadesStore.importarAtividades(idSubprocesso.value, idSubprocessoOrigem);
-  }
   mostrarModalImportar.value = false;
+  notificacoesStore.sucesso('Importação Concluída', 'As atividades foram importadas para o seu mapa.');
+  // A store já foi atualizada pela ação de importação,
+  // então não precisamos buscar os dados novamente aqui.
 }
 
 const {perfilSelecionado} = usePerfil()

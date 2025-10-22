@@ -1,4 +1,5 @@
-import {afterEach, describe, expect, it, vi} from 'vitest'
+import {afterEach, describe, expect, it, vi, beforeEach} from 'vitest'
+import { createPinia, setActivePinia } from 'pinia';
 import * as service from '../mapaService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/mapas'
@@ -19,11 +20,18 @@ vi.mock('@/mappers/mapas', () => ({
 }))
 
 describe('mapaService', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
   const mockApi = api as any;
   const mockMappers = mappers as any;
 
   afterEach(() => {
     vi.clearAllMocks()
+    mockApi.get.mockClear()
+    mockApi.post.mockClear()
+    mockApi.put.mockClear()
+    mockApi.delete.mockClear()
   })
 
   it('listarMapas should fetch and map mapas', async () => {
@@ -66,9 +74,9 @@ describe('mapaService', () => {
     const responseDto = { ...request }
     mockApi.put.mockResolvedValue({ data: responseDto })
 
-    const result = await service.atualizarMapa(1, request)
+    const result = await service.atualizarMapa(request.codigo, request)
 
-    expect(mockApi.put).toHaveBeenCalledWith('/mapas/1', request)
+    expect(mockApi.put).toHaveBeenCalledWith(`/mapas/${request.codigo}`, request)
     expect(mockMappers.mapMapaDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })

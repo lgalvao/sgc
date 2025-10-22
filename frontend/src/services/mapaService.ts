@@ -18,10 +18,10 @@ export const criarMapa = async (mapa: SalvarMapaRequest): Promise<Mapa> => {
 };
 
 export const atualizarMapa = async (codMapa: number, mapa: Mapa): Promise<Mapa> => {
-    const response = await apiClient.post(`/mapas/${codMapa}/atualizar`, mapa);
+    const response = await apiClient.put(`/mapas/${codMapa}`, mapa);
     return mapMapaDtoToModel(response.data);
 };
 
 export const excluirMapa = async (codMapa: number): Promise<void> => {
-    await apiClient.post(`/mapas/${codMapa}/excluir`);
+    await apiClient.delete(`/mapas/${codMapa}`);
 };

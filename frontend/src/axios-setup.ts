@@ -13,13 +13,22 @@ export const handleResponseError = (error: any) => {
   const notificacoesStore = useNotificacoesStore();
   if (error.response) {
     const { status, data } = error.response;
+    // Do not show global popups for these statuses, they will be handled locally
+    const isHandledInline = [400, 404, 409, 422].includes(status);
+
+    if (isHandledInline) {
+      // Just forward the error to the local handler
+      return Promise.reject(error);
+    }
+
     if (status === 401) {
       notificacoesStore.erro('Não Autorizado', 'Sua sessão expirou ou você não está autenticado. Faça login novamente.');
       router.push('/login');
     } else if (data && data.message) {
-      notificacoesStore.erro('Erro na Requisição', data.message);
+      // For other errors (like 500), show a generic popup
+      notificacoesStore.erro('Erro Inesperado', data.message);
     } else {
-      notificacoesStore.erro('Erro na Requisição', 'Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      notificacoesStore.erro('Erro Inesperado', 'Ocorreu um erro. Tente novamente mais tarde.');
     }
   } else if (error.request) {
     notificacoesStore.erro('Erro de Rede', 'Não foi possível conectar ao servidor. Verifique sua conexão com a internet.');
