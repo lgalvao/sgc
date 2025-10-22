@@ -18,10 +18,24 @@
             />
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="processo-select"
+            <div
+              v-if="erroImportacao"
+              class="alert alert-danger alert-dismissible"
+              role="alert"
+            >
+              <div>{{ erroImportacao }}</div>
+              <button
+                type="button"
+                class="btn-close"
+                aria-label="Close"
+                @click="limparErroImportacao"
+              ></button>
+            </div>
+            <fieldset :disabled="importando">
+              <div class="mb-3">
+                <label
+                  class="form-label"
+                  for="processo-select"
               >Processo</label>
               <select
                 id="processo-select"
@@ -112,6 +126,7 @@
                 Nenhuma atividade encontrada para esta unidade/processo.
               </div>
             </div>
+            </fieldset>
           </div>
 
           <div class="modal-footer">
@@ -124,13 +139,14 @@
               Cancelar
             </button>
             <button
-              :disabled="!atividadesSelecionadas.length"
+              :disabled="!atividadesSelecionadas.length || importando"
               class="btn btn-outline-primary"
               type="button"
               data-testid="btn-importar"
               @click="importar"
             >
-              Importar
+              <span v-if="importando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              {{ importando ? 'Importando...' : 'Importar' }}
             </button>
           </div>
         </div>
@@ -147,18 +163,27 @@ import {computed, onMounted, ref, watch} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
 import {type Atividade, TipoProcesso, type ProcessoResumo, type UnidadeParticipante} from '@/types/tipos'
+import { useApi } from '@/composables/useApi';
 
 const props = defineProps<{
-  mostrar: boolean
+  mostrar: boolean,
+  idSubprocessoDestino: number | undefined
 }>()
 
 const emit = defineEmits<{
   fechar: []
-  importar: [atividades: Atividade[]]
+  importar: []
 }>()
 
 const processosStore = useProcessosStore()
 const atividadesStore = useAtividadesStore()
+
+const {
+  execute: executarImportacao,
+  error: erroImportacao,
+  isLoading: importando,
+  clearError: limparErroImportacao
+} = useApi(atividadesStore.importarAtividades);
 
 const processoSelecionado = ref<ProcessoResumo | null>(null)
 const processoSelecionadoId = ref<number | null>(null)
@@ -166,7 +191,7 @@ const unidadesParticipantes = ref<UnidadeParticipante[]>([])
 const unidadeSelecionada = ref<UnidadeParticipante | null>(null)
 const unidadeSelecionadaId = ref<number | null>(null)
 const atividadesParaImportar = ref<Atividade[]>([])
-const atividadesSelecionadas = ref<any[]>([])
+const atividadesSelecionadas = ref<Atividade[]>([])
 
 const processosDisponiveis = computed<ProcessoResumo[]>(() => {
   return processosStore.processosPainel.filter(p =>
@@ -244,12 +269,26 @@ function fechar() {
   emit('fechar')
 }
 
-function importar() {
-  if (atividadesSelecionadas.value.length === 0) {
-    alert('Selecione ao menos uma atividade para importar.')
-    return
+async function importar() {
+  limparErroImportacao();
+  if (!props.idSubprocessoDestino || !unidadeSelecionada.value) {
+    return;
   }
-  emit('importar', atividadesSelecionadas.value)
+  if (atividadesSelecionadas.value.length === 0) {
+    erroImportacao.value = 'Selecione ao menos uma atividade para importar.';
+    return;
+  }
+
+  const idsAtividades = atividadesSelecionadas.value.map(a => a.codigo);
+
+  try {
+    await executarImportacao(props.idSubprocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
+    emit('importar');
+    fechar();
+  } catch (err) {
+    // O erro já está sendo tratado pelo useApi, não é necessário fazer nada aqui
+    // a não ser que queira algum comportamento adicional no erro.
+  }
 }
 </script>
 

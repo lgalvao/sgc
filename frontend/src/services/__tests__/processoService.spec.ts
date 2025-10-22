@@ -1,11 +1,7 @@
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi, Mock} from 'vitest'
+import { createPinia, setActivePinia } from 'pinia';
 import * as service from '../processoService'
 import apiClient from '@/axios-setup'
-
-const getSpy = vi.spyOn(apiClient, 'get')
-const postSpy = vi.spyOn(apiClient, 'post')
-const putSpy = vi.spyOn(apiClient, 'put')
-const deleteSpy = vi.spyOn(apiClient, 'delete')
 
 import {AtualizarProcessoRequest, CriarProcessoRequest, TipoProcesso} from '@/types/tipos';
 
@@ -20,6 +16,8 @@ vi.mock('@/axios-setup', () => {
     };
 });
 
+const mockApi = apiClient as any;
+
 describe('processoService', () => {
     let mockedMappers: typeof import('@/mappers/processos'); // Declarar a variável aqui
 
@@ -31,6 +29,7 @@ describe('processoService', () => {
     });
 
     beforeEach(async () => {
+        setActivePinia(createPinia());
         mockedMappers = await import('@/mappers/processos');
         vi.spyOn(mockedMappers, 'mapProcessoDtoToFrontend') as Mock;
         vi.spyOn(mockedMappers, 'mapProcessoDetalheDtoToFrontend') as Mock;
@@ -38,6 +37,10 @@ describe('processoService', () => {
 
     afterEach(() => {
         vi.clearAllMocks()
+        mockApi.get.mockClear()
+        mockApi.post.mockClear()
+        mockApi.put.mockClear()
+        mockApi.delete.mockClear()
     })
 
 
@@ -45,50 +48,50 @@ describe('processoService', () => {
 
 
     it('iniciarProcesso should post with correct params', async () => {
-            postSpy.mockResolvedValue({})
+            mockApi.post.mockResolvedValue({})
             await service.iniciarProcesso(1, TipoProcesso.REVISAO, [10, 20])
-            expect(postSpy).toHaveBeenCalledWith('/processos/1/iniciar?tipo=REVISAO', [10, 20]);})
+            expect(mockApi.post).toHaveBeenCalledWith('/processos/1/iniciar?tipo=REVISAO', [10, 20]);})
 
     it('finalizarProcesso should post to the correct endpoint', async () => {
-            postSpy.mockResolvedValue({})
+            mockApi.post.mockResolvedValue({})
             await service.finalizarProcesso(1)
-            expect(postSpy).toHaveBeenCalledWith('/processos/1/finalizar');})
+            expect(mockApi.post).toHaveBeenCalledWith('/processos/1/finalizar');})
 
     it('excluirProcesso should call delete', async () => {
-            deleteSpy.mockResolvedValue({})
+            mockApi.delete.mockResolvedValue({})
             await service.excluirProcesso(1)
-            expect(deleteSpy).toHaveBeenCalledWith('/processos/1');})
+            expect(mockApi.delete).toHaveBeenCalledWith('/processos/1');})
 
     it('fetchProcessosFinalizados should get from the correct endpoint', async () => {
-        getSpy.mockResolvedValue({ data: [] });
+        mockApi.get.mockResolvedValue({ data: [] });
         await service.fetchProcessosFinalizados();
-        expect(getSpy).toHaveBeenCalledWith('/processos/finalizados');
+        expect(mockApi.get).toHaveBeenCalledWith('/processos/finalizados');
     });
 
     it('obterProcessoPorId should get from the correct endpoint', async () => {
-        getSpy.mockResolvedValue({ data: {} });
+        mockApi.get.mockResolvedValue({ data: {} });
         await service.obterProcessoPorId(1);
-        expect(getSpy).toHaveBeenCalledWith('/processos/1');
+        expect(mockApi.get).toHaveBeenCalledWith('/processos/1');
     });
 
     it('atualizarProcesso should put to the correct endpoint', async () => {
         const request: AtualizarProcessoRequest = { codigo: 1, tipo: TipoProcesso.MAPEAMENTO, unidades: [], descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
-        putSpy.mockResolvedValue({ data: {} });
-        await service.atualizarProcesso(1, request);
-        expect(putSpy).toHaveBeenCalledWith('/processos/1', request);
+        mockApi.put.mockResolvedValue({ data: {} });
+        await service.atualizarProcesso(request.codigo, request);
+        expect(mockApi.put).toHaveBeenCalledWith(`/processos/${request.codigo}`, request);
     });
 
     it('obterDetalhesProcesso should get from the correct endpoint', async () => {
-        getSpy.mockResolvedValue({ data: {} });
+        mockApi.get.mockResolvedValue({ data: {} });
         await service.obterDetalhesProcesso(1);
-        expect(getSpy).toHaveBeenCalledWith('/processos/1/detalhes');
+        expect(mockApi.get).toHaveBeenCalledWith('/processos/1/detalhes');
     });
 
     it('processarAcaoEmBloco should post to the correct endpoint', async () => {
         const payload = { idProcesso: 1, unidades: ['A'], tipoAcao: 'aceitar' as 'aceitar' | 'homologar', unidadeUsuario: 'B' };
-        postSpy.mockResolvedValue({});
+        mockApi.post.mockResolvedValue({});
         await service.processarAcaoEmBloco(payload);
-        expect(postSpy).toHaveBeenCalledWith('/processos/1/acoes-em-bloco', payload);
+        expect(mockApi.post).toHaveBeenCalledWith('/processos/1/acoes-em-bloco', payload);
     });
 
 
@@ -96,6 +99,6 @@ describe('processoService', () => {
     // Error handling
     it('criarProcesso should throw error on failure', async () => {
             const request: CriarProcessoRequest = { descricao: 'teste', tipo: TipoProcesso.MAPEAMENTO, dataLimiteEtapa1: '2025-12-31', unidades: [1] }
-            postSpy.mockRejectedValue(new Error('Failed'));        await expect(service.criarProcesso(request)).rejects.toThrow()
+            mockApi.post.mockRejectedValue(new Error('Failed'));        await expect(service.criarProcesso(request)).rejects.toThrow()
     })
 })

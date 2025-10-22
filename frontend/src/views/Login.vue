@@ -88,6 +88,7 @@
             class="btn btn-primary w-100 login-btn"
             type="submit"
             data-testid="botao-entrar"
+            aria-label="Entrar"
           >
             <i class="bi bi-box-arrow-in-right me-2" />
             Entrar

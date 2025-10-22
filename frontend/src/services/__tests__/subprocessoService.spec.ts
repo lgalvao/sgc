@@ -1,4 +1,5 @@
-import {describe, expect, it, vi} from 'vitest'
+import {describe, expect, it, vi, beforeEach} from 'vitest'
+import { createPinia, setActivePinia } from 'pinia';
 import * as service from '../subprocessoService'
 import api from '@/axios-setup'
 import * as mappers from '@/mappers/mapas'
@@ -25,6 +26,16 @@ vi.mock('@/mappers/mapas', async (importOriginal) => {
 })
 
 describe('subprocessoService', () => {
+    beforeEach(() => {
+        setActivePinia(createPinia());
+    });
+    afterEach(() => {
+        vi.clearAllMocks()
+        mockApi.get.mockClear()
+        mockApi.post.mockClear()
+        mockApi.put.mockClear()
+        mockApi.delete.mockClear()
+    })
     const mockApi = api as any;
     const mockMappers = mappers as any;
     const id = 1

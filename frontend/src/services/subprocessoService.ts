@@ -76,7 +76,7 @@ export const obterMapaCompleto = async (id: number): Promise<MapaCompleto> => {
 };
 
 export const salvarMapaCompleto = async (codSubprocesso: number, data: any): Promise<MapaCompleto> => {
-    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-completo/atualizar`, data);
+    const response = await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-completo`, data);
     return mapMapaCompletoDtoToModel(response.data);
 };
 
@@ -86,7 +86,7 @@ export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
 };
 
 export const salvarMapaAjuste = async (codSubprocesso: number, data: any): Promise<void> => {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-ajuste/atualizar`, data);
+    await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-ajuste`, data);
 };
 
 export async function verificarMapaVigente(codigoUnidade: number): Promise<boolean> {
