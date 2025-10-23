@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-@Profile("e2e")
+@Profile({"e2e", "test"})
 @RequiredArgsConstructor
 public class JwtMockFilter extends OncePerRequestFilter {
 
