@@ -17,6 +17,10 @@ import sgc.Sgc;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -74,6 +78,10 @@ class CDU10IntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -115,8 +123,10 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro com sucesso quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
+            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade = atividadeRepo.save(atividade);
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))

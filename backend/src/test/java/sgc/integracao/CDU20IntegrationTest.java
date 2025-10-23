@@ -196,9 +196,15 @@ public class CDU20IntegrationTest {
         assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
         List<Alerta> alertasAceite = alertaRepo.findAll();
-        assertThat(alertasAceite).hasSize(3); // Alerta de devolução + alerta de aceite
-        assertThat(alertasAceite.get(0).getDescricao()).contains("Validação do mapa de competências da UNISUB submetida para análise");
-        assertThat(alertasAceite.get(0).getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+        assertThat(alertasAceite).hasSize(3); // devolução + validação + aceite
+
+        // Verifica o alerta de aceite para a unidade hierarquicamente superior
+        Alerta alertaDeAceite = alertasAceite.stream()
+            .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
+
+        assertThat(alertaDeAceite.getDescricao()).contains("Validação do mapa de competências da UNISUB submetida para análise");
     }
 
     @Test
