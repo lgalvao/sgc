@@ -11,9 +11,9 @@ export const usePerfilStore = defineStore('perfil', {
         perfisUnidades: [] as PerfilUnidade[],
     }),
     actions: {
-        setServidorId(novoId: number) {
-            this.servidorId = novoId;
-            localStorage.setItem('idServidor', novoId.toString());
+        setServidorId(novoId: string | number) {
+            this.servidorId = Number(novoId);
+            localStorage.setItem('idServidor', String(novoId));
         },
         setPerfilUnidade(perfil: Perfil, unidadeCodigo: number) {
             this.perfilSelecionado = perfil;
