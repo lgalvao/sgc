@@ -45,6 +45,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -115,8 +116,8 @@ class CDU09IntegrationTest {
         @DisplayName("Deve disponibilizar o cadastro com sucesso quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
             Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
-            atividadeRepo.save(atividade);
-            conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento de Teste"));
+            atividade = atividadeRepo.save(atividade);
+            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar", subprocessoMapeamento.getCodigo()))
                     .andExpect(status().isOk())
@@ -139,7 +140,11 @@ class CDU09IntegrationTest {
             assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT submetido para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            verify(notificacaoService).enviarEmail(anyString(), anyString(), anyString());
+            verify(notificacaoService).enviarEmail(
+                    eq(unidadeSuperior.getTitular().getEmail()),
+                    eq("SGC: Cadastro de atividades e conhecimentos da UT submetido para análise"),
+                    anyString()
+            );
         }
 
         @Test

@@ -113,6 +113,7 @@ public class SubprocessoWorkflowService {
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
             throw new IllegalStateException("Subprocesso sem mapa associado");
         }
+        subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
     }
 
     /**
@@ -218,7 +219,6 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
 
         repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Validação do mapa de competências"));
-        analiseService.removerPorSubprocesso(sp.getCodigo());
         subprocessoNotificacaoService.notificarValidacao(sp);
     }
 

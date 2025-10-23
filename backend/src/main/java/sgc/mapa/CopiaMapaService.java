@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
@@ -32,6 +34,8 @@ public class CopiaMapaService {
     private final ConhecimentoRepo repositorioConhecimento;
     private final UnidadeRepo repositorioUnidade;
     private final CompetenciaRepo competenciaRepo;
+    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    private final sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
 
     /**
      * Realiza uma cópia profunda de um mapa para uma nova unidade.
@@ -62,6 +66,7 @@ public class CopiaMapaService {
         novoMapa.setUnidade(unidadeDestino);
 
         Mapa mapaSalvo = repositorioMapa.save(novoMapa);
+        subprocessoRepo.findByUnidadeCodigo(idUnidadeDestino).forEach(s -> s.setMapa(mapaSalvo));
         Map<Long, Atividade> mapaDeAtividades = new HashMap<>();
 
         List<Atividade> atividadesFonte = atividadeRepo.findByMapaCodigo(fonte.getCodigo());
@@ -90,15 +95,28 @@ public class CopiaMapaService {
         }
 
         List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(fonte.getCodigo());
+        Map<Long, Competencia> mapaDeCompetencias = new HashMap<>();
         if (competenciasFonte != null && !competenciasFonte.isEmpty()) {
-            List<Competencia> novasCompetencias = new ArrayList<>();
             for (Competencia competenciaFonte : competenciasFonte) {
                 Competencia novaCompetencia = new Competencia();
                 novaCompetencia.setDescricao(competenciaFonte.getDescricao());
                 novaCompetencia.setMapa(mapaSalvo);
-                novasCompetencias.add(novaCompetencia);
+                Competencia competenciaSalva = competenciaRepo.save(novaCompetencia);
+                mapaDeCompetencias.put(competenciaFonte.getCodigo(), competenciaSalva);
             }
-            competenciaRepo.saveAll(novasCompetencias);
+        }
+
+        List<CompetenciaAtividade> associacoesFonte = competenciaAtividadeRepo.findByCompetencia_Mapa_Codigo(fonte.getCodigo());
+        if (associacoesFonte != null && !associacoesFonte.isEmpty()) {
+            List<CompetenciaAtividade> novasAssociacoes = new ArrayList<>();
+            for (CompetenciaAtividade associacaoFonte : associacoesFonte) {
+                Competencia novaCompetencia = mapaDeCompetencias.get(associacaoFonte.getCompetencia().getCodigo());
+                Atividade novaAtividade = mapaDeAtividades.get(associacaoFonte.getAtividade().getCodigo());
+                if (novaCompetencia != null && novaAtividade != null) {
+                    novasAssociacoes.add(new CompetenciaAtividade(new CompetenciaAtividade.Id(novaCompetencia.getCodigo(), novaAtividade.getCodigo()), novaCompetencia, novaAtividade));
+                }
+            }
+            competenciaAtividadeRepo.saveAll(novasAssociacoes);
         }
 
         return mapaSalvo;

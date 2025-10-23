@@ -72,4 +72,7 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
     @Modifying
     @Query("DELETE FROM CompetenciaAtividade ca WHERE ca.id.competenciaCodigo IN (SELECT c.codigo FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo)")
     void deleteByCompetenciaMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+
+    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.competencia.mapa.codigo = :mapaCodigo")
+    List<CompetenciaAtividade> findByCompetencia_Mapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 }

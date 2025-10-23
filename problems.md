@@ -24,17 +24,22 @@ spring.sql.init.mode=never
 
 ## Testes Remanescentes com Falha
 
-A solução acima corrigiu o problema de carregamento do `ApplicationContext`, mas 8 testes ainda estão falhando devido à falta de dados de teste. Esses testes precisam ser atualizados para carregar os dados de que precisam, seja através da anotação `@Sql` ou criando as entidades necessárias em seus métodos de setup.
+A solução acima corrigiu o problema de carregamento do `ApplicationContext`, mas 7 testes ainda estão falhando.
 
 **Testes Falhando:**
-- `sgc.integracao.CDU20IntegrationTest` (2 testes)
-- `sgc.subprocesso.SubprocessoWorkflowServiceTest` (2 testes)
+- `sgc.integracao.CDU20IntegrationTest` (1 teste)
 - `sgc.integracao.CDU14IntegrationTest` (4 testes)
+- `sgc.integracao.CDU09IntegrationTest` (1 teste)
+- `sgc.integracao.CDU10IntegrationTest` (1 teste)
 
-**Tentativas de Correção:**
-- Adição da anotação `@Sql` para carregar dados de teste específicos para `CDU14IntegrationTest`.
-- Uso da anotação `@DirtiesContext` para forçar a recriação do contexto de aplicação entre os testes.
-- Refatoração de `CDU14IntegrationTest` para usar `@WebMvcTest` com dependências mockadas.
-- Adição da anotação `@Transactional` para garantir o rollback das transações de teste.
+### `sgc.integracao.CDU20IntegrationTest`
 
-Nenhuma das tentativas acima resolveu o problema, que parece estar relacionado a um problema mais profundo de configuração de teste e isolamento de dados.
+O teste `devolucaoEaceiteComVerificacaoHistorico` está falhando com um `AssertionError`. O teste espera 2 alertas, mas encontra 3. Isso indica que a lógica de negócios está criando um alerta extra em algum lugar do fluxo.
+
+### `sgc.integracao.CDU14IntegrationTest`
+
+Todos os 4 testes nesta classe estão falhando com um erro de status HTTP 400 (Bad Request) durante a fase de setup (`@BeforeEach`). Isso aponta para uma falha de validação na chamada da API `/api/subprocessos/{id}/disponibilizar-revisao-cadastro`. A causa raiz parece ser uma falha na cópia do mapa de competências, que resulta em um mapa inválido sendo submetido para revisão.
+
+### `sgc.integracao.CDU09IntegrationTest` e `sgc.integracao.CDU10IntegrationTest`
+
+Ambos os testes falham com um erro de status HTTP 422 (Unprocessable Entity). Isso indica que a validação da entidade falhou. A causa provável é que os testes não estão associando corretamente as entidades `Atividade` e `Conhecimento`, o que leva a uma falha na validação da lógica de negócios.
