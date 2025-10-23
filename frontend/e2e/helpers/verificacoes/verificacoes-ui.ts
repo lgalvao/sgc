@@ -488,17 +488,3 @@ export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): 
 export async function verificarCardAcaoInvisivel(page: Page, tituloCard: string): Promise<void> {
     await expect(page.locator('.card-acao', {hasText: tituloCard})).not.toBeVisible();
 }
-
-/**
- * Verifica se um card de ação com o título fornecido está visível.
- */
-export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): Promise<void> {
-    await expect(page.locator('.card-acao', {hasText: tituloCard})).toBeVisible();
-}
-
-/**
- * Verifica se um card de ação com o título fornecido NÃO está visível.
- */
-export async function verificarCardAcaoInvisivel(page: Page, tituloCard: string): Promise<void> {
-    await expect(page.locator('.card-acao', {hasText: tituloCard})).not.toBeVisible();
-}

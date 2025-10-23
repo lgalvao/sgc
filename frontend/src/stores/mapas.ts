@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {useNotificacoesStore} from './notificacoes'
 import * as SubprocessoService from '@/services/subprocessoService'
-import {ImpactoMapa, MapaAjuste, MapaCompleto, SalvarAjustesRequest, SalvarMapaRequest} from "@/types/tipos";
+import {Competencia, ImpactoMapa, MapaAjuste, MapaCompleto, SalvarAjustesRequest, SalvarMapaRequest} from "@/types/tipos";
 
 export const useMapasStore = defineStore('mapas', {
     state: () => ({
@@ -31,6 +31,36 @@ export const useMapasStore = defineStore('mapas', {
                 notificacoes.sucesso('Mapa salvo', 'O mapa de competências foi salvo com sucesso.');
             } catch {
                 notificacoes.erro('Erro ao salvar', 'Não foi possível salvar o mapa de competências.');
+            }
+        },
+
+        async adicionarCompetencia(idSubprocesso: number, competencia: Competencia) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                this.mapaCompleto = await SubprocessoService.adicionarCompetencia(idSubprocesso, competencia);
+                notificacoes.sucesso('Competência adicionada', 'A competência foi adicionada com sucesso.');
+            } catch {
+                notificacoes.erro('Erro ao adicionar', 'Não foi possível adicionar a competência.');
+            }
+        },
+
+        async atualizarCompetencia(idSubprocesso: number, competencia: Competencia) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                this.mapaCompleto = await SubprocessoService.atualizarCompetencia(idSubprocesso, competencia);
+                notificacoes.sucesso('Competência atualizada', 'A competência foi atualizada com sucesso.');
+            } catch {
+                notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar a competência.');
+            }
+        },
+
+        async removerCompetencia(idSubprocesso: number, idCompetencia: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                this.mapaCompleto = await SubprocessoService.removerCompetencia(idSubprocesso, idCompetencia);
+                notificacoes.sucesso('Competência removida', 'A competência foi removida com sucesso.');
+            } catch {
+                notificacoes.erro('Erro ao remover', 'Não foi possível remover a competência.');
             }
         },
 

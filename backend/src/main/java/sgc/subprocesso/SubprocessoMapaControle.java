@@ -16,6 +16,7 @@ import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.sgrh.Usuario;
+import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -162,6 +163,43 @@ public class SubprocessoMapaControle {
             @AuthenticationPrincipal Usuario usuario
     ) {
         MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codSubprocesso, request, usuario.getTituloEleitoral());
+        return ResponseEntity.ok(mapa);
+    }
+
+    @PostMapping("/{codSubprocesso}/competencias")
+    @Transactional
+    @Operation(summary = "Adiciona uma nova competência a um mapa")
+    public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
+        @PathVariable Long codSubprocesso,
+        @RequestBody @Valid CompetenciaReq request,
+        @AuthenticationPrincipal Usuario usuario
+    ) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codSubprocesso, request, usuario.getTituloEleitoral());
+        return ResponseEntity.ok(mapa);
+    }
+
+    @PutMapping("/{codSubprocesso}/competencias/{competenciaId}")
+    @Transactional
+    @Operation(summary = "Atualiza uma competência existente em um mapa")
+    public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
+        @PathVariable Long codSubprocesso,
+        @PathVariable Long competenciaId,
+        @RequestBody @Valid CompetenciaReq request,
+        @AuthenticationPrincipal Usuario usuario
+    ) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codSubprocesso, competenciaId, request, usuario.getTituloEleitoral());
+        return ResponseEntity.ok(mapa);
+    }
+
+    @DeleteMapping("/{codSubprocesso}/competencias/{competenciaId}")
+    @Transactional
+    @Operation(summary = "Remove uma competência de um mapa")
+    public ResponseEntity<MapaCompletoDto> removerCompetencia(
+        @PathVariable Long codSubprocesso,
+        @PathVariable Long competenciaId,
+        @AuthenticationPrincipal Usuario usuario
+    ) {
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codSubprocesso, competenciaId, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 }
