@@ -116,8 +116,8 @@ class CDU10IntegrationTest {
         @DisplayName("Deve disponibilizar a revisão do cadastro com sucesso quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
-            atividadeRepo.save(atividade);
-            conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento de Teste"));
+            atividade = atividadeRepo.save(atividade);
+            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())

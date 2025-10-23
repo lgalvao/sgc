@@ -20,6 +20,12 @@ import java.util.logging.Logger;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
@@ -82,6 +88,12 @@ class CDU14IntegrationTest {
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
     @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
     private WebApplicationContext context;
 
     private Long subprocessoId;
@@ -100,8 +112,14 @@ class CDU14IntegrationTest {
 
         // Mapa Vigente e suas atividades (setup manual, pois não há API para isso)
         Mapa mapaVigente = criarMapa();
-        criarAtividade(mapaVigente, "Atividade Vigente 1");
-        criarAtividade(mapaVigente, "Atividade Vigente 2");
+        Competencia competencia1 = criarCompetencia(mapaVigente, "Competência 1");
+        Atividade atividade1 = criarAtividade(mapaVigente, "Atividade Vigente 1");
+        criarConhecimento(atividade1, "Conhecimento 1.1");
+        criarCompetenciaAtividade(competencia1, atividade1);
+        Atividade atividade2 = criarAtividade(mapaVigente, "Atividade Vigente 2");
+        criarConhecimento(atividade2, "Conhecimento 2.1");
+        criarCompetenciaAtividade(competencia1, atividade2);
+        // Adicionando a associação que faltava para a competência
         criarUnidadeMapa(unidade.getCodigo(), mapaVigente.getCodigo());
 
         // Criação do Processo via API
@@ -143,6 +161,10 @@ class CDU14IntegrationTest {
                 .with(csrf())
                 .with(user(chefe.getTituloEleitoral().toString())))
             .andExpect(status().isOk());
+
+        // Verificando o estado do subprocesso
+        var sp = subprocessoRepo.findById(this.subprocessoId).orElseThrow();
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         // Disponibilizar o cadastro para análise (ação do Chefe)
         mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", this.subprocessoId)
@@ -304,6 +326,18 @@ class CDU14IntegrationTest {
 
     private Atividade criarAtividade(Mapa mapa, String descricao) {
         return atividadeRepo.save(new Atividade(mapa, descricao));
+    }
+
+    private Conhecimento criarConhecimento(Atividade atividade, String descricao) {
+        return conhecimentoRepo.save(new Conhecimento(descricao, atividade));
+    }
+
+    private Competencia criarCompetencia(Mapa mapa, String descricao) {
+        return competenciaRepo.save(new Competencia(descricao, mapa));
+    }
+
+    private CompetenciaAtividade criarCompetenciaAtividade(Competencia competencia, Atividade atividade) {
+        return competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
     }
 
     private UnidadeMapa criarUnidadeMapa(Long unidadeCodigo, Long mapaVigenteCodigo) {

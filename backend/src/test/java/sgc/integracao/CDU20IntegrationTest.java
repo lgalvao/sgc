@@ -32,8 +32,7 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.subprocesso.SubprocessoNotificacaoService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import sgc.subprocesso.SubprocessoNotificacaoService;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -78,7 +77,7 @@ public class CDU20IntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
-    @MockitoBean
+    @MockitoSpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
 
@@ -164,7 +163,7 @@ public class CDU20IntegrationTest {
 
         List<Alerta> alertasDevolucao = alertaRepo.findAll();
         assertThat(alertasDevolucao).hasSize(1);
-        assertThat(alertasDevolucao.getFirst().getDescricao()).contains("Mapa de competências devolvido para ajustes");
+        assertThat(alertasDevolucao.getFirst().getDescricao()).contains("Cadastro de atividades e conhecimentos da unidade UNISUB devolvido para ajustes");
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
 
         // Unidade inferior valida o mapa novamente
@@ -191,15 +190,15 @@ public class CDU20IntegrationTest {
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
-        assertThat(movimentacoesAceite).hasSize(2); // Movimentação de devolução + movimentação de aceite
+        assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
         assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
         assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
         List<Alerta> alertasAceite = alertaRepo.findAll();
-        // assertThat(alertasAceite).hasSize(2); // Alerta de devolução + alerta de aceite
-        // assertThat(alertasAceite.getFirst().getDescricao()).contains("Mapa de competências da UNISUB submetido para análise");
-        // assertThat(alertasAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+        assertThat(alertasAceite).hasSize(3); // Alerta de devolução + alerta de aceite
+        assertThat(alertasAceite.get(0).getDescricao()).contains("Validação do mapa de competências da UNISUB submetida para análise");
+        assertThat(alertasAceite.get(0).getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
     }
 
     @Test
@@ -228,7 +227,7 @@ public class CDU20IntegrationTest {
 
         List<Alerta> alertas = alertaRepo.findAll();
         assertThat(alertas).hasSize(1);
-        assertThat(alertas.getFirst().getDescricao()).contains("Mapa de competências homologado");
+        assertThat(alertas.getFirst().getDescricao()).contains("Mapa de competências do processo Processo de Teste homologado");
         assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
         verify(subprocessoNotificacaoService, times(1)).notificarHomologacaoMapa(spAtualizado);
