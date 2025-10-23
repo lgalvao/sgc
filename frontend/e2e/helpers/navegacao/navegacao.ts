@@ -1,10 +1,10 @@
 import {expect, Page} from '@playwright/test';
-import {DADOS_TESTE, ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
-import {Perfil} from '@/types/tipos';
+import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
- * FUNÇÕES DE NAVEGAÇÃO E LOGIN
- * Funções específicas para navegação entre páginas e autenticação
+ * FUNÇÕES DE NAVEGAÇÃO
+ * Funções específicas para navegação entre páginas e interações gerais.
  */
 
 /**
@@ -19,6 +19,13 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
     await page.goto(URLS.PROCESSO_CADASTRO);
+    // Esperar pelo título da página
+    await page.waitForSelector('h2:has-text("Cadastro de processo")');
+    // Esperar pelo campo de descrição estar visível
+    await page.waitForSelector('#descricao', { state: 'visible' });
+    // Adicionar espera pelo campo de tipo estar visível
+    await page.waitForSelector('#tipo', { state: 'visible' });
+    await page.waitForLoadState('networkidle'); // Esperar a rede ficar ociosa
 }
 
 /**
@@ -188,7 +195,7 @@ export async function clicarPrimeiroProcesso(page: Page): Promise<void> {
  * Clica em um processo na tabela principal do painel
  */
 export async function clicarProcesso(page: Page, nomeProcesso: string | RegExp): Promise<void> {
-    await page.getByTestId(SELETORES.TABELA_PROCESSOS).getByRole('row', {name: nomeProcesso}).click();
+    await page.getByTestId(SELETORES.TABELA_PROCESSOS).locator('tr', {hasText: nomeProcesso}).click();
 }
 
 /**
@@ -210,85 +217,6 @@ export async function expandirTodasAsUnidades(page: Page): Promise<void> {
  */
 export async function clicarUnidade(page: Page, nomeUnidade: string): Promise<void> {
     await page.getByRole('row', {name: nomeUnidade}).click();
-}
-
-// ==================================================================
-// FUNÇÕES DE LOGIN E AUTENTICAÇÃO
-// ==================================================================
-
-/**
- * Login genérico para diferentes perfis
- */
-async function fazerLoginComo(page: Page, perfil: keyof typeof DADOS_TESTE.PERFIS): Promise<void> {
-    const dadosUsuario = DADOS_TESTE.PERFIS[perfil];
-
-    await page.goto(URLS.LOGIN);
-    await page.waitForLoadState('networkidle');
-
-    await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(dadosUsuario.idServidor);
-    await page.waitForLoadState('networkidle');
-    await page.getByLabel(ROTULOS.SENHA).fill(dadosUsuario.senha);
-                    await page.route('**/api/usuarios/entrar', async route => {
-                        const response = await route.fetch();
-                        console.log('Requisição /api/usuarios/entrar interceptada. Status:', response.status());
-                        if (!response.ok()) {
-                            const responseBody = await response.text();
-                            console.error('Corpo da resposta /api/usuarios/entrar (erro):', responseBody);
-                        }
-                        route.fulfill({ response });
-                    });
-                
-                    await clicarBotaoEntrar(page); // Clica no botão de login
-                    await page.waitForLoadState('networkidle'); // Espera a rede ficar ociosa
-                
-                    console.log('URL atual após clicar em Entrar (antes de esperar resposta):', page.url());    // Verifica se há múltiplas opções de perfil/unidade
-    const seletorPerfilUnidade = page.getByTestId(SELETORES.SELECT_PERFIL_UNIDADE);
-    if (await seletorPerfilUnidade.isVisible()) {
-        await seletorPerfilUnidade.selectOption({
-            label: `${dadosUsuario.perfil} - ${dadosUsuario.unidade}`,
-        });
-        await clicarBotaoEntrar(page);
-    }
-
-    const erroLoginInvalido = page.getByText(TEXTOS.ERRO_LOGIN_INVALIDO);
-    if (await erroLoginInvalido.isVisible()) {
-        console.error('Erro de login: Título ou senha inválidos.');
-        throw new Error('Login falhou: Título ou senha inválidos.');
-    }
-
-    await page.waitForURL(URLS.PAINEL);
-    await expect(page).toHaveURL(/\/painel/);
-
-}
-
-export const loginComoAdmin = (page: Page) => fazerLoginComo(page, 'ADMIN');
-export const loginComoGestor = (page: Page) => fazerLoginComo(page, 'GESTOR');
-export const loginComoChefe = (page: Page) => fazerLoginComo(page, 'CHEFE');
-export const loginComoChefeSedia = (page: Page) => fazerLoginComo(page, 'CHEFE_SEDIA');
-export const loginComoServidor = (page: Page) => fazerLoginComo(page, 'SERVIDOR');
-
-/**
- * Realiza o login pela UI, preenchendo título e senha.
- * Não clica em "Entrar", permitindo interações adicionais na tela de login.
- */
-export async function login(page: Page, idServidor: string, senha: string): Promise<void> {
-    await page.goto(URLS.LOGIN);
-    await page.waitForLoadState('networkidle');
-
-    await page.getByLabel(ROTULOS.TITULO_ELEITORAL).fill(idServidor);
-    await page.getByLabel(ROTULOS.SENHA).fill(senha);
-}
-
-/**
- * Realiza login com um perfil e unidade específicos.
- */
-export async function loginComo(page: Page, perfil: Perfil, tituloEleitoral: string): Promise<void> {
-    const credenciais = {
-        tituloEleitoral, // Usamos um usuário que tem múltiplos perfis
-        senha: DADOS_TESTE.PERFIS.CHEFE.senha,
-        perfil,
-    };
-    await login(page, credenciais.tituloEleitoral, credenciais.senha);
 }
 
 /**

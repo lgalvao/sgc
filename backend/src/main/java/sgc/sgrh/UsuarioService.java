@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.EntrarRequest;
 import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.PerfilUnidade;
+import sgc.sgrh.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class UsuarioService {
     private final SgrhService sgrhService;
     private final UnidadeRepo unidadeRepo;
+    private final UsuarioRepo usuarioRepo;
 
     /**
      * Simula a autenticação de um usuário.
@@ -51,17 +54,16 @@ public class UsuarioService {
      *                                  encontrada no banco de dados local.
      */
     public List<PerfilUnidade> autorizar(long tituloEleitoral) {
-        log.info("Buscando autorizações (perfis e unidades) para o usuário.");
-        List<PerfilDto> perfisDto = sgrhService.buscarPerfisUsuario(String.valueOf(tituloEleitoral));
+        log.info("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
+        Usuario usuario = usuarioRepo.findByTituloEleitoral(tituloEleitoral)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", tituloEleitoral));
 
-        return perfisDto.stream()
-            .map(dto -> {
-                Unidade unidade = unidadeRepo.findById(dto.unidadeCodigo())
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + dto.unidadeCodigo()));
-                Perfil perfil = Perfil.valueOf(dto.perfil());
-                return new PerfilUnidade(perfil, unidade);
-            })
-            .collect(Collectors.toList());
+        Unidade unidade = usuario.getUnidade();
+        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name());
+
+        return usuario.getPerfis().stream()
+                .map(perfil -> new PerfilUnidade(perfil, unidadeDto))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -96,7 +98,8 @@ public class UsuarioService {
         Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
         Perfil perfil = Perfil.valueOf(request.getPerfil());
-        PerfilUnidade pu = new PerfilUnidade(perfil, unidade);
+        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name());
+        PerfilUnidade pu = new PerfilUnidade(perfil, unidadeDto);
         this.entrar(request.getTituloEleitoral(), pu);
     }
 }

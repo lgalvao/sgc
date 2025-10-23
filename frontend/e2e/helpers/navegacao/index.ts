@@ -24,14 +24,9 @@ export {
     ordenarTabelaProcessosPorColuna,
     expandirTodasAsUnidades,
     clicarUnidade,
-    loginComoAdmin,
-    loginComoGestor,
-    loginComoChefe,
-    loginComoChefeSedia,
-    loginComoServidor,
-    login,
-    loginComo,
     navegarParaHome,
     clicarBotaoEntrar,
     clicarBotaoSair
 } from './navegacao';
+
+export * from '../auth';

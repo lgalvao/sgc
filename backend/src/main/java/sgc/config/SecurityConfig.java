@@ -3,17 +3,26 @@ package sgc.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import java.util.List;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sgc.sgrh.dto.LoginResponse;
 
 @Configuration
 @EnableWebSecurity
 @Profile("!test")
+
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtMockFilter jwtMockFilter;
 
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
@@ -38,7 +47,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/usuarios/autenticar",
                     "/api/usuarios/autorizar",
-                    "/api/usuarios/entrar"
+                    "/api/usuarios/entrar",
+                    "/api/test/**"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
@@ -48,7 +58,16 @@ public class SecurityConfig {
             )
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable);
+            .formLogin(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(List.of("http://localhost:5173")); // Permitir o frontend
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(List.of("*"));
+                config.setAllowCredentials(true);
+                return config;
+            }))
+            .addFilterBefore(jwtMockFilter, UsernamePasswordAuthenticationFilter.class); // Adicionar o filtro
         return http.build();
     }
 }

@@ -31,6 +31,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     // BD
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
@@ -314,6 +316,14 @@ tasks.register<Test>("verboseTest") {
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     jvmArgs = listOf("-Djdk.internal.vm.debug=release")
+}
+
+tasks.register<org.springframework.boot.gradle.tasks.run.BootRun>("bootRunE2E") {
+    group = "Application"
+    description = "Runs the application with the 'e2e' profile for end-to-end testing."
+    jvmArgs = listOf("-Dspring.profiles.active=e2e")
+    mainClass.set("sgc.Sgc")
+    classpath = sourceSets.main.get().runtimeClasspath
 }
 
 

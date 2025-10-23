@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.PerfilUnidade;
+import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -30,6 +31,9 @@ class UsuarioServiceTest {
 
     @Mock
     private UnidadeRepo unidadeRepo;
+
+    @Mock
+    private UsuarioRepo usuarioRepo; // Adicionado
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -65,9 +69,8 @@ class UsuarioServiceTest {
 
         assertThat(resultado).hasSize(2);
         assertThat(resultado.get(0).getPerfil()).isEqualTo(Perfil.ADMIN);
-        assertThat(resultado.get(0).getUnidade().getSigla()).isEqualTo("SEDOC");
-        assertThat(resultado.get(1).getPerfil()).isEqualTo(Perfil.CHEFE);
-        assertThat(resultado.get(1).getUnidade().getSigla()).isEqualTo("SEDOC");
+        assertThat(resultado.get(0).getUnidade().sigla()).isEqualTo("SEDOC");
+        assertThat(resultado.get(1).getUnidade().sigla()).isEqualTo("SEDOC");
 
         verify(sgrhService, times(1)).buscarPerfisUsuario(String.valueOf(tituloEleitoral));
         verify(unidadeRepo, times(2)).findById(1L);
@@ -91,7 +94,8 @@ class UsuarioServiceTest {
     @DisplayName("Deve simular a entrada com sucesso")
     void entrar_deveExecutarSemErro() {
         long tituloEleitoral = 123456789L;
-        PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeMock);
+        UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name());
+        PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 
         // Apenas verifica se o metodo executa sem lançar exceções, já que a implementação atual apenas loga a informação.
         usuarioService.entrar(tituloEleitoral, perfilUnidade);

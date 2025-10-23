@@ -70,9 +70,11 @@ public class PainelService {
                 .collect(Collectors.toList());
         }
 
+        System.out.println("Processos encontrados antes do mapeamento: " + processos.size());
         List<ProcessoResumoDto> dtos = processos.stream()
             .map(this::mapToProcessoResumoDto)
             .collect(Collectors.toList());
+        System.out.println("DTOs de processo gerados: " + dtos.size());
 
         return new PageImpl<>(dtos, pageable, dtos.size());
     }

@@ -38,6 +38,19 @@ export const handleResponseError = (error: any) => {
   return Promise.reject(error);
 };
 
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwtToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 apiClient.interceptors.response.use(
   (response) => response,
   handleResponseError

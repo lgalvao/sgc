@@ -11,6 +11,11 @@ import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.unidade.modelo.UnidadeRepo;
+import sgc.sgrh.dto.LoginResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.List;
 
@@ -61,8 +66,26 @@ public class UsuarioControle {
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/entrar")
-    public ResponseEntity<Void> entrar(@Valid @RequestBody EntrarRequest request) {
+    public ResponseEntity<LoginResponse> entrar(@Valid @RequestBody EntrarRequest request) {
         usuarioService.entrar(request);
-        return ResponseEntity.ok().build();
+        LoginResponse response = new LoginResponse(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
+
+        // Gerar JWT simulado para perfil e2e
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("tituloEleitoral", request.getTituloEleitoral());
+            claims.put("perfil", request.getPerfil());
+            claims.put("unidadeCodigo", request.getUnidadeCodigo());
+            String jsonClaims = objectMapper.writeValueAsString(claims);
+            String encodedClaims = Base64.getEncoder().encodeToString(jsonClaims.getBytes());
+            response.setToken(encodedClaims);
+        } catch (Exception e) {
+            // Logar o erro ou lançar uma exceção apropriada
+            System.err.println("Erro ao gerar token simulado: " + e.getMessage());
+            response.setToken("erro_geracao_token"); // Token de fallback em caso de erro
+        }
+
+        return ResponseEntity.ok(response);
     }
 }

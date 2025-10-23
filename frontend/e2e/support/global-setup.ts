@@ -1,27 +1,30 @@
-// noinspection JSUnusedGlobalSymbols
-
+import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// Workaround for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function globalSetup() {
-    // Limpar diretório de screenshots para garantir que não há arquivos antigos
-    const screenshotsDir = path.join(process.cwd(), 'screenshots');
     try {
-        if (fs.existsSync(screenshotsDir)) {
-            const files = fs.readdirSync(screenshotsDir);
-            if (files.length > 0) {
-                files.forEach(file => {
-                    const filePath = path.join(screenshotsDir, file);
-                    fs.unlinkSync(filePath);
-                });
-            } else {
-            }
-        } else {
-            // Criar diretório se não existir
-            fs.mkdirSync(screenshotsDir, {recursive: true});
+        console.log('Executando o seed do banco de dados para testes E2E...');
+        const response = await axios.post('http://localhost:10000/api/test/seed');
+        const testData = response.data;
+        console.log('Dados recebidos do seed:', testData);
+
+        const dataDir = path.join(__dirname, '..');
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
         }
+
+        fs.writeFileSync(path.join(dataDir, '.test-data.json'), JSON.stringify(testData, null, 2));
+        console.log('Dados de teste gerados e salvos em .test-data.json');
+
     } catch (error) {
-        console.warn('⚠️  Erro ao limpar screenshots:', error);
+        console.error('Falha ao executar o seed do banco de dados:', error);
+        process.exit(1); // Aborta a execução dos testes se o seed falhar
     }
 }
 

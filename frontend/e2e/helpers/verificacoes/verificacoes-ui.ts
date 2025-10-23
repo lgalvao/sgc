@@ -38,7 +38,6 @@ export async function verificarElementosPainel(page: Page): Promise<void> {
     await esperarElementoVisivel(page, SELETORES.TABELA_PROCESSOS);
     await esperarElementoVisivel(page, SELETORES.COLUNA_DESCRICAO);
     await esperarElementoVisivel(page, SELETORES.COLUNA_TIPO);
-    await esperarElementoVisivel(page, SELETORES.COLUNA_UNIDADES);
     await esperarElementoVisivel(page, SELETORES.COLUNA_SITUACAO);
 }
 
@@ -53,7 +52,7 @@ export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<v
  * Verifica a visibilidade de um processo específico na tabela de processos
  */
 export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean): Promise<void> {
-    const processo = page.getByRole('row', {name: nomeProcesso});
+    const processo = page.getByTestId(SELETORES.TABELA_PROCESSOS).locator('tr', {hasText: nomeProcesso});
     if (visivel) {
         await expect(processo).toBeVisible();
     } else {

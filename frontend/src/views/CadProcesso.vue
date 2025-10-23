@@ -431,7 +431,6 @@ async function abrirModalConfirmacao() {
     );
     return
   }
-
   const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
 
   if (unidadesFiltradas.length === 0) {
@@ -470,9 +469,6 @@ async function confirmarIniciarProcesso() {
       console.error('Erro ao iniciar processo:', error);
     }
   } else {
-    // Idealmente, o processo deveria ser salvo primeiro.
-    // O fluxo atual de salvar e depois ter que voltar para iniciar não é ideal.
-    // Por enquanto, mantemos a lógica de que apenas processos já salvos (em edição) podem ser iniciados.
     notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
   }
 }
@@ -562,3 +558,4 @@ function toggleUnidade(unidade: Unidade) {
     });
   }
 }
+</script>

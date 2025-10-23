@@ -5,10 +5,6 @@ import {
     clicarUnidade,
     esperarElementoVisivel,
     expandirTodasAsUnidades,
-    loginComoAdmin,
-    loginComoChefe,
-    loginComoGestor,
-    loginComoServidor,
     SELETORES,
     verificarAlertasOrdenadosPorDataHora,
     verificarAusenciaBotaoCriarProcesso,
@@ -18,7 +14,14 @@ import {
     verificarNavegacaoPaginaDetalhesProcesso,
     verificarNavegacaoPaginaSubprocesso,
     verificarVisibilidadeProcesso,
+    criarProcessoCompleto,
 } from './helpers';
+import {
+    loginComoAdmin,
+    loginComoChefe,
+    loginComoGestor,
+    loginComoServidor,
+} from './helpers/auth';
 
 test.describe('CDU-02: Visualizar Painel', () => {
     test.describe('Visibilidade de Componentes por Perfil', () => {
@@ -49,6 +52,8 @@ test.describe('CDU-02: Visualizar Painel', () => {
 
         test('deve exibir processos em situação "Criado" apenas para ADMIN', async ({page}) => {
             await loginComoAdmin(page);
+            // Criar o processo antes de verificar sua visibilidade
+            await criarProcessoCompleto(page, 'Processo teste revisão CDU-05', 'Revisão', '23/10/2025', [5]);
             await verificarVisibilidadeProcesso(page, /Processo teste revisão CDU-05/, true);
         });
 
@@ -59,7 +64,9 @@ test.describe('CDU-02: Visualizar Painel', () => {
     });
 
     test.describe('Tabela de Processos', () => {
-        test.beforeEach(async ({page}) => await loginComoAdmin(page));
+        test.beforeEach(async ({page}) => {
+            await loginComoAdmin(page);
+        });
 
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
             await loginComoChefe(page); // Chefe da STIC (id 5)
@@ -99,7 +106,9 @@ test.describe('CDU-02: Visualizar Painel', () => {
     });
 
     test.describe('Tabela de Alertas', () => {
-        test.beforeEach(async ({page}) => await loginComoAdmin(page));
+        test.beforeEach(async ({page}) => {
+            await loginComoAdmin(page);
+        });
 
         test('deve mostrar alertas na tabela com as colunas corretas', async ({page}) => {
             await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
