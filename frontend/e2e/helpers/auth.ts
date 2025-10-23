@@ -57,3 +57,6 @@ export async function loginComoChefe(page: Page) {
 export async function loginComoServidor(page: Page) {
     await loginProgramatico(page, testData.servidorUsername, 'SERVIDOR', 'STIC');
 }
+export async function loginComoChefeSedia(page: Page) {
+    await loginProgramatico(page, testData.chefeSediaUsername, 'CHEFE', 'SEDIA');
+}

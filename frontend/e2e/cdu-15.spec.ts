@@ -7,15 +7,15 @@ import {
     criarCompetencia,
     editarCompetencia,
     excluirCompetencia,
-    verificarCompetenciaExiste,
-    verificarCompetenciaNaoExiste,
+    verificarCompetenciaVisivel,
+    verificarCompetenciaNaoVisivel,
     verificarAtividadesAssociadas,
-    verificarDescricaoCompetencia,
     clicarBotaoDisponibilizar,
     preencherDataModal,
     confirmarNoModal,
     esperarUrl
 } from './helpers';
+import {verificarDescricaoCompetencia} from "./helpers/verificacoes/verificacoes-ui";
 
 test.describe('CDU-15: Manter Mapa de Competências', () => {
     let processo: any;
@@ -33,7 +33,7 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
         const atividadesParaAssociar = ['Atividade 1', 'Atividade 2']; // Assumindo que estas atividades existem
 
         await criarCompetencia(page, descricaoCompetencia, atividadesParaAssociar);
-        await verificarCompetenciaExiste(page, descricaoCompetencia);
+        await verificarCompetenciaVisivel(page, descricaoCompetencia);
         await verificarAtividadesAssociadas(page, descricaoCompetencia, atividadesParaAssociar);
     });
 
@@ -45,32 +45,30 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
 
         // Criar uma competência para editar
         await criarCompetencia(page, descricaoOriginal, atividadesOriginais);
-        await verificarCompetenciaExiste(page, descricaoOriginal);
+        await verificarCompetenciaVisivel(page, descricaoOriginal);
 
         await editarCompetencia(page, descricaoOriginal, descricaoEditada, atividadesEditadas);
-        await verificarCompetenciaNaoExiste(page, descricaoOriginal); // A descrição original não deve mais existir
-        await verificarCompetenciaExiste(page, descricaoEditada);
+        await verificarCompetenciaNaoVisivel(page, descricaoOriginal); // A descrição original não deve mais existir
+        await verificarCompetenciaVisivel(page, descricaoEditada);
         await verificarAtividadesAssociadas(page, descricaoEditada, atividadesEditadas);
     });
 
     test('deve permitir excluir uma competência', async ({page}) => {
         const descricaoCompetencia = 'Competência a Ser Excluída';
-        const atividadesParaAssociar = ['Atividade 1'];
 
         // Criar uma competência para excluir
-        await criarCompetencia(page, descricaoCompetencia, atividadesParaAssociar);
-        await verificarCompetenciaExiste(page, descricaoCompetencia);
+        await criarCompetencia(page, descricaoCompetencia, ['Atividade 1']);
+        await verificarCompetenciaVisivel(page, descricaoCompetencia);
 
         await excluirCompetencia(page, descricaoCompetencia);
-        await verificarCompetenciaNaoExiste(page, descricaoCompetencia);
+        await verificarCompetenciaNaoVisivel(page, descricaoCompetencia);
     });
 
     test('deve permitir disponibilizar o mapa após edições', async ({page}) => {
         const descricaoCompetencia = 'Competência para Disponibilizar';
-        const atividadesParaAssociar = ['Atividade 1'];
 
-        await criarCompetencia(page, descricaoCompetencia, atividadesParaAssociar);
-        await verificarCompetenciaExiste(page, descricaoCompetencia);
+        await criarCompetencia(page, descricaoCompetencia, ['Atividade 1']);
+        await verificarCompetenciaVisivel(page, descricaoCompetencia);
 
         await clicarBotaoDisponibilizar(page);
         await preencherDataModal(page, '2025-12-31');

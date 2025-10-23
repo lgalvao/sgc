@@ -1,3 +1,6 @@
+import { expect, Page } from '@playwright/test';
+import { TEXTOS } from '../dados/constantes-teste';
+
 export async function fecharModalImpactos(page: Page): Promise<void> {
     await page.getByTestId('fechar-impactos-mapa-button').click();
 }
@@ -48,4 +51,7 @@ export async function excluirCompetencia(page: Page, descricao: string): Promise
     await expect(page.getByText(`Confirma a exclusão da competência "${descricao}"?`)).toBeVisible();
     await page.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
     await expect(page.getByText(`Confirma a exclusão da competência "${descricao}"?`)).not.toBeVisible(); // Modal deve fechar
+}
+export async function clicarBotaoImpactosMapa(page: Page): Promise<void> {
+    await page.getByRole('button', {name: TEXTOS.IMPACTO_NO_MAPA}).click();
 }

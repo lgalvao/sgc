@@ -6,16 +6,15 @@ import {
     criarProcessoCompleto,
     disponibilizarCadastro,
     gerarNomeUnico,
-    loginComo,
     loginComoAdmin,
     loginComoChefe,
+    loginComoGestor,
     navegarParaProcessoPorId,
     SELETORES_CSS,
     verificarAtividadeVisivel,
     verificarConhecimentoVisivel,
     verificarModoSomenteLeitura,
 } from './helpers';
-import {Perfil} from '@/types/tipos';
 
 test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () => {
     let processo: any;
@@ -51,7 +50,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
     });
 
     test('GESTOR da unidade superior deve visualizar cadastro em modo somente leitura', async ({page}) => {
-        await loginComo(page, Perfil.GESTOR, '1'); // Gestor da SGP (unidade superior à STIC)
+        await loginComoGestor(page); // Gestor da SGP (unidade superior à STIC)
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
@@ -64,7 +63,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
     test('CHEFE de outra unidade não deve ver os botões de edição', async ({page}) => {
         // Loga como chefe de uma unidade que não é a STIC, mas está no processo
         await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-11 OUTRA UNIDADE'), 'MAPEAMENTO', '2025-12-31', [3]); // Adiciona a unidade 3 (SESEL)
-        await loginComo(page, Perfil.CHEFE, '111111111111'); // Chefe da SESEL
+        await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
