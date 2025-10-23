@@ -19,13 +19,6 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
     await page.goto(URLS.PROCESSO_CADASTRO);
-    // Esperar pelo título da página
-    await page.waitForSelector('h2:has-text("Cadastro de processo")');
-    // Esperar pelo campo de descrição estar visível
-    await page.waitForSelector('#descricao', { state: 'visible' });
-    // Adicionar espera pelo campo de tipo estar visível
-    await page.waitForSelector('#tipo', { state: 'visible' });
-    await page.waitForLoadState('networkidle'); // Esperar a rede ficar ociosa
 }
 
 /**
