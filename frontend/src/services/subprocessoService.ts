@@ -1,5 +1,5 @@
 import apiClient from '../axios-setup';
-import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
+import type {Competencia, ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from '@/mappers/mapas';
 
 interface ImportarAtividadesRequest {
@@ -79,6 +79,21 @@ export const salvarMapaCompleto = async (codSubprocesso: number, data: any): Pro
     const response = await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-completo`, data);
     return mapMapaCompletoDtoToModel(response.data);
 };
+
+export const adicionarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
+    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias`, competencia);
+    return mapMapaCompletoDtoToModel(response.data);
+}
+
+export const atualizarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
+    const response = await apiClient.put(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}`, competencia);
+    return mapMapaCompletoDtoToModel(response.data);
+}
+
+export const removerCompetencia = async (codSubprocesso: number, idCompetencia: number): Promise<MapaCompleto> => {
+    const response = await apiClient.delete(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}`);
+    return mapMapaCompletoDtoToModel(response.data);
+}
 
 export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
     const response = await apiClient.get(`/subprocessos/${id}/mapa-ajuste`);

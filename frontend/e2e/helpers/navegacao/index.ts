@@ -11,6 +11,7 @@ export {
     acessarAnaliseRevisaoComoGestor,
     acessarAnaliseRevisaoComoAdmin,
     irParaMapaCompetencias,
+    navegarParaEdicaoMapa,
     irParaVisualizacaoMapa,
     irParaSubprocesso,
     irParaProcessoPorTexto,

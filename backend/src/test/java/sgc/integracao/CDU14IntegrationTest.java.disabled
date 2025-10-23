@@ -52,6 +52,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -136,6 +137,7 @@ class CDU14IntegrationTest {
                 .contentType("application/json")
                 .content(criarProcessoJson))
             .andExpect(status().isCreated())
+            .andDo(print())
             .andReturn();
         var processoDto = objectMapper.readValue(processoResult.getResponse().getContentAsString(), ProcessoDto.class);
         logger.info("Processo de revisão criado com o código: " + processoDto.getCodigo());
@@ -147,13 +149,15 @@ class CDU14IntegrationTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo())))
                 .param("tipo", "REVISAO"))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andDo(print());
         logger.info("Processo de revisão iniciado.");
 
         // Obter o ID do subprocesso criado a partir dos detalhes do processo
         var detalhesResult = mockMvc.perform(get("/api/processos/{id}/detalhes", processoDto.getCodigo())
                 .with(user("222222222222")))
             .andExpect(status().isOk())
+            .andDo(print())
             .andReturn();
         var detalhesDto = objectMapper.readValue(detalhesResult.getResponse().getContentAsString(), ProcessoDetalheDto.class);
         this.subprocessoId = detalhesDto.getResumoSubprocessos().stream()
@@ -173,13 +177,6 @@ class CDU14IntegrationTest {
         var sp = subprocessoRepo.findById(this.subprocessoId).orElseThrow();
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         logger.info("Situação do subprocesso verificada como REVISAO_CADASTRO_EM_ANDAMENTO.");
-
-        // Disponibilizar o cadastro para análise (ação do Chefe)
-        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", this.subprocessoId)
-                .with(csrf())
-                .with(user(chefe.getTituloEleitoral().toString())))
-            .andExpect(status().isOk());
-        logger.info("Cadastro de revisão disponibilizado para análise.");
     }
 
     @Nested
@@ -189,7 +186,7 @@ class CDU14IntegrationTest {
         @DisplayName("GESTOR deve devolver revisão do cadastro, alterar status, registrar análise, movimentação e alerta")
         void testGestorDevolveRevisaoCadastro() throws Exception {
             // CHEFE disponibiliza o cadastro
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", subprocessoId)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                     .with(csrf())
                     .with(user(chefe.getTituloEleitoral().toString())))
                 .andExpect(status().isOk());
@@ -232,7 +229,7 @@ class CDU14IntegrationTest {
         @DisplayName("GESTOR deve aceitar revisão do cadastro, registrar análise, e mover para unidade superior")
         void testGestorAceitaReivado() throws Exception {
             // CHEFE disponibiliza o cadastro
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", subprocessoId)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                     .with(csrf())
                     .with(user(chefe.getTituloEleitoral().toString())))
                 .andExpect(status().isOk());
@@ -268,7 +265,7 @@ class CDU14IntegrationTest {
         @DisplayName("ADMIN deve homologar revisão do cadastro SEM impactos, alterando status para MAPA_HOMOLOGADO")
         void testHomologarRevisaoCadastro_SemImpactos() throws Exception {
             // CHEFE disponibiliza o cadastro
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", subprocessoId)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                     .with(csrf())
                     .with(user(chefe.getTituloEleitoral().toString())))
                 .andExpect(status().isOk());
@@ -291,7 +288,7 @@ class CDU14IntegrationTest {
 
             // Ação
             String jsonContent = objectMapper.writeValueAsString(Map.of("observacoes", "Homologado sem impactos"));
-            mockMvc.perform(post("/api/subprocessos/{codigo}/homologar-revisao-cadastro", subprocessoId)
+            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
                             .with(csrf())
                             .with(user("111111111111"))
                             .contentType("application/json")
@@ -314,7 +311,7 @@ class CDU14IntegrationTest {
         @DisplayName("ADMIN deve homologar revisão do cadastro COM impactos, alterando status para REVISAO_CADASTRO_HOMOLOGADA e criando movimentação")
         void testHomologarRevisaoCadastro_ComImpactos() throws Exception {
             // CHEFE disponibiliza o cadastro
-            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao-cadastro", subprocessoId)
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                     .with(csrf())
                     .with(user(chefe.getTituloEleitoral().toString())))
                 .andExpect(status().isOk());

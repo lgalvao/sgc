@@ -13,6 +13,7 @@ export {
     esperarElementoInvisivel,
     esperarBotaoVisivel,
     verificarUrl,
+    esperarUrl,
     verificarUrlDoPainel, // Corrigido: removido alias e adicionada função específica
     verificarModalVisivel,
     verificarModalFechado,

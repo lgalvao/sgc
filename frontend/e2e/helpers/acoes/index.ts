@@ -72,8 +72,5 @@ export {
 
  // Ações de mapa
  export {
-     validarMapa,
-     apresentarSugestoes,
-     clicarBotaoImpactosMapa,
      fecharModalImpactos
  } from './acoes-mapa';
