@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import {navegarParaCriacaoProcesso} from '../navegacao';
+import {navegarParaCriacaoProcesso} from '~/helpers';
 
 /**
  * Seleciona unidades na árvore de hierarquia com base em seus IDs.

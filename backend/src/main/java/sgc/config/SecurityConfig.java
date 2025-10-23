@@ -13,7 +13,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sgc.sgrh.dto.LoginResponse;
 
 @Configuration
 @EnableWebSecurity

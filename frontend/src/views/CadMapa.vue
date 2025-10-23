@@ -392,7 +392,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {Atividade, Competencia, Perfil, SalvarMapaRequest, SituacaoSubprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()

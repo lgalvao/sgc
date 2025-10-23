@@ -22,7 +22,7 @@ public class CompetenciaService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
-    public Competencia adicionarCompetencia(Mapa mapa, String descricao, List<Long> atividadesIds) {
+    public void adicionarCompetencia(Mapa mapa, String descricao, List<Long> atividadesIds) {
         Competencia competencia = new Competencia(descricao, mapa);
         competenciaRepo.save(competencia);
         if (atividadesIds != null && !atividadesIds.isEmpty()) {
@@ -31,7 +31,6 @@ public class CompetenciaService {
                 competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
             }
         }
-        return competencia;
     }
 
     public Competencia atualizarCompetencia(Long competenciaId, String descricao, List<Long> atividadesIds) {

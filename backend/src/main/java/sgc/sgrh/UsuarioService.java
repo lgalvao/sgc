@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.UsuarioRepo;

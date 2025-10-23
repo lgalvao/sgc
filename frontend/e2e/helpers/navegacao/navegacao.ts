@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
