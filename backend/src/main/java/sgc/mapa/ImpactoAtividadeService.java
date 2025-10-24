@@ -33,8 +33,6 @@ public class ImpactoAtividadeService {
 
     private final ImpactoCompetenciaService impactoCompetenciaService;
     private final AtividadeRepo atividadeRepo;
-    private final CompetenciaRepo repositorioCompetencia;
-    private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
     private final ConhecimentoRepo conhecimentoRepo;
 
     private Map<String, Atividade> mapAtividadesByDescricao(List<Atividade> atividades) {
@@ -43,33 +41,14 @@ public class ImpactoAtividadeService {
     }
 
     /**
-     * Obtém todas as atividades associadas a um mapa, percorrendo as competências e seus vínculos.
+     * Obtém todas as atividades associadas a um mapa, com seus conhecimentos.
      *
      * @param mapa O mapa do qual as atividades serão extraídas.
      * @return Uma {@link List} de {@link Atividade}s.
      */
     public List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: Mapa Código {}", mapa.getCodigo());
-        List<Competencia> competencias = repositorioCompetencia
-                .findByMapaCodigo(mapa.getCodigo());
-        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: Competências encontradas: {}", competencias.size());
-
-        Set<Long> idsAtividades = new HashSet<>();
-        for (Competencia comp : competencias) {
-            List<CompetenciaAtividade> vinculos = repositorioCompetenciaAtividade
-                    .findByCompetenciaCodigo(comp.getCodigo());
-
-            for (CompetenciaAtividade vinculo : vinculos) {
-                idsAtividades.add(vinculo.getId().getAtividadeCodigo());
-            }
-        }
-
-        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: IDs de Atividades coletados: {}", idsAtividades.size());
-
-        if (idsAtividades.isEmpty()) {
-            return List.of();
-        }
-        return atividadeRepo.findAllById(idsAtividades);
+        log.info("Buscando atividades e conhecimentos para o mapa {}", mapa.getCodigo());
+        return atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
     }
 
     public List<AtividadeImpactadaDto> detectarAtividadesInseridas(List<Atividade> atuais,
@@ -134,12 +113,12 @@ public class ImpactoAtividadeService {
                 List<Conhecimento> conhecimentosAtuais = conhecimentoRepo.findByAtividadeCodigo(atual.getCodigo());
                 List<Conhecimento> conhecimentosVigentes = conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
 
-                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
+                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes) || !atual.getDescricao().equals(vigente.getDescricao())) {
                     alteradas.add(new AtividadeImpactadaDto(
                             atual.getCodigo(),
                             atual.getDescricao(),
                             TipoImpactoAtividade.ALTERADA,
-                            "Conhecimentos associados alterados.", // More specific message can be added if needed
+                            "Descrição ou conhecimentos associados alterados.", // More specific message can be added if needed
                             impactoCompetenciaService.obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente)
                     ));
                 }
