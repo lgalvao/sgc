@@ -54,9 +54,7 @@ O backend utiliza **Java 21**.
 
 ## Testes de Backend
 
-### Testes Padrão
-
-Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest`.)  
+Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest` que filtra os stack traces)  
 
 ```bash
 ./gradlew :backend:test

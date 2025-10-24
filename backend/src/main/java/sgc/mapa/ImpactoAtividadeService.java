@@ -12,6 +12,8 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,10 +35,11 @@ public class ImpactoAtividadeService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
+    private final ConhecimentoRepo conhecimentoRepo;
 
-    private Map<Long, Atividade> mapAtividadesByCodigo(List<Atividade> atividades) {
+    private Map<String, Atividade> mapAtividadesByDescricao(List<Atividade> atividades) {
         return atividades.stream()
-                .collect(Collectors.toMap(Atividade::getCodigo, atividade -> atividade));
+                .collect(Collectors.toMap(Atividade::getDescricao, atividade -> atividade));
     }
 
     /**
@@ -75,10 +78,10 @@ public class ImpactoAtividadeService {
         log.info("detectarAtividadesInseridas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
 
         List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
-        Map<Long, Atividade> vigentesMap = mapAtividadesByCodigo(vigentes);
+        Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
 
         for (Atividade atual : atuais) {
-            if (!vigentesMap.containsKey(atual.getCodigo())) {
+            if (!vigentesMap.containsKey(atual.getDescricao())) {
                 inseridas.add(new AtividadeImpactadaDto(
                         atual.getCodigo(),
                         atual.getDescricao(),
@@ -100,10 +103,10 @@ public class ImpactoAtividadeService {
         log.info("detectarAtividadesRemovidas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
 
         List<AtividadeImpactadaDto> removidas = new ArrayList<>();
-        Map<Long, Atividade> atuaisMap = mapAtividadesByCodigo(atuais);
+        Map<String, Atividade> atuaisMap = mapAtividadesByDescricao(atuais);
 
         for (Atividade vigente : vigentes) {
-            if (!atuaisMap.containsKey(vigente.getCodigo())) {
+            if (!atuaisMap.containsKey(vigente.getDescricao())) {
                 removidas.add(new AtividadeImpactadaDto(
                         vigente.getCodigo(),
                         vigente.getDescricao(),
@@ -122,17 +125,21 @@ public class ImpactoAtividadeService {
         log.info("detectarAtividadesAlteradas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
 
         List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
-        Map<Long, Atividade> vigentesMap = mapAtividadesByCodigo(vigentes);
+        Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
 
         for (Atividade atual : atuais) {
-            if (vigentesMap.containsKey(atual.getCodigo())) {
-                Atividade vigente = vigentesMap.get(atual.getCodigo());
-                if (!vigente.getDescricao().equals(atual.getDescricao())) {
+            if (vigentesMap.containsKey(atual.getDescricao())) {
+                Atividade vigente = vigentesMap.get(atual.getDescricao());
+                // Compare conhecimentos associated with the activities
+                List<Conhecimento> conhecimentosAtuais = conhecimentoRepo.findByAtividadeCodigo(atual.getCodigo());
+                List<Conhecimento> conhecimentosVigentes = conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
+
+                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
                     alteradas.add(new AtividadeImpactadaDto(
                             atual.getCodigo(),
                             atual.getDescricao(),
                             TipoImpactoAtividade.ALTERADA,
-                            "Descrição alterada de \"%s\" para \"%s\".".formatted(vigente.getDescricao(), atual.getDescricao()),
+                            "Conhecimentos associados alterados.", // More specific message can be added if needed
                             impactoCompetenciaService.obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente)
                     ));
                 }
@@ -140,5 +147,14 @@ public class ImpactoAtividadeService {
         }
         log.info("detectarAtividadesAlteradas - {} atividades alteradas.", alteradas.size());
         return alteradas;
+    }
+
+    private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
+        if (lista1.size() != lista2.size()) {
+            return true;
+        }
+        Set<String> descricoes1 = lista1.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+        Set<String> descricoes2 = lista2.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+        return !descricoes1.equals(descricoes2);
     }
 }
