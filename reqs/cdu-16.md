@@ -21,6 +21,8 @@ Fluxo principal:
 9. ADMIN usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições
    de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das
    atividades às competências do mapa, conforme descrito no caso de uso Manter mapa de competências.
+
    9.1. ADMIN deve associar a uma competência todas as atividades ainda não associadas.
+
 10. Quando concluir os ajustes, ADMIN clica em Disponibilizar e o sistema segue o fluxo descrito no caso de uso
     Disponibilizar mapa de competências.

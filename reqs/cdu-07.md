@@ -11,7 +11,9 @@ Fluxo principal:
 1. O sistema mostra a tela Detalhes do subprocesso com os dados do subprocesso da unidade do perfil.
 2. A tela Detalhes do subprocesso será composta por três seções: Dados da Unidade, Movimentações do Processo e Elementos
    do Processo.
+
    2.1. Na seção Dados da unidade serão apresentadas as informações:
+
    2.1.1. (Sem título): Sigla e nome da unidade, destacado.
    2.1.2. Titular (exibido apenas se não for o responsável):
    ● [Nome do titular]
@@ -30,11 +32,13 @@ Fluxo principal:
    2.1.5. Localização atual: Unidade destino da última movimentação do subprocesso da unidade.
    2.1.6. Prazo para conclusão da etapa atual: Data limite da última etapa do subprocesso ainda não concluída na
    unidade.
+
    2.2. Na seção Movimentações do processo, título "Movimentações", é apresentada uma tabela com as movimentações que o
    subprocesso já teve até o momento, com os campos: Data/hora da movimentação, unidade origem, unidade destino e
    descrição da movimentação. As informações deverão ser apresentadas em ordem decrescente de data/hora.
    2.3. Na seção Elementos do processo (sem título) serão apresentados cards clicáveis com informação variável em função
    do tipo do processo, os quais darão acesso às telas específicas de cada tema.
+
    2.3.1. Se o processo for dos tipos Mapeamento ou Revisão, a seção apresentará cards para acesso ao cadastro de
    Atividades e conhecimentos (descrição "Cadastro de atividades e conhecimentos da unidade") e ao Mapa de
    competências (descrição "Mapa de competências da unidade").

@@ -17,21 +17,27 @@ Fluxo principal:
 5. Caso o sistema não consiga autenticar o usuário com as credenciais fornecidas, deverá mostrar a mensagem 'Título ou
    senha inválidos.'
 6. O sistema consulta perfis e unidades do usuário
+
    6.1. Um usuário pode estar em várias unidades (ex. substituição, atribuição temporária) e também ter mais de um
    perfil.
 7. O sistema determina os perfis disponíveis para usuário seguindo estas regras:
+
    7.1. ADMIN: Servidor cadastrado como administrador do sistema.
    7.2. GESTOR: Servidor responsável por uma unidade intermediária ou interoperacional..
    7.3. CHEFE: Servidor responsável por unidades operacionais, interoperacionais ou pela SEDOC.
    7.4. SERVIDOR: Servidor que não é o responsável pela sua unidade de lotação.
+
 8. O sistema determina quais pares 'perfil-unidade' se aplicam ao usuário logado.
+
    8.1. Se usuário possuir apenas um perfil e uma unidade:
    ■ O sistema guarda perfil e unidade definidos
    8.2. Se usuário possuir múltiplos perfis ou unidades:
    ■ O sistema expande a tela de login para permitir a seleção de perfil e unidade
    ■ Usuário seleciona o perfil/unidade com o qual vai atuar
    ■ O sistema guarda perfil e unidade definidos
+
 9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: Barra de navegação, Conteúdo e Rodapé.
+
    9.1. A Barra de Navegação, que é sempre mostrada no topo das telas (exceto para tela de login) tem as seguintes
    regras de exibição:
    ■ Elementos alinhado à esquerda:
