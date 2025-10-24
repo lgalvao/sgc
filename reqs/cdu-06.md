@@ -10,10 +10,14 @@ Fluxo principal:
 
 1. O sistema mostra a tela Detalhes do processo com os dados do processo escolhido.
 2. A tela será composta pelas seções Dados do processo e Unidades participantes.
+
    2.1. Seção `Dados do processo` (sem título):
+
    2.1.1. Informações da descrição, tipo e da situação dos processos (ver arquivo _situacoes.md).
    2.1.2. Se for perfil ADMIN, exibe o botão Finalizar processo.
+
    2.2. Seção Unidades participantes:
+
    2.2.1. Subárvore das unidades hierarquicamente inferiores.
    ● Para cada unidade operacional e interoperacional da subárvore são exibidas, em linha, as informações da situação do
    subprocesso da unidade e da data limite para a conclusão da etapa atual do processo naquela unidade.

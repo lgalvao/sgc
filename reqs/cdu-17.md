@@ -20,16 +20,22 @@ Fluxo principal:
 7. ADMIN clica no botão Disponibilizar.
 8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da
    unidade.
+
    8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências
    ainda permanecem sem associação.
+
 9. O sistema verifica se todas as atividades foram associadas a pelo menos uma competência.
+
    9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades
    ainda estão sem associação a competências.
+
 10. O sistema mostra uma janela modal com as seguintes características:
+
     10.1. Título: 'Disponibilização do mapa de competências'
     10.2. Campo de data, de preenchimento obrigatório, para armazenar a Data limite para a validação do mapa
     10.3. Campo de texto formatado, de preenchimento opcional, para registro de Observações
     10.4. Botões Disponibilizar e Cancelar.
+
 11. Caso ADMIN escolha Cancelar, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela
     Edição de mapa.
 12. ADMIN preenche as informações dos campos da tela modal e clica no botão Disponibilizar.
@@ -37,10 +43,12 @@ Fluxo principal:
     a validação do mapa na data limite da etapa 2 do subprocesso.
 14. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
 15. O sistema registra uma movimentação para o subprocesso com os campos:
+
     15.1. Data/hora: Data/hora atual
     15.2. Unidade origem: SEDOC
     15.3. Unidade destino: [SIGLA_UNIDADE_SUBPROCESSO]
     15.4. Descrição: 'Disponibilização do mapa de competências'
+
 16. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
     Assunto: SGC: Mapa de competências disponibilizado
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
@@ -56,11 +64,13 @@ Fluxo principal:
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para
     conclusão desta etapa do processo é [DATA_LIMITE].
 18. O sistema cria internamente um alerta:
+
     18.1. Descrição: "Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     18.2. Processo: [DESCRICAO_PROCESSO]
     18.3. Data/hora: Data/hora atual
     18.4. Unidade de origem: SEDOC
     18.5. Unidade de destino: [SIGLA_UNIDADE_SUBPROCESSO].
+
 19. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da
     unidade.
 20. O sistema mostra confirmação: "Revisão do cadastro de atividades disponibilizada" e redireciona para o Painel.

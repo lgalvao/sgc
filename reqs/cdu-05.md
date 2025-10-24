@@ -21,18 +21,23 @@ Fluxo principal:
 8. O sistema muda a situação do processo de revisão para 'Em andamento';
 9. O sistema cria internamente um subprocesso para cada unidade operacional ou interoperacional participante, com os
    seguintes campos e valores iniciais:
+
    9.1. Data limite etapa 1: Data copiada da data limite da etapa inicial do processo.
    9.2. Situação: 'Não iniciado'
    9.3. Observações: Campo de texto formatado reservado para registro de informações futuras pela SEDOC.
    9.4. Sugestões: Campo de texto formatado reservado para registro de sugestões futuras pelas unidades.
+
 10. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as respectivas atividades e
     conhecimentos, de cada unidade operacional ou interoperacional participante, vinculando-o ao subprocesso da unidade.
 11. O sistema registra uma movimentação para cada subprocesso criado com os campos:
+
     11.1. Data/hora: Data/hora atual
     11.2. Unidade origem: 'SEDOC'
     11.3. Unidade destino: [SIGLA_UNIDADE_SUBPROCESSO]
     11.4. Descrição: 'Processo iniciado'
+
 12. O sistema envia notificações por e-mail para todas as unidades participantes.
+
     12.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo o modelo:
     Assunto: SGC: Início de processo de revisão do mapa de competências
     Prezado(a) responsável pela [SIGLA_UNIDADE],
@@ -49,7 +54,9 @@ Fluxo principal:
     disponibilizadas, será possível visualizar e realizar a sua validação.
     O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].
+
 13. O sistema cria internamente alertas para todas as unidades participantes.
+
     13.1. Para cada unidade operacional será criado um alerta:
     13.1.1. Descrição: "Início do processo"
     13.1.2. Processo: [DESCRICAO_PROCESSO]
