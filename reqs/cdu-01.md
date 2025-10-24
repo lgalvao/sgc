@@ -30,8 +30,11 @@ Fluxo principal:
 8. O sistema determina quais pares 'perfil-unidade' se aplicam ao usuário logado.
 
    8.1. Se usuário possuir apenas um perfil e uma unidade:
+
    ■ O sistema guarda perfil e unidade definidos
+
    8.2. Se usuário possuir múltiplos perfis ou unidades:
+
    ■ O sistema expande a tela de login para permitir a seleção de perfil e unidade
    ■ Usuário seleciona o perfil/unidade com o qual vai atuar
    ■ O sistema guarda perfil e unidade definidos
@@ -40,16 +43,21 @@ Fluxo principal:
 
    9.1. A Barra de Navegação, que é sempre mostrada no topo das telas (exceto para tela de login) tem as seguintes
    regras de exibição:
+
    ■ Elementos alinhado à esquerda:
+
    ● Ícone/logotipo do sistema (link para abrir a tela Painel)
    ● Link Painel, para tela Painel
    ● Link Minha unidade, para tela Detalhe da unidade, apresentando os dados da unidade do usuário logado
    ● Link Relatórios, para tela Relatórios
    ● Link Histórico, para tela Histórico de processos
+
    ■ Elementos alinhado à direita:
+
    ● Se perfil ADMIN: Ícone de engrenagem para acesso à tela de configurações do sistema
    ● [Perfil] - [Sigla da unidade] - Texto fixo, sem interatividade (ex. CHEFE - SESEL)
    ● Ícone de logout - faz logout e mostra tela Login
+
    9.2. O conteúdo compõe a parte central da tela, onde serão exibidas todas as telas.
    9.3. O Rodapé é a seção localizada na parte inferior das telas (exceto na tela de login) em que aparecerá a
    informação da versão do sistema assim como a informação 'Desenvolvido por SESEL/COSIS/TRE-PE'.

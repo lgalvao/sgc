@@ -56,7 +56,8 @@ Fluxo principal:
    7.2. Competências impactadas: Se alguma competência impactada tiver sido detectada, o sistema mostra uma seção
    composta por blocos com a descrição das competências identificadas. No conteúdo de cada bloco, o sistema apresenta a
    lista de impactos observados no formato:
-   <ÍCONE REMOÇÃO/ALTERAÇÃO> Atividade removida/alterada:   
+
+   <ÍCONE REMOÇÃO/ALTERAÇÃO> Atividade removida/alterada:
    <DESCRIÇÃO_ATIVIDADE>
    <DESCRIÇÃO_ALTERAÇÃO>
 

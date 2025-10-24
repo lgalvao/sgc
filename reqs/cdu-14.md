@@ -68,7 +68,8 @@ Fluxo principal:
 
     Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
     ```
-11. 10.10. O sistema cria internamente um alerta:
+
+    10.10. O sistema cria internamente um alerta:
 
     10.10.1. Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para
     ajustes"

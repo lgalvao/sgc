@@ -11,6 +11,7 @@ Fluxo principal:
    apenas os processos que incluam entre as unidades participantes a unidade do usuário e/ou suas unidades subordinadas.
 
    2.1. Campos da tabela
+
    ■ Descrição: Descrição dada ao processo no momento do seu cadastro
    ■ Tipo: Tipo do processo ('Mapeamento', 'Revisão' ou 'Diagnóstico')
    ■ Unidades Participantes: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da
@@ -20,9 +21,11 @@ Fluxo principal:
    ■ Situação: Situação do processo ('Criado', 'Em andamento' ou 'Finalizado').
 
    2.2. Regras de exibição e funcionamento
+
    ■ Processos na situação 'Criado' deverão ser listados apenas se o usuário estiver logado com o perfil ADMIN.
    ■ Cabeçalhos das colunas deverão ser clicáveis, possibilitando ordenação em ordem crescente e decrescente.
    ■ Itens da tabela serão clicáveis com estas regras:
+
    ● Para perfil ADMIN, clicar em um processo na situação 'Criado' mostra tela Cadastro de processo com os dados do
    processo (ver caso de uso Manter processo).
    ● Clicar em processos nas situações 'Em Andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o
@@ -36,15 +39,18 @@ Fluxo principal:
    usuário logado ou, na ausência desta informação específica, a sua unidade de lotação (título 'Alertas')
 
    3.1. Campos da tabela
+
    ● Data/Hora: Informação da data e da hora de geração do alerta
    ● Processo: Descrição do processo a que se refere o alerta
    ● Unidade: Unidade de origem do alerta
    ● Descrição: Descrição do alerta
 
    3.2. Regras de exibição e funcionamento
+
    ■ Os dados devem estar inicialmente em ordem decrescente por data/hora de envio do alerta, podendo-se alternar a
    ordenação clicando no cabeçalho.
    ■ Cabeçalhos da coluna Processo poderá ser clicado para alterar a ordenação dos dados da tabela.
+
    ● Ordenação deve ser feita tendo como primeiro critério a descrição do processo (asc/desc) e em seguida a data/hora (
    desc).
    ■ Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
