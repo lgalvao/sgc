@@ -19,15 +19,19 @@ Fluxo principal:
    2.2. Seção Unidades participantes:
 
    2.2.1. Subárvore das unidades hierarquicamente inferiores.
+
    ● Para cada unidade operacional e interoperacional da subárvore são exibidas, em linha, as informações da situação do
    subprocesso da unidade e da data limite para a conclusão da etapa atual do processo naquela unidade.
    ● O usuário poderá clicar nas unidades operacionais e interoperacionais para visualizar a tela Detalhes do
    subprocesso (ver caso de uso Detalhar subprocesso) com os dados da unidade selecionada.
+
    ○ Caso o perfil do usuário seja ADMIN, serão exibidos, na seção Dados da unidade da tela, elementos para possibilitar
    a alteração da data limite da etapa atual da unidade assim como da situação atual do subprocesso da unidade (ex.
    Reabertura do cadastro de atividades)
+
    2.2.2. Caso existam unidades subordinadas cujos subprocessos estejam localizados na unidade do usuário, os seguintes
    botões poderão ser apresentados:
+
    ● Aceitar/Homologar cadastro em bloco, se existirem unidades subordinadas com subprocesso na situação 'Cadastro
    disponibilizado' (processo de mapeamento) ou 'Revisão do cadastro disponibilizada' (processo de revisão)  (ver caso
    de uso Aceitar/homologar cadastro em bloco).
