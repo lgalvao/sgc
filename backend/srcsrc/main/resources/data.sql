@@ -16,7 +16,7 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 (15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 2),
 -- Unidades para CDU14IntegrationTest
 (100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL),
-(101, 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIaria', 100),
+(101, 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 100),
 (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 101);
 
 -- Unidades do mock
@@ -31,9 +31,9 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (209, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 206);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (210, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 206);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (211, 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 207);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (214, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 202);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (212, 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 214);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (213, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 214);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (214, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 202);
 
 
 -- Usuários
