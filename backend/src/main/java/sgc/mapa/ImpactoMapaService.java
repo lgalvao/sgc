@@ -87,6 +87,9 @@ public class ImpactoMapaService {
         List<Atividade> atividadesAtuais = impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = impactoAtividadeService.obterAtividadesDoMapa(mapaVigente);
 
+        atividadesAtuais.forEach(a -> log.info("Atividade Atual: {} - {}", a.getCodigo(), a.getDescricao()));
+        atividadesVigentes.forEach(a -> log.info("Atividade Vigente: {} - {}", a.getCodigo(), a.getDescricao()));
+
         log.info("ImpactoMapaService - Atividades Atuais (mapaSubprocesso) tamanho: {}", atividadesAtuais.size());
         log.info("ImpactoMapaService - Atividades Vigentes (mapaVigente) tamanho: {}", atividadesVigentes.size());
 

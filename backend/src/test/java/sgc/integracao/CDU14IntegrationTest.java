@@ -1,7 +1,6 @@
 package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.atividade.modelo.Atividade;
@@ -58,7 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Sql("/create-test-data.sql")
-@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CDU14IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -95,24 +95,19 @@ class CDU14IntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
         unidade = unidadeRepo.findById(102L).orElseThrow();
         admin = usuarioRepo.findById(111111111111L).orElseThrow();
         gestor = usuarioRepo.findById(222222222222L).orElseThrow();
         chefe = usuarioRepo.findById(333333333333L).orElseThrow();
 
+        Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
         unidadeAdmin.setTitular(admin);
+        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
         unidadeGestor.setTitular(gestor);
         unidade.setTitular(chefe);
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
 
-        Mapa mapaVigente = criarMapaComCompetenciasEAtividades();
-        System.out.println("CDU14IntegrationTest - setUp: Mapa Vigente Código: " + mapaVigente.getCodigo());
-        criarUnidadeMapa(unidade.getCodigo(), mapaVigente.getCodigo());
-
-        ProcessoDto processoDto = criarEIniciarProcessoDeRevisao(mapaVigente);
-
+        ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
         subprocessoId = obterSubprocessoId(processoDto.getCodigo());
 
         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
@@ -206,6 +201,7 @@ class CDU14IntegrationTest {
 
             // Remover uma atividade existente do mapa do subprocesso
             Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
+            competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
 
             // Recarregar o subprocesso para garantir que o mapa esteja atualizado
@@ -253,6 +249,7 @@ class CDU14IntegrationTest {
 
             // Remover uma atividade existente do mapa do subprocesso
             Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
+            competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
 
             // Recarregar o subprocesso para garantir que o mapa esteja atualizado
@@ -301,26 +298,7 @@ class CDU14IntegrationTest {
         }
     }
 
-    private Mapa criarMapaComCompetenciasEAtividades() {
-        Mapa mapa = mapaRepo.save(new Mapa());
-        System.out.println("CDU14IntegrationTest - criarMapaComCompetenciasEAtividades: Mapa Código: " + mapa.getCodigo());
-        Competencia c1 = competenciaRepo.save(new Competencia("Competência Teste", mapa));
-        Atividade a1 = atividadeRepo.save(new Atividade(mapa, "Atividade Teste"));
-        conhecimentoRepo.save(new Conhecimento("Conhecimento Teste", a1));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), a1.getCodigo()), c1, a1));
-        return mapa;
-    }
-
-    private void criarUnidadeMapa(Long unidadeCodigo, Long mapaCodigo) {
-        UnidadeMapa um = new UnidadeMapa(unidadeCodigo);
-        um.setMapaVigenteCodigo(mapaCodigo);
-        um.setDataVigencia(LocalDateTime.now());
-        unidadeMapaRepo.save(um);
-    }
-
-    private ProcessoDto criarEIniciarProcessoDeRevisao(Mapa mapaBase) throws Exception {
-        Mapa mapaSubprocesso = copiarMapa(mapaBase);
-
+    private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
         Map<String, Object> criarReqMap = Map.of(
                 "descricao", "Processo Revisão",
                 "tipo", "REVISAO",
@@ -343,9 +321,10 @@ class CDU14IntegrationTest {
                         .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo()))))
                 .andExpect(status().isOk());
 
-        // Associar o mapa copiado ao subprocesso recém-criado
+        // Associa o mapa de revisão (pré-carregado) ao subprocesso
         Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
-        sp.setMapa(mapaSubprocesso);
+        Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
+        sp.setMapa(mapaRevisao);
         subprocessoRepo.save(sp);
 
         return processoDto;
@@ -358,33 +337,5 @@ class CDU14IntegrationTest {
 
         ProcessoDetalheDto detalhes = objectMapper.readValue(resJson, ProcessoDetalheDto.class);
         return detalhes.getResumoSubprocessos().getFirst().getCodigo();
-    }
-
-    private Mapa copiarMapa(Mapa mapaOriginal) {
-        Mapa novoMapa = mapaRepo.save(new Mapa());
-
-        // Copiar atividades do mapa original para o novo mapa
-        atividadeRepo.findByMapaCodigo(mapaOriginal.getCodigo()).forEach(atividadeOriginal -> {
-            Hibernate.initialize(atividadeOriginal.getConhecimentos()); // Inicializa a coleção
-            Atividade novaAtividade = atividadeRepo.save(new Atividade(novoMapa, atividadeOriginal.getDescricao()));
-            // Copiar conhecimentos da atividade original para a nova atividade
-            conhecimentoRepo.findByAtividadeCodigo(atividadeOriginal.getCodigo())
-                    .forEach(conhecimentoOriginal -> conhecimentoRepo.save(new Conhecimento(conhecimentoOriginal.getDescricao(), novaAtividade)));
-        });
-
-        // Copiar competências do mapa original para o novo mapa
-        competenciaRepo.findByMapaCodigo(mapaOriginal.getCodigo()).forEach(competenciaOriginal -> {
-            Competencia novaCompetencia = competenciaRepo.save(new Competencia(competenciaOriginal.getDescricao(), novoMapa));
-            // Copiar vínculos CompetenciaAtividade
-            competenciaAtividadeRepo.findByCompetenciaCodigo(competenciaOriginal.getCodigo()).forEach(caOriginal -> {
-                // Procurar a nova atividade correspondente no novo mapa
-                atividadeRepo.findByMapaCodigoAndDescricao(novoMapa.getCodigo(), caOriginal.getAtividade().getDescricao())
-                        .ifPresent(novaAtividade -> competenciaAtividadeRepo.save(new CompetenciaAtividade(
-                                new CompetenciaAtividade.Id(novaCompetencia.getCodigo(), novaAtividade.getCodigo()),
-                                novaCompetencia, novaAtividade
-                        )));
-            });
-        });
-        return novoMapa;
     }
 }
