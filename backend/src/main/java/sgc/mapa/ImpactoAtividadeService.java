@@ -1,6 +1,7 @@
 package sgc.mapa;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
@@ -15,18 +16,28 @@ import sgc.mapa.modelo.TipoImpactoAtividade;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class ImpactoAtividadeService {
+
+    private static final Logger log = LoggerFactory.getLogger(ImpactoAtividadeService.class);
 
     private final ImpactoCompetenciaService impactoCompetenciaService;
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
 
+    private Map<Long, Atividade> mapAtividadesByCodigo(List<Atividade> atividades) {
+        return atividades.stream()
+                .collect(Collectors.toMap(Atividade::getCodigo, atividade -> atividade));
+    }
 
     /**
      * Obtém todas as atividades associadas a um mapa, percorrendo as competências e seus vínculos.
@@ -35,8 +46,10 @@ public class ImpactoAtividadeService {
      * @return Uma {@link List} de {@link Atividade}s.
      */
     public List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
+        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: Mapa Código {}", mapa.getCodigo());
         List<Competencia> competencias = repositorioCompetencia
                 .findByMapaCodigo(mapa.getCodigo());
+        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: Competências encontradas: {}", competencias.size());
 
         Set<Long> idsAtividades = new HashSet<>();
         for (Competencia comp : competencias) {
@@ -48,79 +61,84 @@ public class ImpactoAtividadeService {
             }
         }
 
+        log.info("ImpactoAtividadeService - obterAtividadesDoMapa: IDs de Atividades coletados: {}", idsAtividades.size());
+
         if (idsAtividades.isEmpty()) {
             return List.of();
         }
         return atividadeRepo.findAllById(idsAtividades);
     }
 
-    /**
-     * Compara duas listas de atividades e identifica aquelas que foram inseridas na lista atual.
-     * A comparação é feita com base na descrição da atividade, ignorando maiúsculas/minúsculas e espaços.
-     *
-     * @param atuais   A lista de atividades do mapa atual (em revisão).
-     * @param vigentes A lista de atividades do mapa vigente (original).
-     * @return Uma lista de {@link AtividadeImpactadaDto} representando as atividades inseridas.
-     */
     public List<AtividadeImpactadaDto> detectarAtividadesInseridas(List<Atividade> atuais,
                                                                    List<Atividade> vigentes) {
-        Set<String> descricoesVigentes = vigentes.stream()
-                .map(a -> a.getDescricao().toLowerCase().trim())
-                .collect(Collectors.toSet());
+        log.info("detectarAtividadesInseridas - Atividades Atuais: {}", atuais.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
+        log.info("detectarAtividadesInseridas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
 
-        return atuais.stream()
-                .filter(a -> !descricoesVigentes.contains(
-                        a.getDescricao().toLowerCase().trim()))
-                .map(a -> new AtividadeImpactadaDto(
-                        a.getCodigo(),
-                        a.getDescricao(),
+        List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
+        Map<Long, Atividade> vigentesMap = mapAtividadesByCodigo(vigentes);
+
+        for (Atividade atual : atuais) {
+            if (!vigentesMap.containsKey(atual.getCodigo())) {
+                inseridas.add(new AtividadeImpactadaDto(
+                        atual.getCodigo(),
+                        atual.getDescricao(),
                         TipoImpactoAtividade.INSERIDA,
                         null,
                         List.of()
-                ))
-                .toList();
+                ));
+            }
+        }
+        log.info("detectarAtividadesInseridas - {} atividades inseridas.", inseridas.size());
+        return inseridas;
     }
 
-    /**
-     * Compara duas listas de atividades e identifica aquelas que foram removidas da lista vigente.
-     * Também inclui as competências associadas a cada atividade removida para análise de impacto.
-     *
-     * @param atuais      A lista de atividades do mapa atual (em revisão).
-     * @param vigentes    A lista de atividades do mapa vigente (original).
-     * @param mapaVigente O mapa vigente, usado para buscar as competências associadas.
-     * @return Uma lista de {@link AtividadeImpactadaDto} representando as atividades removidas.
-     */
     public List<AtividadeImpactadaDto> detectarAtividadesRemovidas(
             List<Atividade> atuais,
             List<Atividade> vigentes,
             Mapa mapaVigente) {
-        Set<String> descricoesAtuais = atuais.stream()
-                .map(a -> a.getDescricao().toLowerCase().trim())
-                .collect(Collectors.toSet());
+        log.info("detectarAtividadesRemovidas - Atividades Atuais: {}", atuais.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
+        log.info("detectarAtividadesRemovidas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
 
-        return vigentes.stream()
-                .filter(a -> !descricoesAtuais.contains(
-                        a.getDescricao().toLowerCase().trim()))
-                .map(a -> new AtividadeImpactadaDto(
-                        a.getCodigo(),
-                        a.getDescricao(),
+        List<AtividadeImpactadaDto> removidas = new ArrayList<>();
+        Map<Long, Atividade> atuaisMap = mapAtividadesByCodigo(atuais);
+
+        for (Atividade vigente : vigentes) {
+            if (!atuaisMap.containsKey(vigente.getCodigo())) {
+                removidas.add(new AtividadeImpactadaDto(
+                        vigente.getCodigo(),
+                        vigente.getDescricao(),
                         TipoImpactoAtividade.REMOVIDA,
                         null,
-                        impactoCompetenciaService.obterCompetenciasDaAtividade(a.getCodigo(), mapaVigente)))
-                .toList();
+                        impactoCompetenciaService.obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente)
+                ));
+            }
+        }
+        log.info("detectarAtividadesRemovidas - {} atividades removidas.", removidas.size());
+        return removidas;
     }
 
-    /**
-     * Detecta atividades que tiveram seu conteúdo ou associações alterados entre a versão vigente e a atual.
-     * <p>
-     * <b>Nota:</b> A implementação atual é um placeholder e não detecta alterações.
-     *
-     * @param atuais      A lista de atividades do mapa atual.
-     * @param vigentes    A lista de atividades do mapa vigente.
-     * @param mapaVigente O mapa vigente.
-     * @return Uma lista vazia de {@link AtividadeImpactadaDto}.
-     */
     public List<AtividadeImpactadaDto> detectarAtividadesAlteradas(List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
-        return new ArrayList<>();
+        log.info("detectarAtividadesAlteradas - Atividades Atuais: {}", atuais.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
+        log.info("detectarAtividadesAlteradas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
+
+        List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
+        Map<Long, Atividade> vigentesMap = mapAtividadesByCodigo(vigentes);
+
+        for (Atividade atual : atuais) {
+            if (vigentesMap.containsKey(atual.getCodigo())) {
+                Atividade vigente = vigentesMap.get(atual.getCodigo());
+                if (!vigente.getDescricao().equals(atual.getDescricao())) {
+                    alteradas.add(new AtividadeImpactadaDto(
+                            atual.getCodigo(),
+                            atual.getDescricao(),
+                            TipoImpactoAtividade.ALTERADA,
+                            "Descrição alterada de \"%s\" para \"%s\".".formatted(vigente.getDescricao(), atual.getDescricao()),
+                            impactoCompetenciaService.obterCompetenciasDaAtividade(atual.getCodigo(), mapaVigente)
+                    ));
+                }
+            }
+        }
+        log.info("detectarAtividadesAlteradas - {} atividades alteradas.", alteradas.size());
+        return alteradas;
     }
 }

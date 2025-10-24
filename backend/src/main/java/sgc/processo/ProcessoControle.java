@@ -117,7 +117,7 @@ public class ProcessoControle {
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long id,
-            @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
+            @RequestParam(name = "tipo") String tipo, // Removido defaultValue e required=false
             @RequestBody(required = false) List<Long> unidades) {
 
         if ("REVISAO".equalsIgnoreCase(tipo)) {

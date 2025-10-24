@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositório JPA para a entidade Atividade.
@@ -17,4 +18,6 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
      * @return lista de Atividade
      */
     List<Atividade> findByMapaCodigo(Long mapaCodigo);
+
+    Optional<Atividade> findByMapaCodigoAndDescricao(Long codigo, String descricao);
 }

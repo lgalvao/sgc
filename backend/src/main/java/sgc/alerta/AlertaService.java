@@ -284,7 +284,7 @@ public class AlertaService {
                                     novoUsuario.setEmail(usuarioDto.email());
                                     novoUsuario.setPerfis(java.util.Set.of(Perfil.CHEFE)); // Default role
                                     unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);
-                                    return usuarioRepo.save(novoUsuario);
+                                    return novoUsuario;
                                 })
                                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", titulo));
                     });

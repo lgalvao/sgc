@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,22 +27,25 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -56,7 +60,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("/create-test-data.sql")
 @Transactional
 class CDU14IntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -83,38 +86,35 @@ class CDU14IntegrationTest {
     private CompetenciaRepo competenciaRepo;
     @Autowired
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
     private Long subprocessoId;
-    private Unidade unidade, unidadeGestor, unidadeAdmin;
+    private Unidade unidade;
     private Usuario chefe, gestor, admin;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Carregar unidades e usuários do SQL
-        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
-        unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
+        Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
+        Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
         unidade = unidadeRepo.findById(102L).orElseThrow();
         admin = usuarioRepo.findById(111111111111L).orElseThrow();
         gestor = usuarioRepo.findById(222222222222L).orElseThrow();
         chefe = usuarioRepo.findById(333333333333L).orElseThrow();
 
-        // Associar titulares às unidades
         unidadeAdmin.setTitular(admin);
         unidadeGestor.setTitular(gestor);
         unidade.setTitular(chefe);
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
 
-        // Criar mapa vigente para a unidade
         Mapa mapaVigente = criarMapaComCompetenciasEAtividades();
+        System.out.println("CDU14IntegrationTest - setUp: Mapa Vigente Código: " + mapaVigente.getCodigo());
         criarUnidadeMapa(unidade.getCodigo(), mapaVigente.getCodigo());
 
-        // Criar e iniciar processo de revisão
-        ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
+        ProcessoDto processoDto = criarEIniciarProcessoDeRevisao(mapaVigente);
 
-        // Obter ID do subprocesso
         subprocessoId = obterSubprocessoId(processoDto.getCodigo());
 
-        // Mudar estado do subprocesso para o início do fluxo do CDU-14
         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(sp);
@@ -126,23 +126,21 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("GESTOR deve devolver, alterando status e criando registros")
         void gestorDevolveRevisao() throws Exception {
-            // Chefe disponibiliza
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                    .with(csrf()).with(user(chefe.getTituloEleitoral().toString())))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(chefe)))
+                    .andExpect(status().isOk());
 
-            // Gestor devolve
             mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
-                    .with(csrf()).with(user(gestor.getTituloEleitoral().toString()))
-                    .contentType("application/json")
-                    .content("{\"motivo\": \"Teste\", \"observacoes\": \"Ajustar\"}"))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(gestor))
+                            .contentType("application/json")
+                            .content("{\"motivo\": \"Teste\", \"observacoes\": \"Ajustar\"}"))
+                    .andExpect(status().isOk());
 
-            // Assertivas
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findAll()).hasSize(1);
+            assertThat(alertaRepo.findAll()).hasSize(2);
+            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
 
@@ -150,23 +148,23 @@ class CDU14IntegrationTest {
     @DisplayName("Fluxo de Aceite")
     class Aceite {
         @Test
-        @DisplayName("GESTOR deve aceitar, alterando status e movendo para unidade superior")
+        @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
         void gestorAceitaRevisao() throws Exception {
-            // Chefe disponibiliza
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                .with(csrf()).with(user(chefe.getTituloEleitoral().toString())))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(chefe)))
+                    .andExpect(status().isOk());
 
-            // Gestor aceita
             mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
-                .with(csrf()).with(user(gestor.getTituloEleitoral().toString()))
-                .contentType("application/json")
-                .content("{\"observacoes\": \"OK\"}"))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(gestor))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"OK\"}"))
+                    .andExpect(status().isOk());
 
-            // Assertivas
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
+            assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
+            assertThat(alertaRepo.findAll()).hasSize(2);
+            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
 
@@ -175,55 +173,137 @@ class CDU14IntegrationTest {
     class Homologacao {
         @BeforeEach
         void setUpHomologacao() throws Exception {
-            // Chefe disponibiliza e Gestor aceita
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
-                .with(csrf()).with(user(chefe.getTituloEleitoral().toString())))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(chefe)))
+                    .andExpect(status().isOk());
             mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
-                .with(csrf()).with(user(gestor.getTituloEleitoral().toString()))
-                .contentType("application/json")
-                .content("{\"observacoes\": \"OK\"}"))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(gestor))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"OK\"}"))
+                    .andExpect(status().isOk());
+
+            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+            System.out.println("CDU14IntegrationTest - setUpHomologacao: Subprocesso Situação: " + sp.getSituacao());
         }
 
         @Test
         @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
         void adminHomologaSemImpactos() throws Exception {
-            // ADMIN homologa
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                .with(csrf()).with(user(admin.getTituloEleitoral().toString()))
-                .contentType("application/json")
-                .content("{\"observacoes\": \"Homologado\"}"))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(admin))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"Homologado\"}"))
+                    .andExpect(status().isOk());
 
-            // Assertivas
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         }
 
         @Test
-        @DisplayName("ADMIN homologa COM impactos, alterando status para REVISAO_CADASTRO_HOMOLOGADA")
+        @DisplayName("ADMIN homologa COM impactos, alterando status e criando movimentação")
         void adminHomologaComImpactos() throws Exception {
-            // Adicionar atividade para gerar impacto
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            atividadeRepo.save(new Atividade(sp.getMapa(), "Nova Atividade de Impacto"));
 
-            // ADMIN homologa
+            // Remover uma atividade existente do mapa do subprocesso
+            Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
+            atividadeRepo.delete(atividadeExistente);
+
+            // Recarregar o subprocesso para garantir que o mapa esteja atualizado
+            sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
-                .with(csrf()).with(user(admin.getTituloEleitoral().toString()))
-                .contentType("application/json")
-                .content("{\"observacoes\": \"Homologado com impacto\"}"))
-                .andExpect(status().isOk());
+                            .with(csrf()).with(user(admin))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"Homologado com impacto\"}"))
+                    .andExpect(status().isOk());
 
-            // Assertivas
             sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+            assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(4);
         }
     }
 
-    // Métodos auxiliares
+    @Nested
+    @DisplayName("Endpoints de Consulta")
+    class EndpointsDeConsulta {
+        @Test
+        @DisplayName("Deve retornar histórico de análise corretamente")
+        void deveRetornarHistoricoDeAnalise() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            .with(csrf()).with(user(chefe)))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
+                            .with(csrf()).with(user(gestor))
+                            .contentType("application/json")
+                            .content("{\"motivo\": \"Teste Histórico\", \"observacoes\": \"Registrando análise\"}"))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", subprocessoId)
+                            .with(user(gestor)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].observacoes", is("Registrando análise")));
+        }
+
+        @Test
+        @DisplayName("Deve retornar impactos no mapa corretamente")
+        void deveRetornarImpactosNoMapa() throws Exception {
+            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+
+            // Remover uma atividade existente do mapa do subprocesso
+            Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
+            atividadeRepo.delete(atividadeExistente);
+
+            // Recarregar o subprocesso para garantir que o mapa esteja atualizado
+            sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+
+            mockMvc.perform(get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
+                            .with(user(chefe))) // Trocado para CHEFE que tem a permissão
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.temImpactos", is(true)))
+                    .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
+                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(1)))
+                    .andExpect(jsonPath("$.competenciasImpactadas[0].tipoImpacto", is("ATIVIDADE_REMOVIDA")));
+        }
+    }
+
+    @Nested
+    @DisplayName("Falhas e Segurança")
+    class FalhasESeguranca {
+        @Test
+        @DisplayName("CHEFE não pode homologar revisão")
+        void chefeNaoPodeHomologar() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
+                            .with(csrf()).with(user(chefe)))
+                    .andExpect(status().isOk());
+            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-revisao-cadastro", subprocessoId)
+                            .with(csrf()).with(user(gestor))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"OK\"}"))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            .with(csrf()).with(user(chefe))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"Tudo certo por mim\"}"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("Não pode homologar em estado inválido")
+        void naoPodeHomologarEmEstadoInvalido() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
+                            .with(csrf()).with(user(admin))
+                            .contentType("application/json")
+                            .content("{\"observacoes\": \"Homologado fora de hora\"}"))
+                    .andExpect(status().isConflict());
+        }
+    }
+
     private Mapa criarMapaComCompetenciasEAtividades() {
         Mapa mapa = mapaRepo.save(new Mapa());
+        System.out.println("CDU14IntegrationTest - criarMapaComCompetenciasEAtividades: Mapa Código: " + mapa.getCodigo());
         Competencia c1 = competenciaRepo.save(new Competencia("Competência Teste", mapa));
         Atividade a1 = atividadeRepo.save(new Atividade(mapa, "Atividade Teste"));
         conhecimentoRepo.save(new Conhecimento("Conhecimento Teste", a1));
@@ -238,32 +318,73 @@ class CDU14IntegrationTest {
         unidadeMapaRepo.save(um);
     }
 
-    private ProcessoDto criarEIniciarProcessoDeRevisao() throws Exception {
-        var criarReq = new CriarProcessoReq("Processo Revisão", "REVISAO", LocalDateTime.now().plusDays(10), List.of(unidade.getCodigo()));
-        String reqJson = objectMapper.writeValueAsString(criarReq);
+    private ProcessoDto criarEIniciarProcessoDeRevisao(Mapa mapaBase) throws Exception {
+        Mapa mapaSubprocesso = copiarMapa(mapaBase);
+
+        Map<String, Object> criarReqMap = Map.of(
+                "descricao", "Processo Revisão",
+                "tipo", "REVISAO",
+                "dataLimiteEtapa1", LocalDateTime.now().plusDays(10).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")),
+                "unidades", List.of(unidade.getCodigo())
+        );
+        String reqJson = objectMapper.writeValueAsString(criarReqMap);
 
         String resJson = mockMvc.perform(post("/api/processos")
-                .with(csrf()).with(user(gestor.getTituloEleitoral().toString()))
-                .contentType("application/json").content(reqJson))
-            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+                        .with(csrf()).with(user(gestor))
+                        .contentType("application/json").content(reqJson))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
 
         ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
 
         mockMvc.perform(post("/api/processos/{id}/iniciar", processoDto.getCodigo())
-                .with(csrf()).with(user(gestor.getTituloEleitoral().toString()))
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo()))))
-            .andExpect(status().isOk());
+                        .param("tipo", "REVISAO")
+                        .with(csrf()).with(user(gestor))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo()))))
+                .andExpect(status().isOk());
+
+        // Associar o mapa copiado ao subprocesso recém-criado
+        Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
+        sp.setMapa(mapaSubprocesso);
+        subprocessoRepo.save(sp);
 
         return processoDto;
     }
 
     private Long obterSubprocessoId(Long processoId) throws Exception {
         String resJson = mockMvc.perform(get("/api/processos/{id}/detalhes", processoId)
-                .with(user(gestor.getTituloEleitoral().toString())))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                        .with(user(gestor)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         ProcessoDetalheDto detalhes = objectMapper.readValue(resJson, ProcessoDetalheDto.class);
-        return detalhes.getResumoSubprocessos().get(0).getCodigo();
+        return detalhes.getResumoSubprocessos().getFirst().getCodigo();
+    }
+
+    private Mapa copiarMapa(Mapa mapaOriginal) {
+        Mapa novoMapa = mapaRepo.save(new Mapa());
+
+        // Copiar atividades do mapa original para o novo mapa
+        atividadeRepo.findByMapaCodigo(mapaOriginal.getCodigo()).forEach(atividadeOriginal -> {
+            Hibernate.initialize(atividadeOriginal.getConhecimentos()); // Inicializa a coleção
+            Atividade novaAtividade = atividadeRepo.save(new Atividade(novoMapa, atividadeOriginal.getDescricao()));
+            // Copiar conhecimentos da atividade original para a nova atividade
+            conhecimentoRepo.findByAtividadeCodigo(atividadeOriginal.getCodigo())
+                    .forEach(conhecimentoOriginal -> conhecimentoRepo.save(new Conhecimento(conhecimentoOriginal.getDescricao(), novaAtividade)));
+        });
+
+        // Copiar competências do mapa original para o novo mapa
+        competenciaRepo.findByMapaCodigo(mapaOriginal.getCodigo()).forEach(competenciaOriginal -> {
+            Competencia novaCompetencia = competenciaRepo.save(new Competencia(competenciaOriginal.getDescricao(), novoMapa));
+            // Copiar vínculos CompetenciaAtividade
+            competenciaAtividadeRepo.findByCompetenciaCodigo(competenciaOriginal.getCodigo()).forEach(caOriginal -> {
+                // Procurar a nova atividade correspondente no novo mapa
+                atividadeRepo.findByMapaCodigoAndDescricao(novoMapa.getCodigo(), caOriginal.getAtividade().getDescricao())
+                        .ifPresent(novaAtividade -> competenciaAtividadeRepo.save(new CompetenciaAtividade(
+                                new CompetenciaAtividade.Id(novaCompetencia.getCodigo(), novaAtividade.getCodigo()),
+                                novaCompetencia, novaAtividade
+                        )));
+            });
+        });
+        return novoMapa;
     }
 }

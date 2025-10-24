@@ -8,15 +8,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
-    # Defer datasource initialization to run after Hibernate has created the schema
     defer-datasource-initialization: true
   sql:
     init:
-      # Ensure data.sql is always run for the local profile
       mode: always
 logging:
   level:
-    sgc: DEBUG
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    sgc: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN

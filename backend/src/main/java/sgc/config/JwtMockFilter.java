@@ -43,11 +43,11 @@ public class JwtMockFilter extends OncePerRequestFilter {
                 // Decodificar o token simulado (Base64)
                 String decodedClaims = new String(Base64.getDecoder().decode(token));
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> claims = objectMapper.readValue(decodedClaims, HashMap.class);
+                Map<String, Object> claims = objectMapper.readValue(decodedClaims, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
 
-                Long tituloEleitoral = Long.valueOf(claims.get("tituloEleitoral").toString());
-                String perfilString = claims.get("perfil").toString();
-                Long unidadeCodigo = Long.valueOf(claims.get("unidadeCodigo").toString());
+                Long tituloEleitoral = ((Number) claims.get("tituloEleitoral")).longValue();
+                String perfilString = (String) claims.get("perfil");
+                Long unidadeCodigo = ((Number) claims.get("unidadeCodigo")).longValue();
 
                 // Buscar usuário e unidade no repositório (simulando UserDetailsService)
                 Usuario usuario = usuarioRepo.findByTituloEleitoral(tituloEleitoral)

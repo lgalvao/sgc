@@ -7,7 +7,6 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     java
-    jacoco
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
@@ -124,114 +123,114 @@ tasks.withType<Test> {
         showExceptions = true
         showCauses = true
         showStackTraces = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
-    // addTestListener(object : TestListener {
-    //     private val failures = mutableListOf<TestFailure>()
-    //     private val skipped = mutableListOf<String>()
-    //     private var totalTests = 0
-    //     private var passedTests = 0
+     addTestListener(object : TestListener {
+         private val failures = mutableListOf<TestFailure>()
+         private val skipped = mutableListOf<String>()
+         private var totalTests = 0
+         private var passedTests = 0
 
-    //     override fun beforeSuite(suite: TestDescriptor) {}
-    //     override fun beforeTest(testDescriptor: TestDescriptor) {}
+         override fun beforeSuite(suite: TestDescriptor) {}
+         override fun beforeTest(testDescriptor: TestDescriptor) {}
 
-    //     override fun afterTest(desc: TestDescriptor, result: TestResult) {
-    //         when (result.resultType) {
-    //             TestResult.ResultType.SUCCESS -> {
-    //                 passedTests++
-    //                 totalTests++
-    //             }
+         override fun afterTest(desc: TestDescriptor, result: TestResult) {
+             when (result.resultType) {
+                 TestResult.ResultType.SUCCESS -> {
+                     passedTests++
+                     totalTests++
+                 }
 
-    //             TestResult.ResultType.FAILURE -> {
-    //                 totalTests++
-    //                 val exception = result.exception
-    //                 val rootCause = getRootCause(exception)
-    //                 failures.add(
-    //                     TestFailure(
-    //                         testClass = desc.className ?: "Unknown",
-    //                         testMethod = desc.name,
-    //                         errorMessage = rootCause?.message ?: exception?.message ?: "Erro desconhecido",
-    //                         errorType = rootCause?.javaClass?.simpleName ?: exception?.javaClass?.simpleName
-    //                         ?: "Exception",
-    //                         stackTrace = filterStackTrace(rootCause ?: exception)
-    //                     )
-    //                 )
-    //             }
+                 TestResult.ResultType.FAILURE -> {
+                     totalTests++
+                     val exception = result.exception
+                     val rootCause = getRootCause(exception)
+                     failures.add(
+                         TestFailure(
+                             testClass = desc.className ?: "Unknown",
+                             testMethod = desc.name,
+                             errorMessage = rootCause?.message ?: exception?.message ?: "Erro desconhecido",
+                             errorType = rootCause?.javaClass?.simpleName ?: exception?.javaClass?.simpleName
+                             ?: "Exception",
+                             stackTrace = filterStackTrace(rootCause ?: exception)
+                         )
+                     )
+                 }
 
-    //             TestResult.ResultType.SKIPPED -> {
-    //                 totalTests++
-    //                 skipped.add("${desc.className ?: "Unknown"}.${desc.name}")
-    //             }
+                 TestResult.ResultType.SKIPPED -> {
+                     totalTests++
+                     skipped.add("${desc.className ?: "Unknown"}.${desc.name}")
+                 }
 
-    //             else -> {}
-    //         }
-    //     }
+                 else -> {}
+             }
+         }
 
-    //     override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-    //         if (suite.parent == null) outputAgentSummary(result, failures, skipped)
-    //     }
+         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+             if (suite.parent == null) outputAgentSummary(result, failures, skipped)
+         }
 
-    //     private fun getRootCause(exception: Throwable?): Throwable? {
-    //         var cause = exception
-    //         while (cause?.cause != null && cause.cause != cause) {
-    //             cause = cause.cause
-    //         }
-    //         return cause
-    //     }
+         private fun getRootCause(exception: Throwable?): Throwable? {
+             var cause = exception
+             while (cause?.cause != null && cause.cause != cause) {
+                 cause = cause.cause
+             }
+             return cause
+         }
 
-    //     private fun filterStackTrace(exception: Throwable?): List<String> {
-    //         if (exception == null) return emptyList()
+         private fun filterStackTrace(exception: Throwable?): List<String> {
+             if (exception == null) return emptyList()
 
-    //         return exception.stackTrace.map { element ->
-    //             "    ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
-    //         }
-    //     }
+             return exception.stackTrace.map { element ->
+                 "    ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"
+             }
+         }
 
-    //     private fun outputAgentSummary(
-    //         result: TestResult,
-    //         failures: List<TestFailure>,
-    //         skipped: List<String>
-    //     ) {
-    //         val status = if (result.failedTestCount == 0L) "SUCESSO" else "FALHA"
-    //         val durationSec = (result.endTime - result.startTime) / 1000.0
-    //         val separator = "=".repeat(20)
-    //         val separator2 = "-".repeat(20)
+         private fun outputAgentSummary(
+             result: TestResult,
+             failures: List<TestFailure>,
+             skipped: List<String>
+         ) {
+             val status = if (result.failedTestCount == 0L) "SUCESSO" else "FALHA"
+             val durationSec = (result.endTime - result.startTime) / 1000.0
+             val separator = "=".repeat(20)
+             val separator2 = "-".repeat(20)
 
-    //         println("\n$separator")
-    //         println("RESUMO DOS TESTES")
-    //         println(separator)
-    //         println("Situacao: $status")
-    //         println("Total:    ${result.testCount}")
-    //         println("Sucesso:  ${result.successfulTestCount}")
-    //         println("Falhas:   ${result.failedTestCount}")
-    //         println("Ignorados: ${result.skippedTestCount}")
-    //         println("Tempo:  %.2fs".format(durationSec))
-    //         if (failures.isNotEmpty()) {
-    //             println(separator2)
-    //             println("TESTES FALHANDO (${failures.size})")
-    //             println(separator2)
-    //             failures.forEachIndexed { index, failure ->
-    //                 println("\n${index + 1}. ${failure.testClass}")
-    //                 println("   Metodo: ${failure.testMethod}")
-    //                 println("   Erro: [${failure.errorType}] ${failure.errorMessage}")
-    //                 if (failure.stackTrace.isNotEmpty()) {
-    //                     println("   Stack trace filtrado:")
-    //                     failure.stackTrace.forEach { line -> println("   $line") }
-    //                 } else {
-    //                     println("   (sem stack trace da aplicacao)")
-    //                 }
-    //             }
-    //         }
-    //         if (skipped.isNotEmpty()) {
-    //             println("\n$separator2")
-    //             println("TESTES IGNORADOS (${skipped.size})")
-    //             println(separator2)
-    //             skipped.forEach { println("  • $it") }
-    //         }
-    //         println(separator)
-    //     }
-    // })
+             println("\n$separator")
+             println("RESUMO DOS TESTES")
+             println(separator)
+             println("Situacao: $status")
+             println("Total:    ${result.testCount}")
+             println("Sucesso:  ${result.successfulTestCount}")
+             println("Falha:   ${result.failedTestCount}")
+             println("Ignorados: ${result.skippedTestCount}")
+             println("Tempo:  %.2fs".format(durationSec))
+             if (failures.isNotEmpty()) {
+                 println(separator2)
+                 println("TESTES FALHANDO (${failures.size})")
+                 println(separator2)
+                 failures.forEachIndexed { index, failure ->
+                     println("\n${index + 1}. ${failure.testClass}")
+                     println("   Metodo: ${failure.testMethod}")
+                     println("   Erro: [${failure.errorType}] ${failure.errorMessage}")
+                     if (failure.stackTrace.isNotEmpty()) {
+                         println("   Stack trace filtrado:")
+                         failure.stackTrace.forEach { line -> println("   $line") }
+                     } else {
+                         println("   (sem stack trace da aplicacao)")
+                     }
+                 }
+             }
+             if (skipped.isNotEmpty()) {
+                 println("\n$separator2")
+                 println("TESTES IGNORADOS (${skipped.size})")
+                 println(separator2)
+                 skipped.forEach { println("  • $it") }
+             }
+             println(separator)
+         }
+     })
 
     reports {
         html.required.set(false)
@@ -254,13 +253,7 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
-        compilerArgs.add("-Xlint:-options")
     }
-    options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: emptyList()) + listOf(
-        "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED",
-        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--add-opens=java.base/java.lang=ALL-UNNAMED"
-    )
 }
 
 tasks.withType<DependencyUpdatesTask> {
@@ -287,7 +280,6 @@ tasks.register<Test>("verboseTest") {
     useJUnitPlatform()
     group = "verification"
     description = "Rodar testes com saída completa"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     jvmArgs.addAll(tasks.withType<Test>().getByName("test").jvmArgs)
 
     val byteBuddyAgentFile =
@@ -325,6 +317,3 @@ tasks.register<org.springframework.boot.gradle.tasks.run.BootRun>("bootRunE2E") 
     mainClass.set("sgc.Sgc")
     classpath = sourceSets.main.get().runtimeClasspath
 }
-
-
-

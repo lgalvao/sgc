@@ -56,35 +56,8 @@ O backend utiliza **Java 21**.
 
 ### Testes Padrão
 
-Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest` descrita a seguir.)  
+Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest`.)  
 
 ```bash
 ./gradlew :backend:test
-```
-
-### Testes Otimizados para Agentes
-
-Para executar os testes de backend com uma saída otimizada para agentes (resumo conciso), use o seguinte comando a
-partir do diretório raiz:
-
-```bash
-./gradlew :backend:agentTest
-```
-
-### Testes com stack trace completo
-
-A configuração atual do build do backend filtra as exceções. Para ver todas as exceções com o stack-trace completo, use
-o comando a seguir:
-
-```bash
-gradle test --tests sgc.integracao.<Classe do Teste> --full-stacktrace
-```
-
-### Testes com Saída Completa (Verbose)
-
-Para executar os testes de backend com uma saída completa (mais detalhes sobre cada teste), use o seguinte comando a
-partir do diretório raiz:
-
-```bash
-./gradlew :backend:verboseTest
 ```
