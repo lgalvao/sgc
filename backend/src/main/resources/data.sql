@@ -20,7 +20,7 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 101);
 
 -- Unidades do mock
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (201, 'Seção de Desenvolvimento Organizacional e Capacitação', 'SEDOC', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (201, 'Seção de Desenvolvimento Organizacional e Capacitação', 'SEDOCAP', 'INTEROPERACIONAL', NULL);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (202, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 201);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (203, 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 201);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (204, 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 203);
