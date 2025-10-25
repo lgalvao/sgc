@@ -21,8 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtMockFilter jwtMockFilter;
-
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
      * <p>
@@ -65,8 +63,7 @@ public class SecurityConfig {
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);
                 return config;
-            }))
-            .addFilterBefore(jwtMockFilter, UsernamePasswordAuthenticationFilter.class); // Adicionar o filtro
+            }));
         return http.build();
     }
 }
