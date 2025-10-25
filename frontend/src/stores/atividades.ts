@@ -2,6 +2,7 @@ import {defineStore} from 'pinia';
 import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest} from '@/types/tipos';
 import * as atividadeService from '@/services/atividadeService';
 import * as subprocessoService from '@/services/subprocessoService';
+import * as mapaService from '@/services/mapaService';
 import {useNotificacoesStore} from './notificacoes';
 import {mapMapaVisualizacaoToAtividades} from '@/mappers/mapas';
 
@@ -18,7 +19,7 @@ export const useAtividadesStore = defineStore('atividades', {
         async fetchAtividadesParaSubprocesso(idSubprocesso: number) {
             const notificacoes = useNotificacoesStore();
             try {
-                const mapa = await subprocessoService.obterMapaVisualizacao(idSubprocesso);
+                const mapa = await mapaService.obterMapaVisualizacao(idSubprocesso);
                 const atividades = mapMapaVisualizacaoToAtividades(mapa);
                 this.atividadesPorSubprocesso.set(idSubprocesso, atividades);
             } catch {
