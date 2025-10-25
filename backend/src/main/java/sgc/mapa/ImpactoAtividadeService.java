@@ -51,16 +51,12 @@ public class ImpactoAtividadeService {
         return atividadeRepo.findByMapaCodigoWithConhecimentos(mapa.getCodigo());
     }
 
-    public List<AtividadeImpactadaDto> detectarAtividadesInseridas(List<Atividade> atuais,
-                                                                   List<Atividade> vigentes) {
-        log.info("detectarAtividadesInseridas - Atividades Atuais: {}", atuais.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
-        log.info("detectarAtividadesInseridas - Atividades Vigentes: {}", vigentes.stream().map(a -> a.getCodigo() + ":" + a.getDescricao()).collect(Collectors.joining(", ")));
-
+    public List<AtividadeImpactadaDto> detectarAtividadesInseridas(List<Atividade> atuais, List<Atividade> vigentes) {
+        Set<String> descricoesVigentes = vigentes.stream().map(Atividade::getDescricao).collect(Collectors.toSet());
         List<AtividadeImpactadaDto> inseridas = new ArrayList<>();
-        Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
 
         for (Atividade atual : atuais) {
-            if (!vigentesMap.containsKey(atual.getDescricao())) {
+            if (!descricoesVigentes.contains(atual.getDescricao())) {
                 inseridas.add(new AtividadeImpactadaDto(
                         atual.getCodigo(),
                         atual.getDescricao(),
@@ -70,7 +66,6 @@ public class ImpactoAtividadeService {
                 ));
             }
         }
-        log.info("detectarAtividadesInseridas - {} atividades inseridas.", inseridas.size());
         return inseridas;
     }
 
@@ -113,7 +108,7 @@ public class ImpactoAtividadeService {
                 List<Conhecimento> conhecimentosAtuais = conhecimentoRepo.findByAtividadeCodigo(atual.getCodigo());
                 List<Conhecimento> conhecimentosVigentes = conhecimentoRepo.findByAtividadeCodigo(vigente.getCodigo());
 
-                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes) || !atual.getDescricao().equals(vigente.getDescricao())) {
+                if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
                     alteradas.add(new AtividadeImpactadaDto(
                             atual.getCodigo(),
                             atual.getDescricao(),

@@ -55,7 +55,7 @@ public record ImpactoMapaDto(
             List<AtividadeImpactadaDto> atividadesAlteradas,
             List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
-        boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty();
+        boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
         return new ImpactoMapaDto(
             temImpactos,
             atividadesInseridas.size(),
