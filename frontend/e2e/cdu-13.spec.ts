@@ -3,7 +3,6 @@ import {
     aceitarCadastro,
     cancelarModal,
     clicarBotaoHistoricoAnalise,
-    DADOS_TESTE,
     devolverParaAjustes,
     homologarCadastro,
     loginComoAdmin,
@@ -15,15 +14,41 @@ import {
     verificarModalHistoricoAnaliseAberto,
     verificarUrl,
     verificarUrlDoPainel,
+    criarProcessoCompleto,
+    iniciarProcesso,
+    disponibilizarCadastro,
+    loginComoChefe,
+    adicionarAtividade,
+    adicionarConhecimento,
+    gerarNomeUnico,
+    navegarParaProcessoPorId,
+    clicarUnidadeNaTabelaDetalhes,
+    SELETORES_CSS,
+    navegarParaCadastroAtividades
 } from './helpers';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
-    const ID_PROCESSO_STIC = DADOS_TESTE.PROCESSOS.MAPEAMENTO_STIC.id;
-    const SIGLA_STIC = DADOS_TESTE.UNIDADES.STIC;
+    let processo: any;
+    const SIGLA_STIC = 'STIC';
+
+    test.beforeEach(async ({ page }) => {
+        const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-13');
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [2]); // Unidade 2 = STIC
+        await iniciarProcesso(page);
+
+        // Chefe da STIC preenche e disponibiliza o cadastro
+        await loginComoChefe(page);
+        await navegarParaCadastroAtividades(page, processo.processo.codigo, SIGLA_STIC);
+        const nomeAtividade = gerarNomeUnico('Atividade CDU-13');
+        await adicionarAtividade(page, nomeAtividade);
+        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        await adicionarConhecimento(cardAtividade, gerarNomeUnico('Conhecimento CDU-13'));
+        await disponibilizarCadastro(page);
+    });
 
     test('deve exibir modal de Histórico de análise', async ({page}) => {
         await loginComoGestor(page);
-        await navegarParaVisualizacaoAtividades(page, ID_PROCESSO_STIC, SIGLA_STIC);
+        await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
         await clicarBotaoHistoricoAnalise(page);
         await verificarModalHistoricoAnaliseAberto(page);
@@ -34,7 +59,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
     test('GESTOR deve conseguir devolver cadastro para ajustes', async ({page}) => {
         await loginComoGestor(page);
-        await navegarParaVisualizacaoAtividades(page, ID_PROCESSO_STIC, SIGLA_STIC);
+        await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
         await devolverParaAjustes(page, 'Devolução para correção de detalhes.');
 
@@ -44,7 +69,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
     test('ADMIN deve conseguir devolver cadastro para ajustes', async ({page}) => {
         await loginComoAdmin(page);
-        await navegarParaVisualizacaoAtividades(page, ID_PROCESSO_STIC, SIGLA_STIC);
+        await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
         await devolverParaAjustes(page); // Sem observação
 
@@ -54,7 +79,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
     test('GESTOR deve conseguir registrar aceite do cadastro', async ({page}) => {
         await loginComoGestor(page);
-        await navegarParaVisualizacaoAtividades(page, ID_PROCESSO_STIC, SIGLA_STIC);
+        await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
         await aceitarCadastro(page, 'Aceite do cadastro de atividades.');
 
@@ -64,11 +89,11 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
 
     test('ADMIN deve conseguir homologar o cadastro', async ({page}) => {
         await loginComoAdmin(page);
-        await navegarParaVisualizacaoAtividades(page, ID_PROCESSO_STIC, SIGLA_STIC);
+        await navegarParaVisualizacaoAtividades(page, processo.processo.codigo, SIGLA_STIC);
 
         await homologarCadastro(page);
 
         await verificarMensagemSucesso(page, TEXTOS.CADASTRO_HOMOLOGADO_SUCESSO);
-        await verificarUrl(page, `/processo/${ID_PROCESSO_STIC}/${SIGLA_STIC}`);
+        await verificarUrl(page, `/processo/${processo.processo.codigo}/${SIGLA_STIC}`);
     });
 });
