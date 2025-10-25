@@ -128,8 +128,8 @@ class CDU12IntegrationTest {
 
 
         // 4. Atividades e Competências no Mapa Vigente
-        atividadeVigente1 = atividadeRepo.save(new Atividade(null, "Analisar e despachar processos."));
-        atividadeVigente2 = atividadeRepo.save(new Atividade(null, "Elaborar relatórios gerenciais."));
+        atividadeVigente1 = atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
+        atividadeVigente2 = atividadeRepo.save(new Atividade(mapaVigente, "Elaborar relatórios gerenciais."));
 
         competenciaVigente1 = competenciaRepo.save(new Competencia(mapaVigente, "Gerenciamento de Processos"));
 
