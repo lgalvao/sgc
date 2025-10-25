@@ -19,6 +19,13 @@ public class TestSecurityConfig {
     public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/api/usuarios/autenticar",
+                    "/api/usuarios/autorizar",
+                    "/api/usuarios/entrar",
+                    "/api/test/**"
+                ).permitAll()
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             );
         return http.build();
