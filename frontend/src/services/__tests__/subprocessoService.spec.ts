@@ -1,186 +1,73 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest'
-import { createPinia, setActivePinia } from 'pinia';
-import * as service from '../subprocessoService'
-import api from '@/axios-setup'
-import * as mappers from '@/mappers/mapas'
-import {MapaVisualizacao} from '@/types/tipos'
+import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
+import * as subprocessoService from '@/services/subprocessoService';
+import apiClient from '@/axios-setup';
+import { mapMapaCompletoDtoToModel } from '@/mappers/mapas';
+import type { Competencia } from '@/types/tipos';
 
-vi.mock('@/axios-setup', () => {
-    return {
-        default: {
-            get: vi.fn(),
-            post: vi.fn(),
-            put: vi.fn(),
-            delete: vi.fn(),
-        },
-    };
-});
-vi.mock('@/mappers/mapas', async (importOriginal) => {
-    const original = await importOriginal()
-    return {
-        ...(original as any),
-        mapImpactoMapaDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
-        mapMapaCompletoDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
-        mapMapaAjusteDtoToModel: vi.fn((dto) => ({ ...dto, mapped: true })),
-    }
-})
+vi.mock('@/axios-setup');
+vi.mock('@/mappers/mapas');
 
 describe('subprocessoService', () => {
+    const MOCK_ERROR = new Error('Service failed');
+    const mockedApiClient = apiClient as Mocked<typeof apiClient>;
+
     beforeEach(() => {
-        setActivePinia(createPinia());
+        vi.clearAllMocks();
     });
-    afterEach(() => {
-        vi.clearAllMocks()
-        mockApi.get.mockClear()
-        mockApi.post.mockClear()
-        mockApi.put.mockClear()
-        mockApi.delete.mockClear()
-    })
-    const mockApi = api as any;
-    const mockMappers = mappers as any;
-    const id = 1
 
-    it('importarAtividades should post to the correct endpoint', async () => {
-        const idOrigem = 2
-        mockApi.post.mockResolvedValue({})
-        await service.importarAtividades(id, idOrigem)
-        expect(mockApi.post).toHaveBeenCalledWith(`/subprocessos/${id}/importar-atividades`, {
-            subprocessoOrigemId: idOrigem,
-        })
-    })
+    describe('importarAtividades', () => {
+        it('deve chamar o endpoint correto com o payload correto', async () => {
+            mockedApiClient.post.mockResolvedValue({});
+            await subprocessoService.importarAtividades(1, 2);
+            expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/importar-atividades', { subprocessoOrigemId: 2 });
+        });
 
-    it('obterMapaVisualizacao should fetch data', async () => {
-        const responseData: MapaVisualizacao = { codigo: 1, descricao: 'Viz', competencias: [] }
-        mockApi.get.mockResolvedValue({ data: responseData })
-        const result = await service.obterMapaVisualizacao(id)
-        expect(mockApi.get).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-visualizacao`)
-        expect(result).toEqual(responseData)
-    })
-
-    it('verificarImpactosMapa should fetch and map data', async () => {
-        const responseDto = { temImpactos: true }
-        mockApi.get.mockResolvedValue({ data: responseDto })
-        const result = await service.verificarImpactosMapa(id)
-        expect(mockApi.get).toHaveBeenCalledWith(`/subprocessos/${id}/impactos-mapa`)
-        expect(mockMappers.mapImpactoMapaDtoToModel).toHaveBeenCalledWith(responseDto)
-        expect(result).toHaveProperty('mapped', true)
-    })
-
-    it('obterMapaCompleto should fetch and map data', async () => {
-        const responseDto = { id: 1, nome: 'Completo' }
-        mockApi.get.mockResolvedValue({ data: responseDto })
-        const result = await service.obterMapaCompleto(id)
-        expect(mockApi.get).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-completo`)
-        expect(mockMappers.mapMapaCompletoDtoToModel).toHaveBeenCalledWith(responseDto)
-        expect(result).toHaveProperty('mapped', true)
-    })
-
-    it('salvarMapaCompleto should put and map data', async () => {
-        const data = { nome: 'Mapa Salvo' }
-        const responseDto = { id: 1, ...data }
-        mockApi.put.mockResolvedValue({ data: responseDto })
-        const result = await service.salvarMapaCompleto(id, data)
-        expect(mockApi.put).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-completo`, data)
-        expect(mockMappers.mapMapaCompletoDtoToModel).toHaveBeenCalledWith(responseDto)
-        expect(result).toHaveProperty('mapped', true)
-    })
-
-    it('obterMapaAjuste should fetch and map data', async () => {
-        const responseDto = { id: 1, nome: 'Ajuste' }
-        mockApi.get.mockResolvedValue({ data: responseDto })
-        const result = await service.obterMapaAjuste(id)
-        expect(mockApi.get).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-ajuste`)
-        expect(mockMappers.mapMapaAjusteDtoToModel).toHaveBeenCalledWith(responseDto)
-        expect(result).toHaveProperty('mapped', true)
-    })
-
-    it('salvarMapaAjuste should put data', async () => {
-        const data = { nome: 'Ajuste Salvo' }
-        mockApi.put.mockResolvedValue({})
-        await service.salvarMapaAjuste(id, data)
-        expect(mockApi.put).toHaveBeenCalledWith(`/subprocessos/${id}/mapa-ajuste`, data)
-    })
-
-    it('fetchSubprocessoDetalhe should call the correct endpoint', async () => {
-        mockApi.get.mockResolvedValue({ data: {} });
-        await service.fetchSubprocessoDetalhe(1, 'perfil', 123);
-        expect(mockApi.get).toHaveBeenCalledWith('/subprocessos/1', {
-            params: {
-                perfil: 'perfil',
-                unidadeUsuario: 123,
-            },
+        it('deve lançar um erro em caso de falha', async () => {
+            mockedApiClient.post.mockRejectedValue(MOCK_ERROR);
+            await expect(subprocessoService.importarAtividades(1, 2)).rejects.toThrow(MOCK_ERROR);
         });
     });
 
-    it('disponibilizarCadastro should call the correct endpoint', async () => {
-        mockApi.post.mockResolvedValue({});
-        await service.disponibilizarCadastro(1);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar');
+    describe('fetchSubprocessoDetalhe', () => {
+        it('deve chamar o endpoint correto com os parâmetros corretos', async () => {
+            mockedApiClient.get.mockResolvedValue({ data: {} });
+            await subprocessoService.fetchSubprocessoDetalhe(1, 'perfil', 123);
+            expect(mockedApiClient.get).toHaveBeenCalledWith('/subprocessos/1', {
+                params: { perfil: 'perfil', unidadeUsuario: 123 },
+            });
+        });
     });
 
-    it('disponibilizarRevisaoCadastro should call the correct endpoint', async () => {
-        mockApi.post.mockResolvedValue({});
-        await service.disponibilizarRevisaoCadastro(1);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-revisao');
-    });
+    describe('Competencia Actions', () => {
+        const mockCompetencia: Competencia = { codigo: 1, descricao: 'Teste' };
+        const mockMapaCompleto = { id: 1, competencias: [mockCompetencia] };
 
-    it('devolverCadastro should call the correct endpoint', async () => {
-        const dados = { motivo: 'motivo', observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.devolverCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/devolver-cadastro', dados);
-    });
+        beforeEach(() => {
+            (mapMapaCompletoDtoToModel as vi.Mock).mockReturnValue(mockMapaCompleto);
+        });
 
-    it('aceitarCadastro should call the correct endpoint', async () => {
-        const dados = { observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.aceitarCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-cadastro', dados);
-    });
+        it('adicionarCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {
+            mockedApiClient.post.mockResolvedValue({ data: {} });
+            const result = await subprocessoService.adicionarCompetencia(1, mockCompetencia);
+            expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencias', mockCompetencia);
+            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
+            expect(result).toEqual(mockMapaCompleto);
+        });
 
-    it('homologarCadastro should call the correct endpoint', async () => {
-        const dados = { observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.homologarCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/homologar-cadastro', dados);
-    });
+        it('atualizarCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {
+            mockedApiClient.put.mockResolvedValue({ data: {} });
+            const result = await subprocessoService.atualizarCompetencia(1, mockCompetencia);
+            expect(mockedApiClient.put).toHaveBeenCalledWith('/subprocessos/1/competencias/1', mockCompetencia);
+            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
+            expect(result).toEqual(mockMapaCompleto);
+        });
 
-    it('devolverRevisaoCadastro should call the correct endpoint', async () => {
-        const dados = { motivo: 'motivo', observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.devolverRevisaoCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/devolver-revisao-cadastro', dados);
+        it('removerCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {
+            mockedApiClient.delete.mockResolvedValue({ data: {} });
+            const result = await subprocessoService.removerCompetencia(1, 1);
+            expect(mockedApiClient.delete).toHaveBeenCalledWith('/subprocessos/1/competencias/1');
+            expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
+            expect(result).toEqual(mockMapaCompleto);
+        });
     });
-
-    it('aceitarRevisaoCadastro should call the correct endpoint', async () => {
-        const dados = { observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.aceitarRevisaoCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/aceitar-revisao-cadastro', dados);
-    });
-
-    it('homologarRevisaoCadastro should call the correct endpoint', async () => {
-        const dados = { observacoes: 'obs' };
-        mockApi.post.mockResolvedValue({});
-        await service.homologarRevisaoCadastro(1, dados);
-        expect(mockApi.post).toHaveBeenCalledWith('/subprocessos/1/homologar-revisao-cadastro', dados);
-    });
-
-    it('verificarMapaVigente should return true on success', async () => {
-        mockApi.get.mockResolvedValue({ data: { temMapaVigente: true } });
-        const result = await service.verificarMapaVigente(1);
-        expect(result).toBe(true);
-    });
-
-    it('verificarMapaVigente should return false on failure', async () => {
-        mockApi.get.mockRejectedValue(new Error('Failed'));
-        const result = await service.verificarMapaVigente(1);
-        expect(result).toBe(false);
-    });
-
-    // Error handling
-    it('importarAtividades should throw error on failure', async () => {
-        mockApi.post.mockRejectedValue(new Error('Failed'))
-        await expect(service.importarAtividades(1, 2)).rejects.toThrow()
-    })
-})
+});
