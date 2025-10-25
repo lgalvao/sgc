@@ -242,6 +242,7 @@ public class ProcessoControleTest {
         doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
+                        .param("tipo", "MAPEAMENTO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk());

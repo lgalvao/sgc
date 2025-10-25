@@ -107,8 +107,8 @@ A especificação OpenAPI em formato JSON pode ser encontrada em:
 [http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
 ## Padrões de Design e Boas Práticas
-- **Injeção de Dependência:** Utilizada extensivamente pelo Spring Framework.
-- **DTO (Data Transfer Object):** Usado em toda a camada de controle para desacoplar a API das entidades JPA.
+- **Injeção de Dependências:** Utilizada extensivamente pelo Spring Framework.
+- **DTOs (Data Transfer Objects):** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.

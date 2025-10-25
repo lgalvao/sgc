@@ -81,8 +81,18 @@ public class ImpactoMapaService {
                 .findBySubprocessoCodigo(idSubprocesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado para subprocesso", idSubprocesso));
 
-        List<Atividade> atividadesAtuais = atividadeRepo.findByMapaCodigo(mapaSubprocesso.getCodigo());
+        log.info("ImpactoMapaService - Mapa Vigente Código: {}", mapaVigente.getCodigo());
+        log.info("ImpactoMapaService - Mapa Subprocesso Código: {}", mapaSubprocesso.getCodigo());
+
+        List<Atividade> atividadesAtuais = impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = impactoAtividadeService.obterAtividadesDoMapa(mapaVigente);
+
+        atividadesAtuais.forEach(a -> log.info("Atividade Atual: {} - {}", a.getCodigo(), a.getDescricao()));
+        atividadesVigentes.forEach(a -> log.info("Atividade Vigente: {} - {}", a.getCodigo(), a.getDescricao()));
+
+        log.info("ImpactoMapaService - Atividades Atuais (mapaSubprocesso) tamanho: {}", atividadesAtuais.size());
+        log.info("ImpactoMapaService - Atividades Vigentes (mapaVigente) tamanho: {}", atividadesVigentes.size());
+
         List<AtividadeImpactadaDto> inseridas = impactoAtividadeService.detectarAtividadesInseridas(atividadesAtuais, atividadesVigentes);
         List<AtividadeImpactadaDto> removidas = impactoAtividadeService.detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, mapaVigente);
         List<AtividadeImpactadaDto> alteradas = impactoAtividadeService.detectarAtividadesAlteradas(atividadesAtuais, atividadesVigentes, mapaVigente);
@@ -90,9 +100,8 @@ public class ImpactoMapaService {
 
         ImpactoMapaDto impactos = ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
 
-        log.info("Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
+        log.info("ImpactoMapaService - Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
                 impactos.temImpactos(), impactos.totalAtividadesInseridas(), impactos.totalAtividadesRemovidas(), impactos.totalAtividadesAlteradas());
-
         return impactos;
     }
 

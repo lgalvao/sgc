@@ -154,10 +154,6 @@ public class SgrhService {
         unidadesDto.put(13L, new UnidadeDto(13L, "Seção de Processos", "SEPRO", 14L, "OPERACIONAL"));
         unidadesDto.put(15L, new UnidadeDto(15L, "Seção de Documentação", "SEDOC", 2L, "OPERACIONAL"));
         unidadesDto.put(5L, new UnidadeDto(5L, "Seção Magistrados e Requisitados", "SEMARE", 4L, "OPERACIONAL"));
-        unidadesDto.values().forEach(dto -> {
-            Unidade unidade = new Unidade(dto.codigo(), dto.nome(), dto.sigla(), TipoUnidade.valueOf(dto.tipo()), SituacaoUnidade.ATIVA);
-            unidadeRepo.save(unidade);
-        });
         return unidadesDto;
     }
 }

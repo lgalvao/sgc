@@ -286,6 +286,7 @@ export interface UnidadeParticipante {
     nome: string;
     sigla: string;
     codUnidade: number;
+    codSubprocesso: number;
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
     dataLimite: string;

@@ -83,7 +83,7 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
     test('deve permitir exclusão de competências', async ({page}) => {
         const nome = 'Competência para Excluir';
 
-        await navegarParaMapaRevisao(page);
+        await navegarParaMapaReivado(page);
         await criarCompetencia(page, nome, []);
 
         await excluirCompetencia(page, nome);

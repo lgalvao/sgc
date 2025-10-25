@@ -1,20 +1,17 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
-    clicarPrimeiroProcesso,
     esperarElementoVisivel,
     loginComoChefe,
     SELETORES,
-    verificarUrl,
     criarProcessoCompleto,
     gerarNomeUnico,
     irParaSubprocesso,
-    verificarCardAcaoVisivel,
-    verificarCardAcaoInvisivel,
     loginComoGestor,
     disponibilizarCadastro,
-    iniciarProcesso
 } from './helpers';
-import * as processoService from '@/services/processoService';
+import { aceitarCadastro } from '@/services/subprocessoService';
+import { verificarCardAcaoVisivel, verificarCardAcaoInvisivel } from './helpers/verificacoes/verificacoes-ui';
+import * as subprocessoService from '@/services/subprocessoService';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
     let processo: any;
@@ -43,8 +40,8 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
 
     test('CHEFE deve ver card de Mapa de competências em MAPA_EM_ANDAMENTO', async ({page}) => {
         // Simular que o cadastro foi disponibilizado e aceito, avançando para MAPA_EM_ANDAMENTO
-        await processoService.disponibilizarCadastro(processo.processo.codigo, siglaUnidade);
-        await processoService.aceitarCadastro(processo.processo.codigo, siglaUnidade);
+        await subprocessoService.disponibilizarCadastro(processo.subprocessos[0].codigo);
+        await subprocessoService.aceitarCadastro(processo.subprocessos[0].codigo, {observacoes: 'Teste'});
 
         await loginComoChefe(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
@@ -55,7 +52,7 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
 
     test('GESTOR deve ver card de Análise de cadastro em CADASTRO_DISPONIBILIZADO', async ({page}) => {
         // Simular que o cadastro foi disponibilizado
-        await processoService.disponibilizarCadastro(processo.processo.codigo, siglaUnidade);
+        await subprocessoService.disponibilizarCadastro(processo.subprocessos[0].codigo);
 
         await loginComoGestor(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);

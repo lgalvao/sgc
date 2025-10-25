@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import sgc.config.JwtMockFilter;
 import sgc.sgrh.UsuarioRepo;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -16,15 +15,17 @@ import sgc.unidade.modelo.UnidadeRepo;
 public class TestSecurityConfig {
 
     @Bean
-    public JwtMockFilter jwtMockFilter(UsuarioRepo usuarioRepo, UnidadeRepo unidadeRepo) {
-        return new JwtMockFilter(usuarioRepo, unidadeRepo);
-    }
-
-    @Bean
     @Profile("test")
     public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/api/usuarios/autenticar",
+                    "/api/usuarios/autorizar",
+                    "/api/usuarios/entrar",
+                    "/api/test/**"
+                ).permitAll()
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             );
         return http.build();

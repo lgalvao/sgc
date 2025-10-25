@@ -19,6 +19,22 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 (101, 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 100),
 (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 101);
 
+-- Unidades do mock
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (201, 'Seção de Desenvolvimento Organizacional e Capacitação', 'SEDOCAP', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (202, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', 201);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (203, 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 201);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (204, 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 203);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (205, 'Seção Magistrados e Requisitados', 'SEMARE', 'OPERACIONAL', 204);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (206, 'Coordenadoria de Sistemas', 'COSIS', 'INTERMEDIARIA', 202);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (207, 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIARIA', 202);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (208, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 206);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (209, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 206);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (210, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 206);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (211, 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 207);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (214, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 202);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (212, 'Seção Jurídica', 'SEJUR', 'OPERACIONAL', 214);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (213, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 214);
+
 
 -- Usuários
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
@@ -57,6 +73,39 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 (222222222222, 'Gestor Teste', 'gestor.teste@tre-pe.jus.br', '2222', 101),
 (333333333333, 'Chefe Teste', 'chefe.teste@tre-pe.jus.br', '3333', 102);
 
+-- Usuários do mock
+INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
+(201, 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 210),
+(202, 'Carlos Henrique Lima', 'carlos.lima@tre-pe.jus.br', '2345', 203),
+(203, 'Fernanda Oliveira', 'fernanda.oliveira@tre-pe.jus.br', '3456', 208),
+(204, 'João Batista Silva', 'joao.silva@tre-pe.jus.br', '4567', 210),
+(205, 'Marina Dias', 'marina.dias@tre-pe.jus.br', '5678', 205),
+(206, 'Ricardo Alves', 'ricardo.alves@tre-pe.jus.br', '6789', 201),
+(207, 'Zeca Silva', 'zeca.gado@tre-pe.jus.br', '7001', 201),
+(208, 'Paulo Horta', 'paulo.horta@tre-pe.jus.br', '7002', 208),
+(209, 'Giuseppe Corleone', 'giuseppe.corleone@tre-pe.jus.br', '7003', 208),
+(210, 'Paula Gonçalves', 'paula.goncalves@tre-pe.jus.br', '7004', 209),
+(211, 'Herman Greely', 'herman.greely@tre-pe.jus.br', '7005', 210),
+(212, 'Taís Condida', 'tais.condida@tre-pe.jus.br', '7006', 211),
+(213, 'Mike Smith', 'mike.smith@tre-pe.jus.br', '7007', 211),
+(214, 'Maroca Silva', 'maroca.silva@tre-pe.jus.br', '7008', 202),
+(215, 'Roberto Santos', 'roberto.santos@tre-pe.jus.br', '7009', 214),
+(216, 'Luciana Pereira', 'luciana.pereira@tre-pe.jus.br', '7010', 206),
+(217, 'Fernando Costa', 'fernando.costa@tre-pe.jus.br', '7011', 210),
+(218, 'Amanda Rodrigues', 'amanda.rodrigues@tre-pe.jus.br', '7012', 214),
+(219, 'Diego Fernandes', 'diego.fernandes@tre-pe.jus.br', '7013', 206),
+(220, 'Juliana Almeida', 'juliana.almeida@tre-pe.jus.br', '7014', 202),
+(221, 'Rafael Moreira', 'rafael.moreira@tre-pe.jus.br', '7015', 201),
+(222, 'Camila Barbosa', 'camila.barbosa@tre-pe.jus.br', '7016', 210),
+(223, 'Thiago Carvalho', 'thiago.carvalho@tre-pe.jus.br', '7017', 214),
+(224, 'Patrícia Lima', 'patricia.lima@tre-pe.jus.br', '7018', 206),
+(225, 'Lucas Mendes', 'lucas.mendes@tre-pe.jus.br', '7019', 202),
+(226, 'Beatriz Santos', 'beatriz.santos@tre-pe.jus.br', '7020', 201),
+(227, 'Gustavo Oliveira', 'gustavo.oliveira@tre-pe.jus.br', '7021', 210),
+(228, 'Carolina Souza', 'carolina.souza@tre-pe.jus.br', '7022', 214),
+(229, 'Bruno Rodrigues', 'bruno.rodrigues@tre-pe.jus.br', '7023', 206),
+(230, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 202);
+
 
 -- Perfis
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
@@ -94,3 +143,11 @@ INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (111111111111, 'ADMIN'),
 (222222222222, 'GESTOR'),
 (333333333333, 'CHEFE');
+
+-- Usuário com múltiplos perfis para teste E2E
+INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
+(999999999999, 'Usuario Multi Perfil', 'multi.perfil@tre-pe.jus.br', '9999', 2); -- Associado à STIC
+
+INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
+(999999999999, 'ADMIN'),
+(999999999999, 'GESTOR');

@@ -457,24 +457,6 @@ export async function verificarCompetenciaNaoExiste(page: Page, descricao: strin
 }
 
 /**
- * Verifica se uma competência possui as atividades associadas corretas.
- */
-export async function verificarAtividadesAssociadas(page: Page, descricaoCompetencia: string, atividadesEsperadas: string[]): Promise<void> {
-    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
-    for (const atividade of atividadesEsperadas) {
-        await expect(competenciaCard.locator('.atividade-associada-card-item', {hasText: atividade})).toBeVisible();
-    }
-}
-
-/**
- * Verifica a descrição de uma competência.
- */
-export async function verificarDescricaoCompetencia(page: Page, descricaoCompetencia: string, descricaoEsperada: string): Promise<void> {
-    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
-    await expect(competenciaCard.getByTestId('competencia-descricao')).toHaveText(descricaoEsperada);
-}
-
-/**
  * Verifica se um card de ação com o título fornecido está visível.
  */
 export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): Promise<void> {
@@ -486,4 +468,15 @@ export async function verificarCardAcaoVisivel(page: Page, tituloCard: string): 
  */
 export async function verificarCardAcaoInvisivel(page: Page, tituloCard: string): Promise<void> {
     await expect(page.locator('.card-acao', {hasText: tituloCard})).not.toBeVisible();
+}
+export async function verificarAtividadesAssociadas(page: Page, descricaoCompetencia: string, atividadesEsperadas: string[]): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
+    for (const atividade of atividadesEsperadas) {
+        await expect(competenciaCard.locator('.atividade-associada-card-item', {hasText: atividade})).toBeVisible();
+    }
+}
+
+export async function verificarDescricaoCompetencia(page: Page, descricaoCompetencia: string, descricaoEsperada: string): Promise<void> {
+    const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
+    await expect(competenciaCard.getByTestId('competencia-descricao')).toHaveText(descricaoEsperada);
 }

@@ -73,6 +73,7 @@ describe('useProcessosStore', () => {
                         situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
                         nome: 'Unidade A',
                         codUnidade: 1,
+                        codSubprocesso: 1,
                         dataLimite: '2025-12-31',
                         filhos: []
                     },
@@ -81,6 +82,7 @@ describe('useProcessosStore', () => {
                         situacaoSubprocesso: SituacaoSubprocesso.ATIVIDADES_EM_DEFINICAO,
                         nome: 'Unidade B',
                         codUnidade: 2,
+                        codSubprocesso: 2,
                         dataLimite: '2025-12-31',
                         filhos: []
                     },

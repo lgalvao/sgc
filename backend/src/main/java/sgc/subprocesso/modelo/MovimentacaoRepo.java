@@ -19,4 +19,6 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
      * @return lista de Movimentacao ordenada por dataHora desc
      */
     List<Movimentacao> findBySubprocessoCodigoOrderByDataHoraDesc(Long subprocessoCodigo);
+
+    List<Movimentacao> findBySubprocessoCodigo(Long subprocessoCodigo);
 }

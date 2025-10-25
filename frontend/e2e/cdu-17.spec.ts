@@ -13,19 +13,31 @@ import {
     verificarBotaoDisponibilizarHabilitado,
     verificarCampoObservacoesValor,
     verificarModalDisponibilizacaoVisivel,
-    verificarModalFechado
+    verificarModalFechado,
+    criarProcessoCompleto,
+    iniciarProcesso,
+    gerarNomeUnico
 } from './helpers';
+
+let processo: any;
+const siglaUnidade = 'SESEL';
 
 async function navegarParaMapa(page: Page) {
     await loginComoAdmin(page);
-    await irParaMapaCompetencias(page, 4, 'SESEL');
+    await irParaMapaCompetencias(page, processo.processo.codigo, siglaUnidade);
     await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
 test.describe('CDU-17: Disponibilizar mapa de competências', () => {
+    test.beforeEach(async ({ page }) => {
+        const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-17');
+        processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [10]); // Unidade 10 = SESEL
+        await iniciarProcesso(page);
+    });
+
     test('deve exibir modal com título e campos corretos', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência Teste');
+        await criarCompetencia(page, 'Competência Teste', []);
 
         await abrirModalDisponibilizacao(page);
         await verificarModalDisponibilizacaoVisivel(page);
@@ -33,7 +45,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve preencher observações no modal', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência Teste');
+        await criarCompetencia(page, 'Competência Teste', []);
 
         await abrirModalDisponibilizacao(page);
         await preencherObservacoesModal(page, 'Observações de teste para CDU-17');
@@ -42,7 +54,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve validar data obrigatória', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência Teste');
+        await criarCompetencia(page, 'Competência Teste', []);
 
         await abrirModalDisponibilizacao(page);
         await verificarBotaoDisponibilizarHabilitado(page, false);
@@ -53,7 +65,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve validar campos obrigatórios do modal', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência para Validação');
+        await criarCompetencia(page, 'Competência para Validação', []);
 
         await abrirModalDisponibilizacao(page);
         await verificarModalDisponibilizacaoVisivel(page);
@@ -68,7 +80,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve processar disponibilização', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência para Disponibilizar');
+        await criarCompetencia(page, 'Competência para Disponibilizar', []);
 
         await abrirModalDisponibilizacao(page);
         await preencherDataModal(page, '2025-12-31');
@@ -81,7 +93,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
 
     test('deve cancelar disponibilização', async ({page}) => {
         await navegarParaMapa(page);
-        await criarCompetencia(page, 'Competência Teste');
+        await criarCompetencia(page, 'Competência Teste', []);
 
         await abrirModalDisponibilizacao(page);
         await page.getByRole('button', {name: TEXTOS.CANCELAR}).click();
