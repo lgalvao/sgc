@@ -31,41 +31,7 @@
       @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
     />
 
-
-    <!-- Seção de Movimentações do Processo -->
-    <div class="mt-4">
-      <h4>Movimentações do Processo</h4>
-      <div
-        v-if="movements.length === 0"
-        class="alert alert-info"
-      >
-        Nenhuma movimentação registrada para este subprocesso.
-      </div>
-      <table
-        v-else
-        class="table table-striped"
-      >
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Unidade Origem</th>
-            <th>Unidade Destino</th>
-            <th>Descrição</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="movement in movements"
-            :key="movement.codigo"
-          >
-            <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
-            <td>{{ movement.unidadeOrigem }}</td>
-            <td>{{ movement.unidadeDestino }}</td>
-            <td>{{ movement.descricao }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <TabelaMovimentacoes :movimentacoes="movements" />
   </div>
 
   <SubprocessoModal
@@ -87,12 +53,12 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {MapaCompleto, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
-import {formatDateTimeBR} from '@/utils';
+import {MapaCompleto, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import SubprocessoModal from '@/components/SubprocessoModal.vue';
+import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
 
 const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
 

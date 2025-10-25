@@ -36,50 +36,11 @@
           Alertas
         </div>
       </div>
-      <table
-        class="table"
-        data-testid="tabela-alertas"
-      >
-        <thead>
-          <tr>
-            <th
-              style="cursor: pointer;"
-              @click="ordenarAlertasPor('data')"
-            >
-              Data/Hora
-            </th>
-            <th>Descrição</th>
-            <th
-              style="cursor: pointer;"
-              @click="ordenarAlertasPor('processo')"
-            >
-              Processo
-            </th>
-            <th>Origem</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(alerta, index) in alertasOrdenados"
-            :key="index"
-            style="cursor: pointer;"
-            @click="marcarComoLido(alerta.codigo)"
-          >
-            <td>{{ alerta.dataFormatada }}</td>
-            <td>{{ alerta.descricao }}</td>
-            <td>{{ alerta.processoCodigo }}</td>
-            <td>{{ alerta.unidadeOrigemCodigo }}</td>
-          </tr>
-          <tr v-if="!alertasOrdenados || alertasOrdenados.length === 0">
-            <td
-              class="text-center text-muted"
-              colspan="4"
-            >
-              Nenhum alerta no momento.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <TabelaAlertas
+        :alertas="alertasOrdenados"
+        @ordenar="ordenarAlertasPor"
+        @marcar-como-lido="marcarComoLido"
+      />
     </div>
   </div>
 </template>
@@ -91,8 +52,9 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil, type ProcessoResumo} from '@/types/tipos'
+import {Perfil, type ProcessoResumo, type AlertaFormatado} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
+import TabelaAlertas from '@/components/TabelaAlertas.vue';
 import {formatDateTimeBR} from '@/utils';
 
 const perfil = usePerfilStore()
