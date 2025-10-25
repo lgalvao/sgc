@@ -119,6 +119,7 @@ describe('useProcessosStore', () => {
         describe('iniciarProcesso', () => {
             it('deve chamar o processoService e recarregar os detalhes', async () => {
                 processoService.iniciarProcesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE); // Adicionar mock
                 const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
                 await store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10]);
                 expect(processoService.iniciarProcesso).toHaveBeenCalledWith(1, TipoProcesso.MAPEAMENTO, [10]);
