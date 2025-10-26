@@ -321,3 +321,7 @@ export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page
 export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
 }
+
+export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {
+    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
+}

@@ -14,26 +14,27 @@ import {
     verificarModalHistoricoAnaliseAberto,
     criarProcessoCompleto,
     iniciarProcesso,
-    gerarNomeUnico
+    gerarNomeUnico,
+    SELETORES,
+    esperarUrl,
 } from './helpers';
-import {esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
 
 test.describe('CDU-19: Validar mapa de competências', () => {
     let processo: any;
     const siglaUnidade = 'SEDIA';
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-19');
         processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [9]); // Unidade 9 = SEDIA
         await iniciarProcesso(page);
-        await loginComoChefeSedia(page)
+        await loginComoChefeSedia(page);
     });
 
     test('deve exibir botões Apresentar sugestões e Validar para CHEFE', async ({page}) => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
         await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
-        await esperarElementoVisivel(page, 'apresentar-sugestoes-btn');
-        await esperarElementoVisivel(page, 'validar-btn');
+        await esperarElementoVisivel(page, SELETORES.BTN_APRESENTAR_SUGESTOES);
+        await esperarElementoVisivel(page, SELETORES.BTN_VALIDAR);
     });
 
     test('deve exibir botão Histórico de análise e abrir modal', async ({page}) => {
@@ -57,17 +58,17 @@ test.describe('CDU-19: Validar mapa de competências', () => {
 
     test('deve cancelar apresentação de sugestões', async ({page}) => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
-        await clicarPorTestIdOuRole(page, 'apresentar-sugestoes-btn');
-        await esperarElementoVisivel(page, 'modal-apresentar-sugestoes');
+        await clicarPorTestIdOuRole(page, SELETORES.BTN_APRESENTAR_SUGESTOES);
+        await esperarElementoVisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
         await cancelarModal(page);
-        await esperarElementoInvisivel(page, 'modal-apresentar-sugestoes');
+        await esperarElementoInvisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
     });
 
     test('deve cancelar validação de mapa', async ({page}) => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
-        await clicarPorTestIdOuRole(page, 'validar-btn');
-        await esperarElementoVisivel(page, 'modal-validar');
+        await clicarPorTestIdOuRole(page, SELETORES.BTN_VALIDAR);
+        await esperarElementoVisivel(page, SELETORES.MODAL_VALIDAR);
         await cancelarModal(page);
-        await esperarElementoInvisivel(page, 'modal-validar');
+        await esperarElementoInvisivel(page, SELETORES.MODAL_VALIDAR);
     });
 });

@@ -1,7 +1,7 @@
-import {test} from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     adicionarAtividade,
-    adicionarConhecimento,
+    adicionarConhecimentoNaAtividade,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
     disponibilizarCadastro,
@@ -11,9 +11,8 @@ import {
     loginComoGestor,
     navegarParaProcessoPorId,
     verificarAtividadeVisivel,
-    verificarConhecimentoVisivel,
+    verificarConhecimentoNaAtividade,
     verificarModoSomenteLeitura,
-    SELETORES,
 } from './helpers';
 
 test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () => {
@@ -21,8 +20,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
     const nomeAtividade = gerarNomeUnico('Atividade para Visualizar');
     const nomeConhecimento = gerarNomeUnico('Conhecimento para Visualizar');
 
-    test.beforeAll(async ({browser}) => {
-        const page = await browser.newPage();
+    async function setup(page) {
         // Setup: Cria um processo, adiciona dados e disponibiliza o cadastro
         const context = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-11'), 'MAPEAMENTO', '2025-12-31', [1]);
         processo = context.processo;
@@ -32,10 +30,12 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, nomeConhecimento);
+        await adicionarConhecimentoNaAtividade(page, nomeAtividade, nomeConhecimento);
         await disponibilizarCadastro(page);
-        await page.close();
+    }
+
+    test.beforeEach(async ({page}) => {
+        await setup(page);
     });
 
     test('ADMIN deve visualizar cadastro em modo somente leitura', async ({page}) => {
@@ -44,8 +44,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoNaAtividade(page, nomeAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });
 
@@ -55,8 +54,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoNaAtividade(page, nomeAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });
 
@@ -68,8 +66,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
+        await verificarConhecimentoNaAtividade(page, nomeAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });
 });

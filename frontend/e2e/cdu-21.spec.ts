@@ -11,17 +11,17 @@ import {
     verificarBotaoFinalizarProcessoVisivel,
     verificarMensagemSucesso,
     verificarModalFinalizacaoFechado,
-    verificarProcessoFinalizadoNoPainel
+    verificarProcessoFinalizadoNoPainel,
+    iniciarProcesso,
+    verificarPermanenciaNaPaginaProcesso,
 } from './helpers';
-import * as processoService from '@/services/processoService';
 
 test.describe('CDU-21: Finalizar processo', () => {
-
     async function setupProcessoEmAndamento(page) {
         const nomeProcesso = `PROCESSO FINALIZAR TESTE - ${Date.now()}`;
         const processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1]); // Unidade 1 = SEDOC
-        await processoService.iniciarProcesso(processo.processo.codigo, 'MAPEAMENTO', [1]);
-
+        await navegarParaProcessoPorId(page, processo.processo.codigo);
+        await iniciarProcesso(page);
         return {nomeProcesso, processo};
     }
 
@@ -48,7 +48,7 @@ test.describe('CDU-21: Finalizar processo', () => {
             await cancelarNoModal(page);
 
             await verificarModalFinalizacaoFechado(page);
-            await page.waitForURL(`**/processos/${processo.processo.codigo}`); // Garante que permaneceu na página
+            await verificarPermanenciaNaPaginaProcesso(page, processo.processo.codigo);
         });
     });
 

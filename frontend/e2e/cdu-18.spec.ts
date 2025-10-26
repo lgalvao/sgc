@@ -12,14 +12,15 @@ import {
     verificarModoSomenteLeitura,
     criarProcessoCompleto,
     iniciarProcesso,
-    gerarNomeUnico
+    gerarNomeUnico,
+    SELETORES,
 } from './helpers';
 
 test.describe('CDU-18: Visualizar mapa de competências', () => {
     let processo: any;
     const siglaUnidade = 'STIC';
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-18');
         processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [2]); // Unidade 2 = STIC
         await iniciarProcesso(page);
@@ -54,8 +55,8 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         await verificarModoSomenteLeitura(page);
 
         // Verificações explícitas para botões que não devem existir para servidor
-        await esperarElementoInvisivel(page, 'validar-btn');
-        await esperarElementoInvisivel(page, 'apresentar-sugestoes-btn');
-        await esperarElementoInvisivel(page, 'registrar-aceite-btn');
+        await esperarElementoInvisivel(page, SELETORES.BTN_VALIDAR);
+        await esperarElementoInvisivel(page, SELETORES.BTN_APRESENTAR_SUGESTOES);
+        await esperarElementoInvisivel(page, SELETORES.BTN_REGISTRAR_ACEITE);
     });
 });
