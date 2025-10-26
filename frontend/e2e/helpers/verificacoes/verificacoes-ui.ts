@@ -479,3 +479,31 @@ export async function verificarDescricaoCompetencia(page: Page, descricaoCompete
     const competenciaCard = page.locator('.competencia-card', {hasText: descricaoCompetencia});
     await expect(competenciaCard.getByTestId('competencia-descricao')).toHaveText(descricaoEsperada);
 }
+
+export async function verificarPainelVisivel(page: Page): Promise<void> {
+    await expect(page).toHaveURL(URLS.PAINEL);
+    await expect(page.getByTestId(SELETORES.TITULO_PROCESSOS)).toBeVisible();
+}
+
+export async function verificarSelecaoPerfilVisivel(page: Page): Promise<void> {
+    await expect(page.getByText('Selecione o perfil e a unidade')).toBeVisible();
+    await expect(page.getByTestId('select-perfil-unidade')).toBeVisible();
+}
+
+export async function verificarImpactosNoMapa(page: Page): Promise<void> {
+    try {
+        await expect(page.getByTestId('impacto-mapa-modal')).toBeVisible();
+    } catch {
+        await expect(page.getByText('Nenhum impacto no mapa da unidade.')).toBeVisible();
+    }
+}
+
+export async function verificarPainelAdminVisivel(page: Page): Promise<void> {
+    await expect(page).toHaveURL(URLS.PAINEL);
+    await expect(page.getByTitle('Configurações do sistema')).toBeVisible();
+}
+
+export async function verificarPainelChefeVisivel(page: Page): Promise<void> {
+    await expect(page).toHaveURL(URLS.PAINEL);
+    await expect(page.getByTitle('Configurações do sistema')).not.toBeVisible();
+}

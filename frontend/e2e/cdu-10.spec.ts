@@ -1,7 +1,7 @@
-import {test} from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     adicionarAtividade,
-    adicionarConhecimento,
+    adicionarConhecimentoNaAtividade,
     clicarBotaoHistoricoAnalise,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
@@ -10,15 +10,14 @@ import {
     gerarNomeUnico,
     loginComoChefe,
     navegarParaProcessoPorId,
-    SELETORES,
     verificarAlerta,
     verificarMensagemSucesso,
     verificarModalHistoricoAnalise,
     verificarUrlDoPainel,
+    cancelarNoModal,
 } from './helpers';
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
-
     test('deve disponibilizar a revisão com sucesso após corrigir atividades incompletas', async ({page}) => {
         const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
         await loginComoChefe(page);
@@ -30,13 +29,12 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         await adicionarAtividade(page, nomeAtividadeIncompleta);
 
         // Tenta disponibilizar e verifica o alerta
-        await page.click(SELETORES.DISPONIBILIZAR);
+        await disponibilizarCadastro(page);
         await verificarAlerta(page, 'Atividades Incompletas');
-        await page.locator('.modal-dialog .btn-secondary').click(); // Clica em Cancelar no modal de confirmação
+        await cancelarNoModal(page);
 
         // Adiciona conhecimento à atividade que estava incompleta
-        const cardAtividadeIncompleta = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividadeIncompleta});
-        await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
+        await adicionarConhecimentoNaAtividade(page, nomeAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
         // Disponibiliza com sucesso
         await disponibilizarCadastro(page);
@@ -60,7 +58,6 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         await verificarUrlDoPainel(page);
 
         // 2. GESTOR devolve o cadastro em revisão
-        // A função devolverCadastro já faz o login e navegação
         await devolverCadastro(page, processo, nomeUnidade, motivoDevolucao);
         await verificarMensagemSucesso(page, 'Cadastro devolvido com sucesso');
         await verificarUrlDoPainel(page);

@@ -15,6 +15,14 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
 }
 
 /**
+ * Navega para a página de login.
+ */
+export async function navegarParaLogin(page: Page): Promise<void> {
+    await page.goto(URLS.LOGIN);
+    await page.waitForLoadState('networkidle');
+}
+
+/**
  * Navega para criação de processo
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
@@ -114,6 +122,18 @@ export async function navegarParaEdicaoMapa(page: Page, idProcesso: number, sigl
     await page.goto(`/processo/${idProcesso}/${siglaUnidade}/mapa`);
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${siglaUnidade}/mapa`));
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
+}
+
+export async function navegarParaMapaRevisao(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
+    await loginComoAdmin(page);
+    await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
+}
+
+export async function navegarParaMapaMapeamento(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
+    await loginComoAdmin(page);
+    await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
     await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 

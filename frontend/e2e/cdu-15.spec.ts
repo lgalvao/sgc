@@ -13,9 +13,9 @@ import {
     clicarBotaoDisponibilizar,
     preencherDataModal,
     confirmarNoModal,
-    esperarUrl
+    esperarUrl,
+    verificarDescricaoCompetencia,
 } from './helpers';
-import {verificarDescricaoCompetencia} from "./helpers/verificacoes/verificacoes-ui";
 
 test.describe('CDU-15: Manter Mapa de Competências', () => {
     let processo: any;

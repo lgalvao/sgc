@@ -15,14 +15,15 @@ import {
     verificarModalHistoricoAnaliseAberto,
     criarProcessoCompleto,
     iniciarProcesso,
-    gerarNomeUnico
+    gerarNomeUnico,
+    abrirModalDevolucao,
 } from './helpers';
 
 test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     let processo: any;
     const siglaUnidade = 'SEDESENV';
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-20');
         processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [8]); // Unidade 8 = SEDESENV
         await iniciarProcesso(page);
@@ -52,7 +53,7 @@ test.describe('CDU-20: Analisar validação de mapa de competências', () => {
             await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
 
             // Abrir diálogo de devolução e cancelar
-            await page.getByRole('button', {name: 'Devolver para ajustes'}).click();
+            await abrirModalDevolucao(page);
             await cancelarModal(page);
         });
     });

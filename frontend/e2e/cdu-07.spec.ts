@@ -8,14 +8,17 @@ import {
     irParaSubprocesso,
     loginComoGestor,
     disponibilizarCadastro,
+    aceitarCadastro,
+    verificarCardAcaoVisivel,
+    verificarCardAcaoInvisivel,
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaCadastroAtividades,
 } from './helpers';
-import { aceitarCadastro } from '@/services/cadastroService';
-import { verificarCardAcaoVisivel, verificarCardAcaoInvisivel } from './helpers/verificacoes/verificacoes-ui';
-import * as cadastroService from '@/services/cadastroService';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
     let processo: any;
-    const siglaUnidade = 'STIC'; // Assumindo uma unidade padrão para o teste
+    const siglaUnidade = 'STIC';
 
     test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO CDU-07');
@@ -39,10 +42,19 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
     });
 
     test('CHEFE deve ver card de Mapa de competências em MAPA_EM_ANDAMENTO', async ({page}) => {
-        // Simular que o cadastro foi disponibilizado e aceito, avançando para MAPA_EM_ANDAMENTO
-        await cadastroService.disponibilizarCadastro(processo.subprocessos[0].codigo);
-        await cadastroService.aceitarCadastro(processo.subprocessos[0].codigo, {observacoes: 'Teste'});
+        // CHEFE disponibiliza o cadastro
+        await loginComoChefe(page);
+        await navegarParaCadastroAtividades(page, processo.processo.codigo, siglaUnidade);
+        await adicionarAtividade(page, 'Atividade de Teste');
+        await adicionarConhecimento(page.locator(SELETORES.CARD_ATIVIDADE).first(), 'Conhecimento de Teste');
+        await disponibilizarCadastro(page);
 
+        // GESTOR aceita o cadastro
+        await loginComoGestor(page);
+        await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
+        await aceitarCadastro(page, {observacoes: 'Teste'});
+
+        // CHEFE verifica o card de Mapa de competências
         await loginComoChefe(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
 
@@ -51,9 +63,14 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
     });
 
     test('GESTOR deve ver card de Análise de cadastro em CADASTRO_DISPONIBILIZADO', async ({page}) => {
-        // Simular que o cadastro foi disponibilizado
-        await cadastroService.disponibilizarCadastro(processo.subprocessos[0].codigo);
+        // CHEFE disponibiliza o cadastro
+        await loginComoChefe(page);
+        await navegarParaCadastroAtividades(page, processo.processo.codigo, siglaUnidade);
+        await adicionarAtividade(page, 'Atividade de Teste');
+        await adicionarConhecimento(page.locator(SELETORES.CARD_ATIVIDADE).first(), 'Conhecimento de Teste');
+        await disponibilizarCadastro(page);
 
+        // GESTOR verifica o card de Análise de cadastro
         await loginComoGestor(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
 

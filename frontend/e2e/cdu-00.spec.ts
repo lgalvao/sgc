@@ -1,9 +1,9 @@
-import {test, expect} from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
+import {navegarParaLogin, verificarPaginaLogin} from './helpers';
 
 test.describe('CDU-00: Baseline Test', () => {
-    test('should load the login page correctly', async ({page}) => {
-        await page.goto('http://localhost:5173/login');
-        await expect(page.getByLabel('Título eleitoral')).toBeVisible();
-        await expect(page.getByLabel('Senha')).toBeVisible();
+    test('deve carregar a página de login corretamente', async ({page}) => {
+        await navegarParaLogin(page);
+        await verificarPaginaLogin(page);
     });
 });

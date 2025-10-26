@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     aceitarCadastro,
     cancelarModal,
@@ -19,19 +19,16 @@ import {
     disponibilizarCadastro,
     loginComoChefe,
     adicionarAtividade,
-    adicionarConhecimento,
+    adicionarConhecimentoNaAtividade,
     gerarNomeUnico,
-    navegarParaProcessoPorId,
-    clicarUnidadeNaTabelaDetalhes,
-    SELETORES,
-    navegarParaCadastroAtividades
+    navegarParaCadastroAtividades,
 } from './helpers';
 
 test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
     let processo: any;
     const SIGLA_STIC = 'STIC';
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         const nomeProcesso = gerarNomeUnico('PROCESSO-CDU-13');
         processo = await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [2]); // Unidade 2 = STIC
         await iniciarProcesso(page);
@@ -41,8 +38,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await navegarParaCadastroAtividades(page, processo.processo.codigo, SIGLA_STIC);
         const nomeAtividade = gerarNomeUnico('Atividade CDU-13');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, gerarNomeUnico('Conhecimento CDU-13'));
+        await adicionarConhecimentoNaAtividade(page, nomeAtividade, gerarNomeUnico('Conhecimento CDU-13'));
         await disponibilizarCadastro(page);
     });
 
