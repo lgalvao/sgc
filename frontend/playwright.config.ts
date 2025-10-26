@@ -31,6 +31,21 @@ export default defineConfig({
                         '--disable-setuid-sandbox',
                         '--disable-gpu',
                         '--disable-software-rasterizer',
+                        '--disable-extensions',
+                        '--disable-background-networking',
+                        '--disable-background-timer-throttling',
+                        '--disable-backgrounding-occluded-windows',
+                        '--disable-breakpad',
+                        '--disable-component-extensions-with-background-pages',
+                        '--disable-features=TranslateUI',
+                        '--disable-ipc-flooding-protection',
+                        '--disable-renderer-backgrounding',
+                        '--force-color-profile=srgb',
+                        '--metrics-recording-only',
+                        '--mute-audio',
+                        '--no-first-run',
+                        '--safebrowsing-disable-auto-update',
+                        '--single-process',
                     ]
                 }
             },
@@ -39,8 +54,8 @@ export default defineConfig({
 
     // Let Playwright manage the backend lifecycle
     webServer: {
-        command: 'cd /app && JAVA_OPTS="-Xmx512m -Xms256m" ./gradlew :backend:bootRun --args="--spring.profiles.active=jules"',
-        url: 'http://localhost:8080/api/status',
+        command: 'cd /app && JAVA_OPTS="-Xmx512m -Xms256m" ./gradlew :backend:bootRun -PwithFrontend=true --args="--spring.profiles.active=jules"',
+        url: 'http://localhost:8080/actuator/health',
         timeout: 120000, // 2 minutes for Spring Boot to start
         reuseExistingServer: false,
         stdout: 'pipe',

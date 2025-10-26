@@ -45,7 +45,8 @@ public class SecurityConfig {
                     "/api/usuarios/autenticar",
                     "/api/usuarios/autorizar",
                     "/api/usuarios/entrar",
-                    "/api/test/**"
+                    "/api/test/**",
+                    "/actuator/**"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
