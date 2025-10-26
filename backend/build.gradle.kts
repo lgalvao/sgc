@@ -310,7 +310,7 @@ tasks.register<Test>("verboseTest") {
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
-    jvmArgs = listOf("-Djdk.internal.vm.debug=release")
+    jvmArgs = listOf("--enable-preview", "-Djdk.internal.vm.debug=release")
 }
 
 tasks.register<org.springframework.boot.gradle.tasks.run.BootRun>("bootRunE2E") {
