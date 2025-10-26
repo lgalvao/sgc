@@ -19,3 +19,9 @@ spring:
   devtools:
     restart:
       enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:sgc-db;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    username: sa
+    password:
+    driverClassName: org.h2.Driver

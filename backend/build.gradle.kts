@@ -30,12 +30,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // BD
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("com.h2database:h2")
 
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
