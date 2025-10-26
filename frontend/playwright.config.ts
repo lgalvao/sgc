@@ -40,7 +40,7 @@ export default defineConfig({
     // Let Playwright manage the backend lifecycle
     webServer: {
         command: 'cd /app && JAVA_OPTS="-Xmx512m -Xms256m" ./gradlew :backend:bootRun --args="--spring.profiles.active=jules"',
-        url: 'http://localhost:8080',
+        url: 'http://localhost:8080/api/status',
         timeout: 120000, // 2 minutes for Spring Boot to start
         reuseExistingServer: false,
         stdout: 'pipe',
