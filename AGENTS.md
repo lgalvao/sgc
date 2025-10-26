@@ -41,7 +41,25 @@ npm run test:unit
 
 ### Testes E2E
 
-A suíte de testes E2E foi configurada para gerenciar automaticamente o ciclo de vida do servidor backend. O Playwright irá iniciar uma instância do backend com um perfil de teste (`jules`) antes de executar os testes e irá desligá-lo ao final.
+A suíte de testes E2E depende de duas configurações críticas: o backend precisa servir os arquivos estáticos do frontend, e o Playwright precisa de um endpoint estável para verificar se o servidor está pronto.
+
+**Preparação (Obrigatória):**
+
+Antes de executar os testes, o frontend precisa ser compilado e seus arquivos copiados para o diretório de recursos do backend. Execute os seguintes comandos a partir do diretório raiz do projeto:
+
+1.  **Instale as dependências e compile o frontend:**
+    ```bash
+    cd frontend && npm install && npm run build
+    ```
+
+2.  **Copie os arquivos para o backend (execute a partir do diretório raiz):**
+    ```bash
+    mkdir -p backend/src/main/resources/static && cp -r frontend/dist/* backend/src/main/resources/static/
+    ```
+
+**Execução:**
+
+Após a preparação, você pode executar a suíte de testes. O Playwright gerenciará automaticamente o ciclo de vida do servidor backend.
 
 Para executar todos os testes E2E, navegue até o diretório `frontend` e use o seguinte comando:
 
@@ -49,7 +67,7 @@ Para executar todos os testes E2E, navegue até o diretório `frontend` e use o 
 npx playwright test
 ```
 
-**Importante:** Não é mais necessário iniciar o backend manualmente. A configuração do Playwright (`playwright.config.ts`) se encarrega disso. Se você encontrar problemas de porta em uso, certifique-se de que nenhuma outra instância do backend esteja rodando.
+**Importante:** A configuração do Playwright (`playwright.config.ts`) se encarrega de iniciar e parar o backend. Se você encontrar problemas de porta em uso, certifique-se de que nenhuma outra instância do backend esteja rodando antes de iniciar os testes.
 
 ## Informações Gerais do Backend
 
