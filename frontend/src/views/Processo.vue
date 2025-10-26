@@ -106,7 +106,7 @@ const idProcesso = computed(() =>
 // Carregar detalhes do processo ao montar o componente
 onMounted(async () => {
   if (idProcesso.value) {
-    await processosStore.fetchProcessoDetalhe(idProcesso.value);
+    await processosStore.fetchProcessoDetalhe(Number(idProcesso.value));
   }
 });
 
@@ -179,10 +179,10 @@ function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
+      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: String(item.sigla)}})
     } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
       if (perfilStore.unidadeSelecionada === item.sigla) {
-        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
+        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: String(item.sigla)}})
       }
     }
   }

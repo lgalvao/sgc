@@ -56,9 +56,6 @@ export {
     removerAtividade,
     editarConhecimento,
     removerConhecimento,
-    criarCompetencia,
-    editarCompetencia,
-    excluirCompetencia,
     clicarBotaoImportarAtividades,
     clicarBotaoDisponibilizar,
     abrirModalDisponibilizacao,
@@ -73,6 +70,9 @@ export {
  // Ações de mapa
  export {
      fecharModalImpactos,
-     clicarBotaoImpactosMapa
+     clicarBotaoImpactosMapa,
+     criarCompetencia,
+     editarCompetencia,
+     excluirCompetencia,
  } from './acoes-mapa';
 export * from './acoes-validacao';

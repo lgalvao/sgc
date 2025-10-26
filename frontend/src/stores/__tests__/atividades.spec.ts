@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { useAtividadesStore } from '../atividades';
 import * as mapaService from '@/services/mapaService';
 import { useNotificacoesStore } from '../notificacoes';
@@ -18,7 +18,7 @@ describe('useAtividadesStore', () => {
             sucesso: vi.fn(),
             erro: vi.fn(),
         } as any;
-        (useNotificacoesStore as vi.Mock).mockReturnValue(mockNotificacoesStore);
+        (useNotificacoesStore as Mocked<any>).mockReturnValue(mockNotificacoesStore);
         vi.clearAllMocks();
     });
 
