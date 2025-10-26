@@ -392,7 +392,8 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
+import { usePerfil } from '@/composables/usePerfil'
+import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade, Servidor, Subprocesso} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
@@ -405,6 +406,7 @@ const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
+const { servidorLogado } = usePerfil()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
@@ -673,7 +675,22 @@ function disponibilizarMapa() {
     }
 
     // Registrar movimentação
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: currentUnidade
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...sub,
+      codigo: sub.codSubprocesso,
+      unidade: currentUnidade,
+      situacao: sub.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
     processosStore.addMovement({
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
       unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'

@@ -52,7 +52,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil, type ProcessoResumo, type AlertaFormatado} from '@/types/tipos'
+import {Perfil, type ProcessoResumo, type AlertaFormatado, Unidade, Servidor} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import TabelaAlertas from '@/components/TabelaAlertas.vue';
 import {formatDateTimeBR} from '@/utils';
@@ -104,16 +104,16 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   
   // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
   if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'CRIADO') { 
-    router.push({name: 'CadProcesso', query: {idProcesso: processo.codigo}})
+    router.push({name: 'CadProcesso', query: {idProcesso: String(processo.codigo)}})
     return;
   }
   
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.codigo}})
+    router.push({name: 'Processo', params: {idProcesso: String(processo.codigo)}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {idProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }
@@ -123,6 +123,8 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
 const alertasFormatados = computed((): AlertaFormatado[] => {
   return alertas.value.map(alerta => {
     const partes = alerta.descricao.split(' ');
+    const MOCK_UNIDADE: Unidade = { codigo: 0, nome: '', sigla: '' };
+    const MOCK_SERVIDOR: Servidor = { codigo: 0, nome: '', tituloEleitoral: '', unidade: MOCK_UNIDADE, email: '', ramal: '' };
     return {
       ...alerta,
       mensagem: alerta.descricao,
@@ -131,6 +133,9 @@ const alertasFormatados = computed((): AlertaFormatado[] => {
       dataHoraFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
       origem: partes[0],
       processo: partes[2],
+      unidadeOrigem: MOCK_UNIDADE,
+      unidadeDestino: MOCK_UNIDADE,
+      usuarioDestino: MOCK_SERVIDOR,
     } as AlertaFormatado;
   });
 });
