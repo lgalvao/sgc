@@ -11,7 +11,7 @@ import {
     navegarParaProcessoPorId,
     removerAtividade,
     removerConhecimento,
-    SELETORES_CSS,
+    SELETORES,
     verificarAtividadeNaoVisivel,
     verificarAtividadeVisivel,
     verificarConhecimentoNaoVisivel,
@@ -32,7 +32,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const nomeAtividade = gerarNomeUnico('Atividade de Teste');
         await adicionarAtividade(page, nomeAtividade);
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividade });
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, { hasText: nomeAtividade });
 
         // Adiciona conhecimento
         const nomeConhecimento = gerarNomeUnico('Conhecimento de Teste');

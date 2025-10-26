@@ -1,5 +1,5 @@
 import {expect, Locator, Page} from '@playwright/test';
-import {ROTULOS, SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {ROTULOS, SELETORES, TEXTOS, URLS} from '../dados';
 import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/helpers';
 
 /**
@@ -18,7 +18,7 @@ export async function verificarConhecimentoVisivel(pageOrCard: Page | Locator, n
     if (typeof nomeConhecimento === 'string') {
         // Assinatura: (page, nomeAtividade, nomeConhecimento)
         const page = pageOrCard as Page;
-        cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividadeOuConhecimento});
+        cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividadeOuConhecimento});
         conhecimento = nomeConhecimento;
     } else {
         // Assinatura: (cardLocator, nomeConhecimento)
@@ -26,7 +26,7 @@ export async function verificarConhecimentoVisivel(pageOrCard: Page | Locator, n
         conhecimento = nomeAtividadeOuConhecimento;
     }
 
-    await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: conhecimento})).toBeVisible();
+    await expect(cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: conhecimento})).toBeVisible();
 }
 
 /**
@@ -64,7 +64,7 @@ export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: st
  * Verifica comportamento de seleção em árvore de checkboxes
  */
 export async function verificarSelecaoArvoreCheckboxes(page: Page): Promise<void> {
-    const quantidadeMarcados = await page.locator(SELETORES_CSS.CHECKBOX_MARCADO).count();
+    const quantidadeMarcados = await page.locator(SELETORES.CHECKBOX_MARCADO).count();
     expect(quantidadeMarcados).toBeGreaterThan(0);
 }
 
@@ -72,7 +72,7 @@ export async function verificarSelecaoArvoreCheckboxes(page: Page): Promise<void
  * Verifica comportamento de marcar/desmarcar checkbox
  */
 export async function verificarComportamentoMarcacaoCheckbox(page: Page): Promise<void> {
-    const primeiroCheckbox = page.locator(SELETORES_CSS.CHECKBOX).first();
+    const primeiroCheckbox = page.locator(SELETORES.CHECKBOX).first();
 
     // Deve estar marcado inicialmente (após seleção)
     await expect(primeiroCheckbox).toBeChecked();
@@ -214,7 +214,7 @@ export async function verificarBotaoImpactoVisivel(page: Page): Promise<void> {
  * Verifica se o modal de importação de atividades está visível.
  */
 export async function verificarModalImportacaoVisivel(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
     await expect(page.locator('.modal-body')).toBeVisible();
 }
 
@@ -229,29 +229,29 @@ export async function verificarBotaoDisponibilizarVisivel(page: Page): Promise<v
  * Verifica se uma atividade com um nome específico está visível.
  */
 export async function verificarAtividadeVisivel(page: Page, nomeAtividade: string): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade})).toBeVisible();
+    await expect(page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade})).toBeVisible();
 }
 
 /**
  * Verifica se uma atividade com um nome específico NÃO está visível/anexada.
  */
 export async function verificarAtividadeNaoVisivel(page: Page, nomeAtividade: string): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade})).not.toBeAttached();
+    await expect(page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade})).not.toBeAttached();
 }
 
 /**
  * Verifica se um conhecimento em uma atividade específica NÃO está visível.
  */
 export async function verificarConhecimentoNaoVisivel(page: Page, nomeAtividade: string, nomeConhecimento: string): Promise<void> {
-    const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
-    await expect(cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento})).not.toBeVisible();
+    const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
+    await expect(cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento})).not.toBeVisible();
 }
 
 /**
  * Verifica a quantidade de cards de atividade na página.
  */
 export async function verificarContadorAtividades(page: Page, numeroEsperado: number): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.CARD_ATIVIDADE)).toHaveCount(numeroEsperado);
+    await expect(page.locator(SELETORES.CARD_ATIVIDADE)).toHaveCount(numeroEsperado);
 }
 
 /**
@@ -310,8 +310,8 @@ export async function verificarAlertasOrdenadosPorDataHora(page: Page): Promise<
  */
 export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<void> {
     // Espera explícita pelo modal, pois pode ser aberto após requisições assíncronas
-    await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await page.waitForSelector(SELETORES.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     // Aceitamos variações como "Histórico de Análise" ou "Histórico de Análises"
@@ -334,8 +334,8 @@ export async function verificarModalHistoricoAnaliseAberto(page: Page): Promise<
  * Verifica se o modal de histórico de análise contém uma observação específica.
  */
 export async function verificarModalHistoricoAnalise(page: Page, observacao: string): Promise<void> {
-    await page.waitForSelector(SELETORES_CSS.MODAL_VISIVEL);
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    await page.waitForSelector(SELETORES.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('heading', {name: /Histórico de Análises?/i})).toBeVisible();
     await expect(modal.locator('tbody tr').first()).toContainText(observacao);

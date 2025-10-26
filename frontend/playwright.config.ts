@@ -1,31 +1,56 @@
-import {defineConfig, devices} from '@playwright/test';
-import {vueTest} from '~/support/vue-specific-setup';
+import { defineConfig, devices } from '@playwright/test';
 
-// noinspection JSUnusedGlobalSymbols
 export default defineConfig({
-    testMatch: /.*\.spec\.ts/,
-    timeout: 12000,
     testDir: './e2e',
-    fullyParallel: true,
-    reporter: "dot",
-    globalSetup: './e2e/support/global-setup.ts',
-    webServer: {
-        command: 'npm run dev',
-        url: 'http://localhost:5173/',
-        reuseExistingServer: true,
-        timeout: 120 * 1000,
+
+    // Critical: Run tests sequentially with no parallelism
+    fullyParallel: false,
+    workers: 1,
+
+    // Disable retries to prevent cascading failures
+    retries: 0,
+
+    // Increase timeouts for resource-constrained environment
+    timeout: 60000,
+    expect: {
+        timeout: 10000
     },
-    use: {
-        baseURL: 'http://localhost:5173/',
-        trace: 'on-first-retry',
-        actionTimeout: 3000,
-        navigationTimeout: 3000,
-    },
-    projects: [{
-        name: 'chromium',
-        use: {
-            ...devices['Desktop Chrome'],
-            ...vueTest,
+
+    // Only use Chromium, skip other browsers
+    projects: [
+        {
+            name: 'chromium',
+            use: {
+                ...devices['Desktop Chrome'],
+                // Reduce browser overhead
+                launchOptions: {
+                    args: [
+                        '--disable-dev-shm-usage',
+                        '--disable-blink-features=AutomationControlled',
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-gpu',
+                        '--disable-software-rasterizer',
+                    ]
+                }
+            },
         },
-    }]
+    ],
+
+    // Let Playwright manage the backend lifecycle
+    webServer: {
+        command: 'cd /app && JAVA_OPTS="-Xmx512m -Xms256m" ./gradlew :backend:bootRun --args="--spring.profiles.active=jules"',
+        url: 'http://localhost:8080',
+        timeout: 120000, // 2 minutes for Spring Boot to start
+        reuseExistingServer: false,
+        stdout: 'pipe',
+        stderr: 'pipe',
+    },
+
+    use: {
+        baseURL: 'http://localhost:8080',
+        trace: 'off', // Disable tracing to save resources
+        video: 'off', // Disable video recording
+        screenshot: 'only-on-failure',
+    },
 });

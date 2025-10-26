@@ -28,10 +28,10 @@
         style="cursor: pointer;"
         @click="emit('marcarComoLido', alerta.codigo)"
       >
-        <td>{{ alerta.dataFormatada }}</td>
-        <td>{{ alerta.descricao }}</td>
-        <td>{{ alerta.processoCodigo }}</td>
-        <td>{{ alerta.unidadeOrigemCodigo }}</td>
+        <td>{{ alerta.dataHoraFormatada }}</td>
+        <td>{{ alerta.mensagem }}</td>
+        <td>{{ alerta.processo }}</td>
+        <td>{{ alerta.origem }}</td>
       </tr>
       <tr v-if="!alertas || alertas.length === 0">
         <td

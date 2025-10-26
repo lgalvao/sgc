@@ -281,7 +281,7 @@ import {
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
-import * as SubprocessoService from '@/services/subprocessoService';
+import * as mapaService from '@/services/mapaService';
 import {ServidoresService} from "@/services/servidoresService";
 
 const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
@@ -334,7 +334,7 @@ function isUnidadeIntermediaria(codigo: number): boolean {
 
 // TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
 async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
-  return await SubprocessoService.verificarMapaVigente(codigo);
+  return await mapaService.verificarMapaVigente(codigo);
 }
 
 // TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades

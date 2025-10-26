@@ -10,10 +10,10 @@ import {
     loginComoChefe,
     loginComoGestor,
     navegarParaProcessoPorId,
-    SELETORES_CSS,
     verificarAtividadeVisivel,
     verificarConhecimentoVisivel,
     verificarModoSomenteLeitura,
+    SELETORES,
 } from './helpers';
 
 test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () => {
@@ -32,7 +32,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, nomeConhecimento);
         await disponibilizarCadastro(page);
         await page.close();
@@ -44,7 +44,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });
@@ -55,7 +55,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });
@@ -68,7 +68,7 @@ test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () 
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
 
         await verificarAtividadeVisivel(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await verificarConhecimentoVisivel(cardAtividade, nomeConhecimento);
         await verificarModoSomenteLeitura(page);
     });

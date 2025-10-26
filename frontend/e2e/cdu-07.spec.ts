@@ -9,9 +9,9 @@ import {
     loginComoGestor,
     disponibilizarCadastro,
 } from './helpers';
-import { aceitarCadastro } from '@/services/subprocessoService';
+import { aceitarCadastro } from '@/services/cadastroService';
 import { verificarCardAcaoVisivel, verificarCardAcaoInvisivel } from './helpers/verificacoes/verificacoes-ui';
-import * as subprocessoService from '@/services/subprocessoService';
+import * as cadastroService from '@/services/cadastroService';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
     let processo: any;
@@ -40,8 +40,8 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
 
     test('CHEFE deve ver card de Mapa de competências em MAPA_EM_ANDAMENTO', async ({page}) => {
         // Simular que o cadastro foi disponibilizado e aceito, avançando para MAPA_EM_ANDAMENTO
-        await subprocessoService.disponibilizarCadastro(processo.subprocessos[0].codigo);
-        await subprocessoService.aceitarCadastro(processo.subprocessos[0].codigo, {observacoes: 'Teste'});
+        await cadastroService.disponibilizarCadastro(processo.subprocessos[0].codigo);
+        await cadastroService.aceitarCadastro(processo.subprocessos[0].codigo, {observacoes: 'Teste'});
 
         await loginComoChefe(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
@@ -52,7 +52,7 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
 
     test('GESTOR deve ver card de Análise de cadastro em CADASTRO_DISPONIBILIZADO', async ({page}) => {
         // Simular que o cadastro foi disponibilizado
-        await subprocessoService.disponibilizarCadastro(processo.subprocessos[0].codigo);
+        await cadastroService.disponibilizarCadastro(processo.subprocessos[0].codigo);
 
         await loginComoGestor(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);

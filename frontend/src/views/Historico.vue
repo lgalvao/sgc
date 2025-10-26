@@ -90,3 +90,4 @@ function abrirProcesso(processo: ProcessoResumo) {
     }
   }
 }
+</script>

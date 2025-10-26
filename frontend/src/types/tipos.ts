@@ -200,6 +200,12 @@ export interface Alerta {
     lido: boolean;
 }
 
+export interface AlertaFormatado extends Alerta {
+    dataHoraFormatada: string;
+    origem: string;
+    processo: string;
+}
+
 export interface Movimentacao {
     codigo: number;
     dataHora: string;

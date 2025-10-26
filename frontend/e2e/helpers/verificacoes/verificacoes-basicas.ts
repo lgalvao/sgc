@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {SELETORES, TEXTOS, URLS} from '../dados';
 
 /**
  * VERIFICAÇÕES BÁSICAS E PRIMITIVAS
@@ -27,7 +27,7 @@ export async function esperarMensagemSucesso(page: Page, mensagem: string): Prom
  * Espera uma mensagem de erro aparecer
  */
 export async function esperarMensagemErro(page: Page, mensagem: string): Promise<void> {
-    const notificacao = page.locator(SELETORES_CSS.NOTIFICACAO_ERRO);
+    const notificacao = page.locator(SELETORES.NOTIFICACAO_ERRO);
     await expect(notificacao).toBeVisible();
     await expect(notificacao).toContainText(mensagem);
 }
@@ -91,14 +91,14 @@ export async function verificarUrlDoPainel(page: Page): Promise<void> {
  * Verifica se modal está visível
  */
 export async function verificarModalVisivel(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
 }
 
 /**
  * Verifica se modal foi fechado
  */
 export async function verificarModalFechado(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).not.toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
 }
 
 /**

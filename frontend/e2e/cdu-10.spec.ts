@@ -10,7 +10,7 @@ import {
     gerarNomeUnico,
     loginComoChefe,
     navegarParaProcessoPorId,
-    SELETORES_CSS,
+    SELETORES,
     verificarAlerta,
     verificarMensagemSucesso,
     verificarModalHistoricoAnalise,
@@ -30,12 +30,12 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         await adicionarAtividade(page, nomeAtividadeIncompleta);
 
         // Tenta disponibilizar e verifica o alerta
-        await page.click(SELETORES_CSS.BTN_DISPONIBILIZAR);
+        await page.click(SELETORES.DISPONIBILIZAR);
         await verificarAlerta(page, 'Atividades Incompletas');
         await page.locator('.modal-dialog .btn-secondary').click(); // Clica em Cancelar no modal de confirmação
 
         // Adiciona conhecimento à atividade que estava incompleta
-        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividadeIncompleta});
+        const cardAtividadeIncompleta = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividadeIncompleta});
         await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
         // Disponibiliza com sucesso
