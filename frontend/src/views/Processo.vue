@@ -106,7 +106,7 @@ const idProcesso = computed(() =>
 // Carregar detalhes do processo ao montar o componente
 onMounted(async () => {
   if (idProcesso.value) {
-    await processosStore.fetchProcessoDetalhe(Number(idProcesso.value));
+    await processosStore.fetchProcessoDetalhe(idProcesso.value);
   }
 });
 
@@ -179,10 +179,10 @@ function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: String(item.sigla)}})
+      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value.toString(), siglaUnidade: String(item.sigla)}})
     } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
       if (perfilStore.unidadeSelecionada === item.sigla) {
-        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: String(item.sigla)}})
+        router.push({name: 'Subprocesso', params: {idProcesso: String(idProcesso.value), siglaUnidade: String(item.sigla)}})
       }
     }
   }
@@ -273,7 +273,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       idProcesso: idProcesso.value,
       unidades: unidadesSelecionadas,
       tipoAcao: tipoAcaoBloco.value,
-      unidadeUsuario: perfilStore.unidadeSelecionada || ''
+      unidadeUsuario: String(perfilStore.unidadeSelecionada) || ''
     })
 
     mostrarAlertaSucesso.value = true

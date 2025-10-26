@@ -46,12 +46,12 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             try {
                 // Obter perfil e unidadeCodigo do perfilStore
                 const perfil = perfilStore.perfilSelecionado;
-                const unidadeSelecionadaSigla = perfilStore.unidadeSelecionada;
+                const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
                 let unidadeCodigo: number | null = null;
 
-                if (perfil && unidadeSelecionadaSigla) {
+                if (perfil && unidadeSelecionadaCodigo) {
                     const perfilUnidade = perfilStore.perfisUnidades.find(pu =>
-                        pu.perfil === perfil && pu.unidade.sigla === unidadeSelecionadaSigla
+                        pu.perfil === perfil && pu.unidade.codigo === unidadeSelecionadaCodigo
                     );
                     if (perfilUnidade) {
                         unidadeCodigo = perfilUnidade.unidade.codigo;

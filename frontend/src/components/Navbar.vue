@@ -172,7 +172,7 @@ const handleProfileChange = (event: Event) => {
 
   if (selectedPerfil) {
     perfilStore.setServidorId(selectedPerfil.servidorId);
-    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade.sigla);
+    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade.codigo);
     router.push('/painel');
   }
   stopEditingProfile();

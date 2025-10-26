@@ -215,7 +215,7 @@ function irParaAtividadesConhecimentos() {
   const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
-  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === sigla.value) {
+  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === unidadeOriginal.value?.codigo) {
     console.log('Navigating to SubprocessoCadastro with params:', params); // ADD THIS
     router.push({name: 'SubprocessoCadastro', params}); // Abre CadAtividades.vue
   } else {
