@@ -11,7 +11,7 @@ import {
     iniciarProcesso,
     loginComoChefe,
     navegarParaProcessoPorId,
-    SELETORES_CSS,
+    SELETORES,
     verificarAlerta,
     verificarAtividadeVisivel,
     verificarBotaoHistoricoAnaliseVisivel,
@@ -35,7 +35,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         await verificarAtividadeVisivel(page, nomeAtividadeIncompleta);
 
         // Tenta disponibilizar e verifica o alerta
-        await page.click(SELETORES_CSS.BTN_DISPONIBILIZAR);
+        await page.click(SELETORES.DISPONIBILIZAR);
         await verificarAlerta(page, 'Atividades Incompletas');
         await page.click('.btn-close'); // Fecha o alerta para continuar
 
@@ -43,13 +43,13 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         const nomeAtividadeCompleta = gerarNomeUnico('Atividade Completa');
         await adicionarAtividade(page, nomeAtividadeCompleta);
         await verificarAtividadeVisivel(page, nomeAtividadeCompleta);
-        const cardAtividadeCompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeCompleta });
+        const cardAtividadeCompleta = page.locator(SELETORES.CARD_ATIVIDADE, { hasText: nomeAtividadeCompleta });
         const nomeConhecimento = gerarNomeUnico('Conhecimento');
         await adicionarConhecimento(cardAtividadeCompleta, nomeConhecimento);
         await verificarConhecimentoVisivel(cardAtividadeCompleta, nomeConhecimento);
 
         // Adiciona conhecimento à atividade que estava incompleta
-        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeIncompleta });
+        const cardAtividadeIncompleta = page.locator(SELETORES.CARD_ATIVIDADE, { hasText: nomeAtividadeIncompleta });
         await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
         // Disponibiliza com sucesso
@@ -71,7 +71,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         const atividade = gerarNomeUnico('Atividade');
         const conhecimento = gerarNomeUnico('Conhecimento');
         await adicionarAtividade(page, atividade);
-        await adicionarConhecimento(page.locator(SELETORES_CSS.CARD_ATIVIDADE).first(), conhecimento);
+        await adicionarConhecimento(page.locator(SELETORES.CARD_ATIVIDADE).first(), conhecimento);
         await disponibilizarCadastro(page);
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');
 

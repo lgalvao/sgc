@@ -21,7 +21,7 @@
           :disabled="competencias.length === 0"
           class="btn btn-outline-success"
           data-testid="btn-disponibilizar-page"
-          @click="finalizarEdicao"
+          @click="abrirModalDisponibilizar"
         >
           Disponibilizar
         </button>
@@ -504,6 +504,10 @@ const competenciaParaExcluir = ref<Competencia | null>(null)
 const dataLimiteValidacao = ref('')
 const observacoesDisponibilizacao = ref('')
 const notificacaoDisponibilizacao = ref('')
+
+function abrirModalDisponibilizar() {
+  mostrarModalDisponibilizar.value = true;
+}
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;

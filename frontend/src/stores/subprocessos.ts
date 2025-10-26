@@ -3,17 +3,17 @@ import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroReques
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import { fetchSubprocessoDetalhe } from "@/services/subprocessoService";
 import {
-    aceitarRevisaoCadastro,
-    devolverRevisaoCadastro,
-    disponibilizarRevisaoCadastro,
-    fetchSubprocessoDetalhe,
-    homologarRevisaoCadastro,
-    disponibilizarCadastro,
-    devolverCadastro,
     aceitarCadastro,
-    homologarCadastro
-} from "@/services/subprocessoService";
+    aceitarRevisaoCadastro,
+    devolverCadastro,
+    devolverRevisaoCadastro,
+    disponibilizarCadastro,
+    disponibilizarRevisaoCadastro,
+    homologarCadastro,
+    homologarRevisaoCadastro
+} from "@/services/cadastroService";
 
 async function _executarAcao(
     acao: () => Promise<any>,

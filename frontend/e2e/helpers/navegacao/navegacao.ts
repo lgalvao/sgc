@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {SELETORES, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
@@ -25,7 +25,7 @@ export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
  * Navega para detalhes de um processo
  */
 export async function navegarParaDetalhesProcesso(page: Page, textoProcesso: string): Promise<void> {
-    const linhaProcesso = page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: textoProcesso}).first();
+    const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
     await linhaProcesso.click();
     await expect(page).toHaveURL(/\/processo\/\d+/);
 }
@@ -48,7 +48,7 @@ export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: 
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 
-    await page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: unidade}).first().click();
+    await page.locator(SELETORES.LINHA_TABELA).filter({hasText: unidade}).first().click();
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}`));
 
     await page.waitForSelector('[data-testid="atividades-card"]');
@@ -130,7 +130,7 @@ export async function irParaSubprocesso(page: Page, idProcesso: number, unidade:
  * Navega para detalhes de processo por texto
  */
 export async function irParaProcessoPorTexto(page: Page, textoProcesso: string): Promise<void> {
-    const linhaProcesso = page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: textoProcesso}).first();
+    const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
     await linhaProcesso.click();
     await expect(page).toHaveURL(/\/processo\/\d+/);
 }
@@ -181,7 +181,7 @@ export async function verificarNavegacaoPaginaDetalhesProcesso(page: Page): Prom
  * Clica no primeiro processo da tabela após login
  */
 export async function clicarPrimeiroProcesso(page: Page): Promise<void> {
-    await page.locator(SELETORES_CSS.LINHA_TABELA).first().click();
+    await page.locator(SELETORES.LINHA_TABELA).first().click();
 }
 
 /**

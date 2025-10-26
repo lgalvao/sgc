@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
 
@@ -28,14 +28,14 @@ export async function preencherFormularioProcesso(
     dataLimite?: string,
     sticChecked: boolean = false
 ): Promise<void> {
-    await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, descricao);
-    await page.selectOption(SELETORES_CSS.CAMPO_TIPO, tipo);
+    await page.fill(SELETORES.CAMPO_DESCRICAO, descricao);
+    await page.selectOption(SELETORES.CAMPO_TIPO, tipo);
 
     if (dataLimite) {
-        await page.fill(SELETORES_CSS.CAMPO_DATA_LIMITE, dataLimite);
+        await page.fill(SELETORES.CAMPO_DATA_LIMITE, dataLimite);
     }
     if (sticChecked) {
-        await page.check(SELETORES_CSS.CHECKBOX_STIC);
+        await page.check(SELETORES.CHECKBOX_STIC);
     }
 }
 
@@ -115,7 +115,7 @@ export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso:
  * Editar descrição de processo existente
  */
 export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
-    await page.fill(SELETORES_CSS.CAMPO_DESCRICAO, novaDescricao);
+    await page.fill(SELETORES.CAMPO_DESCRICAO, novaDescricao);
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
 }
 
@@ -144,14 +144,14 @@ export async function clicarBotaoFinalizarProcesso(page: Page): Promise<void> {
  */
 export async function abrirModalFinalizacaoProcesso(page: Page): Promise<void> {
     await clicarBotaoFinalizarProcesso(page);
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
 }
 
 /**
  * Confirma a finalização no modal aberto.
  */
 export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
 
@@ -168,7 +168,7 @@ export async function finalizarProcesso(page: Page): Promise<void> {
  */
 export async function disponibilizarCadastro(page: Page): Promise<void> {
     await page.click(`button:has-text("${TEXTOS.DISPONIBILIZAR}")`);
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
     await page.click(`button:has-text("${TEXTOS.CONFIRMAR}")`);
 }
 
@@ -177,7 +177,7 @@ export async function disponibilizarCadastro(page: Page): Promise<void> {
  */
 export async function devolverParaAjustes(page: Page, observacao?: string): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.DEVOLVER}).click();
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
@@ -209,7 +209,7 @@ export async function devolverCadastro(page: Page, processo: {
 export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
     await clicarElemento([page.getByRole('button', {name: 'Registrar aceite'}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
 
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
@@ -223,7 +223,7 @@ export async function aceitarCadastro(page: Page, observacao?: string): Promise<
  * Registra o aceite da revisão do cadastro, preenchendo a observação se fornecida.
  */
 export async function registrarAceiteRevisao(page: Page, observacao?: string): Promise<void> {
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
 
     await page.getByRole('button', {name: TEXTOS.REGISTRAR_ACEITE}).click();
     await expect(modal).toBeVisible();
@@ -251,7 +251,7 @@ export async function registrarAceiteRevisao(page: Page, observacao?: string): P
 export async function homologarCadastro(page: Page, observacao?: string): Promise<void> {
     await clicarElemento([page.getByRole('button', {name: TEXTOS.HOMOLOGAR}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
 
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
 
     if (observacao) {
@@ -285,7 +285,7 @@ export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): 
  */
 export async function iniciarProcesso(page: Page): Promise<void> {
     await clicarBotaoIniciarProcesso(page);
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }
@@ -295,7 +295,7 @@ export async function iniciarProcesso(page: Page): Promise<void> {
  */
 export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
     await modal.getByRole('button', {name: TEXTOS.CONFIRMAR}).click();
 }

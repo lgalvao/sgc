@@ -41,12 +41,15 @@ npm run test:unit
 
 ### Testes E2E
 
-Para executar os testes end-to-end (E2E) do frontend, primeiro garanta que o backend está em execução.
-Depois navegue até o diretório `frontend` e use o seguinte comando:
+A suíte de testes E2E foi configurada para gerenciar automaticamente o ciclo de vida do servidor backend. O Playwright irá iniciar uma instância do backend com um perfil de teste (`jules`) antes de executar os testes e irá desligá-lo ao final.
+
+Para executar todos os testes E2E, navegue até o diretório `frontend` e use o seguinte comando:
 
 ```bash
-npm run test:e2e
+npx playwright test
 ```
+
+**Importante:** Não é mais necessário iniciar o backend manualmente. A configuração do Playwright (`playwright.config.ts`) se encarrega disso. Se você encontrar problemas de porta em uso, certifique-se de que nenhuma outra instância do backend esteja rodando.
 
 ## Informações Gerais do Backend
 

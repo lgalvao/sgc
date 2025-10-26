@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 10
+      min-spare: 2
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  devtools:
+    restart:
+      enabled: false
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN

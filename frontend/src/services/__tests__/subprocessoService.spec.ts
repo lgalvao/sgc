@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import * as subprocessoService from '@/services/subprocessoService';
 import apiClient from '@/axios-setup';
@@ -39,7 +40,7 @@ describe('subprocessoService', () => {
     });
 
     describe('Competencia Actions', () => {
-        const mockCompetencia: Competencia = { codigo: 1, descricao: 'Teste' };
+        const mockCompetencia: Competencia = { codigo: 1, descricao: 'Teste', atividadesAssociadas: [] };
         const mockMapaCompleto = { id: 1, competencias: [mockCompetencia] };
 
         beforeEach(() => {

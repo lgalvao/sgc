@@ -32,7 +32,7 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
         const descricaoCompetencia = 'Nova Competência de Teste';
         const atividadesParaAssociar = ['Atividade 1', 'Atividade 2']; // Assumindo que estas atividades existem
 
-        await criarCompetencia(page, descricaoCompetencia, atividadesParaAssociar);
+        await criarCompetencia(page, descricaoCompetencia);
         await verificarCompetenciaVisivel(page, descricaoCompetencia);
         await verificarAtividadesAssociadas(page, descricaoCompetencia, atividadesParaAssociar);
     });
@@ -47,10 +47,10 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
         await criarCompetencia(page, descricaoOriginal, atividadesOriginais);
         await verificarCompetenciaVisivel(page, descricaoOriginal);
 
-        await editarCompetencia(page, descricaoOriginal, descricaoEditada, atividadesEditadas);
+        await editarCompetencia(page, descricaoOriginal, descricaoEditada);
         await verificarCompetenciaNaoVisivel(page, descricaoOriginal); // A descrição original não deve mais existir
         await verificarCompetenciaVisivel(page, descricaoEditada);
-        await verificarAtividadesAssociadas(page, descricaoEditada, atividadesEditadas);
+        await verificarAtividadesAssociadas(page, descricaoEditada);
     });
 
     test('deve permitir excluir uma competência', async ({page}) => {

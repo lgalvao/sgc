@@ -98,5 +98,6 @@ export {
     verificarCompetenciaNaoVisivel,
     verificarListagemAtividadesEConhecimentos,
     verificarModoSomenteLeitura,
-    verificarCabecalhoUnidade
+    verificarCabecalhoUnidade,
+    verificarAtividadesAssociadas
 } from './verificacoes-ui';

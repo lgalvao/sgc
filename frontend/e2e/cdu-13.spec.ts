@@ -23,7 +23,7 @@ import {
     gerarNomeUnico,
     navegarParaProcessoPorId,
     clicarUnidadeNaTabelaDetalhes,
-    SELETORES_CSS,
+    SELETORES,
     navegarParaCadastroAtividades
 } from './helpers';
 
@@ -41,7 +41,7 @@ test.describe('CDU-13: Analisar cadastro de atividades e conhecimentos', () => {
         await navegarParaCadastroAtividades(page, processo.processo.codigo, SIGLA_STIC);
         const nomeAtividade = gerarNomeUnico('Atividade CDU-13');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, gerarNomeUnico('Conhecimento CDU-13'));
         await disponibilizarCadastro(page);
     });

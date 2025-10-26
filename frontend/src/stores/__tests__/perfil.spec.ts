@@ -82,7 +82,7 @@ describe('usePerfilStore', () => {
         });
 
         it('loginCompleto should authenticate, fetch profiles, and auto-select if one profile', async () => {
-            const perfilUnidade = { perfil: Perfil.CHEFE, unidade: { codigo: 1, sigla: 'UT', nome: 'Unidade UT' } };
+            const perfilUnidade = { perfil: Perfil.CHEFE, unidade: { codigo: 1, sigla: 'UT', nome: 'Unidade UT' }, siglaUnidade: 'UT' };
             const mockLoginResponse = { perfil: Perfil.CHEFE, unidadeCodigo: 1, tituloEleitoral: 123, token: 'fake-token' };
 
             mockUsuarioService.autenticar.mockResolvedValue(true);
@@ -111,7 +111,7 @@ describe('usePerfilStore', () => {
         });
 
         it('selecionarPerfilUnidade should call entrar and set profile', async () => {
-            const perfilUnidade = { perfil: Perfil.GESTOR, unidade: { codigo: 2, sigla: 'XYZ', nome: 'Unidade XYZ' } };
+            const perfilUnidade = { perfil: Perfil.GESTOR, unidade: { codigo: 2, sigla: 'XYZ', nome: 'Unidade XYZ' }, siglaUnidade: 'XYZ' };
             const mockLoginResponse = { perfil: Perfil.GESTOR, unidadeCodigo: 2, tituloEleitoral: 456, token: 'fake-token' };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 

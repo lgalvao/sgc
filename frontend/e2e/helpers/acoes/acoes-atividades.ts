@@ -1,5 +1,5 @@
 import {Locator, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS} from '../dados';
+import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
 
 // ==================================================================
@@ -10,7 +10,7 @@ import {clicarElemento, preencherCampo} from '../utils';
  * Retorna o locator de um card de atividade pelo nome.
  */
 function obterCardAtividade(page: Page, nomeAtividade: string): Locator {
-    return page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+    return page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
 }
 
 /**
@@ -18,7 +18,7 @@ function obterCardAtividade(page: Page, nomeAtividade: string): Locator {
  */
 function obterLinhaConhecimento(page: Page, nomeAtividade: string, nomeConhecimento: string): Locator {
     const card = obterCardAtividade(page, nomeAtividade);
-    return card.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento});
+    return card.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento});
 }
 
 // ==================================================================
@@ -46,7 +46,7 @@ export async function adicionarConhecimento(cardAtividade: Locator, nomeConhecim
  * Útil para cenários de teste que precisam apenas gerar um impacto, sem se importar com a atividade específica.
  */
 export async function adicionarConhecimentoPrimeiraAtividade(page: Page, nomeConhecimento: string): Promise<void> {
-    const primeiroCard = page.locator(SELETORES_CSS.CARD_ATIVIDADE).first();
+    const primeiroCard = page.locator(SELETORES.CARD_ATIVIDADE).first();
     await adicionarConhecimento(primeiroCard, nomeConhecimento);
 }
 
@@ -217,7 +217,7 @@ export async function preencherDataModal(page: Page, dataLimite: string): Promis
             modal.getByTestId(SELETORES.INPUT_DATA_LIMITE),
             modal.locator('#dataLimite'),
             modal.getByLabel(/data/i),
-            page.locator(SELETORES_CSS.CAMPO_DATA_LIMITE),
+            page.locator(SELETORES.CAMPO_DATA_LIMITE),
         ],
         dataLimite
     );

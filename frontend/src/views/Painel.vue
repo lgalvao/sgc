@@ -120,33 +120,32 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   }
 }
 
-const alertasFormatados = computed(() => {
+const alertasFormatados = computed((): AlertaFormatado[] => {
   return alertas.value.map(alerta => {
+    const partes = alerta.mensagem.split(' ');
     return {
-      codigo: alerta.codigo,
-      dataHora: new Date(alerta.dataHora), 
-      processoCodigo: alerta.processoCodigo,
-      unidadeOrigemCodigo: alerta.unidadeOrigemCodigo,
-      descricao: alerta.descricao,
-      dataFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
+      ...alerta,
+      dataHoraFormatada: formatDateTimeBR(new Date(alerta.data)),
+      origem: partes[0],
+      processo: partes[2],
     };
   });
 });
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
-const alertaCriterio = ref<'dataHora' | 'processoCodigo'>('dataHora');
+const alertaCriterio = ref<'data' | 'processo'>('data');
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 
 const alertasOrdenados = computed(() => {
   const lista = [...alertasFormatados.value];
   return lista.sort((a, b) => {
-    if (alertaCriterio.value === 'dataHora') {
-      const da = a.dataHora.getTime();
-      const db = b.dataHora.getTime();
+    if (alertaCriterio.value === 'data') {
+      const da = new Date(a.data).getTime();
+      const db = new Date(b.data).getTime();
       return alertaAsc.value ? da - db : db - da;
     } else {
-      const pa = (a.processoCodigo || '').toString().toLowerCase();
-      const pb = (b.processoCodigo || '').toString().toLowerCase();
+      const pa = (a.processo || '').toString().toLowerCase();
+      const pb = (b.processo || '').toString().toLowerCase();
       if (pa < pb) return alertaAsc.value ? -1 : 1;
       if (pa > pb) return alertaAsc.value ? 1 : -1;
       return 0;
@@ -156,17 +155,17 @@ const alertasOrdenados = computed(() => {
 
 function ordenarAlertasPor(campo: 'data' | 'processo') {
     if (campo === 'data') {
-        if (alertaCriterio.value === 'dataHora') {
+        if (alertaCriterio.value === 'data') {
             alertaAsc.value = !alertaAsc.value;
         } else {
-            alertaCriterio.value = 'dataHora';
+            alertaCriterio.value = 'data';
             alertaAsc.value = false;
         }
     } else {
-        if (alertaCriterio.value === 'processoCodigo') {
+        if (alertaCriterio.value === 'processo') {
             alertaAsc.value = !alertaAsc.value;
         } else {
-            alertaCriterio.value = 'processoCodigo';
+            alertaCriterio.value = 'processo';
             alertaAsc.value = true;
         }
     }

@@ -45,6 +45,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.spec.ts",
     "src/**/*.d.ts",
     "src/**/*.vue",
     "spec/**/*.ts",

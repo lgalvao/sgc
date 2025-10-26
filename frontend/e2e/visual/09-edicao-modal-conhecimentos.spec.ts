@@ -7,7 +7,6 @@ import {
     loginComoChefe,
     navegarParaCadastroAtividades,
     SELETORES,
-    SELETORES_CSS
 } from "~/helpers";
 
 test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conhecimentos', () => {
@@ -34,7 +33,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         await page.screenshot({path: 'screenshots/30-03-atividade-criada.png', fullPage: true});
 
         // Adicionar conhecimento
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         const nomeConhecimento = gerarNomeUnico('Conhecimento Visual Test');
         await cardAtividade.locator('[data-testid="input-novo-conhecimento"]').fill(nomeConhecimento);
 
@@ -55,11 +54,11 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade e conhecimento para teste
         const nomeAtividade = gerarNomeUnico('Atividade Hover Test');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, 'Conhecimento Hover Test');
 
         // Hover no conhecimento para mostrar botões de ação
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Hover Test'});
+        const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Hover Test'});
         await linhaConhecimento.hover();
         await page.waitForTimeout(500);
 
@@ -82,11 +81,11 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade e conhecimento
         const nomeAtividade = gerarNomeUnico('Atividade Modal Test');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, 'Conhecimento Original');
 
         // Hover e clicar em editar
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Original'});
+        const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Original'});
         await linhaConhecimento.hover();
         await page.waitForTimeout(500);
         await linhaConhecimento.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -122,11 +121,11 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade e conhecimento
         const nomeAtividade = gerarNomeUnico('Atividade Validacao Test');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, 'Conhecimento Validacao');
 
         // Abrir modal
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Validacao'});
+        const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Validacao'});
         await linhaConhecimento.hover();
         await page.waitForTimeout(500);
         await linhaConhecimento.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -164,7 +163,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar primeira atividade com múltiplos conhecimentos
         const atividade1 = gerarNomeUnico('Desenvolvimento de Software');
         await adicionarAtividade(page, atividade1);
-        const card1 = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: atividade1});
+        const card1 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade1});
         await adicionarConhecimento(card1, 'JavaScript/TypeScript');
         await adicionarConhecimento(card1, 'Vue.js Framework');
         await adicionarConhecimento(card1, 'Testes Automatizados');
@@ -172,14 +171,14 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar segunda atividade com conhecimentos
         const atividade2 = gerarNomeUnico('Análise de Sistemas');
         await adicionarAtividade(page, atividade2);
-        const card2 = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: atividade2});
+        const card2 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade2});
         await adicionarConhecimento(card2, 'Levantamento de Requisitos');
         await adicionarConhecimento(card2, 'Modelagem de Processos');
 
         // Criar terceira atividade
         const atividade3 = gerarNomeUnico('Gestão de Projetos');
         await adicionarAtividade(page, atividade3);
-        const card3 = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: atividade3});
+        const card3 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade3});
         await adicionarConhecimento(card3, 'Metodologias Ágeis');
         await adicionarConhecimento(card3, 'Ferramentas de Gestão');
         await adicionarConhecimento(card3, 'Liderança de Equipes');
@@ -204,7 +203,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade com conhecimentos
         const nomeAtividade = gerarNomeUnico('Atividade Edicao Multipla');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
 
         // Adicionar múltiplos conhecimentos
         await adicionarConhecimento(cardAtividade, 'Conhecimento A');
@@ -215,7 +214,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         await page.screenshot({path: 'screenshots/35-01-multiplos-conhecimentos-inicial.png', fullPage: true});
 
         // Editar primeiro conhecimento
-        const conhecimentoA = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento A'});
+        const conhecimentoA = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento A'});
         await conhecimentoA.hover();
         await page.waitForTimeout(500);
         await conhecimentoA.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -228,7 +227,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         await page.getByTestId('input-conhecimento-modal').waitFor({state: 'hidden'});
 
         // Editar segundo conhecimento
-        const conhecimentoB = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento B'});
+        const conhecimentoB = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento B'});
         await conhecimentoB.hover();
         await page.waitForTimeout(500);
         await conhecimentoB.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -251,11 +250,11 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade e conhecimento
         const nomeAtividade = gerarNomeUnico('Atividade Keyboard Test');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, 'Conhecimento Keyboard');
 
         // Abrir modal
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Keyboard'});
+        const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Keyboard'});
         await linhaConhecimento.hover();
         await page.waitForTimeout(500);
         await linhaConhecimento.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -276,7 +275,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         await page.screenshot({path: 'screenshots/36-02-resultado-ctrl-enter.png', fullPage: true});
 
         // Testar cancelamento via ESC - usar elemento recém editado
-        const linhaConhecimentoAtualizada = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO).first();
+        const linhaConhecimentoAtualizada = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO).first();
         await linhaConhecimentoAtualizada.hover();
         await page.waitForTimeout(500);
         await linhaConhecimentoAtualizada.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO).click({force: true});
@@ -303,11 +302,11 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar atividade e conhecimento
         const nomeAtividade = gerarNomeUnico('Demo Nova Interface');
         await adicionarAtividade(page, nomeAtividade);
-        const cardAtividade = page.locator(SELETORES_CSS.CARD_ATIVIDADE, {hasText: nomeAtividade});
+        const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
         await adicionarConhecimento(cardAtividade, 'Conhecimento com Nova Interface');
 
         // Mostrar hover state (botões aparecem)
-        const linhaConhecimento = cardAtividade.locator(SELETORES_CSS.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento com Nova Interface'});
+        const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento com Nova Interface'});
         await linhaConhecimento.hover();
 
         // Capturar nova interface com botões visíveis
