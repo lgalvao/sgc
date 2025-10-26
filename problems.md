@@ -1,19 +1,35 @@
-# Problemas Atuais
+# Known Issues
 
-## 1. Falha na Inicialização do Backend
+## E2E Test Environment Instability
 
-O servidor backend não está iniciando com o perfil `local`, o que impede a verificação E2E e o desenvolvimento frontend. A causa raiz parece ser um `BeanCreationException` durante a execução do script `data.sql`.
+### Description
 
-### Histórico de Erros e Correções:
+The end-to-end test suite is currently unstable and fails to run reliably. While significant progress has been made in fixing the backend startup process, the Playwright tests still fail to execute.
 
-1.  **`JwtMockFilter` ausente**: O `SecurityConfig` tinha uma dependência de um `JwtMockFilter` que só existia nos perfis `e2e` e `test`. Isso foi corrigido removendo a dependência do filtro e o próprio arquivo `JwtMockFilter.java`, que se tornou obsoleto após a refatoração dos testes E2E.
-2.  **Violação de Constraint (Check)**: O `data.sql` continha um erro de digitação no tipo de uma unidade (`INTERMEDIaria` em vez de `INTERMEDIARIA`), causando uma falha de constraint. Isso foi corrigido.
-3.  **Violação de Constraint (Integridade Referencial)**: O `data.sql` tinha uma ordem incorreta de `INSERT`s, onde uma unidade filha era inserida antes de sua unidade pai. A ordem foi corrigida.
+### Investigation and Fixes Implemented
 
-### Situação Atual:
+1.  **Backend Startup Failures (FIXED):**
+    *   **Initial `NullPointerException`:** The backend was failing to start due to a `NullPointerException` in `ProcessoSeguranca`. This was caused by the main `SecurityConfig.java` being disabled during tests via a `@Profile("!test")` annotation, which prevented method-level security from being initialized.
+    *   **Resolution:** The `@Profile("!test")` annotation was removed and `@EnableMethodSecurity(prePostEnabled = true)` was added to `SecurityConfig.java`. A dedicated `TestSecurityConfig.java` was also created and correctly applied using the `jules` profile to provide a stable security context for tests.
 
-Mesmo após as correções acima, o backend ainda falha ao iniciar, e o script de verificação do Playwright não consegue fazer login. A investigação foi interrompida e precisa ser retomada a partir da análise do último log de erro do backend para identificar a próxima falha no `data.sql` ou em outra parte da configuração.
+2.  **Incorrect JVM Arguments (FIXED):**
+    *   **Issue:** The `bootRun` task in `backend/build.gradle.kts` was using an incorrect flag (`-Djdk.internal.vm.debug=release`) to enable Java 21 preview features, causing a silent startup hang.
+    *   **Resolution:** The flag was corrected to `--enable-preview`.
 
-## 2. Bloqueio na Verificação Frontend
+3.  **Database Initialization Conflicts (FIXED):**
+    *   **Issue:** The `application-local.yml` was configured to use both Hibernate's `create-drop` and Spring's `always` initialize, which could cause race conditions.
+    *   **Resolution:** `spring.sql.init.mode` was set to `never` in the `local` and `jules` profiles, making Hibernate solely responsible for schema management.
 
-Devido à falha do backend, o script de verificação do Playwright não consegue executar o fluxo de login com sucesso, bloqueando a etapa de verificação visual das alterações.
+4.  **Playwright Configuration (FIXED):**
+    *   **Issue:** The `playwright.config.ts` was pointing to an incorrect backend port, using a non-existent Spring profile (`jules` instead of `local`), and had an excessively long timeout.
+    *   **Resolution:** The configuration was corrected to use the `local` profile, point to the correct frontend dev server URL (`http://localhost:5173`), and the timeout was reduced.
+
+### Current Status: E2E Tests Still Failing
+
+Despite the backend now starting reliably, the E2E tests (`npm run test:e2e`) still fail. The exact cause is unclear, but the remaining possibilities include:
+
+*   **Data Inconsistency:** A mismatch may still exist between the test users defined in `frontend/e2e/helpers/dados/constantes-teste.ts` and the seed data in `backend/src/main/resources/data.sql`.
+*   **Test Logic/Timing:** The tests themselves may have race conditions or incorrect assumptions about the application's state. An attempt to add an explicit `waitFor` in `cdu-01.spec.ts` did not resolve the issue for that specific test.
+*   **Environment-Specific Issues:** There may be a deeper, undiscovered issue within the provided test environment that prevents Playwright from interacting correctly with the browser or the application.
+
+The E2E tests remain blocked. The next recommended step is a thorough, manual review of the `cdu-01.spec.ts` test logic and a careful, line-by-line comparison of the user data in the test constants and the database seed script.

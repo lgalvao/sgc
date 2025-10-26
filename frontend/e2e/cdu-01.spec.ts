@@ -26,8 +26,11 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
       await page.getByTestId('input-senha').fill(USUARIOS.MULTI_PERFIL.senha);
       await page.getByTestId('botao-entrar').click();
 
-      await expect(page.getByText('Selecione o perfil e a unidade')).toBeVisible();
+      // Adiciona espera explícita para o seletor de perfil
       const seletor = page.getByTestId('select-perfil-unidade');
+      await seletor.waitFor({ state: 'visible', timeout: 5000 });
+
+      await expect(page.getByText('Selecione o perfil e a unidade')).toBeVisible();
       await expect(seletor).toBeVisible();
 
       await seletor.selectOption({ label: 'ADMIN - STIC' });

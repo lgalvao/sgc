@@ -52,18 +52,18 @@ export default defineConfig({
         },
     ],
 
-    // Let Playwright manage the backend lifecycle
+    // Let Playwright manage the frontend dev server lifecycle
     webServer: {
-        command: 'cd /app && JAVA_OPTS="-Xmx512m -Xms256m" ./gradlew :backend:bootRun -PwithFrontend=true --args="--spring.profiles.active=jules"',
-        url: 'http://localhost:8080/actuator/health',
-        timeout: 120000, // 2 minutes for Spring Boot to start
-        reuseExistingServer: false,
+        command: 'npm run dev',
+        url: 'http://localhost:5173',
+        timeout: 60000, // 1 minute for Vite to start
+        reuseExistingServer: !process.env.CI,
         stdout: 'pipe',
         stderr: 'pipe',
     },
 
     use: {
-        baseURL: 'http://localhost:8080',
+        baseURL: 'http://localhost:5173',
         trace: 'off', // Disable tracing to save resources
         video: 'off', // Disable video recording
         screenshot: 'only-on-failure',
