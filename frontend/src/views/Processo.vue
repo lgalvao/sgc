@@ -120,7 +120,7 @@ const subprocessosElegiveis = computed(() => {
   if (!idProcesso.value || !processo.value) return []
 
   if (perfilStore.perfilSelecionado === 'GESTOR') {
-    return processosStore.getSubprocessosElegiveisAceiteBloco(idProcesso.value, perfilStore.unidadeSelecionada || '');
+    return processosStore.getSubprocessosElegiveisAceiteBloco(idProcesso.value, String(perfilStore.unidadeSelecionada) || '');
   } else if (perfilStore.perfilSelecionado === 'ADMIN') {
     return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value);
   }

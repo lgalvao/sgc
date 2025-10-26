@@ -201,7 +201,6 @@ export interface Alerta {
     unidadeDestino: Unidade;
     usuarioDestino: Servidor;
     descricao: string;
-    lido: boolean;
 }
 
 export interface AlertaFormatado {
@@ -212,7 +211,6 @@ export interface AlertaFormatado {
     unidadeDestino: Unidade;
     usuarioDestino: Servidor;
     descricao: string;
-    lido: boolean;
     dataHoraFormatada: string;
     origem: string;
     mensagem: string;
