@@ -39,25 +39,37 @@ Para executar os testes de unidade do frontend, navegue até o diretório `front
 npm run test:unit
 ```
 
-### Testes E2E
+### Testes E2E (End-to-End)
 
-A suíte de testes E2E é totalmente automatizada. A configuração do Playwright (`playwright.config.ts`) é responsável por:
+**IMPORTANTE: A execução dos testes E2E requer uma configuração específica.**
 
-1.  **Construir o frontend:** Instala as dependências (`npm install`), compila os artefatos (`npm run build`).
-2.  **Copiar os artefatos:** Copia os arquivos estáticos do frontend para o diretório de recursos do backend.
-3.  **Iniciar o backend:** Inicia o servidor Spring Boot com um perfil de teste otimizado (`jules`).
-4.  **Executar os testes:** Executa a suíte de testes do Playwright.
-5.  **Parar o backend:** Desliga o servidor Spring Boot após a conclusão dos testes.
+A suíte de testes E2E usa o Playwright para interagir com a aplicação. A configuração do Playwright (`playwright.config.ts`) é responsável por iniciar o servidor de desenvolvimento do **frontend** (`npm run dev`), mas **NÃO** gerencia o ciclo de vida do backend.
 
-**Execução:**
+**Procedimento para Execução Correta:**
 
-Para executar todos os testes E2E, navegue até o diretório `frontend` e use o seguinte comando:
+1.  **Inicie o Backend Manualmente:** Antes de rodar os testes, você **deve** iniciar o servidor backend em um terminal separado. Use o perfil `jules`, que é configurado para o ambiente de teste.
 
-```bash
-npm run test:e2e
-```
+    ```bash
+    cd /app
+    ./gradlew :backend:bootRun --args='--spring.profiles.active=jules' > backend.log 2>&1 &
+    ```
 
-**Importante:** A configuração do Playwright (`playwright.config.ts`) se encarrega de iniciar e parar o backend. Se você encontrar problemas de porta em uso, certifique-se de que nenhuma outra instância do backend esteja rodando antes de iniciar os testes.
+2.  **Verifique se o Backend Iniciou:** Aguarde alguns segundos e verifique o `backend.log` para confirmar que o servidor iniciou com sucesso (procure pela mensagem "Started Sgc").
+
+3.  **Execute os Testes E2E:** Com o backend rodando, navegue até o diretório `frontend` e execute o comando do Playwright.
+
+    ```bash
+    cd /app/frontend
+    npm run test:e2e
+    ```
+
+4.  **Pare o Backend Manualmente:** Após a conclusão dos testes, lembre-se de parar o processo do backend que você iniciou.
+
+    ```bash
+    kill %1
+    ```
+
+**Resumo:** O Playwright cuida do frontend, mas o backend precisa ser gerenciado manualmente. Tentar configurar o Playwright para gerenciar ambos os servidores provou ser instável e leva a timeouts.
 
 ## Informações Gerais do Backend
 
