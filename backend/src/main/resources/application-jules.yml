@@ -4,6 +4,7 @@ server:
     threads:
       max: 10
       min-spare: 2
+
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS SGC
@@ -15,7 +16,14 @@ spring:
   devtools:
     restart:
       enabled: false
+
 logging:
   level:
     root: WARN
     org.springframework: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

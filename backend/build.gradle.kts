@@ -21,6 +21,7 @@ extra["lombok.version"] = "1.18.42"
 
 dependencies {
     // Spring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
