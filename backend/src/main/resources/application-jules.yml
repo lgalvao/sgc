@@ -1,17 +1,24 @@
+# Configurações otimizadas para testes E2E executados por agentes de IA (como Jules)
 server:
-  port: 8080
-  tomcat:
-    threads:
-      max: 10
-      min-spare: 2
+  port: 10000
+  shutdown: graceful
+  error:
+    include-exception: false
+    include-stacktrace: never
+    whitelabel:
+      enabled: false
 
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS SGC
-    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:sgcdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+    defer-datasource-initialization: true
     show-sql: false
   sql:
     init:
@@ -19,14 +26,3 @@ spring:
   devtools:
     restart:
       enabled: false
-
-logging:
-  level:
-    root: WARN
-    org.springframework: WARN
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
