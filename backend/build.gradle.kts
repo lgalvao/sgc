@@ -91,6 +91,7 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     forkEvery = 100L
     jvmArgs = listOf(
+        "--enable-preview",
         "-Xmx4g",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
@@ -254,6 +255,7 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
 }
 
