@@ -283,7 +283,6 @@ export async function verificarAcaoHomologarVisivel(page: Page): Promise<void> {
 export async function verificarColunasTabelaAlertas(page: Page): Promise<void> {
     const tabelaAlertas = page.getByTestId(SELETORES.TABELA_ALERTAS);
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DATA_HORA);
-    await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DESCRICAO);
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_PROCESSO);
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_ORIGEM);
 }

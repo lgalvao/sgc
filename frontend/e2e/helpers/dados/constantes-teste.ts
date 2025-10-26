@@ -50,7 +50,6 @@ export const SELETORES = {
   BTN_REMOVER_ATIVIDADE: 'btn-remover-atividade',
   INPUT_EDITAR_ATIVIDADE: 'input-editar-atividade',
   BTN_SALVAR_EDICAO_ATIVIDADE: 'btn-salvar-edicao-atividade',
-  BTN_CANCELAR_EDICAO_ATIVITUDE: 'btn-cancelar-edicao-atividade',
   BTN_CANCELAR_EDICAO_ATIVIDADE: 'btn-cancelar-edicao-atividade',
 
   // Conhecimentos

@@ -61,7 +61,7 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
     test('deve permitir criação de competências', async ({page}) => {
         await navegarParaMapaRevisao(page);
         const nome = 'Competência CDU-16';
-        await criarCompetencia(page, nome);
+        await criarCompetencia(page, nome, []);
 
         await verificarCompetenciaVisivel(page, nome);
         await esperarElementoVisivel(page, SELETORES.EDITAR_COMPETENCIA);
@@ -73,8 +73,8 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
         const competenciaEditada = 'Competência Editada';
 
         await navegarParaMapaRevisao(page);
-        await criarCompetencia(page, competenciaOriginal);
-        await editarCompetencia(page, competenciaOriginal, competenciaEditada);
+        await criarCompetencia(page, competenciaOriginal, []);
+        await editarCompetencia(page, competenciaOriginal, competenciaEditada, []);
 
         await verificarCompetenciaVisivel(page, competenciaEditada);
         await verificarCompetenciaNaoVisivel(page, competenciaOriginal);
@@ -84,7 +84,7 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
         const nome = 'Competência para Excluir';
 
         await navegarParaMapaRevisao(page);
-        await criarCompetencia(page, nome);
+        await criarCompetencia(page, nome, []);
 
         await excluirCompetencia(page, nome);
         await verificarCompetenciaNaoVisivel(page, nome);
@@ -92,14 +92,14 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
 
     test('deve validar associação de todas as atividades', async ({page}) => {
         await navegarParaMapaRevisao(page);
-        await criarCompetencia(page, 'Competência Parcial');
+        await criarCompetencia(page, 'Competência Parcial', []);
         await disponibilizarMapaComData(page, '2025-12-31');
         await verificarDisponibilizacaoConcluida(page);
     });
 
     test('deve integrar com disponibilização de mapa', async ({page}) => {
         await navegarParaMapaRevisao(page);
-        await criarCompetencia(page, 'Competência Completa');
+        await criarCompetencia(page, 'Competência Completa', []);
         await disponibilizarMapaComData(page, '2025-12-31', 'Mapa ajustado conforme revisão');
         await verificarCompetenciaVisivel(page, 'Competência Completa');
     });

@@ -674,7 +674,6 @@ function disponibilizarMapa() {
 
     // Registrar movimentação
     processosStore.addMovement({
-      usuario: `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`,
       unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'

@@ -53,7 +53,7 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {MapaCompleto, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
+import {type Movimentacao, MapaCompleto, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
@@ -124,7 +124,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 
 const titularDetalhes = computed<Servidor | null>(() => {
   if (unidadeComResponsavelDinamico.value && unidadeComResponsavelDinamico.value.idServidorTitular) {
-    return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.idServidorTitular) || null;
+    return servidoresStore.getServidorById(Number(unidadeComResponsavelDinamico.value.idServidorTitular)) || null;
   }
   return null;
 });
@@ -145,7 +145,7 @@ const idSubprocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
   if (idSubprocesso.value) {
-    await mapaStore.fetchMapaCompleto(idSubprocesso.value as number);
+    await mapaStore.fetchMapaCompleto(idSubprocesso.value);
   }
 });
 
@@ -193,7 +193,6 @@ const dataLimiteAtual = computed<Date>(() => {
 });
 
 // Computed properties movidos para os componentes específicos
-
 const movements = computed<Movimentacao[]>(() => {
   if (!SubprocessoDetalhes.value) return [];
   return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.codigo);

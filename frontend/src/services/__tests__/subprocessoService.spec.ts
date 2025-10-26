@@ -44,7 +44,7 @@ describe('subprocessoService', () => {
         const mockMapaCompleto = { id: 1, competencias: [mockCompetencia] };
 
         beforeEach(() => {
-            (mapMapaCompletoDtoToModel as vi.Mock).mockReturnValue(mockMapaCompleto);
+            (mapMapaCompletoDtoToModel as Mocked<any>).mockReturnValue(mockMapaCompleto);
         });
 
         it('adicionarCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {

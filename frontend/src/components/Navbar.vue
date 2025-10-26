@@ -139,7 +139,7 @@ const profileSelect = ref<HTMLSelectElement | null>(null);
 
 const perfisDisponiveis = computed(() => {
   return servidoresStore.servidores.flatMap(servidor => {
-    const pares = getPerfisDoServidor(servidor.codigo);
+    const pares = getPerfisDoServidor(Number(servidor.codigo));
     return pares.map(par => ({
       id: `${servidor.codigo}-${par.perfil}-${par.unidade.sigla}`,
       servidorId: servidor.codigo,

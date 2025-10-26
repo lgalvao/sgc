@@ -122,13 +122,16 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
 
 const alertasFormatados = computed((): AlertaFormatado[] => {
   return alertas.value.map(alerta => {
-    const partes = alerta.mensagem.split(' ');
+    const partes = alerta.descricao.split(' ');
     return {
       ...alerta,
-      dataHoraFormatada: formatDateTimeBR(new Date(alerta.data)),
+      mensagem: alerta.descricao,
+      data: alerta.dataHora,
+      lido: alerta.lido,
+      dataHoraFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
       origem: partes[0],
       processo: partes[2],
-    };
+    } as AlertaFormatado;
   });
 });
 
@@ -140,8 +143,8 @@ const alertasOrdenados = computed(() => {
   const lista = [...alertasFormatados.value];
   return lista.sort((a, b) => {
     if (alertaCriterio.value === 'data') {
-      const da = new Date(a.data).getTime();
-      const db = new Date(b.data).getTime();
+      const da = new Date(a.dataHora).getTime();
+      const db = new Date(b.dataHora).getTime();
       return alertaAsc.value ? da - db : db - da;
     } else {
       const pa = (a.processo || '').toString().toLowerCase();

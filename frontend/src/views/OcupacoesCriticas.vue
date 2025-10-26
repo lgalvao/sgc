@@ -312,7 +312,8 @@ function confirmarFinalizacao() {
   if (subprocesso && unidade.value) {
     const usuario = `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`;
     processosStore.addMovement({
-      usuario: usuario,
+      subprocesso: subprocesso,
+      usuario: perfilStore.servidorLogado,
       unidadeOrigem: unidade.value,
       unidadeDestino: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       descricao: 'Identificação de ocupações críticas finalizada'
