@@ -1,11 +1,8 @@
-import {Page} from '@playwright/test';
 import {vueTest as test} from './support/vue-specific-setup';
 import {
     disponibilizarCadastro,
     criarCompetencia,
     esperarTextoVisivel,
-    loginComoAdmin,
-    SELETORES,
     TEXTOS,
     verificarBotaoDisponibilizarHabilitado,
     verificarCampoObservacoesValor,

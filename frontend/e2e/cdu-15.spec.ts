@@ -11,9 +11,7 @@ import {
     verificarCompetenciaNaoVisivel,
     verificarAtividadesAssociadas,
     disponibilizarCadastro,
-    confirmarNoModal,
     esperarUrl,
-    verificarDescricaoCompetencia,
 } from './helpers';
 
 test.describe('CDU-15: Manter Mapa de Competências', () => {

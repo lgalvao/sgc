@@ -178,7 +178,6 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {usePerfilStore} from '@/stores/perfil'
 import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
 import { usePerfil } from '@/composables/usePerfil'
 

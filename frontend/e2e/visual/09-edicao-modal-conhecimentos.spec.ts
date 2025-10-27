@@ -163,7 +163,6 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar primeira atividade com múltiplos conhecimentos
         const atividade1 = gerarNomeUnico('Desenvolvimento de Software');
         await adicionarAtividade(page, atividade1);
-        const card1 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade1});
         await editarConhecimento(page, atividade1, 'JavaScript/TypeScript', 'JavaScript/TypeScript');
         await editarConhecimento(page, atividade1, 'Vue.js Framework', 'Vue.js Framework');
         await editarConhecimento(page, atividade1, 'Testes Automatizados', 'Testes Automatizados');
@@ -178,7 +177,6 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         // Criar terceira atividade
         const atividade3 = gerarNomeUnico('Gestão de Projetos');
         await adicionarAtividade(page, atividade3);
-        const card3 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade3});
         await editarConhecimento(page, atividade3, 'Metodologias Ágeis', 'Metodologias Ágeis');
         await editarConhecimento(page, atividade3, 'Ferramentas de Gestão', 'Ferramentas de Gestão');
         await editarConhecimento(page, atividade3, 'Liderança de Equipes', 'Liderança de Equipes');

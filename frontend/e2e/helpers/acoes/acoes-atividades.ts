@@ -1,6 +1,5 @@
 import {Page} from '@playwright/test';
 import {SELETORES} from '../dados';
-import {gerarNomeUnico} from '../utils';
 
 export async function adicionarAtividade(page: Page, nomeAtividade: string): Promise<void> {
     await page.getByTestId(SELETORES.INPUT_NOVA_ATIVIDADE).fill(nomeAtividade);
