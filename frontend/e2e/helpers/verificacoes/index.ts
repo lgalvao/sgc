@@ -54,7 +54,8 @@ export {
     verificarValorCampoDescricao,
     verificarBotaoIniciarProcessoVisivel,
     verificarModalConfirmacaoIniciarProcessoVisivel,
-    verificarModalConfirmacaoIniciarProcessoInvisivel
+    verificarModalConfirmacaoIniciarProcessoInvisivel,
+    verificarPermanenciaNaPaginaProcesso
 } from './verificacoes-processo';
 
 // Verificações de UI
@@ -98,5 +99,16 @@ export {
     verificarCompetenciaNaoVisivel,
     verificarListagemAtividadesEConhecimentos,
     verificarModoSomenteLeitura,
-    verificarCabecalhoUnidade
+    verificarCabecalhoUnidade,
+    verificarAtividadesAssociadas,
+    verificarDescricaoCompetencia,
+    verificarPainelVisivel,
+    verificarSelecaoPerfilVisivel,
+    verificarImpactosNoMapa,
+    verificarCardAcaoVisivel,
+    verificarCardAcaoInvisivel,
+    verificarPainelAdminVisivel,
+    verificarPainelChefeVisivel
 } from './verificacoes-ui';
+
+export * from './verificacoes-atividades';

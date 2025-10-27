@@ -1,10 +1,13 @@
-/**
- * ÍNDICE DE AÇÕES
- * Re-exporta todas as ações organizadas por domínio
- */
-
-// Ações de processo
 export {
+    preencherFormularioLogin,
+    selecionarPerfil,
+    fecharAlerta,
+    cancelarNoModal as cancelarNoModalLogin,
+    confirmarNoModal as confirmarNoModalLogin,
+} from './acoes-login';
+export * from './acoes-atividades';
+export {
+    selecionarUnidadesPorId,
     preencherFormularioProcesso,
     selecionarPrimeiraUnidade,
     clicarPrimeiroProcessoTabela,
@@ -20,22 +23,24 @@ export {
     confirmarFinalizacaoNoModal,
     finalizarProcesso,
     disponibilizarCadastro,
+    abrirModalDevolucao,
+    devolverParaAjustes,
+    devolverCadastro,
     aceitarCadastro,
     registrarAceiteRevisao,
     homologarCadastro,
-    devolverParaAjustes,
-    devolverCadastro,
+    clicarBotaoIniciarProcesso,
+    clicarProcessoNaTabela,
     iniciarProcesso,
     removerProcessoComConfirmacao,
     cancelarRemocaoProcesso,
     confirmarInicializacaoProcesso,
     removerProcessoConfirmandoNoModal,
     clicarUnidadeNaTabelaDetalhes,
-    clicarBotaoIniciarProcesso,
-    clicarProcessoNaTabela
+    clicarBotaoHistoricoAnalise,
+    homologarRevisaoCadastro,
 } from './acoes-processo';
-
-// Ações de modais
+export * from './acoes-mapa';
 export {
     cancelarNoModal,
     confirmarNoModal,
@@ -45,34 +50,6 @@ export {
     abrirModalInicializacaoProcesso,
     confirmarInicializacaoNoModal,
     cancelarModal,
-    clicarBotaoHistoricoAnalise
+    clicarBotaoHistoricoAnalise as clicarBotaoHistoricoAnaliseModal,
 } from './acoes-modais';
-
-// Ações de atividades
-export {
-    adicionarAtividade,
-    adicionarConhecimento,
-    editarAtividade,
-    removerAtividade,
-    editarConhecimento,
-    removerConhecimento,
-    criarCompetencia,
-    editarCompetencia,
-    excluirCompetencia,
-    clicarBotaoImportarAtividades,
-    clicarBotaoDisponibilizar,
-    abrirModalDisponibilizacao,
-    preencherDataModal,
-    preencherObservacoesModal,
-    disponibilizarMapaComData,
-    tentarAdicionarAtividadeVazia,
-    cancelarEdicaoAtividade,
-    adicionarConhecimentoPrimeiraAtividade
-} from './acoes-atividades';
-
- // Ações de mapa
- export {
-     fecharModalImpactos,
-     clicarBotaoImpactosMapa
- } from './acoes-mapa';
 export * from './acoes-validacao';

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -29,10 +31,14 @@ import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.sgrh.Perfil;
+import sgc.sgrh.SgrhService;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -46,6 +52,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -59,6 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Sql("/create-test-data.sql")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Import(TestSecurityConfig.class)
 class CDU14IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -88,32 +96,48 @@ class CDU14IntegrationTest {
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @MockitoBean
+    private SgrhService sgrhService;
 
-    private Long subprocessoId;
     private Unidade unidade;
     private Usuario chefe, gestor, admin;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         unidade = unidadeRepo.findById(102L).orElseThrow();
         admin = usuarioRepo.findById(111111111111L).orElseThrow();
         gestor = usuarioRepo.findById(222222222222L).orElseThrow();
         chefe = usuarioRepo.findById(333333333333L).orElseThrow();
 
+        // Configuração do Mock SgrhService
+        when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString())).thenReturn(List.of(
+                new PerfilDto(admin.getTituloEleitoral().toString(), 100L, "SEDOC", Perfil.ADMIN.name())
+        ));
+        when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString())).thenReturn(List.of(
+                new PerfilDto(gestor.getTituloEleitoral().toString(), 101L, "DA", Perfil.GESTOR.name())
+        ));
+        when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString())).thenReturn(List.of(
+                new PerfilDto(chefe.getTituloEleitoral().toString(), 102L, "SA", Perfil.CHEFE.name())
+        ));
         Unidade unidadeAdmin = unidadeRepo.findById(100L).orElseThrow();
         unidadeAdmin.setTitular(admin);
         Unidade unidadeGestor = unidadeRepo.findById(101L).orElseThrow();
         unidadeGestor.setTitular(gestor);
         unidade.setTitular(chefe);
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
+    }
 
+    // Métodos de setup
+    private Long criarEComecarProcessoDeRevisao() throws Exception {
         ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
-        subprocessoId = obterSubprocessoId(processoDto.getCodigo());
+        Long subprocessoId = obterSubprocessoId(processoDto.getCodigo());
 
         Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(sp);
+        return subprocessoId;
     }
+
 
     @Nested
     @DisplayName("Fluxo de Devolução")
@@ -121,6 +145,9 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("GESTOR deve devolver, alterando status e criando registros")
         void gestorDevolveRevisao() throws Exception {
+
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
+
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                             .with(csrf()).with(user(chefe)))
                     .andExpect(status().isOk());
@@ -145,6 +172,7 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("GESTOR deve aceitar, alterando status e criando todos os registros")
         void gestorAceitaRevisao() throws Exception {
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                             .with(csrf()).with(user(chefe)))
                     .andExpect(status().isOk());
@@ -166,8 +194,11 @@ class CDU14IntegrationTest {
     @Nested
     @DisplayName("Fluxo de Homologação")
     class Homologacao {
+        private Long subprocessoId;
+
         @BeforeEach
         void setUpHomologacao() throws Exception {
+            subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                             .with(csrf()).with(user(chefe)))
                     .andExpect(status().isOk());
@@ -176,9 +207,6 @@ class CDU14IntegrationTest {
                             .contentType("application/json")
                             .content("{\"observacoes\": \"OK\"}"))
                     .andExpect(status().isOk());
-
-            Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            System.out.println("CDU14IntegrationTest - setUpHomologacao: Subprocesso Situação: " + sp.getSituacao());
         }
 
         @Test
@@ -204,9 +232,6 @@ class CDU14IntegrationTest {
             competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
 
-            // Recarregar o subprocesso para garantir que o mapa esteja atualizado
-            sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
                             .with(csrf()).with(user(admin))
                             .contentType("application/json")
@@ -225,6 +250,7 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("Deve retornar histórico de análise corretamente")
         void deveRetornarHistoricoDeAnalise() throws Exception {
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                             .with(csrf()).with(user(chefe)))
                     .andExpect(status().isOk());
@@ -245,15 +271,13 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("Deve retornar impactos no mapa corretamente")
         void deveRetornarImpactosNoMapa() throws Exception {
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
             // Remover uma atividade existente do mapa do subprocesso
             Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
             competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
-
-            // Recarregar o subprocesso para garantir que o mapa esteja atualizado
-            sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
             mockMvc.perform(get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
                             .with(user(chefe))) // Trocado para CHEFE que tem a permissão
@@ -271,6 +295,7 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("CHEFE não pode homologar revisão")
         void chefeNaoPodeHomologar() throws Exception {
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId)
                             .with(csrf()).with(user(chefe)))
                     .andExpect(status().isOk());
@@ -290,6 +315,7 @@ class CDU14IntegrationTest {
         @Test
         @DisplayName("Não pode homologar em estado inválido")
         void naoPodeHomologarEmEstadoInvalido() throws Exception {
+            Long subprocessoId = criarEComecarProcessoDeRevisao();
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
                             .with(csrf()).with(user(admin))
                             .contentType("application/json")
@@ -332,7 +358,7 @@ class CDU14IntegrationTest {
 
     private Long obterSubprocessoId(Long processoId) throws Exception {
         String resJson = mockMvc.perform(get("/api/processos/{id}/detalhes", processoId)
-                        .with(user(gestor)))
+                        .with(user(chefe)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         ProcessoDetalheDto detalhes = objectMapper.readValue(resJson, ProcessoDetalheDto.class);

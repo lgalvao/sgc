@@ -10,12 +10,9 @@ import {
     verificarCompetenciaVisivel,
     verificarCompetenciaNaoVisivel,
     verificarAtividadesAssociadas,
-    clicarBotaoDisponibilizar,
-    preencherDataModal,
-    confirmarNoModal,
-    esperarUrl
+    disponibilizarCadastro,
+    esperarUrl,
 } from './helpers';
-import {verificarDescricaoCompetencia} from "./helpers/verificacoes/verificacoes-ui";
 
 test.describe('CDU-15: Manter Mapa de Competências', () => {
     let processo: any;
@@ -70,9 +67,7 @@ test.describe('CDU-15: Manter Mapa de Competências', () => {
         await criarCompetencia(page, descricaoCompetencia, ['Atividade 1']);
         await verificarCompetenciaVisivel(page, descricaoCompetencia);
 
-        await clicarBotaoDisponibilizar(page);
-        await preencherDataModal(page, '2025-12-31');
-        await confirmarNoModal(page);
+        await disponibilizarCadastro(page);
 
         await esperarUrl(page, new RegExp(`/processo/${processo.processo.codigo}/${siglaUnidade}$`));
     });

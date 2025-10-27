@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {SELETORES, TEXTOS, URLS} from '../dados';
 import {esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel} from './verificacoes-basicas';
 
 /**
@@ -34,7 +34,7 @@ export async function verificarCamposObrigatoriosFormulario(page: Page): Promise
  * Verifica se uma notificação de erro é exibida
  */
 export async function verificarNotificacaoErro(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.NOTIFICACAO_ERRO)).toBeVisible();
+    await expect(page.locator(SELETORES.NOTIFICACAO_ERRO)).toBeVisible();
 }
 
 /**
@@ -169,7 +169,7 @@ export async function verificarBotaoFinalizarProcessoInvisivel(page: Page): Prom
  * Verifica se o modal de finalização está visível com textos corretos.
  */
 export async function verificarModalFinalizacaoProcesso(page: Page): Promise<void> {
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('heading', {name: TEXTOS.FINALIZACAO_PROCESSO})).toBeVisible();
     await expect(modal.getByText(TEXTOS.CONFIRMA_FINALIZACAO)).toBeVisible();
@@ -182,7 +182,7 @@ export async function verificarModalFinalizacaoProcesso(page: Page): Promise<voi
  * Garante que o modal de finalização foi fechado.
  */
 export async function verificarModalFinalizacaoFechado(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).not.toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
 }
 
 /**
@@ -211,14 +211,14 @@ export async function verificarMensagemFinalizacaoSucesso(page: Page): Promise<v
  * Verifica se a notificação informa que os mapas estão vigentes.
  */
 export async function verificarMapasVigentesNotificacao(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.NOTIFICACAO_SUCESSO)).toContainText(TEXTOS.MAPAS_VIGENTES);
+    await expect(page.locator(SELETORES.NOTIFICACAO_SUCESSO)).toContainText(TEXTOS.MAPAS_VIGENTES);
 }
 
 /**
  * Garante que a notificação de envio de email está visível.
  */
 export async function verificarEmailFinalizacaoEnviado(page: Page): Promise<void> {
-    const notificacaoEmail = page.locator(SELETORES_CSS.NOTIFICACAO_EMAIL).first();
+    const notificacaoEmail = page.locator(SELETORES.NOTIFICACAO_EMAIL).first();
     await expect(notificacaoEmail).toBeVisible();
     await expect(notificacaoEmail).toContainText(TEXTOS.EMAIL_ENVIADO);
 }
@@ -275,7 +275,7 @@ export async function verificarConfirmacaoInicializacao(page: Page): Promise<voi
  * Verifica modal de confirmação de inicialização de processo
  */
 export async function verificarModalConfirmacaoInicializacao(page: Page, descricao: string, tipo: string, numUnidades: number): Promise<void> {
-    const modal = page.locator(SELETORES_CSS.MODAL_VISIVEL);
+    const modal = page.locator(SELETORES.MODAL_VISIVEL);
     await expect(modal).toBeVisible();
     await expect(modal.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
     await expect(modal.locator('p')).toContainText(`Descrição: ${descricao}`);
@@ -295,7 +295,7 @@ export async function verificarProcessoInicializadoComSucesso(page: Page): Promi
  * Verifica o valor do campo de descrição.
  */
 export async function verificarValorCampoDescricao(page: Page, valor: string): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.CAMPO_DESCRICAO)).toHaveValue(valor);
+    await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(valor);
 }
 
 /**
@@ -309,8 +309,8 @@ export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<
  * Verifica se o modal de confirmação de iniciar processo está visível e com os textos corretos.
  */
 export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).toBeVisible();
-    await expect(page.locator(SELETORES_CSS.TITULO_MODAL_INICIAR_PROCESSO)).toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
+    await expect(page.locator(SELETORES.TITULO_MODAL_INICIAR_PROCESSO)).toBeVisible();
     await expect(page.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
     // Removido: verificação de notificação por email que pode não estar presente no modal atual
 }
@@ -319,5 +319,9 @@ export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page
  * Verifica se o modal de confirmação de iniciar processo está invisível.
  */
 export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES_CSS.MODAL_VISIVEL)).not.toBeVisible();
+    await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
+}
+
+export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {
+    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 }
