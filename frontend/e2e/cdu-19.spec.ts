@@ -1,7 +1,7 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
     apresentarSugestoes,
-    cancelarModal,
+    cancelarNoModal,
     clicarBotaoHistoricoAnalise,
     clicarPorTestIdOuRole,
     esperarElementoInvisivel,
@@ -41,7 +41,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
         await clicarBotaoHistoricoAnalise(page);
         await verificarModalHistoricoAnaliseAberto(page);
-        await cancelarModal(page);
+        await cancelarNoModal(page);
     });
 
     test('deve permitir apresentar sugestões', async ({page}) => {
@@ -60,7 +60,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
         await clicarPorTestIdOuRole(page, SELETORES.BTN_APRESENTAR_SUGESTOES);
         await esperarElementoVisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
-        await cancelarModal(page);
+        await cancelarNoModal(page);
         await esperarElementoInvisivel(page, SELETORES.MODAL_APRESENTAR_SUGESTOES);
     });
 
@@ -68,7 +68,7 @@ test.describe('CDU-19: Validar mapa de competências', () => {
         await irParaVisualizacaoMapa(page, processo.processo.codigo, siglaUnidade);
         await clicarPorTestIdOuRole(page, SELETORES.BTN_VALIDAR);
         await esperarElementoVisivel(page, SELETORES.MODAL_VALIDAR);
-        await cancelarModal(page);
+        await cancelarNoModal(page);
         await esperarElementoInvisivel(page, SELETORES.MODAL_VALIDAR);
     });
 });

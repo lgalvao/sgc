@@ -1,6 +1,7 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
-    adicionarConhecimentoPrimeiraAtividade,
+    adicionarAtividade,
+    adicionarConhecimentoNaAtividade,
     clicarBotaoImpactosMapa,
     fecharModalImpactos,
     gerarNomeUnico,
@@ -34,7 +35,9 @@ test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
     test('deve exibir modal com impactos quando houver divergências', async ({page}) => {
         // Adiciona um conhecimento para gerar um impacto
         await navegarParaCadastroAtividades(page, processo.processo.codigo, UNIDADE_SESEL);
-        await adicionarConhecimentoPrimeiraAtividade(page, gerarNomeUnico('Conhecimento Impacto'));
+        const nomeAtividade = gerarNomeUnico('Atividade Impacto');
+        await adicionarAtividade(page, nomeAtividade);
+        await adicionarConhecimentoNaAtividade(page, nomeAtividade, gerarNomeUnico('Conhecimento Impacto'));
 
         // Navega para o mapa e abre o modal de impactos
         await irParaMapaCompetencias(page, processo.processo.codigo, UNIDADE_SESEL);

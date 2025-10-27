@@ -3,6 +3,9 @@
  * Re-exporta todas as funções de navegação e login
  */
 export {
+    navegarParaLogin,
+    navegarParaMapaRevisao,
+    navegarParaMapaMapeamento,
     navegarParaCriacaoProcesso,
     navegarParaDetalhesProcesso,
     navegarParaCadastroAtividades,

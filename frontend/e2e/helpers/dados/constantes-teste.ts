@@ -43,8 +43,6 @@ export const SELETORES = {
   BTN_VALIDAR: 'validar-btn',
   BTN_APRESENTAR_SUGESTOES: 'apresentar-sugestoes-btn',
   BTN_REGISTRAR_ACEITE: 'registrar-aceite-btn',
-  MODAL_APRESENTAR_SUGESTOES: 'modal-apresentar-sugestoes',
-  MODAL_VALIDAR: 'modal-validar',
 
 
   // Atividades

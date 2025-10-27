@@ -12,7 +12,7 @@ import {
     verificarCardAcaoVisivel,
     verificarCardAcaoInvisivel,
     adicionarAtividade,
-    adicionarConhecimento,
+    adicionarConhecimentoNaAtividade,
     navegarParaCadastroAtividades,
 } from './helpers';
 
@@ -45,14 +45,15 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
         // CHEFE disponibiliza o cadastro
         await loginComoChefe(page);
         await navegarParaCadastroAtividades(page, processo.processo.codigo, siglaUnidade);
-        await adicionarAtividade(page, 'Atividade de Teste');
-        await adicionarConhecimento(page.locator(SELETORES.CARD_ATIVIDADE).first(), 'Conhecimento de Teste');
+        const nomeAtividade = 'Atividade de Teste';
+        await adicionarAtividade(page, nomeAtividade);
+        await adicionarConhecimentoNaAtividade(page, nomeAtividade, 'Conhecimento de Teste');
         await disponibilizarCadastro(page);
 
         // GESTOR aceita o cadastro
         await loginComoGestor(page);
         await irParaSubprocesso(page, processo.processo.codigo, siglaUnidade);
-        await aceitarCadastro(page, {observacoes: 'Teste'});
+        await aceitarCadastro(page, 'Teste');
 
         // CHEFE verifica o card de Mapa de competências
         await loginComoChefe(page);
@@ -66,8 +67,9 @@ test.describe('CDU-07: Detalhar subprocesso', () => {
         // CHEFE disponibiliza o cadastro
         await loginComoChefe(page);
         await navegarParaCadastroAtividades(page, processo.processo.codigo, siglaUnidade);
-        await adicionarAtividade(page, 'Atividade de Teste');
-        await adicionarConhecimento(page.locator(SELETORES.CARD_ATIVIDADE).first(), 'Conhecimento de Teste');
+        const nomeAtividade = 'Atividade de Teste';
+        await adicionarAtividade(page, nomeAtividade);
+        await adicionarConhecimentoNaAtividade(page, nomeAtividade, 'Conhecimento de Teste');
         await disponibilizarCadastro(page);
 
         // GESTOR verifica o card de Análise de cadastro
