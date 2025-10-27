@@ -2,7 +2,7 @@ import {vueTest as test} from './support/vue-specific-setup';
 import {
     clicarBotaoImpactosMapa,
     criarCompetencia,
-    disponibilizarMapaComData,
+    disponibilizarCadastro,
     editarCompetencia,
     esperarElementoVisivel,
     esperarTextoVisivel,
@@ -78,14 +78,14 @@ test.describe('CDU-16: Ajustar mapa de competências', () => {
     test('deve validar associação de todas as atividades', async ({page}) => {
         await navegarParaMapaRevisao(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Parcial', []);
-        await disponibilizarMapaComData(page, '2025-12-31');
+        await disponibilizarCadastro(page);
         await verificarDisponibilizacaoConcluida(page);
     });
 
     test('deve integrar com disponibilização de mapa', async ({page}) => {
         await navegarParaMapaRevisao(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Completa', []);
-        await disponibilizarMapaComData(page, '2025-12-31', 'Mapa ajustado conforme revisão');
+        await disponibilizarCadastro(page);
         await verificarCompetenciaVisivel(page, 'Competência Completa');
     });
 });

@@ -1,5 +1,5 @@
 import {Page} from '@playwright/test';
-import {USUARIOS} from '../../dados';
+import {USUARIOS} from '../dados/constantes-teste';
 
 export async function preencherFormularioLogin(page: Page, titulo: string, senha_plana: string): Promise<void> {
     await page.getByTestId('input-titulo').fill(titulo);

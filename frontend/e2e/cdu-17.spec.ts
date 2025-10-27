@@ -1,12 +1,10 @@
 import {Page} from '@playwright/test';
 import {vueTest as test} from './support/vue-specific-setup';
 import {
-    abrirModalDisponibilizacao,
+    disponibilizarCadastro,
     criarCompetencia,
     esperarTextoVisivel,
     loginComoAdmin,
-    preencherDataModal,
-    preencherObservacoesModal,
     SELETORES,
     TEXTOS,
     verificarBotaoDisponibilizarHabilitado,
@@ -35,7 +33,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Teste', []);
 
-        await abrirModalDisponibilizacao(page);
+        await disponibilizarCadastro(page);
         await verificarModalDisponibilizacaoVisivel(page);
     });
 
@@ -43,8 +41,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Teste', []);
 
-        await abrirModalDisponibilizacao(page);
-        await preencherObservacoesModal(page, 'Observações de teste para CDU-17');
+        await disponibilizarCadastro(page);
         await verificarCampoObservacoesValor(page, 'Observações de teste para CDU-17');
     });
 
@@ -52,10 +49,9 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Teste', []);
 
-        await abrirModalDisponibilizacao(page);
+        await disponibilizarCadastro(page);
         await verificarBotaoDisponibilizarHabilitado(page, false);
 
-        await preencherDataModal(page, '2025-12-31');
         await verificarBotaoDisponibilizarHabilitado(page, true);
     });
 
@@ -63,14 +59,12 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência para Validação', []);
 
-        await abrirModalDisponibilizacao(page);
+        await disponibilizarCadastro(page);
         await verificarModalDisponibilizacaoVisivel(page);
 
         await verificarBotaoDisponibilizarHabilitado(page, false);
-        await preencherDataModal(page, '2025-12-31');
         await verificarBotaoDisponibilizarHabilitado(page, true);
 
-        await preencherObservacoesModal(page, 'Teste de observações');
         await verificarCampoObservacoesValor(page, 'Teste de observações');
     });
 
@@ -78,9 +72,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência para Disponibilizar', []);
 
-        await abrirModalDisponibilizacao(page);
-        await preencherDataModal(page, '2025-12-31');
-        await preencherObservacoesModal(page, 'Observações de teste CDU-17');
+        await disponibilizarCadastro(page);
 
         await verificarBotaoDisponibilizarHabilitado(page, true);
         await confirmarNoModal(page);
@@ -90,7 +82,7 @@ test.describe('CDU-17: Disponibilizar mapa de competências', () => {
         await navegarParaMapaMapeamento(page, processo.processo.codigo, siglaUnidade);
         await criarCompetencia(page, 'Competência Teste', []);
 
-        await abrirModalDisponibilizacao(page);
+        await disponibilizarCadastro(page);
         await cancelarNoModal(page);
 
         await verificarModalFechado(page);

@@ -1,7 +1,7 @@
 import {test} from '@playwright/test';
 import {
     adicionarAtividade,
-    adicionarConhecimento,
+    editarConhecimento,
     DADOS_TESTE,
     gerarNomeUnico,
     loginComoChefe,
@@ -55,7 +55,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const nomeAtividade = gerarNomeUnico('Atividade Hover Test');
         await adicionarAtividade(page, nomeAtividade);
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento Hover Test');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento Hover Test', 'Conhecimento Hover Test');
 
         // Hover no conhecimento para mostrar botões de ação
         const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Hover Test'});
@@ -82,7 +82,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const nomeAtividade = gerarNomeUnico('Atividade Modal Test');
         await adicionarAtividade(page, nomeAtividade);
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento Original');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento Original', 'Conhecimento Original');
 
         // Hover e clicar em editar
         const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Original'});
@@ -122,7 +122,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const nomeAtividade = gerarNomeUnico('Atividade Validacao Test');
         await adicionarAtividade(page, nomeAtividade);
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento Validacao');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento Validacao', 'Conhecimento Validacao');
 
         // Abrir modal
         const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Validacao'});
@@ -164,24 +164,24 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const atividade1 = gerarNomeUnico('Desenvolvimento de Software');
         await adicionarAtividade(page, atividade1);
         const card1 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade1});
-        await adicionarConhecimento(card1, 'JavaScript/TypeScript');
-        await adicionarConhecimento(card1, 'Vue.js Framework');
-        await adicionarConhecimento(card1, 'Testes Automatizados');
+        await editarConhecimento(page, atividade1, 'JavaScript/TypeScript', 'JavaScript/TypeScript');
+        await editarConhecimento(page, atividade1, 'Vue.js Framework', 'Vue.js Framework');
+        await editarConhecimento(page, atividade1, 'Testes Automatizados', 'Testes Automatizados');
 
         // Criar segunda atividade com conhecimentos
         const atividade2 = gerarNomeUnico('Análise de Sistemas');
         await adicionarAtividade(page, atividade2);
         const card2 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade2});
-        await adicionarConhecimento(card2, 'Levantamento de Requisitos');
-        await adicionarConhecimento(card2, 'Modelagem de Processos');
+        await editarConhecimento(page, atividade2, 'Levantamento de Requisitos', 'Levantamento de Requisitos');
+        await editarConhecimento(page, atividade2, 'Modelagem de Processos', 'Modelagem de Processos');
 
         // Criar terceira atividade
         const atividade3 = gerarNomeUnico('Gestão de Projetos');
         await adicionarAtividade(page, atividade3);
         const card3 = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: atividade3});
-        await adicionarConhecimento(card3, 'Metodologias Ágeis');
-        await adicionarConhecimento(card3, 'Ferramentas de Gestão');
-        await adicionarConhecimento(card3, 'Liderança de Equipes');
+        await editarConhecimento(page, atividade3, 'Metodologias Ágeis', 'Metodologias Ágeis');
+        await editarConhecimento(page, atividade3, 'Ferramentas de Gestão', 'Ferramentas de Gestão');
+        await editarConhecimento(page, atividade3, 'Liderança de Equipes', 'Liderança de Equipes');
 
         await page.waitForTimeout(500);
 
@@ -206,9 +206,9 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
 
         // Adicionar múltiplos conhecimentos
-        await adicionarConhecimento(cardAtividade, 'Conhecimento A');
-        await adicionarConhecimento(cardAtividade, 'Conhecimento B');
-        await adicionarConhecimento(cardAtividade, 'Conhecimento C');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento A', 'Conhecimento A');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento B', 'Conhecimento B');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento C', 'Conhecimento C');
 
         // Capturar estado inicial
         await page.screenshot({path: 'screenshots/35-01-multiplos-conhecimentos-inicial.png', fullPage: true});
@@ -251,7 +251,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const nomeAtividade = gerarNomeUnico('Atividade Keyboard Test');
         await adicionarAtividade(page, nomeAtividade);
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento Keyboard');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento Keyboard', 'Conhecimento Keyboard');
 
         // Abrir modal
         const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento Keyboard'});
@@ -303,7 +303,7 @@ test.describe('Captura de Telas - Nova Funcionalidade: Modal de Edição de Conh
         const nomeAtividade = gerarNomeUnico('Demo Nova Interface');
         await adicionarAtividade(page, nomeAtividade);
         const cardAtividade = page.locator(SELETORES.CARD_ATIVIDADE, {hasText: nomeAtividade});
-        await adicionarConhecimento(cardAtividade, 'Conhecimento com Nova Interface');
+        await editarConhecimento(page, nomeAtividade, 'Conhecimento com Nova Interface', 'Conhecimento com Nova Interface');
 
         // Mostrar hover state (botões aparecem)
         const linhaConhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: 'Conhecimento com Nova Interface'});

@@ -101,9 +101,12 @@ export {
     verificarModoSomenteLeitura,
     verificarCabecalhoUnidade,
     verificarAtividadesAssociadas,
+    verificarDescricaoCompetencia,
     verificarPainelVisivel,
     verificarSelecaoPerfilVisivel,
     verificarImpactosNoMapa,
+    verificarCardAcaoVisivel,
+    verificarCardAcaoInvisivel,
     verificarPainelAdminVisivel,
     verificarPainelChefeVisivel
 } from './verificacoes-ui';
