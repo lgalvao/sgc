@@ -7,7 +7,6 @@ import {
     esperarElementoVisivel,
     esperarTextoVisivel,
     excluirCompetencia,
-    loginComoAdmin,
     SELETORES,
     TEXTOS,
     verificarCompetenciaNaoVisivel,
