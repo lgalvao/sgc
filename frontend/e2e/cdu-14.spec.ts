@@ -15,8 +15,8 @@ import {
     verificarModalFechado,
     verificarModalHistoricoAnaliseAberto,
     homologarCadastro,
+    esperarUrl,
 } from './helpers';
-import {esperarUrl} from "./helpers/verificacoes/verificacoes-basicas";
 
 test.describe('CDU-14: Analisar revisão de cadastro de atividades e conhecimentos', () => {
     let processo: any;

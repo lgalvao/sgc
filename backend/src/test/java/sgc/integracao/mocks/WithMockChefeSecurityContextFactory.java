@@ -1,11 +1,11 @@
 package sgc.integracao.mocks;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+import sgc.comum.BeanUtil;
 import sgc.sgrh.Perfil;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
@@ -14,11 +14,10 @@ import java.util.Set;
 
 @Component
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
-    @Autowired
-    private UsuarioRepo usuarioRepo;
 
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
+        UsuarioRepo usuarioRepo = BeanUtil.getBean(UsuarioRepo.class);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         long chefeId;
         try {

@@ -25,7 +25,7 @@ test.describe('Captura de Telas - Mapas', () => {
         await loginComoAdmin(page);
         await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.SESEL);
         await page.waitForLoadState('networkidle');
-        await criarCompetencia(page, 'Competência Visual');
+        await criarCompetencia(page, 'Competência Visual', []);
         await page.waitForTimeout(500);
         await page.screenshot({path: 'screenshots/31-mapa-competencias-edicao-com-competencia.png', fullPage: true});
     });
@@ -53,7 +53,7 @@ test.describe('Captura de Telas - Mapas', () => {
         await loginComoAdmin(page);
         await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.SESEL);
         await page.waitForLoadState('networkidle');
-        await criarCompetencia(page, 'Competência para Excluir');
+        await criarCompetencia(page, 'Competência para Excluir', []);
         const competenciaCard = page.locator('.competencia-card').filter({hasText: 'Competência para Excluir'});
         await competenciaCard.hover();
         await competenciaCard.getByTestId('btn-excluir-competencia').click();
@@ -66,7 +66,7 @@ test.describe('Captura de Telas - Mapas', () => {
         await loginComoAdmin(page);
         await irParaMapaCompetencias(page, DADOS_TESTE.PROCESSOS.REVISAO_STIC.id, DADOS_TESTE.UNIDADES.SESEL);
         await page.waitForLoadState('networkidle');
-        await criarCompetencia(page, 'Competência para Disponibilizar Mapa');
+        await criarCompetencia(page, 'Competência para Disponibilizar Mapa', []);
         await page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR}).click();
         await page.waitForSelector('.modal.show');
         await page.screenshot({path: 'screenshots/34-modal-disponibilizacao-mapa.png', fullPage: true});

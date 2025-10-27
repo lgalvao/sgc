@@ -1,7 +1,7 @@
-import {test} from '@playwright/test';
+import {vueTest as test} from './support/vue-specific-setup';
 import {
     adicionarAtividade,
-    adicionarConhecimento,
+    adicionarConhecimentoNaAtividade,
     clicarBotaoHistoricoAnalise,
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
@@ -11,20 +11,19 @@ import {
     iniciarProcesso,
     loginComoChefe,
     navegarParaProcessoPorId,
-    SELETORES_CSS,
     verificarAlerta,
     verificarAtividadeVisivel,
     verificarBotaoHistoricoAnaliseVisivel,
-    verificarConhecimentoVisivel,
+    verificarConhecimentoNaAtividade,
     verificarMensagemSucesso,
     verificarModalHistoricoAnalise,
     verificarUrlDoPainel,
+    fecharAlerta,
 } from './helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
-
-    test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar com sucesso', async ({ page }) => {
-        const { processo } = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-09'), 'Mapeamento', '2025-12-31', [1]);
+    test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar com sucesso', async ({page}) => {
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-09'), 'Mapeamento', '2025-12-31', [1]);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
         await clicarUnidadeNaTabelaDetalhes(page, 'STIC');
@@ -35,22 +34,20 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         await verificarAtividadeVisivel(page, nomeAtividadeIncompleta);
 
         // Tenta disponibilizar e verifica o alerta
-        await page.click(SELETORES_CSS.BTN_DISPONIBILIZAR);
+        await disponibilizarCadastro(page);
         await verificarAlerta(page, 'Atividades Incompletas');
-        await page.click('.btn-close'); // Fecha o alerta para continuar
+        await fecharAlerta(page);
 
         // Adiciona uma atividade completa
         const nomeAtividadeCompleta = gerarNomeUnico('Atividade Completa');
         await adicionarAtividade(page, nomeAtividadeCompleta);
         await verificarAtividadeVisivel(page, nomeAtividadeCompleta);
-        const cardAtividadeCompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeCompleta });
         const nomeConhecimento = gerarNomeUnico('Conhecimento');
-        await adicionarConhecimento(cardAtividadeCompleta, nomeConhecimento);
-        await verificarConhecimentoVisivel(cardAtividadeCompleta, nomeConhecimento);
+        await adicionarConhecimentoNaAtividade(page, nomeAtividadeCompleta, nomeConhecimento);
+        await verificarConhecimentoNaAtividade(page, nomeAtividadeCompleta, nomeConhecimento);
 
         // Adiciona conhecimento à atividade que estava incompleta
-        const cardAtividadeIncompleta = page.locator(SELETORES_CSS.CARD_ATIVIDADE, { hasText: nomeAtividadeIncompleta });
-        await adicionarConhecimento(cardAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
+        await adicionarConhecimentoNaAtividade(page, nomeAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
         // Disponibiliza com sucesso
         await disponibilizarCadastro(page);
@@ -60,7 +57,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
     });
 
     test('deve exibir o histórico de análise após devolução', async ({page}) => {
-        const { processo } = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), 'Mapeamento', '2025-12-31', [1]);
+        const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO-CDU-09'), 'Mapeamento', '2025-12-31', [1]);
         await iniciarProcesso(page);
         await verificarMensagemSucesso(page, 'Processo iniciado');
 
@@ -71,7 +68,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         const atividade = gerarNomeUnico('Atividade');
         const conhecimento = gerarNomeUnico('Conhecimento');
         await adicionarAtividade(page, atividade);
-        await adicionarConhecimento(page.locator(SELETORES_CSS.CARD_ATIVIDADE).first(), conhecimento);
+        await adicionarConhecimentoNaAtividade(page, atividade, conhecimento);
         await disponibilizarCadastro(page);
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');
 

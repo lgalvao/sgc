@@ -1,10 +1,10 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
-    abrirModalInicializacaoProcesso,
+    abrirModalFinalizacaoProcesso,
     cancelarNoModal,
     clicarBotao,
     clicarProcessoNaTabela,
-    confirmarInicializacaoNoModal,
+    confirmarFinalizacaoNoModal,
     criarProcessoMapeamentoCompleto,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
@@ -31,9 +31,9 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
         await clicarProcessoNaTabela(page, nomeProcesso);
         await verificarPaginaCadastroProcesso(page);
 
-        await abrirModalInicializacaoProcesso(page);
+        await abrirModalFinalizacaoProcesso(page);
         await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'Mapeamento', 1);
-        await confirmarInicializacaoNoModal(page);
+        await confirmarFinalizacaoNoModal(page);
 
         await verificarProcessoInicializadoComSucesso(page);
     });
@@ -51,7 +51,7 @@ test.describe('CDU-04: Iniciar processo de mapeamento', () => {
         await clicarProcessoNaTabela(page, nomeProcesso);
         await verificarPaginaCadastroProcesso(page);
 
-        await abrirModalInicializacaoProcesso(page);
+        await abrirModalFinalizacaoProcesso(page);
         await verificarModalConfirmacaoInicializacao(page, nomeProcesso, 'Mapeamento', 1);
         await cancelarNoModal(page);
 

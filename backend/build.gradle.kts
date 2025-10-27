@@ -21,6 +21,7 @@ extra["lombok.version"] = "1.18.42"
 
 dependencies {
     // Spring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -29,12 +30,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // BD
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("com.h2database:h2")
 
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
@@ -90,6 +91,7 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     forkEvery = 100L
     jvmArgs = listOf(
+        "--enable-preview",
         "-Xmx4g",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
@@ -253,6 +255,7 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
 }
 
@@ -307,7 +310,7 @@ tasks.register<Test>("verboseTest") {
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
-    jvmArgs = listOf("-Djdk.internal.vm.debug=release")
+    jvmArgs = listOf("--enable-preview", "-Djdk.internal.vm.debug=release")
 }
 
 tasks.register<org.springframework.boot.gradle.tasks.run.BootRun>("bootRunE2E") {

@@ -5,10 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -29,8 +34,10 @@ import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.sgrh.SgrhService;
 import sgc.sgrh.Usuario;
 import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -52,6 +59,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -64,6 +72,8 @@ class CDU14IntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockitoBean
+    private SgrhService sgrhService;
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
@@ -106,6 +116,15 @@ class CDU14IntegrationTest {
         unidadeGestor.setTitular(gestor);
         unidade.setTitular(chefe);
         unidadeRepo.saveAll(List.of(unidadeAdmin, unidadeGestor, unidade));
+
+        // Mock SGRH Service calls
+        when(sgrhService.buscarPerfisUsuario(gestor.getTituloEleitoral().toString()))
+            .thenReturn(List.of(new PerfilDto(gestor.getTituloEleitoral().toString(), unidadeGestor.getCodigo(), unidadeGestor.getNome(), "GESTOR")));
+        when(sgrhService.buscarPerfisUsuario(chefe.getTituloEleitoral().toString()))
+            .thenReturn(List.of(new PerfilDto(chefe.getTituloEleitoral().toString(), unidade.getCodigo(), unidade.getNome(), "CHEFE")));
+        when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString()))
+            .thenReturn(List.of(new PerfilDto(admin.getTituloEleitoral().toString(), unidadeAdmin.getCodigo(), unidadeAdmin.getNome(), "ADMIN")));
+
 
         ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
         subprocessoId = obterSubprocessoId(processoDto.getCodigo());

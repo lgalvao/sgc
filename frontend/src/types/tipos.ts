@@ -195,18 +195,36 @@ export interface Servidor {
 
 export interface Alerta {
     codigo: number;
+    processo: Processo;
+    dataHora: string;
+    unidadeOrigem: Unidade;
+    unidadeDestino: Unidade;
+    usuarioDestino: Servidor;
+    descricao: string;
+}
+
+export interface AlertaFormatado {
+    codigo: number;
+    processo: string;
+    dataHora: string;
+    unidadeOrigem: Unidade;
+    unidadeDestino: Unidade;
+    usuarioDestino: Servidor;
+    descricao: string;
+    dataHoraFormatada: string;
+    origem: string;
     mensagem: string;
     data: string;
-    lido: boolean;
 }
 
 export interface Movimentacao {
     codigo: number;
+    subprocesso: Subprocesso;
     dataHora: string;
-    descricao: string;
-    usuario: string;
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
+    descricao: string;
+    usuario: Servidor;
 }
 
 export interface ResultadoAnalise {

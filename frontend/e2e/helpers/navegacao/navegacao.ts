@@ -1,5 +1,5 @@
 import {expect, Page} from '@playwright/test';
-import {SELETORES, SELETORES_CSS, TEXTOS, URLS} from '../dados';
+import {SELETORES, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
@@ -15,6 +15,14 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
 }
 
 /**
+ * Navega para a página de login.
+ */
+export async function navegarParaLogin(page: Page): Promise<void> {
+    await page.goto(URLS.LOGIN);
+    await page.waitForLoadState('networkidle');
+}
+
+/**
  * Navega para criação de processo
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
@@ -25,7 +33,7 @@ export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
  * Navega para detalhes de um processo
  */
 export async function navegarParaDetalhesProcesso(page: Page, textoProcesso: string): Promise<void> {
-    const linhaProcesso = page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: textoProcesso}).first();
+    const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
     await linhaProcesso.click();
     await expect(page).toHaveURL(/\/processo\/\d+/);
 }
@@ -48,7 +56,7 @@ export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: 
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 
-    await page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: unidade}).first().click();
+    await page.locator(SELETORES.LINHA_TABELA).filter({hasText: unidade}).first().click();
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}`));
 
     await page.waitForSelector('[data-testid="atividades-card"]');
@@ -117,6 +125,18 @@ export async function navegarParaEdicaoMapa(page: Page, idProcesso: number, sigl
     await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
+export async function navegarParaMapaRevisao(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
+    await loginComoAdmin(page);
+    await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
+}
+
+export async function navegarParaMapaMapeamento(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
+    await loginComoAdmin(page);
+    await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
+    await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
+}
+
 /**
  * Navega para subprocesso específico
  */
@@ -130,7 +150,7 @@ export async function irParaSubprocesso(page: Page, idProcesso: number, unidade:
  * Navega para detalhes de processo por texto
  */
 export async function irParaProcessoPorTexto(page: Page, textoProcesso: string): Promise<void> {
-    const linhaProcesso = page.locator(SELETORES_CSS.LINHA_TABELA).filter({hasText: textoProcesso}).first();
+    const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
     await linhaProcesso.click();
     await expect(page).toHaveURL(/\/processo\/\d+/);
 }
@@ -181,7 +201,7 @@ export async function verificarNavegacaoPaginaDetalhesProcesso(page: Page): Prom
  * Clica no primeiro processo da tabela após login
  */
 export async function clicarPrimeiroProcesso(page: Page): Promise<void> {
-    await page.locator(SELETORES_CSS.LINHA_TABELA).first().click();
+    await page.locator(SELETORES.LINHA_TABELA).first().click();
 }
 
 /**
