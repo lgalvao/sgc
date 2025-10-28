@@ -10,6 +10,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
 import java.util.List;
@@ -40,14 +41,14 @@ public class ProcessoControle {
     }
 
     /**
-     * Busca e retorna um processo pelo seu ID.
+     * Busca e retorna um processo pelo seu código.
      *
-     * @param id O ID do processo a ser buscado.
+     * @param codigo O código do processo a ser buscado.
      * @return Um {@link ResponseEntity} contendo o {@link ProcessoDto} ou status 404 Not Found.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long id) {
-        return processoService.obterPorId(id)
+    @GetMapping("/{codigo}")
+    public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long codigo) {
+        return processoService.obterPorId(codigo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -55,25 +56,25 @@ public class ProcessoControle {
     /**
      * Atualiza um processo existente.
      *
-     * @param codProcesso O ID do processo a ser atualizado.
+     * @param codigo O código do processo a ser atualizado.
      * @param requisicao O DTO com os novos dados do processo.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
      */
-    @PostMapping("/{codProcesso}/atualizar")
-    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long codProcesso, @Valid @RequestBody AtualizarProcessoReq requisicao) {
-        ProcessoDto atualizado = processoService.atualizar(codProcesso, requisicao);
+    @PostMapping("/{codigo}/atualizar")
+    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
+        ProcessoDto atualizado = processoService.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
     /**
      * Exclui um processo.
      *
-     * @param codProcesso O ID do processo a ser excluído.
+     * @param codigo O código do processo a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @PostMapping("/{codProcesso}/excluir")
-    public ResponseEntity<Void> excluir(@PathVariable Long codProcesso) {
-        processoService.apagar(codProcesso);
+    @PostMapping("/{codigo}/excluir")
+    public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
+        processoService.apagar(codigo);
         return ResponseEntity.noContent().build();
     }
 
@@ -92,12 +93,12 @@ public class ProcessoControle {
      * Retorna os detalhes completos de um processo, incluindo as unidades participantes
      * e o resumo de seus respectivos subprocessos.
      *
-     * @param id O ID do processo a ser detalhado.
+     * @param codigo O código do processo a ser detalhado.
      * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
      */
-    @GetMapping("/{id}/detalhes")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id) {
-        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id);
+    @GetMapping("/{codigo}/detalhes")
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long codigo) {
+        ProcessoDetalheDto detalhes = processoService.obterDetalhes(codigo);
         return ResponseEntity.ok(detalhes);
     }
 
@@ -107,24 +108,26 @@ public class ProcessoControle {
      * Corresponde ao CDU-03. O comportamento varia com base no tipo de processo:
      * 'MAPEAMENTO' ou 'REVISAO'.
      *
-     * @param id       O ID do processo a ser iniciado.
+     * @param codigo       O código do processo a ser iniciado.
      * @param tipo     O tipo de processo ('MAPEAMENTO' ou 'REVISAO').
      * @param unidades Uma lista opcional de IDs de unidades para restringir o início
      *                 do processo a um subconjunto dos participantes.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
-    @PostMapping("/{id}/iniciar")
+    @PostMapping("/{codigo}/iniciar")
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestParam(name = "tipo") String tipo, // Removido defaultValue e required=false
             @RequestBody(required = false) List<Long> unidades) {
 
         if ("REVISAO".equalsIgnoreCase(tipo)) {
-            processoService.iniciarProcessoRevisao(id, unidades);
+            processoService.iniciarProcessoRevisao(codigo, unidades);
         } else {
+            // TODO Tirar esse padrão e obrigar a passagem explicita do tipo do processo
+
             // por padrão, inicia mapeamento
-            processoService.iniciarProcessoMapeamento(id, unidades);
+            processoService.iniciarProcessoMapeamento(codigo, unidades);
         }
         return ResponseEntity.ok().build();
     }
@@ -135,13 +138,13 @@ public class ProcessoControle {
      * <p>
      * Corresponde ao CDU-21.
      *
-     * @param id O ID do processo a ser finalizado.
+     * @param codigo O código do processo a ser finalizado.
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
-    @PostMapping("/{id}/finalizar")
+    @PostMapping("/{codigo}/finalizar")
     @Operation(summary = "Finaliza um processo (CDU-21)")
-    public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        processoService.finalizar(id);
+    public ResponseEntity<?> finalizar(@PathVariable Long codigo) {
+        processoService.finalizar(codigo);
         return ResponseEntity.ok().build();
     }
 }

@@ -10,6 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -88,7 +93,7 @@ class UsuarioServiceTest {
 
         assertThatThrownBy(() -> usuarioService.autorizar(tituloEleitoral))
             .isInstanceOf(ErroDominioNaoEncontrado.class)
-            .hasMessageContaining("Usuário' com id '999' não encontrado");
+            .hasMessageContaining("Usuário' com codigo '999' não encontrado");
     }
 
     @Test

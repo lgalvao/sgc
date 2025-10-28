@@ -20,11 +20,12 @@ public class ConfigAsync {
      * @return Executor configurado para processar e-mails de forma assíncrona
      */
     @Bean(name = "executorDeTarefasDeEmail")
+    // TODO esse executor está me parecendo 'overengineering'
     public Executor executorDeTarefasDeEmail() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);           // Mínimo de threads ativas
-        executor.setMaxPoolSize(5);            // Máximo de threads
-        executor.setQueueCapacity(100);        // Capacidade da fila de espera
+        executor.setCorePoolSize(2);            // Mínimo de threads ativas
+        executor.setMaxPoolSize(5);             // Máximo de threads
+        executor.setQueueCapacity(100);         // Capacidade da fila de espera
         executor.setThreadNamePrefix("email-"); // Prefixo para identificação em logs
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);

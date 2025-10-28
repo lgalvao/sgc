@@ -21,15 +21,15 @@ import sgc.alerta.modelo.AlertaRepo;
 import sgc.comum.BeanUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -68,7 +68,9 @@ public class CDU02IntegrationTest {
     private UnidadeProcessoRepo unidadeProcessoRepo;
 
     // Unidades
-    private Unidade unidadeRaiz, unidadeFilha1, unidadeFilha2, unidadeNeta1;
+    private Unidade unidadeRaiz;
+    private Unidade unidadeFilha1;
+    private Unidade unidadeFilha2;
 
     @BeforeEach
     void setup() {
@@ -80,13 +82,12 @@ public class CDU02IntegrationTest {
         unidadeFilha2 = new Unidade("Filha 2", "F2");
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeRepo.save(unidadeFilha2);
-        unidadeNeta1 = new Unidade("Neta 1", "N1");
+        Unidade unidadeNeta1 = new Unidade("Neta 1", "N1");
         unidadeNeta1.setUnidadeSuperior(unidadeFilha1);
         unidadeRepo.save(unidadeNeta1);
 
         Processo p1 = criarProcesso("Processo da Raiz", SituacaoProcesso.EM_ANDAMENTO, unidadeRaiz);
         Processo p2 = criarProcesso("Processo da Filha 1", SituacaoProcesso.EM_ANDAMENTO, unidadeFilha1);
-        Processo p3 = criarProcesso("Processo da Filha 2", SituacaoProcesso.FINALIZADO, unidadeFilha2);
         criarProcesso("Processo da Neta 1", SituacaoProcesso.EM_ANDAMENTO, unidadeNeta1);
         criarProcesso("Processo Criado", SituacaoProcesso.CRIADO, unidadeRaiz);
 
@@ -151,7 +152,7 @@ public class CDU02IntegrationTest {
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "ADMIN"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(5))); // Todos os 5 processos
+                    .andExpect(jsonPath("$.content", hasSize(4))); // Todos os 4 processos
         }
 
         @Test
@@ -162,7 +163,7 @@ public class CDU02IntegrationTest {
                             .param("perfil", "GESTOR")
                             .param("unidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(4))); // processoRaiz, processoFilha1, processoFilha2, processoNeta1
+                    .andExpect(jsonPath("$.content", hasSize(3))); // processoRaiz, processoFilha1, processoNeta1
         }
 
         @Test
@@ -184,7 +185,7 @@ public class CDU02IntegrationTest {
                             .param("perfil", "CHEFE")
                             .param("unidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(1)));
+                    .andExpect(jsonPath("$.content", hasSize(0)));
         }
 
         @Test

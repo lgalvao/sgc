@@ -14,7 +14,7 @@ import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.subprocesso.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -44,12 +44,11 @@ class SubprocessoDtoServiceTest {
     private ConhecimentoRepo conhecimentoRepo;
 
     private Subprocesso subprocesso;
-    private Unidade unidade;
 
     @BeforeEach
     void setUp() {
         subprocesso = new Subprocesso();
-        unidade = new Unidade();
+        Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
     }

@@ -25,17 +25,16 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
-import sgc.subprocesso.dto.ConhecimentoAjusteDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
@@ -48,8 +47,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
@@ -92,7 +89,6 @@ public class CDU16IntegrationTest {
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
-    private Atividade atividade2;
 
     @BeforeEach
     void setUp() {
@@ -125,7 +121,7 @@ public class CDU16IntegrationTest {
 
         Competencia c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
         atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
+        Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
         competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade1.getCodigo()), c1, atividade1));
         competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade2.getCodigo()), c1, atividade2));
     }
@@ -155,15 +151,15 @@ public class CDU16IntegrationTest {
         @Test
         @DisplayName("Deve salvar ajustes no mapa e alterar a situação do subprocesso")
         void deveSalvarAjustesComSucesso() throws Exception {
-            Competencia c1 = competenciaRepo.findAll().get(0);
+            Competencia c1 = competenciaRepo.findAll().getFirst();
 
             var request = new SalvarAjustesReq(List.of(
                 CompetenciaAjusteDto.builder()
-                    .competenciaId(c1.getCodigo())
+                    .codCompetencia(c1.getCodigo())
                     .nome("Competência Ajustada")
                     .atividades(List.of(
                         AtividadeAjusteDto.builder()
-                            .atividadeId(atividade1.getCodigo())
+                            .codAtividade(atividade1.getCodigo())
                             .nome("Atividade 1 Ajustada")
                             .conhecimentos(List.of())
                             .build()

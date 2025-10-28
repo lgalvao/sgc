@@ -1,0 +1,21 @@
+{
+  "name": "sgc",
+  "version": "1.0.0",
+  "description": "SGC",
+  "homepage": "https://github.com/lgalvao/sgc#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgalvao/sgc.git"
+  },
+  "license": "ISC",
+  "author": "Leonardo Galvao",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1",
+    "@playwright/test": "^1.56.1"
+  }
+}

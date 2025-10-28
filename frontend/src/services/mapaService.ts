@@ -6,8 +6,8 @@ import {
   mapMapaCompletoDtoToModel,
 } from '@/mappers/mapas';
 
-export async function obterMapaVisualizacao(idSubprocesso: number): Promise<MapaVisualizacao> {
-  const response = await apiClient.get<MapaVisualizacao>(`/subprocessos/${idSubprocesso}/mapa-visualizacao`);
+export async function obterMapaVisualizacao(codSubrocesso: number): Promise<MapaVisualizacao> {
+  const response = await apiClient.get<MapaVisualizacao>(`/subprocessos/${codSubrocesso}/mapa-visualizacao`);
   return response.data;
 }
 

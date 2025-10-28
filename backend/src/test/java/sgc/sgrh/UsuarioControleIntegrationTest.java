@@ -15,6 +15,9 @@ import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 

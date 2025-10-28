@@ -8,25 +8,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.ImpactoMapaService;
-import sgc.mapa.MapaService;
-import sgc.mapa.MapaVisualizacaoService;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
-import sgc.sgrh.Usuario;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.mapa.service.MapaService;
+import sgc.mapa.service.MapaVisualizacaoService;
+import sgc.sgrh.modelo.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoMapaService;
+import sgc.subprocesso.service.SubprocessoMapaWorkflowService;
 
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoMapaControle {
-
     private final SubprocessoMapaService subprocessoMapaService;
     private final MapaService mapaService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
@@ -79,19 +82,19 @@ public class SubprocessoMapaControle {
     /**
      * Salva as alterações feitas no mapa de um subprocesso.
      *
-     * @param codSubprocesso O código do subprocesso.
+     * @param codigo O código do subprocesso.
      * @param request        O DTO contendo as alterações do mapa.
      * @param usuario        O usuário autenticado que está salvando o mapa.
      * @return O {@link MapaCompletoDto} representando o estado atualizado do mapa.
      */
-    @PostMapping("/{codSubprocesso}/mapa/atualizar")
+    @PostMapping("/{codigo}/mapa/atualizar")
     @Transactional
     public MapaCompletoDto salvarMapa(
-            @PathVariable Long codSubprocesso,
+            @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codSubprocesso, request, usuario.getTituloEleitoral());
+        return subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, usuario.getTituloEleitoral());
     }
 
     /**
@@ -108,19 +111,19 @@ public class SubprocessoMapaControle {
     /**
      * Salva os ajustes realizados em um mapa após a fase de validação.
      *
-     * @param codSubprocesso O código do subprocesso.
+     * @param codigo O código do subprocesso.
      * @param request        O DTO contendo as competências ajustadas.
      * @param usuario        O usuário autenticado que está salvando os ajustes.
      */
-    @PostMapping("/{codSubprocesso}/mapa-ajuste/atualizar")
+    @PostMapping("/{codigo}/mapa-ajuste/atualizar")
     @Transactional
     public void salvarAjustesMapa(
-            @PathVariable Long codSubprocesso,
+            @PathVariable Long codigo,
             @RequestBody @Valid SalvarAjustesReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
         subprocessoMapaService.salvarAjustesMapa(
-                codSubprocesso,
+                codigo,
                 request.competencias(),
                 usuario.getTituloEleitoral()
         );
@@ -149,57 +152,57 @@ public class SubprocessoMapaControle {
      * <p>
      * Corresponde ao CDU-15.
      *
-     * @param codSubprocesso O código do subprocesso.
+     * @param codigo O código do subprocesso.
      * @param request        O DTO com a estrutura completa do mapa a ser salvo.
      * @param usuario        O usuário autenticado que realiza a operação.
      * @return Um {@link ResponseEntity} com o {@link MapaCompletoDto} atualizado.
      */
-    @PostMapping("/{codSubprocesso}/mapa-completo/atualizar")
+    @PostMapping("/{codigo}/mapa-completo/atualizar")
     @Transactional
     @Operation(summary = "Salva um mapa completo com competências e atividades")
     public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
-            @PathVariable Long codSubprocesso,
+            @PathVariable Long codigo,
             @RequestBody @Valid SalvarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codSubprocesso, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.salvarMapaSubprocesso(codigo, request, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{codSubprocesso}/competencias")
+    @PostMapping("/{codigo}/competencias")
     @Transactional
     @Operation(summary = "Adiciona uma nova competência a um mapa")
     public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
-        @PathVariable Long codSubprocesso,
-        @RequestBody @Valid CompetenciaReq request,
-        @AuthenticationPrincipal Usuario usuario
+            @PathVariable Long codigo,
+            @RequestBody @Valid CompetenciaReq request,
+            @AuthenticationPrincipal Usuario usuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codSubprocesso, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.adicionarCompetencia(codigo, request, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 
-    @PutMapping("/{codSubprocesso}/competencias/{competenciaId}")
+    @PutMapping("/{codigo}/competencias/{codCompetencia}")
     @Transactional
     @Operation(summary = "Atualiza uma competência existente em um mapa")
     public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
-        @PathVariable Long codSubprocesso,
-        @PathVariable Long competenciaId,
-        @RequestBody @Valid CompetenciaReq request,
-        @AuthenticationPrincipal Usuario usuario
+            @PathVariable Long codigo,
+            @PathVariable Long codCompetencia,
+            @RequestBody @Valid CompetenciaReq request,
+            @AuthenticationPrincipal Usuario usuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codSubprocesso, competenciaId, request, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.atualizarCompetencia(codigo, codCompetencia, request, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 
-    @DeleteMapping("/{codSubprocesso}/competencias/{competenciaId}")
+    @DeleteMapping("/{codigo}/competencias/{codCompetencia}")
     @Transactional
     @Operation(summary = "Remove uma competência de um mapa")
     public ResponseEntity<MapaCompletoDto> removerCompetencia(
-        @PathVariable Long codSubprocesso,
-        @PathVariable Long competenciaId,
-        @AuthenticationPrincipal Usuario usuario
+            @PathVariable Long codigo,
+            @PathVariable Long codCompetencia,
+            @AuthenticationPrincipal Usuario usuario
     ) {
-        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codSubprocesso, competenciaId, usuario.getTituloEleitoral());
+        MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
     }
 }

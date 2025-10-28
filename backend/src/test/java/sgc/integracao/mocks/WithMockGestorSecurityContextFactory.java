@@ -7,9 +7,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 
 import java.util.Set;
 

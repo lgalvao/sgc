@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
@@ -19,24 +18,20 @@ import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.SgrhService;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -340,7 +335,7 @@ class CDU14IntegrationTest {
 
         ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
 
-        mockMvc.perform(post("/api/processos/{id}/iniciar", processoDto.getCodigo())
+        mockMvc.perform(post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
                         .param("tipo", "REVISAO")
                         .with(csrf()).with(user(gestor))
                         .contentType("application/json")

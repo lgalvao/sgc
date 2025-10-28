@@ -7,11 +7,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import sgc.sgrh.UsuarioRepo;
-import sgc.unidade.modelo.UnidadeRepo;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class TestSecurityConfig {
 
     @Bean

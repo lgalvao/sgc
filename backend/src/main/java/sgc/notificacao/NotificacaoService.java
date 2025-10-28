@@ -87,8 +87,7 @@ public class NotificacaoService {
                         if (Boolean.TRUE.equals(sucesso)) {
                             log.info("E-mail para {} enviado com sucesso.", emailDto.destinatario());
                         } else {
-                            log.error("Falha ao enviar e-mail para {} após {} tentativas.",
-                                    emailDto.destinatario(), MAX_TENTATIVAS);
+                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.destinatario(), MAX_TENTATIVAS);
                         }
                     })
                     .exceptionally(ex -> {
@@ -110,7 +109,7 @@ public class NotificacaoService {
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
-     *         email for enviado com sucesso, ou {@code false} caso contrário.
+     * email for enviado com sucesso, ou {@code false} caso contrário.
      */
     @Async("executorDeTarefasDeEmail")
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
@@ -159,16 +158,13 @@ public class NotificacaoService {
         notificacao.setDataHora(LocalDateTime.now());
         String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
         if (conteudo.length() > 500) {
-            conteudo = conteudo.substring(0, 497) + "...";
+            conteudo = "%s...".formatted(conteudo.substring(0, 497));
         }
         notificacao.setConteudo(conteudo);
         return notificacao;
     }
 
     private boolean isEmailValido(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
-        }
-        return PADRAO_EMAIL.matcher(email.trim()).matches();
+        return email != null && !email.trim().isEmpty() && PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 }

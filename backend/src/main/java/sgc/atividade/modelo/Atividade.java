@@ -12,16 +12,16 @@ import sgc.mapa.modelo.Mapa;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa uma atividade desempenhada em um determinado contexto,
+ * associada a um mapa de competências.
+ */
 @Entity
 @Table(name = "ATIVIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * Representa uma atividade desempenhada em um determinado contexto,
- * associada a um mapa de competências.
- */
 public class Atividade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")

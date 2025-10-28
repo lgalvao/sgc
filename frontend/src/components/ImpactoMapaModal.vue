@@ -234,7 +234,7 @@ watch(
   async novoValor => {
     if (novoValor) {
       await processosStore.fetchProcessoDetalhe(props.idProcesso);
-      // Supondo que idProcesso pode ser usado como idSubprocesso para fins de teste/compilação
+      // Supondo que idProcesso pode ser usado como codSubrocesso para fins de teste/compilação
       await mapasStore.fetchMapaCompleto(props.idProcesso);
     }
   },

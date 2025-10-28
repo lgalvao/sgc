@@ -415,7 +415,7 @@ async function salvarProcesso() {
           'O processo foi salvo com sucesso!'
       );
     }
-    await router.push('/painel');
+    router.push('/painel');
     limparCampos();
   } catch (error) {
     notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
@@ -462,7 +462,7 @@ async function confirmarIniciarProcesso() {
           'Processo iniciado',
           'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
       );
-      await router.push('/painel');
+      router.push('/painel');
       limparCampos();
     } catch (error) {
       notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
@@ -491,7 +491,7 @@ async function confirmarRemocao() {
         mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
         testId: 'notificacao-remocao'
       });
-      await router.push('/painel');
+      router.push('/painel');
     } catch (error) {
       notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
       console.error('Erro ao remover processo:', error);

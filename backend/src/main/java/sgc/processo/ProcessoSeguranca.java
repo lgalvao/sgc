@@ -3,13 +3,15 @@ package sgc.processo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import sgc.sgrh.SgrhService;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+// TODO precisa mesmo dessa classe separada?
 public class ProcessoSeguranca {
     private final SubprocessoRepo subprocessoRepo;
     private final SgrhService sgrhService;
@@ -28,10 +30,10 @@ public class ProcessoSeguranca {
      *
      * @param authentication O objeto de autenticação do Spring Security, contendo os
      *                       detalhes do usuário logado.
-     * @param idProcesso     O ID do processo cujo acesso está sendo verificado.
+     * @param codProcesso     O código do processo cujo acesso está sendo verificado.
      * @return {@code true} se o acesso for permitido, {@code false} caso contrário.
      */
-    public boolean checarAcesso(Authentication authentication, Long idProcesso) {
+    public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
@@ -45,16 +47,16 @@ public class ProcessoSeguranca {
         }
 
         // Para gestores, verifica se a unidade dele participa do processo.
-        List<sgc.sgrh.dto.PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
-        Long idUnidadeUsuario = perfis.stream()
+        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        Long codUnidadeUsuario = perfis.stream()
                 .findFirst()
                 .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
                 .orElse(null);
 
-        if (idUnidadeUsuario == null) {
+        if (codUnidadeUsuario == null) {
             return false;
         }
 
-        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(idProcesso, idUnidadeUsuario);
+        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidadeUsuario);
     }
 }

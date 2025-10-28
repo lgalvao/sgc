@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "frontend/src/*"
+      ],
+      "~/*": [
+        "e2e/*"
+      ]
+    },
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "jsx": "preserve",
+    "types": [
+      "vitest/globals",
+      "node",
+      "vite/client",
+      "@playwright/test"
+    ]
+  },
+  "include": [
+    "e2e/**/*.ts"
+  ]
+}

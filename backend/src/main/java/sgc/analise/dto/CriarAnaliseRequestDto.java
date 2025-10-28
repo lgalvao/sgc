@@ -5,6 +5,7 @@ import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.analise.modelo.TipoAnalise;
 
 @Builder
+// TODO converter para classe com @Builder
 public record CriarAnaliseRequestDto(
     Long subprocessoCodigo,
     String observacoes,

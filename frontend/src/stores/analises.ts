@@ -10,30 +10,30 @@ export const useAnalisesStore = defineStore('analises', {
         analisesPorSubprocesso: new Map<number, Analise[]>(),
     }),
     getters: {
-        getAnalisesPorSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.analisesPorSubprocesso.get(idSubprocesso) || [];
+        getAnalisesPorSubprocesso: (state) => (codSubrocesso: number) => {
+            return state.analisesPorSubprocesso.get(codSubrocesso) || [];
         },
     },
     actions: {
-        async fetchAnalisesCadastro(idSubprocesso: number) {
+        async fetchAnalisesCadastro(codSubrocesso: number) {
             const notificacoes = useNotificacoesStore();
             try {
-                const analises = await analiseService.listarAnalisesCadastro(idSubprocesso);
-                const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
+                const analises = await analiseService.listarAnalisesCadastro(codSubrocesso);
+                const atuais = this.analisesPorSubprocesso.get(codSubrocesso) || [];
                 const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
-                this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
+                this.analisesPorSubprocesso.set(codSubrocesso, [...atuais, ...analisesFiltradas]);
             } catch {
                 notificacoes.erro('Erro', 'Erro ao buscar histórico de análises de cadastro.');
             }
         },
 
-        async fetchAnalisesValidacao(idSubprocesso: number) {
+        async fetchAnalisesValidacao(codSubrocesso: number) {
             const notificacoes = useNotificacoesStore();
             try {
-                const analises = await analiseService.listarAnalisesValidacao(idSubprocesso);
-                const atuais = this.analisesPorSubprocesso.get(idSubprocesso) || [];
+                const analises = await analiseService.listarAnalisesValidacao(codSubrocesso);
+                const atuais = this.analisesPorSubprocesso.get(codSubrocesso) || [];
                 const analisesFiltradas = analises.filter(a => !atuais.some(aa => aa.codigo === a.codigo));
-                this.analisesPorSubprocesso.set(idSubprocesso, [...atuais, ...analisesFiltradas]);
+                this.analisesPorSubprocesso.set(codSubrocesso, [...atuais, ...analisesFiltradas]);
             } catch {
                 notificacoes.erro('Erro', 'Erro ao buscar histórico de análises de validação.');
             }

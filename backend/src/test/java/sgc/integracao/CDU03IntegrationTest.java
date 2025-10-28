@@ -19,7 +19,7 @@ import sgc.comum.erros.RestExceptionHandler;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.ProcessoControle;
-import sgc.processo.ProcessoService;
+import sgc.processo.service.ProcessoService;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.modelo.TipoProcesso;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfig.class)
 public class CDU03IntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
-    private static final String API_PROCESSOS_ID = "/api/processos/{id}";
+    private static final String API_PROCESSOS_ID = "/api/processos/{codigo}";
 
     @Autowired
     private MockMvc mockMvc;
@@ -78,7 +78,7 @@ public class CDU03IntegrationTest {
     @Test
     void testCriarProcesso_sucesso() throws Exception {
         List<Long> unidades = new ArrayList<>();
-        unidades.add(1L); // Assumindo que a unidade com ID 1 existe
+        unidades.add(1L); // Assumindo que a unidade com código 1 existe
 
         CriarProcessoReq requestDTO = criarCriarProcessoReq(
                 "Processo de Mapeamento Teste",
@@ -131,7 +131,7 @@ public class CDU03IntegrationTest {
         String responseBody = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         try {
             Files.createDirectories(Paths.get("build"));
-            Files.write(Paths.get("build/test-output.txt"), responseBody.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(Paths.get("build/test-output.txt"), responseBody);
         } catch (java.io.IOException e) {
             // Ignore for test purposes
         }
@@ -197,7 +197,7 @@ public class CDU03IntegrationTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", 999L) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", 999L) // código que não existe
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
@@ -233,7 +233,7 @@ public class CDU03IntegrationTest {
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L)) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L)) // código que não existe
                 .andExpect(status().isNotFound());
     }
 }

@@ -16,8 +16,12 @@ import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.atividade.modelo.Atividade;
 import sgc.comum.erros.ErroValidacao;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoMapaService;
+import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.util.List;
 import java.util.Map;
@@ -41,12 +45,12 @@ public class SubprocessoCadastroControle {
     /**
      * Obtém o histórico de análises da fase de cadastro de um subprocesso.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Uma {@link List} de {@link AnaliseHistoricoDto} com o histórico.
      */
-    @GetMapping("/{id}/historico-cadastro")
-    public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long id) {
-        return analiseService.listarPorSubprocesso(id, TipoAnalise.CADASTRO)
+    @GetMapping("/{codigo}/historico-cadastro")
+    public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codigo) {
+        return analiseService.listarPorSubprocesso(codigo, TipoAnalise.CADASTRO)
                 .stream()
                 .map(analiseMapper::toAnaliseHistoricoDto)
                 .toList();
@@ -56,17 +60,17 @@ public class SubprocessoCadastroControle {
      * Disponibiliza o cadastro de atividades de um subprocesso para a próxima
      * etapa de análise.
      *
-     * @param subprocessoId O ID do subprocesso.
-     * @param usuario       O usuário autenticado que está realizando a ação.
+     * @param codSubprocesso O código do subprocesso.
+     * @param usuario        O usuário autenticado que está realizando a ação.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
      */
-    @PostMapping("/{id}/disponibilizar")
+    @PostMapping("/{codigo}/disponibilizar")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
-            @PathVariable("id") Long subprocessoId,
+            @PathVariable("codigo") Long codSubprocesso,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        subprocessoWorkflowService.disponibilizarCadastro(subprocessoId, usuario);
+        subprocessoWorkflowService.disponibilizarCadastro(codSubprocesso, usuario);
         return ResponseEntity.ok(new RespostaDto("Cadastro de atividades disponibilizado"));
     }
 
@@ -76,15 +80,15 @@ public class SubprocessoCadastroControle {
      * Antes de disponibilizar, o método valida se todas as atividades do subprocesso
      * possuem pelo menos um conhecimento associado.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado que está realizando a ação.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
      * @throws ErroValidacao se existirem atividades sem conhecimentos.
      */
-    @PostMapping("/{id}/disponibilizar-revisao")
+    @PostMapping("/{codigo}/disponibilizar-revisao")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
-    public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(id);
+    public ResponseEntity<RespostaDto> disponibilizarRevisao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        List<Atividade> faltando = subprocessoService.obterAtividadesSemConhecimento(codigo);
         if (faltando != null && !faltando.isEmpty()) {
             var lista = faltando.stream()
                     .map(a -> Map.of("id", a.getCodigo(), "descricao", a.getDescricao()))
@@ -92,40 +96,40 @@ public class SubprocessoCadastroControle {
             throw new ErroValidacao("Existem atividades sem conhecimentos associados.", Map.of("atividadesSemConhecimento", lista));
         }
 
-        subprocessoWorkflowService.disponibilizarRevisao(id, usuario);
+        subprocessoWorkflowService.disponibilizarRevisao(codigo, usuario);
         return ResponseEntity.ok(new RespostaDto("Revisão do cadastro de atividades disponibilizada"));
     }
 
     /**
      * Obtém os dados de cadastro de um subprocesso.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Um {@link SubprocessoCadastroDto} com os dados do cadastro.
      */
-    @GetMapping("/{id}/cadastro")
-    public SubprocessoCadastroDto obterCadastro(@PathVariable Long id) {
-        return subprocessoDtoService.obterCadastro(id);
+    @GetMapping("/{codigo}/cadastro")
+    public SubprocessoCadastroDto obterCadastro(@PathVariable Long codigo) {
+        return subprocessoDtoService.obterCadastro(codigo);
     }
 
     /**
      * Devolve o cadastro de um subprocesso para o responsável pela unidade para
      * que sejam feitos ajustes.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
      * @param usuario O usuário autenticado (analista) que está realizando a devolução.
      */
-    @PostMapping("/{id}/devolver-cadastro")
+    @PostMapping("/{codigo}/devolver-cadastro")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.devolverCadastro(
-                id,
+                codigo,
                 sanitizedMotivo,
                 sanitizedObservacoes,
                 usuario
@@ -136,20 +140,20 @@ public class SubprocessoCadastroControle {
      * Aceita o cadastro de um subprocesso, movendo-o para a próxima etapa do fluxo
      * de trabalho.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
      * @param usuario O usuário autenticado (analista) que está aceitando o cadastro.
      */
-    @PostMapping("/{id}/aceitar-cadastro")
+    @PostMapping("/{codigo}/aceitar-cadastro")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.aceitarCadastro(
-                id,
+                codigo,
                 sanitizedObservacoes,
                 usuario.getTituloEleitoral()
         );
@@ -158,20 +162,20 @@ public class SubprocessoCadastroControle {
     /**
      * Homologa o cadastro de um subprocesso.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
      * @param usuario O usuário autenticado (gestor) que está homologando o cadastro.
      */
-    @PostMapping("/{id}/homologar-cadastro")
+    @PostMapping("/{codigo}/homologar-cadastro")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.homologarCadastro(
-                id,
+                codigo,
                 sanitizedObservacoes,
                 usuario.getTituloEleitoral()
         );
@@ -181,21 +185,21 @@ public class SubprocessoCadastroControle {
      * Devolve a revisão de um cadastro de subprocesso para o responsável pela unidade
      * para que sejam feitos ajustes.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o motivo e as observações da devolução.
      * @param usuario O usuário autenticado (analista) que está realizando a devolução.
      */
-    @PostMapping("/{id}/devolver-revisao-cadastro")
+    @PostMapping("/{codigo}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     public void devolverRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(
-                id,
+                codigo,
                 sanitizedMotivo,
                 sanitizedObservacoes,
                 usuario
@@ -205,20 +209,20 @@ public class SubprocessoCadastroControle {
     /**
      * Aceita a revisão do cadastro de um subprocesso.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da aceitação.
      * @param usuario O usuário autenticado (analista) que está aceitando a revisão.
      */
-    @PostMapping("/{id}/aceitar-revisao-cadastro")
+    @PostMapping("/{codigo}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
     public void aceitarRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(
-                id,
+                codigo,
                 sanitizedObservacoes,
                 usuario
         );
@@ -229,21 +233,21 @@ public class SubprocessoCadastroControle {
      * <p>
      * Esta ação é restrita a usuários com o perfil 'ADMIN'.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações da homologação.
      * @param usuario O usuário autenticado (administrador) que está homologando.
      */
-    @PostMapping("/{id}/homologar-revisao-cadastro")
+    @PostMapping("/{codigo}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
     @PreAuthorize("hasRole('ADMIN')")
     public void homologarRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(
-                id,
+                codigo,
                 sanitizedObservacoes,
                 usuario
         );
@@ -252,18 +256,18 @@ public class SubprocessoCadastroControle {
     /**
      * Importa atividades de um subprocesso de origem para o subprocesso de destino.
      *
-     * @param id      O ID do subprocesso de destino.
-     * @param request O DTO contendo o ID do subprocesso de origem.
+     * @param codigo  O código do subprocesso de destino.
+     * @param request O DTO contendo o código do subprocesso de origem.
      * @return Um {@link Map} com uma mensagem de sucesso.
      */
-    @PostMapping("/{id}/importar-atividades")
+    @PostMapping("/{codigo}/importar-atividades")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestBody @Valid ImportarAtividadesRequest request
     ) {
-        subprocessoMapaService.importarAtividades(id, request.subprocessoOrigemId());
+        subprocessoMapaService.importarAtividades(codigo, request.subprocessoOrigemId());
         return Map.of("message", "Atividades importadas com sucesso.");
     }
 }

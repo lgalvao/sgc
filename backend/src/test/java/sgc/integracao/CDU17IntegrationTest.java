@@ -29,12 +29,12 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.DisponibilizarMapaReq;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
 @org.springframework.context.annotation.Import(TestSecurityConfig.class)
 class CDU17IntegrationTest {
-    private static final String API_URL = "/api/subprocessos/{id}/disponibilizar-mapa";
+    private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
     private static final String SEDOC_LITERAL = "SEDOC";
 

@@ -25,11 +25,8 @@ import java.util.stream.Collectors;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
-    private String sanitize(String untrustedText) {
-        if (untrustedText == null) {
-            return null;
-        }
-        return SANITIZER_POLICY.sanitize(untrustedText);
+    private String sanitizar(String texto) {
+        return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {
@@ -51,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         error.getObjectName(),
                         error.getField(),
                         error.getRejectedValue(),
-                        sanitize(error.getDefaultMessage())))
+                        sanitizar(error.getDefaultMessage())))
                 .collect(Collectors.toList()) : null;
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -59,7 +56,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroValidacao.class)
     protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage()));
+        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage()));
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
         }
@@ -75,7 +72,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 violation.getRootBeanClass().getSimpleName(),
                 violation.getPropertyPath().toString(),
                 violation.getInvalidValue(),
-                sanitize(violation.getMessage())))
+                sanitizar(violation.getMessage())))
             .collect(Collectors.toList());
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
@@ -83,13 +80,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroDominioNaoEncontrado.class)
     protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(ErroDominioAccessoNegado.class)
     protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
         log.warn("Acesso negado: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -116,7 +113,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroProcesso.class)
     protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
         log.error("Erro de negócio no processo: {}", ex.getMessage(), ex);
-        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)

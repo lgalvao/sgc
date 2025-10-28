@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
+import sgc.mapa.service.MapaService;
 
 import java.net.URI;
 import java.util.List;
@@ -23,8 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaControle {
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
-            .toFactory();
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
     private final MapaService mapaService;
     private final MapaMapper mapaMapper;
@@ -58,15 +58,15 @@ public class MapaControle {
     }
 
     /**
-     * Busca e retorna um mapa de competências específico pelo seu ID.
+     * Busca e retorna um mapa de competências específico pelo seu código.
      *
-     * @param id O ID do mapa a ser buscado.
+     * @param codigo O código do mapa a ser buscado.
      * @return Um {@link ResponseEntity} contendo o {@link MapaDto} correspondente.
      */
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtém um mapa pelo ID")
-    public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
-        var mapa = mapaService.obterPorId(id);
+    @GetMapping("/{codigo}")
+    @Operation(summary = "Obtém um mapa pelo código")
+    public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
+        var mapa = mapaService.obterPorCodigo(codigo);
         return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
@@ -77,7 +77,7 @@ public class MapaControle {
      *
      * @param mapaDto O DTO com os dados do mapa a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa
-     *         e o {@link MapaDto} criado no corpo da resposta.
+     * e o {@link MapaDto} criado no corpo da resposta.
      */
     @PostMapping
     @Operation(summary = "Cria um novo mapa")
@@ -95,7 +95,7 @@ public class MapaControle {
      * <p>
      * Os campos de texto do DTO são sanitizados para remover HTML antes da atualização.
      *
-     * @param codMapa O ID do mapa a ser atualizado.
+     * @param codMapa O código do mapa a ser atualizado.
      * @param mapaDto O DTO com os novos dados do mapa.
      * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
      */
@@ -112,7 +112,7 @@ public class MapaControle {
     /**
      * Exclui um mapa de competências.
      *
-     * @param codMapa O ID do mapa a ser excluído.
+     * @param codMapa O código do mapa a ser excluído.
      * @return Um {@link ResponseEntity} com status 204 No Content.
      */
     @PostMapping("/{codMapa}/excluir")

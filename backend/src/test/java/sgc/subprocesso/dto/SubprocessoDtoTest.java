@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +29,7 @@ class SubprocessoDtoTest {
         LocalDateTime now = LocalDateTime.now();
         AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, OBSERVACOES, null, null);
 
-        assertEquals(1L, dto.id());
+        assertEquals(1L, dto.codigo());
         assertEquals(now, dto.dataHora());
         assertEquals(OBSERVACOES, dto.observacoes());
     }
@@ -51,26 +51,39 @@ class SubprocessoDtoTest {
     @Test
     void AtividadeAjusteDto_RecordConstructorAndGetters() {
         List<ConhecimentoAjusteDto> conhecimentos = List.of(ConhecimentoAjusteDto.builder().conhecimentoId(1L).nome(COMPETENCIA).incluido(true).build());
-        AtividadeAjusteDto dto = AtividadeAjusteDto.builder().atividadeId(1L).nome(ATIVIDADE).conhecimentos(conhecimentos).build();
+        AtividadeAjusteDto dto = AtividadeAjusteDto.builder().codAtividade(1L).nome(ATIVIDADE).conhecimentos(conhecimentos).build();
 
-        assertEquals(1L, dto.getAtividadeId());
+        assertEquals(1L, dto.getCodAtividade());
         assertEquals(ATIVIDADE, dto.getNome());
         assertEquals(conhecimentos, dto.getConhecimentos());
     }
 
     @Test
     void CompetenciaAjusteDto_RecordConstructorAndGetters() {
-        List<AtividadeAjusteDto> atividades = List.of(AtividadeAjusteDto.builder().atividadeId(1L).nome(ATIVIDADE).conhecimentos(List.of()).build());
-        CompetenciaAjusteDto dto = CompetenciaAjusteDto.builder().competenciaId(1L).nome(COMPETENCIA).atividades(atividades).build();
+        List<AtividadeAjusteDto> atividades = List.of(AtividadeAjusteDto.builder()
+                .codAtividade(1L)
+                .nome(ATIVIDADE)
+                .conhecimentos(List.of())
+                .build());
 
-        assertEquals(1L, dto.getCompetenciaId());
+        CompetenciaAjusteDto dto = CompetenciaAjusteDto.builder()
+                .codCompetencia(1L)
+                .nome(COMPETENCIA)
+                .atividades(atividades)
+                .build();
+
+        assertEquals(1L, dto.getCodCompetencia());
         assertEquals(COMPETENCIA, dto.getNome());
         assertEquals(atividades, dto.getAtividades());
     }
 
     @Test
     void ConhecimentoAjusteDto_RecordConstructorAndGetters() {
-        ConhecimentoAjusteDto dto = ConhecimentoAjusteDto.builder().conhecimentoId(1L).nome(COMPETENCIA).incluido(true).build();
+        ConhecimentoAjusteDto dto = ConhecimentoAjusteDto.builder()
+                .conhecimentoId(1L)
+                .nome(COMPETENCIA)
+                .incluido(true)
+                .build();
 
         assertEquals(1L, dto.getConhecimentoId());
         assertEquals(COMPETENCIA, dto.getNome());
@@ -87,7 +100,6 @@ class SubprocessoDtoTest {
 
     @Test
     void DevolverCadastroReq_InvalidMotivo_ThrowsException() {
-        // Test will be handled by validation framework during actual usage
         DevolverCadastroReq req = new DevolverCadastroReq("", OBSERVACOES);
         assertEquals("", req.motivo());
     }
@@ -95,13 +107,11 @@ class SubprocessoDtoTest {
     @Test
     void DevolverValidacaoReq_RecordConstructorAndGetters() {
         DevolverValidacaoReq req = new DevolverValidacaoReq(JUSTIFICATIVA);
-
         assertEquals(JUSTIFICATIVA, req.justificativa());
     }
 
     @Test
     void DevolverValidacaoReq_InvalidJustificativa_ThrowsException() {
-        // Test will be handled by validation framework during actual usage
         DevolverValidacaoReq req = new DevolverValidacaoReq("");
         assertEquals("", req.justificativa());
     }
@@ -131,10 +141,21 @@ class SubprocessoDtoTest {
 
     @Test
     void MapaAjusteDto_RecordConstructorAndGetters() {
-        List<CompetenciaAjusteDto> competencias = List.of(CompetenciaAjusteDto.builder().competenciaId(1L).nome("Competência").atividades(List.of()).build());
-        MapaAjusteDto dto = MapaAjusteDto.builder().mapaId(1L).unidadeNome(UNIDADE).competencias(competencias).justificativaDevolucao("Justificativa").build();
+        List<CompetenciaAjusteDto> competencias = List.of(CompetenciaAjusteDto.builder()
+                .codCompetencia(1L)
+                .nome("Competência")
+                .atividades(List.of())
+                .build()
+        );
 
-        assertEquals(1L, dto.getMapaId());
+        MapaAjusteDto dto = MapaAjusteDto.builder()
+                .codMapa(1L)
+                .unidadeNome(UNIDADE)
+                .competencias(competencias)
+                .justificativaDevolucao("Justificativa")
+                .build();
+
+        assertEquals(1L, dto.getCodMapa());
         assertEquals(UNIDADE, dto.getUnidadeNome());
         assertEquals(competencias, dto.getCompetencias());
         assertEquals("Justificativa", dto.getJustificativaDevolucao());
@@ -177,7 +198,7 @@ class SubprocessoDtoTest {
     @Test
     void SubprocessoCadastroDto_RecordConstructorAndAccessors() {
         List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividades = List.of(
-                SubprocessoCadastroDto.AtividadeCadastroDTO.builder().id(1L).descricao("Atividade").conhecimentos(List.of()).build()
+                SubprocessoCadastroDto.AtividadeCadastroDTO.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
         );
         SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder().subprocessoId(1L).unidadeSigla(SIGLA).atividades(atividades).build();
 
@@ -189,7 +210,7 @@ class SubprocessoDtoTest {
     @Test
     void SubprocessoDetalheDto_RecordConstructorAndAccessors() {
         SubprocessoDetalheDto.UnidadeDto unidade = SubprocessoDetalheDto.UnidadeDto.builder().codigo(1L).sigla(SIGLA).nome(NOME).build();
-        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().codigo(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
         LocalDateTime prazo = LocalDateTime.now();
         List<MovimentacaoDto> movimentacoes = List.of();
         List<SubprocessoDetalheDto.ElementoProcessoDto> elementos = List.of();
@@ -224,9 +245,9 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoDetalheDto_ResponsavelDTO_RecordConstructorAndAccessors() {
-        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().id(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
+        SubprocessoDetalheDto.ResponsavelDto responsavel = SubprocessoDetalheDto.ResponsavelDto.builder().codigo(1L).nome(NOME).tipoResponsabilidade("Tipo").ramal("Ramal").email("email@exemplo.com").build();
 
-        assertEquals(1L, responsavel.getId());
+        assertEquals(1L, responsavel.getCodigo());
         assertEquals(NOME, responsavel.getNome());
         assertEquals("Tipo", responsavel.getTipoResponsabilidade());
         assertEquals("Ramal", responsavel.getRamal());
@@ -261,9 +282,9 @@ class SubprocessoDtoTest {
         );
 
         assertEquals(1L, dto.getCodigo());
-        assertEquals(2L, dto.getProcessoCodigo());
-        assertEquals(3L, dto.getUnidadeCodigo());
-        assertEquals(4L, dto.getMapaCodigo());
+        assertEquals(2L, dto.getCodProcesso());
+        assertEquals(3L, dto.getCodUnidade());
+        assertEquals(4L, dto.getCodMapa());
         assertEquals(dataLimite1, dto.getDataLimiteEtapa1());
         assertEquals(dataFim1, dto.getDataFimEtapa1());
         assertEquals(dataLimite2, dto.getDataLimiteEtapa2());

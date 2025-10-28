@@ -17,6 +17,8 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.modelo.ErroProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
+import sgc.processo.service.ProcessoService;
 
 import java.time.LocalDateTime;
 import java.util.List;

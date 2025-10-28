@@ -1,0 +1,326 @@
+package sgc.subprocesso.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.notificacao.NotificacaoService;
+import sgc.subprocesso.modelo.Subprocesso;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
+
+@Service
+@RequiredArgsConstructor
+// TODO esta classe está usando muitos strings fixos. Mudar para usar templates do thymeleaf
+// TODO em vez de IllegalArgumentException usar exceções de negócio específicas
+// TODO usar builder par instanciar os alertas. Considerar criar método auxiliar: codigo esta repetitivo
+public class SubprocessoNotificacaoService {
+    private final NotificacaoService notificacaoService;
+    private final AlertaRepo repositorioAlerta;
+    private final UnidadeRepo unidadeRepo;
+
+    /**
+     * Envia notificações (email e alerta) sobre a disponibilização de um mapa para validação.
+     * <p>
+     * Corresponde aos itens 10.10, 10.11 e 10.12 do CDU-17. Notifica a própria
+     * unidade, suas unidades superiores hierarquicamente e a SEDOC.
+     *
+     * @param sp O subprocesso cujo mapa foi disponibilizado.
+     */
+    public void notificarDisponibilizacaoMapa(Subprocesso sp) {
+        Unidade unidade = sp.getUnidade();
+        if (unidade == null) return;
+
+        String nomeProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidade = unidade.getSigla();
+        String dataLimite = sp.getDataLimiteEtapa2().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        // E-mail para a unidade do subprocesso (Item 10.11 do CDU)
+        String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
+        String corpoUnidade = String.format(
+                "Prezado(a) Chefe da unidade %s,%n%n" +
+                        "O mapa de competências da sua unidade, referente ao processo '%s', foi disponibilizado para validação.%n" +
+                        "O prazo para conclusão desta etapa é %s.%n%n" +
+                        "Acesse o SGC para realizar a validação.",
+                siglaUnidade, nomeProcesso, dataLimite);
+        notificacaoService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
+
+        // E-mail para as unidades superiores (Item 10.12 do CDU)
+        String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
+        String corpoSuperior = String.format(
+                "Prezado(a) Chefe,%n%n" +
+                        "O mapa de competências da unidade %s, referente ao processo '%s', foi disponibilizado para validação.%n" +
+                        "O prazo para conclusão desta etapa é %s.%n%n" +
+                        "Acompanhe o processo no SGC.",
+                siglaUnidade, nomeProcesso, dataLimite);
+        Unidade superior = unidade.getUnidadeSuperior();
+        while (superior != null) {
+            notificacaoService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
+            superior = superior.getUnidadeSuperior();
+        }
+
+
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Mapa de competências da unidade %s disponibilizado para análise", siglaUnidade));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sedoc);
+        alerta.setUnidadeDestino(unidade);
+        repositorioAlerta.save(alerta);
+    }
+
+    /**
+     * Notifica a unidade superior sobre a apresentação de sugestões em um mapa.
+     *
+     * @param sp O subprocesso no qual as sugestões foram feitas.
+     */
+    public void notificarSugestoes(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Sugestões apresentadas para o mapa de competências da %s".formatted(sp.getUnidade().getSigla()),
+                    "A unidade %s apresentou sugestões para o mapa de competências elaborado no processo %s. A análise dessas sugestões já pode ser realizada no sistema.".formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao())
+            );
+
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Sugestões para o mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade());
+            alerta.setUnidadeDestino(unidadeSuperior);
+            repositorioAlerta.save(alerta);
+        }
+    }
+
+    /**
+     * Notifica a unidade superior sobre a submissão de uma validação de mapa para análise.
+     *
+     * @param sp O subprocesso cuja validação foi submetida.
+     */
+    public void notificarValidacao(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                    "A unidade " + sp.getUnidade().getSigla() + " validou o mapa de competências elaborado no processo " + sp.getProcesso().getDescricao() + ". A análise dessa validação já pode ser realizada no sistema."
+            );
+
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Validação do mapa de competências da " + sp.getUnidade().getSigla() + " aguardando análise");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade());
+            alerta.setUnidadeDestino(unidadeSuperior);
+            repositorioAlerta.save(alerta);
+        }
+    }
+
+    /**
+     * Notifica uma unidade sobre a devolução da validação do seu mapa para ajustes.
+     *
+     * @param sp               O subprocesso relacionado.
+     * @param unidadeDevolucao A unidade que receberá a notificação de devolução.
+     */
+    public void notificarDevolucao(Subprocesso sp, Unidade unidadeDevolucao) {
+        notificacaoService.enviarEmail(
+                unidadeDevolucao.getSigla(),
+                "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
+                "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvida para ajustes. Acompanhe o processo no sistema."
+        );
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao("Cadastro de atividades e conhecimentos da unidade " + sp.getUnidade().getSigla() + " devolvido para ajustes");
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+        alerta.setUnidadeDestino(unidadeDevolucao);
+        repositorioAlerta.save(alerta);
+    }
+
+    /**
+     * Notifica a unidade superior hierárquica sobre o aceite de uma validação,
+     * submetendo-a para a próxima etapa de análise.
+     *
+     * @param sp O subprocesso cuja validação foi aceita.
+     */
+    public void notificarAceite(Subprocesso sp) {
+        Unidade unidadeSuperior = sp.getUnidade().getUnidadeSuperior().getUnidadeSuperior();
+        if (unidadeSuperior != null) {
+            notificacaoService.enviarEmail(
+                    unidadeSuperior.getSigla(),
+                    "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
+                    "A validação do mapa de competências da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi submetida para análise por essa unidade. A análise já pode ser realizada no sistema."
+            );
+
+            Alerta alerta = new Alerta();
+            alerta.setDescricao("Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise");
+            alerta.setProcesso(sp.getProcesso());
+            alerta.setDataHora(java.time.LocalDateTime.now());
+            alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+            alerta.setUnidadeDestino(unidadeSuperior);
+            repositorioAlerta.save(alerta);
+        }
+    }
+
+    /**
+     * Notifica a unidade responsável sobre a devolução do seu cadastro de atividades
+     * para ajustes.
+     *
+     * @param sp               O subprocesso cujo cadastro foi devolvido.
+     * @param unidadeDevolucao A unidade que receberá a notificação.
+     * @param motivo           O motivo da devolução.
+     */
+    public void notificarDevolucaoCadastro(Subprocesso sp, Unidade unidadeDevolucao, String motivo) {
+        notificacaoService.enviarEmail(
+                unidadeDevolucao.getSigla(),
+                "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
+                "O cadastro de atividades da " + sp.getUnidade().getSigla() + " no processo " + sp.getProcesso().getDescricao() + " foi devolvido para ajustes com o motivo: " + motivo + ". Acompanhe o processo no sistema."
+        );
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao("Cadastro de atividades da unidade " + sp.getUnidade().getSigla() + " devolvido para ajustes: " + motivo);
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade().getUnidadeSuperior());
+        alerta.setUnidadeDestino(unidadeDevolucao);
+        repositorioAlerta.save(alerta);
+    }
+
+    /**
+     * Notifica a unidade de destino sobre o aceite de um cadastro, submetendo-o
+     * para a próxima fase de análise.
+     * <p>
+     * Corresponde aos itens 10.7 e 10.8 do CDU-13.
+     *
+     * @param sp             O subprocesso cujo cadastro foi aceito.
+     * @param unidadeDestino A unidade que realizará a próxima análise.
+     */
+    public void notificarAceiteCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeOrigem = sp.getUnidade().getSigla();
+        String nomeProcesso = sp.getProcesso().getDescricao();
+
+        // 1. Enviar E-mail (CDU-13 Item 10.7)
+        String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem + " submetido para análise";
+        String corpo = String.format(
+                "Prezado(a) responsável pela %s,%n" +
+                        "O cadastro de atividades e conhecimentos da %s no processo %s foi submetido para análise por essa unidade.%n" +
+                        "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+                unidadeDestino.getSigla(),
+                siglaUnidadeOrigem,
+                nomeProcesso
+        );
+        notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao("Cadastro de atividades e conhecimentos da unidade " + siglaUnidadeOrigem + " submetido para análise");
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade());
+        alerta.setUnidadeDestino(unidadeDestino);
+        repositorioAlerta.save(alerta);
+    }
+
+    /**
+     * Notifica a unidade responsável sobre a devolução da revisão de seu cadastro
+     * para ajustes.
+     * <p>
+     * Corresponde aos itens 10.9 e 10.10 do CDU-14.
+     *
+     * @param sp               O subprocesso cuja revisão foi devolvida.
+     * @param unidadeAnalise   A unidade que realizou a análise e devolução.
+     * @param unidadeDevolucao A unidade que receberá a notificação para ajustar o cadastro.
+     */
+    public void notificarDevolucaoRevisaoCadastro(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
+        String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+
+        String assunto = String.format("SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes", siglaUnidadeSubprocesso);
+        String corpo = String.format(
+                "Prezado(a) responsável pela %s,%n" +
+                        "O cadastro de atividades e conhecimentos da %s no processo %s foi devolvido para ajustes.%n" +
+                        "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
+                unidadeDevolucao.getSigla(),
+                siglaUnidadeSubprocesso,
+                descricaoProcesso
+        );
+        notificacaoService.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Cadastro de atividades e conhecimentos da unidade %s devolvido para ajustes", siglaUnidadeSubprocesso));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(unidadeAnalise);
+        alerta.setUnidadeDestino(unidadeDevolucao);
+        repositorioAlerta.save(alerta);
+    }
+
+    /**
+     * Notifica a unidade de destino sobre o aceite da revisão de um cadastro,
+     * submetendo-o para a próxima fase de análise.
+     * <p>
+     * Corresponde aos itens 11.7 e 11.8 do CDU-14.
+     *
+     * @param sp             O subprocesso cuja revisão de cadastro foi aceita.
+     * @param unidadeDestino A unidade que realizará a próxima análise.
+     */
+    public void notificarAceiteRevisaoCadastro(Subprocesso sp, Unidade unidadeDestino) {
+        if (unidadeDestino == null || sp.getUnidade() == null) return;
+
+        String siglaUnidadeSubprocesso = sp.getUnidade().getSigla();
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+        String siglaUnidadeSuperior = unidadeDestino.getSigla();
+
+        // CDU-14 Item 11.7: Notificação por e-mail
+        String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidadeSubprocesso);
+        String corpo = String.format(
+                "Prezado(a) responsável pela %s,%n" +
+                        "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
+                        "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
+                siglaUnidadeSuperior,
+                siglaUnidadeSubprocesso,
+                descricaoProcesso
+        );
+        notificacaoService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
+
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Revisão do cadastro de atividades e conhecimentos da unidade %s submetida para análise", siglaUnidadeSubprocesso));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sp.getUnidade());
+        alerta.setUnidadeDestino(unidadeDestino);
+        repositorioAlerta.save(alerta);
+    }
+
+    public void notificarHomologacaoMapa(Subprocesso sp) {
+        Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
+                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+
+        String descricaoProcesso = sp.getProcesso().getDescricao();
+
+        // Notificação por e-mail
+        String assunto = String.format("SGC: Mapa de competências do processo %s homologado", descricaoProcesso);
+        String corpo = String.format(
+                "Prezado(a) responsável pela SEDOC,%n" +
+                        "O mapa de competências do processo %s foi homologado.%n" +
+                        "Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].",
+                descricaoProcesso
+        );
+        notificacaoService.enviarEmail(sedoc.getSigla(), assunto, corpo);
+
+        // Alerta interno
+        Alerta alerta = new Alerta();
+        alerta.setDescricao(String.format("Mapa de competências do processo %s homologado", descricaoProcesso));
+        alerta.setProcesso(sp.getProcesso());
+        alerta.setDataHora(java.time.LocalDateTime.now());
+        alerta.setUnidadeOrigem(sedoc);
+        alerta.setUnidadeDestino(sedoc); // O alerta é para a própria SEDOC
+        repositorioAlerta.save(alerta);
+    }
+}

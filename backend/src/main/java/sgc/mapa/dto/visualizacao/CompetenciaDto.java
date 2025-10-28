@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record CompetenciaDto(
-    Long id,
+    Long codigo,
     String descricao,
     List<AtividadeDto> atividades
 ) {

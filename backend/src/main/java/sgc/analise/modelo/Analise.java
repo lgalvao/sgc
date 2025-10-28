@@ -10,12 +10,6 @@ import sgc.subprocesso.modelo.Subprocesso;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "ANALISE", schema = "sgc")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 /**
  * Representa um registro de análise realizado em um subprocesso.
  * <p>
@@ -23,6 +17,12 @@ import java.time.LocalDateTime;
  * análise (e.g., análise de cadastro, análise de validação), registrando a ação,
  * o analista, as observações e o resultado.
  */
+@Entity
+@Table(name = "ANALISE", schema = "sgc")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Analise extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
