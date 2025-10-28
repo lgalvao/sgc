@@ -56,10 +56,9 @@ A suíte de testes E2E usa o Playwright para interagir com a aplicação. A conf
 
 2.  **Verifique se o Backend Iniciou:** Aguarde alguns segundos e verifique o `backend.log` para confirmar que o servidor iniciou com sucesso (procure pela mensagem "Started Sgc").
 
-3.  **Execute os Testes E2E:** Com o backend rodando, navegue até o diretório `frontend` e execute o comando do Playwright.
+3.  **Execute os Testes E2E:** Com o backend rodando, execute o comando do Playwright a partir do **diretório raiz**.
 
     ```bash
-    cd /app/frontend
     npm run test:e2e
     ```
 
