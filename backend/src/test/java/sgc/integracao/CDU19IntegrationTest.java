@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest {
@@ -74,17 +74,28 @@ class CDU19IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
-        unidadeRepo.save(unidadeSuperior);
+        // Limpar dados
+        movimentacaoRepo.deleteAll();
+        alertaRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        mapaRepo.deleteAll();
+        processoRepo.deleteAll();
+        usuarioRepo.deleteAll();
+        unidadeRepo.deleteAll();
 
+        // Criar Unidades
+        unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "UNISUP"));
         unidade = new Unidade("Unidade Subprocesso", "UNISUB");
         unidade.setUnidadeSuperior(unidadeSuperior);
-        unidadeRepo.save(unidade);
+        unidade = unidadeRepo.save(unidade);
 
-        Usuario chefe = usuarioRepo.save(new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE)));
+        // Criar Usuário Chefe e associar à unidade
+        Usuario chefe = new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE));
+        usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
+        // Criar Processo, Mapa e Subprocesso
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
         Mapa mapa = mapaRepo.save(new Mapa());
         subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());

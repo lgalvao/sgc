@@ -3,8 +3,8 @@
 Ator: CHEFE
 
 Pré-condições:
-● Usuário logado com perfil CHEFE.
-● Subprocesso de mapeamento da unidade na situação 'Cadastro em andamento'.
+- Usuário logado com perfil CHEFE.
+- Subprocesso de mapeamento da unidade na situação 'Cadastro em andamento'.
 
 Fluxo principal:
 

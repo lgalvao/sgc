@@ -53,6 +53,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+
+import java.util.Set;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -114,11 +119,21 @@ class CDU17IntegrationTest {
         usuarioRepo.deleteAll();
         unidadeRepo.deleteAll();
 
+        // Criar Usuários de Teste
+        usuarioRepo.save(new Usuario(111111111111L, "Admin User", "admin@example.com", "123", null, Set.of(Perfil.ADMIN)));
+        usuarioRepo.save(new Usuario(222222222222L, "Gestor User", "gestor@example.com", "123", null, Set.of(Perfil.GESTOR)));
+        Usuario titularUS = usuarioRepo.save(new Usuario(444444444444L, "Titular US", "titular.us@example.com", "123", null, Set.of(Perfil.CHEFE)));
+        Usuario titularUT = usuarioRepo.save(new Usuario(555555555555L, "Titular UT", "titular.ut@example.com", "123", null, Set.of(Perfil.CHEFE)));
+
         // Criar Unidades
         unidadeRepo.save(new Unidade(SEDOC_LITERAL, SEDOC_LITERAL));
-        Unidade unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "US"));
+        Unidade unidadeSuperior = new Unidade("Unidade Superior", "US");
+        unidadeSuperior.setTitular(titularUS);
+        unidadeRepo.save(unidadeSuperior);
+
         unidade = new Unidade("Unidade de Teste", "UT");
         unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade.setTitular(titularUT);
         unidade = unidadeRepo.save(unidade);
 
         // Criar Processo e Mapa
@@ -236,7 +251,7 @@ class CDU17IntegrationTest {
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isConflict());
         }
 
         @Test

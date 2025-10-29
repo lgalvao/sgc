@@ -3,9 +3,9 @@
 Atores: GESTOR e ADMIN
 
 Pré-condições:
-● Usuário logado com perfil GESTOR ou ADMIN
-● Processo de mapeamento iniciado que tenha a unidade como participante
-● Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
+- Usuário logado com perfil GESTOR ou ADMIN
+- Processo de mapeamento iniciado que tenha a unidade como participante
+- Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
 usuário.
 
 Fluxo principal:

@@ -247,9 +247,7 @@ public class SubprocessoWorkflowService {
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes(justificativa)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(TipoAcaoAnalise.DEVOLUCAO)
-                .unidadeSigla(usuario.getUnidade().getSigla())
+                .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
                 .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
                 .motivo(justificativa)
                 .build());
@@ -288,9 +286,7 @@ public class SubprocessoWorkflowService {
         analiseService.criarAnalise(CriarAnaliseRequestDto.builder()
                 .subprocessoCodigo(codSubprocesso)
                 .observacoes("Aceite da validação")
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(TipoAcaoAnalise.ACEITE)
-                .unidadeSigla(usuario.getUnidade().getSigla())
+                .unidadeSigla(sp.getUnidade().getUnidadeSuperior().getSigla())
                 .analistaUsuarioTitulo(String.valueOf(usuario.getTituloEleitoral()))
                 .motivo(null)
                 .build());

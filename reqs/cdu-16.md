@@ -3,7 +3,7 @@
 Ator: ADMIN
 
 Pré-condições:
-● Processo de Revisão, com ao menos uma unidade com subprocesso nas situações 'Revisão do cadastro homologada' ou 'Mapa
+- Processo de Revisão, com ao menos uma unidade com subprocesso nas situações 'Revisão do cadastro homologada' ou 'Mapa
 ajustado'.
 
 Fluxo principal:

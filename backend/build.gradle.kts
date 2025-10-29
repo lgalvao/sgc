@@ -77,6 +77,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     jvmArgs = listOf(
+        "-Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
         "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=ERROR",
         "-Dlogging.level.org.hibernate=ERROR",
@@ -100,20 +101,20 @@ tasks.withType<Test> {
             logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
+}
 
-    tasks.withType<JavaCompile> {
-        options.apply {
-            isIncremental = true
-            isFork = true
-            encoding = "UTF-8"
-        }
+tasks.withType<JavaCompile> {
+    options.apply {
+        isIncremental = true
+        isFork = true
+        encoding = "UTF-8"
     }
+}
 
-    tasks.register<BootRun>("bootRunE2E") {
-        group = "Application"
-        description = "Runs the application with the 'e2e' profile for end-to-end testing."
-        jvmArgs = listOf("-Dspring.profiles.active=e2e")
-        mainClass.set("sgc.Sgc")
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
+tasks.register<BootRun>("bootRunE2E") {
+    group = "Application"
+    description = "Runs the application with the 'e2e' profile for end-to-end testing."
+    jvmArgs = listOf("-Dspring.profiles.active=e2e")
+    mainClass.set("sgc.Sgc")
+    classpath = sourceSets.main.get().runtimeClasspath
 }
