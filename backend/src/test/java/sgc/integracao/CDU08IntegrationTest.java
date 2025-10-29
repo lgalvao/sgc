@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
 class CDU08IntegrationTest {
     @Autowired
@@ -172,7 +173,7 @@ class CDU08IntegrationTest {
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict());
+                    .andExpect(status().isUnprocessableEntity());
         }
 
         @Test

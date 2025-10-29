@@ -11,6 +11,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.modelo.*;
+import sgc.sgrh.modelo.Perfil;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -40,15 +41,13 @@ public class PainelService {
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
-    // TODO o parametro 'perfil' ficaria melhor com um tipo mais forte
-    public Page<ProcessoResumoDto> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
-        if (perfil == null || perfil.isBlank()) {
+    public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+        if (perfil == null) {
             throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
         }
 
         List<Processo> processos;
-        // TODO essa comparação com string me parece frágil
-        if ("ADMIN".equalsIgnoreCase(perfil)) {
+        if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll();
         } else {
             if (codigoUnidade == null) {
@@ -128,14 +127,14 @@ public class PainelService {
     }
 
     private AlertaDto mapToAlertaDto(Alerta alerta) {
-        return new AlertaDto(
-                alerta.getCodigo(),
-                alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null,
-                alerta.getDescricao(),
-                alerta.getDataHora(),
-                alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
-                alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
-                alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null
-        );
+        return AlertaDto.builder()
+            .codigo(alerta.getCodigo())
+            .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+            .descricao(alerta.getDescricao())
+            .dataHora(alerta.getDataHora())
+            .codUnidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null)
+            .codUunidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null)
+            .tituloUsuarioDestino(alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null)
+            .build();
     }
 }

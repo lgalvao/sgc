@@ -44,7 +44,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_devePersistirERetornarDTO_quandoRequisicaoForValida() {
-        var requisicao = new CriarProcessoReq("Processo de teste", TipoProcesso.MAPEAMENTO.name(), LocalDateTime.now().plusDays(10), List.of(1L, 2L));
+        var requisicao = new CriarProcessoReq("Processo de teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(10), List.of(1L, 2L));
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
@@ -87,7 +87,7 @@ public class ProcessoServiceTest {
 
     @Test
     public void criar_deveLancarExcecaoDeViolacaoDeRestricao_quandoDescricaoEstiverEmBranco() {
-        var requisicao = new CriarProcessoReq("   ", TipoProcesso.MAPEAMENTO.name(), null, List.of(1L));
+        var requisicao = new CriarProcessoReq("   ", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
         assertThatThrownBy(() -> processoService.criar(requisicao))
                 .isInstanceOf(ConstraintViolationException.class);

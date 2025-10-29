@@ -48,8 +48,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
-@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class})
+@SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
@@ -193,7 +194,7 @@ public class CDU16IntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isUnprocessableEntity());
         }
     }
 }

@@ -68,11 +68,11 @@ public class CDU03IntegrationTest {
 
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.MAPEAMENTO.name(), dataLimiteEtapa1, unidades);
+        return new CriarProcessoReq(descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
     private AtualizarProcessoReq criarAtualizarProcessoReq(Long codigo, String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new AtualizarProcessoReq(codigo, descricao, TipoProcesso.MAPEAMENTO.name(), dataLimiteEtapa1, unidades);
+        return new AtualizarProcessoReq(codigo, descricao, TipoProcesso.MAPEAMENTO, dataLimiteEtapa1, unidades);
     }
 
     @Test

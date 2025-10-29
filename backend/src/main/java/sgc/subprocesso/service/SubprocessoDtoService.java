@@ -22,6 +22,7 @@ import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
+import sgc.sgrh.modelo.Perfil;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.util.HtmlUtils;
@@ -66,8 +67,7 @@ public class SubprocessoDtoService {
      * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
      */
     @Transactional(readOnly = true)
-    // TODO o perfil deveria ser tipado, nao um string
-    public SubprocessoDetalheDto obterDetalhes(Long codigo, String perfil, Long codUnidadeUsuario) {
+    public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
         if (perfil == null) {
             throw new ErroDominioAccessoNegado("Perfil inválido para acesso aos detalhes do subprocesso.");
         }
@@ -75,11 +75,11 @@ public class SubprocessoDtoService {
         Subprocesso sp = repositorioSubprocesso.findById(codigo)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(codigo)));
 
-        if ("GESTOR".equalsIgnoreCase(perfil) || "CHEFE".equalsIgnoreCase(perfil)) {
+        if (perfil == Perfil.GESTOR || perfil == Perfil.CHEFE) {
             if (sp.getUnidade() == null || codUnidadeUsuario == null || !codUnidadeUsuario.equals(sp.getUnidade().getCodigo())) {
                 throw new ErroDominioAccessoNegado("Usuário sem permissão para visualizar este subprocesso.");
             }
-        } else if (!"ADMIN".equalsIgnoreCase(perfil)) {
+        } else if (perfil != Perfil.ADMIN) {
             throw new ErroDominioAccessoNegado("Perfil sem permissão.");
         }
 

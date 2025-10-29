@@ -1,10 +1,7 @@
 package sgc.alerta.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.modelo.Usuario;
@@ -22,6 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "ALERTA", schema = "sgc")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alerta extends EntidadeBase {

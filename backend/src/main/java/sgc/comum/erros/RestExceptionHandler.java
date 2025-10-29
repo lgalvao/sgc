@@ -116,6 +116,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitizar(ex.getMessage())));
     }
 
+    @ExceptionHandler(ErroNegocio.class)
+    protected ResponseEntity<Object> handleErroNegocio(ErroNegocio ex) {
+        log.warn("Erro de negócio: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
         log.error("Erro inesperado na aplicação: {}", ex.getMessage(), ex);

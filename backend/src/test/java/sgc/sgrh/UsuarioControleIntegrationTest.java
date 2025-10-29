@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @DisplayName("Testes de Integração do UsuarioControle")
 class UsuarioControleIntegrationTest {
 

@@ -16,13 +16,17 @@ import java.time.LocalDateTime;
  * @param motivo O motivo da análise (e.g., para devoluções).
  * @param tipo O tipo de análise (sempre VALIDACAO neste contexto).
  */
-// TODO converter para classe com @Builder
-public record AnaliseValidacaoHistoricoDto(
-    LocalDateTime dataHora,
-    String observacoes,
-    TipoAcaoAnalise acao,
-    String unidadeSigla,
-    String analistaUsuarioTitulo,
-    String motivo,
-    TipoAnalise tipo
-) {}
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+public class AnaliseValidacaoHistoricoDto {
+    LocalDateTime dataHora;
+    String observacoes;
+    TipoAcaoAnalise acao;
+    String unidadeSigla;
+    String analistaUsuarioTitulo;
+    String motivo;
+    TipoAnalise tipo;
+}

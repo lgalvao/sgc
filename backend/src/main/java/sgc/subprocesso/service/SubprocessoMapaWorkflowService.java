@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.competencia.CompetenciaService;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -83,10 +84,9 @@ public class SubprocessoMapaWorkflowService {
         Subprocesso subprocesso = repositorioSubprocesso.findById(codSubprocesso)
             .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
-        // TODO usar exceção de negócio
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
-            throw new IllegalStateException("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
+            throw new ErroNegocio("Mapa só pode ser editado com cadastro homologado ou mapa criado. Situação atual: %s".formatted(situacao));
         }
 
         if (subprocesso.getMapa() == null) {

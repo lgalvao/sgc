@@ -1,6 +1,5 @@
 package sgc.subprocesso.modelo;
 
-// TODO esse enum nao esta compativel com o especificado em /reqs/_situacoes.md
 public enum SituacaoSubprocesso {
     NAO_INICIADO,
     CADASTRO_EM_ANDAMENTO,
@@ -13,7 +12,6 @@ public enum SituacaoSubprocesso {
     MAPA_HOMOLOGADO,
     REVISAO_CADASTRO_EM_ANDAMENTO,
     REVISAO_CADASTRO_DISPONIBILIZADA,
-    AGUARDANDO_HOMOLOGACAO_CADASTRO,
     REVISAO_CADASTRO_HOMOLOGADA,
     MAPA_AJUSTADO;
 

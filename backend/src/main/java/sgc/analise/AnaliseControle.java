@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.CriarAnaliseRequestDto;
+import sgc.comum.erros.ErroNegocio;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.TipoAnalise;
 
@@ -55,9 +56,8 @@ public class AnaliseControle {
     public Analise criarAnaliseCadastro(@PathVariable("codigo") Long codigo,
                                         @RequestBody(required = false) Map<String, String> corpo) {
 
-        // TODO usar uma exceção de negócio específica
         if (corpo == null) {
-            throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
+            throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
         }
 
         String observacoes = corpo.getOrDefault("observacoes", "");
@@ -101,9 +101,8 @@ public class AnaliseControle {
     @Operation(summary = "Cria uma nova análise de validação")
     public Analise criarAnaliseValidacao(@PathVariable("codigo") Long codigo,
                                          @RequestBody(required = false) Map<String, String> corpo) {
-        // TODO usar uma exceção de negócio específica
         if (corpo == null) {
-            throw new IllegalArgumentException("O corpo da requisição não pode ser nulo.");
+            throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
         }
 
         String observacoes = corpo.getOrDefault("observacoes", "");

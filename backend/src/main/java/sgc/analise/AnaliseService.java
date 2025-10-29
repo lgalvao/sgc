@@ -51,19 +51,19 @@ public class AnaliseService {
      */
     @Transactional
     public Analise criarAnalise(CriarAnaliseRequestDto req) {
-        Subprocesso sp = subprocessoRepo.findById(req.subprocessoCodigo())
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", req.subprocessoCodigo()));
+        Subprocesso sp = subprocessoRepo.findById(req.getSubprocessoCodigo())
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", req.getSubprocessoCodigo()));
 
-        // TODO usar builder
-        Analise a = new Analise();
-        a.setSubprocesso(sp);
-        a.setDataHora(LocalDateTime.now());
-        a.setObservacoes(req.observacoes());
-        a.setTipo(req.tipo());
-        a.setAcao(req.acao());
-        a.setUnidadeSigla(req.unidadeSigla());
-        a.setAnalistaUsuarioTitulo(req.analistaUsuarioTitulo());
-        a.setMotivo(req.motivo());
+        Analise a = Analise.builder()
+            .subprocesso(sp)
+            .dataHora(LocalDateTime.now())
+            .observacoes(req.getObservacoes())
+            .tipo(req.getTipo())
+            .acao(req.getAcao())
+            .unidadeSigla(req.getUnidadeSigla())
+            .analistaUsuarioTitulo(req.getAnalistaUsuarioTitulo())
+            .motivo(req.getMotivo())
+            .build();
 
         return analiseRepo.save(a);
     }

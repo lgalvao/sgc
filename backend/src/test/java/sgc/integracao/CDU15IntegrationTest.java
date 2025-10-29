@@ -24,8 +24,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.context.annotation.Import;
+import sgc.integracao.mocks.TestThymeleafConfig;
+
 
 @DisplayName("CDU-15: Manter Mapa de Competências")
+@Import(TestThymeleafConfig.class)
 class CDU15IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";
@@ -137,7 +141,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isConflict());
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -238,7 +242,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isUnprocessableEntity());
         }
     }
 }

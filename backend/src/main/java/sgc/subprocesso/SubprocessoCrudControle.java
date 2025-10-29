@@ -41,7 +41,7 @@ public class SubprocessoCrudControle {
      */
     @GetMapping("/{codigo}")
     public SubprocessoDetalheDto obterPorCodigo(@PathVariable Long codigo,
-                                                @RequestParam(required = false) String perfil,
+                                                @RequestParam(required = false) sgc.sgrh.modelo.Perfil perfil,
                                                 @RequestParam(required = false) Long unidadeUsuario) {
         return subprocessoDtoService.obterDetalhes(codigo, perfil, unidadeUsuario);
     }

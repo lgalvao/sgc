@@ -39,10 +39,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest {

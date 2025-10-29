@@ -86,6 +86,9 @@ public class SubprocessoServiceActionsTest {
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
 
+    @MockitoBean
+    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
+
     private Unidade unidade;
     private Unidade unidadeSuperior;
     private Usuario usuario;
@@ -151,11 +154,7 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, movimentacoes.size());
             assertEquals("Cadastro de atividades e conhecimentos aceito", movimentacoes.getFirst().getDescricao());
 
-            List<Alerta> alertas = alertaRepo.findAll();
-            assertEquals(1, alertas.size());
-            assertTrue(alertas.getFirst().getDescricao().contains("submetido para análise"));
-
-            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteCadastro(any(Subprocesso.class), any(Unidade.class));
         }
     }
 
@@ -197,7 +196,7 @@ public class SubprocessoServiceActionsTest {
             assertEquals(1, movimentacoes.size());
             assertEquals("Revisão do cadastro de atividades e conhecimentos aceita", movimentacoes.getFirst().getDescricao());
 
-            verify(notificacaoService, times(1)).enviarEmail(eq(unidadeSuperior.getSigla()), anyString(), anyString());
+            verify(subprocessoNotificacaoService, times(1)).notificarAceiteRevisaoCadastro(any(Subprocesso.class), any(Unidade.class));
         }
 
         @Test

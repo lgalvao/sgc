@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -45,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockAdmin
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
@@ -109,7 +110,7 @@ public class CDU05IntegrationTest {
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO.name(), dataLimiteEtapa1, unidades);
+        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
     }
 
     @Test
@@ -226,6 +227,6 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
-                .andExpect(status().isConflict()); // Espera-se um erro de negócio
+                .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
     }
 }
