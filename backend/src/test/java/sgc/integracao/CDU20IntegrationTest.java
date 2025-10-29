@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.integracao.mocks.TestThymeleafConfig;
+import sgc.notificacao.NotificacaoService;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -47,6 +48,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -81,6 +85,9 @@ public class CDU20IntegrationTest {
 
     @MockitoSpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoSpyBean
+    private NotificacaoService notificacaoService;
 
 
     private Subprocesso subprocesso;
@@ -135,6 +142,9 @@ public class CDU20IntegrationTest {
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
     @WithMockChefe()
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
+        // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
+        doNothing().when(notificacaoService).enviarEmail(any(), any(), any());
+
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())

@@ -75,6 +75,15 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    testLogging {
+        events("skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStackTraces = true
+        showCauses = true
+        showStandardStreams = false
+    }
+
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     jvmArgs = listOf(
         "-Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",

@@ -66,7 +66,7 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
 
         principal.setPerfis(Set.of(Perfil.GESTOR));
 
-        principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+        principal.setUnidade(new Unidade("Unidade Mock", "UO_SUP"));
 
 
 
