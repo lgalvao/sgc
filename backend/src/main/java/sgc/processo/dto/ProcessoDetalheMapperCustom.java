@@ -3,10 +3,10 @@ package sgc.processo.dto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import java.util.Set;
 @Component
 public class ProcessoDetalheMapperCustom {
 
-    private final ProcessoDetalheMapperInterface processoDetalheMapperInterface;
+    private final ProcessoDetalheMapper processoDetalheMapper;
 
-    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
-        this.processoDetalheMapperInterface = processoDetalheMapperInterface;
+    public ProcessoDetalheMapperCustom(ProcessoDetalheMapper processoDetalheMapper) {
+        this.processoDetalheMapper = processoDetalheMapper;
     }
 
     /**
@@ -39,14 +39,14 @@ public class ProcessoDetalheMapperCustom {
         if (p == null) return null;
 
         // Mapeia os dados básicos do processo usando MapStruct
-        ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
+        ProcessoDetalheDto dto = processoDetalheMapper.toDetailDTO(p);
 
         Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
 
         // Mapeia as unidades de processo
         if (unidadesProcesso != null) {
             for (UnidadeProcesso up : unidadesProcesso) {
-                ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
+                ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.unidadeProcessoToUnidadeParticipanteDTO(up);
                 if (unit.getSigla() != null) {
                     unidadesBySigla.put(unit.getSigla(), unit);
                 }
@@ -73,7 +73,7 @@ public class ProcessoDetalheMapperCustom {
                     unidadesBySigla.put(sigla, updatedUnit); // Atualizar no mapa
                 } else {
                     // Cria uma nova unidade participante baseada no subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
+                    ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.subprocessoToUnidadeParticipanteDTO(sp);
                     if (unit.getSigla() != null) {
                         unidadesBySigla.put(unit.getSigla(), unit);
                     }
@@ -88,7 +88,7 @@ public class ProcessoDetalheMapperCustom {
         List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
         if (subprocessos != null) {
             for (Subprocesso sp : subprocessos) {
-                ProcessoResumoDto resumoDto = processoDetalheMapperInterface.subprocessoToProcessoResumoDto(sp);
+                ProcessoResumoDto resumoDto = processoDetalheMapper.subprocessoToProcessoResumoDto(sp);
                 resumoSubprocessos.add(resumoDto);
             }
         }

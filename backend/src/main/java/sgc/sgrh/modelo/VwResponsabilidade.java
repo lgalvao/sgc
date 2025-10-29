@@ -24,10 +24,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VwResponsabilidade {
-
     @Id
-    @Column(name = "ID", nullable = false)
-    private Long id;
+    @Column(name = "codigo", nullable = false)
+    private Long codigo;
 
     @Column(name = "UNIDADE_CODIGO", nullable = false)
     private Long unidadeCodigo;

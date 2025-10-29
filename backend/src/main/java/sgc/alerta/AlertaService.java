@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.*;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -204,6 +204,7 @@ public class AlertaService {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codUnidade);
                 }
             } catch (Exception e) {
+                // TODO essa exceção precisa subir pra camada de controle
                 log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
             }
         }
@@ -321,13 +322,13 @@ public class AlertaService {
      * Marca um alerta específico como lido para um determinado usuário.
      * <p>
      * Este método localiza a associação {@link AlertaUsuario} pela sua chave composta
-     * (ID do alerta e título de eleitor do usuário) e, caso o alerta ainda não
+     * (código do alerta e título de eleitor do usuário) e, caso o alerta ainda não
      * tenha sido lido, define a data e hora da leitura como o momento atual.
      * <p>
      * Corresponde à ação do CDU-02: Visualizar alertas.
      *
      * @param usuarioTituloStr O título de eleitor do usuário (em formato String).
-     * @param alertaId         O ID do alerta a ser marcado como lido.
+     * @param alertaId         O código do alerta a ser marcado como lido.
      * @throws ErroDominioNaoEncontrado se a associação entre o alerta e o usuário não for encontrada.
      * @throws NumberFormatException se o {@code usuarioTituloStr} não for um número válido.
      */

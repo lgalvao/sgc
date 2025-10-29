@@ -6,12 +6,12 @@ interface ImportarAtividadesRequest {
   subprocessoOrigemId: number;
 }
 
-export async function importarAtividades(idSubprocessoDestino: number, idSubprocessoOrigem: number): Promise<void> {
-  const request: ImportarAtividadesRequest = { subprocessoOrigemId: idSubprocessoOrigem };
+export async function importarAtividades(codSubrocessoDestino: number, codSubrocessoOrigem: number): Promise<void> {
+  const request: ImportarAtividadesRequest = { subprocessoOrigemId: codSubrocessoOrigem };
   try {
-    await apiClient.post(`/subprocessos/${idSubprocessoDestino}/importar-atividades`, request);
+    await apiClient.post(`/subprocessos/${codSubrocessoDestino}/importar-atividades`, request);
   } catch (error) {
-    console.error(`Erro ao importar atividades para o subprocesso ${idSubprocessoDestino}:`, error);
+    console.error(`Erro ao importar atividades para o subprocesso ${codSubrocessoDestino}:`, error);
     throw error;
   }
 }

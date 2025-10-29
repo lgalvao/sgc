@@ -459,12 +459,12 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await mapasStore.fetchMapaCompleto(idSubprocesso.value as number);
+  if (codSubrocesso.value) {
+    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
   }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
@@ -476,10 +476,10 @@ onMounted(async () => {
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
@@ -589,9 +589,9 @@ function adicionarCompetenciaEFecharModal() {
   };
 
   if (competenciaSendoEditada.value) {
-    mapasStore.atualizarCompetencia(idSubprocesso.value as number, competencia);
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
   } else {
-    mapasStore.adicionarCompetencia(idSubprocesso.value as number, competencia);
+    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
   }
 
   // Limpar formulário
@@ -612,7 +612,7 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapasStore.removerCompetencia(idSubprocesso.value as number, competenciaParaExcluir.value.codigo);
+    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
     fecharModalExcluirCompetencia();
   }
 }
@@ -629,7 +629,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
       ...competencia,
       atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
     };
-    mapasStore.atualizarCompetencia(idSubprocesso.value as number, competenciaAtualizada);
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
   }
 }
 

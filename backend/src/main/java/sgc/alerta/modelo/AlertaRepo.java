@@ -7,10 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 /**
  * Repositório para a entidade {@link Alerta}.
  */
+@Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     /**
      * Busca alertas destinados a uma unidade específica, de forma paginada.
@@ -22,10 +22,10 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
 
     /**
      * Busca todos os alertas associados a um processo específico.
-     * @param processoCodigo O código do processo.
+     * @param codProcesso O código do processo.
      * @return Uma lista de alertas.
      */
-    List<Alerta> findByProcessoCodigo(Long processoCodigo);
+    List<Alerta> findByProcessoCodigo(Long codProcesso);
 
     /**
      * Busca alertas destinados a um usuário específico, de forma paginada.

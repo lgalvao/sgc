@@ -3,9 +3,9 @@
 Atores: GESTOR e ADMIN
 
 Pré-condições:
-● Usuário logado com perfil GESTOR ou ADMIN
-● Processo de revisão iniciado que tenha a unidade como participante
-● Subprocesso com revisão do cadastro de atividades e conhecimentos já disponibilizada, e com localização atual na
+- Usuário logado com perfil GESTOR ou ADMIN
+- Processo de revisão iniciado que tenha a unidade como participante
+- Subprocesso com revisão do cadastro de atividades e conhecimentos já disponibilizada, e com localização atual na
 unidade do usuário.
 
 Fluxo principal:

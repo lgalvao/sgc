@@ -151,3 +151,8 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (999999999999, 'ADMIN'),
 (999999999999, 'GESTOR');
+
+-- Processos
+INSERT INTO SGC.PROCESSO (codigo, data_criacao, data_limite, descricao, situacao, tipo) VALUES
+(1, '2024-01-01 10:00:00', '2025-12-31 23:59:59', 'Processo de Teste Criado', 'CRIADO', 'MAPEAMENTO'),
+(2, '2024-02-01 11:00:00', '2025-11-30 23:59:59', 'Processo de Teste Em Andamento', 'EM_ANDAMENTO', 'REVISAO');

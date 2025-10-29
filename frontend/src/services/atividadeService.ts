@@ -27,9 +27,9 @@ export async function obterAtividadePorId(id: number): Promise<Atividade> {
   }
 }
 
-export async function criarAtividade(request: any, idSubprocesso: number): Promise<Atividade> {
+export async function criarAtividade(request: any, codSubrocesso: number): Promise<Atividade> {
     try {
-        const requestDto = mapCriarAtividadeRequestToDto(request, idSubprocesso);
+        const requestDto = mapCriarAtividadeRequestToDto(request, codSubrocesso);
         const response = await apiClient.post<any>('/atividades', requestDto);
         return mapAtividadeDtoToModel(response.data);
     } catch (error) {

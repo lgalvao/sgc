@@ -238,7 +238,7 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
+  // Correção temporária: usando idProcesso como codSubrocesso
   await mapasStore.fetchMapaCompleto(idProcesso.value);
 });
 

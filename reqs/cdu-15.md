@@ -3,7 +3,7 @@
 Ator: ADMIN
 
 Pré-condições:
-● Processo de mapeamento com ao menos uma unidade com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
+- Processo de mapeamento com ao menos uma unidade com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
 
 Fluxo principal:
 

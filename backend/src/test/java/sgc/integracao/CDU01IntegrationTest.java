@@ -13,9 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import sgc.integracao.mocks.TestSecurityConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
 import sgc.unidade.modelo.Unidade;
@@ -25,6 +25,7 @@ import sgc.util.TestUtil;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfig.class)
 @DisplayName("CDU-01: Realizar Login")
 public class CDU01IntegrationTest {
-
     private static final String BASE_URL = "/api/usuarios";
 
     @Autowired
@@ -53,29 +53,24 @@ public class CDU01IntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     private Unidade unidadeAdmin;
-    private Unidade unidadeGestor;
 
     @BeforeEach
     void setUp() {
         unidadeAdmin = unidadeRepo.save(new Unidade("Unidade Admin", "ADM"));
-        unidadeGestor = unidadeRepo.save(new Unidade("Unidade Gestor", "GST"));
     }
 
     @Nested
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
-
         @Test
         @DisplayName("Deve realizar login completo com sucesso para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            // Arrange
             long tituloEleitoral = 123456789012L;
             String senha = "password";
             AutenticacaoRequest authRequest = AutenticacaoRequest.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Admin", "admin@email.com", "123", unidadeAdmin, Collections.singleton(Perfil.ADMIN)));
 
-            // Act & Assert: Etapa 1 - Autenticar
             mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +78,6 @@ public class CDU01IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(true));
 
-            // Act & Assert: Etapa 2 - Autorizar
             mockMvc.perform(post(BASE_URL + "/autorizar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -104,17 +98,12 @@ public class CDU01IntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo com sucesso para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            // Arrange
             long tituloEleitoral = 987654321098L;
             String senha = "password";
             AutenticacaoRequest authRequest = AutenticacaoRequest.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Múltiplo", "multiplo@email.com", "456", unidadeAdmin, Set.of(Perfil.ADMIN, Perfil.GESTOR)));
-            // Assumindo que o usuário está associado primariamente a uma unidade (unidadeAdmin),
-            // mas tem perfil em outra (unidadeGestor). O modelo atual simplifica isso,
-            // associando o usuário a uma única unidade principal.
 
-            // Act & Assert: Etapa 1 - Autenticar
             mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -122,16 +111,14 @@ public class CDU01IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(true));
 
-            // Act & Assert: Etapa 2 - Autorizar
             mockMvc.perform(post(BASE_URL + "/autorizar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(String.valueOf(tituloEleitoral)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].perfil").value(org.hamcrest.Matchers.containsInAnyOrder("ADMIN", "GESTOR")));
+                .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
 
-            // Act & Assert: Etapa 3 - Entrar (Escolhendo o perfil GESTOR)
             EntrarRequest entrarRequest = EntrarRequest.builder().tituloEleitoral(tituloEleitoral).perfil("GESTOR").unidadeCodigo(unidadeAdmin.getCodigo()).build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                     .with(csrf())
@@ -154,7 +141,7 @@ public class CDU01IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(String.valueOf(tituloEleitoral)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("&#39;Usuário&#39; com id &#39;" + tituloEleitoral + "&#39; não encontrado(a)."));
+                .andExpect(jsonPath("$.message").value("&#39;Usuário&#39; com codigo &#39;" + tituloEleitoral + "&#39; não encontrado(a)."));
         }
 
         @Test

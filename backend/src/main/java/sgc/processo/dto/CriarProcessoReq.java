@@ -12,8 +12,8 @@ public record CriarProcessoReq(
     @NotBlank(message = "Preencha a descrição")
     String descricao,
 
-    @NotBlank(message = "Tipo do processo é obrigatório")
-    String tipo,
+    @jakarta.validation.constraints.NotNull(message = "Tipo do processo é obrigatório")
+    sgc.processo.modelo.TipoProcesso tipo,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime dataLimiteEtapa1,

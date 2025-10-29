@@ -3,8 +3,8 @@
 Ator: ADMIN
 
 Pré-condições:
-● Login realizado com perfil ADMIN
-● Existência de processo de mapeamento ou de revisão na situação 'Em andamento'
+- Login realizado com perfil ADMIN
+- Existência de processo de mapeamento ou de revisão na situação 'Em andamento'
 
 Fluxo principal:
 1. No Painel, o usuário clica no processo de mapeamento ou de revisão com situação 'Em andamento'.

@@ -6,20 +6,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
 import java.time.LocalDateTime;
 
+/**
+ * Representa a atribuição temporária de um usuário a uma unidade,
+ * por exemplo, para cobrir férias ou licenças.
+ */
 @Entity
 @Table(name = "ATRIBUICAO_TEMPORARIA", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * Representa a atribuição temporária de um usuário a uma unidade,
- * por exemplo, para cobrir férias ou licenças.
- */
 public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_codigo")

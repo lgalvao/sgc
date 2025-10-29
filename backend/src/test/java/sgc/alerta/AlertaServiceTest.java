@@ -15,7 +15,7 @@ import sgc.alerta.modelo.AlertaUsuario;
 import sgc.alerta.modelo.AlertaUsuarioRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
-import sgc.sgrh.SgrhService;
+import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;

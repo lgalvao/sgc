@@ -1,22 +1,18 @@
 spring:
   main.banner-mode: off
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  autoconfigure.exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: leonardo
+    username: postgres
     password: postgres
   test.mockmvc.print: none
   jpa:
     hibernate.ddl-auto: create
     properties:
       hibernate.default_schema: sgc
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     defer-datasource-initialization: true
-  sql:
-    init:
-      mode: always
+  sql.init.mode: always
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -51,6 +47,7 @@ springdoc:
     title: SGC - Sistema de Gestão de Competências API
     version: v1
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
+
 logging:
   level:
     org.hibernate: ERROR
@@ -61,4 +58,113 @@ logging:
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
     org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:sgcdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: never # Manter 'never' para local, pois o data.sql é para testes
+logging:
+  level:
+    sgc: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: WARN
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e
+  sql:
+    init:
+      mode: always # Alterado para 'always'
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:e2edb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+server:
+  error:
+    include-stacktrace: always
+---
+spring:
+  config:
+    activate:
+      on-profile: jules
+# Configurações otimizadas para testes E2E executados por agentes de IA (como Jules)
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  sql:
+    init:
+      mode: always # Alterado para 'always'
+  devtools:
+    restart:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:sgc-db;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+server:
+  port: 10000
+  shutdown: graceful
+  error:
+    include-exception: false
+    include-stacktrace: never
+    whitelabel:
+      enabled: false
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    properties:
+      hibernate.temp.use_jdbc_metadata_defaults: false
+  sql:
+    init:
+      mode: always # Alterado para 'always'
+  mail:
+    host: localhost
+    port: 2525
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+        transport:
+          protocol: smtp
+logging:
+  level:
+    org.hibernate.tool.schema: ERROR

@@ -15,18 +15,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
-import sgc.sgrh.Usuario;
+import sgc.mapa.service.MapaService;
+import sgc.sgrh.modelo.Usuario;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,9 +34,7 @@ public class MapaControleTest {
     private static final String API_MAPAS_1 = "/api/mapas/1";
     private static final String API_MAPAS_1_ATUALIZAR = "/api/mapas/1/atualizar";
     private static final String API_MAPAS_1_EXCLUIR = "/api/mapas/1/excluir";
-    private static final String API_MAPAS_1_COMPLETO = "/api/mapas/1/completo";
     private static final String CODIGO_JSON_PATH = "$.codigo";
-    private static final String OBS = "Obs";
 
     @Mock
     private MapaService mapaService;
@@ -91,7 +88,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(mapaService.obterPorId(1L)).thenReturn(mapa);
+        when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
@@ -101,7 +98,7 @@ public class MapaControleTest {
 
     @Test
     void obterPorId_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        when(mapaService.obterPorId(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
+        when(mapaService.obterPorCodigo(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isNotFound());

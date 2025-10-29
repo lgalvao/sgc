@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.processo.SituacaoProcesso;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import sgc.unidade.modelo.Unidade;
 
 @Entity
 @Table(name = "PROCESSO", schema = "sgc")
@@ -17,7 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Processo extends EntidadeBase {
-
     public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDateTime dataLimite) {
         super();
         this.descricao = descricao;
@@ -27,20 +28,6 @@ public class Processo extends EntidadeBase {
         this.dataCriacao = LocalDateTime.now();
     }
 
-    /**
-     * Construtor de cópia.
-     */
-    public Processo(Processo outro) {
-        if (outro != null) {
-            super.setCodigo(outro.getCodigo());
-            this.descricao = outro.descricao;
-            this.tipo = outro.tipo;
-            this.situacao = outro.situacao;
-            this.dataLimite = outro.dataLimite;
-            this.dataCriacao = outro.dataCriacao;
-            this.dataFinalizacao = outro.dataFinalizacao;
-        }
-    }
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 
@@ -60,4 +47,12 @@ public class Processo extends EntidadeBase {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoProcesso tipo;
+
+    @ManyToMany
+    @JoinTable(
+        name = "PROCESSO_UNIDADE",
+        joinColumns = @JoinColumn(name = "processo_codigo"),
+        inverseJoinColumns = @JoinColumn(name = "unidade_codigo")
+    )
+    private Set<Unidade> unidades = new HashSet<>();
 }

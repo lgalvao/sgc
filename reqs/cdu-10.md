@@ -3,8 +3,8 @@
 Ator: CHEFE
 
 Pré-condições:
-● Usuário logado com perfil CHEFE.
-● Subprocesso de revisão da unidade na situação 'Revisão do cadastro em andamento'.
+- Usuário logado com perfil CHEFE.
+- Subprocesso de revisão da unidade na situação 'Revisão do cadastro em andamento'.
 
 Fluxo principal:
 

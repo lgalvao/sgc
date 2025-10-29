@@ -3,9 +3,9 @@
 Ator: CHEFE
 
 Pré-condições:
-● Usuário logado com perfil CHEFE
-● Processo de mapeamento ou de revisão iniciado que tenha a unidade como participante
-● Subprocesso da unidade com localização atual na própria unidade e situação 'Não iniciado' e 'Cadastro em andamento',
+- Usuário logado com perfil CHEFE
+- Processo de mapeamento ou de revisão iniciado que tenha a unidade como participante
+- Subprocesso da unidade com localização atual na própria unidade e situação 'Não iniciado' e 'Cadastro em andamento',
 no caso de processos de mapeamento, ou 'Não iniciado' e 'Revisão do cadastro em andamento' no caso de processos de
 revisão
 

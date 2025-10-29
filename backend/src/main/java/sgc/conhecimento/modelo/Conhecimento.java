@@ -8,15 +8,15 @@ import lombok.Setter;
 import sgc.atividade.modelo.Atividade;
 import sgc.comum.modelo.EntidadeBase;
 
+/**
+ * Representa um conhecimento específico necessário para realizar uma atividade.
+ */
 @Entity
 @Table(name = "CONHECIMENTO", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * Representa um conhecimento específico necessário para realizar uma atividade.
- */
 public class Conhecimento extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "atividade_codigo")

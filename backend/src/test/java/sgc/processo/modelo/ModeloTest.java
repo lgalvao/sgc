@@ -1,7 +1,6 @@
 package sgc.processo.modelo;
 
 import org.junit.jupiter.api.Test;
-import sgc.processo.SituacaoProcesso;
 import sgc.unidade.modelo.TipoUnidade;
 
 import java.time.LocalDateTime;
@@ -32,7 +31,7 @@ class ModeloTest {
         assertEquals(SituacaoProcesso.CRIADO, processo.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
 
-        Processo processo2 = new Processo(now, now, dataLimite, "Descricao", SituacaoProcesso.CRIADO, TipoProcesso.MAPEAMENTO);
+        Processo processo2 = new Processo("Descricao", TipoProcesso.MAPEAMENTO, SituacaoProcesso.CRIADO, dataLimite);
         assertNotNull(processo2);
     }
 
@@ -41,22 +40,22 @@ class ModeloTest {
         UnidadeProcesso unidadeProcesso = new UnidadeProcesso();
 
         unidadeProcesso.setCodigo(1L);
-        unidadeProcesso.setProcessoCodigo(10L);
+        unidadeProcesso.setCodProcesso(10L);
         unidadeProcesso.setNome("Unidade Teste");
         unidadeProcesso.setSigla("UT");
         unidadeProcesso.setTitularTitulo("Titular Teste");
         unidadeProcesso.setTipo(TipoUnidade.OPERACIONAL);
         unidadeProcesso.setSituacao("PENDENTE");
-        unidadeProcesso.setUnidadeSuperiorCodigo(100L);
+        unidadeProcesso.setCodUnidadeSuperior(100L);
 
         assertEquals(1L, unidadeProcesso.getCodigo());
-        assertEquals(10L, unidadeProcesso.getProcessoCodigo());
+        assertEquals(10L, unidadeProcesso.getCodProcesso());
         assertEquals("Unidade Teste", unidadeProcesso.getNome());
         assertEquals("UT", unidadeProcesso.getSigla());
         assertEquals("Titular Teste", unidadeProcesso.getTitularTitulo());
         assertEquals(TipoUnidade.OPERACIONAL, unidadeProcesso.getTipo());
         assertEquals("PENDENTE", unidadeProcesso.getSituacao());
-        assertEquals(100L, unidadeProcesso.getUnidadeSuperiorCodigo());
+        assertEquals(100L, unidadeProcesso.getCodUnidadeSuperior());
 
         UnidadeProcesso unidadeProcesso2 = new UnidadeProcesso(10L, 20L, "Nome", "Sigla",
                 "Titular", TipoUnidade.OPERACIONAL, "Situacao", 100L);
