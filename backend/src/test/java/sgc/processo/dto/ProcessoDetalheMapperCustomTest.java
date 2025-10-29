@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProcessoDetalheMapperCustomTest {
     @Mock
-    private ProcessoDetalheMapperInterface processoDetalheMapperInterface;
+    private ProcessoDetalheMapper processoDetalheMapper;
 
     private ProcessoDetalheMapperCustom customMapper;
 
     @BeforeEach
     void setUp() {
-        customMapper = new ProcessoDetalheMapperCustom(processoDetalheMapperInterface);
+        customMapper = new ProcessoDetalheMapperCustom(processoDetalheMapper);
     }
 
     @Test
@@ -52,8 +52,8 @@ class ProcessoDetalheMapperCustomTest {
         unidade.setNome("Unidade A");
 
         UnidadeProcesso unidadeProcesso = new UnidadeProcesso();
-        unidadeProcesso.setProcessoCodigo(processo.getCodigo());
-        unidadeProcesso.setUnidadeCodigo(unidade.getCodigo());
+        unidadeProcesso.setCodProcesso(processo.getCodigo());
+        unidadeProcesso.setCodUnidade(unidade.getCodigo());
         unidadeProcesso.setSigla(unidade.getSigla());
 
         Subprocesso subprocesso = new Subprocesso(
@@ -76,8 +76,8 @@ class ProcessoDetalheMapperCustomTest {
             .sigla("UNID-A")
             .build();
 
-        when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
-        when(processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(unidadeProcesso)).thenReturn(unidadeDto);
+        when(processoDetalheMapper.toDetailDTO(processo)).thenReturn(baseDto);
+        when(processoDetalheMapper.unidadeProcessoToUnidadeParticipanteDTO(unidadeProcesso)).thenReturn(unidadeDto);
 
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, List.of(unidadeProcesso), List.of(subprocesso));
 
@@ -86,7 +86,7 @@ class ProcessoDetalheMapperCustomTest {
         ProcessoDetalheDto.UnidadeParticipanteDto resultUnidade = resultDto.getUnidades().getFirst();
         assertEquals(subprocesso.getSituacao(), resultUnidade.getSituacaoSubprocesso());
         assertEquals(subprocesso.getDataLimiteEtapa1(), resultUnidade.getDataLimite());
-        verify(processoDetalheMapperInterface, never()).subprocessoToUnidadeParticipanteDTO(any());
+        verify(processoDetalheMapper, never()).subprocessoToUnidadeParticipanteDTO(any());
     }
 
     @Test
@@ -110,15 +110,15 @@ class ProcessoDetalheMapperCustomTest {
             .dataLimite(LocalDateTime.now())
             .build();
 
-        when(processoDetalheMapperInterface.toDetailDTO(processo)).thenReturn(baseDto);
-        when(processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(subprocesso)).thenReturn(unidadeDtoSub);
+        when(processoDetalheMapper.toDetailDTO(processo)).thenReturn(baseDto);
+        when(processoDetalheMapper.subprocessoToUnidadeParticipanteDTO(subprocesso)).thenReturn(unidadeDtoSub);
 
         ProcessoDetalheDto resultDto = customMapper.toDetailDTO(processo, Collections.emptyList(), List.of(subprocesso));
 
         assertNotNull(resultDto);
         assertEquals(1, resultDto.getUnidades().size());
         assertEquals("UNID-B", resultDto.getUnidades().getFirst().getSigla());
-        verify(processoDetalheMapperInterface, times(1)).subprocessoToUnidadeParticipanteDTO(subprocesso);
-        verify(processoDetalheMapperInterface, never()).unidadeProcessoToUnidadeParticipanteDTO(any());
+        verify(processoDetalheMapper, times(1)).subprocessoToUnidadeParticipanteDTO(subprocesso);
+        verify(processoDetalheMapper, never()).unidadeProcessoToUnidadeParticipanteDTO(any());
     }
 }

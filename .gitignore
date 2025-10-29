@@ -20,6 +20,8 @@ backend/build/
 backend/out/
 backend/bin/
 /backend/src/main/generated/
+!/backend/build/test-results/test
+/backend/build/test-results/test/binary
 
 # Logs
 *.log
@@ -27,3 +29,4 @@ backend/bin/
 # Arquivos compilados
 *.class
 /frontend/tsconfig.tsbuildinfo
+/node_modules/

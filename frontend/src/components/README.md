@@ -48,7 +48,7 @@ Este componente é um diálogo modal projetado para editar a descrição de um i
 
 ## HistoricoAnaliseModal.vue
 
-Este componente é um diálogo modal que exibe um histórico de análises para um determinado subprocesso. Ele busca dados de análise do `useAnalisesStore` com base na propriedade `idSubprocesso`. Se nenhuma análise for encontrada, ele exibe uma mensagem indicando isso. Caso contrário, ele apresenta as análises em uma tabela listrada com colunas para "Data/Hora", "Unidade", "Resultado" e "Observação". As datas são formatadas usando `date-fns`. Ele emite um evento `fechar` quando o botão de fechar é clicado.
+Este componente é um diálogo modal que exibe um histórico de análises para um determinado subprocesso. Ele busca dados de análise do `useAnalisesStore` com base na propriedade `codSubrocesso`. Se nenhuma análise for encontrada, ele exibe uma mensagem indicando isso. Caso contrário, ele apresenta as análises em uma tabela listrada com colunas para "Data/Hora", "Unidade", "Resultado" e "Observação". As datas são formatadas usando `date-fns`. Ele emite um evento `fechar` quando o botão de fechar é clicado.
 
 ---
 

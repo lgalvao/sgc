@@ -81,7 +81,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   mostrar: boolean;
-  idSubprocesso: number | undefined;
+  codSubrocesso: number | undefined;
 }>();
 
 const emit = defineEmits(['fechar']);
@@ -92,8 +92,8 @@ const analises = ref<Analise[]>([]);
 watch(
   () => props.mostrar,
   newVal => {
-    if (newVal && props.idSubprocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
+    if (newVal && props.codSubrocesso) {
+      analises.value = analisesStore.getAnalisesPorSubprocesso(props.codSubrocesso);
     }
   },
   { immediate: true },

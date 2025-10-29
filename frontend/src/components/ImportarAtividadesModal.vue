@@ -172,7 +172,7 @@ import { useApi } from '@/composables/useApi';
 
 const props = defineProps<{
   mostrar: boolean,
-  idSubprocessoDestino: number | undefined
+  codSubrocessoDestino: number | undefined
 }>()
 
 const emit = defineEmits<{
@@ -276,7 +276,7 @@ function fechar() {
 
 async function importar() {
   limparErroImportacao();
-  if (!props.idSubprocessoDestino || !unidadeSelecionada.value) {
+  if (!props.codSubrocessoDestino || !unidadeSelecionada.value) {
     return;
   }
   if (atividadesSelecionadas.value.length === 0) {
@@ -287,7 +287,7 @@ async function importar() {
   const idsAtividades = atividadesSelecionadas.value.map(a => a.codigo);
 
   try {
-    await executarImportacao(props.idSubprocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
+    await executarImportacao(props.codSubrocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
     emit('importar');
     fechar();
   } catch {

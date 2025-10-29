@@ -44,7 +44,7 @@ export const usePerfilStore = defineStore('perfil', {
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
-                    this.setPerfilUnidade(loginResponse.perfil as Perfil, loginResponse.unidadeCodigo); // Usar loginResponse.unidadeCodigo
+                    this.setPerfilUnidade(loginResponse.perfil as Perfil, loginResponse.unidadeCodigo); // Usar loginResponse.codUnidade
                     this.setServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
                     this.setToken(loginResponse.token); // Adicionar esta linha
                 }

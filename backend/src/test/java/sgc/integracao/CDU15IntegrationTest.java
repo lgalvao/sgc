@@ -1,73 +1,38 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.context.annotation.Import;
+import sgc.integracao.mocks.TestThymeleafConfig;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
+
 @DisplayName("CDU-15: Manter Mapa de Competências")
-class CDU15IntegrationTest {
+@Import(TestThymeleafConfig.class)
+class CDU15IntegrationTest extends BaseIntegrationTest {
 
-    private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{id}/mapa";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ProcessoRepo processoRepo;
-
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-
-    @Autowired
-    private MapaRepo mapaRepo;
+    private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";
 
     private Subprocesso subprocesso;
     private Atividade atividade1;
@@ -176,7 +141,7 @@ class CDU15IntegrationTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isConflict());
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -199,5 +164,85 @@ class CDU15IntegrationTest {
             .andExpect(jsonPath("$.subprocessoCodigo").value(subprocesso.getCodigo()))
             .andExpect(jsonPath("$.competencias.length()").value(1))
             .andExpect(jsonPath("$.competencias[0].descricao").value("Competência para GET"));
+    }
+
+    @Nested
+    @DisplayName("Testes de CRUD de Competência Individual")
+    class CrudCompetenciaTests {
+
+        @Test
+        @WithMockGestor
+        @DisplayName("Deve adicionar uma nova competência a um mapa")
+        void deveAdicionarCompetencia() throws Exception {
+            var request = new sgc.subprocesso.dto.CompetenciaReq("Nova Competência", List.of(atividade1.getCodigo()));
+
+            mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencias", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.competencias.length()").value(1))
+                .andExpect(jsonPath("$.competencias[0].descricao").value("Nova Competência"));
+        }
+
+        @Test
+        @WithMockGestor
+        @DisplayName("Deve atualizar uma competência existente")
+        void deveAtualizarCompetencia() throws Exception {
+            // Adicionar primeiro
+            var addRequest = new sgc.subprocesso.dto.CompetenciaReq("Competência Original", List.of(atividade1.getCodigo()));
+            var result = mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencias", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(addRequest)))
+                .andReturn();
+            var codCompetencia = objectMapper.readTree(result.getResponse().getContentAsString()).at("/competencias/0/codigo").asLong();
+
+            // Atualizar
+            var updateRequest = new sgc.subprocesso.dto.CompetenciaReq("Competência Atualizada", List.of(atividade1.getCodigo(), atividade2.getCodigo()));
+            mockMvc.perform(put("/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}", subprocesso.getCodigo(), codCompetencia)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.competencias[0].descricao").value("Competência Atualizada"))
+                .andExpect(jsonPath("$.competencias[0].atividadesCodigos.length()").value(2));
+        }
+
+        @Test
+        @WithMockGestor
+        @DisplayName("Deve remover uma competência existente")
+        void deveRemoverCompetencia() throws Exception {
+            // Adicionar primeiro
+            var addRequest = new sgc.subprocesso.dto.CompetenciaReq("Competência a ser removida", List.of(atividade1.getCodigo()));
+            var result = mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencias", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(addRequest)))
+                .andReturn();
+            var codCompetencia = objectMapper.readTree(result.getResponse().getContentAsString()).at("/competencias/0/codigo").asLong();
+
+            // Remover
+            mockMvc.perform(delete("/api/subprocessos/{codSubprocesso}/competencias/{codCompetencia}", subprocesso.getCodigo(), codCompetencia)
+                    .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.competencias.length()").value(0));
+        }
+
+        @Test
+        @WithMockGestor
+        @DisplayName("Deve retornar 409 se tentar editar mapa para subprocesso em situação inválida")
+        void deveRetornarErroParaSituacaoInvalidaCrud() throws Exception {
+            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(subprocesso);
+
+            var request = new sgc.subprocesso.dto.CompetenciaReq("Nova Competência", List.of(atividade1.getCodigo()));
+
+            mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencias", subprocesso.getCodigo())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableEntity());
+        }
     }
 }

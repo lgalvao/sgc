@@ -1,6 +1,6 @@
 package sgc.mapa.dto.visualizacao;
 
 public record ConhecimentoDto(
-    Long id,
+    Long codigo,
     String descricao
 ) {}

@@ -44,8 +44,8 @@ export const useProcessosStore = defineStore('processos', {
             }
             return [];
         },
-        getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.movements.filter(m => (m as any).idSubprocesso === idSubprocesso)
+        getMovementsForSubprocesso: (state) => (codSubrocesso: number) => {
+            return state.movements.filter(m => (m as any).codSubrocesso === codSubrocesso)
                 .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
         }
     },

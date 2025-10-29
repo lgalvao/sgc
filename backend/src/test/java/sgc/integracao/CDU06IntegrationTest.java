@@ -18,13 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.*;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -98,8 +97,8 @@ public class CDU06IntegrationTest {
 
     private UnidadeProcesso createUnidadeProcesso(Unidade unidade, Processo processo) {
         UnidadeProcesso up = new UnidadeProcesso();
-        up.setProcessoCodigo(processo.getCodigo());
-        up.setUnidadeCodigo(unidade.getCodigo());
+        up.setCodProcesso(processo.getCodigo());
+        up.setCodUnidade(unidade.getCodigo());
         up.setNome(unidade.getNome());
         up.setSigla(unidade.getSigla());
         return up;

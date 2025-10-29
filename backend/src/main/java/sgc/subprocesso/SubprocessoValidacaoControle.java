@@ -14,14 +14,17 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
 import sgc.analise.modelo.TipoAnalise;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.service.SubprocessoDtoService;
+import sgc.subprocesso.service.SubprocessoWorkflowService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
+@Transactional
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoControle {
     private static final PolicyFactory SANITIZADOR_HTML = new HtmlPolicyBuilder().toFactory();
@@ -37,23 +40,23 @@ public class SubprocessoValidacaoControle {
      * <p>
      * Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo observações e a data limite para a etapa.
      * @param usuario O usuário autenticado (administrador) que realiza a ação.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
      */
-    @PostMapping("/{id}/disponibilizar-mapa")
-    @Transactional
+    @PostMapping("/{codigo}/disponibilizar-mapa")
+
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Disponibiliza o mapa de competências para as unidades")
     public ResponseEntity<RespostaDto> disponibilizarMapa(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
 
         var sanitizedObservacoes = SANITIZADOR_HTML.sanitize(request.observacoes());
         subprocessoWorkflowService.disponibilizarMapa(
-                id,
+                codigo,
                 sanitizedObservacoes,
                 request.dataLimiteEtapa2(),
                 usuario
@@ -64,21 +67,21 @@ public class SubprocessoValidacaoControle {
     /**
      * Permite que um usuário apresente sugestões de melhoria para um mapa de competências.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo o texto das sugestões.
      * @param usuario O usuário autenticado que está enviando as sugestões.
      */
-    @PostMapping("/{id}/apresentar-sugestoes")
-    @Transactional
+    @PostMapping("/{codigo}/apresentar-sugestoes")
+
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestBody @Valid ApresentarSugestoesReq request,
             @AuthenticationPrincipal Usuario usuario) {
 
         var sanitizedSugestoes = SANITIZADOR_HTML.sanitize(request.sugestoes());
         subprocessoWorkflowService.apresentarSugestoes(
-                id,
+                codigo,
                 sanitizedSugestoes,
                 usuario.getTituloEleitoral()
         );
@@ -87,36 +90,36 @@ public class SubprocessoValidacaoControle {
     /**
      * Registra a validação de um mapa de competências pelo responsável da unidade.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado (chefe da unidade) que está validando.
      */
-    @PostMapping("/{id}/validar-mapa")
-    @Transactional
+    @PostMapping("/{codigo}/validar-mapa")
+
     @Operation(summary = "Valida o mapa de competências da unidade")
-    public void validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.validarMapa(id, usuario.getTituloEleitoral());
+    public void validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.validarMapa(codigo, usuario.getTituloEleitoral());
     }
 
     /**
      * Obtém as sugestões de melhoria que foram apresentadas para o mapa de um subprocesso.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Um {@link SugestoesDto} contendo as sugestões.
      */
-    @GetMapping("/{id}/sugestoes")
-    public SugestoesDto obterSugestoes(@PathVariable Long id) {
-        return subprocessoDtoService.obterSugestoes(id);
+    @GetMapping("/{codigo}/sugestoes")
+    public SugestoesDto obterSugestoes(@PathVariable Long codigo) {
+        return subprocessoDtoService.obterSugestoes(codigo);
     }
 
     /**
      * Obtém o histórico de análises da fase de validação de um subprocesso.
      *
-     * @param id O ID do subprocesso.
+     * @param codigo O código do subprocesso.
      * @return Uma {@link List} de {@link AnaliseValidacaoHistoricoDto} com o histórico.
      */
-    @GetMapping("/{id}/historico-validacao")
-    public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long id) {
-        return analiseService.listarPorSubprocesso(id, TipoAnalise.VALIDACAO)
+    @GetMapping("/{codigo}/historico-validacao")
+    public List<AnaliseValidacaoHistoricoDto> obterHistoricoValidacao(@PathVariable Long codigo) {
+        return analiseService.listarPorSubprocesso(codigo, TipoAnalise.VALIDACAO)
                 .stream()
                 .map(analiseMapper::toAnaliseValidacaoHistoricoDto)
                 .toList();
@@ -126,22 +129,22 @@ public class SubprocessoValidacaoControle {
      * Devolve a validação de um mapa para a unidade de negócio responsável para
      * que sejam feitos ajustes.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo a justificativa da devolução.
      * @param usuario O usuário autenticado que está realizando a devolução.
      */
-    @PostMapping("/{id}/devolver-validacao")
-    @Transactional
+    @PostMapping("/{codigo}/devolver-validacao")
+
     @Operation(summary = "Devolve a validação do mapa para a unidade de negócio")
     public void devolverValidacao(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestBody @Valid DevolverValidacaoReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
         var sanitizedJustificativa = SANITIZADOR_HTML.sanitize(request.justificativa());
 
         subprocessoWorkflowService.devolverValidacao(
-                id,
+                codigo,
                 sanitizedJustificativa,
                 usuario
         );
@@ -151,14 +154,14 @@ public class SubprocessoValidacaoControle {
      * Aceita a validação de um mapa, movendo o subprocesso para a próxima etapa
      * de análise hierárquica.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado que está aceitando a validação.
      */
-    @PostMapping("/{id}/aceitar-validacao")
-    @Transactional
+    @PostMapping("/{codigo}/aceitar-validacao")
+
     @Operation(summary = "Aceita a validação do mapa")
-    public void aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.aceitarValidacao(id, usuario);
+    public void aceitarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.aceitarValidacao(codigo, usuario);
     }
 
     /**
@@ -166,35 +169,35 @@ public class SubprocessoValidacaoControle {
      * <p>
      * Ação restrita a usuários com perfil 'ADMIN'.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param usuario O usuário autenticado (administrador) que realiza a homologação.
      */
-    @PostMapping("/{id}/homologar-validacao")
-    @Transactional
+    @PostMapping("/{codigo}/homologar-validacao")
+
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa a validação do mapa")
-    public void homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.homologarValidacao(id);
+    public void homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        subprocessoWorkflowService.homologarValidacao(codigo);
     }
 
     /**
      * Submete a versão ajustada de um mapa para uma nova rodada de validação.
      *
-     * @param id      O ID do subprocesso.
+     * @param codigo  O código do subprocesso.
      * @param request O DTO contendo as observações e a nova data limite da etapa.
      * @param usuario O usuário autenticado que está submetendo os ajustes.
      */
-    @PostMapping("/{id}/submeter-mapa-ajustado")
-    @Transactional
+    @PostMapping("/{codigo}/submeter-mapa-ajustado")
+
     @Operation(summary = "Submete o mapa ajustado para nova validação")
     public void submeterMapaAjustado(
-            @PathVariable Long id,
+            @PathVariable Long codigo,
             @RequestBody @Valid SubmeterMapaAjustadoReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
 
         var sanitizedObservacoes = SANITIZADOR_HTML.sanitize(request.observacoes());
         var sanitizedRequest = new SubmeterMapaAjustadoReq(sanitizedObservacoes, request.dataLimiteEtapa2());
-        subprocessoWorkflowService.submeterMapaAjustado(id, sanitizedRequest, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.submeterMapaAjustado(codigo, sanitizedRequest, usuario.getTituloEleitoral());
     }
 }

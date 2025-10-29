@@ -8,14 +8,14 @@ const processoRoutes: RouteRecordRaw[] = [
     meta: { title: 'Novo Processo' },
   },
   {
-    path: '/processo/:idProcesso',
+    path: '/processo/:codProcesso',
     name: 'Processo',
     component: () => import('@/views/Processo.vue'),
     props: true,
     meta: { title: 'Unidades do Processo' },
   },
   {
-    path: '/processo/:idProcesso/:siglaUnidade',
+    path: '/processo/:codProcesso/:siglaUnidade',
     name: 'Subprocesso',
     component: () => import('@/views/Subprocesso.vue'),
     props: (route: RouteLocationNormalized) => ({
@@ -25,7 +25,7 @@ const processoRoutes: RouteRecordRaw[] = [
     meta: { title: 'Processos da Unidade' },
   },
   {
-    path: '/processo/:idProcesso/:siglaUnidade/mapa',
+    path: '/processo/:codProcesso/:siglaUnidade/mapa',
     name: 'SubprocessoMapa',
     component: () => import('@/views/CadMapa.vue'),
     props: (route: RouteLocationNormalized) => ({
@@ -35,7 +35,7 @@ const processoRoutes: RouteRecordRaw[] = [
     meta: { title: 'Mapa' },
   },
   {
-        path: '/processo/:idProcesso/:siglaUnidade/vis-mapa',
+        path: '/processo/:codProcesso/:siglaUnidade/vis-mapa',
         name: 'SubprocessoVisMapa',
         component: () => import('@/views/VisMapa.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -45,7 +45,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {title: 'Visualização de Mapa'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/cadastro',
+        path: '/processo/:codProcesso/:siglaUnidade/cadastro',
         name: 'SubprocessoCadastro',
         component: () => import('@/views/CadAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -55,7 +55,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {title: 'Cadastro'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/vis-cadastro',
+        path: '/processo/:codProcesso/:siglaUnidade/vis-cadastro',
         name: 'SubprocessoVisCadastro',
         component: () => import('@/views/VisAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -65,7 +65,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {title: 'Visualização de Atividades'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/diagnostico-equipe',
+        path: '/processo/:codProcesso/:siglaUnidade/diagnostico-equipe',
         name: 'DiagnosticoEquipe',
         component: () => import('@/views/DiagnosticoEquipe.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -75,7 +75,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {title: 'Diagnóstico da Equipe'},
     },
     {
-        path: '/processo/:idProcesso/:siglaUnidade/ocupacoes-criticas',
+        path: '/processo/:codProcesso/:siglaUnidade/ocupacoes-criticas',
         name: 'OcupacoesCriticas',
         component: () => import('@/views/OcupacoesCriticas.vue'),
         props: (route: RouteLocationNormalized) => ({

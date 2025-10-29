@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Controlador REST para gerenciar alertas.
+ */
 @RestController
 @RequestMapping("/api/alertas")
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Endpoints para gerenciamento de alertas")
-/**
- * Controlador REST para gerenciar alertas.
- */
 public class AlertaControle {
     private final AlertaService alertaService;
 
@@ -27,14 +27,15 @@ public class AlertaControle {
      * Este método corresponde ao CDU-02: Visualizar alertas. A ação de marcar como
      * lido é uma parte fundamental deste caso de uso.
      *
-     * @param id O identificador único do alerta a ser marcado como lido.
+     * @param codigo O identificador único do alerta a ser marcado como lido.
      * @return Uma resposta HTTP 200 OK com uma mensagem de confirmação.
      */
-    @PostMapping("/{id}/marcar-como-lido")
-    @Operation(summary = "Marca um alerta como lido (CDU-02)")
-    public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long id) {
+    @PostMapping("/{codigo}/marcar-como-lido")
+    @Operation(summary = "Marca um alerta como lido")
+    public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long codigo) {
+        // TODO Mudar para usar usuário real
         String usuarioTitulo = "USUARIO_ATUAL"; // Exemplo
-        alertaService.marcarComoLido(usuarioTitulo, id);
+        alertaService.marcarComoLido(usuarioTitulo, codigo);
         return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));
     }
 }

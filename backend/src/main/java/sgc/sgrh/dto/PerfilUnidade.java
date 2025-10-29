@@ -1,7 +1,7 @@
 package sgc.sgrh.dto;
 
 import lombok.*;
-import sgc.sgrh.Perfil;
+import sgc.sgrh.modelo.Perfil;
 
 @Getter
 @Setter

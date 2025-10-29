@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
 import sgc.sgrh.dto.PerfilUnidade;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.modelo.UnidadeRepo;
 import sgc.sgrh.dto.LoginResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;

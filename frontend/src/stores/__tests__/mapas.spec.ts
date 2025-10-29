@@ -20,7 +20,7 @@ vi.mock('@/services/subprocessoService', () => ({
 
 describe('useMapasStore', () => {
     let store: ReturnType<typeof useMapasStore>;
-    const idSubprocesso = 1;
+    const codSubrocesso = 1;
 
     beforeEach(() => {
         setActivePinia(createPinia());
@@ -39,9 +39,9 @@ describe('useMapasStore', () => {
             const mockMapa: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: []};
             vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-            await store.fetchMapaCompleto(idSubprocesso);
+            await store.fetchMapaCompleto(codSubrocesso);
 
-            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(idSubprocesso);
+            expect(mapaService.obterMapaCompleto).toHaveBeenCalledWith(codSubrocesso);
             expect(store.mapaCompleto).toEqual(mockMapa);
         });
 
@@ -49,7 +49,7 @@ describe('useMapasStore', () => {
             vi.mocked(mapaService.obterMapaCompleto).mockRejectedValue(new Error('Failed'));
             store.mapaCompleto = {} as any; // Pre-set state
 
-            await store.fetchMapaCompleto(idSubprocesso);
+            await store.fetchMapaCompleto(codSubrocesso);
 
             expect(store.mapaCompleto).toBeNull();
         });
@@ -61,9 +61,9 @@ describe('useMapasStore', () => {
             const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}]};
             vi.mocked(mapaService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
-            await store.salvarMapa(idSubprocesso, request);
+            await store.salvarMapa(codSubrocesso, request);
 
-            expect(mapaService.salvarMapaCompleto).toHaveBeenCalledWith(idSubprocesso, request);
+            expect(mapaService.salvarMapaCompleto).toHaveBeenCalledWith(codSubrocesso, request);
             expect(store.mapaCompleto).toEqual(mockResponse);
         });
     });
@@ -73,9 +73,9 @@ describe('useMapasStore', () => {
             const mockMapa: MapaAjuste = {codigo: 1, descricao: 'teste', competencias: []};
             vi.mocked(mapaService.obterMapaAjuste).mockResolvedValue(mockMapa);
 
-            await store.fetchMapaAjuste(idSubprocesso);
+            await store.fetchMapaAjuste(codSubrocesso);
 
-            expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(idSubprocesso);
+            expect(mapaService.obterMapaAjuste).toHaveBeenCalledWith(codSubrocesso);
             expect(store.mapaAjuste).toEqual(mockMapa);
         });
     });
@@ -85,9 +85,9 @@ describe('useMapasStore', () => {
             const request = {competencias: [], atividades: [], sugestoes: ''};
             vi.mocked(mapaService.salvarMapaAjuste).mockResolvedValue(undefined);
 
-            await store.salvarAjustes(idSubprocesso, request);
+            await store.salvarAjustes(codSubrocesso, request);
 
-            expect(mapaService.salvarMapaAjuste).toHaveBeenCalledWith(idSubprocesso, request);
+            expect(mapaService.salvarMapaAjuste).toHaveBeenCalledWith(codSubrocesso, request);
         });
     });
 
@@ -106,9 +106,9 @@ describe('useMapasStore', () => {
             };
             vi.mocked(mapaService.verificarImpactosMapa).mockResolvedValue(mockImpacto);
 
-            await store.fetchImpactoMapa(idSubprocesso);
+            await store.fetchImpactoMapa(codSubrocesso);
 
-            expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(idSubprocesso);
+            expect(mapaService.verificarImpactosMapa).toHaveBeenCalledWith(codSubrocesso);
             expect(store.impactoMapa).toEqual(mockImpacto);
         });
     });

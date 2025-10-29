@@ -7,27 +7,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import sgc.sgrh.UsuarioRepo;
-import sgc.unidade.modelo.UnidadeRepo;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class TestSecurityConfig {
 
     @Bean
     @Profile({"test", "jules"})
     public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/usuarios/autenticar",
-                    "/api/usuarios/autorizar",
-                    "/api/usuarios/entrar",
-                    "/api/test/**"
-                ).permitAll()
-                .requestMatchers("/api/**").authenticated()
-                .anyRequest().permitAll()
-            );
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 }
