@@ -153,7 +153,7 @@ public class CDU07IntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve falhar ao buscar subprocesso inexistente")
         void falhaSubprocessoInexistente() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, "ADMIN", null));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
         }
     }
 }

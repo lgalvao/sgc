@@ -562,7 +562,7 @@ public class SubprocessoWorkflowService {
 
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeDestino);
 
-        sp.setSituacao(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         repositorioSubprocesso.save(sp);
     }
 
@@ -590,7 +590,7 @@ public class SubprocessoWorkflowService {
         // Adicionar log para depuração
 
 
-        if (sp.getSituacao() != SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO) {
+        if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) {
             throw new IllegalStateException("Ação de homologar só pode ser executada em revisões de cadastro aguardando homologação.");
         }
 

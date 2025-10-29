@@ -13,13 +13,17 @@ import java.time.LocalDateTime;
  * @param codUunidadeDestino O código da unidade de destino.
  * @param tituloUsuarioDestino O título de eleitor do usuário de destino.
  */
-// TODO converter para classe com @Builder
-public record AlertaDto(
-    Long codigo,
-    Long codProcesso,
-    String descricao,
-    LocalDateTime dataHora,
-    Long codUnidadeOrigem,
-    Long codUunidadeDestino,
-    String tituloUsuarioDestino
-) {}
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+public class AlertaDto {
+    Long codigo;
+    Long codProcesso;
+    String descricao;
+    LocalDateTime dataHora;
+    Long codUnidadeOrigem;
+    Long codUunidadeDestino;
+    String tituloUsuarioDestino;
+}

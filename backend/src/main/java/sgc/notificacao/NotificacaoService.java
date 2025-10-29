@@ -111,7 +111,7 @@ public class NotificacaoService {
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
      * email for enviado com sucesso, ou {@code false} caso contrário.
      */
-    @Async("executorDeTarefasDeEmail")
+    @Async
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {

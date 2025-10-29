@@ -1,10 +1,7 @@
 package sgc.analise.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.subprocesso.modelo.Subprocesso;
 
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "ANALISE", schema = "sgc")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Analise extends EntidadeBase {

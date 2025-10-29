@@ -9,14 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.ProcessoSeguranca;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.EventoProcessoCriado;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.dto.PerfilDto;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.*;
@@ -50,6 +52,34 @@ public class ProcessoService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ProcessoNotificacaoService processoNotificacaoService;
+    private final SgrhService sgrhService;
+
+    public boolean checarAcesso(Authentication authentication, Long codProcesso) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        String username = authentication.getName();
+        boolean isGestorOuChefe = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR") || a.getAuthority().equals("ROLE_CHEFE"));
+
+        if (!isGestorOuChefe) {
+            return false;
+        }
+
+        // Para gestores, verifica se a unidade dele participa do processo.
+        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        Long codUnidadeUsuario = perfis.stream()
+                .findFirst()
+                .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
+                .orElse(null);
+
+        if (codUnidadeUsuario == null) {
+            return false;
+        }
+
+        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidadeUsuario);
+    }
 
     /**
      * Cria um novo processo de mapeamento de competências.
@@ -68,8 +98,7 @@ public class ProcessoService {
             throw new ConstraintViolationException("Pelo menos uma unidade participante deve ser selecionada.", null);
         }
 
-        // TODO usar tipos fortes para o tipo do processo
-        if ("REVISAO".equalsIgnoreCase(requisicao.tipo()) || "DIAGNOSTICO".equalsIgnoreCase(requisicao.tipo())) {
+        if (requisicao.tipo() == TipoProcesso.REVISAO || requisicao.tipo() == TipoProcesso.DIAGNOSTICO) {
             for (Long codigoUnidade : requisicao.unidades()) {
                 if (unidadeRepo.findById(codigoUnidade).isEmpty()) {
                     throw new ErroDominioNaoEncontrado("Unidade", codigoUnidade);
@@ -79,7 +108,7 @@ public class ProcessoService {
 
         Processo processo = new Processo()
                 .setDescricao(requisicao.descricao())
-                .setTipo(TipoProcesso.valueOf(requisicao.tipo()))
+                .setTipo(requisicao.tipo())
                 .setDataLimite(requisicao.dataLimiteEtapa1())
                 .setSituacao(SituacaoProcesso.CRIADO)
                 .setDataCriacao(LocalDateTime.now());
@@ -113,7 +142,7 @@ public class ProcessoService {
         }
 
         processo.setDescricao(requisicao.descricao());
-        processo.setTipo(TipoProcesso.valueOf(requisicao.tipo()));
+        processo.setTipo(requisicao.tipo());
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
         Processo processoAtualizado = processoRepo.save(processo);
@@ -162,14 +191,14 @@ public class ProcessoService {
      * <p>
      * O acesso a este método é protegido e requer que o usuário seja 'ADMIN' ou
      * tenha acesso à unidade participante do processo, conforme verificado por
-     * {@link ProcessoSeguranca#checarAcesso(Authentication, Long)}.
+     * {@link #checarAcesso(Authentication, Long)}.
      *
      * @param codProcesso O código do processo a ser detalhado.
      * @return DTO com os detalhes completos do processo.
      * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
      */
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or @processoSeguranca.checarAcesso(authentication, #codProcesso)")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codProcesso));
@@ -199,14 +228,12 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(codigo)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
 
-        // TODO usar exceção de negócio apropriada
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
-        // TODO usar exceção de negócio apropriada
         if (codsUnidades == null || codsUnidades.isEmpty()) {
-            throw new IllegalArgumentException("A lista de unidades é obrigatória para iniciar o processo de mapeamento.");
+            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de mapeamento.");
         }
 
         validarUnidadesNaoEmProcessosAtivos(codsUnidades);
@@ -236,14 +263,12 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(codigo)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
 
-        // TODO usar exceção de negócio apropriada
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
-        // TODO usar exceção de negócio apropriada
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
-            throw new IllegalArgumentException("A lista de unidades é obrigatória para iniciar o processo de revisão.");
+            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de revisão.");
         }
 
         validarUnidadesComMapasVigentes(codigosUnidades);

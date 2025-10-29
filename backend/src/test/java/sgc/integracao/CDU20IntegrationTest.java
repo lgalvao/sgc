@@ -10,9 +10,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.integracao.mocks.WithMockAdmin;
@@ -51,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
+@Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -149,9 +152,9 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.getFirst().acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-        assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.getFirst().observacoes()).isEqualTo("Justificativa da devolução");
+        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+        assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
+        assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
 
         // Adicionar verificação de Movimentacao e Alerta após devolução
         List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -184,8 +187,8 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-        assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
+        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+        assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());

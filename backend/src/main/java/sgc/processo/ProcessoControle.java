@@ -118,16 +118,15 @@ public class ProcessoControle {
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long codigo,
-            @RequestParam(name = "tipo") String tipo, // Removido defaultValue e required=false
+            @RequestParam(name = "tipo") sgc.processo.modelo.TipoProcesso tipo,
             @RequestBody(required = false) List<Long> unidades) {
 
-        if ("REVISAO".equalsIgnoreCase(tipo)) {
+        if (tipo == sgc.processo.modelo.TipoProcesso.REVISAO) {
             processoService.iniciarProcessoRevisao(codigo, unidades);
-        } else {
-            // TODO Tirar esse padrão e obrigar a passagem explicita do tipo do processo
-
-            // por padrão, inicia mapeamento
+        } else if (tipo == sgc.processo.modelo.TipoProcesso.MAPEAMENTO) {
             processoService.iniciarProcessoMapeamento(codigo, unidades);
+        } else {
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }

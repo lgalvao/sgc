@@ -10,6 +10,7 @@ import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroNegocio;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.subprocesso.modelo.SituacaoSubprocesso;
@@ -62,7 +63,7 @@ public class SubprocessoMapaService {
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
                 sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
-            throw new IllegalStateException("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: %s".formatted(sp.getSituacao()));
+            throw new ErroNegocio("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: %s".formatted(sp.getSituacao()));
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
@@ -116,15 +117,14 @@ public class SubprocessoMapaService {
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
 
         if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
-            throw new IllegalStateException("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
+            throw new ErroNegocio("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
         }
 
         Subprocesso spOrigem = repositorioSubprocesso.findById(codSubprocessoOrigem)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
-        // TODO lançar exceção de negócio
         if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
-            throw new IllegalStateException("Subprocesso de origem ou destino não possui mapa associado.");
+            throw new ErroNegocio("Subprocesso de origem ou destino não possui mapa associado.");
         }
 
         List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());

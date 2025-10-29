@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.alerta.dto.AlertaDto;
 import sgc.processo.dto.ProcessoResumoDto;
+import sgc.sgrh.modelo.Perfil;
 
 @RestController
 @RequestMapping("/api/painel")
 @RequiredArgsConstructor
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 public class PainelControle {
-    private final sgc.painel.PainelService painelService;
+    private final PainelService painelService;
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
@@ -35,7 +36,7 @@ public class PainelControle {
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no perfil e unidade")
     public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(
-            @RequestParam(name = "perfil") String perfil,
+            @RequestParam(name = "perfil") Perfil perfil,
             @RequestParam(name = "unidade", required = false) Long unidade,
             @PageableDefault(size = 20) Pageable pageable
     ) {

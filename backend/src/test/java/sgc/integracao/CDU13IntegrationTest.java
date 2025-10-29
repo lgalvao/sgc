@@ -53,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest {
@@ -313,15 +313,15 @@ public class CDU13IntegrationTest {
 
             // First item in list is the most recent (ACEITE)
             sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-            assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-            assertThat(aceite.observacoes()).isEqualTo(obsAceite);
-            assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
+            assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // Second item is the oldest (DEVOLUCAO)
             sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-            assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-            assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
-            assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
+            assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }
 }

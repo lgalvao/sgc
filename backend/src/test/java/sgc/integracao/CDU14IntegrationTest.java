@@ -61,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
 @Sql("/create-test-data.sql")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 class CDU14IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -179,7 +179,7 @@ class CDU14IntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.AGUARDANDO_HOMOLOGACAO_CADASTRO);
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
             assertThat(alertaRepo.findAll()).hasSize(2);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);

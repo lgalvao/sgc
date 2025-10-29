@@ -3,6 +3,7 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
@@ -48,13 +49,11 @@ public class CopiaMapaService {
      */
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Long codUnidadeDestino) {
-        // TODO usar exceção de negócio apropriada
         Mapa fonte = repositorioMapa.findById(codMapaOrigem)
-                .orElseThrow(() -> new IllegalArgumentException("Mapa fonte não encontrado: %d".formatted(codMapaOrigem)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", codMapaOrigem));
 
-        // TODO usar exceção de negócio apropriada
         Unidade unidadeDestino = repositorioUnidade.findById(codUnidadeDestino)
-                .orElseThrow(() -> new IllegalArgumentException("Unidade de destino não encontrada: %d".formatted(codUnidadeDestino)));
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codUnidadeDestino));
 
         Mapa novoMapa = new Mapa();
         novoMapa.setDataHoraDisponibilizado(fonte.getDataHoraDisponibilizado());
