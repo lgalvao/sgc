@@ -559,11 +559,14 @@ expect: {timeout: 15000},  // 15s (era 5s)
 
 ### Próximos Passos
 
-- [ ] Iniciar backend com perfil `e2e`
-- [ ] Executar testes CDU-04 para verificar correção
-- [ ] Executar suite completa de testes E2E
+- [x] Iniciar backend com perfil `e2e` - ✅ Backend rodando em http://localhost:10000
+- [x] Iniciar frontend - ✅ Frontend rodando em http://localhost:5173
+- [ ] Executar testes CDU-04 para verificar correção (requer instalação do Chromium)
+- [ ] Executar suite completa de testes E2E (requer instalação do Chromium)
 - [ ] Identificar e corrigir quaisquer testes que ainda falham
 - [ ] Documentar novos achados neste arquivo
+
+**Observação:** Backend e frontend estão funcionando corretamente com perfil `e2e`. Testes E2E requerem ambiente com Chromium instalado.
 
 ---
 
