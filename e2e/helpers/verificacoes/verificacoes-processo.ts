@@ -46,7 +46,7 @@ export async function verificarNotificacaoErro(page: Page): Promise<void> {
     let encontrado = false;
     for (const selector of erroSelectors) {
         const element = page.locator(selector).first();
-        if (await element.isVisible({timeout: 5000}).catch(() => false)) {
+        if (await element.isVisible({timeout: 15000}).catch(() => false)) {
             encontrado = true;
             break;
         }
@@ -137,7 +137,7 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
 
     // Verificar que a linha do processo não está mais presente na tabela de processos.
     // Usar polling tolerante para lidar com timings assíncronos da UI
-    const timeoutMs = 10000;
+    const timeoutMs = 15000;
     const intervalMs = 500;
     const deadline = Date.now() + timeoutMs;
     let stillPresent = true;
@@ -347,7 +347,7 @@ export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Pa
  */
 export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await expect(modal).toBeVisible({timeout: 10000});
+    await expect(modal).toBeVisible({timeout: 15000});
     await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
     await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
     await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);

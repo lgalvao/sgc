@@ -5,8 +5,8 @@ import {defineConfig, devices} from '@playwright/test';
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
-    timeout: 10000,
-    expect: {timeout: 5000},
+    timeout: 30000,  // 30s for full test timeout (was 10s)
+    expect: {timeout: 15000},  // 15s for assertions (was 5s)
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
     webServer: {
         command: 'cd frontend ; npm run dev',

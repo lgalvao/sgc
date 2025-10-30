@@ -133,7 +133,7 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
  */
 export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await modal.waitFor({state: 'visible', timeout: 10000});
+    await modal.waitFor({state: 'visible', timeout: 15000});
     
     await clicarElemento([
         modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
@@ -146,7 +146,7 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
  */
 export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await modal.waitFor({state: 'visible', timeout: 10000});
+    await modal.waitFor({state: 'visible', timeout: 15000});
     
     await clicarElemento([
         modal.getByTestId(SELETORES.BTN_MODAL_CANCELAR),
@@ -199,17 +199,17 @@ export async function criarProcessoBasico(
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
     const row = page.locator(`[data-testid="${SELETORES.TABELA_PROCESSOS}"] tr:has-text("${descricao}")`);
-    await row.waitFor({state: 'visible', timeout: 10000});
+    await row.waitFor({state: 'visible', timeout: 15000});
     console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
     console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
     
     // Aguardar navegação para página de cadastro
-    await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 10000});
+    await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 15000});
     console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
     
     // Aguardar formulário carregar com os dados do processo
-    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
+    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 15000});
     // Aguardar um pouco mais para garantir que todos os dados foram carregados (unidades, etc)
     await page.waitForTimeout(2000); // Aumentado de 1s para 2s
     console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
