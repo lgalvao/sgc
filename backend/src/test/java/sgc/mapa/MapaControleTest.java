@@ -15,32 +15,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.Usuario;
+import sgc.mapa.service.MapaService;
+import sgc.sgrh.modelo.Usuario;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MapaControleTest {
     private static final String API_MAPAS = "/api/mapas";
     private static final String API_MAPAS_1 = "/api/mapas/1";
-    private static final String API_MAPAS_1_COMPLETO = "/api/mapas/1/completo";
+    private static final String API_MAPAS_1_ATUALIZAR = "/api/mapas/1/atualizar";
+    private static final String API_MAPAS_1_EXCLUIR = "/api/mapas/1/excluir";
     private static final String CODIGO_JSON_PATH = "$.codigo";
-    private static final String OBS = "Obs";
-
-    @Mock
-    private MapaRepo repositorioMapa;
 
     @Mock
     private MapaService mapaService;
@@ -57,11 +51,12 @@ public class MapaControleTest {
     @BeforeEach
     void setUp() {
         Usuario usuario = new Usuario();
-        usuario.setTitulo("test-user");
+        usuario.setTituloEleitoral(123456789012L);
 
         HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
 
         mockMvc = MockMvcBuilders.standaloneSetup(mapaControle)
+                .setControllerAdvice(new sgc.comum.erros.RestExceptionHandler())
                 .setCustomArgumentResolvers(authenticationPrincipalResolver)
                 .build();
 
@@ -79,7 +74,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(repositorioMapa.findAll()).thenReturn(List.of(mapa));
+        when(mapaService.listar()).thenReturn(List.of(mapa));
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS))
@@ -93,7 +88,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapa));
+        when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
@@ -103,7 +98,7 @@ public class MapaControleTest {
 
     @Test
     void obterPorId_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.empty());
+        when(mapaService.obterPorCodigo(1L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isNotFound());
@@ -116,7 +111,7 @@ public class MapaControleTest {
         mapa.setCodigo(1L);
 
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapa);
+        when(mapaService.criar(any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS)
@@ -129,14 +124,14 @@ public class MapaControleTest {
     @Test
     void atualizar_QuandoMapaExiste_DeveRetornarOk() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
-        Mapa mapaExistente = new Mapa();
-        mapaExistente.setCodigo(1L);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(1L);
 
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(mapaExistente));
-        when(repositorioMapa.save(any(Mapa.class))).thenReturn(mapaExistente);
+        when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
+        when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
 
-        mockMvc.perform(put(API_MAPAS_1)
+        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isOk())
@@ -147,9 +142,10 @@ public class MapaControleTest {
     void atualizar_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.empty());
+        when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
+        when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(new Mapa());
 
-        mockMvc.perform(put(API_MAPAS_1)
+        mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mapaDto)))
                 .andExpect(status().isNotFound());
@@ -157,62 +153,20 @@ public class MapaControleTest {
 
     @Test
     void excluir_QuandoMapaExiste_DeveRetornarNoContent() throws Exception {
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.of(new Mapa()));
+        doNothing().when(mapaService).excluir(1L);
 
-        mockMvc.perform(delete(API_MAPAS_1))
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNoContent());
 
-        verify(repositorioMapa, times(1)).deleteById(1L);
+        verify(mapaService, times(1)).excluir(1L);
     }
 
     @Test
     void excluir_QuandoMapaNaoExiste_DeveRetornarNotFound() throws Exception {
-        when(repositorioMapa.findById(1L)).thenReturn(Optional.empty());
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(mapaService).excluir(1L);
 
-        mockMvc.perform(delete(API_MAPAS_1))
+        mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    void obterCompleto_QuandoMapaExiste_DeveRetornarOk() throws Exception {
-        MapaCompletoDto mapaCompletoDto = new MapaCompletoDto(1L, 100L, OBS, Collections.emptyList());
-        when(mapaService.obterMapaCompleto(1L)).thenReturn(mapaCompletoDto);
-
-        mockMvc.perform(get(API_MAPAS_1_COMPLETO))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
-    }
-
-    @Test
-    void obterCompleto_QuandoServicoLancaExcecao_DeveRetornarNotFound() throws Exception {
-        when(mapaService.obterMapaCompleto(1L)).thenThrow(new RuntimeException("Erro"));
-
-        mockMvc.perform(get(API_MAPAS_1_COMPLETO))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void salvarCompleto_ComDadosValidos_DeveRetornarOk() throws Exception {
-        SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        MapaCompletoDto mapaCompletoDto = new MapaCompletoDto(1L, 100L, OBS, Collections.emptyList());
-
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyString())).thenReturn(mapaCompletoDto);
-
-        mockMvc.perform(put(API_MAPAS_1_COMPLETO)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
-    }
-
-    @Test
-    void salvarCompleto_QuandoServicoLancaExcecao_DeveRetornarBadRequest() throws Exception {
-        SalvarMapaRequest request = new SalvarMapaRequest(OBS, Collections.emptyList());
-        when(mapaService.salvarMapaCompleto(anyLong(), any(SalvarMapaRequest.class), anyString())).thenThrow(new RuntimeException("Erro"));
-
-        mockMvc.perform(put(API_MAPAS_1_COMPLETO)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-    }
 }

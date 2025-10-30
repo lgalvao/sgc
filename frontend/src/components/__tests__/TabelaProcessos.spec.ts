@@ -1,27 +1,31 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
-import {Processo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 // Mock de dados de processo
-const mockProcessos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[] = [
+const mockProcessos: ProcessoResumo[] = [
   {
-    id: 1,
+    codigo: 1,
     descricao: 'Processo Alpha',
-      tipo: TipoProcesso.MAPEAMENTO,
-    unidadesFormatadas: 'UNID1, UNID2',
-      situacao: SituacaoProcesso.EM_ANDAMENTO,
-    dataLimite: new Date(),
+    tipo: TipoProcesso.MAPEAMENTO,
+    unidadeCodigo: 1,
+    unidadeNome: 'UNID1, UNID2',
+    situacao: SituacaoProcesso.EM_ANDAMENTO,
+    dataLimite: new Date().toISOString(),
+    dataCriacao: new Date().toISOString(),
     dataFinalizacao: null,
   },
   {
-    id: 2,
+    codigo: 2,
     descricao: 'Processo Beta',
-      tipo: TipoProcesso.REVISAO,
-    unidadesFormatadas: 'UNID3',
-      situacao: SituacaoProcesso.FINALIZADO,
-    dataLimite: new Date(),
-    dataFinalizacao: new Date('2024-08-26'),
+    tipo: TipoProcesso.REVISAO,
+    unidadeCodigo: 3,
+    unidadeNome: 'UNID3',
+    situacao: SituacaoProcesso.FINALIZADO,
+    dataLimite: new Date().toISOString(),
+    dataCriacao: new Date().toISOString(),
+    dataFinalizacao: new Date('2024-08-26').toISOString(),
     dataFinalizacaoFormatada: '26/08/2024',
   },
 ];
@@ -39,7 +43,6 @@ describe('TabelaProcessos.vue', () => {
     expect(wrapper.find('table').exists()).toBe(true);
     expect(wrapper.find('[data-testid="coluna-descricao"]').text()).toContain('Descrição');
     expect(wrapper.find('[data-testid="coluna-tipo"]').text()).toContain('Tipo');
-    expect(wrapper.find('[data-testid="coluna-unidades"]').text()).toContain('Unidades participantes');
     expect(wrapper.find('[data-testid="coluna-situacao"]').text()).toContain('Situação');
     expect(wrapper.find('[data-testid="coluna-data-finalizacao"]').exists()).toBe(false); // Não deve existir por padrão
   });
@@ -56,15 +59,15 @@ describe('TabelaProcessos.vue', () => {
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockProcessos.length);
 
-    expect(rows[0].text()).toContain('Processo Alpha');
-    expect(rows[0].text()).toContain('Mapeamento');
-    expect(rows[0].text()).toContain('UNID1, UNID2');
-    expect(rows[0].text()).toContain('Em andamento');
+    const cells = rows[0].findAll('td');
+    expect(cells[0].text()).toBe('Processo Alpha');
+    expect(cells[1].text()).toBe('MAPEAMENTO');
+    expect(cells[2].text()).toBe('EM_ANDAMENTO');
 
-    expect(rows[1].text()).toContain('Processo Beta');
-    expect(rows[1].text()).toContain('Revisão');
-    expect(rows[1].text()).toContain('UNID3');
-    expect(rows[1].text()).toContain('Finalizado');
+    const cells2 = rows[1].findAll('td');
+    expect(cells2[0].text()).toBe('Processo Beta');
+    expect(cells2[1].text()).toBe('REVISAO');
+    expect(cells2[2].text()).toBe('FINALIZADO');
   });
 
   it('deve emitir o evento ordenar ao clicar nos cabeçalhos', async () => {
@@ -167,16 +170,6 @@ describe('TabelaProcessos.vue', () => {
       },
     });
     expect(wrapperTipo.find('[data-testid="coluna-tipo"] span').text()).toBe('↑');
-
-    // Teste para critério 'unidades'
-    const wrapperUnidades = mount(TabelaProcessos, {
-      props: {
-        processos: [],
-        criterioOrdenacao: 'unidades',
-        direcaoOrdenacaoAsc: false,
-      },
-    });
-    expect(wrapperUnidades.find('[data-testid="coluna-unidades"] span').text()).toBe('↓');
 
     // Teste para critério 'situacao'
     const wrapperSituacao = mount(TabelaProcessos, {

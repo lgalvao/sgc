@@ -12,9 +12,9 @@ import {
     parseDate
 } from '@/utils';
 
-describe('utils', () => {
+describe('utilitários', () => {
     describe('generateUniqueId', () => {
-        it('should generate unique IDs', () => {
+        it('deve gerar IDs únicos', () => {
             const id1 = generateUniqueId();
             const id2 = generateUniqueId();
             expect(id1).not.toBe(id2);
@@ -24,18 +24,18 @@ describe('utils', () => {
     });
 
     describe('badgeClass', () => {
-        it('should return correct badge class for known situations', () => {
+        it('deve retornar a classe de badge correta para situações conhecidas', () => {
             expect(badgeClass('Finalizado')).toBe('bg-success');
             expect(badgeClass('Em andamento')).toBe('bg-warning text-dark');
         });
 
-        it('should return default class for unknown situations', () => {
+        it('deve retornar a classe padrão para situações desconhecidas', () => {
             expect(badgeClass('unknown')).toBe('bg-secondary');
         });
     });
 
     describe('iconeTipo', () => {
-        it('should return correct icons for notification types', () => {
+        it('deve retornar os ícones corretos para tipos de notificação', () => {
             expect(iconeTipo('success')).toBe('bi bi-check-circle-fill text-success');
             expect(iconeTipo('error')).toBe('bi bi-exclamation-triangle-fill text-danger');
             expect(iconeTipo('warning')).toBe('bi bi-exclamation-triangle-fill text-warning');
@@ -43,19 +43,19 @@ describe('utils', () => {
             expect(iconeTipo('email')).toBe('bi bi-envelope-fill text-primary');
         });
 
-        it('should return default icon for unknown types', () => {
+        it('deve retornar o ícone padrão para tipos desconhecidos', () => {
             expect(iconeTipo('unknown' as 'success')).toBe('bi bi-bell-fill');
         });
     });
 
     describe('parseDate', () => {
-        it('should return null for null or undefined input', () => {
+        it('deve retornar null para entrada nula ou indefinida', () => {
             expect(parseDate(null)).toBeNull();
             expect(parseDate(undefined)).toBeNull();
             expect(parseDate('')).toBeNull();
         });
 
-        it('should parse ISO date strings', () => {
+        it('deve analisar strings de data ISO', () => {
             const date = parseDate('2024-03-15');
             expect(date).toBeInstanceOf(Date);
             expect(date?.getFullYear()).toBe(2024);
@@ -63,12 +63,12 @@ describe('utils', () => {
             expect([14, 15]).toContain(date?.getDate());
         });
 
-        it('should parse Brazilian date format DD/MM/YYYY', () => {
+        it('deve analisar o formato de data brasileiro DD/MM/YYYY', () => {
             const date = parseDate('15/03/2024');
             expect(date).toEqual(new Date(2024, 2, 15));
         });
 
-        it('should return null for invalid date strings', () => {
+        it('deve retornar null para strings de data inválidas', () => {
             expect(parseDate('invalid')).toBeNull();
             expect(parseDate('99/99/9999')).toBeNull();
             expect(parseDate('00/01/2024')).toBeNull();
@@ -76,71 +76,71 @@ describe('utils', () => {
     });
 
     describe('formatDateBR', () => {
-        it('should return "Não informado" for null or undefined', () => {
+        it('deve retornar "Não informado" para nulo ou indefinido', () => {
             expect(formatDateBR(null)).toBe('Não informado');
             expect(formatDateBR(undefined)).toBe('Não informado');
         });
 
-        it('should format Date object to Brazilian format', () => {
+        it('deve formatar o objeto Date para o formato brasileiro', () => {
             const date = new Date(2024, 2, 15);
             expect(formatDateBR(date)).toBe('15/03/2024');
         });
 
-        it('should return "Data inválida" for invalid dates', () => {
+        it('deve retornar "Data inválida" para datas inválidas', () => {
             expect(formatDateBR('invalid')).toBe('Data inválida');
             expect(formatDateBR(new Date('invalid'))).toBe('Data inválida');
         });
     });
 
     describe('formatDateForInput', () => {
-        it('should return empty string for null or undefined', () => {
+        it('deve retornar string vazia para nulo ou indefinido', () => {
             expect(formatDateForInput(null)).toBe('');
             expect(formatDateForInput(undefined)).toBe('');
         });
 
-        it('should format Date to YYYY-MM-DD format', () => {
+        it('deve formatar a data para o formato YYYY-MM-DD', () => {
             const date = new Date(2024, 2, 15);
             expect(formatDateForInput(date)).toBe('2024-03-15');
         });
 
-        it('should pad single digit months and days', () => {
+        it('deve preencher meses e dias de um único dígito', () => {
             const date = new Date(2024, 0, 5);
             expect(formatDateForInput(date)).toBe('2024-01-05');
         });
     });
 
     describe('formatDateTimeBR', () => {
-        it('should format date and time in Brazilian format', () => {
+        it('deve formatar data e hora no formato brasileiro', () => {
             const date = new Date(2024, 2, 15, 14, 30, 0);
             const result = formatDateTimeBR(date);
             expect(result).toContain('15/03/2024');
             expect(result).toContain('14:30');
         });
 
-        it('should handle null and undefined', () => {
+        it('deve lidar com nulo e indefinido', () => {
             expect(formatDateTimeBR(null)).toBe('Não informado');
             expect(formatDateTimeBR(undefined)).toBe('Não informado');
         });
     });
 
     describe('isDateValidAndFuture', () => {
-        it('should return false for null or undefined', () => {
+        it('deve retornar false para nulo ou indefinido', () => {
             expect(isDateValidAndFuture(null)).toBe(false);
             expect(isDateValidAndFuture(undefined)).toBe(false);
         });
 
-        it('should return true for today', () => {
+        it('deve retornar true para hoje', () => {
             const today = new Date();
             expect(isDateValidAndFuture(today)).toBe(true);
         });
 
-        it('should return true for future dates', () => {
+        it('deve retornar true para datas futuras', () => {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             expect(isDateValidAndFuture(tomorrow)).toBe(true);
         });
 
-        it('should return false for past dates', () => {
+        it('deve retornar false para datas passadas', () => {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             expect(isDateValidAndFuture(yesterday)).toBe(false);
@@ -148,19 +148,19 @@ describe('utils', () => {
     });
 
     describe('diffInDays', () => {
-        it('should calculate positive difference between dates', () => {
+        it('deve calcular a diferença positiva entre as datas', () => {
             const date1 = new Date(2024, 0, 1);
             const date2 = new Date(2024, 0, 5);
             expect(diffInDays(date1, date2)).toBe(4);
         });
 
-        it('should calculate difference regardless of order', () => {
+        it('deve calcular a diferença independentemente da ordem', () => {
             const date1 = new Date(2024, 0, 5);
             const date2 = new Date(2024, 0, 1);
             expect(diffInDays(date1, date2)).toBe(4);
         });
 
-        it('should return 0 for same date', () => {
+        it('deve retornar 0 para a mesma data', () => {
             const date1 = new Date(2024, 0, 1);
             const date2 = new Date(2024, 0, 1);
             expect(diffInDays(date1, date2)).toBe(0);
@@ -168,39 +168,39 @@ describe('utils', () => {
     });
 
     describe('ensureValidDate', () => {
-        it('should return null for null or undefined', () => {
+        it('deve retornar null para nulo ou indefinido', () => {
             expect(ensureValidDate(null)).toBeNull();
             expect(ensureValidDate(undefined)).toBeNull();
         });
 
-        it('should return valid Date object for valid Date', () => {
+        it('deve retornar um objeto Date válido para uma data válida', () => {
             const validDate = new Date(2024, 2, 15);
             const result = ensureValidDate(validDate);
             expect(result).toBe(validDate);
         });
 
-        it('should return null for invalid Date object', () => {
+        it('deve retornar null para objeto Date inválido', () => {
             const invalidDate = new Date('invalid');
             expect(ensureValidDate(invalidDate)).toBeNull();
         });
 
-        it('should return null for Date with NaN time', () => {
+        it('deve retornar null para Date com tempo NaN', () => {
             const nanDate = new Date(NaN);
             expect(ensureValidDate(nanDate)).toBeNull();
         });
 
-        it('should handle Date objects with valid time but invalid components', () => {
-            // Create a date that would be invalid (like February 30th)
-            // JavaScript automatically corrects this to March 1st, so this test validates the corrected behavior
-            const edgeCaseDate = new Date(2024, 1, 30); // February 30th becomes March 1st
+        it('deve lidar com objetos Date com tempo válido, mas componentes inválidos', () => {
+            // Cria uma data que seria inválida (como 30 de fevereiro)
+            // JavaScript corrige automaticamente isso para 1º de março, então este teste valida o comportamento corrigido
+            const edgeCaseDate = new Date(2024, 1, 30); // 30 de fevereiro se torna 1º de março
             expect(ensureValidDate(edgeCaseDate)).toBeInstanceOf(Date);
-            expect(ensureValidDate(edgeCaseDate)?.getMonth()).toBe(2); // March
-            expect(ensureValidDate(edgeCaseDate)?.getDate()).toBe(1); // 1st
+            expect(ensureValidDate(edgeCaseDate)?.getMonth()).toBe(2); // Março
+            expect(ensureValidDate(edgeCaseDate)?.getDate()).toBe(1); // 1º
         });
     });
-     describe('error handling in formatDateBR', () => {
-         it('should return "Data inválida" for invalid date strings', () => {
-             // Test with an invalid date string that will cause parseDate to fail
+     describe('tratamento de erro em formatDateBR', () => {
+         it('deve retornar "Data inválida" para strings de data inválidas', () => {
+             // Testa com uma string de data inválida que fará com que parseDate falhe
              const result = formatDateBR('invalid-date-string');
              expect(result).toBe('Data inválida');
          });
@@ -208,23 +208,23 @@ describe('utils', () => {
 });
      
 
-     describe('error handling in formatDateForInput', () => {
-         it('should return empty string when date operations throw an error', () => {
-             // Create a date that will cause getFullYear() to throw
+     describe('tratamento de erro em formatDateForInput', () => {
+         it('deve retornar string vazia quando as operações de data geram um erro', () => {
+             // Cria uma data que fará com que getFullYear() gere um erro
              const invalidDate = new Date('invalid');
 
-             // This should trigger the catch block and return ''
+             // Isso deve acionar o bloco catch e retornar ''
              const result = formatDateForInput(invalidDate);
              expect(result).toBe('');
          });
      });
 
-     describe('error handling in isDateValidAndFuture', () => {
-         it('should return false when date operations throw an error', () => {
-             // Create a date that will cause setHours() to throw
+     describe('tratamento de erro em isDateValidAndFuture', () => {
+         it('deve retornar false quando as operações de data geram um erro', () => {
+             // Cria uma data que fará com que setHours() gere um erro
              const invalidDate = new Date('invalid');
 
-             // This should trigger the catch block and return false
+             // Isso deve acionar o bloco catch e retornar false
              const result = isDateValidAndFuture(invalidDate);
              expect(result).toBe(false);
          });

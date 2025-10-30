@@ -32,15 +32,15 @@ export const useRevisaoStore = defineStore('revisao', {
         };
     },
     actions: {
-        obterIdsCompetenciasImpactadas(atividadeId: number, siglaUnidade: string, idProcesso: number): number[] {
+        obterIdsCompetenciasImpactadas(atividadeId: number): number[] {
             const mapasStore = useMapasStore();
             const idsImpactados: number[] = [];
-            const mapaAtual = mapasStore.getMapaByUnidadeId(siglaUnidade, idProcesso);
+            const mapaAtual = mapasStore.mapaCompleto;
 
             if (mapaAtual) {
-                mapaAtual.competencias.forEach(comp => {
+                (mapaAtual as any).competencias.forEach((comp: any) => {
                     if (comp.atividadesAssociadas.includes(atividadeId)) {
-                        idsImpactados.push(comp.id);
+                        idsImpactados.push(comp.codigo);
                     }
                 });
             }

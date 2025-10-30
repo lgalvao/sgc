@@ -1,80 +1,59 @@
-# Módulo de Atividade - SGC
+# Módulo de Atividade
 
 ## Visão Geral
-Este pacote é responsável por gerenciar as **Atividades** do sistema. Uma `Atividade` representa uma tarefa ou ação específica que é cadastrada no contexto de um `Mapa` de competências.
+Este pacote gerencia a entidade `Atividade`, que representa uma tarefa ou atribuição dentro de um `Mapa` de competências.
 
-O módulo fornece a estrutura de dados (`Atividade.java`), o repositório para acesso ao banco de dados (`AtividadeRepo.java`) e o controlador REST (`AtividadeControle.java`) para expor as operações CRUD (Criar, Ler, Atualizar, Excluir) via API.
+Uma mudança arquitetural importante foi a **centralização da gestão de Conhecimentos** neste módulo. Agora, a entidade `Conhecimento` é tratada como um recurso filho de `Atividade`, e seu ciclo de vida (criação, atualização, exclusão) é gerenciado através da API de `Atividade`. Isso reflete a relação de negócio onde um conhecimento só existe no contexto de uma atividade.
 
-## Arquivos Principais
+## Arquitetura e Componentes
+A lógica de negócio foi movida do `AtividadeControle` para o `AtividadeService`, alinhando este módulo com a arquitetura padrão da aplicação. O `AtividadeControle` agora é responsável apenas por expor a API REST e delegar as operações para a camada de serviço.
 
-### 1. `Atividade.java`
-**Localização:** `backend/src/main/java/sgc/atividade/modelo/Atividade.java`
-- **Descrição:** Entidade JPA que representa uma atividade. Mapeia a tabela `ATIVIDADE` no banco de dados.
-- **Campos Importantes:**
-  - `descricao`: O texto que descreve a atividade.
-  - `mapa`: A associação com a entidade `Mapa` à qual a atividade pertence.
-
-### 2. `AtividadeControle.java`
-**Localização:** `backend/src/main/java/sgc/atividade/AtividadeControle.java`
-- **Descrição:** Controlador REST que expõe endpoints para gerenciar a entidade `Atividade`. Este controlador contém a lógica de negócio para validação e orquestração das operações, interagindo diretamente com os repositórios.
-- **Endpoints Principais:**
-  - `GET /api/atividades`: Lista todas as atividades cadastradas.
-  - `GET /api/atividades/{id}`: Obtém os detalhes de uma atividade específica por seu ID.
-  - `POST /api/atividades`: Cria uma nova atividade, validando o estado do subprocesso e as permissões do usuário.
-  - `PUT /api/atividades/{id}`: Atualiza uma atividade existente.
-  - `DELETE /api/atividades/{id}`: Exclui uma atividade e seus conhecimentos associados (deleção em cascata na camada de aplicação).
-
-### 3. `AtividadeRepo.java`
-**Localização:** `backend/src/main/java/sgc/atividade/modelo/AtividadeRepo.java`
-- **Descrição:** Interface Spring Data JPA que fornece os métodos padrão para acesso e manipulação dos dados da entidade `Atividade`.
-
-### 4. DTOs e Mappers (`dto/`)
-**Localização:** `backend/src/main/java/sgc/atividade/dto/`
-- **Descrição:** O pacote `dto` contém os Data Transfer Objects (DTOs) utilizados para a comunicação via API, como `AtividadeDto`. Isso desacopla a representação da API da estrutura interna da entidade `Atividade`.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário"
-        A[Usuário via API]
+    subgraph "Frontend"
+        Frontend
     end
 
     subgraph "Módulo Atividade"
-        B(AtividadeControle)
-        C[AtividadeRepo]
-        D(Atividade)
-        E(AtividadeDto)
+        Controle(AtividadeControle)
+        Service(AtividadeService)
+        subgraph "Repositórios"
+            AtividadeRepo
+            ConhecimentoRepo
+        end
+        subgraph "Modelos de Dados"
+            Atividade
+            Conhecimento
+        end
     end
 
-    subgraph "Outros Módulos"
-        F[ConhecimentoRepo]
-        G[SubprocessoRepo]
-        H[UsuarioRepo]
-    end
+    Frontend -- API REST --> Controle
 
-    A -- Requisição HTTP com DTO --> B
-    B -- Usa --> C
-    B -- Também usa --> F
-    B -- Também usa --> G
-    B -- Também usa --> H
-    C -- Gerencia --> D
-    B -- Converte para/de --> E
+    Controle -- Delega para --> Service
+
+    Service -- Utiliza --> AtividadeRepo
+    Service -- Também gerencia --> ConhecimentoRepo
+
+    AtividadeRepo -- Gerencia --> Atividade
+    ConhecimentoRepo -- Gerencia --> Conhecimento
+
+    Atividade -- Tem um-para-muitos com --> Conhecimento
 ```
 
-## Como Usar
-Para gerenciar atividades, interaja com os endpoints expostos pelo `AtividadeControle` utilizando um cliente HTTP.
+## Componentes Principais
+- **`AtividadeControle`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos` aninhados.
+  - **Endpoints de Atividade**:
+    - `POST /api/atividades`: Cria uma nova atividade.
+    - `POST /api/atividades/{id}/atualizar`: Atualiza uma atividade.
+    - `POST /api/atividades/{id}/excluir`: Exclui uma atividade.
+  - **Endpoints de Conhecimento (Sub-recurso)**:
+    - `POST /api/atividades/{atividadeId}/conhecimentos`: Adiciona um conhecimento a uma atividade.
+    - `POST /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}/atualizar`: Atualiza um conhecimento.
+    - `POST /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}/excluir`: Remove um conhecimento de uma atividade.
+- **`AtividadeService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e as regras de validação.
+- **`Atividade`**: Entidade JPA que representa uma atividade. Possui uma relação `OneToMany` com `Conhecimento`.
+- **`Conhecimento`**: Entidade JPA que representa um conhecimento necessário para realizar uma atividade. Está sempre associada a uma `Atividade`.
+- **`AtividadeRepo` / `ConhecimentoRepo`**: Repositórios Spring Data para a persistência das entidades.
 
-**Exemplo: Criar uma nova atividade**
-```http
-POST /api/atividades
-Content-Type: application/json
-
-{
-  "descricao": "Elaborar o relatório de progresso do projeto.",
-  "mapaId": 123
-}
-```
-
-## Notas Importantes
-- **Relacionamento com Mapa**: Cada `Atividade` está diretamente associada a um `Mapa`, indicando que as atividades são definidas dentro do contexto de um mapa de competências específico.
-- **Uso de DTOs**: A comunicação com o frontend é feita através de DTOs, uma prática que aumenta a segurança e a flexibilidade da API, evitando a exposição direta das entidades JPA.
+## Propósito da Centralização
+A decisão de gerenciar `Conhecimento` através de `Atividade` simplifica a API e reforça o modelo de domínio. Em vez de ter um endpoint `POST /api/conhecimentos` que exigiria a passagem manual do ID da atividade, o novo modelo `POST /api/atividades/{atividadeId}/conhecimentos` é mais semântico, seguro e alinhado com as melhores práticas de design de APIs RESTful.

@@ -10,23 +10,27 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.AceitarCadastroReq;
 import sgc.subprocesso.dto.DevolverCadastroReq;
 import sgc.subprocesso.dto.HomologarCadastroReq;
@@ -37,7 +41,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,9 +50,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = TestSecurityConfig.class)
+@SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest {
@@ -87,17 +92,19 @@ public class CDU13IntegrationTest {
     @BeforeEach
     void setUp() {
         Usuario titular = new Usuario();
-        titular.setTitulo("chefe");
+        titular.setTituloEleitoral(333333333333L);
         titular.setNome("Chefe da Unidade");
+        titular.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(titular);
 
         unidadeSuperior = new Unidade("Unidade Superior", "UO_SUP");
         unidadeRepo.save(unidadeSuperior);
 
         Usuario gestorDaUnidade = new Usuario();
-        gestorDaUnidade.setTitulo("gestor_unidade");
+        gestorDaUnidade.setTituloEleitoral(222222222222L);
         gestorDaUnidade.setNome("Gestor da Unidade");
         gestorDaUnidade.setUnidade(unidadeSuperior);
+        gestorDaUnidade.setPerfis(java.util.Set.of(Perfil.GESTOR));
         usuarioRepo.save(gestorDaUnidade);
 
         unidadeSuperior.setTitular(gestorDaUnidade);
@@ -109,8 +116,9 @@ public class CDU13IntegrationTest {
         unidadeRepo.save(unidade);
 
         Usuario adminUser = new Usuario();
-        adminUser.setTitulo("admin");
+        adminUser.setTituloEleitoral(111111111111L);
         adminUser.setNome("Administrador");
+        adminUser.setPerfis(java.util.Set.of(Perfil.ADMIN));
         usuarioRepo.save(adminUser);
 
         Unidade sedoc = new Unidade("Secretaria de Documentação", "SEDOC");
@@ -127,7 +135,7 @@ public class CDU13IntegrationTest {
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
-        subprocesso.setDataLimiteEtapa1(LocalDate.now().plusDays(10));
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado
@@ -212,7 +220,7 @@ public class CDU13IntegrationTest {
             Analise analiseRegistrada = analises.getFirst();
             assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("gestor_unidade"); // From @WithMockGestor
+            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("222222222222"); // From @WithMockGestor
 
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -305,15 +313,15 @@ public class CDU13IntegrationTest {
 
             // First item in list is the most recent (ACEITE)
             sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-            assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-            assertThat(aceite.observacoes()).isEqualTo(obsAceite);
-            assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
+            assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // Second item is the oldest (DEVOLUCAO)
             sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-            assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-            assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
-            assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
+            assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }
 }

@@ -1,104 +1,58 @@
-# Módulo de Alertas - SGC
+# Módulo de Alerta
 
 ## Visão Geral
-Este pacote é responsável pela gestão e criação de alertas dentro do sistema SGC. Os alertas são notificações direcionadas a usuários específicos, geralmente relacionadas a eventos importantes em processos e subprocessos, como o início de um processo, a disponibilização de um cadastro para análise ou a devolução de um documento.
+Este pacote é responsável por criar e gerenciar **alertas internos** do sistema, que são notificações exibidas na interface do usuário. Ele funciona de maneira reativa, "escutando" eventos de domínio publicados por outros módulos (como o `processo`) e gerando os alertas correspondentes.
 
-O sistema de alertas é projetado para garantir que os usuários relevantes sejam notificados sobre ações que exigem sua atenção, adaptando as mensagens com base no tipo de unidade organizacional (Operacional, Intermediária, etc.) e buscando os destinatários corretos (titulares e substitutos) através da integração com o módulo SGRH.
+O objetivo é notificar os usuários sobre eventos que exigem sua atenção, como o início de um novo processo ou a devolução de um mapa para ajuste.
 
-## Arquivos Principais
+## Arquitetura e Funcionamento
+A principal característica deste módulo é seu **baixo acoplamento**. Ele não é invocado diretamente. Em vez disso, o `EventoProcessoListener` (localizado no pacote `notificacao`) ouve os eventos de domínio e invoca o `AlertaService` para criar os alertas correspondentes.
 
-### 1. `AlertaService.java`
-**Localização:** `backend/src/main/java/sgc/alerta/AlertaService.java`
-- **Descrição:** Classe de serviço que centraliza toda a lógica de negócio para a criação e gerenciamento de alertas.
-- **Responsabilidades:**
-  - Criar alertas genéricos para unidades de destino.
-  - Orquestrar a criação de alertas específicos para eventos como o início de um processo, a disponibilização de um cadastro e a devolução de um cadastro.
-  - Determinar os destinatários de um alerta (responsável da unidade e seus substitutos) consultando o `SgrhService`.
-  - Customizar as mensagens de alerta com base no tipo de unidade (Operacional, Intermediária, Interoperacional).
-  - Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
-  - Marcar alertas como lidos.
-
-### 2. `Alerta.java`
-**Localização:** `backend/src/main/java/sgc/alerta/modelo/Alerta.java`
-- **Descrição:** Entidade JPA que representa um alerta no sistema. Mapeia a tabela `ALERTA`.
-- **Campos Importantes:**
-  - `processo`: O processo ao qual o alerta está associado.
-  - `dataHora`: O momento em que o alerta foi criado.
-  - `unidadeOrigem`: A unidade que originou o evento do alerta.
-  - `unidadeDestino`: A unidade para a qual o alerta é direcionado.
-  - `descricao`: O texto do alerta a ser exibido ao usuário.
-
-### 3. `AlertaUsuario.java`
-**Localização:** `backend/src/main/java/sgc/alerta/modelo/AlertaUsuario.java`
-- **Descrição:** Entidade de associação que vincula um `Alerta` a um `Usuario` específico. Um mesmo alerta pode ser direcionado a múltiplos usuários (ex: titular e substituto).
-- **Estrutura:**
-  - Utiliza uma chave composta (`@EmbeddedId`) contendo o ID do alerta e o título do usuário.
-  - `dataHoraLeitura`: Armazena o timestamp de quando o usuário marcou o alerta como lido.
-
-### 4. `AlertaControle.java`
-**Localização:** `backend/src/main/java/sgc/alerta/AlertaControle.java`
-- **Descrição:** Controller REST que expõe os endpoints relacionados a alertas.
-- **Endpoints:**
-  - `POST /api/alertas/{id}/marcar-como-lido`: Permite que o usuário autenticado marque um alerta específico como lido.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Outros Módulos"
-        A[ProcessoService]
+    subgraph "Módulo Orquestrador"
+        P[processo]
     end
 
-    subgraph "Módulo Alerta"
-        B(AlertaService)
-        C(AlertaControle)
-        D[AlertaRepo]
-        E[AlertaUsuarioRepo]
-        F(Alerta)
-        G(AlertaUsuario)
+    subgraph "Infraestrutura Spring"
+        EventBus(ApplicationEventPublisher)
     end
 
-    subgraph "Módulo SGRH"
-        H[SgrhService]
+    subgraph "Módulo de Notificação"
+        Listener(notificacao.EventoProcessoListener)
     end
 
-    subgraph "Usuário"
-        U(Usuário via API)
+    subgraph "Módulo Alerta (este pacote)"
+        Service(AlertaService)
+        Controle(AlertaControle)
+        Repo[AlertaRepo]
     end
 
-    A -- Chama --> B
-    B -- Consulta --> H
-    B -- Persiste --> D
-    B -- Persiste --> E
-    D -- Gerencia --> F
-    E -- Gerencia --> G
-    U -- Requisição HTTP --> C
-    C -- Chama --> B
+    subgraph "Módulo de Integração"
+        SGRH[sgrh]
+    end
+
+    P -- 1. Publica evento --> EventBus
+    EventBus -- 2. Notifica --> Listener
+    Listener -- 3. Invoca --> Service
+    Service -- 4. Consulta --> SGRH
+    Service -- 5. Persiste via --> Repo
+
+    Controle -- Expõe API para --> Frontend
+    Controle -- Utiliza --> Service
 ```
 
-## Fluxo de Criação de Alerta
+### Fluxo de Trabalho
+1.  **Publicação do Evento:** Um módulo de negócio, como o `processo`, publica um evento (ex: `ProcessoIniciadoEvento`).
+2.  **Escuta do Evento:** O `EventoProcessoListener` (do pacote `notificacao`) captura o evento.
+3.  **Criação do Alerta:** O listener invoca o `AlertaService` (deste pacote), que contém a lógica para:
+    *   Construir a mensagem de alerta apropriada.
+    *   Consultar o `SgrhService` para identificar os usuários destinatários (ex: chefe da unidade).
+    *   Persistir as entidades `Alerta` e `AlertaUsuario` no banco de dados.
+4.  **Interação do Usuário:** O `AlertaControle` expõe uma API REST para que o frontend possa marcar os alertas do usuário logado como lidos.
 
-1.  **Invocação do Serviço**: Um serviço de nível superior (ex: `ProcessoService`) chama um método público em `AlertaService` (ex: `criarAlertasProcessoIniciado`).
-2.  **Lógica de Negócio**: `AlertaService` processa a requisição, determina a mensagem apropriada, a unidade de destino e outras propriedades do alerta.
-3.  **Criação da Entidade**: Uma nova instância de `Alerta` é criada e persistida.
-4.  **Identificação dos Destinatários**: O serviço consulta o `SgrhService` para encontrar o titular e o substituto da unidade de destino.
-5.  **Criação da Associação**: Para cada destinatário encontrado, uma instância de `AlertaUsuario` é criada, vinculando o alerta ao usuário.
-6.  **Persistência**: As entidades `Alerta` e `AlertaUsuario` são salvas no banco de dados.
-
-## Como Usar
-
-Para interagir com o sistema de alertas, injete `AlertaService` em seu componente e utilize seus métodos públicos.
-
-**Exemplo:**
-```java
-@Service
-public class ExemploService {
-
-    @Autowired
-    private AlertaService alertaService;
-
-    public void notificarCadastroDevolvido(Processo processo, Long unidadeDestino, String motivo) {
-        // Cria um alerta para notificar sobre a devolução de um cadastro
-        alertaService.criarAlertaCadastroDevolvido(processo, unidadeDestino, motivo);
-    }
-}
-```
+## Componentes Principais
+- **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua leitura. É invocado pelo `EventoProcessoListener` central.
+- **`AlertaControle`**: Expõe um endpoint REST para o frontend marcar um alerta como lido.
+- **`Alerta` / `AlertaUsuario`**: Entidades JPA que modelam um alerta e sua associação com um ou mais usuários.
+- **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data para interagir com o banco de dados.

@@ -181,12 +181,12 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
+import {computed, watch} from 'vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useProcessosStore} from '@/stores/processos';
 import {useMapasStore} from '@/stores/mapas';
-import {Mudanca, TipoMudanca, useRevisaoStore} from '@/stores/revisao';
-import {Competencia, Processo} from '@/types/tipos';
+import {type Mudanca, TipoMudanca, useRevisaoStore} from '@/stores/revisao';
+import type {Competencia} from '@/types/tipos';
 
 const props = defineProps<{
   mostrar: boolean;
@@ -194,9 +194,7 @@ const props = defineProps<{
   siglaUnidade: string;
 }>();
 
-const emit = defineEmits<{
-  fechar: [];
-}>();
+const emit = defineEmits<{ (e: 'fechar'): void }>();
 
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
@@ -204,35 +202,46 @@ const mapasStore = useMapasStore();
 const revisaoStore = useRevisaoStore();
 
 const changeDetails = {
-  [TipoMudanca.AtividadeAdicionada]: {icon: 'bi-plus-circle-fill', color: 'text-success', text: 'Atividade adicionada'},
-  [TipoMudanca.AtividadeRemovida]: {icon: 'bi-dash-circle-fill', color: 'text-danger', text: 'Atividade removida'},
+  [TipoMudanca.AtividadeAdicionada]: { icon: 'bi-plus-circle-fill', color: 'text-success', text: 'Atividade adicionada' },
+  [TipoMudanca.AtividadeRemovida]: { icon: 'bi-dash-circle-fill', color: 'text-danger', text: 'Atividade removida' },
   [TipoMudanca.AtividadeAlterada]: {
     icon: 'bi-arrow-right-circle-fill',
     color: 'text-primary',
-    text: 'Atividade alterada'
+    text: 'Atividade alterada',
   },
   [TipoMudanca.ConhecimentoAdicionado]: {
     icon: 'bi-plus-circle-fill',
     color: 'text-success',
-    text: 'Conhecimento adicionado'
+    text: 'Conhecimento adicionado',
   },
   [TipoMudanca.ConhecimentoRemovido]: {
     icon: 'bi-dash-circle-fill',
     color: 'text-danger',
-    text: 'Conhecimento removido'
+    text: 'Conhecimento removido',
   },
   [TipoMudanca.ConhecimentoAlterado]: {
     icon: 'bi-arrow-right-circle-fill',
     color: 'text-primary',
-    text: 'Conhecimento alterado'
+    text: 'Conhecimento alterado',
   },
 };
 
 const unidade = computed(() => unidadesStore.pesquisarUnidade(props.siglaUnidade));
-const processo = computed<Processo | undefined>(() => processosStore.processos.find(p => p.id === props.idProcesso));
+const processo = computed(() => processosStore.processoDetalhe);
+
+watch(
+  () => props.mostrar,
+  async novoValor => {
+    if (novoValor) {
+      await processosStore.fetchProcessoDetalhe(props.idProcesso);
+      // Supondo que idProcesso pode ser usado como codSubrocesso para fins de teste/compilação
+      await mapasStore.fetchMapaCompleto(props.idProcesso);
+    }
+  },
+);
 
 const mapa = computed(() => {
-  return mapasStore.getMapaByUnidadeId(props.siglaUnidade, props.idProcesso);
+  return mapasStore.mapaCompleto;
 });
 
 const mudancas = computed(() => {
@@ -245,14 +254,13 @@ const atividadesInseridas = computed(() => {
 
 const conhecimentosAtividade = (idAtividade: number | undefined) => {
   if (!idAtividade) return [];
-  return mudancas.value.filter(m =>
-      m.tipo === TipoMudanca.ConhecimentoAdicionado &&
-      m.idAtividade === idAtividade
+  return mudancas.value.filter(
+    m => m.tipo === TipoMudanca.ConhecimentoAdicionado && m.idAtividade === idAtividade,
   );
 };
 
-const competenciasImpactadas = computed<Map<number, { competencia: Competencia, mudancas: Mudanca[] }>>(() => {
-  const competenciasImpactadasMap = new Map<number, { competencia: Competencia, mudancas: Mudanca[] }>();
+const competenciasImpactadas = computed<Map<number, { competencia: Competencia; mudancas: Mudanca[] }>>(() => {
+  const competenciasImpactadasMap = new Map<number, { competencia: Competencia; mudancas: Mudanca[] }>();
 
   if (!mapa.value) {
     return competenciasImpactadasMap;
@@ -260,36 +268,36 @@ const competenciasImpactadas = computed<Map<number, { competencia: Competencia, 
   const mapaAtual = mapa.value;
 
   mudancas.value
-      .filter(m => m.tipo !== TipoMudanca.AtividadeAdicionada)
-      .forEach(mudanca => {
-        // Verifica competências explicitamente marcadas como impactadas
-        if (mudanca.competenciasImpactadasIds && mudanca.competenciasImpactadasIds.length > 0) {
-          mudanca.competenciasImpactadasIds.forEach(idCompetenciaImpactada => {
-            const competencia = mapaAtual.competencias.find(c => c.id === idCompetenciaImpactada);
-            if (competencia) {
-              if (!competenciasImpactadasMap.has(competencia.id)) {
-                competenciasImpactadasMap.set(competencia.id, {competencia, mudancas: []});
-              }
-              competenciasImpactadasMap.get(competencia.id)?.mudancas.push(mudanca);
+    .filter(m => m.tipo !== TipoMudanca.AtividadeAdicionada)
+    .forEach(mudanca => {
+      // Verifica competências explicitamente marcadas como impactadas
+      if (mudanca.competenciasImpactadasIds && mudanca.competenciasImpactadasIds.length > 0) {
+        mudanca.competenciasImpactadasIds.forEach(idCompetenciaImpactada => {
+          const competencia = mapaAtual.competencias.find(c => c.codigo === idCompetenciaImpactada);
+          if (competencia) {
+            if (!competenciasImpactadasMap.has(competencia.codigo)) {
+              competenciasImpactadasMap.set(competencia.codigo, { competencia, mudancas: [] });
             }
-          });
-        }
+            competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
+          }
+        });
+      }
 
-        // Verifica competências que têm a atividade associada
-        if (mudanca.idAtividade) {
-          mapaAtual.competencias.forEach(competencia => {
-            if (competencia.atividadesAssociadas.includes(mudanca.idAtividade as number)) {
-              if (!competenciasImpactadasMap.has(competencia.id)) {
-                competenciasImpactadasMap.set(competencia.id, {competencia, mudancas: []});
-              }
-              const mudancasExistentes = competenciasImpactadasMap.get(competencia.id)?.mudancas || [];
-              if (!mudancasExistentes.some(m => m.id === mudanca.id)) {
-                competenciasImpactadasMap.get(competencia.id)?.mudancas.push(mudanca);
-              }
+      // Verifica competências que têm a atividade associada
+      if (mudanca.idAtividade) {
+        mapaAtual.competencias.forEach(competencia => {
+          if (competencia.atividadesAssociadas.includes(mudanca.idAtividade as number)) {
+            if (!competenciasImpactadasMap.has(competencia.codigo)) {
+              competenciasImpactadasMap.set(competencia.codigo, { competencia, mudancas: [] });
             }
-          });
-        }
-      });
+            const mudancasExistentes = competenciasImpactadasMap.get(competencia.codigo)?.mudancas || [];
+            if (!mudancasExistentes.some(m => m.id === mudanca.id)) {
+              competenciasImpactadasMap.get(competencia.codigo)?.mudancas.push(mudanca);
+            }
+          }
+        });
+      }
+    });
   return competenciasImpactadasMap;
 });
 

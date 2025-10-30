@@ -1,90 +1,46 @@
-# Módulo de Competências - SGC
+# Módulo de Competência
 
 ## Visão Geral
-Este pacote é responsável por gerenciar as **Competências** e sua associação com **Atividades**. Ele fornece uma API REST para o gerenciamento CRUD (Criar, Ler, Atualizar, Excluir) de competências e para gerenciar os vínculos que conectam uma competência a uma ou mais atividades.
+Este pacote gerencia a entidade `Competencia` e sua associação com `Atividades`. Uma competência representa um conjunto de habilidades ou conhecimentos. Este módulo fornece a lógica de negócio para o gerenciamento completo de competências, incluindo a criação, atualização, exclusão e a gestão dos vínculos com as atividades.
 
-A lógica de negócio e a exposição dos endpoints estão centralizadas em um único controlador, `CompetenciaControle`, que orquestra as interações com as entidades e repositórios.
+**Nota Arquitetural Importante:** Este pacote **não possui uma camada de controle (`*Controle`)**. A API REST para o gerenciamento de `Competências` foi centralizada no `SubprocessoMapaControle`, que por sua vez invoca o `CompetenciaService`.
 
-## Arquivos Principais
+## Arquitetura e Componentes
+O `CompetenciaService` encapsula toda a lógica de negócio. Ele é um serviço de domínio puro, invocado por outros serviços de nível superior (como `SubprocessoMapaWorkflowService`) para manipular os dados de competências.
 
-### 1. `CompetenciaControle.java`
-**Localização:** `backend/src/main/java/sgc/competencia/CompetenciaControle.java`
-- **Descrição:** Controlador REST que centraliza todas as operações relacionadas a competências e seus vínculos com atividades.
-- **Endpoints de Competência:**
-  - `GET /api/competencias`: Lista todas as competências.
-  - `POST /api/competencias`: Cria uma nova competência.
-  - `PUT /api/competencias/{id}`: Atualiza uma competência existente.
-  - `DELETE /api/competencias/{id}`: Exclui uma competência.
-- **Endpoints de Vínculo Competência-Atividade (Aninhados):**
-  - `GET /api/competencias/{idCompetencia}/atividades`: Lista as atividades vinculadas a uma competência.
-  - `POST /api/competencias/{idCompetencia}/atividades`: Cria um novo vínculo entre a competência e uma atividade.
-  - `DELETE /api/competencias/{idCompetencia}/atividades/{idAtividade}`: Remove um vínculo existente.
-
-### 2. Entidades (`modelo/`)
-- **`Competencia.java`**: Entidade JPA que representa uma competência. Mapeia a tabela `COMPETENCIA`.
-- **`CompetenciaAtividade.java`**: Entidade que representa a tabela de associação entre `Competencia` e `Atividade`. Utiliza uma chave primária composta (`@EmbeddedId`).
-
-### 3. Repositórios (`modelo/`)
-- **`CompetenciaRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade `Competencia`.
-- **`CompetenciaAtividadeRepo.java`**: Interface Spring Data JPA para acesso aos dados da entidade de associação `CompetenciaAtividade`.
-
-### 4. DTOs e Mappers (`dto/`)
-**Localização:** `backend/src/main/java/sgc/competencia/dto/`
-- **Descrição:** Contém os Data Transfer Objects (DTOs) para a comunicação via API, como `CompetenciaDto`, desacoplando a representação da API da estrutura interna das entidades.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário"
-        U[Usuário via API]
+    subgraph "Módulo Subprocesso"
+        Controle(SubprocessoMapaControle)
+        WorkflowService(SubprocessoMapaWorkflowService)
     end
 
-    subgraph "Módulo Competência"
-        CC(CompetenciaControle)
-
-        CR[CompetenciaRepo]
-        CAR[CompetenciaAtividadeRepo]
-
-        C_E(Competencia)
-        CA_E(CompetenciaAtividade)
+    subgraph "Módulo Competência (este pacote)"
+        Service(CompetenciaService)
+        subgraph "Repositórios"
+            CompetenciaRepo
+            CompetenciaAtividadeRepo
+        end
+        subgraph "Modelos de Dados"
+            Competencia
+            CompetenciaAtividade
+        end
     end
 
-    U -- Requisições --> CC
-    CC -- Usa --> CR
-    CC -- Usa --> CAR
-    CR -- Gerencia --> C_E
-    CAR -- Gerencia --> CA_E
+    Controle -- Utiliza --> WorkflowService
+    WorkflowService -- Invoca --> Service
+
+    Service -- Utiliza --> CompetenciaRepo & CompetenciaAtividadeRepo
+
+    CompetenciaRepo -- Gerencia --> Competencia
+    CompetenciaAtividadeRepo -- Gerencia --> CompetenciaAtividade
 ```
 
-## Como Usar
+## Componentes Principais
+- **`CompetenciaService`**: Contém a lógica de negócio para todas as operações de CRUD de `Competencia` e para gerenciar seus vínculos com `Atividade`.
+- **`Competencia`**: Entidade JPA que representa uma competência.
+- **`CompetenciaAtividade`**: Entidade de associação que representa a relação N-para-N entre `Competencia` e `Atividade`.
+- **`CompetenciaRepo` / `CompetenciaAtividadeRepo`**: Repositórios Spring Data para a persistência das entidades.
 
-### Gerenciando Competências
-Interaja com os endpoints base do `CompetenciaControle`.
-
-**Exemplo: Criar uma nova competência**
-```http
-POST /api/competencias
-Content-Type: application/json
-
-{
-  "descricao": "Capacidade de Análise Crítica",
-  "mapaCodigo": 42
-}
-```
-
-### Vinculando Competência e Atividade
-Interaja com os endpoints aninhados.
-
-**Exemplo: Vincular uma competência a uma atividade**
-```http
-POST /api/competencias/10/atividades
-Content-Type: application/json
-
-{
-  "idAtividade": 25
-}
-```
-
-## Notas Importantes
-- **Chave Primária Composta**: A entidade `CompetenciaAtividade` usa uma classe aninhada `Id` como chave primária composta (`@EmbeddedId`), uma abordagem padrão para gerenciar tabelas de associação muitos-para-muitos em JPA.
-- **Controlador Consolidado**: A gestão de competências e de seus relacionamentos está consolidada no `CompetenciaControle` para simplificar a API e manter a coesão.
+## Propósito e Uso
+O módulo permite que a aplicação defina competências de forma granular e as componha associando-as a múltiplas atividades. A decisão de centralizar a exposição da API no `SubprocessoMapaControle` reflete o fato de que, no contexto do negócio, a gestão de competências ocorre sempre dentro de um `Subprocesso` ativo.

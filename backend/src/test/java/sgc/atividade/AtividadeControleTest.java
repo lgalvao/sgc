@@ -13,21 +13,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.mapa.modelo.Mapa;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.conhecimento.dto.ConhecimentoDto;
+import sgc.conhecimento.dto.ConhecimentoMapper;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AtividadeControle.class)
@@ -36,11 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AtividadeControleTest {
     private static final String ATIVIDADE_TESTE = "Atividade Teste";
     private static final String API_ATIVIDADES = "/api/atividades";
-    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
     private static final String API_ATIVIDADES_1 = "/api/atividades/1";
     private static final String API_ATIVIDADES_99 = "/api/atividades/99";
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
     private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -48,34 +44,23 @@ class AtividadeControleTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private AtividadeRepo atividadeRepo;
+    private AtividadeService atividadeService;
 
     @MockitoBean
     private AtividadeMapper atividadeMapper;
 
     @MockitoBean
-    private sgc.conhecimento.modelo.ConhecimentoRepo conhecimentoRepo;
-
-    @MockitoBean
-    private sgc.subprocesso.modelo.SubprocessoRepo subprocessoRepo;
-
-    @MockitoBean
-    private UsuarioRepo usuarioRepo;
+    private ConhecimentoMapper conhecimentoMapper;
 
     @Nested
-    @DisplayName("Testes para listar atividades")
+    @DisplayName("Testes para CRUD de Atividades")
     class ListarAtividades {
         @Test
         @DisplayName("Deve retornar lista de atividades com status 200 OK")
         void deveRetornarListaDeAtividades() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setDescricao(ATIVIDADE_TESTE);
-
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
-            when(atividadeRepo.findAll()).thenReturn(List.of(atividade));
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
+            when(atividadeService.listar()).thenReturn(List.of(atividadeDto));
 
             mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
@@ -87,7 +72,7 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve retornar lista vazia com status 200 OK")
         void deveRetornarListaVazia() throws Exception {
-            when(atividadeRepo.findAll()).thenReturn(Collections.emptyList());
+            when(atividadeService.listar()).thenReturn(Collections.emptyList());
 
             mockMvc.perform(get(API_ATIVIDADES))
                     .andExpect(status().isOk())
@@ -97,18 +82,15 @@ class AtividadeControleTest {
     }
 
     @Nested
-    @DisplayName("Testes para obter atividade por ID")
+    @DisplayName("Testes para obter atividade por código")
     class ObterAtividadePorId {
 
         @Test
         @DisplayName("Deve retornar uma atividade com status 200 OK")
         void deveRetornarAtividadePorId() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeDto);
+            when(atividadeService.obterPorCodigo(1L)).thenReturn(atividadeDto);
 
             mockMvc.perform(get(API_ATIVIDADES_1))
                     .andExpect(status().isOk())
@@ -116,9 +98,9 @@ class AtividadeControleTest {
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(atividadeService.obterPorCodigo(99L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
             mockMvc.perform(get(API_ATIVIDADES_99))
                     .andExpect(status().isNotFound());
@@ -133,33 +115,14 @@ class AtividadeControleTest {
         @DisplayName("Deve criar uma atividade e retornar 201 Created")
         void deveCriarAtividade() throws Exception {
             var atividadeDto = new AtividadeDto(null, 10L, NOVA_ATIVIDADE);
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
-            atividade.setDescricao(NOVA_ATIVIDADE);
-            var mapa = new Mapa();
-            mapa.setCodigo(10L);
-            atividade.setMapa(mapa);
-
-            var chefe = new Usuario();
-            chefe.setTitulo("chefe");
-            var unidade = new sgc.unidade.modelo.Unidade();
-            unidade.setTitular(chefe);
-            var subprocesso = new sgc.subprocesso.modelo.Subprocesso();
-            subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
-            subprocesso.setUnidade(unidade);
-
             var atividadeSalvaDto = new AtividadeDto(1L, 10L, NOVA_ATIVIDADE);
 
-            when(usuarioRepo.findByTitulo("chefe")).thenReturn(Optional.of(chefe));
-            when(subprocessoRepo.findByMapaCodigo(10L)).thenReturn(Optional.of(subprocesso));
-            when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(atividade);
-            when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividade);
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeSalvaDto);
+            when(atividadeService.criar(any(AtividadeDto.class), eq("user"))).thenReturn(atividadeSalvaDto);
 
             mockMvc.perform(post(API_ATIVIDADES).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto))
-                            .with(user("chefe")))
+                            .with(user("user")))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", API_ATIVIDADES_1))
                     .andExpect(jsonPath("$.codigo").value(1L))
@@ -186,26 +149,12 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve atualizar uma atividade e retornar 200 OK")
         void deveAtualizarAtividade() throws Exception {
-            var atividadeExistente = new Atividade();
-            atividadeExistente.setCodigo(1L);
-            atividadeExistente.setDescricao("Descrição Antiga");
-
             var atividadeDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
-            var entidadeParaAtualizar = new Atividade();
-            entidadeParaAtualizar.setDescricao(DESCRICAO_ATUALIZADA);
-
-            var atividadeAtualizada = new Atividade();
-            atividadeAtualizada.setCodigo(1L);
-            atividadeAtualizada.setDescricao(DESCRICAO_ATUALIZADA);
-
             var atividadeAtualizadaDto = new AtividadeDto(1L, null, DESCRICAO_ATUALIZADA);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividadeExistente));
-            when(atividadeMapper.toEntity(any(AtividadeDto.class))).thenReturn(entidadeParaAtualizar);
-            when(atividadeRepo.save(any(Atividade.class))).thenReturn(atividadeAtualizada);
-            when(atividadeMapper.toDTO(any(Atividade.class))).thenReturn(atividadeAtualizadaDto);
+            when(atividadeService.atualizar(eq(1L), any(AtividadeDto.class))).thenReturn(atividadeAtualizadaDto);
 
-            mockMvc.perform(put(API_ATIVIDADES_1).with(csrf())
+            mockMvc.perform(post("/api/atividades/1/atualizar").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isOk())
@@ -213,13 +162,13 @@ class AtividadeControleTest {
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             var atividadeDto = new AtividadeDto(99L, null, "Tanto faz");
 
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            when(atividadeService.atualizar(eq(99L), any(AtividadeDto.class))).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
-            mockMvc.perform(put(API_ATIVIDADES_99).with(csrf())
+            mockMvc.perform(post("/api/atividades/99/atualizar").with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(atividadeDto)))
                     .andExpect(status().isNotFound());
@@ -233,26 +182,86 @@ class AtividadeControleTest {
         @Test
         @DisplayName("Deve excluir uma atividade e retornar 204 No Content")
         void deveExcluirAtividade() throws Exception {
-            var atividade = new Atividade();
-            atividade.setCodigo(1L);
+            doNothing().when(atividadeService).excluir(1L);
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-            when(conhecimentoRepo.findByAtividadeCodigo(1L)).thenReturn(Collections.emptyList());
-            doNothing().when(atividadeRepo).delete(any(Atividade.class));
-
-            mockMvc.perform(delete(API_ATIVIDADES_1).with(csrf()))
+            mockMvc.perform(post("/api/atividades/1/excluir").with(csrf()))
                     .andExpect(status().isNoContent());
 
-            verify(atividadeRepo, times(1)).delete(any(Atividade.class));
+            verify(atividadeService, times(1)).excluir(1L);
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            when(atividadeRepo.findById(99L)).thenReturn(Optional.empty());
+            doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(atividadeService).excluir(99L);
 
-            mockMvc.perform(delete(API_ATIVIDADES_99).with(csrf()))
+            mockMvc.perform(post("/api/atividades/99/excluir").with(csrf()))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes para CRUD de Conhecimentos aninhados")
+    class ConhecimentoEndpoints {
+
+        private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
+        private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{codigo}";
+        private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
+        private static final String API_CONHECIMENTOS_1_ATUALIZAR = "/api/atividades/1/conhecimentos/1/atualizar";
+        private static final String API_CONHECIMENTOS_1_EXCLUIR = "/api/atividades/1/conhecimentos/1/excluir";
+        private static final String NOVO_CONHECIMENTO = "Novo Conhecimento";
+
+        @Test
+        @DisplayName("Deve listar conhecimentos de uma atividade")
+        void deveListarConhecimentos() throws Exception {
+            var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Conhecimento Teste");
+
+            when(atividadeService.listarConhecimentos(1L)).thenReturn(List.of(conhecimentoDto));
+
+            mockMvc.perform(get(API_CONHECIMENTOS))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @DisplayName("Deve criar um conhecimento para uma atividade")
+        void deveCriarConhecimento() throws Exception {
+            var conhecimentoDto = new ConhecimentoDto(null, 1L, NOVO_CONHECIMENTO);
+            var conhecimentoSalvoDto = new ConhecimentoDto(1L, 1L, NOVO_CONHECIMENTO);
+
+            when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoSalvoDto);
+
+            mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .andExpect(status().isCreated())
+                    .andExpect(header().string("Location", API_CONHECIMENTOS_1))
+                    .andExpect(jsonPath("$.codigo").value(1L));
+        }
+
+        @Test
+        @DisplayName("Deve atualizar um conhecimento")
+        void deveAtualizarConhecimento() throws Exception {
+            var conhecimentoDto = new ConhecimentoDto(1L, 1L, "Atualizado");
+
+            when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
+
+            mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.descricao").value("Atualizado"));
+        }
+
+        @Test
+        @DisplayName("Deve excluir um conhecimento")
+        void deveExcluirConhecimento() throws Exception {
+            doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
+
+            mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
+                    .andExpect(status().isNoContent());
+
+            verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);
         }
     }
 }

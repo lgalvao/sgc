@@ -1,4 +1,3 @@
-
 package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +22,14 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoService;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.*;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.SituacaoUnidade;
@@ -37,12 +37,14 @@ import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,7 +80,6 @@ class CDU21IntegrationTest {
     private NotificacaoService notificacaoService;
 
     private Processo processo;
-    private Unidade unidadeIntermediaria;
     private Unidade unidadeOperacional1;
     private Unidade unidadeOperacional2;
 
@@ -88,40 +89,46 @@ class CDU21IntegrationTest {
         doNothing().when(notificacaoService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         // 2. Create Users
-        Usuario titularIntermediaria = usuarioRepo.save(new Usuario("T01", "Titular Intermediaria", "titular.intermediaria@test.com", null, null, null));
-        Usuario titularOp1 = usuarioRepo.save(new Usuario("T02", "Titular Op1", "titular.op1@test.com", null, null, null));
-        Usuario titularOp2 = usuarioRepo.save(new Usuario("T03", "Titular Op2", "titular.op2@test.com", null, null, null));
+        Usuario titularIntermediaria = new Usuario(101010101010L, "Titular Intermediaria", "titular.intermediaria@test.com", null, null, Set.of(Perfil.CHEFE));
+        Usuario titularOp1 = new Usuario(202020202020L, "Titular Op1", "titular.op1@test.com", null, null, Set.of(Perfil.CHEFE));
+        Usuario titularOp2 = new Usuario(303030303030L, "Titular Op2", "titular.op2@test.com", null, null, Set.of(Perfil.CHEFE));
+        usuarioRepo.saveAll(List.of(titularIntermediaria, titularOp1, titularOp2));
 
         // 3. Create Units
-        unidadeIntermediaria = unidadeRepo.save(new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null));
-        unidadeOperacional1 = unidadeRepo.save(new Unidade("Unidade Operacional 1", "UOP1", titularOp1, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
-        unidadeOperacional2 = unidadeRepo.save(new Unidade("Unidade Operacional 2", "UOP2", titularOp2, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria));
+        Unidade unidadeIntermediaria = new Unidade("Unidade Intermediária", "UINT", titularIntermediaria, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.ATIVA, null);
+        unidadeRepo.save(unidadeIntermediaria);
+
+        unidadeOperacional1 = new Unidade("Unidade Operacional 1", "UOP1", titularOp1, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria);
+        unidadeOperacional2 = new Unidade("Unidade Operacional 2", "UOP2", titularOp2, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, unidadeIntermediaria);
+        unidadeRepo.saveAll(List.of(unidadeOperacional1, unidadeOperacional2));
 
         // 4. Create Process
-        processo = processoRepo.save(new Processo("Processo de Teste para Finalizar", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30)));
+        processo = processoRepo.save(new Processo("Processo de Teste para Finalizar", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30)));
 
         // 5. Create Subprocesses and Maps
         Mapa mapa1 = mapaRepo.save(new Mapa());
-        subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        Subprocesso sp1 = new Subprocesso(processo, unidadeOperacional1, mapa1, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        subprocessoRepo.save(sp1);
 
         Mapa mapa2 = mapaRepo.save(new Mapa());
-        subprocessoRepo.save(new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
+        Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
+        subprocessoRepo.save(sp2);
 
         // 6. Create UnidadeProcesso snapshots
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), titularIntermediaria.getTitulo(), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional1.getCodigo(), unidadeOperacional1.getNome(), unidadeOperacional1.getSigla(), titularOp1.getTitulo(), unidadeOperacional1.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
-        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional2.getCodigo(), unidadeOperacional2.getNome(), unidadeOperacional2.getSigla(), titularOp2.getTitulo(), unidadeOperacional2.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), String.valueOf(titularIntermediaria.getTituloEleitoral()), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional1.getCodigo(), unidadeOperacional1.getNome(), unidadeOperacional1.getSigla(), String.valueOf(titularOp1.getTituloEleitoral()), unidadeOperacional1.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
+        unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional2.getCodigo(), unidadeOperacional2.getNome(), unidadeOperacional2.getSigla(), String.valueOf(titularOp2.getTituloEleitoral()), unidadeOperacional2.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
 
         // 7. Mock SGRH Service
         when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
-            unidadeIntermediaria.getCodigo(), new ResponsavelDto(unidadeIntermediaria.getCodigo(), titularIntermediaria.getTitulo(), "Titular Intermediaria", null, null),
-            unidadeOperacional1.getCodigo(), new ResponsavelDto(unidadeOperacional1.getCodigo(), titularOp1.getTitulo(), "Titular Op1", null, null),
-            unidadeOperacional2.getCodigo(), new ResponsavelDto(unidadeOperacional2.getCodigo(), titularOp2.getTitulo(), "Titular Op2", null, null)
+            unidadeIntermediaria.getCodigo(), new ResponsavelDto(unidadeIntermediaria.getCodigo(), String.valueOf(titularIntermediaria.getTituloEleitoral()), "Titular Intermediaria", null, null),
+            unidadeOperacional1.getCodigo(), new ResponsavelDto(unidadeOperacional1.getCodigo(), String.valueOf(titularOp1.getTituloEleitoral()), "Titular Op1", null, null),
+            unidadeOperacional2.getCodigo(), new ResponsavelDto(unidadeOperacional2.getCodigo(), String.valueOf(titularOp2.getTituloEleitoral()), "Titular Op2", null, null)
         ));
         when(sgrhService.buscarUsuariosPorTitulos(anyList())).thenReturn(Map.of(
-            "T01", new UsuarioDto("T01", "Titular Intermediaria", "titular.intermediaria@test.com", "123", "Cargo"),
-            "T02", new UsuarioDto("T02", "Titular Op1", "titular.op1@test.com", "123", "Cargo"),
-            "T03", new UsuarioDto("T03", "Titular Op2", "titular.op2@test.com", "123", "Cargo")
+            String.valueOf(101010101010L), new UsuarioDto("101010101010", "Titular Intermediaria", "titular.intermediaria@test.com", "123", "Cargo"),
+            String.valueOf(202020202020L), new UsuarioDto("202020202020", "Titular Op1", "titular.op1@test.com", "123", "Cargo"),
+            String.valueOf(303030303030L), new UsuarioDto("303030303030", "Titular Op2", "titular.op2@test.com", "123", "Cargo")
         ));
     }
 
@@ -151,7 +158,7 @@ class CDU21IntegrationTest {
         UnidadeMapa um1 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo()).orElseThrow();
         Subprocesso sp1 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo())).findFirst().orElseThrow();
         assertThat(um1.getMapaVigenteCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(um1.getDataVigencia()).isEqualTo(LocalDate.now());
+        assertThat(um1.getDataVigencia()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
 
         UnidadeMapa um2 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo()).orElseThrow();
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();
@@ -168,23 +175,54 @@ class CDU21IntegrationTest {
         int indexOp1 = allEmails.indexOf("titular.op1@test.com");
         assertThat(indexOp1).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexOp1)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp1)).contains("Prezado(a) responsável pela UOP1");
-        assertThat(allBodies.get(indexOp1)).contains("conclusão do processo <strong>" + processo.getDescricao() + "</strong> para a sua unidade.");
+        assertThat(allBodies.get(indexOp1)).contains("<p>Prezado(a) responsável pela <span>UOP1</span>,</p>");
+        assertThat(allBodies.get(indexOp1)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para a sua unidade.</p>");
         assertThat(allBodies.get(indexOp1)).doesNotContain("para as unidades:");
 
         // Email para Unidade Operacional 2
         int indexOp2 = allEmails.indexOf("titular.op2@test.com");
         assertThat(indexOp2).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexOp2)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao());
-        assertThat(allBodies.get(indexOp2)).contains("Prezado(a) responsável pela UOP2");
+        assertThat(allBodies.get(indexOp2)).contains("<p>Prezado(a) responsável pela <span>UOP2</span>,</p>");
 
         // Email para Unidade Intermediária
         int indexIntermediaria = allEmails.indexOf("titular.intermediaria@test.com");
         assertThat(indexIntermediaria).isGreaterThanOrEqualTo(0);
         assertThat(allSubjects.get(indexIntermediaria)).isEqualTo("SGC: Conclusão do processo " + processo.getDescricao() + " em unidades subordinadas");
-        assertThat(allBodies.get(indexIntermediaria)).contains("Prezado(a) responsável pela UINT");
-        assertThat(allBodies.get(indexIntermediaria)).contains("para as unidades:");
+        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Prezado(a) responsável pela <span>UINT</span>,</p>");
+        assertThat(allBodies.get(indexIntermediaria)).contains("<p>Comunicamos a conclusão do processo <strong>Processo de Teste para Finalizar</strong> para as unidades:</p>");
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP1</li>");
         assertThat(allBodies.get(indexIntermediaria)).contains("<li>UOP2</li>");
+    }
+
+    @Test
+    @WithMockAdmin
+    @DisplayName("Não deve finalizar processo se houver subprocessos pendentes e deve retornar 409 Conflict")
+    void finalizarProcesso_ComSubprocessoPendente_DeveRetornarConflito() throws Exception {
+        // Arrange: Alterar um dos subprocessos para um estado não homologado
+        Subprocesso spPendente = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
+                .filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo()))
+                .findFirst().orElseThrow();
+        spPendente.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocessoRepo.save(spPendente);
+
+        // Act
+        mockMvc.perform(post("/api/processos/{id}/finalizar", processo.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isConflict()); // Espera status 409 Conflict
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert: Verificar que o status do processo principal não foi alterado
+        Processo processoNaoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        assertThat(processoNaoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+
+        // Verificar que nenhum mapa se tornou vigente
+        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo())).isEmpty();
+        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo())).isEmpty();
+
+        // Verificar que nenhuma notificação foi enviada
+        verify(notificacaoService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 }

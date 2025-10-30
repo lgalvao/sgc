@@ -1,5 +1,7 @@
 package sgc.processo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
 import java.util.List;
@@ -19,9 +22,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
+@Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 public class ProcessoControle {
     private final ProcessoService processoService;
 
+    /**
+     * Cria um novo processo.
+     *
+     * @param requisicao O DTO com os dados para a criação do processo.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo
+     *         processo e o {@link ProcessoDto} criado no corpo da resposta.
+     */
     @PostMapping
     public ResponseEntity<ProcessoDto> criar(@Valid @RequestBody CriarProcessoReq requisicao) {
         ProcessoDto criado = processoService.criar(requisicao);
@@ -29,70 +40,110 @@ public class ProcessoControle {
         return ResponseEntity.created(uri).body(criado);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long id) {
-        return processoService.obterPorId(id)
+    /**
+     * Busca e retorna um processo pelo seu código.
+     *
+     * @param codigo O código do processo a ser buscado.
+     * @return Um {@link ResponseEntity} contendo o {@link ProcessoDto} ou status 404 Not Found.
+     */
+    @GetMapping("/{codigo}")
+    public ResponseEntity<ProcessoDto> obterPorId(@PathVariable Long codigo) {
+        return processoService.obterPorId(codigo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarProcessoReq requisicao) {
-        ProcessoDto atualizado = processoService.atualizar(id, requisicao);
+    /**
+     * Atualiza um processo existente.
+     *
+     * @param codigo O código do processo a ser atualizado.
+     * @param requisicao O DTO com os novos dados do processo.
+     * @return Um {@link ResponseEntity} com status 200 OK e o {@link ProcessoDto} atualizado.
+     */
+    @PostMapping("/{codigo}/atualizar")
+    public ResponseEntity<ProcessoDto> atualizar(@PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoReq requisicao) {
+        ProcessoDto atualizado = processoService.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        processoService.apagar(id);
+    /**
+     * Exclui um processo.
+     *
+     * @param codigo O código do processo a ser excluído.
+     * @return Um {@link ResponseEntity} com status 204 No Content.
+     */
+    @PostMapping("/{codigo}/excluir")
+    public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
+        processoService.apagar(codigo);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Retorna os detalhes completos de um processo, incluindo unidades snapshot e resumo de subprocessos.
-     * Este endpoint delega para ProcessoService.obterDetalhes e aplica tratamento de autorização.
-     * <p>
-     * Exemplo: GET /api/processos/1/detalhes?perfil=ADMIN
+     * Lista todos os processos que estão com a situação 'FINALIZADO'.
+     *
+     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto} finalizados.
      */
-    @GetMapping("/{id}/detalhes")
-    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long id) {
-        ProcessoDetalheDto detalhes = processoService.obterDetalhes(id);
+    @GetMapping("/finalizados")
+    @Operation(summary = "Lista todos os processos com situação FINALIZADO")
+    public ResponseEntity<List<ProcessoDto>> listarFinalizados() {
+        return ResponseEntity.ok(processoService.listarFinalizados());
+    }
+
+    /**
+     * Retorna os detalhes completos de um processo, incluindo as unidades participantes
+     * e o resumo de seus respectivos subprocessos.
+     *
+     * @param codigo O código do processo a ser detalhado.
+     * @return Um {@link ResponseEntity} com o {@link ProcessoDetalheDto}.
+     */
+    @GetMapping("/{codigo}/detalhes")
+    public ResponseEntity<ProcessoDetalheDto> obterDetalhes(@PathVariable Long codigo) {
+        ProcessoDetalheDto detalhes = processoService.obterDetalhes(codigo);
         return ResponseEntity.ok(detalhes);
     }
 
     /**
-     * Inicia um processo. O parâmetro `tipo` indica fluxo esperado (MAPEAMENTO, REVISAO, DIAGNOSTICO).
-     * O corpo opcional pode conter uma lista de unidades (IDs) que participam do início.
+     * Inicia um processo, disparando a criação dos subprocessos e notificações.
+     * <p>
+     * Corresponde ao CDU-03. O comportamento varia com base no tipo de processo:
+     * 'MAPEAMENTO' ou 'REVISAO'.
+     *
+     * @param codigo       O código do processo a ser iniciado.
+     * @param tipo     O tipo de processo ('MAPEAMENTO' ou 'REVISAO').
+     * @param unidades Uma lista opcional de IDs de unidades para restringir o início
+     *                 do processo a um subconjunto dos participantes.
+     * @return Um {@link ResponseEntity} com status 200 OK.
      */
-    @PostMapping("/{id}/iniciar")
+    @PostMapping("/{codigo}/iniciar")
+    @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
-            @PathVariable Long id,
-            @RequestParam(name = "tipo", required = false, defaultValue = "MAPEAMENTO") String tipo,
+            @PathVariable Long codigo,
+            @RequestParam(name = "tipo") sgc.processo.modelo.TipoProcesso tipo,
             @RequestBody(required = false) List<Long> unidades) {
 
-        ProcessoDto resultado;
-        if ("REVISAO".equalsIgnoreCase(tipo)) {
-            resultado = processoService.iniciarProcessoRevisao(id, unidades);
+        if (tipo == sgc.processo.modelo.TipoProcesso.REVISAO) {
+            processoService.iniciarProcessoRevisao(codigo, unidades);
+        } else if (tipo == sgc.processo.modelo.TipoProcesso.MAPEAMENTO) {
+            processoService.iniciarProcessoMapeamento(codigo, unidades);
         } else {
-            // por padrão, inicia mapeamento
-            resultado = processoService.iniciarProcessoMapeamento(id, unidades);
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(resultado);
+        return ResponseEntity.ok().build();
     }
 
     /**
-     * CDU-21 - Finalizar processo
-     * POST /api/processos/{id}/finalizar
-     * <p> <p>
-     * Finaliza um processo de mapeamento ou revisão, tornando os mapas vigentes
-     * e notificando todas as unidades participantes.
+     * Finaliza um processo, tornando os mapas de seus subprocessos homologados
+     * como os novos mapas vigentes para as respectivas unidades.
+     * <p>
+     * Corresponde ao CDU-21.
      *
-     * @param id ID do processo a ser finalizado
-     * @return ProcessoDto com dados do processo finalizado
+     * @param codigo O código do processo a ser finalizado.
+     * @return Um {@link ResponseEntity} com status 200 OK.
      */
-    @PostMapping("/{id}/finalizar")
-    public ResponseEntity<?> finalizar(@PathVariable Long id) {
-        ProcessoDto finalizado = processoService.finalizar(id);
-        return ResponseEntity.ok(finalizado);
+    @PostMapping("/{codigo}/finalizar")
+    @Operation(summary = "Finaliza um processo (CDU-21)")
+    public ResponseEntity<?> finalizar(@PathVariable Long codigo) {
+        processoService.finalizar(codigo);
+        return ResponseEntity.ok().build();
     }
 }

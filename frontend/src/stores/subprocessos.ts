@@ -1,54 +1,141 @@
 import {defineStore} from 'pinia'
-import subprocessosMock from '../mocks/subprocessos.json'
-import {Movimentacao, Subprocesso} from '@/types/tipos'
-import {parseDate} from '@/utils'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes'
+import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest, ProcessoDetalhe} from '@/types/tipos'
+import {useNotificacoesStore} from './notificacoes'
+import {useProcessosStore} from "@/stores/processos";
+import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import { fetchSubprocessoDetalhe } from "@/services/subprocessoService";
+import {
+    aceitarCadastro,
+    aceitarRevisaoCadastro,
+    devolverCadastro,
+    devolverRevisaoCadastro,
+    disponibilizarCadastro,
+    disponibilizarRevisaoCadastro,
+    homologarCadastro,
+    homologarRevisaoCadastro
+} from "@/services/cadastroService";
 
-function parseSubprocessoDates(pu: Partial<Subprocesso>): Subprocesso {
-    return {
-        id: pu.id || 0,
-        idProcesso: pu.idProcesso || 0,
-        unidade: pu.unidade || '',
-        situacao: SITUACOES_SUBPROCESSO.MAPA_CRIADO,
-        unidadeAtual: pu.unidadeAtual || '',
-        unidadeAnterior: pu.unidadeAnterior || null,
-        dataLimiteEtapa1: typeof pu.dataLimiteEtapa1 === 'string' ? parseDate(pu.dataLimiteEtapa1) || new Date() : new Date(),
-        dataFimEtapa1: typeof pu.dataFimEtapa1 === 'string' ? parseDate(pu.dataFimEtapa1) : null,
-        dataLimiteEtapa2: typeof pu.dataLimiteEtapa2 === 'string' ? parseDate(pu.dataLimiteEtapa2) : null,
-        dataFimEtapa2: typeof pu.dataFimEtapa2 === 'string' ? parseDate(pu.dataFimEtapa2) : null,
-        sugestoes: pu.sugestoes || undefined,
-        observacoes: pu.observacoes || undefined,
-        movimentacoes: pu.movimentacoes || [],
-        analises: pu.analises || [],
-        idMapaCopiado: pu.idMapaCopiado || undefined,
-    };
+async function _executarAcao(
+    acao: () => Promise<any>,
+    sucessoMsg: string,
+    erroMsg: string
+): Promise<boolean> {
+    const notificacoes = useNotificacoesStore();
+    try {
+        await acao();
+        notificacoes.sucesso(sucessoMsg, `${sucessoMsg} com sucesso.`);
+        const processosStore = useProcessosStore();
+        if (processosStore.processoDetalhe) {
+            await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+        }
+        return true;
+    } catch {
+        notificacoes.erro(erroMsg, `Não foi possível concluir a ação: ${erroMsg}.`);
+        return false;
+    }
 }
 
 export const useSubprocessosStore = defineStore('subprocessos', {
-    state: () => {
-        return {
-             
-            subprocessos: (subprocessosMock as any[]).map(parseSubprocessoDates) as Subprocesso[],
-        };
-    },
-    getters: {
-        getUnidadesDoProcesso: (state) => (idProcesso: number): Subprocesso[] => {
-            return state.subprocessos.filter(pu => pu.idProcesso === idProcesso);
-        },
-        getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            const subprocesso = state.subprocessos.find(sp => sp.id === idSubprocesso);
-            return subprocesso ? subprocesso.movimentacoes.sort((a: Movimentacao, b: Movimentacao) => b.dataHora.getTime() - a.dataHora.getTime()) : [];
-        },
-        getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
-            return state.subprocessos.filter(pu =>
-                pu.idProcesso === idProcesso &&
-                (pu.situacao === SITUACOES_SUBPROCESSO.CADASTRO_DISPONIBILIZADO || pu.situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_DISPONIBILIZADA)
-            );
-        }
-    },
+    state: () => ({
+        subprocessoDetalhe: null as ProcessoDetalhe | null,
+    }),
     actions: {
+        async fetchSubprocessoDetalhe(id: number) {
+            const notificacoes = useNotificacoesStore();
+            const perfilStore = usePerfilStore(); // Adicionar esta linha
+            try {
+                // Obter perfil e codUnidade do perfilStore
+                const perfil = perfilStore.perfilSelecionado;
+                const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
+                let unidadeCodigo: number | null = null;
+
+                if (perfil && unidadeSelecionadaCodigo) {
+                    const perfilUnidade = perfilStore.perfisUnidades.find(pu =>
+                        pu.perfil === perfil && pu.unidade.codigo === unidadeSelecionadaCodigo
+                    );
+                    if (perfilUnidade) {
+                        unidadeCodigo = perfilUnidade.unidade.codigo;
+                    }
+                }
+
+                if (perfil && unidadeCodigo !== null) {
+                    this.subprocessoDetalhe = await fetchSubprocessoDetalhe(id, perfil, unidadeCodigo);
+                } else {
+                    notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Informações de perfil ou unidade não disponíveis.');
+                }
+            } catch {
+                notificacoes.erro('Erro ao buscar detalhes do subprocesso', 'Não foi possível carregar as informações.');
+            }
+        },
+
+        async disponibilizarCadastro(codSubrocesso: number) {
+            return _executarAcao(
+                () => disponibilizarCadastro(codSubrocesso),
+                'Cadastro disponibilizado',
+                'Erro ao disponibilizar'
+            );
+        },
+
+        async disponibilizarRevisaoCadastro(codSubrocesso: number) {
+            return _executarAcao(
+                () => disponibilizarRevisaoCadastro(codSubrocesso),
+                'Revisão disponibilizada',
+                'Erro ao disponibilizar'
+            );
+        },
+
+        async devolverCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
+            return _executarAcao(
+                () => devolverCadastro(codSubrocesso, req),
+                'Cadastro devolvido',
+                'Erro ao devolver'
+            );
+        },
+
+        async aceitarCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
+            return _executarAcao(
+                () => aceitarCadastro(codSubrocesso, req),
+                'Cadastro aceito',
+                'Erro ao aceitar'
+            );
+        },
+
+        async homologarCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
+            return _executarAcao(
+                () => homologarCadastro(codSubrocesso, req),
+                'Cadastro homologado',
+                'Erro ao homologar'
+            );
+        },
+
+        async devolverRevisaoCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
+            return _executarAcao(
+                () => devolverRevisaoCadastro(codSubrocesso, req),
+                'Revisão devolvida',
+                'Erro ao devolver'
+            );
+        },
+
+        async aceitarRevisaoCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
+            return _executarAcao(
+                () => aceitarRevisaoCadastro(codSubrocesso, req),
+                'Revisão aceita',
+                'Erro ao aceitar'
+            );
+        },
+
+        async homologarRevisaoCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
+            return _executarAcao(
+                () => homologarRevisaoCadastro(codSubrocesso, req),
+                'Revisão homologada',
+                'Erro ao homologar'
+            );
+        },
+
         reset() {
-            this.subprocessos = [];
-        }
+            this.subprocessoDetalhe = null;
+        },
+
+
     }
 });

@@ -29,7 +29,7 @@
     >
       <div
         v-for="competencia in competencias"
-        :key="competencia.id"
+        :key="competencia.codigo"
         class="col-md-6 mb-4"
       >
         <div class="card h-100">
@@ -42,7 +42,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
               <select
-                v-model="avaliacoes[competencia.id].importancia"
+                v-model="avaliacoes[competencia.codigo].importancia"
                 class="form-select"
               >
                 <option value="1">
@@ -66,7 +66,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
               <select
-                v-model="avaliacoes[competencia.id].dominio"
+                v-model="avaliacoes[competencia.codigo].dominio"
                 class="form-select"
               >
                 <option value="1">
@@ -90,7 +90,7 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Observações:</label>
               <textarea
-                v-model="avaliacoes[competencia.id].observacoes"
+                v-model="avaliacoes[competencia.codigo].observacoes"
                 class="form-control"
                 rows="2"
                 placeholder="Comentários sobre esta competência..."
@@ -138,7 +138,7 @@
               <ul class="mb-0 mt-2">
                 <li
                   v-for="comp in avaliacoesPendentes"
-                  :key="comp.id"
+                  :key="comp.codigo"
                 >
                   {{ comp.descricao }}
                 </li>
@@ -178,8 +178,8 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {useAlertasStore} from '@/stores/alertas'
-import {Competencia, Mapa, Processo} from '@/types/tipos'
+import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
+import { usePerfil } from '@/composables/usePerfil'
 
 const route = useRoute()
 const router = useRouter()
@@ -187,7 +187,7 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const alertasStore = useAlertasStore()
+const { servidorLogado } = usePerfil()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
@@ -195,12 +195,25 @@ const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
 const nomeUnidade = computed(() => unidade.value?.nome || '')
 
-const processoAtual = computed<Processo | null>(() => {
-  return processosStore.processos.find(p => p.id === idProcesso.value) || null
-})
+const processoAtual = computed(() => processosStore.processoDetalhe);
 
-const mapa = computed<Mapa | null>(() => {
-  return mapasStore.getMapaByUnidadeId(siglaUnidade.value, idProcesso.value) || null
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como codSubrocesso
+  await mapasStore.fetchMapaCompleto(idProcesso.value);
+  competencias.value.forEach(comp => {
+    if (!avaliacoes.value[comp.codigo]) {
+      avaliacoes.value[comp.codigo] = {
+        importancia: 3,
+        dominio: 3,
+        observacoes: ''
+      }
+    }
+  })
+});
+
+const mapa = computed<MapaCompleto | null>(() => {
+  return mapasStore.mapaCompleto;
 })
 
 const competencias = computed<Competencia[]>(() => {
@@ -208,7 +221,7 @@ const competencias = computed<Competencia[]>(() => {
 })
 
 // Estado das avaliações
-const avaliacoes = ref<Record<number, {
+const avaliacoes = ref<Record<string, {
   importancia: number
   dominio: number
   observacoes: string
@@ -220,8 +233,8 @@ const mostrarModalConfirmacao = ref(false)
 // Inicializar avaliações
 onMounted(() => {
   competencias.value.forEach(comp => {
-    if (!avaliacoes.value[comp.id]) {
-      avaliacoes.value[comp.id] = {
+    if (!avaliacoes.value[comp.codigo]) {
+      avaliacoes.value[comp.codigo] = {
         importancia: 3,
         dominio: 3,
         observacoes: ''
@@ -232,7 +245,7 @@ onMounted(() => {
 
 const avaliacoesPendentes = computed(() => {
   return competencias.value.filter(comp => {
-    const aval = avaliacoes.value[comp.id]
+    const aval = avaliacoes.value[comp.codigo]
     return !aval || aval.importancia === 0 || aval.dominio === 0
   })
 })
@@ -249,27 +262,35 @@ function confirmarFinalizacao() {
   if (!processoAtual.value) return
 
   // Registrar movimentação
-  processosStore.addMovement({
-    idSubprocesso: processosStore.subprocessos.find(sp =>
-      sp.idProcesso === idProcesso.value && sp.unidade === siglaUnidade.value
-    )?.id || 0,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Diagnóstico da equipe finalizado'
-  })
+  const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
+  if (subprocesso && unidade.value && servidorLogado.value) {
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: unidade.value
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...subprocesso,
+      codigo: subprocesso.codSubprocesso,
+      unidade: unidade.value,
+      situacao: subprocesso.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
+    processosStore.addMovement({
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
+      unidadeOrigem: unidade.value,
+      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      descricao: 'Diagnóstico da equipe finalizado',
+    });
+  }
 
-  // Criar alerta
-  alertasStore.criarAlerta({
-    idProcesso: idProcesso.value,
-    unidadeOrigem: siglaUnidade.value,
-    unidadeDestino: 'SEDOC',
-    descricao: 'Diagnóstico da equipe finalizado',
-    dataHora: new Date()
-  })
+  // A criação de alertas agora é responsabilidade do backend
 
   notificacoesStore.sucesso(
-    'Diagnóstico finalizado',
-    'O diagnóstico da equipe foi concluído com sucesso!'
+      'Diagnóstico finalizado',
+      'O diagnóstico da equipe foi concluído com sucesso!'
   )
 
   fecharModalConfirmacao()
@@ -283,6 +304,6 @@ function confirmarFinalizacao() {
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

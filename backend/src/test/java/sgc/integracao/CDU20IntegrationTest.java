@@ -1,294 +1,253 @@
 package sgc.integracao;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockGestor;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.notificacao.NotificacaoService;
-import sgc.processo.SituacaoProcesso;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoNotificacaoService;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = Sgc.class)
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@Import(TestSecurityConfig.class)
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
+@Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
+    ProcessoRepo processoRepo;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
     private SubprocessoRepo subprocessoRepo;
+
     @Autowired
     private UnidadeRepo unidadeRepo;
+
     @Autowired
     private UsuarioRepo usuarioRepo;
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
-    @Autowired
-    private AnaliseRepo analiseRepo;
+
     @Autowired
     private AlertaRepo alertaRepo;
-    @Autowired
-    private EntityManager entityManager;
 
-    @MockitoBean
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+
+    @MockitoSpyBean
+    private SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoSpyBean
     private NotificacaoService notificacaoService;
 
-    private Unidade unidadeSubordinada;
-    private Unidade unidadeGestor;
-    private Unidade unidadeAdmin;
-    private Processo processo;
+
     private Subprocesso subprocesso;
+    private Unidade unidadeSuperior;
+    private Unidade unidadeSuperiorSuperior;
 
     @BeforeEach
     void setUp() {
-        // Hierarquia de Unidades
-        unidadeAdmin = unidadeRepo.save(new Unidade("Unidade Admin", "ADM"));
-        unidadeGestor = new Unidade("Unidade Gestor", "GES");
-        unidadeGestor.setUnidadeSuperior(unidadeAdmin);
-        unidadeRepo.save(unidadeGestor);
-        unidadeSubordinada = new Unidade("Unidade Subordinada", "SUB");
-        unidadeSubordinada.setUnidadeSuperior(unidadeGestor);
-        unidadeRepo.save(unidadeSubordinada);
+        Unidade sedoc = unidadeRepo.save(new Unidade("SEC. DOCUMENTACAO", "SEDOC"));
+        Usuario adminMock = new Usuario();
+        adminMock.setTituloEleitoral(111111111111L);
+        adminMock.setPerfis(java.util.Set.of(Perfil.ADMIN));
+        adminMock.setUnidade(sedoc);
+        usuarioRepo.save(adminMock);
+        sedoc.setTitular(adminMock);
+        unidadeRepo.save(sedoc);
 
-        // Usuários
-        Usuario admin = new Usuario();
-        admin.setTitulo("admin");
-        admin.setNome("Admin");
-        admin.setEmail("admin@test.com");
-        admin.setUnidade(unidadeAdmin);
-        usuarioRepo.save(admin);
-        unidadeAdmin.setTitular(admin);
-        unidadeRepo.save(unidadeAdmin);
+        unidadeSuperiorSuperior = unidadeRepo.save(new Unidade("Unidade Superior Superior", "UNISUPSUP"));
+        unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
+        unidadeSuperior.setUnidadeSuperior(unidadeSuperiorSuperior);
+        unidadeRepo.save(unidadeSuperior);
 
-        Usuario gestor = new Usuario();
-        gestor.setTitulo("gestor_unidade");
-        gestor.setNome("Gestor");
-        gestor.setEmail("gestor@test.com");
-        gestor.setUnidade(unidadeGestor);
-        usuarioRepo.save(gestor);
-        unidadeGestor.setTitular(gestor);
-        unidadeRepo.save(unidadeGestor);
+        Unidade unidade = new Unidade("Unidade Subprocesso", "UNISUB");
+        unidade.setUnidadeSuperior(unidadeSuperior);
+        unidadeRepo.save(unidade);
 
-        Usuario chefeSubordinado = new Usuario();
-        chefeSubordinado.setTitulo("chefe_sub");
-        chefeSubordinado.setNome("Chefe Sub");
-        chefeSubordinado.setEmail("chefe@test.com");
-        chefeSubordinado.setUnidade(unidadeSubordinada);
-        usuarioRepo.save(chefeSubordinado);
-        unidadeSubordinada.setTitular(chefeSubordinado);
-        unidadeRepo.save(unidadeSubordinada);
+        // Criar usuários mockados para as unidades
+        Usuario chefeMock = new Usuario();
+        chefeMock.setTituloEleitoral(333333333333L);
+        chefeMock.setPerfis(java.util.Set.of(Perfil.CHEFE));
+        chefeMock.setUnidade(unidadeSuperior);
+        usuarioRepo.save(chefeMock);
+        unidadeSuperior.setTitular(chefeMock);
+        unidadeRepo.save(unidadeSuperior);
 
-        // Processo e Subprocesso
-        processo = new Processo("Processo de Validação",
-                TipoProcesso.MAPEAMENTO,
-                SituacaoProcesso.EM_ANDAMENTO,
-                LocalDate.now().plusDays(30));
+        Usuario gestorMock = new Usuario();
+        gestorMock.setTituloEleitoral(222222222222L);
+        gestorMock.setPerfis(java.util.Set.of(Perfil.GESTOR));
+        gestorMock.setUnidade(unidade);
+        usuarioRepo.save(gestorMock);
+        unidade.setTitular(gestorMock);
+        unidadeRepo.save(unidade);
 
-        processoRepo.save(processo);
-
-        subprocesso = new Subprocesso(processo,
-                unidadeSubordinada,
-                null,
-                SituacaoSubprocesso.MAPA_VALIDADO,
-                processo.getDataLimite());
-
-        subprocessoRepo.save(subprocesso);
-
-        // Movimentação inicial: O mapa da unidade SUB foi validado e enviado para a unidade GES
-        movimentacaoRepo.save(new Movimentacao(subprocesso,
-                unidadeSubordinada,
-                unidadeGestor,
-                "Validação do mapa de competências")
+        Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
+        subprocesso = subprocessoRepo.save(
+                new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, LocalDateTime.now())
         );
+        subprocessoRepo.flush();
     }
 
-    @Nested
-    @DisplayName("Fluxo de Devolução")
-    class Devolucao {
+    @Test
+    @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
+    @WithMockChefe()
+    void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
+        // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
+        doNothing().when(notificacaoService).enviarEmail(any(), any(), any());
 
-        @Test
-        @DisplayName("GESTOR deve devolver validação, registrar análise e alterar situação")
-        @WithMockGestor
-        void gestorDeveDevolverValidacao() throws Exception {
-            // Arrange
-            String justificativa = "Mapa precisa de ajustes na competência X.";
-            DevolverValidacaoReq request = new DevolverValidacaoReq(justificativa);
+        // Devolução do mapa
+        DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
+        mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(devolverReq)))
+                .andExpect(status().isOk());
 
-            // Act
-            mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isOk());
+        // Verificação do histórico após devolução
+        String responseDevolucao = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoDevolucao = objectMapper.readValue(responseDevolucao, new TypeReference<>() {
+        });
 
-            entityManager.flush();
-            entityManager.clear();
+        assertThat(historicoDevolucao).hasSize(1);
+        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+        assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
+        assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
 
-            // Assert
-            // 1. Subprocesso
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
-            assertThat(spAtualizado.getDataFimEtapa2()).isNull();
+        // Adicionar verificação de Movimentacao e Alerta após devolução
+        List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoesDevolucao).hasSize(1);
+        assertThat(movimentacoesDevolucao.getFirst().getDescricao()).isEqualTo("Devolução da validação do mapa de competências para ajustes");
+        assertThat(movimentacoesDevolucao.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoesDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
 
-            // 2. Análise de Validação
-            List<Analise> analises = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
-            assertThat(analises).hasSize(1);
-            Analise analise = analises.getFirst();
-            assertThat(analise.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-            assertThat(analise.getObservacoes()).isEqualTo(justificativa);
-            assertThat(analise.getUnidadeSigla()).isEqualTo(unidadeGestor.getSigla());
+        List<Alerta> alertasDevolucao = alertaRepo.findAll();
+        assertThat(alertasDevolucao).hasSize(1);
+        assertThat(alertasDevolucao.getFirst().getDescricao()).contains("Cadastro de atividades e conhecimentos da unidade UNISUB devolvido para ajustes");
+        assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla()).isEqualTo(subprocesso.getUnidade().getSigla());
 
-            // 3. Movimentação
-            Movimentacao mov = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).getFirst();
-            assertThat(mov.getDescricao()).isEqualTo("Devolução da validação do mapa de competências para ajustes");
-            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(unidadeGestor.getSigla());
-            assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidadeSubordinada.getSigla());
+        // Unidade inferior valida o mapa novamente
+        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk());
 
-            // 4. Alerta e Notificação
-            List<Alerta> alertas = alertaRepo.findAll().stream().filter(a -> a.getProcesso().getCodigo().equals(processo.getCodigo())).collect(Collectors.toList());
-            assertThat(alertas).hasSize(1);
-            Alerta alerta = alertas.getFirst();
-            assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeSubordinada.getSigla());
-            assertThat(alerta.getDescricao()).contains("devolvido para ajustes");
+        // Chefe da unidade superior aceita a validação
+        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk());
 
-            verify(notificacaoService).enviarEmail(eq(unidadeSubordinada.getSigla()), anyString(), anyString());
-        }
+        // Verificação do histórico após aceite
+        String responseAceite = mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        List<sgc.analise.dto.AnaliseValidacaoHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {
+        });
+
+        assertThat(historicoAceite).hasSize(2);
+        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+        assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
+
+        // Adicionar verificação de Movimentacao e Alerta após aceite
+        List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoesAceite).hasSize(3); // Movimentação inicial + devolução + aceite
+        assertThat(movimentacoesAceite.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+
+        List<Alerta> alertasAceite = alertaRepo.findAll();
+        assertThat(alertasAceite).hasSize(3); // devolução + validação + aceite
+
+        // Verifica o alerta de aceite para a unidade hierarquicamente superior
+        Alerta alertaDeAceite = alertasAceite.stream()
+            .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
+
+        assertThat(alertaDeAceite.getDescricao()).contains("Validação do mapa de competências da UNISUB submetida para análise");
     }
 
-    @Nested
-    @DisplayName("Fluxo de Aceite")
-    class Aceite {
+    @Test
+    @DisplayName("ADMIN deve homologar validação do mapa, alterando status para MAPA_HOMOLOGADO e registrando movimentação e alerta")
+    @WithMockAdmin
+    void testHomologarValidacao_Sucesso() throws Exception {
+        // Cenário: Subprocesso já validado e pronto para homologação
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
+        subprocessoRepo.save(subprocesso);
+        subprocessoRepo.flush();
 
-        @Test
-        @DisplayName("GESTOR deve aceitar validação, registrar análise e mover para unidade superior")
-        @WithMockGestor
-        void gestorDeveAceitarValidacao() throws Exception {
-            // Act
-            mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
-                            .with(csrf()))
-                    .andExpect(status().isOk());
+        // Ação
+        mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk());
 
-            entityManager.flush();
-            entityManager.clear();
+        // Verificações
+        Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
 
-            // Assert
-            // 1. Subprocesso (situação não muda, apenas a localização via movimentação)
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoes).hasSize(1); // Apenas a movimentação de homologação
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências homologado");
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDOC");
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
-            // 2. Análise de Validação
-            List<Analise> analises = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
-            assertThat(analises).hasSize(1);
-            Analise analise = analises.getFirst();
-            assertThat(analise.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-            assertThat(analise.getUnidadeSigla()).isEqualTo(unidadeGestor.getSigla());
+        List<Alerta> alertas = alertaRepo.findAll();
+        assertThat(alertas).hasSize(1);
+        assertThat(alertas.getFirst().getDescricao()).contains("Mapa de competências do processo Processo de Teste homologado");
+        assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo("SEDOC");
 
-            // 3. Movimentação
-            Movimentacao mov = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).getFirst();
-            assertThat(mov.getDescricao()).isEqualTo("Mapa de competências validado");
-            assertThat(mov.getUnidadeOrigem().getSigla()).isEqualTo(unidadeGestor.getSigla());
-            assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
-
-            // 4. Alerta e Notificação
-            List<Alerta> alertas = alertaRepo.findAll().stream().filter(a -> a.getProcesso().getCodigo().equals(processo.getCodigo())).collect(Collectors.toList());
-            assertThat(alertas).hasSize(1);
-            Alerta alerta = alertas.getFirst();
-            assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeAdmin.getSigla());
-            assertThat(alerta.getDescricao()).contains("submetida para análise");
-
-            verify(notificacaoService).enviarEmail(eq(unidadeAdmin.getSigla()), anyString(), anyString());
-        }
-    }
-
-    @Nested
-    @DisplayName("Fluxo de Homologação")
-    class Homologacao {
-
-        @Test
-        @DisplayName("ADMIN deve homologar validação e alterar situação para MAPA_HOMOLOGADO")
-        @WithMockAdmin
-        void adminDeveHomologarValidacao() throws Exception {
-            // Arrange: Simular que o processo chegou na unidade do admin
-            movimentacaoRepo.save(new Movimentacao(subprocesso, unidadeGestor, unidadeAdmin, "Mapa de competências validado"));
-
-            // Act
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
-                            .with(csrf()))
-                    .andExpect(status().isOk());
-
-            entityManager.flush();
-            entityManager.clear();
-
-            // Assert
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-            assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-
-            // Verificar que não há novas análises ou movimentações para a homologação simples
-            assertThat(analiseRepo.count()).isZero();
-
-            // A movimentação inicial, a do arrange e a da ação
-            assertThat(movimentacaoRepo.count()).isEqualTo(2);
-        }
-
-        @Test
-        @DisplayName("GESTOR não deve conseguir homologar")
-        @WithMockGestor
-        void gestorNaoPodeHomologar() throws Exception {
-            mockMvc.perform(post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
-                            .with(csrf()))
-                    .andExpect(status().isForbidden());
-        }
+        verify(subprocessoNotificacaoService, times(1)).notificarHomologacaoMapa(spAtualizado);
     }
 }

@@ -5,12 +5,28 @@ import sgc.analise.modelo.TipoAnalise;
 
 import java.time.LocalDateTime;
 
-public record AnaliseValidacaoHistoricoDto(
-    LocalDateTime dataHora,
-    String observacoes,
-    TipoAcaoAnalise acao,
-    String unidadeSigla,
-    String analistaUsuarioTitulo,
-    String motivo,
-    TipoAnalise tipo
-) {}
+/**
+ * DTO para exibir o histórico de uma análise de validação.
+ *
+ * @param dataHora A data e hora da análise.
+ * @param observacoes As observações registradas.
+ * @param acao A ação realizada.
+ * @param unidadeSigla A sigla da unidade que realizou a análise.
+ * @param analistaUsuarioTitulo O título de eleitor do analista.
+ * @param motivo O motivo da análise (e.g., para devoluções).
+ * @param tipo O tipo de análise (sempre VALIDACAO neste contexto).
+ */
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+public class AnaliseValidacaoHistoricoDto {
+    LocalDateTime dataHora;
+    String observacoes;
+    TipoAcaoAnalise acao;
+    String unidadeSigla;
+    String analistaUsuarioTitulo;
+    String motivo;
+    TipoAnalise tipo;
+}

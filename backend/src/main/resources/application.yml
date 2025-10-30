@@ -1,22 +1,21 @@
 spring:
   main.banner-mode: off
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: leonardo
+    username: postgres
     password: postgres
+  test.mockmvc.print: none
   jpa:
-    hibernate.ddl-auto: update
-    properties.hibernate.default_schema: sgc
+    hibernate.ddl-auto: create
+    properties:
+      hibernate.default_schema: sgc
     show-sql: false
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=1h
-    cache-names:
-      - sgrh-usuarios
-      - sgrh-unidades
-      - sgrh-responsabilidades
-      - sgrh-perfis
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -32,12 +31,8 @@ spring:
         transport:
           protocol: smtp
     default-encoding: UTF-8
-
 server:
-  port: 8080
-jwt:
-  secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production-please-use-at-least-32-characters}
-  expiration: 86400000  # 24 horas em milissegundos
+  port: 10000
 aplicacao:
   ambiente-testes: ${AMBIENTE_TESTES:true}
   url-acesso-hom: ${URL_ACESSO_HOM:http://localhost:8081/api/acesso}
@@ -46,6 +41,16 @@ aplicacao:
     remetente: ${EMAIL_REMETENTE:sgc@tre-pe.jus.br}
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  info:
+    title: SGC - Sistema de Gestão de Competências API
+    version: v1
+    description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
+
 logging:
   level:
     org.hibernate: ERROR
@@ -55,5 +60,6 @@ logging:
     org.springframework.jdbc: ERROR
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
-    sgc.auth: DEBUG  # Habilita logs de debug para autenticação
+    org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO

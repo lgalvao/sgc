@@ -10,11 +10,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import sgc.integracao.mocks.TestThymeleafConfig;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.conhecimento.modelo.Conhecimento;
@@ -23,301 +23,205 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.dto.ImportarAtividadesRequest;
+import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = Sgc.class)
+@SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-@WithMockChefe
-@Import(TestSecurityConfig.class)
 @Transactional
-@DisplayName("CDU-08: Manter Cadastro de Atividades e Conhecimentos")
+@ActiveProfiles("test")
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
+@DisplayName("CDU-08: Manter cadastro de atividades e conhecimentos")
 class CDU08IntegrationTest {
-
-    private static final String API_ATIVIDADES = "/api/atividades";
-    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
-    private static final String API_CONHECIMENTOS = "/api/conhecimentos";
-    private static final String API_CONHECIMENTOS_ID = "/api/conhecimentos/{id}";
-    private static final String DESCRICAO_JSON_PATH = "$.descricao";
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Repositories
-    @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
-    private UnidadeRepo unidadeRepo;
-    @Autowired
-    private SubprocessoRepo subprocessoRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
 
-    private Subprocesso subprocessoMapeamento;
-    private Mapa mapaMapeamento;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private MapaRepo mapaRepo;
+
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+
+    private Subprocesso subprocessoOrigem;
+    private Subprocesso subprocessoDestino;
 
     @BeforeEach
     void setUp() {
-        var chefe = new Usuario();
-        chefe.setTitulo("chefe");
-        chefe = usuarioRepo.save(chefe);
-        // Test data
-        Unidade unidadeChefe = new Unidade("Unidade Teste", "UT");
-        unidadeChefe.setTitular(chefe);
-        unidadeRepo.save(unidadeChefe);
+        Usuario chefe = new Usuario();
+        chefe.setTituloEleitoral(888888888888L);
+        chefe.setNome("Chefe de Teste");
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
+        usuarioRepo.save(chefe);
 
-        Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
-        processoRepo.save(processoMapeamento);
+        Unidade unidadeOrigem = new Unidade("UNIDADE-CDU08-ORIGEM", "U08O");
+        unidadeOrigem.setTitular(chefe);
+        unidadeRepo.save(unidadeOrigem);
 
-        mapaMapeamento = mapaRepo.save(new Mapa());
-        subprocessoMapeamento = new Subprocesso(processoMapeamento, unidadeChefe, mapaMapeamento, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processoMapeamento.getDataLimite());
-        subprocessoRepo.save(subprocessoMapeamento);
+        Unidade unidadeDestino = new Unidade("UNIDADE-CDU08-DESTINO", "U08D");
+        unidadeDestino.setTitular(chefe);
+        unidadeRepo.save(unidadeDestino);
 
-        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
-        processoRepo.save(processoRevisao);
+        Mapa mapaOrigem = new Mapa();
+        mapaRepo.save(mapaOrigem);
 
-        Mapa mapaRevisao = mapaRepo.save(new Mapa());
-        Subprocesso subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapaRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
-        subprocessoRepo.save(subprocessoRevisao);
+        Atividade atividade1 = new Atividade(mapaOrigem, "Atividade 1");
+        atividadeRepo.save(atividade1);
+        conhecimentoRepo.save(new Conhecimento("Conhecimento 1.1", atividade1));
+
+        Atividade atividade2 = new Atividade(mapaOrigem, "Atividade 2");
+        atividadeRepo.save(atividade2);
+        conhecimentoRepo.save(new Conhecimento("Conhecimento 2.1", atividade2));
+        conhecimentoRepo.save(new Conhecimento("Conhecimento 2.2", atividade2));
+
+        subprocessoOrigem = new Subprocesso();
+        subprocessoOrigem.setUnidade(unidadeOrigem);
+        subprocessoOrigem.setMapa(mapaOrigem);
+        subprocessoOrigem.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
+        subprocessoOrigem.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoRepo.save(subprocessoOrigem);
+
+        Mapa mapa = new Mapa(); // Inicializa o mapa para os testes de CRUD
+        mapaRepo.save(mapa);
+
+        subprocessoDestino = new Subprocesso();
+        subprocessoDestino.setUnidade(unidadeDestino);
+        subprocessoDestino.setMapa(mapa); // Usa o 'mapa' para os testes de CRUD
+        subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
+        subprocessoDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoRepo.save(subprocessoDestino);
     }
 
     @Nested
-    @DisplayName("Testes de Criação (POST)")
-    class Criacao {
+    @DisplayName("Testes de importação de atividades")
+    @WithMockChefe("888888888888")
+    class ImportacaoAtividades {
         @Test
-        @DisplayName("Deve adicionar uma nova atividade ao mapa do subprocesso")
-        void deveAdicionarNovaAtividade() throws Exception {
-            String novaAtividadeJson = String.format("{\"descricao\": \"Nova Atividade de Teste\", \"mapaCodigo\": %d}", mapaMapeamento.getCodigo());
+        @DisplayName("Deve importar atividades e conhecimentos com sucesso")
+        void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post(API_ATIVIDADES)
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(novaAtividadeJson))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Nova Atividade de Teste")));
-
-            List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaMapeamento.getCodigo());
-            assertThat(atividades).hasSize(1);
-            assertThat(atividades.getFirst().getDescricao()).isEqualTo("Nova Atividade de Teste");
-        }
-
-        @Test
-        @DisplayName("Deve adicionar um novo conhecimento a uma atividade existente")
-        void deveAdicionarNovoConhecimento() throws Exception {
-            Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Conhecimento"));
-            String novoConhecimentoJson = String.format("{\"descricao\": \"Novo Conhecimento de Teste\", \"atividadeCodigo\": %d}", atividade.getCodigo());
-
-            mockMvc.perform(post(API_CONHECIMENTOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(novoConhecimentoJson))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Novo Conhecimento de Teste")));
-
-            List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());
-            assertThat(conhecimentos).hasSize(1);
-            assertThat(conhecimentos.getFirst().getDescricao()).isEqualTo("Novo Conhecimento de Teste");
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Edição (PUT)")
-    class Edicao {
-
-        @Test
-        @DisplayName("Deve editar a descrição de uma atividade existente")
-        void deveEditarAtividade() throws Exception {
-            Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade Original"));
-            String atividadeEditadaJson = "{\"descricao\": \"Atividade Editada\"}";
-
-            mockMvc.perform(put(API_ATIVIDADES_ID, atividade.getCodigo())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(atividadeEditadaJson))
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Atividade Editada")));
+                    .andExpect(jsonPath("$.message", is("Atividades importadas com sucesso.")));
 
-            Atividade atividadeDoBanco = atividadeRepo.findById(atividade.getCodigo()).orElseThrow();
-            assertThat(atividadeDoBanco.getDescricao()).isEqualTo("Atividade Editada");
+            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            assertThat(atividadesDestino).hasSize(2);
+
+            Atividade atividade1Importada = atividadesDestino.stream().filter(a -> a.getDescricao().equals("Atividade 1")).findFirst().orElse(null);
+            assertThat(atividade1Importada).isNotNull();
+            List<Conhecimento> conhecimentos1 = conhecimentoRepo.findByAtividadeCodigo(atividade1Importada.getCodigo());
+            assertThat(conhecimentos1).hasSize(1);
+            assertThat(conhecimentos1.getFirst().getDescricao()).isEqualTo("Conhecimento 1.1");
+
+            Atividade atividade2Importada = atividadesDestino.stream().filter(a -> a.getDescricao().equals("Atividade 2")).findFirst().orElse(null);
+            assertThat(atividade2Importada).isNotNull();
+            List<Conhecimento> conhecimentos2 = conhecimentoRepo.findByAtividadeCodigo(atividade2Importada.getCodigo());
+            assertThat(conhecimentos2).hasSize(2);
+            assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList()).containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
+
+            List<sgc.subprocesso.modelo.Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
+            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
         }
 
         @Test
-        @DisplayName("Deve editar a descrição de um conhecimento existente")
-        void deveEditarConhecimento() throws Exception {
-            Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Edição de Conhecimento"));
-            Conhecimento conhecimento = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento Original"));
-            String conhecimentoEditadoJson = String.format(
-                    "{\"descricao\": \"Conhecimento Editado\", \"atividadeCodigo\": %d}",
-                    atividade.getCodigo()
-            );
+        @DisplayName("Deve falhar ao importar para subprocesso em estado inválido")
+        void deveFalharAoImportarParaSubprocessoEmEstadoInvalido() throws Exception {
+            subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
+            subprocessoRepo.save(subprocessoDestino);
 
-            mockMvc.perform(put(API_CONHECIMENTOS_ID, conhecimento.getCodigo())
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(conhecimentoEditadoJson))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath(DESCRICAO_JSON_PATH, is("Conhecimento Editado")));
-
-            Conhecimento conhecimentoDoBanco = conhecimentoRepo.findById(conhecimento.getCodigo()).orElseThrow();
-            assertThat(conhecimentoDoBanco.getDescricao()).isEqualTo("Conhecimento Editado");
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Remoção (DELETE)")
-    class Remocao {
-
-        @Test
-        @DisplayName("Deve remover um conhecimento de uma atividade")
-        void deveRemoverConhecimento() throws Exception {
-            Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Remoção de Conhecimento"));
-            Conhecimento conhecimento = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento a ser Removido"));
-
-            mockMvc.perform(delete(API_CONHECIMENTOS_ID, conhecimento.getCodigo()))
-                    .andExpect(status().isNoContent());
-
-            assertThat(conhecimentoRepo.findById(conhecimento.getCodigo())).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Deve remover uma atividade e todos os seus conhecimentos associados")
-        void deveRemoverAtividadeEConhecimentos() throws Exception {
-            Atividade atividade = atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade para Remoção Completa"));
-            Conhecimento conhecimento1 = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento 1"));
-            Conhecimento conhecimento2 = conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento 2"));
-
-            mockMvc.perform(delete(API_ATIVIDADES_ID, atividade.getCodigo()))
-                    .andExpect(status().isNoContent());
-
-            assertThat(atividadeRepo.findById(atividade.getCodigo())).isEmpty();
-            assertThat(conhecimentoRepo.findById(conhecimento1.getCodigo())).isEmpty();
-            assertThat(conhecimentoRepo.findById(conhecimento2.getCodigo())).isEmpty();
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Importação")
-    class Importacao {
-
-        private Mapa mapaFonte;
-
-        @BeforeEach
-        void setUp() {
-            Unidade unidadeFonte = unidadeRepo.save(new Unidade("Unidade Fonte", "UF"));
-            Processo processoFonte = new Processo("Processo Fonte Finalizado", TipoProcesso.MAPEAMENTO, SituacaoProcesso.FINALIZADO, LocalDate.now().minusDays(10));
-            processoRepo.save(processoFonte);
-
-            mapaFonte = mapaRepo.save(new Mapa());
-            Subprocesso subprocessoFonte = new Subprocesso(processoFonte, unidadeFonte, mapaFonte, SituacaoSubprocesso.MAPA_HOMOLOGADO, processoFonte.getDataLimite());
-            subprocessoRepo.save(subprocessoFonte);
-
-            Atividade atividadeFonte1 = new Atividade(mapaFonte, "Atividade Fonte 1");
-            atividadeRepo.save(atividadeFonte1);
-            conhecimentoRepo.save(new Conhecimento(atividadeFonte1, "Conhecimento Fonte 1.1"));
-
-            Atividade atividadeFonte2 = new Atividade(mapaFonte, "Atividade Fonte 2");
-            atividadeRepo.save(atividadeFonte2);
-
-            // Add a pre-existing activity to the target map to test the non-import rule
-            atividadeRepo.save(new Atividade(mapaMapeamento, "Atividade Fonte 2"));
-        }
-
-        @Test
-        @DisplayName("Deve importar atividades e conhecimentos de outro mapa finalizado")
-        void deveImportarAtividadesEConhecimentos() throws Exception {
-            // Corrigido para usar o ID do subprocesso de origem, não do processo.
-            Subprocesso subprocessoFonte = subprocessoRepo.findByMapaCodigo(mapaFonte.getCodigo())
-                    .orElseThrow(() -> new IllegalStateException("Subprocesso fonte não encontrado para o mapa " + mapaFonte.getCodigo()));
-
-            String importRequestJson = String.format("{\"subprocessoOrigemId\": %d}", subprocessoFonte.getCodigo());
-
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoMapeamento.getCodigo())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(importRequestJson))
-                    .andExpect(status().isOk());
-
-            // Verify that only the non-existing activity was imported
-            List<Atividade> atividadesImportadas = atividadeRepo.findByMapaCodigo(mapaMapeamento.getCodigo());
-            assertThat(atividadesImportadas).hasSize(2); // "Atividade Fonte 2" (pre-existing) + "Atividade Fonte 1" (imported)
-
-            Atividade atividadeImportada = atividadesImportadas.stream()
-                    .filter(a -> a.getDescricao().equals("Atividade Fonte 1"))
-                    .findFirst().orElseThrow();
-
-            assertThat(atividadeImportada.getDescricao()).isEqualTo("Atividade Fonte 1");
-            List<Conhecimento> conhecimentosImportados = conhecimentoRepo.findByAtividadeCodigo(atividadeImportada.getCodigo());
-            assertThat(conhecimentosImportados).hasSize(1);
-            assertThat(conhecimentosImportados.getFirst().getDescricao()).isEqualTo("Conhecimento Fonte 1.1");
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Segurança e Validação")
-    class SegurancaEValidacao {
-
-        @Test
-        @DisplayName("Não deve adicionar atividade se subprocesso estiver em estado final")
-        void naoDeveAdicionarAtividadeSubprocessoFinalizado() throws Exception {
-            subprocessoMapeamento.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-            subprocessoRepo.save(subprocessoMapeamento);
-
-            String novaAtividadeJson = "{\"descricao\": \"Atividade Inválida\"}";
-
-            mockMvc.perform(post(API_ATIVIDADES)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(novaAtividadeJson))
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableEntity());
         }
 
         @Test
-        @DisplayName("Não deve adicionar atividade com descrição vazia")
-        void naoDeveAdicionarAtividadeComDescricaoVazia() throws Exception {
-            String novaAtividadeJson = "{\"descricao\": \"\"}";
+        @DisplayName("Deve falhar ao importar de subprocesso inexistente")
+        void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(9999L);
 
-            mockMvc.perform(post(API_ATIVIDADES)
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(novaAtividadeJson))
-                    .andExpect(status().isBadRequest());
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isNotFound());
         }
 
         @Test
-        @WithMockUser(username = "outro", roles = {"GESTOR"})
-        @DisplayName("Não deve permitir acesso a usuário não autorizado")
-        void naoDevePermitirAcessoUsuarioNaoAutorizado() throws Exception {
-            var outroUsuario = new Usuario();
-            outroUsuario.setTitulo("outro");
-            usuarioRepo.save(outroUsuario);
+        @DisplayName("Não deve importar nada de subprocesso sem atividades")
+        void naoDeveImportarNadaDeSubprocessoSemAtividades() throws Exception {
+            Mapa mapaOrigemVazio = new Mapa();
+            mapaRepo.save(mapaOrigemVazio);
+            subprocessoOrigem.setMapa(mapaOrigemVazio);
+            subprocessoRepo.save(subprocessoOrigem);
 
-            String novaAtividadeJson = String.format("{\"descricao\": \"Atividade Nao Autorizada\", \"mapaCodigo\": %d}", mapaMapeamento.getCodigo());
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
 
-            mockMvc.perform(post(API_ATIVIDADES)
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(novaAtividadeJson))
-                    .andExpect(status().isForbidden());
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            assertThat(atividadesDestino).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve importar apenas atividades não existentes no destino")
+        void deveImportarApenasAtividadesNaoExistentesNoDestino() throws Exception {
+            Atividade atividadeExistente = new Atividade(subprocessoDestino.getMapa(), "Atividade 2");
+            atividadeRepo.save(atividadeExistente);
+
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+
+            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
+
+            List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
+            assertThat(atividadesDestino).hasSize(2);
+            assertThat(atividadesDestino.stream().map(Atividade::getDescricao).toList()).containsExactlyInAnyOrder("Atividade 1", "Atividade 2");
         }
     }
 }

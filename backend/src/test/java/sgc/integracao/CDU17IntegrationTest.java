@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
@@ -28,12 +29,12 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.DisponibilizarMapaReq;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
@@ -42,7 +43,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,14 +53,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+
+import java.util.Set;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-17: Disponibilizar Mapa de Competências")
-@org.springframework.context.annotation.Import(TestSecurityConfig.class)
+@org.springframework.context.annotation.Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 class CDU17IntegrationTest {
-    private static final String API_URL = "/api/subprocessos/{id}/disponibilizar-mapa";
+    private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
     private static final String SEDOC_LITERAL = "SEDOC";
 
@@ -113,11 +119,21 @@ class CDU17IntegrationTest {
         usuarioRepo.deleteAll();
         unidadeRepo.deleteAll();
 
+        // Criar Usuários de Teste
+        usuarioRepo.save(new Usuario(111111111111L, "Admin User", "admin@example.com", "123", null, Set.of(Perfil.ADMIN)));
+        usuarioRepo.save(new Usuario(222222222222L, "Gestor User", "gestor@example.com", "123", null, Set.of(Perfil.GESTOR)));
+        Usuario titularUS = usuarioRepo.save(new Usuario(444444444444L, "Titular US", "titular.us@example.com", "123", null, Set.of(Perfil.CHEFE)));
+        Usuario titularUT = usuarioRepo.save(new Usuario(555555555555L, "Titular UT", "titular.ut@example.com", "123", null, Set.of(Perfil.CHEFE)));
+
         // Criar Unidades
         unidadeRepo.save(new Unidade(SEDOC_LITERAL, SEDOC_LITERAL));
-        Unidade unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "US"));
+        Unidade unidadeSuperior = new Unidade("Unidade Superior", "US");
+        unidadeSuperior.setTitular(titularUS);
+        unidadeRepo.save(unidadeSuperior);
+
         unidade = new Unidade("Unidade de Teste", "UT");
         unidade.setUnidadeSuperior(unidadeSuperior);
+        unidade.setTitular(titularUT);
         unidade = unidadeRepo.save(unidade);
 
         // Criar Processo e Mapa
@@ -160,7 +176,7 @@ class CDU17IntegrationTest {
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
             analiseRepo.save(analiseAntiga);
 
-            LocalDate dataLimite = LocalDate.now().plusDays(10);
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(10);
             String observacoes = "Observações de teste para o mapa.";
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
 
@@ -173,11 +189,11 @@ class CDU17IntegrationTest {
                     .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado com sucesso."));
 
             // Verificar o estado final no banco de dados
-            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+            Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
             assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite);
 
-            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).get();
+            Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow(() -> new AssertionError("Mapa não encontrado após atualização."));
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
 
             // Verificar Movimentação
@@ -213,7 +229,7 @@ class CDU17IntegrationTest {
             var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -229,13 +245,13 @@ class CDU17IntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict()); // IllegalStateException é mapeado para 409
+                    .andExpect(status().isConflict());
         }
 
         @Test
@@ -248,7 +264,7 @@ class CDU17IntegrationTest {
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, dummyActivity));
             // A 'atividade' principal (criada no setUp) permanece não associada.
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             String responseBody = mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -275,7 +291,7 @@ class CDU17IntegrationTest {
             competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
             competenciaRepo.save(new Competencia(mapa, "Competência Solta"));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDate.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())

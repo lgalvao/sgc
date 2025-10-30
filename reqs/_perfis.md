@@ -1,0 +1,8 @@
+## **Atores e perfis**
+
+O sistema de Gestão de Competências opera com os seguintes perfis de usuários, cujas atribuições e acessos são automaticamente reconhecidos com base na condição de responsabilidade ou lotação em uma unidade, de acordo com o SGRH, ou por atribuição de responsabilidade temporária realizada no próprio sistema. Caso um usuário acumule mais de um perfil ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o login.
+
+* **ADMIN**: Administrador da SEDOC. É responsável por criar, configurar e monitorar processos, além de criar/ajustar os mapas de competências das unidades. A unidade SEDOC é tratada como unidade raiz da estrutura organizacional para efeito dos processos de mapeamento, de revisão e de diagnóstico.
+* **GESTOR**: Responsável por uma unidade intermediária (exemplo: Coordenador). Pode visualizar e validar as informações cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou devolver à unidade subordinada para realização de retificações.
+* **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Pode cadastrar as informações de sua unidade em cada processo e submeter essas informações para validação pela unidade superior.
+* **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de diagnóstico.

@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Entidade JPA para view VW_RESPONSABILIDADE do SGRH.
@@ -24,10 +24,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VwResponsabilidade {
-
     @Id
-    @Column(name = "ID", nullable = false)
-    private Long id;
+    @Column(name = "codigo", nullable = false)
+    private Long codigo;
 
     @Column(name = "UNIDADE_CODIGO", nullable = false)
     private Long unidadeCodigo;
@@ -39,10 +38,10 @@ public class VwResponsabilidade {
     private String substitutoTitulo;
 
     @Column(name = "DATA_INICIO")
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
     @Column(name = "DATA_FIM")
-    private LocalDate dataFim;
+    private LocalDateTime dataFim;
 
     @Column(name = "ATIVA")
     private Boolean ativa;

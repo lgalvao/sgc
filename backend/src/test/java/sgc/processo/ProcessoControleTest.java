@@ -17,8 +17,10 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.modelo.ErroProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.service.ProcessoService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -65,14 +67,14 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao(NOVO_PROCESSO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(MAPEAMENTO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao(NOVO_PROCESSO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(TipoProcesso.MAPEAMENTO.name())
+                .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
 
@@ -91,7 +93,7 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        var req = new CriarProcessoReq("", MAPEAMENTO, LocalDate.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,12 +104,12 @@ public class ProcessoControleTest {
     @Test
     void obterPorId_ProcessoExiste_RetornaOk() throws Exception {
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao("Processo Teste")
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(MAPEAMENTO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao("Processo Teste")
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(TipoProcesso.MAPEAMENTO.name())
+                .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
@@ -131,18 +133,18 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDate.now().plusDays(45), List.of(1L));
+        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, TipoProcesso.REVISAO, LocalDateTime.now().plusDays(45), List.of(1L));
         var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .dataCriacao(LocalDateTime.now())
-            .descricao(PROCESSO_ATUALIZADO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .tipo(REVISAO)
-            .build();
+                .codigo(1L)
+                .dataCriacao(LocalDateTime.now())
+                .descricao(PROCESSO_ATUALIZADO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .tipo(TipoProcesso.REVISAO.name())
+                .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
 
-        mockMvc.perform(put(API_PROCESSOS_1)
+        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -156,11 +158,11 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        var req = new AtualizarProcessoReq(999L, "Teste", MAPEAMENTO, null, List.of(1L));
+        var req = new AtualizarProcessoReq(999L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put(API_PROCESSOS_999)
+        mockMvc.perform(post(API_PROCESSOS + "/999/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound());
@@ -168,11 +170,11 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        var req = new AtualizarProcessoReq(1L, "Teste", MAPEAMENTO, null, List.of(1L));
+        var req = new AtualizarProcessoReq(1L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
-        mockMvc.perform(put(API_PROCESSOS_1)
+        mockMvc.perform(post(API_PROCESSOS + "/1/atualizar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict());
@@ -180,7 +182,7 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoExiste_RetornaNoContent() throws Exception {
-        mockMvc.perform(delete(API_PROCESSOS_1))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir"))
                 .andExpect(status().isNoContent());
 
         verify(processoService).apagar(1L);
@@ -188,9 +190,9 @@ public class ProcessoControleTest {
 
     @Test
     void excluir_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).apagar(999L);
 
-        mockMvc.perform(delete(API_PROCESSOS_999))
+        mockMvc.perform(post(API_PROCESSOS + "/999/excluir"))
                 .andExpect(status().isNotFound());
     }
 
@@ -198,19 +200,19 @@ public class ProcessoControleTest {
     void excluir_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
         doThrow(new IllegalStateException()).when(processoService).apagar(eq(1L));
 
-        mockMvc.perform(delete(API_PROCESSOS_1))
+        mockMvc.perform(post(API_PROCESSOS + "/1/excluir"))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void obterDetalhes_ProcessoExiste_RetornaOk() throws Exception {
         var dto = ProcessoDetalheDto.builder()
-            .codigo(1L)
-            .descricao("Processo Detalhado")
-            .tipo(MAPEAMENTO)
-            .situacao(SituacaoProcesso.CRIADO)
-            .dataCriacao(LocalDateTime.now())
-            .build();
+                .codigo(1L)
+                .descricao("Processo Detalhado")
+                .tipo(TipoProcesso.MAPEAMENTO.name())
+                .situacao(SituacaoProcesso.CRIADO)
+                .dataCriacao(LocalDateTime.now())
+                .build();
 
         when(processoService.obterDetalhes(eq(1L))).thenReturn(dto);
 
@@ -224,7 +226,7 @@ public class ProcessoControleTest {
 
     @Test
     void obterDetalhes_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).obterDetalhes(eq(999L));
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).obterDetalhes(eq(999L));
 
         mockMvc.perform(get("/api/processos/999/detalhes"))
                 .andExpect(status().isNotFound());
@@ -240,40 +242,25 @@ public class ProcessoControleTest {
 
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo Iniciado")
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo(MAPEAMENTO)
-            .build();
-
-        when(processoService.iniciarProcessoMapeamento(eq(1L), anyList())).thenReturn(dto);
+        doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
 
         mockMvc.perform(post("/api/processos/1/iniciar")
+                        .param("tipo", "MAPEAMENTO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+                .andExpect(status().isOk());
 
         verify(processoService).iniciarProcessoMapeamento(eq(1L), eq(List.of(1L)));
     }
 
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo de Revisão Iniciado")
-            .situacao(SituacaoProcesso.EM_ANDAMENTO)
-            .tipo(REVISAO)
-            .build();
-
-        when(processoService.iniciarProcessoRevisao(eq(1L), anyList())).thenReturn(dto);
+        doNothing().when(processoService).iniciarProcessoRevisao(eq(1L), anyList());
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar?tipo=REVISAO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(1L))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+                .andExpect(status().isOk());
 
         verify(processoService).iniciarProcessoRevisao(eq(1L), eq(List.of(1L)));
     }
@@ -290,25 +277,16 @@ public class ProcessoControleTest {
 
     @Test
     void finalizar_ProcessoValido_RetornaOk() throws Exception {
-        var dto = ProcessoDto.builder()
-            .codigo(1L)
-            .descricao("Processo Finalizado")
-            .situacao(SituacaoProcesso.FINALIZADO)
-            .tipo(MAPEAMENTO)
-            .build();
+        doNothing().when(processoService).finalizar(1L);
 
-        when(processoService.finalizar(1L)).thenReturn(dto);
-
-        mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
+        mockMvc.perform(post("/api/processos/1/finalizar")).andExpect(status().isOk());
 
         verify(processoService).finalizar(1L);
     }
 
     @Test
     void finalizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        doThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada(PROCESSO_NAO_ENCONTRADO)).when(processoService).finalizar(999L);
+        doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).finalizar(999L);
 
         mockMvc.perform(post(API_PROCESSOS_999 + "/finalizar"))
                 .andExpect(status().isNotFound());
@@ -324,11 +302,11 @@ public class ProcessoControleTest {
     }
 
     @Test
-    void finalizar_ValidacaoFalhou_RetornaUnprocessableEntity() throws Exception {
+    void finalizar_ValidacaoFalhou_RetornaConflict() throws Exception {
         doThrow(new ErroProcesso("Subprocessos não homologados")).when(processoService).finalizar(1L);
 
         mockMvc.perform(post("/api/processos/1/finalizar"))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Subprocessos não homologados"));
     }
 }

@@ -1,71 +1,94 @@
-# Módulo de Subprocessos - SGC
+# Módulo de Subprocesso
 
 ## Visão Geral
-O pacote `subprocesso` é o motor do fluxo de trabalho (workflow) do SGC. Enquanto o pacote `processo` gerencia a iniciativa de alto nível, o `subprocesso` gerencia a jornada detalhada que cada unidade organizacional individual percorre dentro desse processo.
+Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o ciclo de vida de cada tarefa, desde sua criação até a homologação.
 
-Cada `Subprocesso` representa a tarefa de uma única unidade (ex: a "Zona Eleitoral 001" preenchendo seu mapa de competências). Este pacote gerencia o estado, as transições, as validações e o histórico de cada uma dessas tarefas individuais.
+A principal responsabilidade deste módulo é garantir que as transições de estado (`situacao`) sigam as regras de negócio e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimentacao`).
 
-## Arquivos e Componentes Principais
+Para melhor organização e desacoplamento, o `SubprocessoControle` original foi dividido em múltiplos controladores especializados.
 
-### 1. Entidades Core (`modelo/`)
-**Localização:** `backend/src/main/java/sgc/subprocesso/modelo/`
-- **`Subprocesso.java`**: A entidade JPA central que representa a tarefa de uma unidade dentro de um processo.
-  - **Associações:** Vinculada a `Processo` (pai), `Unidade` (executora) e `Mapa` (o artefato sendo trabalhado).
-  - **Gerenciamento de Estado:** O campo `situacao`, do tipo `SituacaoSubprocesso` (enum), é a chave para o workflow, armazenando o estado atual (ex: `PENDENTE_CADASTRO`, `CADASTRO_DISPONIBILIZADO`, `MAPA_HOMOLOGADO`).
-- **`Movimentacao.java`**: Uma entidade de log/auditoria. Para **cada ação** realizada em um subprocesso (disponibilizar, devolver, aprovar), um novo registro de `Movimentacao` é criado, garantindo uma trilha de auditoria completa.
+## Arquitetura de Serviços
+A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService` atua como uma fachada apenas para operações de CRUD, enquanto os controladores de workflow interagem diretamente com os serviços especializados.
 
-### 2. Serviço de Workflow
-- **`SubprocessoService.java`**: O coração do pacote, funcionando como um **mecanismo de state machine**. Ele contém a lógica de negócio para cada ação possível no ciclo de vida de um subprocesso.
-- **Padrão de Ação:** Cada método de ação (ex: `devolverCadastro`, `validarMapa`, `homologarCadastro`) segue um padrão rigoroso dentro de uma transação:
-  1.  **Buscar** o `Subprocesso`.
-  2.  **Validar** o estado atual (garantir que a ação é permitida).
-  3.  **Atualizar** o estado do `Subprocesso` (alterar o enum `situacao`).
-  4.  **Criar** uma `Movimentacao` para a trilha de auditoria.
-  5.  **Gravar** uma `Analise` (se aplicável) com justificativas.
-  6.  **Disparar** notificações e alertas para os usuários relevantes.
+```mermaid
+graph TD
+    subgraph "Frontend"
+        ControleCrud(SubprocessoCrudControle)
+        ControleCadastro(SubprocessoCadastroControle)
+        ControleMapa(SubprocessoMapaControle)
+        ControleValidacao(SubprocessoValidacaoControle)
+    end
 
-### 3. DTOs e Controlador
-- **`SubprocessoControle.java`**: O controlador REST que expõe os endpoints para o frontend interagir com o workflow. Cada endpoint geralmente corresponde a uma ação na interface do usuário (ex: "Devolver", "Aprovar").
-- **DTOs Específicos (`dto/`)**: O pacote utiliza DTOs de requisição específicos para cada ação, como `DevolucaoRequestDto` e `DisponibilizacaoRequestDto`, criando um contrato de API claro e robusto.
+    subgraph "Módulo Subprocesso"
+        Facade(SubprocessoService - Fachada CRUD)
 
-## Exemplo de Fluxo: Devolução de um Cadastro
-1.  **Ação do Usuário**: Um gestor clica no botão "Devolver" na tela de análise, preenchendo um motivo.
-2.  **Requisição**: O frontend envia um `POST` para `/api/subprocessos/{id}/devolver-cadastro` com um DTO contendo o motivo.
-3.  **Controller**: O `SubprocessoControle` recebe a requisição e chama `subprocessoService.devolverCadastro(...)`.
-4.  **Serviço (em uma transação)**:
-    a. O serviço carrega o `Subprocesso`.
-    b. Valida se a `situacao` atual é `CADASTRO_DISPONIBILIZADO`.
-    c. Altera a `situacao` para `PENDENTE_AJUSTES_CADASTRO`.
-    d. Cria uma `Movimentacao` registrando a devolução.
-    e. Salva o motivo da devolução em uma nova entidade `AnaliseCadastro`.
-    f. Dispara eventos que resultarão em e-mails e alertas para o responsável da unidade original.
-5.  **Resposta**: O controller retorna uma resposta de sucesso. Se qualquer passo falhar, a transação é revertida.
+        subgraph "Serviços Especializados"
+            Workflow(SubprocessoWorkflowService)
+            Consulta(SubprocessoConsultaService)
+            DtoBuilder(SubprocessoDtoService)
+            Mapa(SubprocessoMapaService)
+            MapaWorkflow(SubprocessoMapaWorkflowService)
+            Notificacao(SubprocessoNotificacaoService)
+        end
 
-## Notas Importantes
-- **Motor do Negócio**: Este pacote é o verdadeiro motor que impulsiona o fluxo de trabalho principal do SGC. A lógica aqui contida é a representação mais fiel das regras de negócio do sistema.
-- **Trilha de Auditoria Imutável**: O uso da entidade `Movimentacao` para registrar cada passo garante uma trilha de auditoria completa e imutável, essencial para a transparência do processo.
-- **Complexidade Gerenciada**: A complexidade do workflow é bem gerenciada através da separação de responsabilidades entre o serviço (regras de negócio), a entidade `Subprocesso` (estado) e a entidade `Movimentacao` (histórico).
+        Repos(Repositórios JPA)
+    end
 
-## Diagrama de State Machine
+    ControleCrud -- Utiliza --> Facade
+    ControleCadastro -- Utiliza --> Workflow & DtoBuilder
+    ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder
+    ControleValidacao -- Utiliza --> Workflow & DtoBuilder
+
+    Workflow & Consulta & DtoBuilder & Mapa & MapaWorkflow & Notificacao -- Acessam --> Repos
+```
+
+## Componentes Principais
+
+### Controladores REST
+- **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD.
+- **`SubprocessoCadastroControle`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver, aceitar, etc.).
+- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências.
+- **`SubprocessoValidacaoControle`**: Lida com as ações de workflow da etapa de validação.
+
+### Camada de Fachada
+- **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD.
+
+### Serviços Especializados
+- **`SubprocessoWorkflowService`**: O coração da máquina de estados. Contém a lógica para todas as transições de estado.
+- **`SubprocessoConsultaService`**: Centraliza as consultas complexas e a lógica de busca de subprocessos.
+- **`SubprocessoDtoService`**: Responsável por construir os DTOs de visualização complexos.
+- **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação com o mapa.
+- **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow.
+- **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações específicas do subprocesso.
+- **`modelo/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
+- **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
+
+## Diagrama da Máquina de Estados
+O fluxo de trabalho do subprocesso segue o diagrama de estados abaixo. Note que existem fluxos paralelos para "cadastro" e "revisão de cadastro".
+
 ```mermaid
 stateDiagram-v2
     direction LR
 
     [*] --> PENDENTE_CADASTRO: Processo iniciado
 
-    PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
-    CADASTRO_DISPONIBILIZADO --> CADASTRO_EM_ANDAMENTO: devolverCadastro()
-    CADASTRO_EM_ANDAMENTO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+    state "Fluxo de Cadastro Inicial" {
+        PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+        CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
+        PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
+        CADASTRO_DISPONIBILIZADO --> REVISAO_CADASTRO_HOMOLOGADA: aceitarCadastro()
+    }
 
-    CADASTRO_DISPONIBILIZADO --> MAPA_EM_ANALISE: aceitarCadastro()
-    MAPA_EM_ANALISE --> MAPA_DISPONIBILIZADO: disponibilizarMapa()
+    state "Fluxo de Ajuste/Revisão" {
+         REVISAO_CADASTRO_HOMOLOGADA --> MAPA_AJUSTADO: submeterMapaAjustado()
+         MAPA_AJUSTADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
+         PENDENTE_AJUSTES_MAPA --> MAPA_AJUSTADO: submeterMapaAjustado()
+         MAPA_AJUSTADO --> MAPA_VALIDADO: validarMapa()
+    }
 
-    MAPA_DISPONIBILIZADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
-    PENDENTE_AJUSTES_MAPA --> MAPA_DISPONIBILIZADO: disponibilizarMapa()
-
-    MAPA_DISPONIBILIZADO --> MAPA_VALIDADO: validarMapa()
     MAPA_VALIDADO --> MAPA_HOMOLOGADO: homologarMapa()
     MAPA_HOMOLOGADO --> [*]: Processo finalizado
-
-    note "Para cada transição, uma Movimentacao é criada" as N1
 ```
+
+## Trilha de Auditoria (`Movimentacao`)
+Para cada transição de estado no diagrama acima, uma nova entidade `Movimentacao` é criada e persistida. Isso cria um histórico imutável e detalhado de todas as ações realizadas em um subprocesso, garantindo total rastreabilidade.

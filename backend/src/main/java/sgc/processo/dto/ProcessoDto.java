@@ -1,9 +1,8 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +13,7 @@ public class ProcessoDto {
     private Long codigo;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
-    private LocalDate dataLimite;
+    private LocalDateTime dataLimite;
     private String descricao;
     private SituacaoProcesso situacao;
     private String tipo;

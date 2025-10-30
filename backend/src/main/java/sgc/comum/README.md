@@ -1,88 +1,60 @@
-# Módulo Comum - SGC
+# Pacote Comum
 
 ## Visão Geral
-O pacote `comum` é um pilar fundamental da aplicação, contendo classes, configurações e utilitários transversais que são utilizados por diversos outros módulos. Ele serve como uma base compartilhada, definindo entidades centrais, configurações globais, tratamento de erros e outros componentes de utilidade geral para garantir a consistência e evitar a duplicação de código.
+O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir consistência.
 
-## Arquivos e Diretórios Principais
+Este pacote abriga exclusivamente código de suporte sem lógica de negócio.
 
-### 1. Entidades Comuns (`modelo/`)
-**Localização:** `backend/src/main/java/sgc/comum/modelo/`
-- **`EntidadeBase.java`**: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) autoincrementado para a maioria das entidades do sistema, padronizando a definição de chaves primárias.
-- **`Administrador.java`**: Entidade que representa um administrador do sistema, com permissões elevadas.
-- **`Parametro.java`**: Entidade para armazenar parâmetros de configuração do sistema no banco de dados, permitindo ajustes dinâmicos sem a necessidade de reimplantar a aplicação.
+## Arquitetura e Subpacotes
+O `comum` fornece infraestrutura básica, como o tratamento de erros e modelos de dados compartilhados.
 
-## Diagrama de Arquitetura
 ```mermaid
-graph LR
-    subgraph "Módulos de Negócio (Ex: Processo, Mapa)"
-        A(Services)
-        B(Controllers)
+graph TD
+    subgraph "Módulos de Negócio (ex: processo, mapa, etc.)"
+        direction LR
+        Controllers
+        Services
+        Models
     end
 
-    subgraph "Módulo Comum"
-        C(modelo)
-        D(erros)
-        E(config)
+    subgraph "Pacote Comum"
+        direction LR
+        Erros(erros)
+        ModeloBase(modelo)
+        BeanUtil
     end
 
-    A -- Usa --> C
-    A -- Lança --> D
-    B -- Capturadas por --> D
-
-    subgraph "Spring Framework"
-        G(Spring Core)
-    end
-
-    G -- Carrega --> E
-
-    style C fill:#e6f3ff,stroke:#36c
-    style D fill:#ffe6e6,stroke:#c33
-    style E fill:#f0f0f0,stroke:#555
+    Services -- Lançam --> Erros
+    Controllers -- Capturam exceções via --> Erros
+    Models -- Herdam de --> ModeloBase
 ```
 
-### 2. Sub-pacotes
+### 1. `erros`
+- **Responsabilidade:** Define a hierarquia de exceções customizadas e o tratador global de erros.
+- **Componentes Notáveis:**
+  - `RestExceptionHandler`: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte em respostas JSON padronizadas para a API.
+  - `ErroDominioNaoEncontrado`: Exceção padrão para ser lançada quando uma entidade não é encontrada (resulta em HTTP 404).
+  - `ApiError`: Classe que modela a resposta de erro JSON padrão.
 
-#### `config/`
-**Localização:** `backend/src/main/java/sgc/comum/config/`
-- **Descrição:** Contém classes de configuração do Spring Framework.
-- **Arquivos Notáveis:**
-  - `AsyncConfig.java`: Configura o pool de threads para operações assíncronas (ex: envio de notificações).
-  - `SgrhDataSourceConfig.java`: Configura uma fonte de dados secundária para integração com o sistema SGRH.
-  - `WebConfig.java`: Define configurações globais da aplicação web, como CORS (Cross-Origin Resource Sharing).
+### 2. `modelo`
+- **Responsabilidade:** Contém modelos de dados compartilhados.
+- **Componentes Notáveis:**
+  - `EntidadeBase`: Uma superclasse (`@MappedSuperclass`) que fornece um campo de ID (`codigo`) padronizado para a maioria das entidades JPA do sistema.
 
-#### `erros/`
-**Localização:** `backend/src/main/java/sgc/comum/erros/`
-- **Descrição:** Define uma hierarquia de exceções customizadas e não checadas (`RuntimeException`) para padronizar o tratamento de erros. Inclui também o `RestExceptionHandler` (`@ControllerAdvice`) que captura essas exceções e as traduz em respostas HTTP padronizadas.
-- **Exceções Notáveis:**
-  - `ErroEntidadeNaoEncontrada`: Lançada quando uma busca por uma entidade no banco de dados não retorna resultados (resulta em HTTP 404).
-  - `ErroAcessoNegado`: Lançada quando um usuário tenta executar uma ação para a qual não tem permissão (resulta em HTTP 403).
-  - `ErroServicoExterno`: Para erros de comunicação com serviços externos (resulta em HTTP 502).
+### 3. Utilitários
+- **Responsabilidade:** Fornece classes de utilidade diversas.
+- **Componentes Notáveis:**
+  - `BeanUtil`: Permite o acesso a beans gerenciados pelo Spring em contextos não gerenciados.
 
-### 3. Funcionalidade de Painel
-- **`PainelControle.java` e `PainelService.java`**: Componentes que servem para alimentar um painel de controle (dashboard) com dados agregados e estatísticas do sistema, oferecendo uma visão geral do estado dos processos e outras métricas importantes.
+## Propósito e Uso
+- **Exceções (`erros`)**: Lançadas pelos serviços para sinalizar um erro de negócio ou técnico. O `RestExceptionHandler` cuida do resto.
+- **Modelo (`modelo`)**: A `EntidadeBase` é estendida por outras entidades para padronizar a chave primária.
 
-## Como Usar
-As classes deste pacote são, em sua maioria, utilizadas implicitamente por outras partes do sistema.
-- **Entidades**: São estendidas (`EntidadeBase`) ou referenciadas (`Usuario`) por outras entidades nos demais módulos.
-- **Configurações**: São carregadas automaticamente pelo Spring no momento da inicialização.
-- **Exceções**: São lançadas por serviços em outros pacotes para sinalizar erros de forma consistente e centralizada.
-
-**Exemplo de uso de uma exceção customizada:**
+**Exemplo de uso de uma exceção:**
 ```java
-@Service
-public class MeuServico {
-
-    @Autowired
-    private RecursoRepository recursoRepository;
-
-    public Recurso buscarRecurso(Long id) {
-        return recursoRepository.findById(id)
-            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Recurso com ID " + id + " não encontrado."));
-    }
+// Em um serviço de outro módulo
+public Recurso buscar(Long codigo) {
+    return repository.findById(codigo)
+        .orElseThrow(() -> new ErroDominioNaoEncontrado("Recurso", codigo));
 }
 ```
-
-## Notas Importantes
-- **Centralização**: Manter componentes compartilhados neste pacote é crucial para evitar a duplicação de código e promover a consistência em toda a aplicação.
-- **Configuração de Múltiplos DataSources**: A presença de `SgrhDataSourceConfig` demonstra que a aplicação se conecta a mais de um banco de dados, uma configuração avançada gerenciada pelo Spring.
-- **Tratamento de Erros Padronizado**: O uso do `RestExceptionHandler` para capturar as exceções customizadas do pacote `erros` permite um tratamento de erros global e consistente, retornando respostas JSON bem formatadas para os clientes da API.

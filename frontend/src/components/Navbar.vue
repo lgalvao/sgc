@@ -87,7 +87,7 @@
                 :key="perfil.id"
                 :value="perfil.id"
               >
-                {{ perfil.perfil }} - {{ perfil.unidade }} ({{ perfil.nome }})
+                {{ perfil.perfil }} - {{ perfil.unidade.sigla }} ({{ perfil.nome }})
               </option>
             </select>
           </li>
@@ -122,67 +122,66 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {usePerfilStore} from '@/stores/perfil'
-import {useServidoresStore} from '@/stores/servidores'
-import {usePerfil} from '@/composables/usePerfil'
+import {computed, nextTick, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {usePerfilStore} from '@/stores/perfil';
+import {useServidoresStore} from '@/stores/servidores';
+import {usePerfil} from '@/composables/usePerfil';
 
-const router = useRouter()
-const perfilStore = usePerfilStore()
-const servidoresStore = useServidoresStore()
+const router = useRouter();
+const perfilStore = usePerfilStore();
+const servidoresStore = useServidoresStore();
 
-const {servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor} = usePerfil()
+const {servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor} = usePerfil();
 
-const isEditingProfile = ref(false)
-const profileSelect = ref<HTMLSelectElement | null>(null)
+const isEditingProfile = ref(false);
+const profileSelect = ref<HTMLSelectElement | null>(null);
 
 const perfisDisponiveis = computed(() => {
   return servidoresStore.servidores.flatMap(servidor => {
-    const pares = getPerfisDoServidor(servidor.id)
+    const pares = getPerfisDoServidor(Number(servidor.codigo));
     return pares.map(par => ({
-      id: `${servidor.id}-${par.perfil}-${par.unidade}`,
-      servidorId: servidor.id,
+      id: `${servidor.codigo}-${par.perfil}-${par.unidade.sigla}`,
+      servidorId: servidor.codigo,
       nome: servidor.nome,
       perfil: par.perfil,
       unidade: par.unidade,
-    }))
-  })
-})
+    }));
+  });
+});
 
 const selectedProfileKey = computed(() => {
-  if (!servidorLogado.value || !perfilSelecionado.value || !unidadeSelecionada.value) return ''
-  return `${perfilStore.servidorId}-${perfilSelecionado.value}-${unidadeSelecionada.value}`
-})
+  if (!servidorLogado.value || !perfilSelecionado.value || !unidadeSelecionada.value) return '';
+  return `${perfilStore.servidorId}-${perfilSelecionado.value}-${unidadeSelecionada.value}`;
+});
 
 const startEditingProfile = () => {
-  isEditingProfile.value = true
+  isEditingProfile.value = true;
   nextTick(() => {
-    profileSelect.value?.focus()
-  })
-}
+    profileSelect.value?.focus();
+  });
+};
 
 const stopEditingProfile = () => {
-  isEditingProfile.value = false
-}
+  isEditingProfile.value = false;
+};
 
 const handleProfileChange = (event: Event) => {
-  const selectedKey = (event.target as HTMLSelectElement).value
-  const selectedPerfil = perfisDisponiveis.value.find(p => p.id === selectedKey)
+  const selectedKey = (event.target as HTMLSelectElement).value;
+  const selectedPerfil = perfisDisponiveis.value.find(p => p.id === selectedKey);
 
   if (selectedPerfil) {
-    perfilStore.setServidorId(selectedPerfil.servidorId)
-    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade)
-    router.push('/painel')
+    perfilStore.setServidorId(selectedPerfil.servidorId);
+    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade.codigo);
+    router.push('/painel');
   }
-  stopEditingProfile()
-}
+  stopEditingProfile();
+};
 
 function navigateFromNavbar(path: string) {
-  sessionStorage.setItem('cameFromNavbar', '1')
-  router.push(path)
+  sessionStorage.setItem('cameFromNavbar', '1');
+  router.push(path);
 }
-
 </script>
 
 <style scoped>

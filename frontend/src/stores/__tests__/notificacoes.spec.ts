@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {initPinia} from '@/test/helpers';
+import {initPinia} from '@/test-utils/helpers';
 import {type TipoNotificacao, useNotificacoesStore} from '../notificacoes';
 
 describe('useNotificacoesStore', () => {

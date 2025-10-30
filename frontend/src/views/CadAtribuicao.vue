@@ -27,8 +27,8 @@
               </option>
               <option
                 v-for="servidor in servidoresElegiveis"
-                :key="servidor.id"
-                :value="servidor.id"
+                :key="servidor.codigo"
+                :value="servidor.codigo"
               >
                 {{ servidor.nome }}
               </option>
@@ -103,7 +103,7 @@ import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import servidoresMock from '@/mocks/servidores.json'
+import {useServidoresStore} from "@/stores/servidores";
 import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
 
 const props = defineProps<{ sigla: string }>()
@@ -113,6 +113,7 @@ const sigla = computed(() => props.sigla)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
+const servidoresStore = useServidoresStore()
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
@@ -128,7 +129,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
 const atribuicoes = computed<AtribuicaoTemporaria[]>(() =>
     atribuicaoStore.atribuicoes
-        ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade === sigla.value)
+        ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade.sigla === sigla.value)
         : []
 )
 
@@ -138,17 +139,17 @@ const justificativa = ref("")
 const sucesso = ref(false)
 const erroServidor = ref("")
 
-const servidores = ref<Servidor[]>(servidoresMock as Servidor[])
+const servidores = computed(() => servidoresStore.servidores);
 
 const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade === sigla.value)
+  return servidores.value.filter(s => s.unidade?.sigla === sigla.value)
 })
 
 const servidoresElegiveis = computed<Servidor[]>(() => {
   const titularId = unidade.value?.idServidorTitular
   return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.idServidor === servidor.id)
-    return servidor.id !== titularId && !jaTemAtribuicao
+    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === servidor.codigo)
+    return servidor.codigo !== titularId && !jaTemAtribuicao
   })
 })
 
@@ -159,16 +160,18 @@ function criarAtribuicao() {
     return
   }
 
-  if (atribuicoes.value.some(a => a.idServidor === servidorSelecionado.value)) {
+  if (atribuicoes.value.some(a => a.servidor.codigo === servidorSelecionado.value)) {
     erroServidor.value = "Este servidor já possui atribuição temporária nesta unidade."
     return
   }
   atribuicaoStore.criarAtribuicao({
-    unidade: sigla.value,
-    idServidor: servidorSelecionado.value,
-    dataInicio: new Date(),
-    dataTermino: new Date(dataTermino.value),
-    justificativa: justificativa.value
+    unidade: unidade.value as Unidade,
+    servidor: servidores.value.find(s => s.codigo === servidorSelecionado.value) as Servidor,
+    dataInicio: new Date().toISOString(),
+    dataFim: new Date(dataTermino.value).toISOString(),
+    dataTermino: new Date(dataTermino.value).toISOString(),
+    justificativa: justificativa.value,
+    codigo: 0
   })
   sucesso.value = true
   router.push(`/unidade/${sigla.value}`)

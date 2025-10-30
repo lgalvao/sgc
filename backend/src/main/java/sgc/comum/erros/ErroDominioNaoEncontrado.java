@@ -8,4 +8,8 @@ public class ErroDominioNaoEncontrado extends RuntimeException {
     public ErroDominioNaoEncontrado(String message) {
         super(message);
     }
+
+    public ErroDominioNaoEncontrado(String entidade, Object id) {
+        super("'%s' com codigo '%s' não encontrado(a).".formatted(entidade, id));
+    }
 }

@@ -23,14 +23,6 @@
             <span v-if="criterioOrdenacao === 'tipo'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
           </th>
           <th
-            data-testid="coluna-unidades"
-            style="cursor:pointer"
-            @click="emit('ordenar', 'unidades')"
-          >
-            Unidades participantes
-            <span v-if="criterioOrdenacao === 'unidades'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
             v-if="showDataFinalizacao"
             data-testid="coluna-data-finalizacao"
             style="cursor:pointer"
@@ -52,7 +44,8 @@
       <tbody>
         <tr
           v-for="processo in processos"
-          :key="processo.id"
+          :key="processo.codigo"
+          :data-testid="`processo-row-${processo.codigo}`"
           class="clickable-row"
           style="cursor:pointer;"
           @click="emit('selecionarProcesso', processo)"
@@ -61,9 +54,8 @@
             {{ processo.descricao }}
           </td>
           <td>{{ processo.tipo }}</td>
-          <td>{{ processo.unidadesFormatadas }}</td>
           <td v-if="showDataFinalizacao">
-            {{ processo.dataFinalizacaoFormatada }}
+            {{ (processo as any).dataFinalizacaoFormatada }}
           </td>
           <td>{{ processo.situacao }}</td>
         </tr>
@@ -73,17 +65,17 @@
 </template>
 
 <script lang="ts" setup>
-import {Processo} from '@/types/tipos';
+import {ProcessoResumo} from '@/types/tipos';
 
 defineProps<{
-  processos: (Processo & { unidadesFormatadas: string, dataFinalizacaoFormatada?: string | null })[];
-  criterioOrdenacao: keyof Processo | 'unidades' | 'dataFinalizacao';
+  processos: ProcessoResumo[];
+  criterioOrdenacao: keyof ProcessoResumo | 'dataFinalizacao';
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', campo: keyof Processo | 'unidades' | 'dataFinalizacao'): void;
-  (e: 'selecionarProcesso', processo: Processo): void;
+  (e: 'ordenar', campo: keyof ProcessoResumo | 'dataFinalizacao'): void;
+  (e: 'selecionarProcesso', processo: ProcessoResumo): void;
 }>();
 </script>

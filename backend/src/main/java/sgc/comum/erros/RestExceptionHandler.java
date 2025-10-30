@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.lang.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,11 +25,8 @@ import java.util.stream.Collectors;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
-    private String sanitize(String untrustedText) {
-        if (untrustedText == null) {
-            return null;
-        }
-        return SANITIZER_POLICY.sanitize(untrustedText);
+    private String sanitizar(String texto) {
+        return texto == null ? null : SANITIZER_POLICY.sanitize(texto);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErroApi erroApi) {
@@ -35,29 +34,29 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        @Nullable HttpMessageNotReadableException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
         String error = "Requisição JSON malformada";
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }
 
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-        MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        log.warn("Erro de validação de argumento de método: {}", ex.getMessage());
+        @Nullable MethodArgumentNotValidException ex, @Nullable HttpHeaders headers, @Nullable HttpStatusCode status, @Nullable WebRequest request) {
+        log.warn("Erro de validação de argumento de método: {}", ex != null ? ex.getMessage() : null);
         String message = "A requisição contém dados de entrada inválidos.";
-        var subErrors = ex.getBindingResult().getFieldErrors().stream()
-            .map(error -> new ErroSubApi(
-                error.getObjectName(),
-                error.getField(),
-                error.getRejectedValue(),
-                sanitize(error.getDefaultMessage())))
-            .collect(Collectors.toList());
+        var subErrors = ex != null ? ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new ErroSubApi(
+                        error.getObjectName(),
+                        error.getField(),
+                        error.getRejectedValue(),
+                        sanitizar(error.getDefaultMessage())))
+                .collect(Collectors.toList()) : null;
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
     @ExceptionHandler(ErroValidacao.class)
     protected ResponseEntity<Object> handleErroValidacao(ErroValidacao ex) {
         log.warn("Erro de validação de negócio: {}", ex.getMessage());
-        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage()));
+        ErroApi erroApi = new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage()));
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
         }
@@ -73,25 +72,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 violation.getRootBeanClass().getSimpleName(),
                 violation.getPropertyPath().toString(),
                 violation.getInvalidValue(),
-                sanitize(violation.getMessage())))
+                sanitizar(violation.getMessage())))
             .collect(Collectors.toList());
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
-    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
-    protected ResponseEntity<Object> handleErroEntidadeNaoEncontrada(ErroEntidadeNaoEncontrada ex) {
+    @ExceptionHandler(ErroDominioNaoEncontrado.class)
+    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(ErroDominioAccessoNegado.class)
     protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
         log.warn("Acesso negado: {}", ex.getMessage());
-        return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitizar(ex.getMessage())));
     }
 
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    protected ResponseEntity<Object> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Acesso negado via Spring Security: {}", ex.getMessage());
         ErroApi erroApi = new ErroApi(HttpStatus.FORBIDDEN, "Acesso negado.");
         return buildResponseEntity(erroApi);
@@ -114,7 +113,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ErroProcesso.class)
     protected ResponseEntity<Object> handleErroProcesso(ErroProcesso ex) {
         log.error("Erro de negócio no processo: {}", ex.getMessage(), ex);
-        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitize(ex.getMessage())));
+        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroNegocio.class)
+    protected ResponseEntity<Object> handleErroNegocio(ErroNegocio ex) {
+        log.warn("Erro de negócio: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)

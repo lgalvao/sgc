@@ -1,149 +1,114 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
 ## Visão Geral
-Este diretório contém todo o código-fonte do backend do SGC, uma aplicação Spring Boot desenvolvida em Java 21. A aplicação é responsável por gerenciar o mapeamento de competências, orquestrar os fluxos de trabalho associados e fornecer uma API REST para o frontend.
+Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST modular para ser consumida pelo frontend. A arquitetura é organizada em pacotes que representam domínios de negócio específicos, promovendo alta coesão e baixo acoplamento. A comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio, o que garante a separação de responsabilidades.
 
-A arquitetura é modular e orientada a domínios, com cada pacote principal representando uma área de negócio específica. A comunicação entre os módulos é, em grande parte, orientada a eventos, promovendo baixo acoplamento e alta coesão.
+## Diagrama de Arquitetura
+O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências principais entre os pacotes.
 
-## Diagrama de Arquitetura Geral
 ```mermaid
 graph TD
-    subgraph "Orquestração e Workflow"
-        P(processo)
-        SP(subprocesso)
+    subgraph "1. Frontend (Cliente)"
+        Frontend[Aplicação Vue.js]
     end
 
-    subgraph "Domínio Principal"
-        M(mapa)
-        A(atividade)
-        C(competencia)
-        K(conhecimento)
+    subgraph "2. Camada de API"
+        API[Controladores REST]
     end
 
-    subgraph "Comunicação"
-        AL(alerta)
-        N(notificacao)
+    subgraph "3. Camada de Serviço"
+        Servico[Serviços de Negócio]
+        Processo[Processo Orquestrador]
     end
 
-    subgraph "Infraestrutura e Suporte"
-        S(sgrh)
-        U(unidade)
-        CM(comum)
+    subgraph "4. Camada de Domínio e Dados"
+        Dominio[Entidades JPA & Repositórios]
+        IntegracaoRH[SGRH & Unidade]
     end
 
-    subgraph "Auditoria e Análise"
-        AN(analise)
+    subgraph "5. Módulos Reativos & Suporte"
+        Eventos[Eventos de Domínio]
+        Notificacao[Notificação]
+        Alerta[Alerta]
+        Comum[Comum Utilitários]
     end
 
-    P -- Cria e gerencia --> SP
-    SP -- Trabalha em --> M
-    SP -- É revisado por --> AN
+    Frontend --> API
+    API --> Servico
+    Servico --> Dominio
 
-    M -- Composto por --> A
-    M -- Composto por --> C
-    C -- Associado a --> A
-    A -- Requer --> K
+    Processo -- Publica --> Eventos
+    Eventos --> Notificacao
+    Eventos --> Alerta
 
-    P -- Dispara eventos para --> AL
-    P -- Dispara eventos para --> N
+    IntegracaoRH -- Popula Dados --> Dominio
 
-    P -- Usa dados de --> U
-    SP -- Usa dados de --> U
-    AL -- Usa dados de --> U
-    AN -- Associada a --> U
-
-    U -- Populado por --> S
-    AL -- Usa --> S
-    AN -- Realizada por --> S
-
-    CM -- Suporte para Todos --> P
-    CM -- Suporte para Todos --> SP
-    CM -- Suporte para Todos --> M
-    CM -- Suporte para Todos --> AL
-    CM -- Suporte para Todos --> N
-    CM -- Suporte para Todos --> S
-    CM -- Suporte para Todos --> AN
+    Comum -- Suporte Geral --> Servico & Dominio & Notificacao & Alerta
 ```
 
-## Arquitetura e Módulos Principais
+## Módulos Principais (`src/main/java/sgc/`)
 
-O backend está organizado nos seguintes pacotes principais, localizados em `src/main/java/sgc/`:
+### 1. `processo` (Orquestrador)
+- **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros módulos, mantendo o sistema desacoplado.
 
-### 1. `comum`
-- **Responsabilidade:** Contém classes e configurações transversais utilizadas por toda a aplicação.
-- **Componentes Notáveis:**
-  - `EntidadeBase`: Superclasse para entidades JPA com ID padronizado.
-  - `RestExceptionHandler`: Tratamento global de exceções para a API REST.
-  - `config/`: Configurações do Spring (CORS, datasources, etc.).
-  - `erros/`: Hierarquia de exceções customizadas.
+### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
+- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoCadastroControle` (ações de workflow da etapa de cadastro), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (ações de workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
 
-### 2. `unidade`
-- **Responsabilidade:** Define o modelo de dados da estrutura organizacional.
-- **Componentes Notáveis:**
-  - `Unidade.java`: Entidade que representa uma unidade organizacional (secretaria, seção, etc.).
-  - **Nota:** Este pacote não possui lógica de negócio; ele é a "fonte da verdade" dos dados organizacionais, que são gerenciados por outros serviços.
+### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
+- **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
+- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências.
+- **`competencia`:** Define as competências que compõem um mapa.
+- **`atividade`:** Define as atividades associadas às competências. Este módulo também é responsável por gerenciar os **conhecimentos** vinculados a cada atividade.
 
-### 3. `sgrh`
-- **Responsabilidade:** Camada de integração com o sistema de RH (SGRH).
-- **Componentes Notáveis:**
-  - `SgrhService.java`: Serviço que consulta dados de usuários e unidades.
-  - **Status Atual:** Utiliza dados **simulados (mock)** e está pronto para ser conectado a um banco de dados Oracle real.
+### 4. `analise` (Auditoria e Revisão)
+- **Responsabilidade:** Registra o histórico de todas as análises de "cadastro" e "validação" realizadas sobre um subprocesso, fornecendo uma trilha de auditoria das revisões.
 
-### 4. `processo`
-- **Responsabilidade:** O orquestrador central dos fluxos de trabalho.
-- **Componentes Notáveis:**
-  - `ProcessoService.java`: Gerencia o ciclo de vida de processos de alto nível (ex: "Mapeamento Anual").
-  - `eventos/`: Publica eventos de domínio (ex: `ProcessoIniciadoEvento`) para desacoplar a comunicação com outros módulos.
+### 5. `notificacao` e `alerta` (Comunicação Reativa)
+- **Responsabilidade:** Módulos reativos que "escutam" os eventos de domínio publicados pelo `processo`.
+- **`alerta`:** Cria alertas visíveis dentro da interface do sistema.
+- **`notificacao`:** Envia notificações externas (como e-mails) de forma assíncrona.
 
-### 5. `subprocesso`
-- **Responsabilidade:** O motor do workflow para cada unidade individual.
-- **Componentes Notáveis:**
-  - `SubprocessoService.java`: Funciona como uma **state machine**, gerenciando as transições de estado de cada tarefa (ex: de `PENDENTE_CADASTRO` para `CADASTRO_DISPONIBILIZADO`).
-  - `Movimentacao.java`: Entidade que cria uma trilha de auditoria imutável para cada ação no subprocesso.
+### 6. `sgrh` e `unidade` (Estrutura e Integração)
+- **Responsabilidade:** Fornecem os dados sobre a estrutura organizacional e os usuários.
+- **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica de negócio.
+- **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar dados de um sistema de RH externo (atualmente simulado).
 
-### 6. `analise`
-- **Responsabilidade:** Gerencia o processo de revisão e validação dos subprocessos.
-- **Componentes Notáveis:**
-  - `AnaliseService.java`: Orquestra as análises de cadastro e validação, registrando o histórico de ações.
-  - `Analise.java`: Entidade que representa uma única etapa de análise (ex: uma devolução para ajuste).
-
-### 7. `mapa`
-- **Responsabilidade:** Gerencia o artefato "Mapa de Competências".
-- **Componentes Notáveis:**
-  - `MapaService.java`: Orquestra operações complexas e transacionais de salvamento do mapa.
-  - `ImpactoMapaService.java`: Analisa as diferenças entre versões de um mapa.
-  - `CopiaMapaService.java`: Clona mapas existentes.
-
-### 8. `atividade`, `conhecimento`, `competencia`
-- **Responsabilidade:** Gerenciam as entidades de base que compõem um mapa.
-- **Componentes Notáveis:**
-  - `Atividade.java`: Uma tarefa ou atribuição.
-  - `Conhecimento.java`: Uma habilidade necessária para uma atividade.
-  - `Competencia.java`: Um agrupamento de conhecimentos e atividades.
-
-### 9. `alerta` e `notificacao`
-- **Responsabilidade:** Módulos reativos que lidam com a comunicação com o usuário.
-- **Componentes Notáveis:**
-  - `EventoProcessoListener`: "Escuta" os eventos publicados pelo `ProcessoService`.
-  - `AlertaService.java`: Cria alertas dentro do sistema.
-  - `NotificacaoServicoImpl.java`: Envia e-mails de forma assíncrona, com retentativas.
+### 7. `comum`, `config` e `util` (Componentes Transversais)
+- **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
+- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro, a `EntidadeBase` para entidades JPA e a lógica do `Painel`.
+- **`config`**: Fornece classes de configuração do Spring, como `SecurityConfig` e `ThymeleafConfig`.
+- **`util`**: Contém classes de utilidade, como `HtmlUtils`.
 
 ## Como Construir e Executar
-Para construir o projeto e rodar os testes, utilize o Gradle Wrapper:
+Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da raiz do repositório:
 ```bash
-# A partir da raiz do repositório
 ./gradlew :backend:build
 ```
 
-Para executar a aplicação:
+Para executar a aplicação em modo de desenvolvimento (utilizando o banco de dados em memória H2), ative o perfil `local`:
+
 ```bash
-./gradlew :backend:bootRun
+./gradlew :backend:bootRun --args='--spring.profiles.active=local'
 ```
-A API estará disponível em `http://localhost:8080`.
+
+Para executar o processo em segundo plano e liberar o terminal, adicione `&` ao final do comando:
+
+```bash
+./gradlew :backend:bootRun --args='--spring.profiles.active=local' &
+```
+
+A API estará disponível em `http://localhost:10000`.
+
+## Documentação da API (Swagger UI)
+A documentação da API é gerada automaticamente com SpringDoc e está acessível em:
+[http://localhost:10000/swagger-ui.html](http://localhost:10000/swagger-ui.html)
+
+A especificação OpenAPI em formato JSON pode ser encontrada em:
+[http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
 ## Padrões de Design e Boas Práticas
-- **Injeção de Dependência:** Utilizada extensivamente pelo Spring Framework.
-- **DTO (Data Transfer Object):** Usado em toda a camada de controle para desacoplar a API das entidades JPA.
+- **Injeção de Dependências:** Utilizada extensivamente pelo Spring Framework.
+- **DTOs (Data Transfer Objects):** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.

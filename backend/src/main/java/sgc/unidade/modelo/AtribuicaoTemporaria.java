@@ -6,10 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+/**
+ * Representa a atribuição temporária de um usuário a uma unidade,
+ * por exemplo, para cobrir férias ou licenças.
+ */
 @Entity
 @Table(name = "ATRIBUICAO_TEMPORARIA", schema = "sgc")
 @Getter
@@ -26,10 +30,10 @@ public class AtribuicaoTemporaria extends EntidadeBase {
     private Usuario usuario;
 
     @Column(name = "data_inicio")
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
     @Column(name = "data_termino")
-    private LocalDate dataTermino;
+    private LocalDateTime dataTermino;
 
     @Column(name = "justificativa", length = 500)
     private String justificativa;

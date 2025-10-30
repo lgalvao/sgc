@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -23,19 +23,20 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,17 +50,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import(sgc.integracao.mocks.TestSecurityConfig.class)
 class CDU11IntegrationTest {
-    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{id}/cadastro";
+    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{codigo}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
-    private static final String ADMIN_ROLE = "ADMIN";
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    // Repositories
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired
@@ -85,13 +80,14 @@ class CDU11IntegrationTest {
         // Unidade e Chefe
         unidade = new Unidade("Unidade Teste", "UT");
         var chefe = new Usuario();
-        chefe.setTitulo("chefe_ut");
+        chefe.setTituloEleitoral(111122223333L);
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
         // Processo
-        processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processo);
 
         // Mapa e Subprocesso
@@ -118,7 +114,7 @@ class CDU11IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockChefe("chefe_ut")
+        @WithMockChefe("111122223333")
         @DisplayName("Deve retornar o cadastro completo de atividades e conhecimentos para o Chefe da unidade")
         void deveRetornarCadastroCompleto_QuandoChefeDaUnidade() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))

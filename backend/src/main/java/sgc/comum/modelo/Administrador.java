@@ -5,10 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
 import java.io.Serializable;
 
+/**
+ * Representa um administrador do sistema.
+ * <p>
+ * A entidade Administrador estende as informações de um {@link Usuario},
+ * marcando-o com privilégios de administrador no sistema SGC.
+ */
 @Entity
 @Table(name = "ADMINISTRADOR", schema = "sgc")
 @Getter

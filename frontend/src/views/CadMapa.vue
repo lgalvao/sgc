@@ -21,7 +21,7 @@
           :disabled="competencias.length === 0"
           class="btn btn-outline-success"
           data-testid="btn-disponibilizar-page"
-          @click="finalizarEdicao"
+          @click="abrirModalDisponibilizar"
         >
           Disponibilizar
         </button>
@@ -40,7 +40,7 @@
 
         <div
           v-for="comp in competencias"
-          :key="comp.id"
+          :key="comp.codigo"
           class="card mb-2 competencia-card"
           data-testid="competencia-item"
         >
@@ -67,7 +67,7 @@
                   data-bs-toggle="tooltip"
                   data-testid="btn-excluir-competencia"
                   title="Excluir"
-                  @click="excluirCompetencia(comp.id)"
+                  @click="excluirCompetencia(comp.codigo)"
                 >
                   <i class="bi bi-trash" />
                 </button>
@@ -99,7 +99,7 @@
                     class="btn btn-sm btn-outline-secondary botao-acao-inline"
                     data-bs-toggle="tooltip"
                     title="Remover Atividade"
-                    @click="removerAtividadeAssociada(comp.id, atvId)"
+                    @click="removerAtividadeAssociada(comp.codigo, atvId)"
                   >
                     <i class="bi bi-trash" />
                   </button>
@@ -160,17 +160,17 @@
               <div class="d-flex flex-wrap gap-2">
                 <div
                   v-for="atividade in atividades"
-                  :key="atividade.id"
-                  :class="{ checked: atividadesSelecionadas.includes(atividade.id) }"
+                  :key="atividade.codigo"
+                  :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
                   class="card atividade-card-item"
-                  :data-testid="atividadesSelecionadas.includes(atividade.id) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.id)"
+                  :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
+                  @click="toggleAtividade(atividade.codigo)"
                 >
                   <div class="card-body d-flex align-items-center">
                     <input
-                      :id="`atv-${atividade.id}`"
+                      :id="`atv-${atividade.codigo}`"
                       v-model="atividadesSelecionadas"
-                      :value="atividade.id"
+                      :value="atividade.codigo"
                       class="form-check-input me-2"
                       data-testid="atividade-checkbox"
                       hidden
@@ -382,7 +382,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
@@ -392,41 +392,38 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {useAlertasStore} from '@/stores/alertas'
-import {Atividade, Competencia, Perfil, Subprocesso, Unidade} from '@/types/tipos'
+import { usePerfil } from '@/composables/usePerfil'
+import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade, Servidor, Subprocesso} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 const route = useRoute()
 const mapasStore = useMapasStore()
-const {mapas} = storeToRefs(mapasStore)
+const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
 const notificacoesStore = useNotificacoesStore()
 const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const unidadesStore = useUnidadesStore()
-const alertasStore = useAlertasStore()
 const {unidades} = storeToRefs(unidadesStore)
+const { servidorLogado } = usePerfil()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
-  if (!idProcesso.value || !siglaUnidade.value) return null;
-  return (processosStore.subprocessos as Subprocesso[]).find(
-      (pu) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === siglaUnidade.value);
 });
 
 const podeVerImpacto = computed(() => {
   if (!perfilStore.perfilSelecionado || !subprocesso.value) return false;
 
   const perfil = perfilStore.perfilSelecionado;
-  const situacao = subprocesso.value.situacao;
+  const situacao = subprocesso.value.situacaoSubprocesso;
 
   const isPermittedProfile = perfil === Perfil.ADMIN;
-  const isCorrectSituation = situacao === SITUACOES_SUBPROCESSO.REVISAO_CADASTRO_HOMOLOGADA || situacao === SITUACOES_SUBPROCESSO.MAPA_AJUSTADO;
+  const isCorrectSituation = situacao === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS || situacao === SituacaoSubprocesso.MAPA_AJUSTADO;
 
   return isPermittedProfile && isCorrectSituation;
 });
@@ -462,35 +459,39 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
-const idSubprocesso = computed(() => {
-  const Subprocesso = processosStore.subprocessos.find(
-      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
-  return Subprocesso?.id;
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  if (codSubrocesso.value) {
+    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
+  }
+  // Inicializar tooltips após o componente ser montado
+  import('bootstrap').then(({Tooltip}) => {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipTriggerList.forEach(tooltipTriggerEl => {
+      new Tooltip(tooltipTriggerEl)
+    })
+  })
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
-const mapa = computed(() => mapas.value.find(m => m.unidade === siglaUnidade.value && m.idProcesso === idProcesso.value))
-const competencias = ref<Competencia[]>([])
-watch(mapa, (novoMapa) => {
-  if (novoMapa) {
-    competencias.value = [...novoMapa.competencias];
-  }
-}, {immediate: true});
+
+const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
-function toggleAtividade(id: number) {
-  const index = atividadesSelecionadas.value.indexOf(id);
+function toggleAtividade(codigo: number) {
+  const index = atividadesSelecionadas.value.indexOf(codigo);
   if (index > -1) {
     atividadesSelecionadas.value.splice(index, 1);
   } else {
-    atividadesSelecionadas.value.push(id);
+    atividadesSelecionadas.value.push(codigo);
   }
 }
 
@@ -505,6 +506,10 @@ const competenciaParaExcluir = ref<Competencia | null>(null)
 const dataLimiteValidacao = ref('')
 const observacoesDisponibilizacao = ref('')
 const notificacaoDisponibilizacao = ref('')
+
+function abrirModalDisponibilizar() {
+  mostrarModalDisponibilizar.value = true;
+}
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
@@ -540,13 +545,13 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 
-function descricaoAtividade(id: number): string {
-  const atv = atividades.value.find(a => a.id === id)
+function descricaoAtividade(codigo: number): string {
+  const atv = atividades.value.find(a => a.codigo === codigo)
   return atv ? atv.descricao : 'Atividade não encontrada'
 }
 
 function getConhecimentosTooltip(atividadeId: number): string {
-  const atividade = atividades.value.find(a => a.id === atividadeId)
+  const atividade = atividades.value.find(a => a.codigo === atividadeId)
   if (!atividade || !atividade.conhecimentos.length) {
     return 'Nenhum conhecimento cadastrado'
   }
@@ -558,8 +563,8 @@ function getConhecimentosTooltip(atividadeId: number): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }
 
-function getAtividadeCompleta(id: number): Atividade | undefined {
-  return atividades.value.find(a => a.id === id)
+function getAtividadeCompleta(codigo: number): Atividade | undefined {
+  return atividades.value.find(a => a.codigo === codigo)
 }
 
 function getConhecimentosModal(atividade: Atividade): string {
@@ -574,84 +579,31 @@ function getConhecimentosModal(atividade: Atividade): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }
 
-function adicionarOuAtualizarCompetencia() {
+function adicionarCompetenciaEFecharModal() {
   if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
 
+  const competencia: Competencia = {
+    codigo: competenciaSendoEditada.value?.codigo || 0,
+    descricao: novaCompetencia.value.descricao,
+    atividadesAssociadas: atividadesSelecionadas.value,
+  };
+
   if (competenciaSendoEditada.value) {
-    const index = competencias.value.findIndex(c => c.id === competenciaSendoEditada.value!.id);
-    if (index !== -1) {
-      competencias.value[index].descricao = novaCompetencia.value.descricao;
-      competencias.value[index].atividadesAssociadas = [...atividadesSelecionadas.value];
-    }
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
   } else {
-    competencias.value.push({
-      id: Date.now(),
-      descricao: novaCompetencia.value.descricao,
-      atividadesAssociadas: [...atividadesSelecionadas.value]
-    });
+    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
   }
 
-  // Persistir as mudanças no mapaStore
-  if (mapa.value) {
-    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
-  } else {
-    // Se não houver mapa, cria um novo.
-    const novoMapa = {
-      id: Date.now(),
-      unidade: siglaUnidade.value,
-      idProcesso: idProcesso.value,
-      competencias: competencias.value,
-      situacao: 'em_andamento',
-      dataCriacao: new Date(),
-      dataDisponibilizacao: null,
-      dataFinalizacao: null,
-    };
-    mapas.value.push(novoMapa);
-    mapasStore.adicionarMapa(novoMapa);
-  }
-  
-  // 10. Se a situação do subprocesso ainda for 'Cadastro homologado', alterar para 'Mapa criado'
-  if (subprocesso.value && subprocesso.value.situacao === 'Cadastro homologado') {
-    const subprocessoIndex = processosStore.subprocessos.findIndex(pu => pu.id === subprocesso.value!.id);
-    if (subprocessoIndex !== -1) {
-      processosStore.subprocessos[subprocessoIndex].situacao = 'Mapa criado';
-    }
-  }
-
+  // Limpar formulário
   novaCompetencia.value.descricao = '';
   atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
-}
 
-function adicionarCompetenciaEFecharModal() {
-  adicionarOuAtualizarCompetencia();
   fecharModalCriarNovaCompetencia();
 }
 
-function finalizarEdicao() {
-  if (mapa.value) {
-    mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value})
-  } else {
-    const novoMapa = {
-      id: Date.now(),
-      unidade: siglaUnidade.value,
-      idProcesso: idProcesso.value,
-      competencias: competencias.value,
-      situacao: 'em_andamento',
-      dataCriacao: new Date(),
-      dataDisponibilizacao: null,
-      dataFinalizacao: null,
-    };
-    mapas.value.push(novoMapa);
-  }
-  mostrarModalDisponibilizar.value = true;
-  dataLimiteValidacao.value = '';
-  observacoesDisponibilizacao.value = '';
-  notificacaoDisponibilizacao.value = '';
-}
-
-function excluirCompetencia(id: number) {
-  const competencia = competencias.value.find(comp => comp.id === id);
+function excluirCompetencia(codigo: number) {
+  const competencia = competencias.value.find(comp => comp.codigo === codigo);
   if (competencia) {
     competenciaParaExcluir.value = competencia;
     mostrarModalExcluirCompetencia.value = true;
@@ -660,10 +612,7 @@ function excluirCompetencia(id: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    competencias.value = competencias.value.filter(comp => comp.id !== competenciaParaExcluir.value!.id);
-    if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
-    }
+    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
     fecharModalExcluirCompetencia();
   }
 }
@@ -674,13 +623,13 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competenciaIndex = competencias.value.findIndex(comp => comp.id === competenciaId);
-  if (competenciaIndex !== -1) {
-    const competencia = competencias.value[competenciaIndex];
-    competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter(id => id !== atividadeId);
-    if (mapa.value) {
-      mapasStore.editarMapa(mapa.value.id, {competencias: competencias.value});
-    }
+  const competencia = competencias.value.find(comp => comp.codigo === competenciaId);
+  if (competencia) {
+    const competenciaAtualizada = {
+      ...competencia,
+      atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
+    };
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
   }
 }
 
@@ -691,23 +640,22 @@ function formatarData(data: string): string {
 }
 
 function disponibilizarMapa() {
-  if (!mapa.value || !unidade.value) {
+  if (!mapaCompleto.value || !unidade.value) {
     notificacaoDisponibilizacao.value = 'Erro: Mapa ou unidade não encontrados.'
     return
   }
 
-  const currentMapa = mapa.value;
   const currentUnidade = unidade.value;
 
   // Validações conforme plano
-  const competenciasSemAtividades = competencias.value.filter(comp => comp.atividadesAssociadas.length === 0);
+  const competenciasSemAtividades = mapaCompleto.value.competencias.filter(comp => comp.atividadesAssociadas.length === 0);
   if (competenciasSemAtividades.length > 0) {
     notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
     return;
   }
 
-  const atividadesIds = atividades.value.map(a => a.id);
-  const atividadesAssociadas = competencias.value.flatMap(comp => comp.atividadesAssociadas);
+  const atividadesIds = atividades.value.map(a => a.codigo);
+  const atividadesAssociadas = mapaCompleto.value.competencias.flatMap(comp => comp.atividadesAssociadas);
   const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
 
   if (atividadesNaoAssociadas.length > 0) {
@@ -717,30 +665,38 @@ function disponibilizarMapa() {
   }
 
   // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
-  const subprocesso = processosStore.subprocessos.find(
-      pu => pu.idProcesso === idProcesso.value && pu.unidade === siglaUnidade.value
-  );
-  if (subprocesso) {
-    subprocesso.situacao = SITUACOES_SUBPROCESSO.MAPA_DISPONIBILIZADO;
-    subprocesso.dataLimiteEtapa2 = new Date(dataLimiteValidacao.value);
+  const sub = subprocesso.value;
+  if (sub) {
+    sub.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO;
+    sub.dataLimite = dataLimiteValidacao.value;
     if (observacoesDisponibilizacao.value) {
-      subprocesso.observacoes = observacoesDisponibilizacao.value;
+      // O DTO não tem mais um campo de observações direto, isso precisaria ser tratado
+      // em uma movimentação ou em um campo específico se existir no backend.
     }
 
     // Registrar movimentação
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: currentUnidade
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...sub,
+      codigo: sub.codSubprocesso,
+      unidade: currentUnidade,
+      situacao: sub.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
     processosStore.addMovement({
-      idSubprocesso: subprocesso.id,
-      unidadeOrigem: 'SEDOC',
-      unidadeDestino: siglaUnidade.value,
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
+      unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
+      unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'
     });
   }
 
-  // Atualizar mapa
-  mapasStore.editarMapa(currentMapa.id, {
-    situacao: 'disponivel_validacao',
-    dataDisponibilizacao: new Date(),
-  });
 
   // Simular notificações por e-mail
   const notificacoesStore = useNotificacoesStore();
@@ -757,20 +713,10 @@ function disponibilizarMapa() {
       `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
   );
 
-  // Criar alerta interno (CDU-17 item 18)
-  alertasStore.criarAlerta({
-    descricao: `Mapa de competências da unidade ${currentUnidade.sigla} disponibilizado para análise`,
-    idProcesso: idProcesso.value,
-    dataHora: new Date(),
-    unidadeOrigem: 'SEDOC',
-    unidadeDestino: currentUnidade.sigla
-  });
+  // A criação de alertas agora é responsabilidade do backend
 
   // Excluir sugestões e histórico de análise (CDU-17 item 19)
-  if (subprocesso) {
-    subprocesso.sugestoes = '';
-    subprocesso.analises = [];
-  }
+  // A ser implementado no backend
 
   notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
 

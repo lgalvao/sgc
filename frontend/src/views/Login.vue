@@ -59,7 +59,7 @@
           </div>
 
           <div
-            v-if="loginStep === 2 && paresDisponiveis.length > 1"
+            v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
             class="mb-3"
             data-testid="secao-perfil-unidade"
           >
@@ -75,11 +75,11 @@
               data-testid="select-perfil-unidade"
             >
               <option
-                v-for="par in paresDisponiveis"
-                :key="par.perfil + par.unidade"
+                v-for="par in perfilStore.perfisUnidades"
+                :key="par.perfil + par.unidade.sigla"
                 :value="par"
               >
-                {{ par.perfil }} - {{ par.unidade }}
+                {{ par.perfil }} - {{ par.unidade.sigla }}
               </option>
             </select>
           </div>
@@ -88,6 +88,7 @@
             class="btn btn-primary w-100 login-btn"
             type="submit"
             data-testid="botao-entrar"
+            aria-label="Entrar"
           >
             <i class="bi bi-box-arrow-in-right me-2" />
             Entrar
@@ -99,34 +100,30 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import {useRouter} from 'vue-router'
-import {useServidoresStore} from '@/stores/servidores'
 import {usePerfilStore} from '@/stores/perfil'
-import {usePerfil} from '@/composables/usePerfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {Perfil, Servidor} from '@/types/tipos';
-
-interface Par {
-  perfil: Perfil;
-  unidade: string;
-}
+import {PerfilUnidade} from '@/mappers/sgrh';
 
 const router = useRouter()
-const servidoresStore = useServidoresStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
-const {getPerfisDoServidor} = usePerfil()
 
-// Credenciais de teste - remover em produção
 const titulo = ref(import.meta.env.DEV ? '1' : '')
 const senha = ref(import.meta.env.DEV ? '123' : '')
 const loginStep = ref(1)
-const servidor = ref<Servidor | null | undefined>(null)
-const paresDisponiveis = ref<Par[]>([])
-const parSelecionado = ref<Par | null>(null)
+const parSelecionado = ref<PerfilUnidade | null>(null)
 
-const handleLogin = () => {
+const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
+
+watch(perfisUnidadesDisponiveis, (newVal) => {
+  if (newVal.length > 0) {
+    parSelecionado.value = newVal[0];
+  }
+});
+
+const handleLogin = async () => {
   if (loginStep.value === 1) {
     if (!titulo.value || !senha.value) {
       notificacoesStore.erro(
@@ -136,16 +133,13 @@ const handleLogin = () => {
       return
     }
 
-    servidor.value = servidoresStore.getServidorById(Number(titulo.value))
+    const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
 
-    if (servidor.value) {
-      paresDisponiveis.value = getPerfisDoServidor(servidor.value.id)
-
-      if (paresDisponiveis.value.length > 1) {
-        loginStep.value = 2
-        parSelecionado.value = paresDisponiveis.value[0]
-      } else if (paresDisponiveis.value.length === 1) {
-        finalizarLogin(servidor.value.id, paresDisponiveis.value[0].perfil, paresDisponiveis.value[0].unidade)
+    if (sucessoAutenticacao) {
+      if (perfilStore.perfisUnidades.length > 1) {
+        loginStep.value = 2;
+      } else if (perfilStore.perfisUnidades.length === 1) {
+        router.push('/painel');
       } else {
         notificacoesStore.erro(
           'Perfis indisponíveis',
@@ -154,58 +148,15 @@ const handleLogin = () => {
       }
     } else {
       notificacoesStore.erro(
-        'Título ou senha inválidos',
+        'Falha na autenticação',
         'Título ou senha inválidos.'
       );
     }
   } else {
-    if (servidor.value && parSelecionado.value) {
-      finalizarLogin(servidor.value.id, parSelecionado.value.perfil, parSelecionado.value.unidade)
+    if (parSelecionado.value) {
+      await perfilStore.selecionarPerfilUnidade(Number(titulo.value), parSelecionado.value);
+      router.push('/painel');
     }
   }
 }
-
-const finalizarLogin = (idServidor: number, perfil: Perfil, unidadeSigla: string) => {
-  perfilStore.setServidorId(idServidor)
-  perfilStore.setPerfilUnidade(perfil, unidadeSigla)
-  router.push('/painel')
-}
-
 </script>
-
-<style scoped>
-.login-bg {
-  min-height: 100vh;
-  width: 100vw;
-  background: linear-gradient(120deg, var(--bs-primary-bg-subtle) 0%, var(--bs-info-bg-subtle) 50%, var(--bs-light) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-center-wrapper {
-  width: 100vw;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  border: none;
-  background: var(--bs-body-bg);
-}
-
-.login-btn {
-  transition: background 0.2s;
-  font-weight: 500;
-}
-
-.login-btn:hover {
-  background: var(--bs-primary);
-}
-
-
-</style>

@@ -1,5 +1,6 @@
 package sgc.mapa.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,4 +14,13 @@ public record MapaCompletoDto(
     Long subprocessoCodigo,
     String observacoes,
     List<CompetenciaMapaDto> competencias
-) {}
+) {
+    public MapaCompletoDto {
+        competencias = new ArrayList<>(competencias);
+    }
+
+    @Override
+    public List<CompetenciaMapaDto> competencias() {
+        return new ArrayList<>(competencias);
+    }
+}

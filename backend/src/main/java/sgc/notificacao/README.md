@@ -1,78 +1,64 @@
-# Módulo de Notificação por E-mail - SGC
+# Módulo de Notificação e Orquestração de Eventos
 
 ## Visão Geral
-Este pacote é responsável pelo envio de notificações por e-mail para os usuários do sistema. Ele é projetado para ser robusto e assíncrono, garantindo que as falhas no envio de e-mail não interrompam os fluxos de negócio principais da aplicação.
+Este pacote tem uma dupla responsabilidade:
 
-A arquitetura é orientada a eventos, utilizando um `EventoProcessoListener` para reagir a eventos de domínio (como `ProcessoIniciadoEvento`) e acionar o envio das notificações correspondentes.
+1.  **Envio de Notificações:** É responsável pelo envio de **notificações por e-mail** para os usuários de forma robusta e desacoplada.
+2.  **Orquestração de Eventos:** Contém o `EventoProcessoListener`, o principal listener de eventos de domínio da aplicação, que também orquestra a criação de **alertas** ao invocar o `AlertaService`.
 
-## Arquivos e Componentes Principais
+## Arquitetura Orientada a Eventos
+O `EventoProcessoListener` é o coração da arquitetura reativa do SGC. Ele se inscreve para receber eventos publicados pelo `ApplicationEventPublisher` do Spring e, em resposta, delega as tarefas para os módulos `notificacao` e `alerta`.
 
-### 1. `NotificacaoService.java`
-- **Localização:** `backend/src/main/java/sgc/notificacao/`
-- **Descrição:** Classe de serviço que centraliza toda a lógica de envio de e-mails.
-- **Funcionalidades Chave:**
-  - **Persistência:** Antes de tentar o envio, uma entidade `Notificacao` é salva no banco de dados para fins de auditoria.
-  - **Envio Assíncrono:** O envio de e-mail é executado em um pool de threads separado (`@Async`), evitando o bloqueio da thread principal da aplicação.
-  - **Retentativas:** Em caso de falha, o sistema tenta reenviar o e-mail automaticamente (até 3 tentativas com tempo de espera crescente).
-  - **Validação:** Verifica se o formato do e-mail do destinatário é válido antes do envio.
-
-### 2. `NotificacaoModeloEmailService.java`
-- **Localização:** `backend/src/main/java/sgc/notificacao/NotificacaoModeloEmailService.java`
-- **Descrição:** Um serviço utilitário dedicado a criar o conteúdo HTML dos e-mails. Cada método corresponde a um evento de negócio específico (ex: `criarEmailDeProcessoIniciado`, `criarEmailDeCadastroDevolvido`), garantindo que todas as notificações tenham um formato padronizado e informativo.
-
-### 3. `EventoProcessoListener.java`
-- **Localização:** `backend/src/main/java/sgc/notificacao/EventoProcessoListener.java`
-- **Descrição:** Um listener de eventos do Spring (`@EventListener`) que escuta por eventos de domínio publicados pelo `ProcessoServico`. Ao capturar um evento, ele orquestra a criação do e-mail (usando `NotificacaoModeloEmailService`) e o envia (usando `NotificacaoService`).
-
-### 4. `Notificacao.java` (Entidade)
-- **Localização:** `backend/src/main/java/sgc/notificacao/modelo/Notificacao.java`
-- **Descrição:** Entidade JPA que representa um registro de notificação no banco de dados. Armazena informações sobre o destinatário, o conteúdo e o momento em que a notificação foi gerada.
-
-### 5. `EmailDto.java` (DTO)
-- **Localização:** `backend/src/main/java/sgc/notificacao/dto/EmailDto.java`
-- **Descrição:** Um `record` Java simples usado para transportar os dados do e-mail (destinatário, assunto, corpo, se é HTML) entre os componentes do módulo.
-
-## Diagrama de Sequência (Orientado a Eventos)
 ```mermaid
-sequenceDiagram
-    participant PS as ProcessoService
-    participant EP as ApplicationEventPublisher
-    participant EL as EventoProcessoListener
-    participant MS as NotificacaoModeloEmailService
-    participant NS as NotificacaoService
+graph TD
+    subgraph "Módulo de Negócio (ex: processo)"
+        ProcessoService -- 1. Publica evento -->
+    end
 
-    PS->>EP: publica(new ProcessoIniciadoEvento(...))
-    EP-->>EL: notifica(evento)
-    EL->>MS: criarEmailDeProcessoIniciado(evento.dados)
-    MS-->>EL: retorna corpoHtml
-    EL->>NS: enviarEmailHtml(destinatario, assunto, corpoHtml)
-    activate NS
-    Note right of NS: Envio assíncrono com retentativas
-    deactivate NS
+    subgraph "Infraestrutura Spring"
+        EventBus(ApplicationEventPublisher)
+    end
+
+    subgraph "Módulo de Notificação (este pacote)"
+        Listener(EventoProcessoListener)
+        TemplateService(NotificacaoModeloEmailService)
+        EmailService(NotificacaoService)
+    end
+
+    subgraph "Módulo de Alerta"
+        AlertaService
+    end
+
+    subgraph "Infraestrutura de E-mail"
+        MailServer
+    end
+
+    EventBus -- 2. Notifica --> Listener
+    Listener -- 3. Invoca --> AlertaService
+    Listener -- 4. Usa --> TemplateService
+    Listener -- 5. Invoca --> EmailService
+    TemplateService -- Gera HTML --> Listener
+    EmailService -- 6. Envia para --> MailServer
 ```
 
-## Fluxo de Notificação (Orientado a Eventos)
+### Fluxo de Trabalho:
+1.  **Ação de Negócio:** O `ProcessoService` executa uma ação (ex: inicia um processo).
+2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `ProcessoIniciadoEvento`).
+3.  **Captura do Evento:** O `EventoProcessoListener` captura este evento.
+4.  **Criação de Alertas:** O listener invoca o `AlertaService` para criar os alertas internos.
+5.  **Criação do E-mail:** O listener usa o `NotificacaoModeloEmailService` para gerar o conteúdo HTML do e-mail.
+6.  **Envio do E-mail:** O listener invoca o `NotificacaoService` para enviar o e-mail.
 
-1.  **Ação de Negócio**: Um serviço, como o `ProcessoServico`, executa uma operação importante (ex: iniciar um processo).
-2.  **Publicação do Evento**: Ao final da operação, o `ProcessoServico` publica um evento de domínio (ex: `new ProcessoIniciadoEvento(this, ...)`).
-3.  **Captura do Evento**: O `EventoProcessoListener` captura o evento.
-4.  **Criação do Template**: O listener chama o `NotificacaoModeloEmailService` para gerar o corpo do e-mail em HTML com os dados do evento.
-5.  **Envio do E-mail**: O listener chama `NotificacaoService.enviarEmailHtml()`.
-6.  **Processamento Assíncrono**: `NotificacaoService` persiste a notificação e inicia o processo de envio assíncrono com retentativas.
+## Componentes Principais
+- **`EventoProcessoListener`**: O principal ponto de entrada reativo da aplicação. Ouve os eventos de domínio e orquestra as ações de notificação e alerta.
+- **`NotificacaoService`**: Serviço responsável pela lógica de envio de e-mails.
+  - **Assíncrono (`@Async`):** O envio é executado em uma thread separada.
+  - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
+  - **Retentativas:** Em caso de falha, tenta reenviar o e-mail.
+- **`NotificacaoModeloEmailService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando Thymeleaf.
+- **`Notificacao`**: A entidade JPA que representa o registro de uma notificação enviada.
 
-## Como Usar
-Na maioria dos casos, o envio de notificações é automático e baseado em eventos. Para enviar um e-mail manualmente, injete `NotificacaoServico`.
-
-**Exemplo:**
-```java
-@Autowired
-private NotificacaoService notificacaoService;
-
-public void notificarManualmente(String email, String mensagem) {
-    notificacaoService.enviarEmail(email, "Aviso Manual do SGC", mensagem);
-}
-```
-
-## Notas Importantes
-- **Desacoplamento**: A arquitetura orientada a eventos desacopla fortemente o módulo de notificação dos módulos de negócio. O `ProcessoServico` não precisa saber como os e-mails são enviados; ele apenas anuncia que algo aconteceu.
-- **Robustez**: O tratamento de erros, a persistência e o envio assíncrono tornam o sistema de notificações resiliente a falhas na infraestrutura de e-mail.
+## Benefícios da Arquitetura
+- **Desacoplamento:** O `ProcessoService` não sabe como as notificações ou alertas são tratados. Ele apenas anuncia que "algo aconteceu".
+- **Robustez:** O envio assíncrono de e-mails torna o sistema resiliente a falhas temporárias na infraestrutura de e-mail.
+- **Centralização da Lógica Reativa:** O `EventoProcessoListener` centraliza a resposta aos eventos de domínio, tornando o fluxo de trabalho reativo claro e fácil de entender.

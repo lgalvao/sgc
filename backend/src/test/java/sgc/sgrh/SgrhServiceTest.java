@@ -3,25 +3,33 @@ package sgc.sgrh;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.sgrh.service.SgrhService;
+import sgc.unidade.modelo.UnidadeRepo;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SgrhServiceTest {
-    private static final String TITULO = "12345678901";
+    private static final String TITULO = "123456789012";
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
+
     private SgrhService sgrhService;
 
     @BeforeEach
     void setUp() {
-        sgrhService = new SgrhService();
+        sgrhService = new SgrhService(unidadeRepo);
     }
 
     @Test
@@ -58,11 +66,11 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarUnidadePorCodigo() {
-        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(1L);
+        Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(2L);
 
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().codigo());
-        assertEquals("SEDOC - Secretaria de Documentação", result.get().nome());
+        assertEquals(2L, result.get().codigo());
+        assertEquals("Secretaria de Informática e Comunicações", result.get().nome());
     }
 
     @Test
@@ -76,13 +84,13 @@ class SgrhServiceTest {
 
     @Test
     void testBuscarSubunidades() {
-        List<UnidadeDto> result = sgrhService.buscarSubunidades(1L); // SEDOC
+        List<UnidadeDto> result = sgrhService.buscarSubunidades(2L); // STIC
 
         assertNotNull(result);
-        // Should return COP and CGC (the direct children of SEDOC)
-        assertTrue(result.size() >= 2);
+        // Should return SGP, COSIS, COSINF, COJUR (the direct children of STIC)
+        assertTrue(result.size() >= 4);
         for (UnidadeDto unidade : result) {
-            assertEquals(1L, unidade.codigoPai()); // All should have SEDOC as parent
+            assertEquals(2L, unidade.codigoPai()); // All should have STIC as parent
         }
     }
 
@@ -105,7 +113,7 @@ class SgrhServiceTest {
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().unidadeCodigo());
         assertEquals(TITULO, result.get().titularTitulo());
-        assertEquals("98765432109", result.get().substitutoTitulo());
+        assertEquals("987654321098", result.get().substitutoTitulo());
     }
 
     @Test
@@ -143,5 +151,27 @@ class SgrhServiceTest {
         
         List<Long> gestorUnits = sgrhService.buscarUnidadesPorPerfil(TITULO, "GESTOR");
         assertTrue(gestorUnits.contains(2L) || gestorUnits.contains(3L));
+    }
+
+    @Test
+    void testBuscarResponsaveisUnidades() {
+        List<Long> unidades = List.of(1L, 2L);
+        Map<Long, ResponsavelDto> result = sgrhService.buscarResponsaveisUnidades(unidades);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey(1L));
+        assertTrue(result.containsKey(2L));
+    }
+
+    @Test
+    void testBuscarUsuariosPorTitulos() {
+        List<String> titulos = List.of(TITULO, "987654321098");
+        Map<String, UsuarioDto> result = sgrhService.buscarUsuariosPorTitulos(titulos);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey(TITULO));
+        assertTrue(result.containsKey("987654321098"));
     }
 }

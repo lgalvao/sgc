@@ -22,72 +22,48 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {Perfil, Processo, Subprocesso} from '@/types/tipos'
+import {Perfil, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
-import {useProcessosFiltrados} from '@/composables/useProcessosFiltrados';
+import {formatDateTimeBR} from '@/utils';
 
-type SortCriteria = keyof Processo | 'unidades' | 'dataFinalizacao';
+type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
-
 const perfil = usePerfilStore()
 
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
 
-const {processosFiltrados} = useProcessosFiltrados(ref(true));
+onMounted(async () => {
+  await processosStore.fetchProcessosFinalizados();
+});
 
 const processosFinalizadosOrdenados = computed(() => {
-  return [...processosFiltrados.value].sort((a: Processo, b: Processo) => {
-
-    if (criterio.value === 'unidades') {
-      const valA = processosStore.getUnidadesDoProcesso(a.id).map((pu: Subprocesso) => pu.unidade).join(', ');
-      const valB = processosStore.getUnidadesDoProcesso(b.id).map((pu: Subprocesso) => pu.unidade).join(', ');
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
-    } else if (criterio.value === 'dataFinalizacao') {
-      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : null;
-      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : null;
-
-      if (dateA === null && dateB === null) return 0;
-      if (dateA === null) return asc.value ? -1 : 1;
-      if (dateB === null) return asc.value ? 1 : -1;
+  return [...processosStore.processosFinalizados].sort((a, b) => {
+    if (criterio.value === 'dataFinalizacao') {
+      const dateA = a.dataFinalizacao ? new Date(a.dataFinalizacao).getTime() : 0;
+      const dateB = b.dataFinalizacao ? new Date(b.dataFinalizacao).getTime() : 0;
       return (dateA - dateB) * (asc.value ? 1 : -1);
-    } else if (criterio.value === 'descricao') {
-      const valA = String(a.descricao);
-      const valB = String(b.descricao);
+    } else {
+      const valA = String(a[criterio.value as keyof ProcessoResumo]);
+      const valB = String(b[criterio.value as keyof ProcessoResumo]);
       if (valA < valB) return asc.value ? -1 : 1;
       if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
-    } else if (criterio.value === 'tipo') {
-      const valA = String(a.tipo);
-      const valB = String(b.tipo);
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
-    } else if (criterio.value === 'situacao') {
-      const valA = String(a.situacao);
-      const valB = String(b.situacao);
-      if (valA < valB) return asc.value ? -1 : 1;
-      if (valA > valB) return asc.value ? 1 : -1;
-      return 0;
     }
-    return 0; // Fallback para garantir que todos os caminhos retornem um valor
+    return 0;
   });
 });
 
 const processosFinalizadosOrdenadosComFormatacao = computed(() => {
   return processosFinalizadosOrdenados.value.map(p => ({
     ...p,
-    unidadesFormatadas: processosStore.getUnidadesDoProcesso(p.id).map(pu => pu.unidade).join(', '),
-    dataFinalizacaoFormatada: p.dataFinalizacao ? new Date(p.dataFinalizacao).toLocaleDateString('pt-BR') : null
+    dataFinalizacaoFormatada: p.dataFinalizacao ? formatDateTimeBR(new Date(p.dataFinalizacao)) : null
   }));
 });
 
@@ -101,14 +77,14 @@ function ordenarPor(campo: SortCriteria) {
   }
 }
 
-function abrirProcesso(processo: Processo) {
+function abrirProcesso(processo: ProcessoResumo) {
   const perfilUsuario = perfil.perfilSelecionado;
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.id.toString()}}); // <-- Alterado aqui
+    router.push({name: 'Processo', params: {idProcesso: processo.codigo.toString()}});
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.id, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }

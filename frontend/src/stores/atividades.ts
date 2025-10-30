@@ -1,177 +1,135 @@
 import {defineStore} from 'pinia';
-import atividadesMock from '../mocks/atividades.json';
-import type {Atividade, Conhecimento} from '@/types/tipos';
-import {TipoMudanca, useRevisaoStore} from './revisao';
-import {mapAtividadesArray} from '@/mappers/entidades';
+import type {Atividade, Conhecimento, CriarAtividadeRequest, CriarConhecimentoRequest} from '@/types/tipos';
+import * as atividadeService from '@/services/atividadeService';
+import * as subprocessoService from '@/services/subprocessoService';
+import * as mapaService from '@/services/mapaService';
+import {useNotificacoesStore} from './notificacoes';
+import {mapMapaVisualizacaoToAtividades} from '@/mappers/mapas';
 
 export const useAtividadesStore = defineStore('atividades', {
-    state: () => {
-        const atividades = mapAtividadesArray(atividadesMock as any) as Atividade[];
-        let maxId = 0;
-        atividades.forEach(atividade => {
-            if (atividade.id > maxId) maxId = atividade.id;
-            atividade.conhecimentos.forEach(conhecimento => {
-                if (conhecimento.id > maxId) maxId = conhecimento.id;
-            });
-        });
-        return {
-            atividades: atividades,
-            nextId: maxId + 1,
-            atividadesSnapshot: [] as Atividade[], // Adicionado para armazenar o snapshot
-        };
-    },
+    state: () => ({
+        atividadesPorSubprocesso: new Map<number, Atividade[]>(),
+    }),
     getters: {
-        getAtividadesPorSubprocesso: (state) => (idSubprocesso: number): Atividade[] => {
-            return state.atividades.filter(a => a.idSubprocesso === idSubprocesso);
+        getAtividadesPorSubprocesso: (state) => (codSubrocesso: number): Atividade[] => {
+            return state.atividadesPorSubprocesso.get(codSubrocesso) || [];
         }
     },
     actions: {
-        setAtividades(idSubprocesso: number, novasAtividades: Atividade[]) {
-            // Remove as atividades antigas para este idSubprocesso
-            this.atividades = this.atividades.filter(a => a.idSubprocesso !== idSubprocesso);
-
-            // Adiciona as novas atividades
-            this.atividades.push(...novasAtividades);
-        },
-        adicionarAtividade(atividade: Atividade) {
-            atividade.id = this.nextId++;
-            // Substituir o array para garantir reatividade
-            this.atividades = [...this.atividades, atividade];
-        },
-        removerAtividade(atividadeId: number) {
-            this.atividades = this.atividades.filter(a => a.id !== atividadeId);
-        },
-        adicionarConhecimento(atividadeId: number, conhecimento: Conhecimento, impactedCompetencyIds: number[]) {
-            const revisaoStore = useRevisaoStore();
-            const index = this.atividades.findIndex(a => a.id === atividadeId);
-            if (index !== -1) {
-                const atividade = this.atividades[index];
-                conhecimento.id = this.nextId++;
-                const updatedAtividade = {
-                    ...atividade,
-                    conhecimentos: [...atividade.conhecimentos, conhecimento]
-                };
-                this.atividades.splice(index, 1, updatedAtividade);
-                revisaoStore.registrarMudanca({
-                    tipo: TipoMudanca.ConhecimentoAdicionado,
-                    idAtividade: atividade.id,
-                    descricaoAtividade: atividade.descricao,
-                    idConhecimento: conhecimento.id,
-                    descricaoConhecimento: conhecimento.descricao,
-                    competenciasImpactadasIds: impactedCompetencyIds
-                });
-            }
-        },
-        removerConhecimento(atividadeId: number, conhecimentoId: number, impactedCompetencyIds: number[]) {
-            const revisaoStore = useRevisaoStore();
-            const atividade = this.atividades.find(a => a.id === atividadeId);
-            if (atividade) {
-                const conhecimentoRemovido = atividade.conhecimentos.find(c => c.id === conhecimentoId);
-                atividade.conhecimentos = atividade.conhecimentos.filter(c => c.id !== conhecimentoId);
-                if (conhecimentoRemovido) {
-                    revisaoStore.registrarMudanca({
-                        tipo: TipoMudanca.ConhecimentoRemovido,
-                        idAtividade: atividade.id,
-                        descricaoAtividade: atividade.descricao,
-                        idConhecimento: conhecimentoRemovido.id,
-                        descricaoConhecimento: conhecimentoRemovido.descricao,
-                        competenciasImpactadasIds: impactedCompetencyIds
-                    });
-                }
+        async fetchAtividadesParaSubprocesso(codSubrocesso: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const mapa = await mapaService.obterMapaVisualizacao(codSubrocesso);
+                const atividades = mapMapaVisualizacaoToAtividades(mapa);
+                this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+            } catch {
+                notificacoes.erro('Erro ao buscar atividades', 'Não foi possível carregar as atividades do subprocesso.');
             }
         },
 
-        async fetchAtividadesPorSubprocesso(idSubprocesso: number) {
-            const todasAtividades = atividadesMock as Atividade[];
-            const atividadesDoProcesso = todasAtividades.filter(a => a.idSubprocesso === idSubprocesso);
-
-            // Adiciona as atividades buscadas ao estado, evitando duplicatas
-            atividadesDoProcesso.forEach(novaAtividade => {
-                if (!this.atividades.some(a => a.id === novaAtividade.id)) {
-                    this.atividades.push(novaAtividade);
-                }
-            });
-        },
-
-        adicionarMultiplasAtividades(atividades: Atividade[]) {
-            const novasAtividadesComId = atividades.map(atividade => {
-                const novaAtividade = {...atividade, id: this.nextId++};
-                novaAtividade.conhecimentos = novaAtividade.conhecimentos.map(conhecimento => {
-                    return {...conhecimento, id: this.nextId++};
-                });
-                return novaAtividade;
-            });
-            this.atividades.push(...novasAtividadesComId);
-        },
-        setAtividadesSnapshot(snapshot: Atividade[]) {
-            this.atividadesSnapshot = snapshot;
-        },
-        importarAtividades(idSubprocessoDestino: number, selecionadas: Atividade[]) {
-            // Normalização de strings
-            const normalize = (s: string) => s?.trim().toLowerCase() || '';
-            const ignoradas: { descricao: string; motivo: string }[] = [];
-    
-            // Atividades já existentes no destino
-            const existentes = this.getAtividadesPorSubprocesso(idSubprocessoDestino) || [];
-            const existentesSet = new Set(existentes.map(a => normalize(a.descricao)));
-    
-            // Evitar duplicatas na própria seleção
-            const vistos = new Set<string>();
-    
-            const novasAtividades: Atividade[] = [];
-    
-            for (const ativ of selecionadas) {
-                const descNorm = normalize(ativ.descricao);
-                if (!descNorm) {
-                    ignoradas.push({ descricao: ativ.descricao || '(sem descrição)', motivo: 'Descrição vazia' });
-                    continue;
-                }
-                if (vistos.has(descNorm)) {
-                    ignoradas.push({ descricao: ativ.descricao, motivo: 'Duplicada na seleção' });
-                    continue;
-                }
-                vistos.add(descNorm);
-    
-                if (existentesSet.has(descNorm)) {
-                    ignoradas.push({ descricao: ativ.descricao, motivo: 'Já existe no cadastro' });
-                    continue;
-                }
-    
-                // Deduplicar conhecimentos desta atividade
-                const conhecimentosVistos = new Set<string>();
-                const conhecimentosDedup: Conhecimento[] = [];
-                for (const c of ativ.conhecimentos || []) {
-                    const cNorm = normalize(c.descricao);
-                    if (!cNorm || conhecimentosVistos.has(cNorm)) continue;
-                    conhecimentosVistos.add(cNorm);
-                    conhecimentosDedup.push({ id: 0, descricao: c.descricao.trim() });
-                }
-    
-                const novaAtividade: Atividade = {
-                    id: 0,
-                    descricao: ativ.descricao.trim(),
-                    idSubprocesso: idSubprocessoDestino,
-                    conhecimentos: conhecimentosDedup
-                };
-    
-                novasAtividades.push(novaAtividade);
+        async adicionarAtividade(codSubrocesso: number, request: CriarAtividadeRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                // Passa o codSubrocesso para o serviço, que o adicionará ao DTO
+                const novaAtividade = await atividadeService.criarAtividade(request, codSubrocesso);
+                const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                atividades.push(novaAtividade);
+                this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                notificacoes.sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
+                // Opcional: recarregar para garantir consistência total, mas a adição otimista já ajuda.
+                await this.fetchAtividadesParaSubprocesso(codSubrocesso);
+            } catch {
+                notificacoes.erro('Erro ao adicionar atividade', 'Não foi possível salvar a nova atividade.');
             }
-    
-            // Atribuir IDs e inserir
-            const novasComIds = novasAtividades.map(a => {
-                const novoId = this.nextId++;
-                const conhecimentosComIds = a.conhecimentos.map(c => ({ ...c, id: this.nextId++ }));
-                return { ...a, id: novoId, conhecimentos: conhecimentosComIds };
-            });
-    
-            if (novasComIds.length) {
-                this.atividades.push(...novasComIds);
+        },
+
+        async removerAtividade(codSubrocesso: number, atividadeId: number) {
+            try {
+                await atividadeService.excluirAtividade(atividadeId);
+                let atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                atividades = atividades.filter(a => a.codigo !== atividadeId);
+                this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                useNotificacoesStore().sucesso('Atividade removida', 'A atividade foi removida com sucesso.');
+            } catch {
+                useNotificacoesStore().erro('Erro ao remover atividade', 'Não foi possível remover a atividade.');
             }
-    
-            return {
-                importadas: novasComIds.length,
-                ignoradas
-            };
+        },
+
+        async adicionarConhecimento(codSubrocesso: number, atividadeId: number, request: CriarConhecimentoRequest) {
+            try {
+                const novoConhecimento = await atividadeService.criarConhecimento(atividadeId, request);
+                const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
+                if (atividade) {
+                    atividade.conhecimentos.push(novoConhecimento);
+                    this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                }
+                 useNotificacoesStore().sucesso('Conhecimento adicionado', 'O novo conhecimento foi adicionado com sucesso.');
+            } catch {
+                useNotificacoesStore().erro('Erro ao adicionar conhecimento', 'Não foi possível salvar o novo conhecimento.');
+            }
+        },
+
+        async removerConhecimento(codSubrocesso: number, atividadeId: number, conhecimentoId: number) {
+            try {
+                await atividadeService.excluirConhecimento(atividadeId, conhecimentoId);
+                const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
+                if (atividade) {
+                    atividade.conhecimentos = atividade.conhecimentos.filter(c => c.id !== conhecimentoId);
+                    this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                }
+                useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido com sucesso.');
+            } catch {
+                useNotificacoesStore().erro('Erro ao remover conhecimento', 'Não foi possível remover o conhecimento.');
+            }
+        },
+
+        async importarAtividades(codSubrocessoDestino: number, codSubrocessoOrigem: number) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
+                notificacoes.sucesso('Atividades importadas', 'As atividades foram importadas com sucesso.');
+                // Recarregar as atividades do subprocesso de destino para refletir a importação
+                await this.fetchAtividadesParaSubprocesso(codSubrocessoDestino);
+            } catch {
+                notificacoes.erro('Erro ao importar', 'Não foi possível importar as atividades.');
+            }
+        },
+
+        async atualizarAtividade(codSubrocesso: number, atividadeId: number, data: Atividade) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const atividadeAtualizada = await atividadeService.atualizarAtividade(atividadeId, data);
+                const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                const index = atividades.findIndex(a => a.codigo === atividadeId);
+                if (index !== -1) {
+                    atividades[index] = atividadeAtualizada;
+                    this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                }
+                notificacoes.sucesso('Atividade atualizada', 'A atividade foi atualizada com sucesso.');
+            } catch {
+                notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar a atividade.');
+            }
+        },
+
+        async atualizarConhecimento(codSubrocesso: number, atividadeId: number, conhecimentoId: number, data: Conhecimento) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                const conhecimentoAtualizado = await atividadeService.atualizarConhecimento(atividadeId, conhecimentoId, data);
+                const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
+                const atividade = atividades.find(a => a.codigo === atividadeId);
+                if (atividade) {
+                    const index = atividade.conhecimentos.findIndex(c => c.id === conhecimentoId);
+                    if (index !== -1) {
+                        atividade.conhecimentos[index] = conhecimentoAtualizado;
+                        this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
+                    }
+                }
+                notificacoes.sucesso('Conhecimento atualizado', 'O conhecimento foi atualizado com sucesso.');
+            } catch {
+                notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar o conhecimento.');
+            }
         }
     }
 });

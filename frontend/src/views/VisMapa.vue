@@ -92,7 +92,7 @@
         </div>
         <div
           v-for="comp in competencias"
-          :key="comp.id"
+          :key="comp.codigo"
           class="card mb-3 competencia-card"
           data-testid="competencia-block"
         >
@@ -422,13 +422,13 @@
               <tbody>
                 <tr
                   v-for="item in historicoAnalise"
-                  :key="item.id"
+                  :key="item.codigo"
                   data-testid="historico-item"
                 >
                   <td>{{ item.data }}</td>
                   <td>{{ item.unidade }}</td>
                   <td>{{ item.resultado }}</td>
-                  <td>{{ item.observacao }}</td>
+                  <td>{{ item.observacoes }}</td>
                 </tr>
               </tbody>
             </table>
@@ -450,7 +450,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 import {useMapasStore} from '@/stores/mapas'
@@ -460,7 +460,8 @@ import {useProcessosStore} from "@/stores/processos";
 import {useNotificacoesStore} from "@/stores/notificacoes";
 import {useAnalisesStore} from "@/stores/analises";
 import {usePerfil} from "@/composables/usePerfil";
-import {Atividade, Competencia, Conhecimento, ResultadoAnalise, Subprocesso, Unidade} from '@/types/tipos';
+import {useSubprocessosStore} from "@/stores/subprocessos";
+import {Atividade, Competencia, Conhecimento, SituacaoSubprocesso, Unidade} from '@/types/tipos';
 import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 
 const route = useRoute()
@@ -473,6 +474,7 @@ const atividadesStore = useAtividadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
 const analisesStore = useAnalisesStore()
+const subprocessosStore = useSubprocessosStore()
 const {perfilSelecionado} = usePerfil()
 
 // Estados reativos para o modal
@@ -501,40 +503,51 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const idSubprocesso = computed(() => {
-  const subprocesso = processosStore.subprocessos.find(
-      (pu: Subprocesso) => pu.idProcesso === idProcesso.value && pu.unidade === sigla.value
-  );
-  return subprocesso?.id;
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
+
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
-const mapa = computed(() => mapaStore.mapas.find(m => m.unidade === sigla.value && m.idProcesso === idProcesso.value))
+onMounted(async () => {
+  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  // Correção temporária: usando idProcesso como codSubrocesso
+  await mapaStore.fetchMapaCompleto(idProcesso.value);
+});
+
+const mapa = computed(() => {
+  if (unidade.value?.codigo) {
+    return mapaStore.mapaCompleto;
+  }
+  return null;
+})
 const competencias = computed<Competencia[]>(() => mapa.value ? mapa.value.competencias : [])
 
-const subprocesso = computed(() => processosStore.subprocessos.find(
-    (sp: Subprocesso) => sp.idProcesso === idProcesso.value && sp.unidade === sigla.value
-))
+const subprocesso = computed(() => {
+  if (!processosStore.processoDetalhe) return null;
+  return processosStore.processoDetalhe.unidades.find(u => u.sigla === sigla.value);
+})
 
 // Computed para determinar quais botões mostrar baseado no perfil e situação
 const podeValidar = computed(() => {
   return perfilSelecionado.value === 'CHEFE' &&
-      subprocesso.value?.situacao === 'Mapa disponibilizado'
+      subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO
 })
 
 const podeAnalisar = computed(() => {
   return (perfilSelecionado.value === 'GESTOR' || perfilSelecionado.value === 'ADMIN') &&
-      (subprocesso.value?.situacao === 'Mapa validado' || subprocesso.value?.situacao === 'Mapa com sugestões')
+      (subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.MAPA_VALIDADO || subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA)
 })
 
 const podeVerSugestoes = computed(() => {
-  return subprocesso.value?.situacao === 'Mapa com sugestões'
+  return subprocesso.value?.situacaoSubprocesso === SituacaoSubprocesso.AGUARDANDO_AJUSTES_MAPA
 })
 
 const temHistoricoAnalise = computed(() => {
@@ -542,19 +555,19 @@ const temHistoricoAnalise = computed(() => {
 })
 
 const historicoAnalise = computed(() => {
-  if (!idSubprocesso.value) return []
+  if (!codSubrocesso.value) return []
 
-  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
-    id: analise.id,
-    data: analise.dataHora.toLocaleString('pt-BR'),
-    unidade: analise.unidade,
+  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value).map(analise => ({
+    codigo: analise.codigo,
+    data: new Date(analise.dataHora).toLocaleString('pt-BR'),
+    unidade: (analise as any).unidadeSigla || (analise as any).unidade,
     resultado: analise.resultado,
-    observacao: analise.observacao || ''
+    observacoes: analise.observacoes || ''
   }))
 })
 
 function getAtividadeCompleta(id: number): Atividade | undefined {
-  return atividades.value.find(a => a.id === id)
+  return atividades.value.find(a => a.codigo === id);
 }
 
 function getConhecimentosAtividade(id: number): Conhecimento[] {
@@ -572,8 +585,8 @@ function fecharModalAceitar() {
 
 function abrirModalSugestoes() {
   // Pré-preencher com sugestões existentes se houver
-  if (subprocesso.value?.sugestoes) {
-    sugestoes.value = subprocesso.value.sugestoes
+  if ((mapa.value as any)?.sugestoes) {
+    sugestoes.value = (mapa.value as any).sugestoes
   }
   mostrarModalSugestoes.value = true
 }
@@ -615,7 +628,7 @@ function fecharModalHistorico() {
 
 function verSugestoes() {
   // Buscar sugestões do subprocesso
-  const sugestoes = subprocesso.value?.sugestoes || "Nenhuma sugestão registrada.";
+  const sugestoes = (mapa.value as any)?.sugestoes || "Nenhuma sugestão registrada.";
 
   // Mostrar modal de visualização com sugestões
   mostrarModalVerSugestoes.value = true;
@@ -628,12 +641,9 @@ function verHistorico() {
 }
 
 async function confirmarSugestoes() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value,
-      sugestoes: sugestoes.value
-    })
+    await processosStore.apresentarSugestoes(codSubrocesso.value, { sugestoes: sugestoes.value });
 
     fecharModalSugestoes()
 
@@ -642,7 +652,7 @@ async function confirmarSugestoes() {
         'Sugestões submetidas para análise da unidade superior'
     )
 
-    await router.push({
+    router.push({
       name: 'Subprocesso',
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
@@ -656,11 +666,9 @@ async function confirmarSugestoes() {
 }
 
 async function confirmarValidacao() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.validarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value
-    })
+    await processosStore.validarMapa(codSubrocesso.value);
 
     fecharModalValidar()
 
@@ -669,7 +677,7 @@ async function confirmarValidacao() {
         'Mapa validado e submetido para análise da unidade superior'
     )
 
-    await router.push({
+    router.push({
       name: 'Subprocesso',
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
@@ -682,86 +690,33 @@ async function confirmarValidacao() {
   }
 }
 
-async function confirmarAceitacao() {
-  try {
-    // Registrar análise de aceite (apenas para GESTOR, ADMIN não registra análise)
-    if (perfilSelecionado.value === 'GESTOR' && idSubprocesso.value) {
-      analisesStore.registrarAnalise({
-        idSubprocesso: idSubprocesso.value,
-        dataHora: new Date(),
-        unidade: unidade.value?.sigla || '',
-        resultado: ResultadoAnalise.ACEITE,
-        observacao: undefined // Modal AceitarMapaModal não tem campo de observação
-      })
-    }
+async function confirmarAceitacao(observacoes?: string) {
+  if (!codSubrocesso.value) return;
 
-    await processosStore.aceitarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value,
-      perfil: perfilSelecionado.value || ''
-    })
+  const perfil = perfilSelecionado.value;
+  const isHomologacao = perfil === 'ADMIN';
 
-    fecharModalAceitar()
-
-    // Determinar mensagem baseada no perfil
-    // Usamos o título "Aceite registrado" para compatibilidade com os testes E2E,
-    // mantendo mensagens específicas no corpo.
-    let titulo = 'Aceite registrado';
-    let mensagem = 'Mapa aceito e submetido para análise da unidade superior';
-    if (perfilSelecionado.value === 'ADMIN') {
-      // Para ADMIN mantemos o título compatível com os helpers de teste
-      // e colocamos uma mensagem indicando homologação.
-      titulo = 'Aceite registrado';
-      mensagem = 'Mapa homologado';
-    }
-
-    notificacoesStore.sucesso(titulo, mensagem);
-
-    // Redirecionar para o painel
-    await router.push({ name: 'Painel' })
-
-  } catch {
-    notificacoesStore.erro(
-        'Erro ao aceitar mapa',
-        'Ocorreu um erro ao aceitar o mapa. Tente novamente.'
-    )
+  if (isHomologacao) {
+    await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+  } else {
+    await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   }
+
+  fecharModalAceitar();
+  router.push({name: 'Painel'});
 }
 
 
-
 async function confirmarDevolucao() {
-  try {
-    // Registrar análise de devolução
-    if (idSubprocesso.value) {
-      analisesStore.registrarAnalise({
-        idSubprocesso: idSubprocesso.value,
-        dataHora: new Date(),
-        unidade: perfilSelecionado.value === 'ADMIN' ? 'SEDOC' : (unidade.value?.sigla || ''),
-        resultado: ResultadoAnalise.DEVOLUCAO,
-        observacao: observacaoDevolucao.value || undefined
-      })
-    }
+  if (!codSubrocesso.value) return;
 
-    await processosStore.rejeitarMapa({
-      idProcesso: idProcesso.value,
-      unidade: sigla.value
-    })
+  await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, {
+    motivo: '', // Adicionar motivo
+    observacoes: observacaoDevolucao.value,
+  });
 
-    fecharModalDevolucao()
-
-    // Notificação alinhada ao texto esperado pelos testes E2E
-    notificacoesStore.sucesso('Cadastro devolvido', 'O cadastro foi devolvido para ajustes!');
-
-    // Redirecionar para o painel
-    await router.push({ name: 'Painel' })
-
-  } catch {
-    notificacoesStore.erro(
-        'Erro ao devolver validação',
-        'Ocorreu um erro. Tente novamente.'
-    )
-  }
+  fecharModalDevolucao();
+  router.push({name: 'Painel'});
 }
 </script>
 

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
@@ -20,17 +21,17 @@ import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -78,7 +79,7 @@ class CDU18IntegrationTest {
         unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.setDataLimite(LocalDate.now().plusMonths(1));
+        processo.setDataLimite(LocalDateTime.now().plusMonths(1));
         processo.setDescricao("Processo de Teste");
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
@@ -89,7 +90,7 @@ class CDU18IntegrationTest {
             unidade,
             mapa,
             SituacaoSubprocesso.CADASTRO_HOMOLOGADO,
-            LocalDate.now().plusMonths(1)
+            LocalDateTime.now().plusMonths(1)
         );
         subprocesso = subprocessoRepo.save(subprocesso);
 

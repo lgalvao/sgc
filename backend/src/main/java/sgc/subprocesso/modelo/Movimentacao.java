@@ -48,4 +48,15 @@ public class Movimentacao extends EntidadeBase {
         this.descricao = descricao;
         this.dataHora = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return """
+                Movimentacao{descricao='%s',
+                             unidadeDestino=%s,
+                             unidadeOrigem=%s,
+                             dataHora=%s,
+                             subprocesso=%s}
+                """.formatted(descricao, unidadeDestino, unidadeOrigem, dataHora, subprocesso);
+    }
 }

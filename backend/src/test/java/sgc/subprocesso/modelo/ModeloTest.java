@@ -3,10 +3,8 @@ package sgc.subprocesso.modelo;
 import org.junit.jupiter.api.Test;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,16 +28,16 @@ class ModeloTest {
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
-        subprocesso.setDataLimiteEtapa1(LocalDate.now());
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now());
         subprocesso.setDataFimEtapa1(LocalDateTime.now());
-        subprocesso.setDataLimiteEtapa2(LocalDate.now());
+        subprocesso.setDataLimiteEtapa2(LocalDateTime.now());
         subprocesso.setDataFimEtapa2(LocalDateTime.now());
         subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
         
         assertEquals(1L, subprocesso.getCodigo());
-        assertEquals(processo, subprocesso.getProcesso());
-        assertEquals(unidade, subprocesso.getUnidade());
-        assertEquals(mapa, subprocesso.getMapa());
+        assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
+        assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
+        assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
         assertNotNull(subprocesso.getDataFimEtapa1());
         assertNotNull(subprocesso.getDataLimiteEtapa2());
@@ -59,12 +57,12 @@ class ModeloTest {
         mapa.setCodigo(1L);
         
         Subprocesso subprocesso = new Subprocesso(
-            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDate.now()
+            processo, unidade, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, LocalDateTime.now()
         );
         
-        assertEquals(processo, subprocesso.getProcesso());
-        assertEquals(unidade, subprocesso.getUnidade());
-        assertEquals(mapa, subprocesso.getMapa());
+        assertEquals(processo.getCodigo(), subprocesso.getProcesso().getCodigo());
+        assertEquals(unidade.getCodigo(), subprocesso.getUnidade().getCodigo());
+        assertEquals(mapa.getCodigo(), subprocesso.getMapa().getCodigo());
         assertEquals(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, subprocesso.getSituacao());
         assertNotNull(subprocesso.getDataLimiteEtapa1());
     }
@@ -90,10 +88,10 @@ class ModeloTest {
         movimentacao.setDescricao("Descrição");
         
         assertEquals(1L, movimentacao.getCodigo());
-        assertEquals(subprocesso, movimentacao.getSubprocesso());
+        assertEquals(subprocesso.getCodigo(), movimentacao.getSubprocesso().getCodigo());
         assertNotNull(movimentacao.getDataHora());
-        assertEquals(unidadeOrigem, movimentacao.getUnidadeOrigem());
-        assertEquals(unidadeDestino, movimentacao.getUnidadeDestino());
+        assertEquals(unidadeOrigem.getCodigo(), movimentacao.getUnidadeOrigem().getCodigo());
+        assertEquals(unidadeDestino.getCodigo(), movimentacao.getUnidadeDestino().getCodigo());
         assertEquals("Descrição", movimentacao.getDescricao());
     }
 
@@ -112,9 +110,9 @@ class ModeloTest {
             subprocesso, unidadeOrigem, unidadeDestino, "Descrição de movimentação"
         );
         
-        assertEquals(subprocesso, movimentacao.getSubprocesso());
-        assertEquals(unidadeOrigem, movimentacao.getUnidadeOrigem());
-        assertEquals(unidadeDestino, movimentacao.getUnidadeDestino());
+        assertEquals(subprocesso.getCodigo(), movimentacao.getSubprocesso().getCodigo());
+        assertEquals(unidadeOrigem.getCodigo(), movimentacao.getUnidadeOrigem().getCodigo());
+        assertEquals(unidadeDestino.getCodigo(), movimentacao.getUnidadeDestino().getCodigo());
         assertEquals("Descrição de movimentação", movimentacao.getDescricao());
         assertNotNull(movimentacao.getDataHora());
     }

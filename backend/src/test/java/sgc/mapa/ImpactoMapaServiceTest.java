@@ -6,18 +6,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.mapa.dto.AtividadeImpactadaDto;
+import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.Usuario;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.modelo.TipoImpactoCompetencia;
+import sgc.mapa.service.ImpactoAtividadeService;
+import sgc.mapa.service.ImpactoCompetenciaService;
+import sgc.mapa.service.ImpactoMapaService;
+import sgc.sgrh.modelo.Usuario;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -30,6 +37,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ImpactoMapaServiceTest {
     private static final String COMPETENCIA_AFETADA = "Competência Afetada";
     @Mock
@@ -42,10 +50,10 @@ class ImpactoMapaServiceTest {
     private AtividadeRepo atividadeRepo;
 
     @Mock
-    private CompetenciaRepo repositorioCompetencia;
+    private ImpactoAtividadeService impactoAtividadeService;
 
     @Mock
-    private CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
+    private ImpactoCompetenciaService impactoCompetenciaService;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaServico;
@@ -103,21 +111,22 @@ class ImpactoMapaServiceTest {
         competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
+
+        AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(10L, "Atividade Antiga", TipoImpactoAtividade.REMOVIDA, null, List.of());
+        List<AtividadeImpactadaDto> removidas = List.of(atividadeRemovidaDto);
+        CompetenciaImpactadaDto competenciaImpactadaDto = new CompetenciaImpactadaDto(20L, COMPETENCIA_AFETADA, List.of("Detalhe"), TipoImpactoCompetencia.IMPACTO_GENERICO);
+        List<CompetenciaImpactadaDto> competenciasImpactadas = List.of(competenciaImpactadaDto);
 
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
         when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
-
-        when(atividadeRepo.findByMapaCodigo(2L)).thenReturn(java.util.Collections.emptyList());
-
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepo.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeRemovida));
-
-        when(repositorioCompetenciaAtividade.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
-        when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
+        when(atividadeRepo.findByMapaCodigo(mapaSubprocesso.getCodigo())).thenReturn(List.of());
+        when(impactoAtividadeService.obterAtividadesDoMapa(mapaVigente)).thenReturn(List.of(atividadeRemovida));
+        when(impactoAtividadeService.detectarAtividadesInseridas(List.of(), List.of(atividadeRemovida))).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesRemovidas(List.of(), List.of(atividadeRemovida), mapaVigente)).thenReturn(removidas);
+        when(impactoAtividadeService.detectarAtividadesAlteradas(List.of(), List.of(atividadeRemovida), mapaVigente)).thenReturn(List.of());
+        when(impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, removidas, List.of())).thenReturn(competenciasImpactadas);
 
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
@@ -145,17 +154,15 @@ class ImpactoMapaServiceTest {
         competencia.setCodigo(20L);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
 
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
         when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
-
-        when(atividadeRepo.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividade));
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepo.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividade));
+        when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividade), List.of())).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesRemovidas(List.of(atividade), List.of(), mapaVigente)).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesAlteradas(List.of(atividade), List.of(), mapaVigente)).thenReturn(List.of());
+        when(impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, List.of(), List.of())).thenReturn(List.of());
 
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
@@ -178,13 +185,24 @@ class ImpactoMapaServiceTest {
         atividadeNova.setDescricao("Atividade Nova");
         atividadeNova.setMapa(mapaSubprocesso);
 
+        AtividadeImpactadaDto atividadeInseridaDto = new AtividadeImpactadaDto(
+                10L,
+                "Atividade Nova",
+                TipoImpactoAtividade.INSERIDA,
+                null,
+                List.of()
+        );
+        List<AtividadeImpactadaDto> inseridas = List.of(atividadeInseridaDto);
+
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
         when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
-
-        when(atividadeRepo.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeNova));
-
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.Collections.emptyList());
+        when(impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso)).thenReturn(List.of(atividadeNova));
+        when(impactoAtividadeService.obterAtividadesDoMapa(mapaVigente)).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividadeNova), List.of())).thenReturn(inseridas);
+        when(impactoAtividadeService.detectarAtividadesRemovidas(List.of(atividadeNova), List.of(), mapaVigente)).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesAlteradas(List.of(atividadeNova), List.of(), mapaVigente)).thenReturn(List.of());
+        when(impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, List.of(), List.of())).thenReturn(List.of());
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
@@ -217,30 +235,33 @@ class ImpactoMapaServiceTest {
         competencia.setDescricao(COMPETENCIA_AFETADA);
         competencia.setMapa(mapaVigente);
 
-        CompetenciaAtividade vinculo = new CompetenciaAtividade();
-        vinculo.setId(new CompetenciaAtividade.Id(10L, 20L));
+        new CompetenciaAtividade().setId(new CompetenciaAtividade.Id(10L, 20L));
+
+        AtividadeImpactadaDto atividadeAlteradaDto = new AtividadeImpactadaDto(11L, "Descrição Nova", TipoImpactoAtividade.ALTERADA, "Descrição Antiga", List.of());
+        List<AtividadeImpactadaDto> alteradas = List.of(atividadeAlteradaDto);
+        CompetenciaImpactadaDto competenciaImpactadaDto = new CompetenciaImpactadaDto(20L, COMPETENCIA_AFETADA, List.of("Detalhe"), TipoImpactoCompetencia.IMPACTO_GENERICO);
+        List<CompetenciaImpactadaDto> competenciasImpactadas = List.of(competenciaImpactadaDto);
 
         when(repositorioSubprocesso.findById(100L)).thenReturn(Optional.of(subprocesso));
         when(repositorioMapa.findMapaVigenteByUnidade(1L)).thenReturn(Optional.of(mapaVigente));
         when(repositorioMapa.findBySubprocessoCodigo(100L)).thenReturn(Optional.of(mapaSubprocesso));
+        when(impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso)).thenReturn(List.of(atividadeAtual));
+        when(impactoAtividadeService.obterAtividadesDoMapa(mapaVigente)).thenReturn(List.of(atividadeVigente));
 
-        when(atividadeRepo.findByMapaCodigo(2L)).thenReturn(java.util.List.of(atividadeAtual));
 
-        when(repositorioCompetencia.findByMapaCodigo(1L)).thenReturn(java.util.List.of(competencia));
-        when(repositorioCompetenciaAtividade.findByCompetenciaCodigo(20L)).thenReturn(java.util.List.of(vinculo));
-        when(atividadeRepo.findAllById(java.util.Set.of(10L))).thenReturn(java.util.List.of(atividadeVigente));
+        when(impactoAtividadeService.detectarAtividadesInseridas(List.of(atividadeAtual), List.of(atividadeVigente))).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesRemovidas(List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente)).thenReturn(List.of());
+        when(impactoAtividadeService.detectarAtividadesAlteradas(List.of(atividadeAtual), List.of(atividadeVigente), mapaVigente)).thenReturn(alteradas);
+        when(impactoCompetenciaService.identificarCompetenciasImpactadas(mapaVigente, List.of(), alteradas)).thenReturn(competenciasImpactadas);
 
-        when(repositorioCompetenciaAtividade.findByAtividadeCodigo(10L)).thenReturn(java.util.List.of(vinculo));
-        when(repositorioCompetencia.findById(20L)).thenReturn(Optional.of(competencia));
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
         assertThat(result.temImpactos()).isTrue();
-        assertThat(result.totalAtividadesInseridas()).isEqualTo(1);
-        assertThat(result.totalAtividadesRemovidas()).isEqualTo(1);
-        assertThat(result.totalAtividadesAlteradas()).isZero();
-        assertThat(result.atividadesInseridas().getFirst().descricao()).isEqualTo("Descrição Nova");
-        assertThat(result.atividadesRemovidas().getFirst().descricao()).isEqualTo("Descrição Antiga");
+        assertThat(result.totalAtividadesInseridas()).isZero();
+        assertThat(result.totalAtividadesRemovidas()).isZero();
+        assertThat(result.totalAtividadesAlteradas()).isEqualTo(1);
+        assertThat(result.atividadesAlteradas().getFirst().descricao()).isEqualTo("Descrição Nova");
         assertThat(result.competenciasImpactadas()).hasSize(1);
         assertThat(result.competenciasImpactadas().getFirst().descricao()).isEqualTo(COMPETENCIA_AFETADA);
     }

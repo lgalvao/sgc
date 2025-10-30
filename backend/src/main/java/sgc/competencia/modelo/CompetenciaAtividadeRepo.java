@@ -17,29 +17,32 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
     /**
      * Busca todos os vínculos de uma competência.
      *
-     * @param competenciaCodigo Código da competência
+     * @param codCompetencia Código da competência
      * @return Lista de vínculos da competência com atividades
      */
-    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.id.competenciaCodigo = :competenciaCodigo")
-    List<CompetenciaAtividade> findByCompetenciaCodigo(@Param("competenciaCodigo") Long competenciaCodigo);
-    
+    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.id.codCompetencia = :codCompetencia")
+    List<CompetenciaAtividade> findByCompetencia_Codigo(@Param("codCompetencia") Long codCompetencia);
+
     /**
      * Busca todos os vínculos de uma atividade.
      *
-     * @param atividadeCodigo Código da atividade
+     * @param codAtividade Código da atividade
      * @return Lista de vínculos da atividade com competências
      */
-    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.id.atividadeCodigo = :atividadeCodigo")
-    List<CompetenciaAtividade> findByAtividadeCodigo(@Param("atividadeCodigo") Long atividadeCodigo);
-    
+    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.id.codAtividade = :codAtividade")
+    List<CompetenciaAtividade> findByAtividadeCodigo(@Param("codAtividade") Long codAtividade);
+
     /**
      * Verifica se existe vínculo para uma atividade.
      *
-     * @param atividadeCodigo Código da atividade
+     * @param codAtividade Código da atividade
      * @return true se existe ao menos um vínculo
      */
-    @Query("SELECT CASE WHEN COUNT(ca) > 0 THEN true ELSE false END FROM CompetenciaAtividade ca WHERE ca.id.atividadeCodigo = :atividadeCodigo")
-    boolean existsByAtividadeCodigo(@Param("atividadeCodigo") Long atividadeCodigo);
+    @Query("""
+            SELECT CASE WHEN COUNT(ca) > 0 THEN true ELSE false END
+            FROM CompetenciaAtividade ca
+            WHERE ca.id.codAtividade = :codAtividade""")
+    boolean existsByAtividadeCodigo(@Param("codAtividade") Long codAtividade);
 
     /**
      * Conta o número de competências associadas a uma atividade.
@@ -56,13 +59,23 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
      * @return O número de atividades associadas.
      */
     long countByCompetenciaCodigo(Long competenciaCodigo);
-    
+
     /**
      * Remove todos os vínculos de uma competência.
      *
-     * @param competenciaCodigo Código da competência
+     * @param codCompetencia Código da competência
      */
     @Modifying
-    @Query("DELETE FROM CompetenciaAtividade ca WHERE ca.id.competenciaCodigo = :competenciaCodigo")
-    void deleteByCompetenciaCodigo(@Param("competenciaCodigo") Long competenciaCodigo);
+    @Query("DELETE FROM CompetenciaAtividade ca WHERE ca.id.codCompetencia = :codCompetencia")
+    void deleteByCompetenciaCodigo(@Param("codCompetencia") Long codCompetencia);
+
+    @Query("SELECT ca FROM CompetenciaAtividade ca JOIN Atividade a ON ca.id.codAtividade = a.codigo WHERE a.mapa.codigo = :codMapa")
+    List<CompetenciaAtividade> findByMapaCodigo(@Param("codMapa") Long codMapa);
+
+    @Modifying
+    @Query("DELETE FROM CompetenciaAtividade ca WHERE ca.id.codCompetencia IN (SELECT c.codigo FROM Competencia c WHERE c.mapa.codigo = :codMapa)")
+    void deleteByCompetenciaMapaCodigo(@Param("codMapa") Long codMapa);
+
+    @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.competencia.mapa.codigo = :codMapa")
+    List<CompetenciaAtividade> findByCompetencia_Mapa_Codigo(@Param("codMapa") Long codMapa);
 }

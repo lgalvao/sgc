@@ -1,77 +1,42 @@
-# Módulo de Conhecimentos - SGC
+# Pacote Conhecimento (Modelo de Dados)
 
 ## Visão Geral
-O pacote `conhecimento` é responsável pelo gerenciamento de **Conhecimentos**. No contexto do sistema SGC, um "Conhecimento" representa uma habilidade, um saber ou uma informação necessária para executar uma determinada `Atividade`.
+Este pacote contém a definição da entidade JPA `Conhecimento` e seus componentes associados, como o repositório (`ConhecimentoRepo`) e os DTOs.
 
-Este pacote fornece a estrutura completa para o CRUD (Criar, Ler, Atualizar, Excluir) de conhecimentos, incluindo a entidade, o repositório, o controlador REST e os DTOs para a comunicação via API.
+**Nota Arquitetural Importante:** Este pacote **não possui uma camada de serviço ou de controle (`*Service`, `*Controle`)**. A lógica de negócio e a API REST para o gerenciamento de `Conhecimentos` foram centralizadas no módulo `atividade`.
 
-## Arquivos Principais
+## Arquitetura e Propósito
+A entidade `Conhecimento` é tratada como um **recurso filho** da entidade `Atividade`. Isso significa que um conhecimento não existe de forma independente; ele está sempre associado a uma atividade específica.
 
-### 1. `Conhecimento.java`
-**Localização:** `backend/src/main/java/sgc/conhecimento/modelo/Conhecimento.java`
-- **Descrição:** Entidade JPA que representa um conhecimento. Mapeia a tabela `CONHECIMENTO`.
-- **Campos Importantes:**
-  - `descricao`: O texto que descreve o conhecimento.
-  - `atividade`: A `Atividade` à qual este conhecimento está associado.
+Portanto, a responsabilidade de gerenciar o ciclo de vida de um `Conhecimento` (criar, ler, atualizar, excluir) pertence ao `AtividadeService` e é exposta através do `AtividadeControle`.
 
-### 2. `ConhecimentoControle.java`
-**Localização:** `backend/src/main/java/sgc/conhecimento/ConhecimentoControle.java`
-- **Descrição:** Controlador REST que expõe os endpoints para gerenciar a entidade `Conhecimento`.
-- **Endpoints Principais:**
-  - `GET /api/conhecimentos`: Lista todos os conhecimentos.
-  - `POST /api/conhecimentos`: Cria um novo conhecimento.
-  - `PUT /api/conhecimentos/{id}`: Atualiza um conhecimento existente.
-  - `DELETE /api/conhecimentos/{id}`: Exclui um conhecimento.
-
-### 3. `ConhecimentoRepo.java`
-**Localização:** `backend/src/main/java/sgc/conhecimento/modelo/ConhecimentoRepo.java`
-- **Descrição:** Interface Spring Data JPA que fornece os métodos de acesso a dados para a entidade `Conhecimento`.
-
-### 4. DTOs (`dto/`)
-**Localização:** `backend/src/main/java/sgc/conhecimento/dto/`
-- **Descrição:** Contém os Data Transfer Objects (DTOs), como `ConhecimentoDto`, utilizados para transferir dados entre o cliente (frontend) e o servidor de forma segura e desacoplada da entidade do banco de dados.
-
-## Diagrama de Componentes
 ```mermaid
 graph TD
-    subgraph "Usuário"
-        A[Usuário via API]
+    subgraph "Pacote Atividade (sgc.atividade)"
+        Controle(AtividadeControle)
+        Service(AtividadeService)
     end
 
-    subgraph "Módulo Conhecimento"
-        B(ConhecimentoControle)
-        C[ConhecimentoRepo]
-        D(Conhecimento)
-        E(ConhecimentoDto)
+    subgraph "Pacote Conhecimento (este pacote)"
+        Modelo(Conhecimento)
+        Repo[ConhecimentoRepo]
     end
 
-    A -- Requisição HTTP com DTO --> B
-    B -- Usa --> C
-    C -- Gerencia --> D
-    B -- Converte para/de --> E
+    Controle -- delega para --> Service
+    Service -- gerencia o ciclo de vida de --> Modelo
+    Service -- usa --> Repo
+
 ```
 
-## Fluxo de uma Requisição
-1.  **Requisição HTTP**: O cliente envia uma requisição para um dos endpoints do `ConhecimentoControle` (ex: `POST /api/conhecimentos` com um `ConhecimentoDto` no corpo).
-2.  **Controlador**: O controller recebe a requisição e valida o DTO.
-3.  **Mapeamento**: O DTO é convertido para uma entidade `Conhecimento`.
-4.  **Repositório**: O controller invoca o `ConhecimentoRepo` para persistir a entidade no banco de dados.
-5.  **Resposta HTTP**: O controller retorna uma resposta HTTP (ex: `201 Created`) com o DTO do conhecimento recém-criado.
+### Por que esta abordagem?
+Gerenciar `Conhecimento` como um sub-recurso de `Atividade` torna a API mais semântica e alinhada com as práticas RESTful. Em vez de um endpoint genérico como `POST /api/conhecimentos`, a operação é feita através de um endpoint aninhado que deixa a relação explícita:
 
-## Como Usar
-Para interagir com este módulo, utilize um cliente HTTP para fazer requisições aos endpoints expostos pelo `ConhecimentoControle`.
+`POST /api/atividades/{atividadeId}/conhecimentos`
 
-**Exemplo: Criar um novo conhecimento associado a uma atividade**
-```http
-POST /api/conhecimentos
-Content-Type: application/json
+## Componentes Principais
+- **`Conhecimento`**: A entidade JPA que representa um conhecimento necessário para executar uma `Atividade`.
+- **`ConhecimentoRepo`**: O repositório Spring Data JPA para acesso direto à entidade `Conhecimento`. **Seu uso deve ser evitado fora do `AtividadeService`**.
+- **`dto/`**: Contém os Data Transfer Objects (DTOs) usados pelo `AtividadeControle` para expor dados de conhecimento na API.
 
-{
-  "descricao": "Conhecimento em desenvolvimento de APIs REST com Spring Boot",
-  "atividadeId": 42
-}
-```
-
-## Notas Importantes
-- **Padrão DTO**: O uso do padrão Data Transfer Object é uma boa prática que evita expor a estrutura interna do banco de dados (entidades JPA) diretamente na API, aumentando a segurança e a flexibilidade.
-- **Relacionamento com Atividade**: Cada `Conhecimento` está diretamente ligado a uma `Atividade`, formando a base para a construção do mapa de competências.
+## Conclusão
+Este pacote serve como um local para os **modelos de dados** de `Conhecimento`. Para toda a lógica de negócio, API e gerenciamento, consulte o pacote `sgc.atividade`.

@@ -9,21 +9,25 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.modelo.*;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.alerta.modelo.Alerta;
+import sgc.alerta.modelo.AlertaRepo;
+import sgc.alerta.modelo.AlertaUsuario;
+import sgc.alerta.modelo.AlertaUsuarioRepo;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
-import sgc.sgrh.SgrhService;
+import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.alerta.modelo.TipoAlerta.CADASTRO_DISPONIBILIZADO;
 
 @Nested
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +64,7 @@ class AlertaServiceTest {
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        subprocesso.setDataLimiteEtapa1(LocalDate.of(2025, 12, 31));
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2025, 12, 31, 0, 0));
     }
 
     @Test
@@ -113,7 +117,8 @@ class AlertaServiceTest {
     @DisplayName("Deve marcar alerta como lido com sucesso")
     void marcarComoLido_deveMarcarComoLido() {
         Long alertaId = 1L;
-        String usuarioTitulo = "user.teste";
+        String usuarioTituloStr = "123456789012";
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         alertaUsuario.setId(id);
@@ -121,7 +126,7 @@ class AlertaServiceTest {
 
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.of(alertaUsuario));
 
-        alertaService.marcarComoLido(usuarioTitulo, alertaId);
+        alertaService.marcarComoLido(usuarioTituloStr, alertaId);
 
         ArgumentCaptor<AlertaUsuario> captor = ArgumentCaptor.forClass(AlertaUsuario.class);
         verify(repositorioAlertaUsuario).save(captor.capture());
@@ -132,11 +137,12 @@ class AlertaServiceTest {
     @DisplayName("Deve lançar exceção ao tentar marcar como lido alerta inexistente")
     void marcarComoLido_deveLancarExcecaoSeAlertaNaoEncontrado() {
         Long alertaId = 1L;
-        String usuarioTitulo = "user.teste";
+        String usuarioTituloStr = "123456789012";
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTitulo, alertaId));
+        assertThrows(ErroDominioNaoEncontrado.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
     }
 
     @Test
@@ -160,7 +166,8 @@ class AlertaServiceTest {
         // A asserção principal aqui é que o metodo não lança exceção com data nula.
         // A formatação da data em si é privada, mas seu efeito na descrição pode ser verificado.
         String descricaoEsperada = "Cadastro disponibilizado pela unidade ORIGEM no processo 'Processo de Teste'. Realize a análise do cadastro.";
-        assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+        Alerta alertaSalvo = alertaCaptor.getValue();
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
@@ -178,7 +185,8 @@ class AlertaServiceTest {
         verify(repositorioAlerta).save(alertaCaptor.capture());
 
         String descricaoEsperada = "Cadastro devolvido no processo 'Processo de Teste'. Motivo: Informações incompletas. Realize os ajustes necessários e disponibilize novamente.";
-        assertEquals(descricaoEsperada, alertaCaptor.getValue().getDescricao());
+        Alerta alertaSalvo = alertaCaptor.getValue();
+        assertEquals(descricaoEsperada, alertaSalvo.getDescricao());
     }
 
     @Test
@@ -186,7 +194,6 @@ class AlertaServiceTest {
     void criarAlertasProcessoIniciado_deveIgnorarSubprocessoSemUnidade() {
         Subprocesso subprocessoSemUnidade = new Subprocesso();
         subprocessoSemUnidade.setCodigo(101L);
-        subprocessoSemUnidade.setUnidade(null);
 
         alertaService.criarAlertasProcessoIniciado(processo, List.of(), List.of(subprocessoSemUnidade));
 
@@ -207,14 +214,14 @@ class AlertaServiceTest {
     @Test
     @DisplayName("Deve criar alerta mesmo se SGRH falhar ao buscar responsável")
     void criarAlerta_deveContinuarSeSGRHFalhar() {
-        Long unidadeDestinoCodigo = 30L;
-        when(repositorioUnidade.findById(unidadeDestinoCodigo)).thenReturn(Optional.of(new Unidade()));
-        when(servicoSgrh.buscarResponsavelUnidade(unidadeDestinoCodigo)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
+        Long codUnidadeDestino = 30L;
+        when(repositorioUnidade.findById(codUnidadeDestino)).thenReturn(Optional.of(new Unidade()));
+        when(servicoSgrh.buscarResponsavelUnidade(codUnidadeDestino)).thenThrow(new RuntimeException("Erro de comunicação com SGRH"));
         when(repositorioAlerta.save(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Apenas chama o método. O teste passa se nenhuma exceção for lançada.
+        // Apenas chama o metodo. O teste passa se nenhuma exceção for lançada.
         assertDoesNotThrow(() -> {
-            alertaService.criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, unidadeDestinoCodigo, "Descrição", null);
+            alertaService.criarAlerta(processo, CADASTRO_DISPONIBILIZADO, codUnidadeDestino, "Descrição", null);
         });
 
         // Verifica que o alerta principal foi salvo, mas nenhum AlertaUsuario foi criado

@@ -8,10 +8,8 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Subprocesso extends EntidadeBase {
-
     @ManyToOne
     @JoinColumn(name = "processo_codigo")
     private Processo processo;
@@ -35,19 +32,16 @@ public class Subprocesso extends EntidadeBase {
     private Mapa mapa;
 
     @Column(name = "data_limite_etapa1")
-    private LocalDate dataLimiteEtapa1;
+    private LocalDateTime dataLimiteEtapa1;
 
     @Column(name = "data_fim_etapa1")
     private LocalDateTime dataFimEtapa1;
 
     @Column(name = "data_limite_etapa2")
-    private LocalDate dataLimiteEtapa2;
+    private LocalDateTime dataLimiteEtapa2;
 
     @Column(name = "data_fim_etapa2")
     private LocalDateTime dataFimEtapa2;
-
-    @Column(name = "data_fim_etapa3")
-    private LocalDateTime dataFimEtapa3;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao_id", length = 50)
@@ -56,12 +50,16 @@ public class Subprocesso extends EntidadeBase {
     /**
      * Construtor de conveniência para criar um novo subprocesso no início de um processo.
      */
-    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDate dataLimiteEtapa1) {
+    public Subprocesso(Processo processo, Unidade unidade, Mapa mapa, SituacaoSubprocesso situacao, LocalDateTime dataLimiteEtapa1) {
         super();
         this.processo = processo;
         this.unidade = unidade;
         this.mapa = mapa;
         this.situacao = situacao;
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
+    }
+
+    public Mapa getMapa() {
+        return this.mapa == null ? null : this.mapa;
     }
 }

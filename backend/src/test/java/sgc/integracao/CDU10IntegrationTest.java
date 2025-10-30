@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,10 @@ import sgc.Sgc;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -23,13 +28,14 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.notificacao.NotificacaoService;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -37,7 +43,7 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class})
+@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
 class CDU10IntegrationTest {
@@ -72,14 +78,18 @@ class CDU10IntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
 
-    @MockitoBean
-    private NotificacaoService notificacaoService;
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
@@ -93,12 +103,13 @@ class CDU10IntegrationTest {
         unidadeChefe = new Unidade("Unidade Teste", "UT");
         unidadeChefe.setUnidadeSuperior(unidadeSuperior);
         var chefe = new Usuario();
-        chefe.setTitulo("chefe");
+        chefe.setTituloEleitoral(333333333333L);
+        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
         chefe = usuarioRepo.save(chefe);
         unidadeChefe.setTitular(chefe);
         unidadeRepo.save(unidadeChefe);
 
-        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDate.now().plusDays(30));
+        Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
         var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());
@@ -112,9 +123,11 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro com sucesso quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
+            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
-            atividadeRepo.save(atividade);
-            conhecimentoRepo.save(new Conhecimento(atividade, "Conhecimento de Teste"));
+            atividade = atividadeRepo.save(atividade);
+            competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
+            conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isOk())
@@ -128,22 +141,20 @@ class CDU10IntegrationTest {
             assertThat(movimentacoes).hasSize(1);
             Movimentacao movimentacao = movimentacoes.getFirst();
             assertThat(movimentacao.getDescricao()).isEqualTo("Disponibilização da revisão do cadastro de atividades");
-            assertThat(movimentacao.getUnidadeOrigem()).isEqualTo(unidadeChefe);
-            assertThat(movimentacao.getUnidadeDestino()).isEqualTo(unidadeSuperior);
+            assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
+            assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
             var alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT disponibilizado para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade UT submetida para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             // Assert Notificação
-            String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: UT";
-            String corpoEsperado = """
-                    Prezado(a) responsável pela US,
-                    A unidade UT concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo Processo de Revisão.
-                    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).""";
-            verify(notificacaoService).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
+            verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
+                org.mockito.ArgumentMatchers.any(Subprocesso.class),
+                org.mockito.ArgumentMatchers.any(Unidade.class)
+            );
         }
 
         @Test
@@ -165,11 +176,12 @@ class CDU10IntegrationTest {
     @DisplayName("Testes de Segurança")
     class Seguranca {
         @Test
-        @WithMockChefe("outro_chefe")
+        @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
             var outroChefe = new Usuario();
-            outroChefe.setTitulo("outro_chefe");
+            outroChefe.setTituloEleitoral(999999999999L);
+            outroChefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
             usuarioRepo.save(outroChefe);
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))

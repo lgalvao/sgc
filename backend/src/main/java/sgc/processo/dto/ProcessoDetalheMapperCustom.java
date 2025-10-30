@@ -1,14 +1,19 @@
 package sgc.processo.dto;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementação customizada para mapeamento complexo de Processo para ProcessoDetalheDto.
@@ -18,10 +23,10 @@ import java.util.Map;
 @Component
 public class ProcessoDetalheMapperCustom {
 
-    private final ProcessoDetalheMapperInterface processoDetalheMapperInterface;
+    private final ProcessoDetalheMapper processoDetalheMapper;
 
-    public ProcessoDetalheMapperCustom(ProcessoDetalheMapperInterface processoDetalheMapperInterface) {
-        this.processoDetalheMapperInterface = processoDetalheMapperInterface;
+    public ProcessoDetalheMapperCustom(ProcessoDetalheMapper processoDetalheMapper) {
+        this.processoDetalheMapper = processoDetalheMapper;
     }
 
     /**
@@ -32,16 +37,16 @@ public class ProcessoDetalheMapperCustom {
                                          List<UnidadeProcesso> unidadesProcesso,
                                          List<Subprocesso> subprocessos) {
         if (p == null) return null;
-        
-        // Mapeia os dados básicos do processo usando MapStruct
-        ProcessoDetalheDto dto = processoDetalheMapperInterface.toDetailDTO(p);
 
-        Map<String, ProcessoDetalheDto.UnidadeParticipanteDTO> unidadesBySigla = new HashMap<>();
+        // Mapeia os dados básicos do processo usando MapStruct
+        ProcessoDetalheDto dto = processoDetalheMapper.toDetailDTO(p);
+
+        Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
 
         // Mapeia as unidades de processo
         if (unidadesProcesso != null) {
             for (UnidadeProcesso up : unidadesProcesso) {
-                ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.unidadeProcessoToUnidadeParticipanteDTO(up);
+                ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.unidadeProcessoToUnidadeParticipanteDTO(up);
                 if (unit.getSigla() != null) {
                     unidadesBySigla.put(unit.getSigla(), unit);
                 }
@@ -55,12 +60,12 @@ public class ProcessoDetalheMapperCustom {
 
                 if (sigla != null && unidadesBySigla.containsKey(sigla)) {
                     // Atualiza a unidade existente com informações do subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDTO existingUnit = unidadesBySigla.get(sigla);
-                    ProcessoDetalheDto.UnidadeParticipanteDTO updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDTO.builder()
-                        .unidadeCodigo(existingUnit.getUnidadeCodigo())
+                    ProcessoDetalheDto.UnidadeParticipanteDto existingUnit = unidadesBySigla.get(sigla);
+                    ProcessoDetalheDto.UnidadeParticipanteDto updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
+                        .codUnidade(existingUnit.getCodUnidade())
                         .nome(existingUnit.getNome())
                         .sigla(existingUnit.getSigla())
-                        .unidadeSuperiorCodigo(existingUnit.getUnidadeSuperiorCodigo())
+                        .codUnidadeSuperior(existingUnit.getCodUnidadeSuperior())
                         .situacaoSubprocesso(sp.getSituacao()) // Novo valor
                         .dataLimite(sp.getDataLimiteEtapa1())   // Novo valor
                         .filhos(existingUnit.getFilhos())
@@ -68,7 +73,7 @@ public class ProcessoDetalheMapperCustom {
                     unidadesBySigla.put(sigla, updatedUnit); // Atualizar no mapa
                 } else {
                     // Cria uma nova unidade participante baseada no subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDTO unit = processoDetalheMapperInterface.subprocessoToUnidadeParticipanteDTO(sp);
+                    ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.subprocessoToUnidadeParticipanteDTO(sp);
                     if (unit.getSigla() != null) {
                         unidadesBySigla.put(unit.getSigla(), unit);
                     }
@@ -77,16 +82,42 @@ public class ProcessoDetalheMapperCustom {
         }
 
         // Constroi a lista final de unidades a partir do mapa para garantir que as atualizações sejam refletidas
-        List<ProcessoDetalheDto.UnidadeParticipanteDTO> unidades = new ArrayList<>(unidadesBySigla.values());
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> unidades = new ArrayList<>(unidadesBySigla.values());
 
         // Mapeia os subprocessos para resumo
         List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
         if (subprocessos != null) {
             for (Subprocesso sp : subprocessos) {
-                ProcessoResumoDto resumoDto = processoDetalheMapperInterface.subprocessoToProcessoResumoDto(sp);
+                ProcessoResumoDto resumoDto = processoDetalheMapper.subprocessoToProcessoResumoDto(sp);
                 resumoSubprocessos.add(resumoDto);
             }
         }
+
+        // Lógica para os botões condicionais
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean allSubprocessosHomologados = subprocessos != null && !subprocessos.isEmpty() && subprocessos.stream()
+                .allMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_HOMOLOGADO);
+
+        boolean podeFinalizar = isAdmin
+                && p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO
+                && allSubprocessosHomologados;
+
+        final Set<SituacaoSubprocesso> situacoesHomologacaoCadastro = Set.of(
+            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
+            SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+        );
+        boolean podeHomologarCadastro = subprocessos != null && subprocessos.stream()
+                .anyMatch(sp -> situacoesHomologacaoCadastro.contains(sp.getSituacao()));
+
+        final Set<SituacaoSubprocesso> situacoesHomologacaoMapa = Set.of(
+            SituacaoSubprocesso.MAPA_VALIDADO,
+            SituacaoSubprocesso.MAPA_COM_SUGESTOES
+        );
+        boolean podeHomologarMapa = subprocessos != null && subprocessos.stream()
+                .anyMatch(sp -> situacoesHomologacaoMapa.contains(sp.getSituacao()));
 
         return ProcessoDetalheDto.builder()
             .codigo(dto.getCodigo())
@@ -98,6 +129,9 @@ public class ProcessoDetalheMapperCustom {
             .dataFinalizacao(dto.getDataFinalizacao())
             .unidades(unidades)
             .resumoSubprocessos(resumoSubprocessos)
+            .podeFinalizar(podeFinalizar)
+            .podeHomologarCadastro(podeHomologarCadastro)
+            .podeHomologarMapa(podeHomologarMapa)
             .build();
     }
 }

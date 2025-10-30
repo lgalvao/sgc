@@ -20,6 +20,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mapa extends EntidadeBase {
+
+    public Mapa(Mapa mapa) {
+        if (mapa != null) {
+            super.setCodigo(mapa.getCodigo());
+            this.dataHoraDisponibilizado = mapa.getDataHoraDisponibilizado();
+            this.observacoesDisponibilizacao = mapa.getObservacoesDisponibilizacao();
+            this.sugestoes = mapa.getSugestoes();
+            this.sugestoesApresentadas = mapa.getSugestoesApresentadas();
+            this.dataHoraHomologado = mapa.getDataHoraHomologado();
+            this.unidade = mapa.getUnidade();
+        }
+    }
     @Column(name = "data_hora_disponibilizado")
     private LocalDateTime dataHoraDisponibilizado;
 

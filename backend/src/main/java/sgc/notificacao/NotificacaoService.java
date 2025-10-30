@@ -42,19 +42,32 @@ public class NotificacaoService {
     private static final int MAX_TENTATIVAS = 3;
     private static final long ESPERA_ENTRE_TENTATIVAS_MS = 1000;
 
+    /**
+     * Envia um email de texto simples.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para    O endereço de email do destinatário.
+     * @param assunto O assunto do email.
+     * @param corpo   O corpo do email em texto simples.
+     */
     @Transactional
     public void enviarEmail(String para, String assunto, String corpo) {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpo, false));
     }
 
+    /**
+     * Envia um email com conteúdo HTML.
+     * <p>
+     * O processo de envio é assíncrono e inclui retentativas.
+     *
+     * @param para      O endereço de email do destinatário.
+     * @param assunto   O assunto do email.
+     * @param corpoHtml O corpo do email em formato HTML.
+     */
     @Transactional
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
         processarEnvioDeEmail(new EmailDto(para, assunto, corpoHtml, true));
-    }
-
-    @Transactional
-    public void enviarEmailDto(EmailDto emailDto) {
-        processarEnvioDeEmail(emailDto);
     }
 
     private void processarEnvioDeEmail(EmailDto emailDto) {
@@ -74,8 +87,7 @@ public class NotificacaoService {
                         if (Boolean.TRUE.equals(sucesso)) {
                             log.info("E-mail para {} enviado com sucesso.", emailDto.destinatario());
                         } else {
-                            log.error("Falha ao enviar e-mail para {} após {} tentativas.",
-                                    emailDto.destinatario(), MAX_TENTATIVAS);
+                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.destinatario(), MAX_TENTATIVAS);
                         }
                     })
                     .exceptionally(ex -> {
@@ -88,7 +100,18 @@ public class NotificacaoService {
         }
     }
 
-    @Async("executorDeTarefasDeEmail")
+    /**
+     * Tenta enviar um email de forma assíncrona, com uma política de retentativas.
+     * <p>
+     * Este método é executado em uma thread separada. Ele tentará enviar o email
+     * até {@code MAX_TENTATIVAS} vezes, com um tempo de espera crescente entre
+     * as tentativas.
+     *
+     * @param emailDto O DTO contendo os detalhes do email a ser enviado.
+     * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
+     * email for enviado com sucesso, ou {@code false} caso contrário.
+     */
+    @Async
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
@@ -112,18 +135,17 @@ public class NotificacaoService {
                 }
             }
         }
-        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.",
-                MAX_TENTATIVAS, emailDto.destinatario(), excecaoFinal);
+        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS, emailDto.destinatario(), excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
-    private void enviarEmailSmtp(EmailDto emailDto) throws MessagingException, UnsupportedEncodingException {
+    private void enviarEmailSmtp(EmailDto emailDto) throws UnsupportedEncodingException, MessagingException {
         MimeMessage mensagem = enviadorDeEmail.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
         helper.setFrom(new InternetAddress(remetente, nomeRemetente));
         helper.setTo(emailDto.destinatario());
-        String assuntoCompleto = prefixoAssunto + " " + emailDto.assunto();
+        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.assunto());
         helper.setSubject(assuntoCompleto);
         helper.setText(emailDto.corpo(), emailDto.html());
 
@@ -134,19 +156,15 @@ public class NotificacaoService {
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s",
-                emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
+        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
         if (conteudo.length() > 500) {
-            conteudo = conteudo.substring(0, 497) + "...";
+            conteudo = "%s...".formatted(conteudo.substring(0, 497));
         }
         notificacao.setConteudo(conteudo);
         return notificacao;
     }
 
     private boolean isEmailValido(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
-        }
-        return PADRAO_EMAIL.matcher(email.trim()).matches();
+        return email != null && !email.trim().isEmpty() && PADRAO_EMAIL.matcher(email.trim()).matches();
     }
 }

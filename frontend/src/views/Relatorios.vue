@@ -145,10 +145,7 @@
                 <thead>
                   <tr>
                     <th>Unidade</th>
-                    <th>Processo</th>
                     <th>Competências</th>
-                    <th>Data Criação</th>
-                    <th>Situação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,10 +154,7 @@
                     :key="mapa.id"
                   >
                     <td>{{ mapa.unidade }}</td>
-                    <td>{{ mapa.idProcesso }}</td>
                     <td>{{ mapa.competencias?.length || 0 }}</td>
-                    <td>{{ formatarData(mapa.dataCriacao) }}</td>
-                    <td>{{ mapa.situacao }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -282,21 +276,21 @@
                     <th>Tipo</th>
                     <th>Situação</th>
                     <th>Data Limite</th>
-                    <th>Unidades Participantes</th>
+                    <th>Unidade</th>
                     <th>% Concluído</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="processo in processosFiltrados"
-                    :key="processo.id"
+                    :key="processo.codigo"
                   >
                     <td>{{ processo.descricao }}</td>
                     <td>{{ processo.tipo }}</td>
                     <td>{{ processo.situacao }}</td>
-                    <td>{{ formatarData(processo.dataLimite) }}</td>
-                    <td>{{ getUnidadesParticipantes(processo.id).length }}</td>
-                    <td>{{ calcularPercentualConcluido(processo.id) }}%</td>
+                    <td>{{ formatarData(new Date(processo.dataLimite)) }}</td>
+                    <td>{{ processo.unidadeNome }}</td>
+                    <td>{{ calcularPercentualConcluido }}%</td>
                   </tr>
                 </tbody>
               </table>
@@ -312,31 +306,25 @@
 import {computed, ref} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useMapasStore} from '@/stores/mapas'
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
-
+import {TipoProcesso} from '@/types/tipos';
 import {formatDateBR} from '@/utils'
 
-// Definição de tipo para os dados do CSV
 type CSVData = Record<string, string | number | undefined>;
 
-// Stores
 const processosStore = useProcessosStore()
 const mapasStore = useMapasStore()
 
-
-// Filtros reativos
 const filtroTipo = ref('')
 const filtroDataInicio = ref('')
 const filtroDataFim = ref('')
 
-// Refs para controle dos modais
 const mostrarModalMapasVigentes = ref(false)
 const mostrarModalDiagnosticosGaps = ref(false)
 const mostrarModalAndamentoGeral = ref(false)
 
 // Dados computados
 const processosFiltrados = computed(() => {
-  let processos = processosStore.processos
+  let processos = processosStore.processosPainel
 
   if (filtroTipo.value) {
     processos = processos.filter(p => p.tipo === filtroTipo.value)
@@ -344,12 +332,12 @@ const processosFiltrados = computed(() => {
 
   if (filtroDataInicio.value) {
     const dataInicio = new Date(filtroDataInicio.value)
-    processos = processos.filter(p => p.dataLimite >= dataInicio)
+    processos = processos.filter(p => new Date(p.dataCriacao) >= dataInicio)
   }
 
   if (filtroDataFim.value) {
     const dataFim = new Date(filtroDataFim.value)
-    processos = processos.filter(p => p.dataLimite <= dataFim)
+    processos = processos.filter(p => new Date(p.dataCriacao) <= dataFim)
   }
 
   return processos
@@ -357,13 +345,14 @@ const processosFiltrados = computed(() => {
 
 const mapasVigentes = computed(() => {
   // Filtrar mapas vigentes (aqueles com processos finalizados)
-  const processosFinalizados = processosStore.processos.filter(p => p.situacao === 'Finalizado')
-  const idsProcessosFinalizados = processosFinalizados.map(p => p.id)
-
-  return mapasStore.mapas.filter(m =>
-    idsProcessosFinalizados.includes(m.idProcesso) &&
-    m.competencias && m.competencias.length > 0
-  )
+  if (mapasStore.mapaCompleto && mapasStore.mapaCompleto.competencias && mapasStore.mapaCompleto.competencias.length > 0) {
+    return [{
+      ...(mapasStore.mapaCompleto as any),
+      unidade: (mapasStore.mapaCompleto as any).unidade.sigla,
+      id: mapasStore.mapaCompleto.codigo
+    }]
+  }
+  return []
 })
 
 const diagnosticosGaps = computed(() => {
@@ -419,7 +408,7 @@ const diagnosticosGaps = computed(() => {
 const diagnosticosGapsFiltrados = computed(() => {
   let diagnosticos = diagnosticosGaps.value
 
-  if (filtroTipo.value && filtroTipo.value !== 'Diagnóstico') {
+  if (filtroTipo.value && filtroTipo.value !== TipoProcesso.DIAGNOSTICO) {
     // Se filtro não for diagnóstico, mostrar apenas diagnósticos relacionados ao tipo
     return []
   }
@@ -450,24 +439,14 @@ const getClasseStatus = (status: string) => {
   }
 }
 
-// Metodos
 const formatarData = (data: Date) => {
   return formatDateBR(data)
 }
 
-const getUnidadesParticipantes = (idProcesso: number) => {
-  return processosStore.getUnidadesDoProcesso(idProcesso)
-}
-
-const calcularPercentualConcluido = (idProcesso: number) => {
-  const subprocessos = processosStore.getUnidadesDoProcesso(idProcesso)
-  if (subprocessos.length === 0) return 0
-
-  const concluidos = subprocessos.filter(sp =>
-      sp.situacao === 'Mapa homologado' || sp.situacao === SITUACOES_SUBPROCESSO.CADASTRO_HOMOLOGADO
-  ).length
-
-  return Math.round((concluidos / subprocessos.length) * 100)
+const calcularPercentualConcluido = () => {
+  // A lógica de percentual concluído precisa ser reavaliada com os novos DTOs.
+  // Por enquanto, retornaremos um valor fixo ou uma lógica simplificada.
+  return 0;
 }
 
 const abrirModalMapasVigentes = () => {
@@ -481,14 +460,10 @@ const abrirModalAndamentoGeral = () => {
 }
 
 
-
 const exportarMapasVigentes = () => {
   const dados = mapasVigentes.value.map(mapa => ({
     Unidade: mapa.unidade,
-    Processo: mapa.idProcesso,
-    Competencias: mapa.competencias?.length || 0,
-    'Data Criacao': formatarData(mapa.dataCriacao),
-    Situacao: mapa.situacao
+    Competencias: mapa.competencias?.length || 0
   }))
 
   const csv = gerarCSV(dados)
@@ -516,9 +491,9 @@ const exportarAndamentoGeral = () => {
     Descricao: processo.descricao,
     Tipo: processo.tipo,
     Situacao: processo.situacao,
-    'Data Limite': formatarData(processo.dataLimite),
-    'Unidades Participantes': getUnidadesParticipantes(processo.id).length,
-    '% Concluido': calcularPercentualConcluido(processo.id)
+    'Data Limite': formatarData(new Date(processo.dataLimite)),
+    'Unidade': processo.unidadeNome,
+    '% Concluido': calcularPercentualConcluido()
   }))
 
   const csv = gerarCSV(dados)
@@ -530,14 +505,14 @@ const gerarCSV = (dados: CSVData[]) => {
 
   const headers = Object.keys(dados[0])
   const linhas = dados.map(item =>
-    headers.map(header => `"${item[header]}"`).join(',')
+      headers.map(header => `"${item[header]}"`).join(',')
   )
 
   return [headers.join(','), ...linhas].join('\n')
 }
 
 const downloadCSV = (csv: string, nomeArquivo: string) => {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'})
   const link = document.createElement('a')
 
   if (link.download !== undefined) {

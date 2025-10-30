@@ -8,10 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.analise.dto.CriarAnaliseRequestDto;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
@@ -24,8 +25,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para AnaliseService")
 class AnaliseServiceTest {
+    private static final String OBS = "Observação";
 
-    private static final String OBSERVACAO = "Observação";
     @Mock
     private AnaliseRepo analiseRepo;
 
@@ -59,7 +60,7 @@ class AnaliseServiceTest {
 
             assertFalse(resultado.isEmpty());
             assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.CADASTRO, resultado.get(0).getTipo());
+            assertEquals(TipoAnalise.CADASTRO, resultado.getFirst().getTipo());
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -75,7 +76,7 @@ class AnaliseServiceTest {
 
             assertFalse(resultado.isEmpty());
             assertEquals(1, resultado.size());
-            assertEquals(TipoAnalise.VALIDACAO, resultado.get(0).getTipo());
+            assertEquals(TipoAnalise.VALIDACAO, resultado.getFirst().getTipo());
             verify(analiseRepo).findBySubprocessoCodigoOrderByDataHoraDesc(1L);
         }
 
@@ -84,9 +85,7 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-                service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO);
-            });
+            assertThrows(ErroDominioNaoEncontrado.class, () -> service.listarPorSubprocesso(99L, TipoAnalise.CADASTRO));
         }
     }
 
@@ -100,11 +99,19 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(1L, OBSERVACAO, TipoAnalise.CADASTRO, null, null, null, null);
+            Analise resultado = service.criarAnalise(CriarAnaliseRequestDto.builder()
+                    .subprocessoCodigo(1L)
+                    .observacoes(OBS)
+                    .tipo(TipoAnalise.CADASTRO)
+                    .acao(null)
+                    .unidadeSigla(null)
+                    .analistaUsuarioTitulo(null)
+                    .motivo(null)
+                    .build());
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBSERVACAO, resultado.getObservacoes());
+            assertEquals(OBS, resultado.getObservacoes());
             assertEquals(TipoAnalise.CADASTRO, resultado.getTipo());
             verify(analiseRepo).save(any(Analise.class));
         }
@@ -115,11 +122,19 @@ class AnaliseServiceTest {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
             when(analiseRepo.save(any(Analise.class))).thenAnswer(i -> i.getArgument(0));
 
-            Analise resultado = service.criarAnalise(1L, OBSERVACAO, TipoAnalise.VALIDACAO, null, null, null, null);
+            Analise resultado = service.criarAnalise(CriarAnaliseRequestDto.builder()
+                    .subprocessoCodigo(1L)
+                    .observacoes(OBS)
+                    .tipo(TipoAnalise.VALIDACAO)
+                    .acao(null)
+                    .unidadeSigla(null)
+                    .analistaUsuarioTitulo(null)
+                    .motivo(null)
+                    .build());
 
             assertNotNull(resultado);
             assertEquals(subprocesso, resultado.getSubprocesso());
-            assertEquals(OBSERVACAO, resultado.getObservacoes());
+            assertEquals(OBS, resultado.getObservacoes());
             assertEquals(TipoAnalise.VALIDACAO, resultado.getTipo());
             verify(analiseRepo).save(any(Analise.class));
         }
@@ -129,16 +144,21 @@ class AnaliseServiceTest {
         void deveLancarExcecaoSeSubprocessoNaoEncontradoAoCriar() {
             when(subprocessoRepo.findById(99L)).thenReturn(Optional.empty());
 
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> {
-                service.criarAnalise(99L, "Obs", TipoAnalise.CADASTRO, null, null, null, null);
-            });
+            assertThrows(ErroDominioNaoEncontrado.class, () -> service.criarAnalise(CriarAnaliseRequestDto.builder()
+                    .subprocessoCodigo(99L)
+                    .observacoes("Obs")
+                    .tipo(TipoAnalise.CADASTRO)
+                    .acao(null)
+                    .unidadeSigla(null)
+                    .analistaUsuarioTitulo(null)
+                    .motivo(null)
+                    .build()));
         }
     }
 
     @Nested
     @DisplayName("Testes para removerPorSubprocesso")
     class RemoverPorSubprocesso {
-
         @Test
         @DisplayName("Deve remover análises por subprocesso")
         void deveRemoverAnalisesPorSubprocesso() {

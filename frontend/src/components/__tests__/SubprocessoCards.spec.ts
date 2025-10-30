@@ -1,21 +1,33 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import SubprocessoCards from '../SubprocessoCards.vue';
-import {Mapa, TipoProcesso} from '@/types/tipos';
+import {type Mapa, TipoProcesso, type Unidade} from '@/types/tipos';
 
 describe('SubprocessoCards.vue', () => {
   const mountComponent = (props: { tipoProcesso: TipoProcesso; mapa: Mapa | null; situacao?: string }) => {
     return mount(SubprocessoCards, {
-      props
+      props,
     });
   };
 
+  const mockMapa: Mapa = {
+    codigo: 1,
+    descricao: 'mapa de teste',
+    unidade: { sigla: 'UNID_TESTE' } as Unidade,
+    situacao: 'em_andamento',
+    idProcesso: 1,
+    competencias: [],
+    dataCriacao: new Date().toISOString(),
+    dataDisponibilizacao: null,
+    dataFinalizacao: null,
+  };
+
   describe('MAPEAMENTO and REVISAO process types', () => {
-    it.each([TipoProcesso.MAPEAMENTO, TipoProcesso.REVISAO])('should render both cards for %s', (tipoProcesso) => {
+    it.each([TipoProcesso.MAPEAMENTO, TipoProcesso.REVISAO])('should render both cards for %s', tipoProcesso => {
       const wrapper = mountComponent({
         tipoProcesso,
         mapa: null,
-        situacao: 'Mapa disponibilizado'
+        situacao: 'Mapa disponibilizado',
       });
 
       expect(wrapper.findAll('.card')).toHaveLength(2);
@@ -27,7 +39,7 @@ describe('SubprocessoCards.vue', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: null,
-        situacao: 'Mapa disponibilizado'
+        situacao: 'Mapa disponibilizado',
       });
 
       const atividadesCard = wrapper.findAll('.card')[0];
@@ -40,17 +52,8 @@ describe('SubprocessoCards.vue', () => {
     it('should emit navegarParaMapa when mapa card is clicked and mapa exists', async () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: 'Mapa em andamento'
+        mapa: mockMapa,
+        situacao: 'Mapa em andamento',
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -65,11 +68,11 @@ describe('SubprocessoCards.vue', () => {
     it('should emit navegarParaMapa when handleMapaClick is called', async () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null,
-        situacao: 'Mapa em andamento'
+        mapa: mockMapa,
+        situacao: 'Mapa em andamento',
       });
 
-        await wrapper.find('[data-testid="mapa-card"]').trigger('click');
+      await wrapper.find('[data-testid="mapa-card"]').trigger('click');
 
       expect(wrapper.emitted()).toHaveProperty('navegarParaMapa');
       expect(wrapper.emitted('navegarParaMapa')).toHaveLength(1);
@@ -78,14 +81,14 @@ describe('SubprocessoCards.vue', () => {
     it('should handle mapa click for different process types', async () => {
       const testCases = [
         { tipoProcesso: TipoProcesso.MAPEAMENTO, expectedEmits: 1 },
-        { tipoProcesso: TipoProcesso.REVISAO, expectedEmits: 1 }
+        { tipoProcesso: TipoProcesso.REVISAO, expectedEmits: 1 },
       ];
 
       for (const { tipoProcesso, expectedEmits } of testCases) {
         const wrapper = mountComponent({
           tipoProcesso,
-          mapa: { id: 1, unidade: 'TEST', situacao: 'em_andamento', idProcesso: 1, competencias: [], dataCriacao: new Date(), dataDisponibilizacao: null, dataFinalizacao: null },
-          situacao: 'Mapa em andamento'
+          mapa: mockMapa,
+          situacao: 'Mapa em andamento',
         });
 
         await wrapper.find('[data-testid="mapa-card"]').trigger('click');
@@ -99,7 +102,7 @@ describe('SubprocessoCards.vue', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         mapa: null,
-        situacao: 'Mapa disponibilizado'
+        situacao: 'Mapa disponibilizado',
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -110,17 +113,8 @@ describe('SubprocessoCards.vue', () => {
     it('should enable mapa card when mapa exists', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: 'Mapa em andamento'
+        mapa: mockMapa,
+        situacao: 'Mapa em andamento',
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -130,17 +124,8 @@ describe('SubprocessoCards.vue', () => {
     it('should show EM_ANDAMENTO badge when mapa situacao is EM_ANDAMENTO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: 'Mapa em andamento'
+        mapa: { ...mockMapa, situacao: 'em_andamento' },
+        situacao: 'Mapa em andamento',
       });
 
       expect(wrapper.text()).toContain('Em andamento');
@@ -150,17 +135,8 @@ describe('SubprocessoCards.vue', () => {
     it('should show DISPONIVEL_VALIDACAO badge when mapa situacao is DISPONIVEL_VALIDACAO', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'disponivel_validacao',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: 'Mapa disponibilizado'
+        mapa: { ...mockMapa, situacao: 'disponivel_validacao' },
+        situacao: 'Mapa disponibilizado',
       });
 
       expect(wrapper.text()).toContain('Disponibilizado');
@@ -170,17 +146,8 @@ describe('SubprocessoCards.vue', () => {
     it('should show custom situacao badge when situacao has a custom value', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: 'Custom Status'
+        mapa: mockMapa,
+        situacao: 'Custom Status',
       });
 
       expect(wrapper.text()).toContain('Custom Status');
@@ -192,7 +159,7 @@ describe('SubprocessoCards.vue', () => {
     it('should render diagnostico cards for DIAGNOSTICO type', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.DIAGNOSTICO,
-        mapa: null
+        mapa: null,
       });
 
       expect(wrapper.findAll('.card')).toHaveLength(2);
@@ -203,7 +170,7 @@ describe('SubprocessoCards.vue', () => {
     it('should show NAO_DISPONIBILIZADO badges for diagnostico cards', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.DIAGNOSTICO,
-        mapa: null
+        mapa: null,
       });
 
       const badges = wrapper.findAll('.badge.bg-secondary');
@@ -216,7 +183,7 @@ describe('SubprocessoCards.vue', () => {
     it('should render atividades card with correct content', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       const atividadesCard = wrapper.findAll('.card')[0];
@@ -228,7 +195,7 @@ describe('SubprocessoCards.vue', () => {
     it('should render mapa card with correct content', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -239,7 +206,7 @@ describe('SubprocessoCards.vue', () => {
     it('should render diagnostico card with correct content', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.DIAGNOSTICO,
-        mapa: null
+        mapa: null,
       });
 
       const diagnosticoCard = wrapper.findAll('.card')[0];
@@ -250,7 +217,7 @@ describe('SubprocessoCards.vue', () => {
     it('should render ocupacoes card with correct content', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.DIAGNOSTICO,
-        mapa: null
+        mapa: null,
       });
 
       const ocupacoesCard = wrapper.findAll('.card')[1];
@@ -263,7 +230,7 @@ describe('SubprocessoCards.vue', () => {
     it('should have correct card classes', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       const cards = wrapper.findAll('.card');
@@ -277,7 +244,7 @@ describe('SubprocessoCards.vue', () => {
     it('should have correct row structure', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       expect(wrapper.find('.row').exists()).toBe(true);
@@ -287,7 +254,7 @@ describe('SubprocessoCards.vue', () => {
     it('should have correct badge structure', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       const badges = wrapper.findAll('.badge');
@@ -301,7 +268,7 @@ describe('SubprocessoCards.vue', () => {
     it('should handle null mapa prop', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: null
+        mapa: null,
       });
 
       expect(wrapper.findAll('.card')).toHaveLength(2);
@@ -312,16 +279,7 @@ describe('SubprocessoCards.vue', () => {
     it('should handle empty mapa object', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'alguma_situacao', // Pode ser qualquer string válida para a situação
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          }
+        mapa: mockMapa,
       });
 
       const mapaCard = wrapper.findAll('.card')[1];
@@ -332,16 +290,7 @@ describe('SubprocessoCards.vue', () => {
     it('should handle undefined situacao prop', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          }
+        mapa: mockMapa,
         // situacao is undefined
       });
 
@@ -353,17 +302,8 @@ describe('SubprocessoCards.vue', () => {
     it('should handle empty string situacao', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-          mapa: {
-              id: 1,
-              unidade: 'UNID_TESTE',
-              situacao: 'em_andamento',
-              idProcesso: 1,
-              competencias: [],
-              dataCriacao: new Date(),
-              dataDisponibilizacao: null,
-              dataFinalizacao: null,
-          },
-        situacao: '' // Empty string
+        mapa: mockMapa,
+        situacao: '', // Empty string
       });
 
       // Should show default "Disponibilizado" badge when situacao is empty string

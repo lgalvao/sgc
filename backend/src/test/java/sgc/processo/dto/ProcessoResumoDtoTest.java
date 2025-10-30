@@ -1,9 +1,8 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,7 +11,7 @@ class ProcessoResumoDtoTest {
     @Test
     void testProcessoResumoDtoBuilderAndAccessors() {
         var now = LocalDateTime.now();
-        var limitDate = LocalDate.now();
+        var limitDate = LocalDateTime.now();
         var dto = ProcessoResumoDto.builder()
             .codigo(1L)
             .descricao("Test Description")

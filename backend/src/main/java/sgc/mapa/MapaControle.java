@@ -1,22 +1,19 @@
 package sgc.mapa;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.Usuario;
+import sgc.mapa.service.MapaService;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Controlador REST para gerenciar Mapas usando DTOs.
@@ -25,86 +22,104 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/mapas")
 @RequiredArgsConstructor
+@Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaControle {
-    private final MapaRepo repositorioMapa;
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
+
     private final MapaService mapaService;
     private final MapaMapper mapaMapper;
 
+    private MapaDto sanitizarEMapearMapaDto(MapaDto mapaDto) {
+        var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
+        var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
+
+        return MapaDto.builder()
+                .codigo(mapaDto.getCodigo())
+                .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
+                .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
+                .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
+                .dataHoraHomologado(mapaDto.getDataHoraHomologado())
+                .sugestoes(sanitizedSugestoes)
+                .build();
+    }
+
+    /**
+     * Retorna uma lista com todos os mapas de competências.
+     *
+     * @return Uma {@link List} de {@link MapaDto}.
+     */
     @GetMapping
+    @Operation(summary = "Lista todos os mapas")
     public List<MapaDto> listar() {
-        return repositorioMapa.findAll()
+        return mapaService.listar()
                 .stream()
                 .map(mapaMapper::toDTO)
                 .toList();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MapaDto> obterPorId(@PathVariable Long id) {
-        Optional<Mapa> m = repositorioMapa.findById(id);
-        return m.map(mapaMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    /**
+     * Busca e retorna um mapa de competências específico pelo seu código.
+     *
+     * @param codigo O código do mapa a ser buscado.
+     * @return Um {@link ResponseEntity} contendo o {@link MapaDto} correspondente.
+     */
+    @GetMapping("/{codigo}")
+    @Operation(summary = "Obtém um mapa pelo código")
+    public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
+        var mapa = mapaService.obterPorCodigo(codigo);
+        return ResponseEntity.ok(mapaMapper.toDTO(mapa));
     }
 
+    /**
+     * Cria um novo mapa de competências.
+     * <p>
+     * Os campos de texto do DTO são sanitizados para remover HTML antes da persistência.
+     *
+     * @param mapaDto O DTO com os dados do mapa a ser criado.
+     * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa
+     * e o {@link MapaDto} criado no corpo da resposta.
+     */
     @PostMapping
+    @Operation(summary = "Cria um novo mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
-        var entidade = mapaMapper.toEntity(mapaDto);
-        var salvo = repositorioMapa.save(entidade);
+        var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
+
+        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
+        var salvo = mapaService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MapaDto> atualizar(@PathVariable Long id, @Valid @RequestBody MapaDto mapaDto) {
-        return repositorioMapa.findById(id)
-                .map(existente -> {
-                    existente.setDataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado());
-                    existente.setObservacoesDisponibilizacao(mapaDto.getObservacoesDisponibilizacao());
-                    existente.setSugestoesApresentadas(mapaDto.getSugestoesApresentadas());
-                    existente.setDataHoraHomologado(mapaDto.getDataHoraHomologado());
-                    var atualizado = repositorioMapa.save(existente);
-                    return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    /**
+     * Atualiza um mapa de competências existente.
+     * <p>
+     * Os campos de texto do DTO são sanitizados para remover HTML antes da atualização.
+     *
+     * @param codMapa O código do mapa a ser atualizado.
+     * @param mapaDto O DTO com os novos dados do mapa.
+     * @return Um {@link ResponseEntity} com status 200 OK e o {@link MapaDto} atualizado.
+     */
+    @PostMapping("/{codMapa}/atualizar")
+    @Operation(summary = "Atualiza um mapa existente")
+    public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
+        var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        return repositorioMapa.findById(id)
-                .map(x -> {
-                    repositorioMapa.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                }).orElseGet(() -> ResponseEntity.notFound().build());
+        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
+        var atualizado = mapaService.atualizar(codMapa, entidade);
+        return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
     }
 
     /**
-     * CDU-15 - Obter mapa completo com competências e atividades aninhadas.
-     * GET /api/mapas/{id}/completo
+     * Exclui um mapa de competências.
+     *
+     * @param codMapa O código do mapa a ser excluído.
+     * @return Um {@link ResponseEntity} com status 204 No Content.
      */
-    @GetMapping("/{id}/completo")
-    public ResponseEntity<MapaCompletoDto> obterCompleto(@PathVariable Long id) {
-        try {
-            MapaCompletoDto mapa = mapaService.obterMapaCompleto(id);
-            return ResponseEntity.ok(mapa);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PostMapping("/{codMapa}/excluir")
+    @Operation(summary = "Exclui um mapa")
+    public ResponseEntity<Void> excluir(@PathVariable Long codMapa) {
+        mapaService.excluir(codMapa);
+        return ResponseEntity.noContent().build();
     }
 
-    /**
-     * CDU-15 - Salvar mapa completo (criar/editar competências + vínculos).
-     * PUT /api/mapas/{id}/completo
-     */
-    @PutMapping("/{id}/completo")
-    @Transactional
-    public ResponseEntity<MapaCompletoDto> salvarCompleto(
-            @PathVariable Long id,
-            @RequestBody @Valid SalvarMapaRequest request,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        try {
-            MapaCompletoDto mapa = mapaService.salvarMapaCompleto(id, request, usuario.getTitulo());
-            return ResponseEntity.ok(mapa);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

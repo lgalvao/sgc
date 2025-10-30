@@ -1,19 +1,18 @@
 package sgc.unidade.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// TODO em vez de criar todos os esses construtores diferentes, fazer os clientes usarem sempre o builder.
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();
@@ -22,6 +21,26 @@ public class Unidade extends EntidadeBase {
         this.situacao = SituacaoUnidade.ATIVA;
         this.tipo = TipoUnidade.OPERACIONAL;
     }
+
+    public Unidade(String nome, String sigla, Usuario titular, TipoUnidade tipo, SituacaoUnidade situacao, Unidade unidadeSuperior) {
+        super();
+        this.nome = nome;
+        this.sigla = sigla;
+        this.titular = titular;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.unidadeSuperior = unidadeSuperior;
+    }
+
+    public Unidade(Long codigo, String nome, String sigla, TipoUnidade tipo, SituacaoUnidade situacao) {
+        super();
+        super.setCodigo(codigo);
+        this.nome = nome;
+        this.sigla = sigla;
+        this.tipo = tipo;
+        this.situacao = situacao;
+    }
+
     @Column(name = "nome")
     private String nome;
 
