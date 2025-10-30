@@ -22,13 +22,13 @@ async function loginPelaUI(
     // Se um seletor de perfil aparecer, selecione a opção desejada
     if (perfilUnidadeLabel) {
         const seletorPerfil = page.getByTestId('select-perfil-unidade');
-        await seletorPerfil.waitFor({state: 'visible', timeout: 5000});
+        await seletorPerfil.waitFor({state: 'visible', timeout: 15000});
         await seletorPerfil.selectOption({label: perfilUnidadeLabel});
         await page.getByTestId('botao-entrar').click();
     }
 
     // Aguarda o redirecionamento para o painel
-    await page.waitForURL('/painel', {timeout: 10000});
+    await page.waitForURL('/painel', {timeout: 15000});
 }
 
 // --- Funções de Abstração Semântica (DSL) ---
@@ -44,6 +44,10 @@ export async function loginComoGestor(page: Page) {
 export async function loginComoChefe(page: Page) {
     // Usar um chefe específico como padrão
     await loginPelaUI(page, USUARIOS.CHEFE_SGP);
+}
+
+export async function loginComoChefeStic(page: Page) {
+    await loginPelaUI(page, USUARIOS.CHEFE_STIC);
 }
 
 export async function loginComoServidor(page: Page) {

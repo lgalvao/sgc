@@ -8,8 +8,8 @@ export const SELETORES = {
   COLUNA_DESCRICAO: 'coluna-descricao',
   COLUNA_TIPO: 'coluna-tipo',
   COLUNA_SITUACAO: 'coluna-situacao',
-  BTN_CRIAR_PROCESSO: 'btn-criar-proceso',
-  BTN_INICIAR_PROCESSO: 'btn-iniciar-proceso',
+  BTN_CRIAR_PROCESSO: 'btn-criar-processo',
+  BTN_INICIAR_PROCESSO: 'btn-iniciar-processo',
   INFO_UNIDADE: 'info-unidade',
   BTN_MODAL_CONFIRMAR: 'btn-modal-confirmar',
   BTN_MODAL_CANCELAR: 'btn-modal-cancelar',
@@ -158,6 +158,12 @@ export const USUARIOS = {
     nome: 'Carlos Henrique Lima',
     senha: '123',
     unidade: 'SGP',
+  },
+  CHEFE_STIC: {
+    titulo: '777',
+    nome: 'Chefe STIC Teste',
+    senha: '123',
+    unidade: 'STIC',
   },
   CHEFE_SEDESENV: {
     titulo: '3',

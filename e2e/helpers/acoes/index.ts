@@ -8,10 +8,10 @@ export {
 export * from './acoes-atividades';
 export {
     selecionarUnidadesPorId,
+    selecionarUnidadesPorSigla,
     preencherFormularioProcesso,
     selecionarPrimeiraUnidade,
     clicarPrimeiroProcessoTabela,
-    selecionarPrimeiroProcessoPorSituacao,
     criarProcessoCompleto,
     tentarSalvarProcessoVazio,
     criarProcessoSemUnidades,
@@ -39,6 +39,11 @@ export {
     clicarUnidadeNaTabelaDetalhes,
     clicarBotaoHistoricoAnalise,
     homologarRevisaoCadastro,
+    iniciarProcessoMapeamento,
+    confirmarIniciacaoProcesso,
+    cancelarIniciacaoProcesso,
+    criarProcessoBasico,
+    abrirProcessoPorNome
 } from './acoes-processo';
 export * from './acoes-mapa';
 export {

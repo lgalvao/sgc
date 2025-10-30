@@ -44,6 +44,7 @@
             <template
               v-for="unidade in unidadesStore.unidades"
               :key="unidade.sigla"
+              v-if="!unidadesStore.isLoading"
             >
               <div
                 :style="{ marginLeft: '0' }"
@@ -52,11 +53,11 @@
                 <!--suppress HtmlUnknownAttribute -->
                 <input
                   :id="`chk-${unidade.sigla}`"
-                  :checked="getEstadoSelecao(unidade) === true"
+                  v-model="unidadesSelecionadas"
+                  :value="unidade.codigo"
                   class="form-check-input"
                   type="checkbox"
-                  :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-                  @change="() => toggleUnidade(unidade)"
+                  :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
                 >
                 <label
                   :for="`chk-${unidade.sigla}`"
@@ -77,11 +78,11 @@
                     <!--suppress HtmlUnknownAttribute -->
                     <input
                       :id="`chk-${filha.sigla}`"
-                      :checked="getEstadoSelecao(filha) === true"
+                      v-model="unidadesSelecionadas"
+                      :value="filha.codigo"
                       class="form-check-input"
                       type="checkbox"
-                      :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                      @change="() => toggleUnidade(filha)"
+                      :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
                     >
                     <label
                       :for="`chk-${filha.sigla}`"
@@ -102,10 +103,10 @@
                     >
                       <input
                         :id="`chk-${neta.sigla}`"
-                        :checked="isChecked(neta.codigo)"
+                        v-model="unidadesSelecionadas"
+                        :value="neta.codigo"
                         class="form-check-input"
                         type="checkbox"
-                        @change="() => toggleUnidade(neta)"
                       >
                       <label
                         :for="`chk-${neta.sigla}`"
@@ -267,7 +268,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {computed, nextTick, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -297,13 +298,35 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
 
+/**
+ * Extrai recursivamente todos os códigos de unidades de uma árvore hierárquica
+ * @param unidades Array de UnidadeParticipante (pode ter filhos)
+ * @returns Array com todos os códigos de unidades (raiz + filhos + netos...)
+ */
+function extrairCodigosUnidades(unidades: any[]): number[] {
+  const codigos: number[] = [];
+  for (const unidade of unidades) {
+    codigos.push(unidade.codUnidade);
+    if (unidade.filhos && unidade.filhos.length > 0) {
+      codigos.push(...extrairCodigosUnidades(unidade.filhos));
+    }
+  }
+  return codigos;
+}
+
 // Carregar processo se estiver editando
 onMounted(async () => {
+  // CRÍTICO: Carregar unidades primeiro
+  await unidadesStore.fetchUnidades();
+  console.log('[DEBUG Vue] Unidades da store carregadas:', unidadesStore.unidades.length);
+  
   const idProcesso = route.query.idProcesso;
   if (idProcesso) {
     try {
+      console.log('[DEBUG Vue] Carregando processo:', idProcesso);
       await processosStore.fetchProcessoDetalhe(Number(idProcesso));
       const processo = processosStore.processoDetalhe; // Obter o processo detalhado da store
+      console.log('[DEBUG Vue] Processo carregado:', processo);
       if (processo) {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
@@ -311,7 +334,14 @@ onMounted(async () => {
         dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
 
         // Carregar unidades participantes do processo detalhe
-        unidadesSelecionadas.value = processo.unidades.map(up => up.codUnidade);
+        console.log('[DEBUG Vue] processo.unidades:', processo.unidades);
+        // CORRIGIDO: extrair recursivamente todos os códigos (raiz + filhos + netos)
+        unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
+        console.log('[DEBUG Vue] unidadesSelecionadas após extração:', unidadesSelecionadas.value);
+        
+        // Forçar atualização do DOM
+        await nextTick();
+        console.log('[DEBUG Vue] nextTick concluído, DOM deve estar atualizado');
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');

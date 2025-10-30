@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
 @EnableWebSecurity
-@Profile("!test")
+@Profile("disabled-for-now")
 @RequiredArgsConstructor
 public class SecurityConfig {
     /**

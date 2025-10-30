@@ -55,7 +55,9 @@ export {
     verificarBotaoIniciarProcessoVisivel,
     verificarModalConfirmacaoIniciarProcessoVisivel,
     verificarModalConfirmacaoIniciarProcessoInvisivel,
-    verificarPermanenciaNaPaginaProcesso
+    verificarPermanenciaNaPaginaProcesso,
+    verificarModalConfirmacaoIniciacaoProcesso,
+    verificarProcessoBloqueadoParaEdicao
 } from './verificacoes-processo';
 
 // Verificações de UI

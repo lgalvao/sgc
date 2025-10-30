@@ -1,15 +1,15 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
+    clicarBotaoEntrar,
+    loginComMultiPerfilAdmin,
     loginComoAdmin,
     loginComoChefe,
-    loginComMultiPerfilAdmin,
     navegarParaLogin,
     preencherFormularioLogin,
-    clicarBotaoEntrar,
+    selecionarPerfil,
     verificarPainelAdminVisivel,
     verificarPainelChefeVisivel,
     verificarSelecaoPerfilVisivel,
-    selecionarPerfil,
 } from './helpers';
 import {USUARIOS} from './helpers/dados/constantes-teste';
 
@@ -19,6 +19,9 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await navegarParaLogin(page);
             await preencherFormularioLogin(page, USUARIOS.CHEFE_SGP.titulo, USUARIOS.CHEFE_SGP.senha);
             await clicarBotaoEntrar(page);
+
+            // Aguarda navegação para o painel
+            await page.waitForURL('/painel', {timeout: 15000});
             await verificarPainelChefeVisivel(page);
         });
 
@@ -26,9 +29,14 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await navegarParaLogin(page);
             await preencherFormularioLogin(page, USUARIOS.MULTI_PERFIL.titulo, USUARIOS.MULTI_PERFIL.senha);
             await clicarBotaoEntrar(page);
+
+            // Aguarda a interface de seleção de perfil aparecer
             await verificarSelecaoPerfilVisivel(page);
             await selecionarPerfil(page, 'ADMIN - STIC');
             await clicarBotaoEntrar(page);
+
+            // Aguarda navegação para o painel
+            await page.waitForURL('/painel', {timeout: 15000});
             await verificarPainelAdminVisivel(page);
         });
     });

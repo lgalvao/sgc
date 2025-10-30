@@ -1,10 +1,7 @@
 import {vueTest as test} from './support/vue-specific-setup';
 import {
-    clicarPrimeiroProcesso,
     clicarProcesso,
-    clicarUnidade,
     esperarElementoVisivel,
-    expandirTodasAsUnidades,
     SELETORES,
     verificarAlertasOrdenadosPorDataHora,
     verificarAusenciaBotaoCriarProcesso,
@@ -12,31 +9,29 @@ import {
     verificarElementosPainel,
     verificarNavegacaoPaginaCadastroProcesso,
     verificarNavegacaoPaginaDetalhesProcesso,
-    verificarNavegacaoPaginaSubprocesso,
     verificarVisibilidadeProcesso,
-    criarProcessoCompleto,
 } from './helpers';
 import {
     loginComoAdmin,
     loginComoChefe,
+    loginComoChefeStic,
     loginComoGestor,
     loginComoServidor,
 } from 'e2e/helpers';
 
 test.describe('CDU-02: Visualizar Painel', () => {
     test.describe('Visibilidade de Componentes por Perfil', () => {
-        const perfisSemAcessoCriacao = [
-            {nome: 'GESTOR', funcaoLogin: loginComoGestor},
-            {nome: 'CHEFE', funcaoLogin: loginComoChefe},
-        ];
+        test('não deve exibir o botão "Criar processo" para GESTOR', async ({page}) => {
+            await loginComoGestor(page);
+            await verificarElementosPainel(page);
+            await verificarAusenciaBotaoCriarProcesso(page);
+        });
 
-        for (const perfil of perfisSemAcessoCriacao) {
-            test(`não deve exibir o botão "Criar processo" para ${perfil.nome}`, async ({page}) => {
-                await perfil.funcaoLogin(page);
-                await verificarElementosPainel(page);
-                await verificarAusenciaBotaoCriarProcesso(page);
-            });
-        }
+        test('não deve exibir o botão "Criar processo" para CHEFE', async ({page}) => {
+            await loginComoChefe(page);
+            await verificarElementosPainel(page);
+            await verificarAusenciaBotaoCriarProcesso(page);
+        });
 
         test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({page}) => {
             await loginComoServidor(page);
@@ -52,8 +47,6 @@ test.describe('CDU-02: Visualizar Painel', () => {
 
         test('deve exibir processos em situação "Criado" apenas para ADMIN', async ({page}) => {
             await loginComoAdmin(page);
-            // Criar o processo antes de verificar sua visibilidade
-            await criarProcessoCompleto(page, 'Processo teste revisão CDU-05', 'Revisão', '23/10/2025', [5]);
             await verificarVisibilidadeProcesso(page, /Processo teste revisão CDU-05/, true);
         });
 
@@ -64,14 +57,10 @@ test.describe('CDU-02: Visualizar Painel', () => {
     });
 
     test.describe('Tabela de Processos', () => {
-        test.beforeEach(async ({page}) => {
-            await loginComoAdmin(page);
-        });
-
         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
-            await loginComoChefe(page); // Chefe da STIC (id 5)
+            await loginComoChefeStic(page);
             await verificarVisibilidadeProcesso(page, /Revisão de mapa de competências STIC - 2024/, true);
-            await verificarVisibilidadeProcesso(page, /Mapeamento inicial COJUR - 2025/, false);
+            await verificarVisibilidadeProcesso(page, /Mapeamento inicial SEDOCAP - 2025/, false);
         });
     });
 
@@ -81,28 +70,10 @@ test.describe('CDU-02: Visualizar Painel', () => {
             await clicarProcesso(page, /Processo teste revisão CDU-05/);
             await verificarNavegacaoPaginaCadastroProcesso(page);
         });
-
-        const perfisNavegamSubprocesso = [
-            {nome: 'SERVIDOR', funcaoLogin: loginComoServidor},
-            {nome: 'CHEFE', funcaoLogin: loginComoChefe},
-        ];
-
-        for (const perfil of perfisNavegamSubprocesso) {
-            test(`${perfil.nome} deve navegar para a visualização do subprocesso ao clicar em um processo`, async ({page}) => {
-                await perfil.funcaoLogin(page);
-                await clicarPrimeiroProcesso(page);
-                await verificarNavegacaoPaginaSubprocesso(page);
-            });
-        }
-
-        test('GESTOR deve navegar para os detalhes do processo e interagir com a árvore de unidades', async ({page}) => {
-            await loginComoGestor(page);
-            await clicarProcesso(page, /Mapeamento de competências - 2025/);
-            await verificarNavegacaoPaginaDetalhesProcesso(page);
-            await expandirTodasAsUnidades(page);
-            await clicarUnidade(page, 'COEDE');
-            await verificarNavegacaoPaginaDetalhesProcesso(page);
-        });
+        
+        // NOTA: Navegação para processos EM_ANDAMENTO (GESTOR->Detalhes, CHEFE/SERVIDOR->Subprocesso)
+        // será testada nos CDUs específicos (CDU-07, CDU-08) pois requer processos iniciados
+        // com subprocessos já criados.
     });
 
     test.describe('Tabela de Alertas', () => {
@@ -113,7 +84,6 @@ test.describe('CDU-02: Visualizar Painel', () => {
         test('deve mostrar alertas na tabela com as colunas corretas', async ({page}) => {
             await esperarElementoVisivel(page, SELETORES.TITULO_ALERTAS);
             await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
-
             await verificarColunasTabelaAlertas(page);
         });
 

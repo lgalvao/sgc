@@ -34,7 +34,27 @@ export async function verificarCamposObrigatoriosFormulario(page: Page): Promise
  * Verifica se uma notificação de erro é exibida
  */
 export async function verificarNotificacaoErro(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES.NOTIFICACAO_ERRO)).toBeVisible();
+    // As notificações aparecem como alerts do Bootstrap ou mensagens inline
+    // Vamos verificar se há alguma mensagem de erro visível
+    const erroSelectors = [
+        '.alert.alert-danger',  // Bootstrap alert
+        '[role="alert"]',        // ARIA alert
+        '.text-danger',          // Texto vermelho
+        '.invalid-feedback:visible', // Feedback de validação do Bootstrap
+    ];
+    
+    let encontrado = false;
+    for (const selector of erroSelectors) {
+        const element = page.locator(selector).first();
+        if (await element.isVisible({timeout: 5000}).catch(() => false)) {
+            encontrado = true;
+            break;
+        }
+    }
+    
+    if (!encontrado) {
+        throw new Error('Nenhuma mensagem de erro encontrada na página');
+    }
 }
 
 /**
@@ -320,6 +340,29 @@ export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page
  */
 export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
+}
+
+/**
+ * Verifica se modal de confirmação de iniciação está visível com textos corretos (CDU-04)
+ */
+export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible({timeout: 10000});
+    await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
+    await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
+    await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);
+    await expect(modal.getByRole('button', {name: /confirmar/i})).toBeVisible();
+    await expect(modal.getByRole('button', {name: /cancelar/i})).toBeVisible();
+}
+
+/**
+ * Verifica que processo não pode mais ser editado após iniciado (CDU-04)
+ */
+export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<void> {
+    // Verificar que botões de edição não estão disponíveis
+    await expect(page.getByRole('button', {name: /^salvar$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', {name: /^remover$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', {name: /^iniciar processo$/i})).not.toBeVisible();
 }
 
 export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {

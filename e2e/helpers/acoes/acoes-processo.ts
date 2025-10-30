@@ -4,17 +4,47 @@ import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from 'e2e/helpers/index';
 
 /**
+ * Seleciona unidades na árvore usando suas SIGLAS
+ * @param page - A instância da página do Playwright.
+ * @param siglas - Um array de SIGLAS das unidades a serem selecionadas (ex: ['STIC', 'SGP']).
+ */
+export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
+    // Aguardar a árvore de unidades carregar
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
+    
+    for (const sigla of siglas) {
+        const seletorCheckbox = `#chk-${sigla}`;
+        await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 15000});
+        await page.check(seletorCheckbox);
+    }
+}
+
+/**
  * Seleciona unidades na árvore de hierarquia com base em seus IDs.
+ * NOTA: Este helper converte IDs para SIGLAS conhecidas
  * @param page - A instância da página do Playwright.
  * @param unidades - Um array de IDs (números) das unidades a serem selecionadas.
  */
 export async function selecionarUnidadesPorId(page: Page, unidades: number[]): Promise<void> {
-    for (const id of unidades) {
-        // O seletor assume que cada checkbox tem um `id` no formato `chk-unidade-${id}`
-        const seletorCheckbox = `#chk-unidade-${id}`;
-        await page.waitForSelector(seletorCheckbox, {state: 'visible'});
-        await page.check(seletorCheckbox);
+    // Mapeamento conhecido de ID -> SIGLA (baseado no data.sql)
+    const idParaSigla: Record<number, string> = {
+        1: 'TRE-PE',
+        2: 'STIC',
+        3: 'SGP',
+        4: 'COEDE',
+        5: 'COJUR',
+        6: 'COSIS',
+        7: 'COSINF',
+        8: 'SEDESENV',
+        // Adicione mais conforme necessário
+    };
+    
+    const siglas = unidades.map(id => idParaSigla[id]).filter(Boolean);
+    if (siglas.length !== unidades.length) {
+        console.warn('Algumas unidades não têm SIGLA mapeada:', unidades);
     }
+    
+    await selecionarUnidadesPorSigla(page, siglas);
 }
 
 
@@ -57,15 +87,146 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
 }
 
 /**
- * Seleciona o primeiro processo que contenha a situação informada.
+ * Iniciar processo de mapeamento (CDU-04)
+ * Clica no botão "Iniciar processo" e aguarda modal de confirmação
  */
-export async function selecionarPrimeiroProcessoPorSituacao(page: Page, situacao: string): Promise<void> {
-    await page.waitForSelector(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`);
-    const processo = page
-        .locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`)
-        .filter({hasText: situacao})
-        .first();
-    await processo.click();
+export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
+    console.log(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
+    
+    // DEBUG: Verificar chamadas de rede
+    const responses: string[] = [];
+    page.on('response', async (response) => {
+        if (response.url().includes('/api/')) {
+            const status = response.status();
+            const url = response.url();
+            try {
+                const body = await response.text();
+                responses.push(`${status} ${url}: ${body.substring(0, 200)}`);
+                console.log(`[DEBUG] API Response: ${status} ${url}`);
+            } catch (e) {
+                responses.push(`${status} ${url}: (couldn't read body)`);
+            }
+        }
+    });
+    
+    // DEBUG: Verificar se checkboxes de unidades estão marcados
+    const checkboxesMarcados = await page.locator('input[type="checkbox"]:checked').count();
+    console.log(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
+    
+    // Se não há checkboxes marcados, há um bug no frontend!
+    // O processo foi criado com unidades, mas ao abrir para edição elas não são carregadas
+    if (checkboxesMarcados === 0) {
+        console.warn(`[AVISO] BUG DO FRONTEND: Unidades não foram carregadas ao abrir processo para edição!`);
+        console.warn(`[AVISO] Últimas ${responses.length} respostas da API:`);
+        responses.forEach(r => console.warn(`  ${r}`));
+    }
+    
+    await clicarElemento([
+        page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
+        page.getByRole('button', {name: /iniciar processo/i})
+    ]);
+    console.log(`[DEBUG] iniciarProcessoMapeamento: Clicou em Iniciar processo`);
+}
+
+/**
+ * Confirmar iniciação de processo no modal (CDU-04)
+ */
+export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await modal.waitFor({state: 'visible', timeout: 10000});
+    
+    await clicarElemento([
+        modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
+        modal.getByRole('button', {name: /confirmar/i})
+    ]);
+}
+
+/**
+ * Cancelar iniciação de processo no modal (CDU-04)
+ */
+export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await modal.waitFor({state: 'visible', timeout: 10000});
+    
+    await clicarElemento([
+        modal.getByTestId(SELETORES.BTN_MODAL_CANCELAR),
+        modal.getByRole('button', {name: /cancelar/i})
+    ]);
+}
+
+/**
+ * Criar processo básico (usado em vários CDUs)
+ * Preenche formulário e salva
+ */
+export async function criarProcessoBasico(
+    page: Page,
+    descricao: string,
+    tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO',
+    siglas: string[],
+    dataLimite: string = '2025-12-31'
+): Promise<void> {
+    console.log(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
+    
+    await navegarParaCriacaoProcesso(page);
+    console.log(`[DEBUG] criarProcessoBasico: Navegou para criação`);
+    
+    await preencherCampo([page.locator(SELETORES.CAMPO_DESCRICAO)], descricao);
+    console.log(`[DEBUG] criarProcessoBasico: Preencheu descrição`);
+    
+    await page.selectOption(SELETORES.CAMPO_TIPO, tipo);
+    console.log(`[DEBUG] criarProcessoBasico: Selecionou tipo ${tipo}`);
+    
+    await preencherCampo([page.locator(SELETORES.CAMPO_DATA_LIMITE)], dataLimite);
+    console.log(`[DEBUG] criarProcessoBasico: Preencheu data limite`);
+    
+    await selecionarUnidadesPorSigla(page, siglas);
+    console.log(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);
+    
+    await clicarElemento([
+        page.getByRole('button', {name: /salvar/i}),
+        page.getByTestId('btn-salvar')
+    ]);
+    console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
+    
+    // Aguardar redirecionamento ao painel
+    await page.waitForURL(/\/painel/, {timeout: 15000});
+    console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
+}
+
+/**
+ * Abrir processo específico da tabela pelo nome
+ */
+export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
+    console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
+    const row = page.locator(`[data-testid="${SELETORES.TABELA_PROCESSOS}"] tr:has-text("${descricao}")`);
+    await row.waitFor({state: 'visible', timeout: 10000});
+    console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
+    await row.click();
+    console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
+    
+    // Aguardar navegação para página de cadastro
+    await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 10000});
+    console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
+    
+    // Aguardar formulário carregar com os dados do processo
+    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
+    // Aguardar um pouco mais para garantir que todos os dados foram carregados (unidades, etc)
+    await page.waitForTimeout(2000); // Aumentado de 1s para 2s
+    console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
+    
+    // DEBUG: Verificar dados carregados usando page.evaluate
+    const dadosCarregados = await page.evaluate(() => {
+        // Acessar variáveis Vue através do DOM
+        const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+        const checkboxesChecked = checkboxes.filter((cb: any) => cb.checked);
+        return {
+            totalCheckboxes: checkboxes.length,
+            checkboxesMarcados: checkboxesChecked.length,
+            idsCheckboxes: checkboxes.map((cb: any) => cb.id),
+            idsCheckboxesMarcados: checkboxesChecked.map((cb: any) => cb.id)
+        };
+    });
+    console.log(`[DEBUG] abrirProcessoPorNome: Dados carregados:`, JSON.stringify(dadosCarregados));
 }
 
 /**
