@@ -66,7 +66,7 @@ sgc/
 │       ├── application.yml         # Config padrão (PostgreSQL)
 │       ├── application-local.yml   # Desenvolvimento (H2)
 │       ├── application-e2e.yml     # Testes E2E (H2 + data)
-│       └── data.sql                # Dados de teste
+│       └── data.sql                # Dados iniciais para testes
 │
 ├── frontend/             # Aplicação Vue.js
 │   ├── src/
@@ -75,32 +75,32 @@ sgc/
 │   │   ├── stores/       # Pinia stores
 │   │   ├── services/     # Serviços de API
 │   │   ├── router/       # Vue Router
-│   │   └── types/        # TypeScript types
+│   │   └── types/        # Tipo TypeScript
 │   └── build/            # Build artifacts
 │
 ├── e2e/                  # Testes End-to-End (Playwright)
 │   ├── cdu-01.spec.ts    # Login e autenticação
 │   ├── cdu-02.spec.ts    # Criar processo
-│   ├── ...               # 21 casos de uso testados
-│   ├── helpers/          # Funções auxiliares organizadas
+│   ├── ...               # 21 casos de uso
+│   ├── helpers/          # Funções auxiliares
 │   │   ├── acoes/        # Ações por domínio
 │   │   ├── verificacoes/ # Verificações por domínio
 │   │   ├── navegacao/    # Navegação e rotas
-│   │   └── dados/        # Constantes de teste
-│   └── support/          # Configurações de teste
+│   │   └── dados/        # Constantes de testes
+│   └── support/          # Configurações de testes
 │
 ├── reqs/                 # Documentação de requisitos
 │   ├── cdu-01.md         # Caso de uso 01: Login
 │   ├── cdu-02.md         # Caso de uso 02: Criar processo
-│   ├── ...               # 21 casos de uso documentados
+│   ├── ...               # Ao toodo, 21 casos de uso documentados
 │   ├── PROFILES.md       # Guia de perfis Spring
 │   └── _informacoes-gerais.md
 │
 ├── build.gradle.kts      # Build raiz (multi-projeto)
 ├── package.json          # Scripts E2E
 ├── playwright.config.ts  # Configuração Playwright
-├── AGENTS.md            # Guia para agentes de IA
-└── lessons-cdu01.md     # Lições aprendidas (testes E2E)
+├── AGENTS.md             # Guia para agentes de IA
+└── licoes-aprendidas.md  # Lições aprendidas (ao corrigir os testes E2E)
 ```
 
 ---
@@ -310,7 +310,7 @@ O backend servirá tanto a API REST (`/api/**`) quanto o frontend estático (`/`
 
 - **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
 - **[reqs/PROFILES.md](reqs/PROFILES.md)**: Detalhes completos dos perfis Spring
-- **[lessons-cdu01.md](licoes-aprendidas.md)**: Lições aprendidas ao corrigir testes E2E
+- **[licoes-aprendidas.md](licoes-aprendidas.md)**: Lições aprendidas ao corrigir testes E2E
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
 

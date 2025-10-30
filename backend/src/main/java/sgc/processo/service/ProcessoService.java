@@ -115,6 +115,14 @@ public class ProcessoService {
 
         Processo processoSalvo = processoRepo.save(processo);
 
+        // Salvar snapshot das unidades participantes
+        for (Long codigoUnidade : requisicao.unidades()) {
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoSalvo, unidade);
+            unidadeProcessoRepo.save(unidadeProcesso);
+        }
+
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
@@ -232,15 +240,21 @@ public class ProcessoService {
             throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
-        if (codsUnidades == null || codsUnidades.isEmpty()) {
-            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de mapeamento.");
+        // Buscar unidades já salvas no processo
+        List<UnidadeProcesso> unidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codigo);
+        if (unidadesProcesso.isEmpty()) {
+            throw new ErroNegocio("Não há unidades participantes definidas para este processo.");
         }
 
-        validarUnidadesNaoEmProcessosAtivos(codsUnidades);
+        List<Long> codigosUnidades = unidadesProcesso.stream()
+                .map(UnidadeProcesso::getCodUnidade)
+                .toList();
 
-        for (Long codigoUnidade : codsUnidades) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+        validarUnidadesNaoEmProcessosAtivos(codigosUnidades);
+
+        for (UnidadeProcesso up : unidadesProcesso) {
+            Unidade unidade = unidadeRepo.findById(up.getCodUnidade())
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", up.getCodUnidade()));
 
             criarSubprocessoParaMapeamento(processo, unidade);
         }
@@ -252,7 +266,7 @@ public class ProcessoService {
                 processo.getCodigo(),
                 processo.getTipo().name(),
                 LocalDateTime.now(),
-                codsUnidades
+                codigosUnidades
         ));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", codigo, codsUnidades.size());

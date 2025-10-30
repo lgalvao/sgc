@@ -1,6 +1,6 @@
 # Lições Aprendidas - Testes E2E
 
-**Última atualização:** 2025-10-30
+**Última atualização:** 2025-10-30 (14:49)
 
 ---
 
@@ -20,13 +20,91 @@
 - 📝 **Lacunas documentadas no arquivo de teste**
 - **Recomendação:** Complementar com testes unitários para comportamento da árvore de unidades
 
+### CDU-04: Iniciar Processo
+- ❌ **Status:** 0/3 testes passando (em correção)
+- 🐛 **Bug crítico encontrado:** Unidades não persistidas ao criar processo
+
 ---
 
-## 🐛 **BUG CRÍTICO ENCONTRADO: Árvore de Unidades Vazia**
+## 🐛 **BUG CRÍTICO #1: Unidades Não Persistidas ao Criar Processo**
+
+**Data:** 2025-10-30 (14:49)  
+**Arquivo:** `backend/src/main/java/sgc/processo/service/ProcessoService.java`  
+**Impacto:** ⚠️ **CRÍTICO** - Impossível editar processos criados (unidades não aparecem)
+
+### Problema
+O método `ProcessoService.criar()` **não salva as unidades participantes** na tabela `UnidadeProcesso`:
+- Unidades são validadas mas não persistidas
+- Ao editar processo criado, `obterDetalhes()` retorna `unidades: []`
+- Frontend não consegue carregar checkboxes marcadas
+- Testes CDU-04 falhando: checkboxes vazias ao reabrir processo
+
+### Root Cause
+```java
+// ❌ ANTES: criar() não persistia unidades
+public ProcessoDto criar(CriarProcessoReq requisicao) {
+    // ...validações...
+    Processo processoSalvo = processoRepo.save(processo);
+    // ❌ requisicao.unidades() validadas mas NUNCA salvas!
+    return processoMapper.toDto(processoSalvo);
+}
+
+// ❌ iniciarProcessoMapeamento() esperava receber unidades por parâmetro
+public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
+    // Criava snapshot das unidades AQUI (tarde demais!)
+}
+```
+
+### Solução (EM PROGRESSO)
+```java
+// ✅ CORREÇÃO 1/2: Salvar unidades ao criar
+public ProcessoDto criar(CriarProcessoReq requisicao) {
+    Processo processoSalvo = processoRepo.save(processo);
+    
+    // ✅ Salvar snapshot das unidades participantes
+    for (Long codigoUnidade : requisicao.unidades()) {
+        Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoSalvo, unidade);
+        unidadeProcessoRepo.save(unidadeProcesso);
+    }
+    
+    return processoMapper.toDto(processoSalvo);
+}
+
+// ✅ CORREÇÃO 2/2: Buscar unidades salvas ao iniciar
+public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
+    // Buscar unidades JÁ SALVAS no processo
+    List<UnidadeProcesso> unidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codigo);
+    if (unidadesProcesso.isEmpty()) {
+        throw new ErroNegocio("Não há unidades participantes definidas.");
+    }
+    // ...criar subprocessos...
+}
+```
+
+### Status
+- ✅ Código corrigido em `ProcessoService.criar()`
+- ✅ Código corrigido em `iniciarProcessoMapeamento()`
+- ⏳ **TODO:** Corrigir `iniciarProcessoRevisao()` (mesmo problema)
+- ⏳ **TODO:** Corrigir `criarSubprocessoParaMapeamento()` (não duplicar UnidadeProcesso)
+- ⏳ **TODO:** Corrigir `criarSubprocessoParaRevisao()` (não duplicar UnidadeProcesso)
+- ⏳ **TODO:** Atualizar método `atualizar()` para modificar UnidadeProcesso
+- ⏳ **TODO:** Reiniciar backend e rodar testes CDU-04
+
+### Lições
+1. ✅ **Persistir dados essenciais imediatamente** - não postergar para outra operação
+2. ✅ **Testes E2E revelam bugs de integração** que testes unitários não pegam
+3. ✅ **Criar → Editar → Salvar** é fluxo crítico que deve ser testado
+4. ⚠️ **Snapshots devem ser criados UMA VEZ** - no momento da criação, não da iniciação
+
+---
+
+## 🐛 **BUG CRÍTICO #2: Árvore de Unidades Vazia** (RESOLVIDO)
 
 **Data:** 2025-10-30  
 **Arquivo:** `frontend/src/views/CadProcesso.vue`  
-**Impacto:** ⚠️ **CRÍTICO** - Impossível criar/editar processos na UI
+**Status:** ✅ **CORRIGIDO**
 
 ### Problema
 O componente `CadProcesso.vue` **não carregava a lista de unidades**, resultando em:
@@ -69,6 +147,36 @@ onMounted(async () => {
 - [ ] Ordem de carregamento está correta (dependências primeiro)?
 - [ ] Há loading state enquanto dados carregam?
 - [ ] Há tratamento de erro se fetch falhar?
+
+---
+
+## 🔧 **CONFIGURAÇÃO E2E: Carregamento de data.sql**
+
+**Data:** 2025-10-30 (14:30)  
+**Problema:** Backend rodava com profile `e2e` mas data.sql não carregava  
+**Causa:** Conflito entre duas configurações:
+1. `application-e2e.yml` com `spring.sql.init.mode: always`
+2. `E2eDataLoader` (bean @Profile("e2e")) tentava carregar data.sql também
+3. Resultado: data.sql executado DUAS VEZES → erro de chave duplicada
+
+**Solução:**
+```java
+// Desabilitar E2eDataLoader
+@Profile("disabled-e2e-dataloader") // Era @Profile("e2e")
+public class E2eDataLoader { ... }
+```
+
+```yaml
+# application-e2e.yml
+spring:
+  jpa:
+    defer-datasource-initialization: true  # CRÍTICO
+  sql:
+    init:
+      mode: always  # Carregar data.sql
+```
+
+**Lição:** Escolher UMA estratégia de carga de dados (Spring Boot SQL init OU CommandLineRunner), nunca ambas.
 
 ---
 

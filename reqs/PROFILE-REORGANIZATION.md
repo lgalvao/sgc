@@ -16,7 +16,7 @@
 - ✅ `application-jules.yml` → `application-e2e.yml`
 - ✅ `JulesSecurityConfig.java` → `E2eSecurityConfig.java`
 - ✅ `AGENTS.md` (documentação atualizada)
-- ✅ `lessons-cdu01.md` (referências atualizadas)
+- ✅ `licoes-aprendidas.md` (referências atualizadas)
 
 ### 2. Perfis Consolidados
 
@@ -143,7 +143,7 @@ Após backend restart, verificar:
 ## Referências
 
 - `PROFILES.md` - Guia completo de perfis
-- `lessons-cdu01.md` - Lições aprendidas dos testes E2E
+- `licoes-aprendidas.md` - Lições aprendidas dos testes E2E
 - `AGENTS.md` - Instruções para agentes de IA
 
 ---

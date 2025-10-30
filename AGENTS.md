@@ -163,7 +163,7 @@ pkill java
   - `navegacao/` - Navegação e rotas
   - `dados/` - Constantes de teste
 
-📖 **Lições aprendidas:** [`lessons-cdu01.md`](licoes-aprendidas.md) contém soluções para problemas comuns
+📖 **Lições aprendidas:** [`licoes-aprendidas.md`](licoes-aprendidas.md) contém soluções para problemas comuns
 
 ---
 
@@ -252,7 +252,7 @@ sgc/
 │
 ├── README.md                # Documentação principal
 ├── AGENTS.md                # Este arquivo
-└── lessons-cdu01.md         # Lições aprendidas (E2E)
+└── licoes-aprendidas.md         # Lições aprendidas (E2E)
 ``
 
 ---
@@ -309,7 +309,7 @@ npm run coverage:unit
 ### Essencial
 - 📖 **[README.md](README.md)** - Visão geral completa do projeto
 - 📊 **[reqs/PROFILES.md](reqs/PROFILES.md)** - Guia detalhado dos 4 perfis Spring
-- 🎓 **[lessons-cdu01.md](licoes-aprendidas.md)** - Lições aprendidas ao corrigir testes E2E
+- 🎓 **[licoes-aprendidas.md](licoes-aprendidas.md)** - Lições aprendidas ao corrigir testes E2E
 
 ### Backend
 - 🏗️ **[backend/README.md](backend/README.md)** - Arquitetura com diagramas Mermaid
@@ -354,7 +354,7 @@ import {
 ``
 
 ### 6. **Consulte Lições Aprendidas**
-Antes de corrigir testes E2E, leia [`lessons-cdu01.md`](licoes-aprendidas.md) para evitar problemas conhecidos:
+Antes de corrigir testes E2E, leia [`licoes-aprendidas.md`](licoes-aprendidas.md) para evitar problemas conhecidos:
 - Ordem de inicialização do banco
 - Conflitos de beans Spring Security
 - Timeouts insuficientes
@@ -397,7 +397,7 @@ curl http://localhost:10000/actuator/health
 ## 📞 Precisa de Ajuda?
 
 1. **Consulte a documentação** listada acima
-2. **Verifique issues conhecidas** em `lessons-cdu01.md`
+2. **Verifique issues conhecidas** em `licoes-aprendidas.md`
 3. **Leia o README do backend** para entender a arquitetura
 4. **Consulte PROFILES.md** para problemas de configuração
 
