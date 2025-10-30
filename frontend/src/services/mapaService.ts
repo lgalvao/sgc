@@ -22,7 +22,7 @@ export const obterMapaCompleto = async (id: number): Promise<MapaCompleto> => {
 };
 
 export const salvarMapaCompleto = async (codSubprocesso: number, data: any): Promise<MapaCompleto> => {
-  const response = await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-completo`, data);
+  const response = await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-completo/salvar`, data);
   return mapMapaCompletoDtoToModel(response.data);
 };
 
@@ -32,7 +32,7 @@ export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
 };
 
 export const salvarMapaAjuste = async (codSubprocesso: number, data: any): Promise<void> => {
-  await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-ajuste`, data);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-ajuste/salvar`, data);
 };
 
 export async function verificarMapaVigente(codigoUnidade: number): Promise<boolean> {
