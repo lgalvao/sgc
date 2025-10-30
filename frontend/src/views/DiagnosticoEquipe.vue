@@ -180,7 +180,6 @@ import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
 import { usePerfil } from '@/composables/usePerfil'
-import { usePerfilStore } from '@/stores/perfil'
 
 const route = useRoute()
 const router = useRouter()

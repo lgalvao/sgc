@@ -1,10 +1,9 @@
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi, Mock} from 'vitest'
 import { createPinia, setActivePinia } from 'pinia';
+import apiClient from '@/axios-setup'
+vi.mock('@/axios-setup');
 import * as service from '../processoService'
 import {AtualizarProcessoRequest, CriarProcessoRequest, TipoProcesso} from '@/types/tipos';
-import apiClient from "@/axios-setup";
-
-vi.mock('@/axios-setup');
 
 const mockedApi = vi.mocked(apiClient, true);
 
@@ -47,7 +46,7 @@ describe('processoService', () => {
             await service.finalizarProcesso(1)
             expect(mockedApi.post).toHaveBeenCalledWith('/processos/1/finalizar');})
 
-    it('excluirProcesso should call delete', async () => {
+    it('excluirProcesso should call post to the correct endpoint', async () => {
             mockedApi.post.mockResolvedValue({})
             await service.excluirProcesso(1)
             expect(mockedApi.post).toHaveBeenCalledWith('/processos/1/excluir');})
@@ -64,7 +63,7 @@ describe('processoService', () => {
         expect(mockedApi.get).toHaveBeenCalledWith('/processos/1');
     });
 
-    it('atualizarProcesso should put to the correct endpoint', async () => {
+    it('atualizarProcesso should post to the correct endpoint', async () => {
         const request: AtualizarProcessoRequest = { codigo: 1, tipo: TipoProcesso.MAPEAMENTO, unidades: [], descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
         mockedApi.post.mockResolvedValue({ data: {} });
         await service.atualizarProcesso(request.codigo, request);
