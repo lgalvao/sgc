@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
+// TODO em vez de criar todos os esses construtores diferentes, fazer os clientes usarem sempre o builder.
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();
@@ -38,18 +39,6 @@ public class Unidade extends EntidadeBase {
         this.sigla = sigla;
         this.tipo = tipo;
         this.situacao = situacao;
-    }
-
-    public Unidade(Unidade unidade) {
-        if (unidade != null) {
-            super.setCodigo(unidade.getCodigo());
-            this.nome = unidade.getNome();
-            this.sigla = unidade.getSigla();
-            this.titular = unidade.getTitular();
-            this.tipo = unidade.getTipo();
-            this.situacao = unidade.getSituacao();
-            this.unidadeSuperior = unidade.getUnidadeSuperior();
-        }
     }
 
     @Column(name = "nome")

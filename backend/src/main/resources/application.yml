@@ -4,14 +4,13 @@ spring:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: leonardo
+    username: postgres
     password: postgres
   test.mockmvc.print: none
   jpa:
     hibernate.ddl-auto: create
     properties:
       hibernate.default_schema: sgc
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     defer-datasource-initialization: true
   sql:
@@ -51,6 +50,7 @@ springdoc:
     title: SGC - Sistema de Gestão de Competências API
     version: v1
     description: API para gerenciar o mapeamento de competências e seus fluxos de trabalho.
+
 logging:
   level:
     org.hibernate: ERROR
@@ -61,4 +61,5 @@ logging:
     com.zaxxer.hikari: ERROR
     org.springframework.boot.autoconfigure.orm.jpa: ERROR
     org.springframework: ERROR
+    org.hibernate.tool.schema.internal.SchemaDropperImpl: ERROR
     sgc: INFO

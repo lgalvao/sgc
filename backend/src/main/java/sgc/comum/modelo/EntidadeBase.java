@@ -14,17 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class EntidadeBase implements Serializable {
-    /**
-     * Construtor de cópia.
-     *
-     * @param outra A entidade da qual os valores serão copiados.
-     */
-    public EntidadeBase(EntidadeBase outra) {
-        if (outra != null) {
-            this.codigo = outra.codigo;
-        }
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")

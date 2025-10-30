@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -50,8 +50,4 @@ tasks.register<Copy>("copyFrontend") {
 
 tasks.register<Delete>("cleanFrontend") {
     delete("frontend/dist", "frontend/node_modules")
-}
-
-tasks.named("clean") {
-    dependsOn("cleanFrontend")
 }

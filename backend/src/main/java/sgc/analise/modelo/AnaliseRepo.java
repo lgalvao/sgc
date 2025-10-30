@@ -5,10 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 /**
  * Repositório para a entidade {@link Analise}.
  */
+@Repository
 public interface AnaliseRepo extends JpaRepository<Analise, Long> {
     /**
      * Deleta todas as análises associadas a um subprocesso.

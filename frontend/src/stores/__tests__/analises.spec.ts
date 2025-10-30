@@ -37,42 +37,42 @@ describe('useAnalisesStore', () => {
 
         it('getAnalisesPorSubprocesso should return the correct analyses for a given subprocess', () => {
             const mockAnalises: (AnaliseCadastro | AnaliseValidacao)[] = [
-                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', idSubprocesso: 123},
-                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', idSubprocesso: 123},
+                {codigo: 1, dataHora: '2023-01-01T12:00:00Z', observacoes: 'Obs 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', codSubrocesso: 123},
+                {codigo: 2, dataHora: '2023-01-02T12:00:00Z', observacoes: 'Obs 2', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', codSubrocesso: 123},
             ];
-            const idSubprocesso = 123;
-            store.analisesPorSubprocesso.set(idSubprocesso, mockAnalises);
+            const codSubrocesso = 123;
+            store.analisesPorSubprocesso.set(codSubrocesso, mockAnalises);
 
-            const result = store.getAnalisesPorSubprocesso(idSubprocesso);
+            const result = store.getAnalisesPorSubprocesso(codSubrocesso);
             expect(result).toEqual(mockAnalises);
         });
     });
 
     describe('actions', () => {
-        const idSubprocesso = 123;
+        const codSubrocesso = 123;
         const mockAnalisesCadastro: AnaliseCadastro[] = [
-            {codigo: 1, dataHora: '2023-01-01T10:00:00Z', observacoes: 'Cadastro 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', idSubprocesso: 123},
+            {codigo: 1, dataHora: '2023-01-01T10:00:00Z', observacoes: 'Cadastro 1', acao: 'ACEITE', unidadeSigla: 'ABC', analista: 'Analista 1', resultado: 'APROVADO', codSubrocesso: 123},
         ];
         const mockAnalisesValidacao: AnaliseValidacao[] = [
-            {codigo: 2, dataHora: '2023-01-02T10:00:00Z', observacoes: 'Validacao 1', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', idSubprocesso: 123},
+            {codigo: 2, dataHora: '2023-01-02T10:00:00Z', observacoes: 'Validacao 1', acao: 'DEVOLUCAO', unidade: 'DEF', analista: 'Analista 2', resultado: 'REPROVADO', codSubrocesso: 123},
         ];
 
         it('fetchAnalisesCadastro should call the service and update the state', async () => {
             vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue(mockAnalisesCadastro);
 
-            await store.fetchAnalisesCadastro(idSubprocesso);
+            await store.fetchAnalisesCadastro(codSubrocesso);
 
-            expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(idSubprocesso);
-            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesCadastro);
+            expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(codSubrocesso);
+            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(mockAnalisesCadastro);
         });
 
         it('fetchAnalisesValidacao should call the service and update the state', async () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(mockAnalisesValidacao);
 
-            await store.fetchAnalisesValidacao(idSubprocesso);
+            await store.fetchAnalisesValidacao(codSubrocesso);
 
-            expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(idSubprocesso);
-            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesValidacao);
+            expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(codSubrocesso);
+            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(mockAnalisesValidacao);
         });
 
         it('should merge results when fetching both cadastro and validacao analyses', async () => {
@@ -80,15 +80,15 @@ describe('useAnalisesStore', () => {
             vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue(mockAnalisesValidacao);
 
             // Fetch cadastro first
-            await store.fetchAnalisesCadastro(idSubprocesso);
-            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(mockAnalisesCadastro);
+            await store.fetchAnalisesCadastro(codSubrocesso);
+            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(mockAnalisesCadastro);
 
             // Then fetch validacao
-            await store.fetchAnalisesValidacao(idSubprocesso);
+            await store.fetchAnalisesValidacao(codSubrocesso);
 
             const expected = [...mockAnalisesCadastro, ...mockAnalisesValidacao];
-            expect(store.getAnalisesPorSubprocesso(idSubprocesso)).toEqual(expect.arrayContaining(expected));
-            expect(store.getAnalisesPorSubprocesso(idSubprocesso).length).toBe(2);
+            expect(store.getAnalisesPorSubprocesso(codSubrocesso)).toEqual(expect.arrayContaining(expected));
+            expect(store.getAnalisesPorSubprocesso(codSubrocesso).length).toBe(2);
         });
     });
 });

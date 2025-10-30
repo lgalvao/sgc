@@ -29,103 +29,103 @@
                 class="btn-close"
                 aria-label="Close"
                 @click="limparErroImportacao"
-              ></button>
+              />
             </div>
             <fieldset :disabled="importando">
               <div class="mb-3">
                 <label
                   class="form-label"
                   for="processo-select"
-              >Processo</label>
-              <select
-                id="processo-select"
-                v-model="processoSelecionadoId"
-                class="form-select"
-                data-testid="select-processo"
-              >
-                <option
-                  disabled
-                  value=""
+                >Processo</label>
+                <select
+                  id="processo-select"
+                  v-model="processoSelecionadoId"
+                  class="form-select"
+                  data-testid="select-processo"
                 >
-                  Selecione
-                </option>
-                <option
-                  v-for="proc in processosDisponiveis"
-                  :key="proc.codigo"
-                  :value="proc.codigo"
-                >
-                  {{ proc.descricao }}
-                </option>
-              </select>
-              <div
-                v-if="!processosDisponiveis.length"
-                class="text-center text-muted mt-3"
-              >
-                Nenhum processo disponível para importação.
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label
-                class="form-label"
-                for="unidade-select"
-              >Unidade</label>
-              <select
-                id="unidade-select"
-                v-model="unidadeSelecionadaId"
-                :disabled="!processoSelecionado"
-                class="form-select"
-                data-testid="select-unidade"
-              >
-                <option
-                  disabled
-                  value=""
-                >
-                  Selecione
-                </option>
-                <option
-                  v-for="pu in unidadesParticipantes"
-                  :key="pu.codUnidade"
-                  :value="pu.codUnidade"
-                >
-                  {{ pu.sigla }}
-                </option>
-              </select>
-            </div>
-
-            <div v-if="unidadeSelecionada">
-              <h6>Atividades para importar</h6>
-              <div
-                v-if="atividadesParaImportar.length"
-                class="atividades-container border rounded p-2"
-              >
+                  <option
+                    disabled
+                    value=""
+                  >
+                    Selecione
+                  </option>
+                  <option
+                    v-for="proc in processosDisponiveis"
+                    :key="proc.codigo"
+                    :value="proc.codigo"
+                  >
+                    {{ proc.descricao }}
+                  </option>
+                </select>
                 <div
-                  v-for="ativ in atividadesParaImportar"
-                  :key="ativ.codigo"
-                  class="form-check"
+                  v-if="!processosDisponiveis.length"
+                  class="text-center text-muted mt-3"
                 >
-                  <input
-                    :id="`ativ-check-${ativ.codigo}`"
-                    v-model="atividadesSelecionadas"
-                    :value="ativ"
-                    class="form-check-input"
-                    type="checkbox"
-                  >
-                  <label
-                    :for="`ativ-check-${ativ.codigo}`"
-                    class="form-check-label"
-                  >
-                    {{ ativ.descricao }}
-                  </label>
+                  Nenhum processo disponível para importação.
                 </div>
               </div>
-              <div
-                v-else
-                class="text-center text-muted mt-3"
-              >
-                Nenhuma atividade encontrada para esta unidade/processo.
+
+              <div class="mb-3">
+                <label
+                  class="form-label"
+                  for="unidade-select"
+                >Unidade</label>
+                <select
+                  id="unidade-select"
+                  v-model="unidadeSelecionadaId"
+                  :disabled="!processoSelecionado"
+                  class="form-select"
+                  data-testid="select-unidade"
+                >
+                  <option
+                    disabled
+                    value=""
+                  >
+                    Selecione
+                  </option>
+                  <option
+                    v-for="pu in unidadesParticipantes"
+                    :key="pu.codUnidade"
+                    :value="pu.codUnidade"
+                  >
+                    {{ pu.sigla }}
+                  </option>
+                </select>
               </div>
-            </div>
+
+              <div v-if="unidadeSelecionada">
+                <h6>Atividades para importar</h6>
+                <div
+                  v-if="atividadesParaImportar.length"
+                  class="atividades-container border rounded p-2"
+                >
+                  <div
+                    v-for="ativ in atividadesParaImportar"
+                    :key="ativ.codigo"
+                    class="form-check"
+                  >
+                    <input
+                      :id="`ativ-check-${ativ.codigo}`"
+                      v-model="atividadesSelecionadas"
+                      :value="ativ"
+                      class="form-check-input"
+                      type="checkbox"
+                    >
+                    <label
+                      :for="`ativ-check-${ativ.codigo}`"
+                      class="form-check-label"
+                    >
+                      {{ ativ.descricao }}
+                    </label>
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="text-center text-muted mt-3"
+                >
+                  Nenhuma atividade encontrada para esta unidade/processo.
+                </div>
+              </div>
             </fieldset>
           </div>
 
@@ -145,7 +145,12 @@
               data-testid="btn-importar"
               @click="importar"
             >
-              <span v-if="importando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span
+                v-if="importando"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              />
               {{ importando ? 'Importando...' : 'Importar' }}
             </button>
           </div>
@@ -167,7 +172,7 @@ import { useApi } from '@/composables/useApi';
 
 const props = defineProps<{
   mostrar: boolean,
-  idSubprocessoDestino: number | undefined
+  codSubrocessoDestino: number | undefined
 }>()
 
 const emit = defineEmits<{
@@ -271,7 +276,7 @@ function fechar() {
 
 async function importar() {
   limparErroImportacao();
-  if (!props.idSubprocessoDestino || !unidadeSelecionada.value) {
+  if (!props.codSubrocessoDestino || !unidadeSelecionada.value) {
     return;
   }
   if (atividadesSelecionadas.value.length === 0) {
@@ -282,10 +287,10 @@ async function importar() {
   const idsAtividades = atividadesSelecionadas.value.map(a => a.codigo);
 
   try {
-    await executarImportacao(props.idSubprocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
+    await executarImportacao(props.codSubrocessoDestino, unidadeSelecionada.value.codSubprocesso, idsAtividades);
     emit('importar');
     fechar();
-  } catch (err) {
+  } catch {
     // O erro já está sendo tratado pelo useApi, não é necessário fazer nada aqui
     // a não ser que queira algum comportamento adicional no erro.
   }

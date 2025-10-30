@@ -53,8 +53,8 @@ graph TD
 **Exemplo de uso de uma exceção:**
 ```java
 // Em um serviço de outro módulo
-public Recurso buscar(Long id) {
-    return repository.findById(id)
-        .orElseThrow(() -> new ErroDominioNaoEncontrado("Recurso", id));
+public Recurso buscar(Long codigo) {
+    return repository.findById(codigo)
+        .orElseThrow(() -> new ErroDominioNaoEncontrado("Recurso", codigo));
 }
 ```

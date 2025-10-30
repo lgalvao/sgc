@@ -5,8 +5,8 @@ Ator: Qualquer pessoa autorizada a acessar o sistema (com qualquer dos perfis).
 Ator secundário: Sistema Acesso do TRE-PE
 
 Pré-condições:
-● Usuário deve possuir credenciais válidas (título e senha de rede no TRE-PE)
-● Usuário deve estar cadastrado no SGRH com lotação ativa em alguma unidade
+- Usuário deve possuir credenciais válidas (título e senha de rede no TRE-PE)
+- Usuário deve estar cadastrado no SGRH com lotação ativa em alguma unidade
 
 Fluxo principal:
 
@@ -46,17 +46,17 @@ Fluxo principal:
 
    ■ Elementos alinhado à esquerda:
 
-   ● Ícone/logotipo do sistema (link para abrir a tela Painel)
-   ● Link Painel, para tela Painel
-   ● Link Minha unidade, para tela Detalhe da unidade, apresentando os dados da unidade do usuário logado
-   ● Link Relatórios, para tela Relatórios
-   ● Link Histórico, para tela Histórico de processos
+   - Ícone/logotipo do sistema (link para abrir a tela Painel)
+   - Link Painel, para tela Painel
+   - Link Minha unidade, para tela Detalhe da unidade, apresentando os dados da unidade do usuário logado
+   - Link Relatórios, para tela Relatórios
+   - Link Histórico, para tela Histórico de processos
 
    ■ Elementos alinhado à direita:
 
-   ● Se perfil ADMIN: Ícone de engrenagem para acesso à tela de configurações do sistema
-   ● [Perfil] - [Sigla da unidade] - Texto fixo, sem interatividade (ex. CHEFE - SESEL)
-   ● Ícone de logout - faz logout e mostra tela Login
+   - Se perfil ADMIN: Ícone de engrenagem para acesso à tela de configurações do sistema
+   - [Perfil] - [Sigla da unidade] - Texto fixo, sem interatividade (ex. CHEFE - SESEL)
+   - Ícone de logout - faz logout e mostra tela Login
 
    9.2. O conteúdo compõe a parte central da tela, onde serão exibidas todas as telas.
    9.3. O Rodapé é a seção localizada na parte inferior das telas (exceto na tela de login) em que aparecerá a

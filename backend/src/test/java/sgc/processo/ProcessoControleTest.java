@@ -17,6 +17,9 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.modelo.ErroProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
+import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.service.ProcessoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,13 +67,13 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoValido_RetornaCreatedComUri() throws Exception {
-        var req = new CriarProcessoReq(NOVO_PROCESSO, MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq(NOVO_PROCESSO, TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
         var dto = ProcessoDto.builder()
                 .codigo(1L)
                 .dataCriacao(LocalDateTime.now())
                 .descricao(NOVO_PROCESSO)
                 .situacao(SituacaoProcesso.CRIADO)
-                .tipo(MAPEAMENTO)
+                .tipo(TipoProcesso.MAPEAMENTO.name())
                 .build();
 
         when(processoService.criar(any(CriarProcessoReq.class))).thenReturn(dto);
@@ -90,7 +93,7 @@ public class ProcessoControleTest {
 
     @Test
     void criar_ProcessoInvalido_RetornaBadRequest() throws Exception {
-        var req = new CriarProcessoReq("", MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
+        var req = new CriarProcessoReq("", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(30), List.of(1L));
 
         mockMvc.perform(post(API_PROCESSOS)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -105,7 +108,7 @@ public class ProcessoControleTest {
                 .dataCriacao(LocalDateTime.now())
                 .descricao("Processo Teste")
                 .situacao(SituacaoProcesso.CRIADO)
-                .tipo(MAPEAMENTO)
+                .tipo(TipoProcesso.MAPEAMENTO.name())
                 .build();
 
         when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
@@ -130,13 +133,13 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoExiste_RetornaOk() throws Exception {
-        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, REVISAO, LocalDateTime.now().plusDays(45), List.of(1L));
+        var req = new AtualizarProcessoReq(1L, PROCESSO_ATUALIZADO, TipoProcesso.REVISAO, LocalDateTime.now().plusDays(45), List.of(1L));
         var dto = ProcessoDto.builder()
                 .codigo(1L)
                 .dataCriacao(LocalDateTime.now())
                 .descricao(PROCESSO_ATUALIZADO)
                 .situacao(SituacaoProcesso.CRIADO)
-                .tipo(REVISAO)
+                .tipo(TipoProcesso.REVISAO.name())
                 .build();
 
         when(processoService.atualizar(eq(1L), any(AtualizarProcessoReq.class))).thenReturn(dto);
@@ -155,7 +158,7 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoNaoEncontrado_RetornaNotFound() throws Exception {
-        var req = new AtualizarProcessoReq(999L, "Teste", MAPEAMENTO, null, List.of(1L));
+        var req = new AtualizarProcessoReq(999L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
         doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(PROCESSO_NAO_ENCONTRADO)).when(processoService).atualizar(eq(999L), any(AtualizarProcessoReq.class));
 
@@ -167,7 +170,7 @@ public class ProcessoControleTest {
 
     @Test
     void atualizar_ProcessoEstadoInvalido_RetornaBadRequest() throws Exception {
-        var req = new AtualizarProcessoReq(1L, "Teste", MAPEAMENTO, null, List.of(1L));
+        var req = new AtualizarProcessoReq(1L, "Teste", TipoProcesso.MAPEAMENTO, null, List.of(1L));
 
         doThrow(new IllegalStateException()).when(processoService).atualizar(eq(1L), any(AtualizarProcessoReq.class));
 
@@ -206,7 +209,7 @@ public class ProcessoControleTest {
         var dto = ProcessoDetalheDto.builder()
                 .codigo(1L)
                 .descricao("Processo Detalhado")
-                .tipo(MAPEAMENTO)
+                .tipo(TipoProcesso.MAPEAMENTO.name())
                 .situacao(SituacaoProcesso.CRIADO)
                 .dataCriacao(LocalDateTime.now())
                 .build();

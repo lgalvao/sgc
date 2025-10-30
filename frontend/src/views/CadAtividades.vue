@@ -208,7 +208,7 @@
     <!-- Modais -->
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
-      :id-subprocesso-destino="idSubprocesso"
+      :cod-subrocesso-destino="codSubrocesso"
       @fechar="mostrarModalImportar = false"
       @importar="handleImportAtividades"
     />
@@ -428,12 +428,12 @@ const unidade = computed(() => {
 const siglaUnidade = computed(() => unidade.value?.sigla || props.sigla)
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
 const novaAtividade = ref('')
-const idSubprocesso = computed(() => processosStore.processoDetalhe?.unidades.find(u => u.sigla === unidadeId.value)?.codUnidade);
+const codSubrocesso = computed(() => processosStore.processoDetalhe?.unidades.find(u => u.sigla === unidadeId.value)?.codUnidade);
 
 const atividades = computed<AtividadeComEdicao[]>({
   get: () => {
-    if (idSubprocesso.value === undefined) return []
-    return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value).map(a => ({...a, novoConhecimento: ''}));
+    if (codSubrocesso.value === undefined) return []
+    return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value).map(a => ({...a, novoConhecimento: ''}));
   },
   set: () => {
     // Setter intencionalmente vazio para evitar mutações diretas.
@@ -444,41 +444,41 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 async function adicionarAtividade() {
-  if (novaAtividade.value?.trim() && idSubprocesso.value) {
+  if (novaAtividade.value?.trim() && codSubrocesso.value) {
     const request: CriarAtividadeRequest = {
       descricao: novaAtividade.value.trim(),
     };
-    await atividadesStore.adicionarAtividade(idSubprocesso.value, request);
+    await atividadesStore.adicionarAtividade(codSubrocesso.value, request);
     novaAtividade.value = '';
   }
 }
 
 async function removerAtividade(idx: number) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
   const atividadeRemovida = atividades.value[idx];
   if (confirm('Confirma a remoção desta atividade e todos os conhecimentos associados?')) {
-    await atividadesStore.removerAtividade(idSubprocesso.value, atividadeRemovida.codigo);
+    await atividadesStore.removerAtividade(codSubrocesso.value, atividadeRemovida.codigo);
   }
 }
 
 async function adicionarConhecimento(idx: number) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
   const atividade = atividades.value[idx];
   if (atividade.novoConhecimento?.trim()) {
     const request: CriarConhecimentoRequest = {
       descricao: atividade.novoConhecimento.trim()
     };
-    await atividadesStore.adicionarConhecimento(idSubprocesso.value, atividade.codigo, request);
+    await atividadesStore.adicionarConhecimento(codSubrocesso.value, atividade.codigo, request);
     atividade.novoConhecimento = '';
   }
 }
 
 async function removerConhecimento(idx: number, cidx: number) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
   const atividade = atividades.value[idx];
   const conhecimentoRemovido = atividade.conhecimentos[cidx];
   if (confirm('Confirma a remoção deste conhecimento?')) {
-    await atividadesStore.removerConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoRemovido.id);
+    await atividadesStore.removerConhecimento(codSubrocesso.value, atividade.codigo, conhecimentoRemovido.id);
   }
 }
 
@@ -496,13 +496,13 @@ function fecharModalEdicaoConhecimento() {
 }
 
 async function salvarEdicaoConhecimento(conhecimentoId: number, novaDescricao: string) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
   const atividade = atividades.value.find(a => a.conhecimentos.some(c => c.id === conhecimentoId));
   if (atividade) {
     const conhecimento = atividade.conhecimentos.find(c => c.id === conhecimentoId);
     if (conhecimento) {
       const conhecimentoAtualizado: Conhecimento = {...conhecimento, descricao: novaDescricao};
-      await atividadesStore.atualizarConhecimento(idSubprocesso.value, atividade.codigo, conhecimentoId, conhecimentoAtualizado);
+      await atividadesStore.atualizarConhecimento(codSubrocesso.value, atividade.codigo, conhecimentoId, conhecimentoAtualizado);
     }
   }
   fecharModalEdicaoConhecimento();
@@ -517,11 +517,11 @@ function iniciarEdicaoAtividade(id: number, valorAtual: string) {
 }
 
 async function salvarEdicaoAtividade(id: number) {
-  if (String(atividadeEditada.value).trim() && idSubprocesso.value) {
+  if (String(atividadeEditada.value).trim() && codSubrocesso.value) {
     const atividadeOriginal = atividades.value.find(a => a.codigo === id);
     if (atividadeOriginal) {
       const atividadeAtualizada: Atividade = {...atividadeOriginal, descricao: atividadeEditada.value.trim()};
-      await atividadesStore.atualizarAtividade(idSubprocesso.value, id, atividadeAtualizada);
+      await atividadesStore.atualizarAtividade(codSubrocesso.value, id, atividadeAtualizada);
     }
   }
   cancelarEdicaoAtividade();
@@ -570,9 +570,9 @@ const confirmacaoModalRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
-    await analisesStore.fetchAnalisesCadastro(idSubprocesso.value)
+  if (codSubrocesso.value) {
+    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
+    await analisesStore.fetchAnalisesCadastro(codSubrocesso.value)
   }
 });
 
@@ -632,8 +632,8 @@ function validarAtividades(): Atividade[] {
 }
 
 const historicoAnalises = computed(() => {
-  if (!idSubprocesso.value) return []
-  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value)
+  if (!codSubrocesso.value) return []
+  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value)
 })
 
 function formatarData(data: string): string {
@@ -676,16 +676,16 @@ function fecharModalConfirmacao() {
 }
 
 async function confirmarDisponibilizacao() {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
 
   if (isRevisao.value) {
-    await subprocessosStore.disponibilizarRevisaoCadastro(idSubprocesso.value);
+    await subprocessosStore.disponibilizarRevisaoCadastro(codSubrocesso.value);
   } else {
-    await subprocessosStore.disponibilizarCadastro(idSubprocesso.value);
+    await subprocessosStore.disponibilizarCadastro(codSubrocesso.value);
   }
 
   fecharModalConfirmacao();
-  await router.push('/painel');
+  router.push('/painel');
 }
 
 function abrirModalImpacto() {

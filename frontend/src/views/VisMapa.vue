@@ -503,22 +503,22 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
+  // Correção temporária: usando idProcesso como codSubrocesso
   await mapaStore.fetchMapaCompleto(idProcesso.value);
 });
 
@@ -555,9 +555,9 @@ const temHistoricoAnalise = computed(() => {
 })
 
 const historicoAnalise = computed(() => {
-  if (!idSubprocesso.value) return []
+  if (!codSubrocesso.value) return []
 
-  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
+  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value).map(analise => ({
     codigo: analise.codigo,
     data: new Date(analise.dataHora).toLocaleString('pt-BR'),
     unidade: (analise as any).unidadeSigla || (analise as any).unidade,
@@ -651,7 +651,7 @@ async function confirmarSugestoes() {
         'Sugestões submetidas para análise da unidade superior'
     )
 
-    await router.push({
+    router.push({
       name: 'Subprocesso',
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
@@ -675,7 +675,7 @@ async function confirmarValidacao() {
         'Mapa validado e submetido para análise da unidade superior'
     )
 
-    await router.push({
+    router.push({
       name: 'Subprocesso',
       params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
     })
@@ -689,32 +689,32 @@ async function confirmarValidacao() {
 }
 
 async function confirmarAceitacao(observacoes?: string) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
 
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === 'ADMIN';
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   }
 
   fecharModalAceitar();
-  await router.push({name: 'Painel'});
+  router.push({name: 'Painel'});
 }
 
 
 async function confirmarDevolucao() {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
 
-  await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, {
+  await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, {
     motivo: '', // Adicionar motivo
     observacoes: observacaoDevolucao.value,
   });
 
   fecharModalDevolucao();
-  await router.push({name: 'Painel'});
+  router.push({name: 'Painel'});
 }
 </script>
 

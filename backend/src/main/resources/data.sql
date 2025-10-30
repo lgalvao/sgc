@@ -151,3 +151,44 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
 (999999999999, 'ADMIN'),
 (999999999999, 'GESTOR');
+
+-- Processos de teste para E2E
+-- Nota: Como a tabela PROCESSO usa IDENTITY, precisamos inserir na ordem e
+-- assumir que os IDs serão 1, 2, 3, 4 (banco vazio na inicialização)
+INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) VALUES
+('Mapeamento de competências - 2025', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 365);
+
+INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) VALUES
+('Revisão de mapa de competências STIC - 2024', 'REVISAO', 'EM_ANDAMENTO', CURRENT_DATE - 150, CURRENT_DATE + 60);
+
+INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) VALUES
+('Mapeamento inicial SEDOCAP - 2025', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE - 30, CURRENT_DATE + 300);
+
+INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) VALUES
+('Processo teste revisão CDU-05', 'REVISAO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 60);
+
+-- Unidades participantes dos processos
+-- Os IDs dos processos acima serão 1, 2, 3 respectivamente (considerando banco vazio)
+-- Processo 1: Várias unidades (para teste de GESTOR)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 2);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 3);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 4);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 8);
+
+-- Processo 2: Apenas STIC e subordinadas (para teste de CHEFE)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 2);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 6);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 7);
+
+-- Processo 3: SEDOCAP (unidade raiz diferente - não deve aparecer para usuário STIC)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (3, 201);
+
+-- Processo 4: Teste CDU-05 em situação CRIADO (visível apenas para ADMIN)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (4, 5);
+
+-- Usuário CHEFE da STIC para testes E2E
+INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES
+(777, 'Chefe STIC Teste', 'chefe.stic@tre-pe.jus.br', '7777', 2);
+
+INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES
+(777, 'CHEFE');

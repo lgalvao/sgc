@@ -129,7 +129,6 @@ const alertasFormatados = computed((): AlertaFormatado[] => {
       ...alerta,
       mensagem: alerta.descricao,
       data: alerta.dataHora,
-      lido: alerta.lido,
       dataHoraFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
       origem: partes[0],
       processo: partes[2],

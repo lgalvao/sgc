@@ -8,7 +8,7 @@ import sgc.processo.modelo.Processo;
  */
 @Mapper(componentModel = "spring")
 public interface ProcessoMapper {
-    ProcessoDto toDTO(Processo processo);
+    ProcessoDto toDto(Processo processo);
 
     Processo toEntity(ProcessoDto processoDTO);
 }

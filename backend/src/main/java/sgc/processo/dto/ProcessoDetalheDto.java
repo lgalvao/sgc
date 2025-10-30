@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sgc.processo.SituacaoProcesso;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.processo.modelo.SituacaoProcesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

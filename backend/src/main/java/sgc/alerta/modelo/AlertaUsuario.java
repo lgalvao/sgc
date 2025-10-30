@@ -2,33 +2,33 @@ package sgc.alerta.modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Usuario;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "ALERTA_USUARIO", schema = "sgc")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 /**
  * Tabela de associação que conecta um {@link Alerta} a um {@link Usuario} específico.
  * <p>
  * Esta entidade rastreia quais usuários receberam um alerta e quando o leram.
  * Utiliza uma chave primária composta ({@link Chave}) para identificar a relação.
  */
+@Entity
+@Table(name = "ALERTA_USUARIO", schema = "sgc")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertaUsuario implements Serializable {
+    /**
+     * Chave primária composta para a entidade {@link AlertaUsuario}.
+     */
     @Embeddable
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
-    /**
-     * Chave primária composta para a entidade {@link AlertaUsuario}.
-     */
     public static class Chave implements Serializable {
         private Long alertaCodigo;
         private Long usuarioTituloEleitoral;
