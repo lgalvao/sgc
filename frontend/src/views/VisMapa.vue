@@ -641,8 +641,9 @@ function verHistorico() {
 }
 
 async function confirmarSugestoes() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes()
+    await processosStore.apresentarSugestoes(codSubrocesso.value, { sugestoes: sugestoes.value });
 
     fecharModalSugestoes()
 
@@ -665,8 +666,9 @@ async function confirmarSugestoes() {
 }
 
 async function confirmarValidacao() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.validarMapa()
+    await processosStore.validarMapa(codSubrocesso.value);
 
     fecharModalValidar()
 

@@ -258,7 +258,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   try {
     // Chamar a store para atualizar a data limite
-    await processosStore.alterarDataLimiteSubprocesso();
+    await processosStore.alterarDataLimiteSubprocesso(SubprocessoDetalhes.value.codigo, { novaData: novaData });
 
     // Fechar modal
     fecharModalAlterarDataLimite();
