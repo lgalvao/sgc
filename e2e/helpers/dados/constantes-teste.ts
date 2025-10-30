@@ -190,3 +190,75 @@ export const USUARIOS = {
     unidade: 'SEDIA',
   },
 } as const;
+
+/**
+ * TEST_IDS - Identificadores data-testid para seleção robusta de elementos
+ * 
+ * Uso recomendado em vez de seletores CSS frágeis.
+ * Para migração gradual: adicione data-testid aos componentes Vue conforme necessário.
+ */
+export const TEST_IDS = {
+  // Login
+  INPUT_TITULO: 'input-titulo',
+  INPUT_SENHA: 'input-senha',
+  BTN_ENTRAR: 'btn-entrar',
+  SELECT_PERFIL_UNIDADE: 'select-perfil-unidade',
+  
+  // Painel
+  PAINEL_PROCESSOS: 'painel-processos',
+  PAINEL_ALERTAS: 'painel-alertas',
+  
+  // Processos - Lista
+  PROCESSO_CARD: 'processo-card',
+  PROCESSO_CARD_TITULO: 'processo-card-titulo',
+  PROCESSO_CARD_TIPO: 'processo-card-tipo',
+  PROCESSO_CARD_SITUACAO: 'processo-card-situacao',
+  PROCESSO_CARD_ACOES: 'processo-card-acoes',
+  
+  // Processos - Formulário
+  FORM_DESCRICAO: 'form-descricao',
+  FORM_TIPO: 'form-tipo',
+  FORM_DATA_LIMITE: 'form-data-limite',
+  FORM_UNIDADES: 'form-unidades',
+  
+  // Botões comuns
+  BTN_SALVAR: 'btn-salvar',
+  BTN_CANCELAR: 'btn-cancelar',
+  BTN_CONFIRMAR: 'btn-confirmar',
+  BTN_FECHAR: 'btn-fechar',
+  
+  // Modais
+  MODAL_TITULO: 'modal-titulo',
+  MODAL_CORPO: 'modal-corpo',
+  MODAL_ACOES: 'modal-acoes',
+} as const;
+
+/**
+ * Helper para criar seletor data-testid
+ * @param testId - ID do elemento
+ * @returns Seletor Playwright para data-testid
+ * 
+ * @example
+ * ```ts
+ * await page.locator(testIdSelector('btn-entrar')).click();
+ * // ou use diretamente:
+ * await page.getByTestId('btn-entrar').click();
+ * ```
+ */
+export function testIdSelector(testId: string): string {
+  return `[data-testid="${testId}"]`;
+}
+
+/**
+ * Helper para criar seletor de card de processo por ID
+ * @param processoId - ID do processo
+ * @returns Seletor Playwright para card do processo
+ * 
+ * @example
+ * ```ts
+ * await page.locator(processCardSelector(1)).click();
+ * ```
+ */
+export function processCardSelector(processoId: number): string {
+  return `[data-testid="processo-card-${processoId}"]`;
+}

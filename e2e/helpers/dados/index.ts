@@ -9,5 +9,9 @@ export {
     TEXTOS,
     URLS,
     ROTULOS,
-    DADOS_TESTE
+    DADOS_TESTE,
+    TEST_IDS,
+    testIdSelector,
+    processCardSelector,
+    USUARIOS
 } from './constantes-teste';

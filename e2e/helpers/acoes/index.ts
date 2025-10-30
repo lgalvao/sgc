@@ -58,3 +58,4 @@ export {
     clicarBotaoHistoricoAnalise as clicarBotaoHistoricoAnaliseModal,
 } from './acoes-modais';
 export * from './acoes-validacao';
+export * from './api-setup';
