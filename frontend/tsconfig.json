@@ -11,7 +11,7 @@
 
     // Modules
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -27,8 +27,7 @@
     "types": [
       "vitest/globals",
       "node",
-      "vite/client",
-      "@playwright/test"
+      "vite/client"
     ],
 
     // Project
@@ -36,9 +35,6 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      "~/*": [
-        "e2e/*"
       ]
     },
     "forceConsistentCasingInFileNames": true
@@ -51,8 +47,6 @@
     "spec/**/*.ts",
     "spec/**/*.d.ts",
     "vitest.setup.ts",
-    "../playwright.config.ts",
-    "../e2e/**/*.ts",
     "vite.config.ts"
   ],
   "exclude": [
