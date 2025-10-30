@@ -190,3 +190,33 @@ export const USUARIOS = {
     unidade: 'SEDIA',
   },
 } as const;
+
+// -----------------------------------------------------------------------------
+// NEW: Test IDs centralization and helpers (non-breaking)
+// -----------------------------------------------------------------------------
+
+export const TEST_IDS = {
+  // Map logical names to data-testid attributes. Use these in new/updated specs.
+  BTN_CRIAR_PROCESSO: 'btn-criar-processo',
+  BTN_LOGIN: 'btn-login',
+  LOGIN_USERNAME: 'login-username',
+  LOGIN_PASSWORD: 'login-password',
+  LOGIN_SUBMIT: 'login-submit',
+  PROFILE_SELECTOR: 'profile-selector',
+  ALERT_LIST: 'alert-list',
+  PROCESS_CARD_PREFIX: 'process-card-',
+  // Activities
+  INPUT_NOVA_ATIVIDADE: 'input-nova-atividade',
+  BTN_ADICIONAR_ATIVIDADE: 'btn-adicionar-atividade',
+  // Modals
+  BTN_MODAL_CONFIRMAR: 'btn-modal-confirmar',
+  BTN_MODAL_CANCELAR: 'btn-modal-cancelar',
+};
+
+export function testIdSelector(id: string) {
+  return `[data-testid="${id}"]`;
+}
+
+export function processCardSelector(id: string | number) {
+  return testIdSelector(`${TEST_IDS.PROCESS_CARD_PREFIX}${id}`);
+}
