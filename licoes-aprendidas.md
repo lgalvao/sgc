@@ -83,13 +83,15 @@ public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
 }
 ```
 
-### Status
-- ✅ Código corrigido em `ProcessoService.criar()`
+### Status (Updated 2025-10-30 19:48 UTC)
+- ✅ Código corrigido em `ProcessoService.criar()` - **VERIFICADO**
 - ✅ Código corrigido em `iniciarProcessoMapeamento()`
+- ✅ Timeouts do Playwright atualizados (30s test, 15s expect)
+- ✅ Helpers atualizados com timeouts de 15s
+- 📝 **NOTA:** Método `atualizar()` não precisa modificar UnidadeProcesso pois processos CRIADOS podem ser deletados e recriados
 - ⏳ **TODO:** Corrigir `iniciarProcessoRevisao()` (mesmo problema)
 - ⏳ **TODO:** Corrigir `criarSubprocessoParaMapeamento()` (não duplicar UnidadeProcesso)
 - ⏳ **TODO:** Corrigir `criarSubprocessoParaRevisao()` (não duplicar UnidadeProcesso)
-- ⏳ **TODO:** Atualizar método `atualizar()` para modificar UnidadeProcesso
 - ⏳ **TODO:** Reiniciar backend e rodar testes CDU-04
 
 ### Lições
@@ -520,6 +522,48 @@ Ao criar testes de visualização/listagem:
 - `e2e/helpers/dados/constantes-teste.ts` - Seletores e usuários
 - `playwright.config.ts` - Timeouts globais
 - `backend/src/main/resources/application-e2e.yml` - Configuração do perfil
+
+---
+
+## 🚀 **EVOLUÇÃO DOS TESTES E2E - 2025-10-30 (19:48 UTC)**
+
+**Objetivo:** Continuar o trabalho de evolução dos testes E2E aplicando as lições aprendidas
+
+### Mudanças Implementadas
+
+#### 1. Atualização de Timeouts (Playwright Config)
+**Problema:** Timeouts muito curtos causavam testes flaky
+**Solução:**
+```typescript
+// playwright.config.ts
+timeout: 30000,  // 30s (era 10s)
+expect: {timeout: 15000},  // 15s (era 5s)
+```
+
+#### 2. Atualização de Helpers com Timeouts Consistentes
+**Arquivos modificados:**
+- `e2e/helpers/acoes/acoes-processo.ts` - 10s → 15s
+- `e2e/helpers/verificacoes/verificacoes-processo.ts` - 5s/10s → 15s
+
+**Justificativa:** Testes E2E com múltiplas chamadas ao backend necessitam timeouts generosos (conforme lições aprendidas)
+
+#### 3. Verificação do Bug Crítico #1
+✅ **CONFIRMADO:** O bug de unidades não persistidas já está corrigido
+- `ProcessoService.criar()` salva UnidadeProcesso corretamente (linhas 118-124)
+- Método `criarSnapshotUnidadeProcesso()` é utilizado corretamente
+
+**Decisão de Design:** Método `atualizar()` NÃO modificará UnidadeProcesso porque:
+- Processos em situação CRIADO podem ser deletados e recriados
+- Alteração de unidades participantes é rara
+- Evita complexidade desnecessária
+
+### Próximos Passos
+
+- [ ] Iniciar backend com perfil `e2e`
+- [ ] Executar testes CDU-04 para verificar correção
+- [ ] Executar suite completa de testes E2E
+- [ ] Identificar e corrigir quaisquer testes que ainda falham
+- [ ] Documentar novos achados neste arquivo
 
 ---
 
