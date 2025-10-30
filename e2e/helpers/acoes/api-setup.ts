@@ -41,7 +41,7 @@ export interface UnidadeTestData {
 export interface ProcessoTestData {
   descricao: string;
   tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO';
-  situacao: 'EM_ELABORACAO' | 'EM_ANDAMENTO' | 'FINALIZADO';
+  situacao: 'CRIADO' | 'EM_ANDAMENTO' | 'FINALIZADO';
   dataLimite?: string; // ISO 8601 format
   unidadesCodigos: number[]; // Lista de códigos de unidades participantes
 }
@@ -123,7 +123,7 @@ export async function garantirUnidade(page: Page, unidade: UnidadeTestData): Pro
  * const processoId = await garantirProcesso(page, {
  *   descricao: 'Processo de Teste',
  *   tipo: 'MAPEAMENTO',
- *   situacao: 'EM_ELABORACAO',
+ *   situacao: 'CRIADO',
  *   dataLimite: '2025-12-31T23:59:59',
  *   unidadesCodigos: [2, 3, 8]
  * });
@@ -171,7 +171,7 @@ export async function garantirProcesso(page: Page, processo: ProcessoTestData): 
  *   processo: {
  *     descricao: 'Mapeamento 2025',
  *     tipo: 'MAPEAMENTO',
- *     situacao: 'EM_ELABORACAO',
+ *     situacao: 'CRIADO',
  *     unidadesCodigos: [998, 997]
  *   }
  * });
