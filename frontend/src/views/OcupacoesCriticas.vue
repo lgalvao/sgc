@@ -225,7 +225,6 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const perfilStore = usePerfilStore()
 const { servidorLogado } = usePerfil()
 
 const idProcesso = computed(() => Number(route.params.idProcesso))

@@ -208,7 +208,7 @@
     <!-- Modais -->
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
-      :id-subprocesso-destino="codSubrocesso"
+      :cod-subrocesso-destino="codSubrocesso"
       @fechar="mostrarModalImportar = false"
       @importar="handleImportAtividades"
     />
