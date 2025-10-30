@@ -56,17 +56,17 @@ describe('subprocessoService', () => {
         });
 
         it('atualizarCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {
-            mockedApiClient.put.mockResolvedValue({ data: {} });
+            mockedApiClient.post.mockResolvedValue({ data: {} });
             const result = await subprocessoService.atualizarCompetencia(1, mockCompetencia);
-            expect(mockedApiClient.put).toHaveBeenCalledWith('/subprocessos/1/competencias/1', mockCompetencia);
+            expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencias/1/atualizar', mockCompetencia);
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);
         });
 
         it('removerCompetencia deve chamar o endpoint correto e mapear a resposta', async () => {
-            mockedApiClient.delete.mockResolvedValue({ data: {} });
+            mockedApiClient.post.mockResolvedValue({ data: {} });
             const result = await subprocessoService.removerCompetencia(1, 1);
-            expect(mockedApiClient.delete).toHaveBeenCalledWith('/subprocessos/1/competencias/1');
+            expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencias/1/remover');
             expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
             expect(result).toEqual(mockMapaCompleto);
         });
