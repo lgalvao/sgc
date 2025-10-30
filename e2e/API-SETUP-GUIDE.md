@@ -14,7 +14,9 @@ Este documento demonstra como usar os helpers de API para preparar cenários de 
 ## Importação
 
 ```typescript
-import { garantirUsuario, garantirUnidade, garantirProcesso, setupCenarioCompleto } from './helpers';
+import { garantirUsuario, garantirUnidade, garantirProcesso, setupCenarioCompleto } from './helpers/acoes/api-setup';
+// ou se estiver usando o index geral:
+// import { garantirUsuario, garantirUnidade, garantirProcesso, setupCenarioCompleto } from './helpers';
 ```
 
 ## Exemplos de Uso
@@ -73,7 +75,8 @@ Para casos mais complexos, use `setupCenarioCompleto`:
 
 ```typescript
 import { test } from '@playwright/test';
-import { setupCenarioCompleto, loginComoGestor } from './helpers';
+import { setupCenarioCompleto } from './helpers';
+import { navegarParaLogin, preencherFormularioLogin, clicarBotaoEntrar } from './helpers';
 
 test('teste com cenário completo', async ({ page }) => {
   // Prepara todo o cenário de uma vez
@@ -178,10 +181,15 @@ await garantirUsuario(page, { tituloEleitoral: 12345, ... });
 
 ```typescript
 import { test, expect } from '@playwright/test';
-import { setupCenarioCompleto, loginComoGestor } from './helpers';
+import { setupCenarioCompleto } from './helpers';
+import { navegarParaLogin, preencherFormularioLogin, clicarBotaoEntrar } from './helpers';
 
 test.describe('CDU-XX: Meu Caso de Uso', () => {
   let processoId: number;
+  const GESTOR_TESTE = {
+    titulo: '55555',
+    senha: '123'
+  };
 
   test.beforeEach(async ({ page }) => {
     // Prepara cenário antes de cada teste
@@ -206,8 +214,11 @@ test.describe('CDU-XX: Meu Caso de Uso', () => {
   });
 
   test('deve fazer algo com o processo', async ({ page }) => {
-    // Login
-    await loginComoGestor(page);
+    // Login via UI
+    await navegarParaLogin(page);
+    await preencherFormularioLogin(page, GESTOR_TESTE.titulo, GESTOR_TESTE.senha);
+    await clicarBotaoEntrar(page);
+    await page.waitForURL('/painel', { timeout: 15000 });
 
     // Navega para o processo
     await page.goto(`/processo/${processoId}`);
