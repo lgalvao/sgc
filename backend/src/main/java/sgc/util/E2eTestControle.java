@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuarioRepo;
 import sgc.comum.modelo.EntidadeBase;
@@ -18,6 +15,7 @@ import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller com endpoints auxiliares para testes E2E.

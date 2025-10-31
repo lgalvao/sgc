@@ -72,9 +72,15 @@ INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) 
 INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite) VALUES ('Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 180);
 
 -- Unidades participantes dos processos
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (4, 100); -- CDU-05 usa ADMIN-UNIT (livre)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (5, 100);
+-- Processo 2: STIC (código 2)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+  VALUES (2, 2, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', NULL);
+-- Processo 4: ADMIN-UNIT (código 100) - para CDU-05
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+  VALUES (4, 100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL);
+-- Processo 5: ADMIN-UNIT (código 100)
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+  VALUES (5, 100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL);
 
 -- Usuários adicionais para testes E2E (antes dos perfis!)
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (777, 'Chefe STIC Teste', 'chefe.stic@tre-pe.jus.br', '7777', 2);
