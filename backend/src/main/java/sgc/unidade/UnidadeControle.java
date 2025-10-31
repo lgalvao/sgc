@@ -3,8 +3,10 @@ package sgc.unidade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sgc.mapa.modelo.MapaRepo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -23,6 +25,7 @@ import java.util.Map;
 public class UnidadeControle {
     
     private final UnidadeRepo unidadeRepo;
+    private final MapaRepo mapaRepo;
 
     /**
      * Busca todas as unidades em estrutura hierárquica
@@ -33,6 +36,21 @@ public class UnidadeControle {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
         List<UnidadeDto> hierarquia = montarHierarquia(todasUnidades);
         return ResponseEntity.ok(hierarquia);
+    }
+    
+    /**
+     * Verifica se a unidade possui mapa de competências vigente
+     * Usado pelo frontend para determinar se deve exibir opções de revisão
+     * 
+     * @param codigoUnidade O código da unidade
+     * @return Um objeto com o campo temMapaVigente (boolean)
+     */
+    @GetMapping("/{codigoUnidade}/mapa-vigente")
+    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codigoUnidade) {
+        // Verifica se existe mapa vigente para a unidade usando o método do repositório
+        boolean temMapaVigente = mapaRepo.findMapaVigenteByUnidade(codigoUnidade).isPresent();
+        
+        return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
     
     /**

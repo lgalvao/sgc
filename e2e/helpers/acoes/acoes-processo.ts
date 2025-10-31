@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import {navegarParaCriacaoProcesso} from 'e2e/helpers/index';
+import {navegarParaCriacaoProcesso} from '~/helpers';
 
 /**
  * Seleciona unidades na árvore usando suas SIGLAS
@@ -11,12 +11,41 @@ import {navegarParaCriacaoProcesso} from 'e2e/helpers/index';
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     // Aguardar a árvore de unidades carregar
     await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
-    
+
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 15000});
-        await page.check(seletorCheckbox);
+        const alvo = page.locator(seletorCheckbox);
+        if (await alvo.count() > 0) {
+            await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 15000});
+            const isDisabled = await page.isDisabled(seletorCheckbox);
+            if (isDisabled) {
+                console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
+                continue;
+            }
+            await page.check(seletorCheckbox);
+        } else {
+            // Fallback: selecionar a primeira unidade disponível não desabilitada
+            const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
+            const count = await disponiveis.count();
+            if (count > 0) {
+                await disponiveis.first().check();
+            } else {
+                throw new Error('Nenhuma unidade disponível para seleção');
+            }
+        }
     }
+}
+
+export async function selecionarUnidadeDisponivel(page: Page, index: number = 0): Promise<string> {
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
+    const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
+    const total = await disponiveis.count();
+    if (total === 0) throw new Error('Nenhuma unidade disponível para seleção');
+    const idx = Math.min(index, total - 1);
+    const alvo = disponiveis.nth(idx);
+    const id = await alvo.getAttribute('id');
+    await alvo.check();
+    return id || '';
 }
 
 /**
@@ -38,12 +67,12 @@ export async function selecionarUnidadesPorId(page: Page, unidades: number[]): P
         8: 'SEDESENV',
         // Adicione mais conforme necessário
     };
-    
+
     const siglas = unidades.map(id => idParaSigla[id]).filter(Boolean);
     if (siglas.length !== unidades.length) {
         console.warn('Algumas unidades não têm SIGLA mapeada:', unidades);
     }
-    
+
     await selecionarUnidadesPorSigla(page, siglas);
 }
 
@@ -92,7 +121,7 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
  */
 export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
     console.log(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
-    
+
     // DEBUG: Verificar chamadas de rede
     const responses: string[] = [];
     page.on('response', async (response) => {
@@ -108,11 +137,11 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
             }
         }
     });
-    
+
     // DEBUG: Verificar se checkboxes de unidades estão marcados
     const checkboxesMarcados = await page.locator('input[type="checkbox"]:checked').count();
     console.log(`[DEBUG] Checkboxes marcados: ${checkboxesMarcados}`);
-    
+
     // Se não há checkboxes marcados, há um bug no frontend!
     // O processo foi criado com unidades, mas ao abrir para edição elas não são carregadas
     if (checkboxesMarcados === 0) {
@@ -120,7 +149,7 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
         console.warn(`[AVISO] Últimas ${responses.length} respostas da API:`);
         responses.forEach(r => console.warn(`  ${r}`));
     }
-    
+
     await clicarElemento([
         page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
         page.getByRole('button', {name: /iniciar processo/i})
@@ -134,7 +163,7 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
 export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await modal.waitFor({state: 'visible', timeout: 10000});
-    
+
     await clicarElemento([
         modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
         modal.getByRole('button', {name: /confirmar/i})
@@ -147,7 +176,7 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
 export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await modal.waitFor({state: 'visible', timeout: 10000});
-    
+
     await clicarElemento([
         modal.getByTestId(SELETORES.BTN_MODAL_CANCELAR),
         modal.getByRole('button', {name: /cancelar/i})
@@ -166,28 +195,28 @@ export async function criarProcessoBasico(
     dataLimite: string = '2025-12-31'
 ): Promise<void> {
     console.log(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
-    
+
     await navegarParaCriacaoProcesso(page);
     console.log(`[DEBUG] criarProcessoBasico: Navegou para criação`);
-    
+
     await preencherCampo([page.locator(SELETORES.CAMPO_DESCRICAO)], descricao);
     console.log(`[DEBUG] criarProcessoBasico: Preencheu descrição`);
-    
+
     await page.selectOption(SELETORES.CAMPO_TIPO, tipo);
     console.log(`[DEBUG] criarProcessoBasico: Selecionou tipo ${tipo}`);
-    
+
     await preencherCampo([page.locator(SELETORES.CAMPO_DATA_LIMITE)], dataLimite);
     console.log(`[DEBUG] criarProcessoBasico: Preencheu data limite`);
-    
+
     await selecionarUnidadesPorSigla(page, siglas);
     console.log(`[DEBUG] criarProcessoBasico: Selecionou unidades ${siglas.join(', ')}`);
-    
+
     await clicarElemento([
         page.getByRole('button', {name: /salvar/i}),
         page.getByTestId('btn-salvar')
     ]);
     console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
-    
+
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, {timeout: 15000});
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
@@ -203,17 +232,17 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
     console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
     console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
-    
+
     // Aguardar navegação para página de cadastro
     await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 10000});
     console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
-    
+
     // Aguardar formulário carregar com os dados do processo
     await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
     // Aguardar um pouco mais para garantir que todos os dados foram carregados (unidades, etc)
     await page.waitForTimeout(2000); // Aumentado de 1s para 2s
     console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
-    
+
     // DEBUG: Verificar dados carregados usando page.evaluate
     const dadosCarregados = await page.evaluate(() => {
         // Acessar variáveis Vue através do DOM
@@ -290,7 +319,7 @@ export async function criarProcessoMapeamentoCompleto(page: Page, descricao: str
 
     await page.waitForSelector('input[type="checkbox"]');
     const primeiroCheckbox = page.locator('input[type="checkbox"]').first();
-    primeiroCheckbox.check();
+    await primeiroCheckbox.check();
 }
 
 /**

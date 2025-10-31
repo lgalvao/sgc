@@ -2,6 +2,7 @@ import {vueTest as test} from './support/vue-specific-setup';
 import {
     clicarProcesso,
     esperarElementoVisivel,
+    limparProcessosEmAndamento,
     SELETORES,
     verificarAlertasOrdenadosPorDataHora,
     verificarAusenciaBotaoCriarProcesso,
@@ -56,13 +57,15 @@ test.describe('CDU-02: Visualizar Painel', () => {
         });
     });
 
-    test.describe('Tabela de Processos', () => {
-        test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
-            await loginComoChefeStic(page);
-            await verificarVisibilidadeProcesso(page, /Revisão de mapa de competências STIC - 2024/, true);
-            await verificarVisibilidadeProcesso(page, /Mapeamento inicial SEDOCAP - 2025/, false);
-        });
-    });
+     test.describe('Tabela de Processos', () => {
+         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
+             await loginComoChefeStic(page);
+             // Chefe STIC deve ver processo EM_ANDAMENTO da STIC (processo 2)
+             await verificarVisibilidadeProcesso(page, /Revisão de mapa de competências STIC - 2024/, true);
+             // Não deve ver processo da ADMIN-UNIT (processo 5)
+             await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);
+         });
+     });
 
     test.describe('Navegação a partir do Painel', () => {
         test('ADMIN deve navegar para a edição ao clicar em processo "Criado"', async ({page}) => {

@@ -89,21 +89,3 @@ export async function cancelarModal(page: Page): Promise<void> {
         modalVisivel.locator('[data-bs-dismiss="modal"]').last(),
     ]);
 }
-
-/**
- * Clica no botão "Histórico de análise" de forma robusta.
- * - Prioriza test-id (SELETORES.BTN_HISTORICO_ANALISE)
- * - Fallback por role/text (TEXTOS.HISTORICO_ANALISE)
- * - Lança erro claro se não encontrado para diagnóstico imediato
- */
-export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
-    await clicarElemento(
-        [
-            page.getByTestId(SELETORES.BTN_HISTORICO_ANALISE),
-            page.getByTestId('historico-analise-btn'),
-            page.getByTestId('historico-analise-btn-gestor'),
-            page.getByRole('button', {name: TEXTOS.HISTORICO_ANALISE}),
-        ],
-        {force: true} // Mantém o clique forçado como fallback, encapsulado no utilitário
-    );
-}

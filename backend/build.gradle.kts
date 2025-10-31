@@ -36,7 +36,6 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
-//    testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
 
     // MapStruct
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")

@@ -146,4 +146,18 @@ public class ProcessoControle {
         processoService.finalizar(codigo);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado.
+     * Útil para desabilitar checkboxes no frontend durante criação/edição de processos.
+     *
+     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @return Lista de códigos de unidades bloqueadas
+     */
+    @GetMapping("/unidades-bloqueadas")
+    @Operation(summary = "Lista unidades que já participam de processos ativos por tipo")
+    public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
+        List<Long> unidadesBloqueadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
+        return ResponseEntity.ok(unidadesBloqueadas);
+    }
 }

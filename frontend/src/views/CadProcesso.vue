@@ -58,12 +58,17 @@
                   class="form-check-input"
                   type="checkbox"
                   :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
+                  :disabled="isUnidadeBloqueada(unidade.codigo)"
                 >
                 <label
                   :for="`chk-${unidade.sigla}`"
                   class="form-check-label ms-2"
+                  :class="{ 'text-muted': isUnidadeBloqueada(unidade.codigo) }"
                 >
                   <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
+                  <span v-if="isUnidadeBloqueada(unidade.codigo)" class="badge bg-warning text-dark ms-2">
+                    Já em processo ativo
+                  </span>
                 </label>
               </div>
               <div
@@ -83,12 +88,17 @@
                       class="form-check-input"
                       type="checkbox"
                       :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
+                      :disabled="isUnidadeBloqueada(filha.codigo)"
                     >
                     <label
                       :for="`chk-${filha.sigla}`"
                       class="form-check-label ms-2"
+                      :class="{ 'text-muted': isUnidadeBloqueada(filha.codigo) }"
                     >
                       <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
+                      <span v-if="isUnidadeBloqueada(filha.codigo)" class="badge bg-warning text-dark ms-2">
+                        Já em processo ativo
+                      </span>
                     </label>
                   </div>
 
@@ -107,12 +117,17 @@
                         :value="neta.codigo"
                         class="form-check-input"
                         type="checkbox"
+                        :disabled="isUnidadeBloqueada(neta.codigo)"
                       >
                       <label
                         :for="`chk-${neta.sigla}`"
                         class="form-check-label ms-2"
+                        :class="{ 'text-muted': isUnidadeBloqueada(neta.codigo) }"
                       >
                         <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
+                        <span v-if="isUnidadeBloqueada(neta.codigo)" class="badge bg-warning text-dark ms-2">
+                          Já em processo ativo
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -289,6 +304,7 @@ const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da un
 const descricao = ref<string>('')
 const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
 const dataLimite = ref<string>('')
+const unidadesBloqueadas = ref<number[]>([]) // Unidades que já participam de processos ativos
 const router = useRouter()
 const route = useRoute()
 const processosStore = useProcessosStore()
@@ -349,6 +365,27 @@ onMounted(async () => {
     }
   }
 })
+
+// Buscar unidades bloqueadas quando o tipo de processo mudar
+watch(tipo, async (novoTipo) => {
+  try {
+    const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
+    if (response.ok) {
+      unidadesBloqueadas.value = await response.json();
+      console.log('[DEBUG Vue] Unidades bloqueadas para tipo', novoTipo, ':', unidadesBloqueadas.value);
+    }
+  } catch (error) {
+    console.error('Erro ao buscar unidades bloqueadas:', error);
+  }
+}, { immediate: true });
+
+function isUnidadeBloqueada(codigo: number): boolean {
+  // Não bloquear se estamos editando e a unidade já estava selecionada
+  if (processoEditando.value && unidadesSelecionadas.value.includes(codigo)) {
+    return false;
+  }
+  return unidadesBloqueadas.value.includes(codigo);
+}
 
 function limparCampos() {
   descricao.value = ''

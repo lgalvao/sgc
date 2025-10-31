@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // Type Checking
     "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -8,15 +7,11 @@
     "skipLibCheck": true,
     "allowJs": true,
     "checkJs": true,
-
-    // Modules
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-
-    // Language & Environment
     "target": "ESNext",
     "lib": [
       "ESNext",
@@ -29,8 +24,6 @@
       "node",
       "vite/client"
     ],
-
-    // Project
     "baseUrl": ".",
     "paths": {
       "@/*": [

@@ -4,6 +4,7 @@ import {
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     selecionarUnidadesPorSigla,
+    limparProcessosEmAndamento,
     SELETORES,
     TEXTOS,
 } from './helpers';
@@ -64,7 +65,16 @@ import {
  * negócio devem ser cobertos por testes unitários específicos.
  */
 test.describe('CDU-03: Manter processo (Expandido)', () => {
-    test.beforeEach(async ({page}) => await loginComoAdmin(page));
+    test.beforeEach(async ({page}) => {
+        // Limpar processos EM_ANDAMENTO antes de cada teste
+        await limparProcessosEmAndamento(page);
+        await loginComoAdmin(page);
+    });
+
+    test.afterEach(async ({page}) => {
+        // Limpar processos EM_ANDAMENTO após cada teste para evitar bloquear próximos testes
+        await limparProcessosEmAndamento(page);
+    });
 
     // ===== CRIAÇÃO DE PROCESSO =====
     
@@ -125,9 +135,10 @@ test.describe('CDU-03: Manter processo (Expandido)', () => {
     test('deve editar processo e modificar descrição', async ({page}) => {
         // 1. Abrir processo existente para edição
         await page.click('[data-testid="tabela-processos"] tr:has-text("Processo teste revisão CDU-05")');
-        await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+/);
+        await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 15000});
         
         // 2. Verificar que campo está preenchido com valor atual
+        await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 15000});
         const descricaoAtual = await page.locator(SELETORES.CAMPO_DESCRICAO).inputValue();
         expect(descricaoAtual).toBeTruthy();
         
@@ -149,29 +160,37 @@ test.describe('CDU-03: Manter processo (Expandido)', () => {
         
         // Edição: DEVE ter botão Remover
         await page.goto('http://localhost:5173/painel');
+        await page.waitForSelector('[data-testid="tabela-processos"]', {state: 'visible', timeout: 15000});
         await page.click('[data-testid="tabela-processos"] tr:has-text("Processo teste revisão CDU-05")');
-        await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
+        await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 15000});
+        await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible({timeout: 15000});
     });
 
     // ===== REMOÇÃO DE PROCESSO =====
     
     test('deve abrir modal de confirmação ao clicar em Remover', async ({page}) => {
         // 1. Abrir processo para edição
+        await page.goto('http://localhost:5173/painel');
+        await page.waitForSelector('[data-testid="tabela-processos"]', {state: 'visible', timeout: 15000});
         await page.click('[data-testid="tabela-processos"] tr:has-text("Processo teste revisão CDU-05")');
+        await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 15000});
         
         // 2. Clicar em Remover
         await page.getByRole('button', {name: /^Remover$/i}).click();
         
         // 3. Verificar modal de confirmação
         const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible();
+        await expect(modal).toBeVisible({timeout: 15000});
         await expect(modal.getByText(/Remover o processo/i)).toBeVisible();
         await expect(modal.getByText(/Esta ação não poderá ser desfeita/i)).toBeVisible();
     });
 
     test('deve cancelar remoção e permanecer na tela de edição', async ({page}) => {
         // 1. Abrir processo e clicar em Remover
+        await page.goto('http://localhost:5173/painel');
+        await page.waitForSelector('[data-testid="tabela-processos"]', {state: 'visible', timeout: 15000});
         await page.click('[data-testid="tabela-processos"] tr:has-text("Processo teste revisão CDU-05")');
+        await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 15000});
         await page.getByRole('button', {name: /^Remover$/i}).click();
         
         // 2. Cancelar no modal
@@ -230,12 +249,13 @@ test.describe('CDU-03: Manter processo (Expandido)', () => {
     test('deve selecionar múltiplas unidades', async ({page}) => {
         await navegarParaCriacaoProcesso(page);
         
-        // Selecionar apenas unidades que sabemos que existem como raiz
-        await selecionarUnidadesPorSigla(page, ['SEDOCAP', 'STIC']);
+        // Selecionar unidades que não estão bloqueadas por outros processos
+        // STIC está em uso nos processos 2 e 4, então usamos ADMIN-UNIT e suas filhas
+        await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT', 'GESTOR-UNIT']);
         
-        // Verificar que ambas estão marcadas
-        await expect(page.locator('#chk-SEDOCAP')).toBeChecked();
-        await expect(page.locator('#chk-STIC')).toBeChecked();
+        // Verificar que ambas foram marcadas
+        await expect(page.locator('#chk-ADMIN-UNIT')).toBeChecked({timeout: 15000});
+        await expect(page.locator('#chk-GESTOR-UNIT')).toBeChecked({timeout: 15000});
     });
 
     // ===== CAMPOS E TIPOS =====

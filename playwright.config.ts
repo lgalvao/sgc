@@ -2,6 +2,18 @@
 
 import {defineConfig, devices} from '@playwright/test';
 
+/**
+ * ⚠️ IMPORTANTE: Idempotência dos Testes E2E
+ * 
+ * Os testes E2E modificam o banco de dados (H2 em memória do backend).
+ * Para executar a suíte completa múltiplas vezes, REINICIE O BACKEND entre execuções:
+ * 
+ * 1. Pare o backend (Ctrl+C ou taskkill /F /IM java.exe)
+ * 2. Inicie novamente: ./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
+ * 3. Execute os testes: npm run test:e2e
+ * 
+ * Alternativamente, execute apenas testes específicos que não foram modificados.
+ */
 export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,

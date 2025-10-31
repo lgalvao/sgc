@@ -440,4 +440,28 @@ public class ProcessoService {
         }
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
     }
+
+    /**
+     * Lista códigos de unidades que já participam de processos ativos (EM_ANDAMENTO) do tipo especificado.
+     * 
+     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @return Lista de códigos de unidades bloqueadas
+     */
+    public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
+        TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
+        
+        // Busca todos os processos EM_ANDAMENTO do tipo especificado
+        List<Processo> processosAtivos = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+            .filter(p -> p.getTipo() == tipoProcesso)
+            .toList();
+        
+        // Extrai todas as unidades desses processos
+        List<Long> codigosUnidadesBloqueadas = processosAtivos.stream()
+            .flatMap(p -> unidadeProcessoRepo.findByCodProcesso(p.getCodigo()).stream())
+            .map(UnidadeProcesso::getCodUnidade)
+            .distinct()
+            .toList();
+        
+        return codigosUnidadesBloqueadas;
+    }
 }

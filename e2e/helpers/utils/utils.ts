@@ -5,6 +5,34 @@ export function gerarNomeUnico(prefixo: string): string {
 }
 
 /**
+ * Remove TODOS os processos (CRIADOS e EM_ANDAMENTO) que usam a unidade especificada.
+ * Usa endpoint E2E especial ativo apenas no perfil 'e2e' do backend.
+ */
+export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade: string): Promise<void> {
+    try {
+        // Mapeamento de siglas para códigos (STIC = 2)
+        const codigosUnidade: Record<string, number> = {
+            'STIC': 2,
+            'SGP': 3,
+            'COEDE': 4,
+            'SEMARE': 5,
+        };
+        
+        const codigo = codigosUnidade[siglaUnidade];
+        if (!codigo) {
+            console.warn(`Unidade ${siglaUnidade} não mapeada para cleanup`);
+            return;
+        }
+        
+        // Usar endpoint E2E (POST em vez de DELETE por questões de segurança)
+        await page.request.post(`http://localhost:10000/api/e2e/processos/unidade/${codigo}/limpar`);
+    } catch (error) {
+        // Falha silenciosa - se não conseguir limpar, teste tentará rodar mesmo assim
+        console.log('Aviso: Não foi possível limpar processos:', error);
+    }
+}
+
+/**
  * Localiza um elemento preferindo test-id e mantendo fallback por role/text/locator.
  * - testId: string | undefined — se fornecido, tenta `page.getByTestId(testId)`
  * - role: Playwright role string (ex: 'button') e name: texto para getByRole fallback

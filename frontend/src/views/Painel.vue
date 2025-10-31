@@ -109,11 +109,11 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   }
   
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: String(processo.codigo)}})
+    router.push({name: 'Processo', params: {codProcesso: String(processo.codigo)}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
+      router.push({name: 'Subprocesso', params: {codProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }

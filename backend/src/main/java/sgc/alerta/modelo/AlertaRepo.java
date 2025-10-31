@@ -3,6 +3,9 @@ package sgc.alerta.modelo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +29,20 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
      * @return Uma lista de alertas.
      */
     List<Alerta> findByProcessoCodigo(Long codProcesso);
+
+    @Query("select a.codigo from Alerta a where a.processo.codigo = :proc")
+    List<Long> findIdsByProcessoCodigo(@Param("proc") Long processoCodigo);
+
+    @Query("select a.codigo from Alerta a where a.processo.codigo in :procs")
+    List<Long> findIdsByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
+
+    @Modifying
+    @Query("delete from Alerta a where a.processo.codigo = :proc")
+    void deleteByProcessoCodigo(@Param("proc") Long processoCodigo);
+
+    @Modifying
+    @Query("delete from Alerta a where a.processo.codigo in :procs")
+    void deleteByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
 
     /**
      * Busca alertas destinados a um usuário específico, de forma paginada.

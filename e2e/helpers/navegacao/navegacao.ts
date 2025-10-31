@@ -3,11 +3,6 @@ import {SELETORES, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
- * FUNÇÕES DE NAVEGAÇÃO
- * Funções específicas para navegação entre páginas e interações gerais.
- */
-
-/**
  * Espera um texto ficar visível na página (função local para evitar dependência circular)
  */
 async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {

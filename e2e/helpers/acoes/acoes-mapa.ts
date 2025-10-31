@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { TEXTOS } from 'e2e/helpers/index';
+import { TEXTOS } from '~/helpers';
 
 export async function fecharModalImpactos(page: Page): Promise<void> {
     await page.getByTestId('fechar-impactos-mapa-button').click();

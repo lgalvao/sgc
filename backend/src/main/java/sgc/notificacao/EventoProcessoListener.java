@@ -3,6 +3,8 @@ package sgc.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
@@ -22,6 +24,7 @@ import sgc.unidade.modelo.TipoUnidade;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
 
 import static sgc.unidade.modelo.TipoUnidade.*;
 
@@ -32,6 +35,7 @@ import static sgc.unidade.modelo.TipoUnidade.*;
  * para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
  */
 @Component
+@Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
 public class EventoProcessoListener {
@@ -41,6 +45,7 @@ public class EventoProcessoListener {
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo repoSubprocesso;
+    private final Environment environment;
 
     /**
      * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando
@@ -101,9 +106,16 @@ public class EventoProcessoListener {
 
         Long codigoUnidade = subprocesso.getUnidade().getCodigo();
         try {
-            UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(codigoUnidade)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Unidade não encontrada no SGRH: %d".formatted(codigoUnidade)));
+            Optional<UnidadeDto> unidadeOpt = sgrhService.buscarUnidadePorCodigo(codigoUnidade);
+            if (unidadeOpt.isEmpty()) {
+                boolean isE2E = Arrays.asList(environment.getActiveProfiles()).contains("e2e");
+                if (isE2E) {
+                    log.warn("Unidade não encontrada no SGRH: {} (ignorado no perfil e2e)", codigoUnidade);
+                    return;
+                }
+                throw new IllegalStateException("Unidade não encontrada no SGRH: %d".formatted(codigoUnidade));
+            }
+            UnidadeDto unidade = unidadeOpt.get();
 
             Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
             if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {

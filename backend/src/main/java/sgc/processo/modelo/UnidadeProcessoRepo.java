@@ -18,7 +18,7 @@ public interface UnidadeProcessoRepo extends JpaRepository<UnidadeProcesso, Long
      * @return Uma lista de códigos de unidade que já estão em um processo ativo.
      */
     @Query("""
-            SELECT up.codUnidade
+            SELECT DISTINCT up.codUnidade
             FROM UnidadeProcesso up JOIN Processo p ON up.codProcesso = p.codigo
             WHERE p.situacao = 'EM_ANDAMENTO' AND
                   up.codUnidade IN :codUnidades
