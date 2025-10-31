@@ -57,7 +57,7 @@ graph TD
 ### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
 - **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
 - **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências.
-- **`competencia`:** Define as competências que compõem um mapa.
+- **`competencia`:** Define as competências que compõem um mapa. A API para sua gestão é exposta pelo `SubprocessoMapaControle`.
 - **`atividade`:** Define as atividades associadas às competências. Este módulo também é responsável por gerenciar os **conhecimentos** vinculados a cada atividade.
 
 ### 4. `analise` (Auditoria e Revisão)
@@ -70,12 +70,15 @@ graph TD
 
 ### 6. `sgrh` e `unidade` (Estrutura e Integração)
 - **Responsabilidade:** Fornecem os dados sobre a estrutura organizacional e os usuários.
-- **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica de negócio.
+- **`unidade`:** Modela a hierarquia organizacional. É primariamente um modelo de dados, mas expõe uma API de leitura através do `UnidadeControle`.
 - **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar dados de um sistema de RH externo (atualmente simulado).
 
-### 7. `comum`, `config` e `util` (Componentes Transversais)
+### 7. `painel` (Dashboard)
+- **Responsabilidade:** Fornece dados agregados para o dashboard da aplicação, consultando informações de outros módulos como `processo` e `alerta`.
+
+### 8. `comum`, `config` e `util` (Componentes Transversais)
 - **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
-- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro, a `EntidadeBase` para entidades JPA e a lógica do `Painel`.
+- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro, a `EntidadeBase` para entidades JPA.
 - **`config`**: Fornece classes de configuração do Spring, como `SecurityConfig` e `ThymeleafConfig`.
 - **`util`**: Contém classes de utilidade, como `HtmlUtils`.
 

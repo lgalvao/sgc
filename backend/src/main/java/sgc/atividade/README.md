@@ -44,12 +44,12 @@ graph TD
 - **`AtividadeControle`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos` aninhados.
   - **Endpoints de Atividade**:
     - `POST /api/atividades`: Cria uma nova atividade.
-    - `POST /api/atividades/{id}/atualizar`: Atualiza uma atividade.
-    - `POST /api/atividades/{id}/excluir`: Exclui uma atividade.
+    - `PUT /api/atividades/{id}`: Atualiza uma atividade.
+    - `DELETE /api/atividades/{id}`: Exclui uma atividade.
   - **Endpoints de Conhecimento (Sub-recurso)**:
     - `POST /api/atividades/{atividadeId}/conhecimentos`: Adiciona um conhecimento a uma atividade.
-    - `POST /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}/atualizar`: Atualiza um conhecimento.
-    - `POST /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}/excluir`: Remove um conhecimento de uma atividade.
+    - `PUT /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}`: Atualiza um conhecimento.
+    - `DELETE /api/atividades/{atividadeId}/conhecimentos/{conhecimentoId}`: Remove um conhecimento de uma atividade.
 - **`AtividadeService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e as regras de validação.
 - **`Atividade`**: Entidade JPA que representa uma atividade. Possui uma relação `OneToMany` com `Conhecimento`.
 - **`Conhecimento`**: Entidade JPA que representa um conhecimento necessário para realizar uma atividade. Está sempre associada a uma `Atividade`.

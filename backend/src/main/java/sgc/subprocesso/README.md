@@ -47,7 +47,7 @@ graph TD
 ### Controladores REST
 - **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD.
 - **`SubprocessoCadastroControle`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver, aceitar, etc.).
-- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências.
+- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências, incluindo o gerenciamento de `Competencia` e seus vínculos.
 - **`SubprocessoValidacaoControle`**: Lida com as ações de workflow da etapa de validação.
 
 ### Camada de Fachada

@@ -1,21 +1,22 @@
 # Módulo de Competência
 
 ## Visão Geral
-Este pacote gerencia a entidade `Competencia` e sua associação com `Atividades`. Uma competência representa um conjunto de habilidades ou conhecimentos. Este módulo fornece a lógica de negócio para o gerenciamento completo de competências, incluindo a criação, atualização, exclusão e a gestão dos vínculos com as atividades.
-
-**Nota Arquitetural Importante:** Este pacote **não possui uma camada de controle (`*Controle`)**. A API REST para o gerenciamento de `Competências` foi centralizada no `SubprocessoMapaControle`, que por sua vez invoca o `CompetenciaService`.
+Este pacote gerencia a entidade `Competencia` e sua associação com `Atividades`. Uma competência representa um conjunto de habilidades ou conhecimentos, e este módulo fornece a API REST para seu gerenciamento completo, incluindo a criação, leitura, atualização e exclusão de competências, bem como a gestão dos vínculos com as atividades que as compõem.
 
 ## Arquitetura e Componentes
-O `CompetenciaService` encapsula toda a lógica de negócio. Ele é um serviço de domínio puro, invocado por outros serviços de nível superior (como `SubprocessoMapaWorkflowService`) para manipular os dados de competências.
+A lógica de negócio para o gerenciamento de competências está encapsulada no `CompetenciaService`. No entanto, este módulo não possui um controlador próprio. A API REST para `Competencia` é exposta pelo `SubprocessoMapaControle`, localizado no pacote `subprocesso`.
 
 ```mermaid
 graph TD
-    subgraph "Módulo Subprocesso"
-        Controle(SubprocessoMapaControle)
-        WorkflowService(SubprocessoMapaWorkflowService)
+    subgraph "Frontend"
+        Frontend
     end
 
-    subgraph "Módulo Competência (este pacote)"
+    subgraph "Módulo Subprocesso"
+        Controle(SubprocessoMapaControle)
+    end
+
+    subgraph "Módulo Competência"
         Service(CompetenciaService)
         subgraph "Repositórios"
             CompetenciaRepo
@@ -27,8 +28,9 @@ graph TD
         end
     end
 
-    Controle -- Utiliza --> WorkflowService
-    WorkflowService -- Invoca --> Service
+    Frontend -- API REST --> Controle
+
+    Controle -- Delega para --> Service
 
     Service -- Utiliza --> CompetenciaRepo & CompetenciaAtividadeRepo
 
@@ -37,10 +39,11 @@ graph TD
 ```
 
 ## Componentes Principais
-- **`CompetenciaService`**: Contém a lógica de negócio para todas as operações de CRUD de `Competencia` e para gerenciar seus vínculos com `Atividade`.
+- **`CompetenciaService`**: Contém a lógica de negócio para todas as operações, garantindo a integridade dos dados e as regras de validação antes de interagir com os repositórios.
+- **`SubprocessoMapaControle`**: (no pacote `subprocesso`) Expõe a API REST para gerenciar `Competencias` e seus vínculos com `Atividades`.
 - **`Competencia`**: Entidade JPA que representa uma competência.
-- **`CompetenciaAtividade`**: Entidade de associação que representa a relação N-para-N entre `Competencia` e `Atividade`.
+- **`CompetenciaAtividade`**: Entidade de associação (tabela `competencia_atividade`) que representa a relação N-para-N entre `Competencia` e `Atividade`. Utiliza uma chave primária composta.
 - **`CompetenciaRepo` / `CompetenciaAtividadeRepo`**: Repositórios Spring Data para a persistência das entidades.
 
 ## Propósito e Uso
-O módulo permite que a aplicação defina competências de forma granular e as componha associando-as a múltiplas atividades. A decisão de centralizar a exposição da API no `SubprocessoMapaControle` reflete o fato de que, no contexto do negócio, a gestão de competências ocorre sempre dentro de um `Subprocesso` ativo.
+O módulo permite que os usuários definam competências de forma granular e, em seguida, as componham associando-as a múltiplas atividades. A API aninhada para o gerenciamento de vínculos (`/api/competencias/{id}/atividades`) segue as melhores práticas RESTful, tornando a intenção da operação clara e semântica.

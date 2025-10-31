@@ -3,7 +3,7 @@
 ## Visão Geral
 Este pacote define o **modelo de dados da estrutura organizacional** do SGC. Ele contém a entidade `Unidade`, que representa uma unidade organizacional (secretaria, seção, etc.), e seu repositório.
 
-**Nota Arquitetural Importante:** Este pacote é estritamente um **módulo de modelo de dados**. Ele **não contém lógica de negócio ou serviços**. A `UnidadeControle` existe apenas para expor os dados da estrutura organizacional de forma hierárquica para o frontend.
+**Nota Arquitetural Importante:** Este pacote é primariamente um **módulo de modelo de dados**. Ele contém a entidade `Unidade` e seu repositório. A lógica de negócio para gerenciar Unidades é de responsabilidade do `SgrhService`. No entanto, este pacote contém um `UnidadeControle` que expõe uma API de leitura para o frontend.
 
 ## Arquitetura e Propósito
 A entidade `Unidade` serve como a "fonte da verdade" para a hierarquia organizacional dentro do SGC. Outros módulos consomem os dados deste pacote para executar seus fluxos de trabalho.
@@ -11,7 +11,6 @@ A entidade `Unidade` serve como a "fonte da verdade" para a hierarquia organizac
 ```mermaid
 graph TD
     subgraph "Pacote Unidade (este pacote)"
-        Controle(UnidadeControle)
         Modelo(Unidade)
         Repo[UnidadeRepo]
     end
@@ -27,7 +26,6 @@ graph TD
     end
 
     ProcessoService & SubprocessoService & AlertaService -- Leem dados de --> Repo
-    Controle -- Leem dados de --> Repo
 
     SgrhService -- Alimenta/Atualiza dados em --> Repo
 
@@ -37,13 +35,12 @@ graph TD
 ## Componentes Principais
 - **`Unidade`**: A entidade JPA principal que representa uma unidade organizacional.
 - **`UnidadeRepo`**: O repositório Spring Data JPA para acessar a entidade `Unidade`.
-- **`UnidadeControle`**: Expõe um endpoint (`GET /api/unidades`) que retorna a estrutura hierárquica completa das unidades.
 - **`AtribuicaoTemporaria` / `VinculacaoUnidade`**: Entidades relacionadas que modelam outras características da estrutura organizacional.
 - **`TipoUnidade`**: Enum que classifica a unidade (ex: `OPERACIONAL`, `INTERMEDIARIA`), usado para direcionar a lógica em outros módulos.
 - **`SituacaoUnidade`**: Enum que define a situação de uma unidade (ex: `ATIVA`, `EXTINTA`).
 
 ## Como os Dados são Gerenciados?
-- **Leitura:** Diversos serviços (`ProcessoService`, `SubprocessoService`, etc.) e o `UnidadeControle` utilizam o `UnidadeRepo` para buscar informações sobre a estrutura organizacional.
+- **Leitura:** Diversos serviços (`ProcessoService`, `SubprocessoService`, etc.) utilizam o `UnidadeRepo` para buscar informações sobre a estrutura organizacional.
 - **Escrita:** A criação e atualização das unidades **não são feitas por uma API de CRUD**. A responsabilidade de manter os dados da tabela `UNIDADE` sincronizados recai sobre o `SgrhService`, que deve buscar os dados de um sistema de RH externo (a fonte de verdade oficial) e populá-los no banco de dados do SGC.
 
 Em resumo, este pacote fornece o "esqueleto" organizacional sobre o qual os outros módulos operam.

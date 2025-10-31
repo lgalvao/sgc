@@ -45,6 +45,7 @@ graph TD
 - **Responsabilidade:** Fornece classes de utilidade diversas.
 - **Componentes Notáveis:**
   - `BeanUtil`: Permite o acesso a beans gerenciados pelo Spring em contextos não gerenciados.
+  - `HealthCheckController`: Expõe um endpoint `/api/health` para monitoramento da aplicação.
 
 ## Propósito e Uso
 - **Exceções (`erros`)**: Lançadas pelos serviços para sinalizar um erro de negócio ou técnico. O `RestExceptionHandler` cuida do resto.
