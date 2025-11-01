@@ -114,3 +114,5 @@ export {
 } from './verificacoes-ui';
 
 export * from './verificacoes-atividades';
+export * from './verificacoes-subprocesso';
+export * from './verificacoes-modais';

@@ -55,3 +55,20 @@ export async function excluirCompetencia(page: Page, descricao: string): Promise
 export async function clicarBotaoImpactosMapa(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.IMPACTO_NO_MAPA}).click();
 }
+
+export async function irParaAjusteMapa(page: Page, processoId: number, siglaUnidade: string): Promise<void> {
+    await page.goto(`/processo/${processoId}/${siglaUnidade}/mapa-ajuste`);
+}
+
+export async function submeterAjusteMapa(page: Page): Promise<void> {
+    await page.getByRole('button', { name: /Submeter ajuste/i }).click();
+}
+
+export async function disponibilizarMapa(page: Page, data: string, observacoes: string): Promise<void> {
+    await page.getByRole('button', { name: /Disponibilizar mapa/i }).click();
+    const modal = page.locator('.modal.show');
+    await modal.waitFor({ state: 'visible' });
+    await modal.locator('input[type="date"]').fill(data);
+    await modal.locator('textarea').fill(observacoes);
+    await modal.getByRole('button', { name: /Confirmar/i }).click();
+}
