@@ -117,6 +117,7 @@
     <!-- Modal de Criar Nova Competência -->
     <div
       v-if="mostrarModalCriarNovaCompetencia"
+      data-testid="criar-competencia-modal"
       aria-labelledby="criarCompetenciaModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -230,6 +231,7 @@
     <!-- Modal de Disponibilizar -->
     <div
       v-if="mostrarModalDisponibilizar"
+      data-testid="disponibilizar-modal"
       aria-labelledby="disponibilizarModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -275,7 +277,7 @@
               <textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes"
+                data-testid="input-observacoes-disponibilizacao"
                 class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
