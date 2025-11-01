@@ -8,7 +8,8 @@ import {clicarElemento} from '../utils';
  */
 
 /**
- * Cancelar ação no modal
+ * Clica no botão "Cancelar" em um modal.
+ * @param page A instância da página do Playwright.
  */
 export async function cancelarNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
@@ -20,7 +21,8 @@ export async function cancelarNoModal(page: Page): Promise<void> {
 }
 
 /**
- * Confirmar ação no modal
+ * Clica no botão "Confirmar" em um modal.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
@@ -33,7 +35,8 @@ export async function confirmarNoModal(page: Page): Promise<void> {
 }
 
 /**
- * Confirmar remoção no modal usando botão de danger
+ * Clica no botão "Remover" em um modal de confirmação de remoção.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarRemocaoNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
@@ -46,31 +49,35 @@ export async function confirmarRemocaoNoModal(page: Page): Promise<void> {
 }
 
 /**
- * Abrir diálogo de remoção de processo
+ * Abre o diálogo de remoção de um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function abrirDialogoRemocaoProcesso(page: Page): Promise<void> {
     await clicarElemento([page.getByTestId(SELETORES.BTN_EXCLUIR), page.getByRole('button', {name: TEXTOS.REMOVER})]);
 }
 
 /**
- * Iniciar processo através do botão
+ * Clica no botão "Iniciar processo".
+ * @param page A instância da página do Playwright.
  */
 export async function clicarIniciarProcesso(page: Page): Promise<void> {
     await clicarElemento([
         page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
-        page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}),
+        page.getByRole('button', {name: TEXTOS.INICIAR_PROCESO}),
     ]);
 }
 
 /**
- * Abrir modal de inicialização de processo
+ * Abre o modal de inicialização de processo.
+ * @param page A instância da página do Playwright.
  */
 export async function abrirModalInicializacaoProcesso(page: Page): Promise<void> {
     await clicarIniciarProcesso(page); // Reutiliza a função mais simples
 }
 
 /**
- * Confirmar inicialização no modal
+ * Clica no botão "Confirmar" no modal de inicialização de processo.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarInicializacaoNoModal(page: Page): Promise<void> {
     await confirmarNoModal(page); // Reutiliza a função de confirmação genérica
@@ -78,6 +85,7 @@ export async function confirmarInicializacaoNoModal(page: Page): Promise<void> {
 
 /**
  * Cancela um modal clicando no botão "Cancelar", "Fechar", ou em um botão de fechar genérico.
+ * @param page A instância da página do Playwright.
  */
 export async function cancelarModal(page: Page): Promise<void> {
     const modalVisivel = page.locator('.modal.show');
@@ -90,10 +98,20 @@ export async function cancelarModal(page: Page): Promise<void> {
     ]);
 }
 
+/**
+ * Abre o modal para disponibilizar o mapa.
+ * @param page A instância da página do Playwright.
+ */
 export async function abrirModalDisponibilizarMapa(page: Page): Promise<void> {
     await page.getByRole('button', { name: /Disponibilizar mapa/i }).click();
 }
 
+/**
+ * Preenche o modal de disponibilização de mapa.
+ * @param page A instância da página do Playwright.
+ * @param data A data de disponibilização.
+ * @param observacoes As observações.
+ */
 export async function preencherModalDisponibilizarMapa(page: Page, data: string, observacoes: string): Promise<void> {
     const modal = page.locator('.modal.show');
     await modal.locator('input[type="date"]').fill(data);

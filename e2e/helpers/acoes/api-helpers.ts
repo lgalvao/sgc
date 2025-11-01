@@ -3,7 +3,12 @@ import { preencherFormularioProcesso, selecionarUnidadesPorSigla } from './acoes
 import { navegarParaCriacaoProcesso } from '../navegacao';
 
 /**
- * Cria um processo via UI e retorna o ID do processo criado.
+ * Cria um processo através da UI e retorna o ID do processo criado.
+ * @param page A instância da página do Playwright.
+ * @param tipo O tipo do processo.
+ * @param descricao A descrição do processo.
+ * @param siglasUnidades As siglas das unidades a serem associadas ao processo.
+ * @returns O ID do processo criado.
  */
 export async function criarProcesso(page: Page, tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO', descricao: string, siglasUnidades: string[]): Promise<number> {
     await navegarParaCriacaoProcesso(page);
@@ -30,6 +35,8 @@ export async function criarProcesso(page: Page, tipo: 'MAPEAMENTO' | 'REVISAO' |
 
 /**
  * Submete um processo que está no estado "CRIADO".
+ * @param page A instância da página do Playwright.
+ * @param processoId O ID do processo a ser submetido.
  */
 export async function submeterProcesso(page: Page, processoId: number): Promise<void> {
     await page.goto(`/processo/cadastro?idProcesso=${processoId}`);
@@ -40,6 +47,7 @@ export async function submeterProcesso(page: Page, processoId: number): Promise<
 
 /**
  * Limpa todos os processos criados durante os testes.
+ * @param page A instância da página do Playwright.
  */
 export async function limparProcessos(page: Page): Promise<void> {
     await page.goto('/painel');
@@ -55,6 +63,8 @@ export async function limparProcessos(page: Page): Promise<void> {
 
 /**
  * Abre um processo pela sua descrição na tabela do painel.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo a ser aberto.
  */
 export async function abrirProcessoPorDescricao(page: Page, descricao: string): Promise<void> {
     await page.getByText(descricao).click();

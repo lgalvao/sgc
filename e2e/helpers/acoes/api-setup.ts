@@ -3,6 +3,12 @@ import {DADOS_TESTE, USUARIOS} from '../dados/constantes-teste';
 
 const API_BASE = 'http://localhost:10000/api';
 
+/**
+ * Garante que um usuário exista no banco de dados.
+ * @param request O contexto da requisição da API do Playwright.
+ * @param user Os dados do usuário.
+ * @returns Os dados do usuário.
+ */
 export async function ensureUser(request: APIRequestContext, user: {
     titulo?: string | number;
     username?: string;
@@ -27,6 +33,12 @@ export async function ensureUser(request: APIRequestContext, user: {
     return await create.json();
 }
 
+/**
+ * Garante que uma unidade exista no banco de dados.
+ * @param request O contexto da requisição da API do Playwright.
+ * @param codigo O código da unidade.
+ * @returns Os dados da unidade.
+ */
 export async function ensureUnidade(request: APIRequestContext, codigo: number | string) {
     const resp = await request.get(`${API_BASE}/unidades/${codigo}`);
     if (resp.ok()) return await resp.json();
@@ -41,6 +53,12 @@ export async function ensureUnidade(request: APIRequestContext, codigo: number |
     return await create.json();
 }
 
+/**
+ * Garante que um processo exista no banco de dados.
+ * @param request O contexto da requisição da API do Playwright.
+ * @param processo Os dados do processo.
+ * @returns Os dados do processo.
+ */
 export async function ensureProcesso(request: APIRequestContext, processo: {
     descricao: string;
     tipo?: string;
@@ -55,6 +73,10 @@ export async function ensureProcesso(request: APIRequestContext, processo: {
     return await create.json();
 }
 
+/**
+ * Prepara o cenário de teste padrão.
+ * @param request O contexto da requisição da API do Playwright.
+ */
 export async function prepareDefaultScenario(request: APIRequestContext) {
     await ensureUnidade(request, DADOS_TESTE.UNIDADES.STIC);
     await ensureUser(request, {

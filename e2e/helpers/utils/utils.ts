@@ -1,12 +1,18 @@
 import {Locator, Page} from '@playwright/test';
 
+/**
+ * Gera um nome único adicionando um timestamp a um prefixo.
+ * @param prefixo O prefixo para o nome único.
+ * @returns O nome único.
+ */
 export function gerarNomeUnico(prefixo: string): string {
     return `${prefixo} ${Date.now()}`;
 }
 
 /**
- * Remove TODOS os processos (CRIADOS e EM_ANDAMENTO) que usam a unidade especificada.
- * Usa endpoint E2E especial ativo apenas no perfil 'e2e' do backend.
+ * Remove todos os processos que usam a unidade especificada.
+ * @param page A instância da página do Playwright.
+ * @param siglaUnidade A sigla da unidade.
  */
 export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade: string): Promise<void> {
     try {
@@ -33,10 +39,13 @@ export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade:
 }
 
 /**
- * Localiza um elemento preferindo test-id e mantendo fallback por role/text/locator.
- * - testId: string | undefined — se fornecido, tenta `page.getByTestId(testId)`
- * - role: Playwright role string (ex: 'button') e name: texto para getByRole fallback
- * - locatorFallback: css selector ou locator string para fallback adicional
+ * Localiza um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
+ * @param pageOrLocator A instância da página ou um localizador do Playwright.
+ * @param testId O test-id do elemento.
+ * @param role A role do elemento.
+ * @param name O nome do elemento.
+ * @param locatorFallback Um seletor de fallback.
+ * @returns O localizador do elemento.
  */
 export async function localizarPorTestIdOuRole(pageOrLocator: Page | Locator, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<Locator> {
     const page = pageOrLocator as Page;
@@ -65,8 +74,13 @@ export async function localizarPorTestIdOuRole(pageOrLocator: Page | Locator, te
 }
 
 /**
- * Clica em um elemento preferindo test-id, com fallback para role/text/locator.
- * Retorna true se clicou com sucesso, false caso contrário.
+ * Clica em um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
+ * @param page A instância da página do Playwright.
+ * @param testId O test-id do elemento.
+ * @param role A role do elemento.
+ * @param name O nome do elemento.
+ * @param locatorFallback Um seletor de fallback.
+ * @returns `true` se o clique foi bem-sucedido, `false` caso contrário.
  */
 export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<boolean> {
     const el = await localizarPorTestIdOuRole(page, testId, role, name, locatorFallback);

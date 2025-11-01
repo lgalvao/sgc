@@ -1,10 +1,8 @@
 import { Page } from '@playwright/test';
 
 /**
- * Limpa todos os processos EM_ANDAMENTO do banco (apenas para E2E)
- * Evita que testes deixem "lixo" que bloqueie testes subsequentes.
- * 
- * Usa um endpoint de teste especial disponível apenas no perfil E2E.
+ * Limpa todos os processos em andamento do banco de dados.
+ * @param page A instância da página do Playwright.
  */
 export async function limparProcessosEmAndamento(page: Page): Promise<void> {
     try {
@@ -16,8 +14,8 @@ export async function limparProcessosEmAndamento(page: Page): Promise<void> {
 }
 
 /**
- * Limpa todo o banco de testes (apenas para E2E)
- * Resets para estado inicial com dados de import.sql
+ * Limpa todo o banco de dados de teste.
+ * @param page A instância da página do Playwright.
  */
 export async function limparBancoTestes(page: Page): Promise<void> {
     try {
