@@ -15,10 +15,10 @@ Sistema para gerenciar sistematicamente as competências técnicas das unidades 
 O SGC permite:
 
 - **Mapeamento de Competências**: Coleta sistemática de atividades e conhecimentos de cada unidade operacional
-- **Revisão Periódica**: Atualização dos mapas considerando mudanças organizacionais
+- **Revisão Periódica**: Atualização dos mapas de competencias
 - **Diagnóstico**: Avaliação de importância e domínio das competências, identificando gaps de capacitação
 - **Gestão de Processos**: Workflow completo com máquina de estados e trilha de auditoria
-- **Notificações**: Sistema reativo de alertas e notificações por e-mail
+- **Notificações**: Alertas visuais e notificações por e-mail sobre evolucoes nos processos e subprocessos
 
 ---
 
@@ -31,19 +31,19 @@ O SGC permite:
 - Spring Boot 3.5.7
 - JPA/Hibernate
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
-- Architecture: Event-Driven + Domain-Driven Design
+- Arquitetura: Em camadas, estruturada por domínio 
 
 **Frontend:**
 - Vue.js 3.5 + TypeScript
-- Vite (build tool)
-- Pinia (state management)
+- Vite (build)
+- Pinia (estado)
 - Bootstrap 5
-- Axios (HTTP client)
+- Axios (cliente http)
 
 **Testes:**
-- JUnit 5 (testes unitários backend)
-- Vitest (testes unitários frontend)
-- Playwright (testes E2E - 21 casos de uso)
+- JUnit 5 (testes unitários do backend)
+- Vitest (testes unitários do frontend)
+- Playwright (testes E2E - organizados por casos de uso)
 
 ### Estrutura do Projeto
 
@@ -51,8 +51,8 @@ O SGC permite:
 sgc/
 ├── backend/              # API REST Spring Boot
 │   ├── src/main/java/sgc/
-│   │   ├── processo/     # Orquestrador de processos
-│   │   ├── subprocesso/  # Máquina de estados e workflow
+│   │   ├── processo/     # Principal conceito do sistema, de onde partem todos os fluxos. 
+│   │   ├── subprocesso/  # Cada unidade envolvida em um processo tem o seu subprocesso
 │   │   ├── mapa/         # Mapas de competências
 │   │   ├── competencia/  # Gestão de competências
 │   │   ├── atividade/    # Atividades e conhecimentos
