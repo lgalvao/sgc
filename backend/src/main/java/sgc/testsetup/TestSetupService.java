@@ -14,6 +14,7 @@ import sgc.sgrh.modelo.*;
 import sgc.analise.modelo.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -49,7 +50,7 @@ public class TestSetupService {
         Processo processo = new Processo();
         processo.setDescricao(prefixo + " - Processo de Mapeamento para " + siglaUnidade);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
-        processo.setDataLimite(LocalDate.now().plusDays(30));
+        processo.setDataLimite(LocalDate.now().plusDays(30).atStartOfDay());
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO); // Inicia diretamente
         processo = processoRepo.save(processo);
 
@@ -66,15 +67,15 @@ public class TestSetupService {
         conhecimentoRepo.save(new Conhecimento(prefixo + " - Conhecimento de Teste", atividade));
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
         subprocesso = subprocessoRepo.save(subprocesso);
-        movimentacaoRepo.save(new Movimentacao(subprocesso, chefe, unidade, "Cadastro disponibilizado"));
+        movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Cadastro disponibilizado"));
 
         // 5. Simular Análise e Homologação do Cadastro
-        analiseRepo.save(new Analise(subprocesso, TipoAnalise.CADASTRO, "Análise de aceite (Gestor) via Test Setup"));
-        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_ACEITO);
+        analiseRepo.save(Analise.builder().subprocesso(subprocesso).tipo(TipoAnalise.CADASTRO).observacoes("Análise de aceite (Gestor) via Test Setup").build());
+        subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Cadastro aceito"));
 
-        analiseRepo.save(new Analise(subprocesso, TipoAnalise.CADASTRO, "Análise de homologação (Admin) via Test Setup"));
+        analiseRepo.save(Analise.builder().subprocesso(subprocesso).tipo(TipoAnalise.CADASTRO).observacoes("Análise de homologação (Admin) via Test Setup").build());
         subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Cadastro homologado"));
@@ -84,20 +85,20 @@ public class TestSetupService {
         competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         subprocesso = subprocessoRepo.save(subprocesso);
-        movimentacaoRepo.save(new Movimentacao(subprocesso, chefe, unidade, "Mapa disponibilizado"));
+        movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Mapa disponibilizado"));
 
         // 7. Simular Validação e Homologação do Mapa
-        analiseRepo.save(new Analise(subprocesso, TipoAnalise.VALIDACAO, "Análise de validação (Chefe) via Test Setup"));
+        analiseRepo.save(Analise.builder().subprocesso(subprocesso).tipo(TipoAnalise.VALIDACAO).observacoes("Análise de validação (Chefe) via Test Setup").build());
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
         subprocesso = subprocessoRepo.save(subprocesso);
-        movimentacaoRepo.save(new Movimentacao(subprocesso, chefe, unidade, "Mapa validado"));
+        movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Mapa validado"));
 
-        analiseRepo.save(new Analise(subprocesso, TipoAnalise.VALIDACAO, "Análise de aceite (Gestor) via Test Setup"));
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_ACEITO);
+        analiseRepo.save(Analise.builder().subprocesso(subprocesso).tipo(TipoAnalise.VALIDACAO).observacoes("Análise de aceite (Gestor) via Test Setup").build());
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Mapa aceito"));
 
-        analiseRepo.save(new Analise(subprocesso, TipoAnalise.VALIDACAO, "Análise de homologação (Admin) via Test Setup"));
+        analiseRepo.save(Analise.builder().subprocesso(subprocesso).tipo(TipoAnalise.VALIDACAO).observacoes("Análise de homologação (Admin) via Test Setup").build());
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
         movimentacaoRepo.save(new Movimentacao(subprocesso, null, unidade, "Mapa homologado"));
@@ -106,7 +107,7 @@ public class TestSetupService {
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processoRepo.save(processo);
 
-        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapa.getCodigo()));
+        unidadeMapaRepo.save(new UnidadeMapa(unidade.getCodigo(), mapa.getCodigo(), LocalDateTime.now(), unidade, mapa));
 
         // 9. Retornar IDs para verificação no teste
         Map<String, Object> result = new HashMap<>();

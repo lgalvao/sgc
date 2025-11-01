@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import sgc.alerta.dto.AlertaDto;
+import sgc.sgrh.modelo.Usuario;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +25,19 @@ public class AlertaControle {
     private final AlertaService alertaService;
 
     /**
+     * Lista todos os alertas para o usuário autenticado.
+     *
+     * @param usuario O usuário autenticado.
+     * @return Uma lista de {@link AlertaDto}.
+     */
+    @GetMapping
+    @Operation(summary = "Lista todos os alertas do usuário autenticado")
+    public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Usuario usuario) {
+        List<AlertaDto> alertas = alertaService.listarAlertasPorUsuario(String.valueOf(usuario.getTituloEleitoral()));
+        return ResponseEntity.ok(alertas);
+    }
+
+    /**
      * Marca um alerta específico como lido para o usuário autenticado.
      * <p>
      * Este método corresponde ao CDU-02: Visualizar alertas. A ação de marcar como
@@ -32,10 +48,8 @@ public class AlertaControle {
      */
     @PostMapping("/{codigo}/marcar-como-lido")
     @Operation(summary = "Marca um alerta como lido")
-    public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long codigo) {
-        // TODO Mudar para usar usuário real
-        String usuarioTitulo = "USUARIO_ATUAL"; // Exemplo
-        alertaService.marcarComoLido(usuarioTitulo, codigo);
+    public ResponseEntity<Map<String, String>> marcarComoLido(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
+        alertaService.marcarComoLido(String.valueOf(usuario.getTituloEleitoral()), codigo);
         return ResponseEntity.ok(Map.of("message", "Alerta marcado como lido."));
     }
 }

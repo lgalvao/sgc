@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.dto.AlertaMapper;
+
 import static sgc.alerta.modelo.TipoAlerta.*;
 
 /**
@@ -40,6 +43,7 @@ public class AlertaService {
     private final UnidadeRepo unidadeRepo;
     private final SgrhService servicoSgrh;
     private final UsuarioRepo usuarioRepo;
+    private final AlertaMapper alertaMapper;
 
     /**
      * Cria um alerta genérico para uma unidade específica e o associa aos seus
@@ -345,5 +349,34 @@ public class AlertaService {
             alertaUsuarioRepo.save(alertaUsuario);
             log.info("Alerta {} marcado como lido para o usuário {}", alertaId, usuarioTitulo);
         }
+    }
+
+    /**
+     * Lista todos os alertas para um usuário específico.
+     *
+     * @param usuarioTituloStr O título de eleitor do usuário.
+     * @return Uma lista de {@link AlertaDto}.
+     */
+    @Transactional(readOnly = true)
+    public List<AlertaDto> listarAlertasPorUsuario(String usuarioTituloStr) {
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
+        List<AlertaUsuario> alertasUsuario = alertaUsuarioRepo.findById_UsuarioTituloEleitoral(usuarioTitulo);
+
+        return alertasUsuario.stream()
+            .map(alertaUsuario -> {
+                Alerta alerta = alertaUsuario.getAlerta();
+                AlertaDto dto = alertaMapper.toDto(alerta);
+                // Adicionar a data de leitura específica do usuário ao DTO
+                return AlertaDto.builder()
+                    .codigo(dto.getCodigo())
+                    .codProcesso(dto.getCodProcesso())
+                    .unidadeOrigem(dto.getUnidadeOrigem())
+                    .unidadeDestino(dto.getUnidadeDestino())
+                    .descricao(dto.getDescricao())
+                    .dataHora(dto.getDataHora())
+                    .dataHoraLeitura(alertaUsuario.getDataHoraLeitura())
+                    .build();
+            })
+            .toList();
     }
 }

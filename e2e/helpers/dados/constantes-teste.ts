@@ -10,6 +10,7 @@ export const SELETORES = {
     COLUNA_SITUACAO: 'coluna-situacao',
     BTN_CRIAR_PROCESSO: 'btn-criar-processo',
     BTN_INICIAR_PROCESSO: 'btn-iniciar-processo',
+    BTN_FINALIZAR_PROCESSO: 'btn-finalizar-processo',
     INFO_UNIDADE: 'info-unidade',
     BTN_MODAL_CONFIRMAR: 'btn-modal-confirmar',
     BTN_MODAL_CANCELAR: 'btn-modal-cancelar',
