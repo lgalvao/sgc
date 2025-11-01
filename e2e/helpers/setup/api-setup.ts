@@ -3,13 +3,11 @@ import { Page } from '@playwright/test';
 const BASE_URL = 'http://localhost:10000/api';
 
 /**
- * Invokes a backend scenario setup endpoint.
- * This requires the user to be authenticated in the browser context.
- *
- * @param page The Playwright page object with an authenticated session.
- * @param scenario The name of the scenario to invoke on the backend.
- * @param params An object containing parameters for the scenario.
- * @returns The response data from the backend, typically containing IDs of created entities.
+ * Executa um cenário de setup no backend.
+ * @param page A instância da página do Playwright.
+ * @param scenario O nome do cenário a ser executado.
+ * @param params Os parâmetros para o cenário.
+ * @returns A resposta da API.
  */
 export async function setupScenario(page: Page, scenario: string, params: Record<string, any>): Promise<any> {
     const response = await page.request.post(`${BASE_URL}/test-setup/${scenario}`, {

@@ -3,7 +3,9 @@ import {SELETORES, TEXTOS, URLS} from '../dados';
 import {loginComoAdmin, loginComoGestor} from '../auth';
 
 /**
- * Espera um texto ficar visível na página (função local para evitar dependência circular)
+ * Espera um texto ficar visível na página.
+ * @param page A instância da página do Playwright.
+ * @param texto O texto a ser esperado.
  */
 async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
     await expect(page.getByText(texto)).toBeVisible();
@@ -11,6 +13,7 @@ async function esperarTextoVisivel(page: Page, texto: string): Promise<void> {
 
 /**
  * Navega para a página de login.
+ * @param page A instância da página do Playwright.
  */
 export async function navegarParaLogin(page: Page): Promise<void> {
     await page.goto(URLS.LOGIN);
@@ -18,14 +21,17 @@ export async function navegarParaLogin(page: Page): Promise<void> {
 }
 
 /**
- * Navega para criação de processo
+ * Navega para a página de criação de processo.
+ * @param page A instância da página do Playwright.
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
     await page.goto(URLS.PROCESSO_CADASTRO);
 }
 
 /**
- * Navega para detalhes de um processo
+ * Navega para a página de detalhes de um processo.
+ * @param page A instância da página do Playwright.
+ * @param textoProcesso O texto que identifica o processo na tabela.
  */
 export async function navegarParaDetalhesProcesso(page: Page, textoProcesso: string): Promise<void> {
     const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
@@ -34,7 +40,10 @@ export async function navegarParaDetalhesProcesso(page: Page, textoProcesso: str
 }
 
 /**
- * Navega para cadastro de atividades
+ * Navega para a página de cadastro de atividades de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function navegarParaCadastroAtividades(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/cadastro`);
@@ -44,7 +53,10 @@ export async function navegarParaCadastroAtividades(page: Page, idProcesso: numb
 }
 
 /**
- * Navega para visualização de atividades de um processo/unidade específica
+ * Navega para a página de visualização de atividades de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}`);
@@ -61,7 +73,10 @@ export async function navegarParaVisualizacaoAtividades(page: Page, idProcesso: 
 }
 
 /**
- * Navega diretamente para a tela de análise da revisão de cadastro de atividades e conhecimentos.
+ * Acessa a tela de análise da revisão de cadastro de atividades e conhecimentos.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function acessarAnaliseRevisaoCadastro(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await irParaSubprocesso(page, idProcesso, unidade);
@@ -73,6 +88,9 @@ export async function acessarAnaliseRevisaoCadastro(page: Page, idProcesso: numb
 
 /**
  * Realiza o login como gestor e acessa a análise de revisão do cadastro.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function acessarAnaliseRevisaoComoGestor(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await loginComoGestor(page);
@@ -85,6 +103,9 @@ export async function acessarAnaliseRevisaoComoGestor(page: Page, idProcesso: nu
 
 /**
  * Realiza o login como administrador e acessa a análise de revisão do cadastro.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function acessarAnaliseRevisaoComoAdmin(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await loginComoAdmin(page);
@@ -96,7 +117,10 @@ export async function acessarAnaliseRevisaoComoAdmin(page: Page, idProcesso: num
 }
 
 /**
- * Navega para mapa de competências
+ * Navega para a página do mapa de competências de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function irParaMapaCompetencias(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/mapa`);
@@ -105,7 +129,10 @@ export async function irParaMapaCompetencias(page: Page, idProcesso: number, uni
 }
 
 /**
- * Navega para visualização de mapa
+ * Navega para a página de visualização do mapa de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function irParaVisualizacaoMapa(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}/vis-mapa`);
@@ -113,6 +140,12 @@ export async function irParaVisualizacaoMapa(page: Page, idProcesso: number, uni
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}/${unidade}/vis-mapa`));
 }
 
+/**
+ * Navega para a página de edição do mapa de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param siglaUnidade A sigla da unidade.
+ */
 export async function navegarParaEdicaoMapa(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${siglaUnidade}/mapa`);
     await page.waitForLoadState('networkidle');
@@ -120,12 +153,24 @@ export async function navegarParaEdicaoMapa(page: Page, idProcesso: number, sigl
     await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
+/**
+ * Navega para a página do mapa de competências de um processo de revisão.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param siglaUnidade A sigla da unidade.
+ */
 export async function navegarParaMapaRevisao(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
     await esperarTextoVisivel(page, TEXTOS.MAPA_COMPETENCIAS_TECNICAS);
 }
 
+/**
+ * Navega para a página do mapa de competências de um processo de mapeamento.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param siglaUnidade A sigla da unidade.
+ */
 export async function navegarParaMapaMapeamento(page: Page, idProcesso: number, siglaUnidade: string): Promise<void> {
     await loginComoAdmin(page);
     await irParaMapaCompetencias(page, idProcesso, siglaUnidade);
@@ -133,7 +178,10 @@ export async function navegarParaMapaMapeamento(page: Page, idProcesso: number, 
 }
 
 /**
- * Navega para subprocesso específico
+ * Navega para a página de um subprocesso.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
+ * @param unidade A sigla da unidade.
  */
 export async function irParaSubprocesso(page: Page, idProcesso: number, unidade: string): Promise<void> {
     await page.goto(`/processo/${idProcesso}/${unidade}`);
@@ -142,7 +190,9 @@ export async function irParaSubprocesso(page: Page, idProcesso: number, unidade:
 }
 
 /**
- * Navega para detalhes de processo por texto
+ * Navega para a página de detalhes de um processo a partir da tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param textoProcesso O texto que identifica o processo na tabela.
  */
 export async function irParaProcessoPorTexto(page: Page, textoProcesso: string): Promise<void> {
     const linhaProcesso = page.locator(SELETORES.LINHA_TABELA).filter({hasText: textoProcesso}).first();
@@ -151,7 +201,9 @@ export async function irParaProcessoPorTexto(page: Page, textoProcesso: string):
 }
 
 /**
- * Navega diretamente para um processo pelo ID.
+ * Navega para a página de um processo pelo seu ID.
+ * @param page A instância da página do Playwright.
+ * @param idProcesso O ID do processo.
  */
 export async function navegarParaProcessoPorId(page: Page, idProcesso: number): Promise<void> {
     await page.goto(`/processo/${idProcesso}`);
@@ -159,12 +211,9 @@ export async function navegarParaProcessoPorId(page: Page, idProcesso: number): 
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
 }
 
-// ==================================================================
-// FUNÇÕES DE VERIFICAÇÃO DE NAVEGAÇÃO
-// ==================================================================
-
 /**
- * Verifica se a navegação para a página de um subprocesso foi bem-sucedida
+ * Verifica se a navegação para a página de um subprocesso foi bem-sucedida.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarNavegacaoPaginaSubprocesso(page: Page): Promise<void> {
     await expect(page).toHaveURL(/.*\/processo\/\d+\/\w+$/);
@@ -173,7 +222,8 @@ export async function verificarNavegacaoPaginaSubprocesso(page: Page): Promise<v
 }
 
 /**
- * Verifica se a navegação para a página de cadastro/edição de processo foi bem-sucedida
+ * Verifica se a navegação para a página de cadastro de processo foi bem-sucedida.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarNavegacaoPaginaCadastroProcesso(page: Page): Promise<void> {
     await expect(page).toHaveURL(/.*\/processo\/cadastro\?idProcesso=\d+/);
@@ -181,54 +231,60 @@ export async function verificarNavegacaoPaginaCadastroProcesso(page: Page): Prom
 }
 
 /**
- * Verifica se a navegação para a página de detalhes de um processo foi bem-sucedida
+ * Verifica se a navegação para a página de detalhes de um processo foi bem-sucedida.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarNavegacaoPaginaDetalhesProcesso(page: Page): Promise<void> {
     await expect(page).toHaveURL(/.*\/processo\/\d+$/);
     await expect(page.getByTestId('processo-info').first()).toBeVisible();
 }
 
-// ==================================================================
-// FUNÇÕES DE INTERAÇÃO COM TABELAS E ELEMENTOS
-// ==================================================================
-
 /**
- * Clica no primeiro processo da tabela após login
+ * Clica no primeiro processo da tabela.
+ * @param page A instância da página do Playwright.
  */
 export async function clicarPrimeiroProcesso(page: Page): Promise<void> {
     await page.locator(SELETORES.LINHA_TABELA).first().click();
 }
 
 /**
- * Clica em um processo na tabela principal do painel
+ * Clica em um processo na tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param nomeProcesso O nome do processo.
  */
 export async function clicarProcesso(page: Page, nomeProcesso: string | RegExp): Promise<void> {
     await page.getByTestId(SELETORES.TABELA_PROCESSOS).locator('tr', {hasText: nomeProcesso}).click();
 }
 
 /**
- * Clica no cabeçalho de uma coluna da tabela de processos para ordenar
+ * Ordena a tabela de processos por uma coluna.
+ * @param page A instância da página do Playwright.
+ * @param testIdColuna O test-id da coluna.
  */
 export async function ordenarTabelaProcessosPorColuna(page: Page, testIdColuna: string): Promise<void> {
     await page.getByTestId(testIdColuna).click();
 }
 
 /**
- * Clica no botão para expandir todas as unidades na árvore de um processo
+ * Expande todas as unidades na árvore de hierarquia.
+ * @param page A instância da página do Playwright.
  */
 export async function expandirTodasAsUnidades(page: Page): Promise<void> {
     await page.getByTestId('btn-expandir-todas').click();
 }
 
 /**
- * Clica em uma unidade na árvore de um processo
+ * Clica em uma unidade na árvore de hierarquia.
+ * @param page A instância da página do Playwright.
+ * @param nomeUnidade O nome da unidade.
  */
 export async function clicarUnidade(page: Page, nomeUnidade: string): Promise<void> {
     await page.getByRole('row', {name: nomeUnidade}).click();
 }
 
 /**
- * Navega para a página inicial (raiz do site).
+ * Navega para a página inicial.
+ * @param page A instância da página do Playwright.
  */
 export async function navegarParaHome(page: Page): Promise<void> {
     await page.goto('/');
@@ -236,14 +292,16 @@ export async function navegarParaHome(page: Page): Promise<void> {
 }
 
 /**
- * Clica no botão "Entrar" na tela de login.
+ * Clica no botão "Entrar".
+ * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoEntrar(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.ENTRAR}).click();
 }
 
 /**
- * Clica no botão/link "Sair" para fazer logout.
+ * Clica no botão "Sair".
+ * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoSair(page: Page): Promise<void> {
     await page.locator('a[title="Sair"]').click();

@@ -4,9 +4,9 @@ import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '../navegacao';
 
 /**
- * Seleciona unidades na árvore usando suas SIGLAS
- * @param page - A instância da página do Playwright.
- * @param siglas - Um array de SIGLAS das unidades a serem selecionadas (ex: ['STIC', 'SGP']).
+ * Seleciona unidades na árvore de hierarquia usando suas siglas.
+ * @param page A instância da página do Playwright.
+ * @param siglas Um array de siglas das unidades a serem selecionadas (ex: ['STIC', 'SGP']).
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     // Aguardar a árvore de unidades carregar
@@ -36,6 +36,12 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
     }
 }
 
+/**
+ * Seleciona uma unidade disponível na árvore de hierarquia.
+ * @param page A instância da página do Playwright.
+ * @param index O índice da unidade a ser selecionada (padrão: 0).
+ * @returns O ID da unidade selecionada.
+ */
 export async function selecionarUnidadeDisponivel(page: Page, index: number = 0): Promise<string> {
     await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
     const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
@@ -50,9 +56,8 @@ export async function selecionarUnidadeDisponivel(page: Page, index: number = 0)
 
 /**
  * Seleciona unidades na árvore de hierarquia com base em seus IDs.
- * NOTA: Este helper converte IDs para SIGLAS conhecidas
- * @param page - A instância da página do Playwright.
- * @param unidades - Um array de IDs (números) das unidades a serem selecionadas.
+ * @param page A instância da página do Playwright.
+ * @param unidades Um array de IDs das unidades a serem selecionadas.
  */
 export async function selecionarUnidadesPorId(page: Page, unidades: number[]): Promise<void> {
     // Mapeamento conhecido de ID -> SIGLA (baseado no data.sql)
@@ -76,9 +81,13 @@ export async function selecionarUnidadesPorId(page: Page, unidades: number[]): P
     await selecionarUnidadesPorSigla(page, siglas);
 }
 
-
 /**
- * Preencher formulário básico de processo
+ * Preenche o formulário de criação de processo.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param tipo O tipo do processo.
+ * @param dataLimite A data limite do processo.
+ * @param sticChecked `true` se a unidade STIC deve ser selecionada.
  */
 export async function preencherFormularioProcesso(
     page: Page,
@@ -99,7 +108,8 @@ export async function preencherFormularioProcesso(
 }
 
 /**
- * Selecionar primeira unidade disponível
+ * Seleciona a primeira unidade na árvore de hierarquia.
+ * @param page A instância da página do Playwright.
  */
 export async function selecionarPrimeiraUnidade(page: Page): Promise<void> {
     await page.waitForSelector('input[type="checkbox"]');
@@ -108,7 +118,8 @@ export async function selecionarPrimeiraUnidade(page: Page): Promise<void> {
 }
 
 /**
- * Clicar no primeiro processo da tabela
+ * Clica no primeiro processo da tabela de processos.
+ * @param page A instância da página do Playwright.
  */
 export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
     const primeiraLinha = page.locator('table tbody tr').first();
@@ -116,8 +127,8 @@ export async function clicarPrimeiroProcessoTabela(page: Page): Promise<void> {
 }
 
 /**
- * Iniciar processo de mapeamento (CDU-04)
- * Clica no botão "Iniciar processo" e aguarda modal de confirmação
+ * Inicia o processo de mapeamento.
+ * @param page A instância da página do Playwright.
  */
 export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
     console.log(`[DEBUG] iniciarProcessoMapeamento: Procurando botão Iniciar processo`);
@@ -158,7 +169,8 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
 }
 
 /**
- * Confirmar iniciação de processo no modal (CDU-04)
+ * Confirma a iniciação do processo no modal.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
@@ -171,7 +183,8 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Cancelar iniciação de processo no modal (CDU-04)
+ * Cancela a iniciação do processo no modal.
+ * @param page A instância da página do Playwright.
  */
 export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
@@ -184,8 +197,12 @@ export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Criar processo básico (usado em vários CDUs)
- * Preenche formulário e salva
+ * Cria um processo básico.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param tipo O tipo do processo.
+ * @param siglas As siglas das unidades a serem associadas ao processo.
+ * @param dataLimite A data limite do processo.
  */
 export async function criarProcessoBasico(
     page: Page,
@@ -223,7 +240,9 @@ export async function criarProcessoBasico(
 }
 
 /**
- * Abrir processo específico da tabela pelo nome
+ * Abre um processo pelo nome na tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo a ser aberto.
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
@@ -259,8 +278,13 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
 }
 
 /**
- * Criar processo completo com dados básicos, interagindo com a UI.
- * Esta função agora retorna o ID do processo criado para uso em testes subsequentes.
+ * Cria um processo completo e retorna seus dados.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param tipo O tipo do processo.
+ * @param dataLimite A data limite do processo.
+ * @param unidades Uma lista de IDs de unidades a serem associadas ao processo.
+ * @returns Um objeto com o código e a descrição do processo criado.
  */
 export async function criarProcessoCompleto(
     page: Page,
@@ -280,14 +304,18 @@ export async function criarProcessoCompleto(
 }
 
 /**
- * Tentar salvar processo sem preencher dados
+ * Tenta salvar um processo com o formulário vazio.
+ * @param page A instância da página do Playwright.
  */
 export async function tentarSalvarProcessoVazio(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
 }
 
 /**
- * Criar processo apenas com descrição e tipo (sem unidades)
+ * Cria um processo sem associar nenhuma unidade.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param tipo O tipo do processo.
  */
 export async function criarProcessoSemUnidades(page: Page, descricao: string, tipo: string): Promise<void> {
     await preencherFormularioProcesso(page, descricao, tipo);
@@ -295,14 +323,18 @@ export async function criarProcessoSemUnidades(page: Page, descricao: string, ti
 }
 
 /**
- * Navegar para processo específico na tabela
+ * Navega para a página de um processo a partir da tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function navegarParaProcessoNaTabela(page: Page, descricaoProcesso: string): Promise<void> {
     await page.getByText(descricaoProcesso).click();
 }
 
 /**
- * Editar descrição de processo existente
+ * Edita a descrição de um processo.
+ * @param page A instância da página do Playwright.
+ * @param novaDescricao A nova descrição do processo.
  */
 export async function editarDescricaoProcesso(page: Page, novaDescricao: string): Promise<void> {
     await page.fill(SELETORES.CAMPO_DESCRICAO, novaDescricao);
@@ -310,7 +342,10 @@ export async function editarDescricaoProcesso(page: Page, novaDescricao: string)
 }
 
 /**
- * Criar processo de mapeamento completo (versão específica para CDU-04)
+ * Cria um processo de mapeamento completo.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param dataLimite A data limite do processo.
  */
 export async function criarProcessoMapeamentoCompleto(page: Page, descricao: string, dataLimite: string): Promise<void> {
     await page.getByLabel('Descrição').fill(descricao);
@@ -323,7 +358,8 @@ export async function criarProcessoMapeamentoCompleto(page: Page, descricao: str
 }
 
 /**
- * Clica no botão de finalização do processo.
+ * Clica no botão "Finalizar processo".
+ * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoFinalizarProcesso(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO}).click();
@@ -331,6 +367,7 @@ export async function clicarBotaoFinalizarProcesso(page: Page): Promise<void> {
 
 /**
  * Abre o modal de finalização do processo.
+ * @param page A instância da página do Playwright.
  */
 export async function abrirModalFinalizacaoProcesso(page: Page): Promise<void> {
     await clicarBotaoFinalizarProcesso(page);
@@ -338,7 +375,8 @@ export async function abrirModalFinalizacaoProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Confirma a finalização no modal aberto.
+ * Clica no botão "Confirmar" no modal de finalização do processo.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
@@ -346,7 +384,8 @@ export async function confirmarFinalizacaoNoModal(page: Page): Promise<void> {
 }
 
 /**
- * Finaliza um processo com confirmação
+ * Finaliza um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function finalizarProcesso(page: Page): Promise<void> {
     await abrirModalFinalizacaoProcesso(page);
@@ -354,7 +393,8 @@ export async function finalizarProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Disponibiliza cadastro com confirmação
+ * Disponibiliza o cadastro de um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function disponibilizarCadastro(page: Page): Promise<void> {
     await page.click(`button:has-text("${TEXTOS.DISPONIBILIZAR}")`);
@@ -364,13 +404,16 @@ export async function disponibilizarCadastro(page: Page): Promise<void> {
 
 /**
  * Abre o modal para devolver um cadastro para ajustes.
+ * @param page A instância da página do Playwright.
  */
 export async function abrirModalDevolucao(page: Page): Promise<void> {
     await page.getByRole('button', {name: 'Devolver para ajustes'}).click();
 }
 
 /**
- * Devolve um cadastro para ajustes, preenchendo a observação se fornecida.
+ * Devolve um cadastro para ajustes.
+ * @param page A instância da página do Playwright.
+ * @param observacao Uma observação opcional.
  */
 export async function devolverParaAjustes(page: Page, observacao?: string): Promise<void> {
     await abrirModalDevolucao(page);
@@ -385,7 +428,11 @@ export async function devolverParaAjustes(page: Page, observacao?: string): Prom
 }
 
 /**
- * Orquestra o fluxo de devolução de um cadastro por um GESTOR.
+ * Devolve um cadastro.
+ * @param page A instância da página do Playwright.
+ * @param processo O processo.
+ * @param nomeUnidade O nome da unidade.
+ * @param observacao A observação.
  */
 export async function devolverCadastro(page: Page, processo: {
     codigo: any;
@@ -399,9 +446,10 @@ export async function devolverCadastro(page: Page, processo: {
     await devolverParaAjustes(page, observacao);
 }
 
-
 /**
- * Aceita um cadastro, preenchendo a observação se fornecida.
+ * Aceita o cadastro de um processo.
+ * @param page A instância da página do Playwright.
+ * @param observacao Uma observação opcional.
  */
 export async function aceitarCadastro(page: Page, observacao?: string): Promise<void> {
     await clicarElemento([page.getByRole('button', {name: 'Registrar aceite'}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
@@ -417,7 +465,9 @@ export async function aceitarCadastro(page: Page, observacao?: string): Promise<
 }
 
 /**
- * Registra o aceite da revisão do cadastro, preenchendo a observação se fornecida.
+ * Registra o aceite da revisão de um cadastro.
+ * @param page A instância da página do Playwright.
+ * @param observacao Uma observação opcional.
  */
 export async function registrarAceiteRevisao(page: Page, observacao?: string): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
@@ -443,7 +493,9 @@ export async function registrarAceiteRevisao(page: Page, observacao?: string): P
 }
 
 /**
- * Homologa um cadastro, preenchendo a observação se fornecida.
+ * Homologa o cadastro de um processo.
+ * @param page A instância da página do Playwright.
+ * @param observacao Uma observação opcional.
  */
 export async function homologarCadastro(page: Page, observacao?: string): Promise<void> {
     await clicarElemento([page.getByRole('button', {name: TEXTOS.HOMOLOGAR}), page.getByRole('button', {name: TEXTOS.VALIDAR})]);
@@ -462,14 +514,17 @@ export async function homologarCadastro(page: Page, observacao?: string): Promis
 }
 
 /**
- * Clica no botão de iniciar processo
+ * Clica no botão "Iniciar processo".
+ * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoIniciarProcesso(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}).click();
 }
 
 /**
- * Clica em um processo específico na tabela do painel
+ * Clica em um processo na tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param nomeProcesso O nome do processo.
  */
 export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): Promise<void> {
     await page.waitForSelector(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"]`); // Espera a tabela carregar
@@ -478,7 +533,8 @@ export async function clicarProcessoNaTabela(page: Page, nomeProcesso: string): 
 }
 
 /**
- * Inicia um processo com confirmação
+ * Inicia um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function iniciarProcesso(page: Page): Promise<void> {
     await clicarBotaoIniciarProcesso(page);
@@ -488,7 +544,8 @@ export async function iniciarProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Remover processo com confirmação
+ * Remove um processo com confirmação.
+ * @param page A instância da página do Playwright.
  */
 export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
@@ -498,7 +555,8 @@ export async function removerProcessoComConfirmacao(page: Page): Promise<void> {
 }
 
 /**
- * Cancelar remoção de processo
+ * Cancela a remoção de um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function cancelarRemocaoProcesso(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
@@ -506,7 +564,8 @@ export async function cancelarRemocaoProcesso(page: Page): Promise<void> {
 }
 
 /**
- * Confirmar inicialização de processo
+ * Confirma a inicialização de um processo.
+ * @param page A instância da página do Playwright.
  */
 export async function confirmarInicializacaoProcesso(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}).click();
@@ -514,7 +573,8 @@ export async function confirmarInicializacaoProcesso(page: Page): Promise<void> 
 }
 
 /**
- * Remover processo com confirmação usando botão de danger no modal
+ * Remove um processo confirmando no modal.
+ * @param page A instância da página do Playwright.
  */
 export async function removerProcessoConfirmandoNoModal(page: Page): Promise<void> {
     await page.getByRole('button', {name: TEXTOS.REMOVER}).click();
@@ -522,23 +582,27 @@ export async function removerProcessoConfirmandoNoModal(page: Page): Promise<voi
 }
 
 /**
- * Clica em uma unidade específica na tabela de detalhes do processo.
+ * Clica em uma unidade na tabela de detalhes de um processo.
+ * @param page A instância da página do Playwright.
+ * @param nomeUnidade O nome da unidade.
  */
 export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: string): Promise<void> {
     const unidadeRow = page.locator(SELETORES.LINHA_TABELA_ARVORE).filter({hasText: nomeUnidade}).first();
     await unidadeRow.click();
 }
 
-// noinspection JSUnusedGlobalSymbols
 /**
  * Clica no botão de histórico de análise.
+ * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
     await page.getByTestId(SELETORES.BTN_HISTORICO_ANALISE).click();
 }
 
 /**
- * Homologa a revisão de um cadastro, preenchendo a observação se fornecida.
+ * Homologa a revisão de um cadastro.
+ * @param page A instância da página do Playwright.
+ * @param observacao Uma observação opcional.
  */
 export async function homologarRevisaoCadastro(page: Page, observacao?: string): Promise<void> {
     await homologarCadastro(page, observacao);

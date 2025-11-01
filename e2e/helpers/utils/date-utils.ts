@@ -3,6 +3,11 @@
  * Copiado de frontend/src/utils/index.ts para evitar dependência do código fonte
  */
 
+/**
+ * Converte uma data em string, número ou objeto Date para um objeto Date.
+ * @param dateInput A data a ser convertida.
+ * @returns Um objeto Date ou nulo se a conversão falhar.
+ */
 export function parseDate(dateInput: string | number | Date | null | undefined): Date | null {
   if (dateInput === null || dateInput === undefined || dateInput === '') return null;
 
