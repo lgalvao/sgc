@@ -230,6 +230,19 @@ public class ProcessoService {
                 .toList();
     }
 
+    /**
+     * Retorna uma lista de todos os processos que estão na situação 'EM_ANDAMENTO'.
+     *
+     * @return Uma {@link List} de {@link ProcessoDto}.
+     */
+    @Transactional(readOnly = true)
+    public List<ProcessoDto> listarAtivos() {
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)
+            .stream()
+            .map(processoMapper::toDto)
+            .toList();
+    }
+
     // Métodos de Iniciação
     @Transactional
     public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {

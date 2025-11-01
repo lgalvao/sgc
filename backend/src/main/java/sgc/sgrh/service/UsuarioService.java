@@ -56,7 +56,7 @@ public class UsuarioService {
      */
     public List<PerfilUnidade> autorizar(long tituloEleitoral) {
         log.info("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
-        Usuario usuario = usuarioRepo.findByTituloEleitoral(tituloEleitoral)
+        Usuario usuario = usuarioRepo.findById(tituloEleitoral)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", tituloEleitoral));
 
         Unidade unidade = usuario.getUnidade();

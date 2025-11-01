@@ -90,6 +90,17 @@ public class ProcessoControle {
     }
 
     /**
+     * Lista todos os processos que estão com a situação 'EM_ANDAMENTO'.
+     *
+     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto} ativos.
+     */
+    @GetMapping("/ativos")
+    @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
+    public ResponseEntity<List<ProcessoDto>> listarAtivos() {
+        return ResponseEntity.ok(processoService.listarAtivos());
+    }
+
+    /**
      * Retorna os detalhes completos de um processo, incluindo as unidades participantes
      * e o resumo de seus respectivos subprocessos.
      *
