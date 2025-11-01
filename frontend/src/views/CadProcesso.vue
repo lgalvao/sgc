@@ -14,6 +14,7 @@
           class="form-control"
           placeholder="Descreva o processo"
           type="text"
+          data-testid="input-descricao"
         >
       </div>
 
@@ -26,6 +27,7 @@
           id="tipo"
           v-model="tipo"
           class="form-select"
+          data-testid="select-tipo"
         >
           <option
             v-for="tipoOption in TipoProcesso"
@@ -59,6 +61,7 @@
                   type="checkbox"
                   :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
                   :disabled="isUnidadeBloqueada(unidade.codigo)"
+                  :data-testid="`chk-${unidade.sigla}`"
                 >
                 <label
                   :for="`chk-${unidade.sigla}`"
@@ -148,6 +151,7 @@
           v-model="dataLimite"
           class="form-control"
           type="date"
+          data-testid="input-dataLimite"
         >
       </div>
       <button

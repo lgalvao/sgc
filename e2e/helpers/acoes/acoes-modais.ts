@@ -63,7 +63,7 @@ export async function abrirDialogoRemocaoProcesso(page: Page): Promise<void> {
 export async function clicarIniciarProcesso(page: Page): Promise<void> {
     await clicarElemento([
         page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
-        page.getByRole('button', {name: TEXTOS.INICIAR_PROCESO}),
+        page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}),
     ]);
 }
 

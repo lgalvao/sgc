@@ -7,15 +7,13 @@ import {SELETORES, TEXTOS, URLS} from '../dados';
  * @param mensagem A mensagem a ser esperada.
  */
 export async function esperarMensagemSucesso(page: Page, mensagem: string): Promise<void> {
-    // Procuramos qualquer notificação que contenha o texto, independente da classe específica.
-    const notificacao = page.locator('.notification', {hasText: mensagem});
-    // Espera explícita e tolerante para notificações que podem demorar a aparecer
+    const seletorNotificacao = `[data-testid^="notificacao-"]`;
+    const notificacao = page.locator(seletorNotificacao, {hasText: mensagem});
     try {
         await notificacao.first().waitFor({state: 'visible'});
     } catch {
-        // fallback: tentar buscar por qualquer notificação que contenha parte da mensagem (nome do processo, etc.)
         const parcial = mensagem.split(' ').slice(0, 3).join(' ');
-        const alternativa = page.locator('.notification', {hasText: parcial});
+        const alternativa = page.locator(seletorNotificacao, {hasText: parcial});
         await alternativa.first().waitFor({state: 'visible'});
     }
 }
@@ -37,7 +35,7 @@ export async function esperarMensagemErro(page: Page, mensagem: string): Promise
  * @param texto O texto do alerta.
  */
 export async function verificarAlerta(page: Page, texto: string): Promise<void> {
-    const alerta = page.locator('.notification.notification-warn', { hasText: texto });
+    const alerta = page.locator('[data-testid="notificacao-warning"]', { hasText: texto });
     await expect(alerta).toBeVisible();
 }
 
@@ -129,7 +127,7 @@ export async function esperarBotaoVisivel(page: Page, nomeBotao: string): Promis
  * @param page A instância da página do Playwright.
  */
 export async function esperarNotificacaoLoginInvalido(page: Page): Promise<void> {
-    const notificacao = page.locator('.notification-container');
+    const notificacao = page.locator('[data-testid="notificacao-error"]');
     await expect(notificacao.getByText(TEXTOS.ERRO_LOGIN_INVALIDO)).toBeVisible();
 }
 
@@ -139,8 +137,8 @@ export async function esperarNotificacaoLoginInvalido(page: Page): Promise<void>
  * @param modalSelector O seletor do modal.
  * @param notificacaoTestId O test-id da notificação.
  */
-export async function verificarDisponibilizacaoConcluida(page: Page, modalSelector: string = '[aria-labelledby="disponibilizarModalLabel"]', notificacaoTestId: string = 'notificacao-disponibilizacao'): Promise<void> {
-    const modal = page.locator(modalSelector);
+export async function verificarDisponibilizacaoConcluida(page: Page, modalTestId: string = 'disponibilizar-modal', notificacaoTestId: string = 'notificacao-disponibilizacao'): Promise<void> {
+    const modal = page.getByTestId(modalTestId);
     try {
         await modal.waitFor({state: 'hidden', timeout: 2000});
         return;
@@ -155,46 +153,7 @@ export async function verificarDisponibilizacaoConcluida(page: Page, modalSelect
  * @param page A instância da página do Playwright.
  */
 export async function verificarModalDisponibilizacaoVisivel(page: Page): Promise<void> {
-    // Preferência por test-ids dentro do modal (mais estáveis)
-    const modal = page.locator('[aria-labelledby="disponibilizarModalLabel"], .modal.show');
-    if ((await modal.count()) > 0) {
-        // botão com test-id
-        if ((await modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).count()) > 0) {
-            await expect(modal.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).first()).toBeVisible();
-            return;
-        }
-        // input de data com test-id
-        if ((await modal.getByTestId('input-data-limite').count()) > 0) {
-            await expect(modal.getByTestId('input-data-limite').first()).toBeVisible();
-            return;
-        }
-        // fallback para título/labels informativos
-        try {
-            await expect(modal).toBeVisible();
-            return;
-        } catch {
-            // continue para fallback global
-        }
-    }
-
-    // Fallback global por test-id do botão
-    if ((await page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).count()) > 0) {
-        await expect(page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE).first()).toBeVisible();
-        return;
-    }
-
-    // Fallback por títulos conhecidos (suportando variações)
-    const possiveisTitulos = [TEXTOS.DISPONIBILACAO_TITULO, 'Disponibilizar Mapa', 'Disponibilizar'];
-    for (const titulo of possiveisTitulos) {
-        const heading = page.getByRole('heading', {name: titulo});
-        if ((await heading.count()) > 0) {
-            await expect(heading.first()).toBeVisible();
-            return;
-        }
-    }
-
-    // Último recurso: checar se algum modal está visível
-    await expect(page.locator('.modal.show')).toBeVisible();
+    await expect(page.getByTestId('disponibilizar-modal')).toBeVisible();
 }
 
 /**
@@ -203,12 +162,7 @@ export async function verificarModalDisponibilizacaoVisivel(page: Page): Promise
  * @param valorEsperado O valor esperado.
  */
 export async function verificarCampoObservacoesValor(page: Page, valorEsperado: string): Promise<void> {
-    const modal = page.locator('[aria-labelledby="disponibilizarModalLabel"], .modal.show');
-    if ((await modal.locator('#observacoes').count()) > 0) {
-        await expect(modal.locator('#observacoes')).toHaveValue(valorEsperado);
-    } else {
-        await expect(modal.getByLabel(/observa/i)).toHaveValue(valorEsperado);
-    }
+    await expect(page.getByTestId('input-observacoes-disponibilizacao')).toHaveValue(valorEsperado);
 }
 
 /**
@@ -217,41 +171,10 @@ export async function verificarCampoObservacoesValor(page: Page, valorEsperado: 
  * @param habilitado `true` se o botão deve estar habilitado, `false` caso contrário.
  */
 export async function verificarBotaoDisponibilizarHabilitado(page: Page, habilitado: boolean = true): Promise<void> {
-    // Priorizar test-id do botão (mais confiável entre variações de UI)
-    const btnTestId = page.getByTestId(SELETORES.BTN_DISPONIBILIZAR_PAGE);
-    if ((await btnTestId.count()) > 0) {
-        const btn = btnTestId.first();
-        if (habilitado) {
-            await expect(btn).toBeEnabled();
-        } else {
-            await expect(btn).toBeDisabled();
-        }
-        return;
+    const botao = page.getByTestId('btn-disponibilizar');
+    if (habilitado) {
+        await expect(botao).toBeEnabled();
+    } else {
+        await expect(botao).toBeDisabled();
     }
-
-    // Fallback dentro do modal, por role/name
-    const btnNoModal = page.locator('[aria-labelledby="disponibilizarModalLabel"]').getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-    if ((await btnNoModal.count()) > 0) {
-        if (habilitado) {
-            await expect(btnNoModal).toBeEnabled();
-        } else {
-            await expect(btnNoModal).toBeDisabled();
-        }
-        return;
-    }
-
-    // Fallback global por role/name
-    const btnGlobal = page.getByRole('button', {name: TEXTOS.DISPONIBILIZAR});
-    if ((await btnGlobal.count()) > 0) {
-        const first = btnGlobal.first();
-        if (habilitado) {
-            await expect(first).toBeEnabled();
-        } else {
-            await expect(first).toBeDisabled();
-        }
-        return;
-    }
-
-    // Se não encontramos o botão, lançar erro claro para diagnóstico
-    throw new Error('Botão "Disponibilizar" não encontrado na página ou no modal.');
 }
