@@ -37,3 +37,14 @@ export async function removerConhecimento(page: Page, nomeAtividade: string, nom
     const conhecimento = cardAtividade.locator(SELETORES.GRUPO_CONHECIMENTO, {hasText: nomeConhecimento});
     await conhecimento.getByTestId(SELETORES.BTN_REMOVER_CONHECIMENTO).click();
 }
+
+export async function associarTodasAtividadesACompetencia(page: Page, nomeCompetencia: string): Promise<void> {
+    await page.locator('.competencia-card').filter({ hasText: nomeCompetencia }).click();
+    const atividades = await page.locator('.atividade-card-item').all();
+    for (const atividade of atividades) {
+        if (!(await atividade.isChecked())) {
+            await atividade.click();
+        }
+    }
+    await page.getByTestId('btn-criar-competencia').click();
+}

@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import {navegarParaCriacaoProcesso} from '~/helpers';
+import {navegarParaCriacaoProcesso} from '../navegacao';
 
 /**
  * Seleciona unidades na árvore usando suas SIGLAS

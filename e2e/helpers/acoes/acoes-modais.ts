@@ -89,3 +89,13 @@ export async function cancelarModal(page: Page): Promise<void> {
         modalVisivel.locator('[data-bs-dismiss="modal"]').last(),
     ]);
 }
+
+export async function abrirModalDisponibilizarMapa(page: Page): Promise<void> {
+    await page.getByRole('button', { name: /Disponibilizar mapa/i }).click();
+}
+
+export async function preencherModalDisponibilizarMapa(page: Page, data: string, observacoes: string): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await modal.locator('input[type="date"]').fill(data);
+    await modal.locator('textarea').fill(observacoes);
+}
