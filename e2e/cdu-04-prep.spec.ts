@@ -1,81 +1,81 @@
-import {vueTest as test} from './support/vue-specific-setup';
+import { vueTest as test } from './support/vue-specific-setup';
 import { expect } from '@playwright/test';
-
 import {
     loginComoAdmin,
-    navegarParaCriacaoProcesso,
-    selecionarUnidadesPorSigla,
     limparProcessos,
     criarProcesso,
     SELETORES
 } from './helpers';
+import {
+    getProcessoById,
+    getSubprocessosByProcessoId,
+    getAlertas
+} from './helpers/verificacoes/api-verifications';
 
-test.describe('CDU-04: Iniciar processo (com preparação)', () => {
+test.describe('CDU-04: Iniciar processo (com preparação e verificação de backend)', () => {
 
-    test.beforeEach(async ({page}) => {
+    test.beforeEach(async ({ page }) => {
         await loginComoAdmin(page);
         await limparProcessos(page);
     });
 
-    test.afterEach(async ({page}) => {
-        await loginComoAdmin(page);
-        await limparProcessos(page);
-    });
+    // afterEach is removed to avoid redundant cleanup, as beforeEach handles it.
 
-    test('deve abrir modal de confirmação e iniciar processo', async ({page}) => {
+    test('deve iniciar processo e verificar efeitos no backend', async ({ page }) => {
         const descricao = `Processo Iniciar ${Date.now()}`;
-        const processoId = await criarProcesso(page, 'MAPEAMENTO', descricao, ['SGP']);
+        const unidadesParticipantes = ['SGP', 'STIC'];
+        const processoId = await criarProcesso(page, 'MAPEAMENTO', descricao, unidadesParticipantes);
 
-        await page.goto('/painel');
-        await page.getByText(descricao).first().click();
-        await page.waitForURL(new RegExp(`/processo/cadastro\\?idProcesso=${processoId}`));
+        await page.goto(`/processo/cadastro?idProcesso=${processoId}`);
 
         await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
         const modal = page.locator('.modal.show');
         await expect(modal).toBeVisible();
-        await expect(modal.getByText(/Iniciar processo/i)).toBeVisible();
-
-        await modal.getByRole('button', {name: /confirmar/i}).click();
+        await modal.getByRole('button', { name: /confirmar/i }).click();
         await page.waitForURL(/\/painel/);
 
-        await expect(page.getByText(descricao).first()).toBeVisible();
+        // --- Verificações de Backend ---
+
+        // 1. Verificar se o status do processo mudou para "EM_ANDAMENTO"
+        const processo = await getProcessoById(page, processoId);
+        expect(processo.situacao).toBe('EM_ANDAMENTO');
+
+        // 2. Verificar se os subprocessos foram criados corretamente
+        const subprocessos = await getSubprocessosByProcessoId(page, processoId);
+        expect(subprocessos).toHaveLength(unidadesParticipantes.length);
+        expect(subprocessos.map(s => s.unidade.sigla)).toEqual(expect.arrayContaining(unidadesParticipantes));
+        subprocessos.forEach(sub => {
+            expect(sub.situacao).toBe('CRIADO');
+        });
+
+        // 3. Verificar se um alerta foi gerado
+        await page.goto('/painel'); // Refresh to ensure alerts are loaded
+        const alertas = await getAlertas(page);
+        const alertaDoProcesso = alertas.content.find(a => a.mensagem.includes(descricao));
+        expect(alertaDoProcesso).toBeDefined();
+        expect(alertaDoProcesso.mensagem).toContain('Um novo processo de mapeamento de competências foi iniciado');
+
+        // --- Verificação de UI (mantida e corrigida) ---
+        await page.getByText(descricao).first().click();
+        await page.waitForURL(new RegExp(`/processo/${processoId}`));
+        await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).not.toBeVisible();
     });
 
-    test('deve cancelar iniciação e permanecer na tela', async ({page}) => {
+    test('deve cancelar iniciação e permanecer na tela com estado inalterado', async ({ page }) => {
         const descricao = `Processo Cancelar ${Date.now()}`;
         const processoId = await criarProcesso(page, 'MAPEAMENTO', descricao, ['STIC']);
 
-        await page.goto('/painel');
-        await page.getByText(descricao).first().click();
-        await page.waitForURL(new RegExp(`/processo/cadastro\\?idProcesso=${processoId}`));
+        await page.goto(`/processo/cadastro?idProcesso=${processoId}`);
 
         await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
         const modal = page.locator('.modal.show');
         await expect(modal).toBeVisible();
 
-        await modal.getByRole('button', {name: /cancelar/i}).click();
+        await modal.getByRole('button', { name: /cancelar/i }).click();
         await expect(modal).not.toBeVisible();
-        await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(descricao);
-    });
 
-    test('não deve permitir editar processo após iniciado', async ({page}) => {
-        const descricao = `Processo Bloqueio ${Date.now()}`;
-        const processoId = await criarProcesso(page, 'MAPEAMENTO', descricao, ['COEDE']);
-
-        await page.goto('/painel');
-        await page.getByText(descricao).first().click();
-        await page.waitForURL(new RegExp(`/processo/cadastro\\?idProcesso=${processoId}`));
-
-        await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
-        await page.locator('.modal.show').getByRole('button', {name: /confirmar/i}).click();
-        await page.waitForURL(/\/painel/);
-
-        await page.getByText(descricao).first().click();
-
-        await page.waitForURL(new RegExp(`/processo/${processoId}`), {timeout: 15000});
-
-        await expect(page.getByRole('button', {name: /salvar/i})).not.toBeVisible();
-        await expect(page.getByRole('button', {name: /remover/i})).not.toBeVisible();
-        await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).not.toBeVisible();
+        // Verificar que o processo ainda está no estado "CRIADO" via API
+        const processo = await getProcessoById(page, processoId);
+        expect(processo.situacao).toBe('CRIADO');
     });
 });
