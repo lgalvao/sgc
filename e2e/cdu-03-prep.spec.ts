@@ -1,121 +1,104 @@
-import {vueTest as test} from './support/vue-specific-setup';
-import {expect} from '@playwright/test';
+import { vueTest as test } from './support/vue-specific-setup';
 import {
     loginComoAdmin,
     navegarParaCriacaoProcesso,
-    selecionarUnidadesPorSigla,
     limparProcessos,
     criarProcesso,
-    SELETORES,
+    preencherFormularioProcesso,
+    salvarProcesso,
+    removerProcesso,
+    verificarRedirecionamentoParaPainel,
+    verificarProcessoVisivelNoPainel,
+    verificarNaoRedirecionadoParaPainel,
+    verificarPaginaEdicaoProcesso,
+    verificarBotaoRemoverVisivel,
+    verificarBotaoRemoverNaoVisivel,
+    verificarProcessoNaoVisivelNoPainel,
 } from './helpers';
 
 test.describe('CDU-03: Manter processo (com preparação)', () => {
-    // Limpa todos os processos antes de iniciar os testes deste arquivo.
-    test.beforeAll(async ({page}) => {
+    test.beforeAll(async ({ page }) => {
         await loginComoAdmin(page);
         await limparProcessos(page);
     });
 
-    // Garante que nenhum processo criado durante um teste afete o próximo.
-    test.afterEach(async ({page}) => {
+    test.afterEach(async ({ page }) => {
         await loginComoAdmin(page);
         await limparProcessos(page);
     });
 
-    // ===== CRIAÇÃO DE PROCESSO =====
-
-    test('deve criar processo com sucesso e redirecionar para o Painel', async ({page}) => {
-        await loginComoAdmin(page);
+    test('deve criar processo com sucesso e redirecionar para o Painel', async ({ page }) => {
         const descricao = `Processo E2E ${Date.now()}`;
 
-        await navegarParaCriacaoProcesso(page);
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill(descricao);
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['SGP']);
-
-        await page.getByRole('button', {name: /Salvar/i}).click();
-
-        await expect(page).toHaveURL(/\/painel/, {timeout: 15000});
-        await expect(page.getByText(descricao)).toBeVisible({timeout: 15000});
-    });
-
-    test('deve validar descrição obrigatória', async ({page}) => {
         await loginComoAdmin(page);
         await navegarParaCriacaoProcesso(page);
+        await preencherFormularioProcesso(page, descricao, 'MAPEAMENTO', '2025-12-31', ['SGP']);
+        await salvarProcesso(page);
 
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['SGP']);
-
-        await page.getByRole('button', {name: /Salvar/i}).click();
-
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await verificarRedirecionamentoParaPainel(page);
+        await verificarProcessoVisivelNoPainel(page, descricao);
     });
 
-    test('deve validar ao menos uma unidade selecionada', async ({page}) => {
+    test('deve validar descrição obrigatória', async ({ page }) => {
         await loginComoAdmin(page);
         await navegarParaCriacaoProcesso(page);
-
-        await page.locator(SELETORES.CAMPO_DESCRICAO).fill('Processo sem unidades');
-        await page.locator(SELETORES.CAMPO_TIPO).selectOption('MAPEAMENTO');
-        await page.locator(SELETORES.CAMPO_DATA_LIMITE).fill('2025-12-31');
-
-        await page.getByRole('button', {name: /Salvar/i}).click();
-
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await preencherFormularioProcesso(page, '', 'MAPEAMENTO', '2025-12-31', ['SGP']);
+        await salvarProcesso(page);
+        await verificarNaoRedirecionadoParaPainel(page);
     });
 
-    // ===== EDIÇÃO E REMOÇÃO DE PROCESSO =====
+    test('deve validar ao menos uma unidade selecionada', async ({ page }) => {
+        await loginComoAdmin(page);
+        await navegarParaCriacaoProcesso(page);
+        await preencherFormularioProcesso(page, 'Processo sem unidades', 'MAPEAMENTO', '2025-12-31', []);
+        await salvarProcesso(page);
+        await verificarNaoRedirecionadoParaPainel(page);
+    });
+
     test.describe('Edição e Remoção', () => {
-        let processoId;
         const descricaoOriginal = `Processo para Editar/Remover ${Date.now()}`;
 
-        // Cria um processo antes de cada teste neste grupo
-        test.beforeEach(async ({page}) => {
+        test.beforeEach(async ({ page }) => {
             await loginComoAdmin(page);
-            processoId = await criarProcesso(page, 'MAPEAMENTO', descricaoOriginal, ['SGP']);
+            await criarProcesso(page, 'MAPEAMENTO', descricaoOriginal, ['SGP']);
             await page.goto('/painel');
-            await expect(page.getByText(descricaoOriginal)).toBeVisible();
+            await verificarProcessoVisivelNoPainel(page, descricaoOriginal);
         });
 
-        test('deve editar processo e modificar descrição', async ({page}) => {
+        test('deve editar processo e modificar descrição', async ({ page }) => {
+            const novaDescricao = `Processo Editado ${Date.now()}`;
+
             await loginComoAdmin(page);
             await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricaoOriginal}")`);
-            await expect(page).toHaveURL(new RegExp(`/processo/cadastro\\?idProcesso=${processoId}`));
+            await verificarPaginaEdicaoProcesso(page);
 
-            const novaDescricao = `Processo Editado ${Date.now()}`;
-            await page.locator(SELETORES.CAMPO_DESCRICAO).fill(novaDescricao);
-            await page.getByRole('button', {name: /Salvar/i}).click();
+            await preencherFormularioProcesso(page, novaDescricao, 'MAPEAMENTO', '2025-12-31', ['SGP']);
+            await salvarProcesso(page);
 
-            await expect(page).toHaveURL(/\/painel/, {timeout: 15000});
-            await expect(page.getByText(novaDescricao)).toBeVisible();
-            await expect(page.getByText(descricaoOriginal)).not.toBeVisible();
+            await verificarRedirecionamentoParaPainel(page);
+            await verificarProcessoVisivelNoPainel(page, novaDescricao);
+            await verificarProcessoNaoVisivelNoPainel(page, descricaoOriginal);
         });
 
-        test('deve exibir botão Remover apenas em modo de edição', async ({page}) => {
+        test('deve exibir botão Remover apenas em modo de edição', async ({ page }) => {
             await loginComoAdmin(page);
             await navegarParaCriacaoProcesso(page);
-            await expect(page.getByRole('button', {name: /^Remover$/i})).not.toBeVisible();
+            await verificarBotaoRemoverNaoVisivel(page);
 
             await page.goto('/painel');
             await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricaoOriginal}")`);
-            await expect(page).toHaveURL(new RegExp(`/processo/cadastro\\?idProcesso=${processoId}`));
-            await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
+            await verificarPaginaEdicaoProcesso(page);
+            await verificarBotaoRemoverVisivel(page);
         });
 
-        test('deve remover processo com sucesso após confirmação', async ({page}) => {
+        test('deve remover processo com sucesso após confirmação', async ({ page }) => {
             await loginComoAdmin(page);
             await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricaoOriginal}")`);
 
-            await page.getByRole('button', {name: /^Remover$/i}).click();
+            await removerProcesso(page);
 
-            const modal = page.locator('.modal.show');
-            await expect(modal).toBeVisible();
-            await modal.getByRole('button', {name: /Remover/i}).click();
-
-            await expect(page).toHaveURL(/\/painel/, {timeout: 15000});
-            await expect(page.getByText(descricaoOriginal)).not.toBeVisible();
+            await verificarRedirecionamentoParaPainel(page);
+            await verificarProcessoNaoVisivelNoPainel(page, descricaoOriginal);
         });
     });
 });

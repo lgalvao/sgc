@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
-import { preencherFormularioProcesso, selecionarUnidadesPorSigla } from './acoes-processo';
+import { preencherFormularioProcesso } from './acoes-processo';
+import { selecionarUnidadesPorSigla } from './acoes-unidade';
 import { navegarParaCriacaoProcesso } from '../navegacao';
 
 /**
@@ -12,8 +13,7 @@ import { navegarParaCriacaoProcesso } from '../navegacao';
  */
 export async function criarProcesso(page: Page, tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO', descricao: string, siglasUnidades: string[]): Promise<number> {
     await navegarParaCriacaoProcesso(page);
-    await preencherFormularioProcesso(page, descricao, tipo, '2025-12-31');
-    await selecionarUnidadesPorSigla(page, siglasUnidades);
+    await preencherFormularioProcesso(page, descricao, tipo, '2025-12-31', siglasUnidades);
     await page.getByRole('button', { name: /Salvar/i }).click();
     await page.waitForURL(/\/painel/);
 

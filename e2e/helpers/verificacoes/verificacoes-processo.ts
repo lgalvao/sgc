@@ -180,14 +180,6 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
 }
 
 /**
- * Verifica se o botão "Finalizar processo" está visível.
- * @param page A instância da página do Playwright.
- */
-export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promise<void> {
-    await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).toBeVisible();
-}
-
-/**
  * Verifica se o botão "Finalizar processo" não está visível.
  * @param page A instância da página do Playwright.
  */
@@ -352,14 +344,6 @@ export async function verificarValorCampoDescricao(page: Page, valor: string): P
 }
 
 /**
- * Verifica se o botão "Iniciar processo" está visível.
- * @param page A instância da página do Playwright.
- */
-export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<void> {
-    await expect(page.locator(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`)).toBeVisible();
-}
-
-/**
  * Verifica se o modal de confirmação de iniciar processo está visível.
  * @param page A instância da página do Playwright.
  */
@@ -410,4 +394,56 @@ export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<
  */
 export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {
     await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
+}
+
+export async function verificarRedirecionamentoParaPainel(page: Page): Promise<void> {
+    await expect(page).toHaveURL(/\/painel/, { timeout: 15000 });
+}
+
+export async function verificarProcessoVisivelNoPainel(page: Page, descricao: string): Promise<void> {
+    await expect(page.getByText(descricao)).toBeVisible({ timeout: 15000 });
+}
+
+export async function verificarNaoRedirecionadoParaPainel(page: Page): Promise<void> {
+    await expect(page).not.toHaveURL(/\/painel/);
+}
+
+export async function verificarBotaoRemoverVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', { name: /^Remover$/i })).toBeVisible({ timeout: 15000 });
+}
+
+export async function verificarBotaoRemoverNaoVisivel(page: Page): Promise<void> {
+    await expect(page.getByRole('button', { name: /^Remover$/i })).not.toBeVisible();
+}
+
+export async function verificarModalRemocaoVisivel(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible({ timeout: 15000 });
+    await expect(modal.getByText(/Remover o processo/i)).toBeVisible();
+    await expect(modal.getByText(/Esta ação não poderá ser desfeita/i)).toBeVisible();
+}
+
+export async function verificarModalRemocaoNaoVisivel(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await expect(modal).not.toBeVisible();
+}
+
+export async function verificarProcessoNaoVisivelNoPainel(page: Page, descricao: string): Promise<void> {
+    await expect(page.getByText(descricao)).not.toBeVisible();
+}
+
+export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<void> {
+    await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).toBeVisible();
+}
+
+export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promise<void> {
+    await expect(page.getByTestId(SELETORES.BTN_FINALIZAR_PROCESSO)).toBeVisible();
+}
+
+export async function verificarBotaoIniciarProcessoNaoVisivel(page: Page): Promise<void> {
+    await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).not.toBeVisible();
+}
+
+export async function verificarBotaoFinalizarProcessoNaoVisivel(page: Page): Promise<void> {
+    await expect(page.getByTestId(SELETORES.BTN_FINALIZAR_PROCESSO)).not.toBeVisible();
 }

@@ -10,6 +10,7 @@ import {
     verificarPainelAdminVisivel,
     verificarPainelChefeVisivel,
     verificarSelecaoPerfilVisivel,
+    verificarNavegacaoParaPainel,
 } from './helpers';
 import {USUARIOS} from './helpers/dados/constantes-teste';
 
@@ -21,7 +22,7 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await clicarBotaoEntrar(page);
 
             // Aguarda navegação para o painel
-            await page.waitForURL('/painel', {timeout: 15000});
+            await verificarNavegacaoParaPainel(page);
             await verificarPainelChefeVisivel(page);
         });
 
@@ -36,7 +37,7 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await clicarBotaoEntrar(page);
 
             // Aguarda navegação para o painel
-            await page.waitForURL('/painel', {timeout: 15000});
+            await verificarNavegacaoParaPainel(page);
             await verificarPainelAdminVisivel(page);
         });
     });

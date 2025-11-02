@@ -15,6 +15,7 @@ export {
     verificarUrl,
     esperarUrl,
     verificarUrlDoPainel, // Corrigido: removido alias e adicionada função específica
+    verificarNavegacaoParaPainel,
     verificarModalVisivel,
     verificarModalFechado,
     esperarNotificacaoLoginInvalido,
@@ -57,7 +58,17 @@ export {
     verificarModalConfirmacaoIniciarProcessoInvisivel,
     verificarPermanenciaNaPaginaProcesso,
     verificarModalConfirmacaoIniciacaoProcesso,
-    verificarProcessoBloqueadoParaEdicao
+    verificarProcessoBloqueadoParaEdicao,
+    verificarRedirecionamentoParaPainel,
+    verificarProcessoVisivelNoPainel,
+    verificarNaoRedirecionadoParaPainel,
+    verificarBotaoRemoverVisivel,
+    verificarBotaoRemoverNaoVisivel,
+    verificarModalRemocaoVisivel,
+    verificarModalRemocaoNaoVisivel,
+    verificarProcessoNaoVisivelNoPainel,
+    verificarBotaoIniciarProcessoNaoVisivel,
+    verificarBotaoFinalizarProcessoNaoVisivel,
 } from './verificacoes-processo';
 
 // Verificações de UI
@@ -116,3 +127,4 @@ export {
 export * from './verificacoes-atividades';
 export * from './verificacoes-subprocesso';
 export * from './verificacoes-modais';
+export * from './api-verifications';

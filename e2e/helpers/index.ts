@@ -9,7 +9,7 @@
  * 📁 verificacoes/  - Verificações por domínio (básicas, processo, UI)  
  * 📁 navegacao/     - Navegação, login e rotas
  * 📁 dados/         - Constantes e dados de teste
- * 📁 utils/         - Utilitários gerais
+ * _utils/         - Utilitários gerais
  */
 
 // ===== AÇÕES =====
@@ -20,6 +20,8 @@ export * from './verificacoes';
 
 // ===== NAVEGAÇÃO E LOGIN =====
 export * from './navegacao';
+export * from './auth';
+export * from './authHelpers';
 
 // ===== DADOS E CONSTANTES =====
 export * from './dados';

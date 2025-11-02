@@ -98,6 +98,14 @@ export async function verificarUrlDoPainel(page: Page): Promise<void> {
 }
 
 /**
+ * Verifica se a aplicação navegou para a página do painel.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarNavegacaoParaPainel(page: Page): Promise<void> {
+    await page.waitForURL('/painel', { timeout: 15000 });
+}
+
+/**
  * Verifica se um modal está visível.
  * @param page A instância da página do Playwright.
  */
