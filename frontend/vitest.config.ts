@@ -9,5 +9,6 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,ts}'],
     exclude: ['node_modules', 'e2e', 'eve'],
+    setupFiles: ['./vitest.setup.ts'],
   },
 })

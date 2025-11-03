@@ -3,8 +3,8 @@
 Ator: CHEFE
 
 Pré-condições:
-● Usuário logado com perfil CHEFE
-● Processo de mapeamento ou revisão com subprocesso na situação 'Mapa disponibilizado'
+- Usuário logado com perfil CHEFE
+- Processo de mapeamento ou revisão com subprocesso na situação 'Mapa disponibilizado'
 
 Fluxo principal:
 

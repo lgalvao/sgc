@@ -44,7 +44,7 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             const notificacoes = useNotificacoesStore();
             const perfilStore = usePerfilStore(); // Adicionar esta linha
             try {
-                // Obter perfil e unidadeCodigo do perfilStore
+                // Obter perfil e codUnidade do perfilStore
                 const perfil = perfilStore.perfilSelecionado;
                 const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
                 let unidadeCodigo: number | null = null;
@@ -68,65 +68,65 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             }
         },
 
-        async disponibilizarCadastro(idSubprocesso: number) {
+        async disponibilizarCadastro(codSubrocesso: number) {
             return _executarAcao(
-                () => disponibilizarCadastro(idSubprocesso),
+                () => disponibilizarCadastro(codSubrocesso),
                 'Cadastro disponibilizado',
                 'Erro ao disponibilizar'
             );
         },
 
-        async disponibilizarRevisaoCadastro(idSubprocesso: number) {
+        async disponibilizarRevisaoCadastro(codSubrocesso: number) {
             return _executarAcao(
-                () => disponibilizarRevisaoCadastro(idSubprocesso),
+                () => disponibilizarRevisaoCadastro(codSubrocesso),
                 'Revisão disponibilizada',
                 'Erro ao disponibilizar'
             );
         },
 
-        async devolverCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+        async devolverCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
             return _executarAcao(
-                () => devolverCadastro(idSubprocesso, req),
+                () => devolverCadastro(codSubrocesso, req),
                 'Cadastro devolvido',
                 'Erro ao devolver'
             );
         },
 
-        async aceitarCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+        async aceitarCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
             return _executarAcao(
-                () => aceitarCadastro(idSubprocesso, req),
+                () => aceitarCadastro(codSubrocesso, req),
                 'Cadastro aceito',
                 'Erro ao aceitar'
             );
         },
 
-        async homologarCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+        async homologarCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
             return _executarAcao(
-                () => homologarCadastro(idSubprocesso, req),
+                () => homologarCadastro(codSubrocesso, req),
                 'Cadastro homologado',
                 'Erro ao homologar'
             );
         },
 
-        async devolverRevisaoCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
+        async devolverRevisaoCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
             return _executarAcao(
-                () => devolverRevisaoCadastro(idSubprocesso, req),
+                () => devolverRevisaoCadastro(codSubrocesso, req),
                 'Revisão devolvida',
                 'Erro ao devolver'
             );
         },
 
-        async aceitarRevisaoCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
+        async aceitarRevisaoCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
             return _executarAcao(
-                () => aceitarRevisaoCadastro(idSubprocesso, req),
+                () => aceitarRevisaoCadastro(codSubrocesso, req),
                 'Revisão aceita',
                 'Erro ao aceitar'
             );
         },
 
-        async homologarRevisaoCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
+        async homologarRevisaoCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
             return _executarAcao(
-                () => homologarRevisaoCadastro(idSubprocesso, req),
+                () => homologarRevisaoCadastro(codSubrocesso, req),
                 'Revisão homologada',
                 'Erro ao homologar'
             );

@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Builder
 public class AtividadeAjusteDto {
-    @NotNull private final Long atividadeId;
+    @NotNull private final Long codAtividade;
     @NotBlank private final String nome;
     @NotNull @Valid private final List<ConhecimentoAjusteDto> conhecimentos;
 }

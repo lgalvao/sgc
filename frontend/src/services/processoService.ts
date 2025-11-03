@@ -64,7 +64,7 @@ export async function obterProcessoPorId(id: number): Promise<Processo> {
 
 export async function atualizarProcesso(codProcesso: number, request: AtualizarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.put<Processo>(`/processos/${codProcesso}`, request);
+    const response = await apiClient.post<Processo>(`/processos/${codProcesso}/atualizar`, request);
     return response.data;
   } catch (error) {
     return handleError(error, `atualizar processo ${codProcesso}`);
@@ -73,7 +73,7 @@ export async function atualizarProcesso(codProcesso: number, request: AtualizarP
 
 export async function excluirProcesso(codProcesso: number): Promise<void> {
   try {
-    await apiClient.delete(`/processos/${codProcesso}`);
+    await apiClient.post(`/processos/${codProcesso}/excluir`);
   } catch (error) {
     return handleError(error, `excluir processo ${codProcesso}`);
   }
@@ -98,5 +98,45 @@ export async function processarAcaoEmBloco(payload: {
         await apiClient.post(`/processos/${payload.idProcesso}/acoes-em-bloco`, payload);
     } catch (error) {
         return handleError(error, `processar ação em bloco para o processo ${payload.idProcesso}`);
+    }
+}
+
+export async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/alterar-data-limite`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `alterar a data limite para o subprocesso ${id}`);
+    }
+}
+
+export async function aceitarMapa(id: number, dados: { observacoes: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/aceitar-mapa`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `aceitar o mapa para o subprocesso ${id}`);
+    }
+}
+
+export async function rejeitarMapa(id: number, dados: { motivo: string; observacoes: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/rejeitar-mapa`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `rejeitar o mapa para o subprocesso ${id}`);
+    }
+}
+
+export async function apresentarSugestoes(id: number, dados: { sugestoes: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/apresentar-sugestoes`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `apresentar sugestões para o subprocesso ${id}`);
+    }
+}
+
+export async function validarMapa(id: number): Promise<void> {
+    try {
+        await apiClient.post(`/processos/validar-mapa`, { id });
+    } catch (error) {
+        return handleError(error, `validar o mapa para o subprocesso ${id}`);
     }
 }

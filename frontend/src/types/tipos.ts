@@ -240,7 +240,7 @@ export interface AnaliseValidacao {
     acao: string;
     observacoes: string;
     resultado: string;
-    idSubprocesso: number;
+    codSubrocesso: number;
 }
 
 export interface AnaliseCadastro {
@@ -251,7 +251,7 @@ export interface AnaliseCadastro {
     acao: string;
     observacoes: string;
     resultado: string;
-    idSubprocesso: number;
+    codSubrocesso: number;
 }
 
 export interface AtribuicaoTemporaria {

@@ -68,64 +68,45 @@ const shouldShowBackButton = computed(() => route.path !== '/login' && route.pat
 const shouldShowBreadcrumbs = computed(() => route.path !== '/login' && route.path !== '/painel');
 
 const crumbs = computed((): Breadcrumb[] => {
-  const breadcrumbs: Breadcrumb[] = [{ label: 'Painel', to: { name: 'Painel' }, isHome: true }];
-  const params = route.params;
-  const perfil = usePerfilStore();
-  const perfilUsuario = perfil.perfilSelecionado;
+    const breadcrumbs: Breadcrumb[] = [];
+    const perfil = usePerfilStore();
+    const perfilUsuario = perfil.perfilSelecionado;
 
-  // Processo crumb
-  if (params.idProcesso && (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR)) {
-    breadcrumbs.push({
-      label: 'Processo',
-      to: { name: 'Processo', params: { idProcesso: Number(params.idProcesso) } }
+    // Add home breadcrumb
+    breadcrumbs.push({ label: 'Painel', to: { name: 'Painel' }, isHome: true });
+
+    // Iterate over matched routes to build breadcrumbs
+    route.matched.forEach((routeRecord) => {
+        const { meta, name } = routeRecord;
+
+        const shouldAddCrumb = () => {
+            if (name === 'Processo' && (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR)) {
+                return false;
+            }
+            return true;
+        };
+
+        if (meta.breadcrumb && shouldAddCrumb()) {
+            const label = typeof meta.breadcrumb === 'function' ? meta.breadcrumb(route) : (meta.breadcrumb as string);
+
+            if (label) {
+                // Add breadcrumb if it doesn't already exist as the last one
+                if (breadcrumbs.length === 0 || breadcrumbs[breadcrumbs.length - 1].label !== label) {
+                    breadcrumbs.push({
+                        label,
+                        to: { name: name as string, params: route.params },
+                    });
+                }
+            }
+        }
     });
-  }
 
-  // Unidade crumb (within a process or standalone)
-  if (params.siglaUnidade) {
-    // If it's a subprocess route, link to Subprocesso
-    if (params.idProcesso) {
-      breadcrumbs.push({
-        label: params.siglaUnidade as string,
-        to: { name: 'Subprocesso', params: { idProcesso: Number(params.idProcesso), siglaUnidade: params.siglaUnidade } }
-      });
-    } else { // Standalone unit route
-      breadcrumbs.push({
-        label: params.siglaUnidade as string,
-        to: { name: 'Unidade', params: { siglaUnidade: params.siglaUnidade } }
-      });
+    // Remove link from the last breadcrumb
+    if (breadcrumbs.length > 0) {
+        breadcrumbs[breadcrumbs.length - 1].to = undefined;
     }
-  }
 
-  // Determine the label for the *current* page (last crumb)
-  let currentPageLabel: string | undefined;
-  const currentRouteMetaBreadcrumb = route.meta.breadcrumb;
-
-  if (currentRouteMetaBreadcrumb) {
-      if (typeof currentRouteMetaBreadcrumb === 'function') {
-          currentPageLabel = currentRouteMetaBreadcrumb(route);
-      } else if (typeof currentRouteMetaBreadcrumb === 'string') {
-          currentPageLabel = currentRouteMetaBreadcrumb;
-      }
-  }
-
-  // Add the current page's label as the last crumb, if it's not already covered
-  // and it's not the 'Painel' or 'Login' route itself.
-  if (currentPageLabel && route.name !== 'Painel' && route.name !== 'Login') {
-      const lastCrumbInArray = breadcrumbs[breadcrumbs.length - 1];
-      // Avoid adding if it's a duplicate of the previous crumb's label
-      // This handles cases like /processo/123 (Processo is last) or /unidade/XYZ (XYZ is last)
-      if (lastCrumbInArray.label !== currentPageLabel) {
-          breadcrumbs.push({ label: currentPageLabel });
-      }
-  }
-
-  // Special case for Painel: if only Home and Painel are there, just show Home.
-  if (breadcrumbs.length === 2 && breadcrumbs[1].label === 'Painel') {
-      return [breadcrumbs[0]];
-  }
-  
-  return breadcrumbs;
+    return breadcrumbs;
 });
 </script>
 

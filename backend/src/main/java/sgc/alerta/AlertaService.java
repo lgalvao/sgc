@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.*;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.processo.modelo.Processo;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.SgrhService;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.service.SgrhService;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.dto.AlertaMapper;
 
 import static sgc.alerta.modelo.TipoAlerta.*;
 
@@ -40,6 +43,7 @@ public class AlertaService {
     private final UnidadeRepo unidadeRepo;
     private final SgrhService servicoSgrh;
     private final UsuarioRepo usuarioRepo;
+    private final AlertaMapper alertaMapper;
 
     /**
      * Cria um alerta genérico para uma unidade específica e o associa aos seus
@@ -204,6 +208,7 @@ public class AlertaService {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codUnidade);
                 }
             } catch (Exception e) {
+                // TODO essa exceção precisa subir pra camada de controle
                 log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
             }
         }
@@ -321,13 +326,13 @@ public class AlertaService {
      * Marca um alerta específico como lido para um determinado usuário.
      * <p>
      * Este método localiza a associação {@link AlertaUsuario} pela sua chave composta
-     * (ID do alerta e título de eleitor do usuário) e, caso o alerta ainda não
+     * (código do alerta e título de eleitor do usuário) e, caso o alerta ainda não
      * tenha sido lido, define a data e hora da leitura como o momento atual.
      * <p>
      * Corresponde à ação do CDU-02: Visualizar alertas.
      *
      * @param usuarioTituloStr O título de eleitor do usuário (em formato String).
-     * @param alertaId         O ID do alerta a ser marcado como lido.
+     * @param alertaId         O código do alerta a ser marcado como lido.
      * @throws ErroDominioNaoEncontrado se a associação entre o alerta e o usuário não for encontrada.
      * @throws NumberFormatException se o {@code usuarioTituloStr} não for um número válido.
      */
@@ -344,5 +349,34 @@ public class AlertaService {
             alertaUsuarioRepo.save(alertaUsuario);
             log.info("Alerta {} marcado como lido para o usuário {}", alertaId, usuarioTitulo);
         }
+    }
+
+    /**
+     * Lista todos os alertas para um usuário específico.
+     *
+     * @param usuarioTituloStr O título de eleitor do usuário.
+     * @return Uma lista de {@link AlertaDto}.
+     */
+    @Transactional(readOnly = true)
+    public List<AlertaDto> listarAlertasPorUsuario(String usuarioTituloStr) {
+        Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
+        List<AlertaUsuario> alertasUsuario = alertaUsuarioRepo.findById_UsuarioTituloEleitoral(usuarioTitulo);
+
+        return alertasUsuario.stream()
+            .map(alertaUsuario -> {
+                Alerta alerta = alertaUsuario.getAlerta();
+                AlertaDto dto = alertaMapper.toDto(alerta);
+                // Adicionar a data de leitura específica do usuário ao DTO
+                return AlertaDto.builder()
+                    .codigo(dto.getCodigo())
+                    .codProcesso(dto.getCodProcesso())
+                    .unidadeOrigem(dto.getUnidadeOrigem())
+                    .unidadeDestino(dto.getUnidadeDestino())
+                    .descricao(dto.getDescricao())
+                    .dataHora(dto.getDataHora())
+                    .dataHoraLeitura(alertaUsuario.getDataHoraLeitura())
+                    .build();
+            })
+            .toList();
     }
 }

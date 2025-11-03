@@ -6,12 +6,12 @@ interface ImportarAtividadesRequest {
   subprocessoOrigemId: number;
 }
 
-export async function importarAtividades(idSubprocessoDestino: number, idSubprocessoOrigem: number): Promise<void> {
-  const request: ImportarAtividadesRequest = { subprocessoOrigemId: idSubprocessoOrigem };
+export async function importarAtividades(codSubrocessoDestino: number, codSubrocessoOrigem: number): Promise<void> {
+  const request: ImportarAtividadesRequest = { subprocessoOrigemId: codSubrocessoOrigem };
   try {
-    await apiClient.post(`/subprocessos/${idSubprocessoDestino}/importar-atividades`, request);
+    await apiClient.post(`/subprocessos/${codSubrocessoDestino}/importar-atividades`, request);
   } catch (error) {
-    console.error(`Erro ao importar atividades para o subprocesso ${idSubprocessoDestino}:`, error);
+    console.error(`Erro ao importar atividades para o subprocesso ${codSubrocessoDestino}:`, error);
     throw error;
   }
 }
@@ -30,11 +30,11 @@ export const adicionarCompetencia = async (codSubprocesso: number, competencia: 
 }
 
 export const atualizarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
-    const response = await apiClient.put(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}`, competencia);
+    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`, competencia);
     return mapMapaCompletoDtoToModel(response.data);
 }
 
 export const removerCompetencia = async (codSubprocesso: number, idCompetencia: number): Promise<MapaCompleto> => {
-    const response = await apiClient.delete(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}`);
+    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}/remover`);
     return mapMapaCompletoDtoToModel(response.data);
 }

@@ -16,14 +16,14 @@ import sgc.alerta.modelo.AlertaRepo;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -39,10 +39,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-19: Validar Mapa de Competências")
 class CDU19IntegrationTest {
@@ -64,27 +68,36 @@ class CDU19IntegrationTest {
     @Autowired
     private MapaRepo mapaRepo;
 
-    private Processo processo;
     private Unidade unidade;
     private Unidade unidadeSuperior;
     private Subprocesso subprocesso;
-    private Mapa mapa;
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "UNISUP");
-        unidadeRepo.save(unidadeSuperior);
+        // Limpar dados
+        movimentacaoRepo.deleteAll();
+        alertaRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        mapaRepo.deleteAll();
+        processoRepo.deleteAll();
+        usuarioRepo.deleteAll();
+        unidadeRepo.deleteAll();
 
+        // Criar Unidades
+        unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "UNISUP"));
         unidade = new Unidade("Unidade Subprocesso", "UNISUB");
         unidade.setUnidadeSuperior(unidadeSuperior);
-        unidadeRepo.save(unidade);
+        unidade = unidadeRepo.save(unidade);
 
-        Usuario chefe = usuarioRepo.save(new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE)));
+        // Criar Usuário Chefe e associar à unidade
+        Usuario chefe = new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE));
+        usuarioRepo.save(chefe);
         unidade.setTitular(chefe);
         unidadeRepo.save(unidade);
 
-        processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
-        mapa = mapaRepo.save(new Mapa());
+        // Criar Processo, Mapa e Subprocesso
+        Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
+        Mapa mapa = mapaRepo.save(new Mapa());
         subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());
         subprocessoRepo.save(subprocesso);
     }

@@ -14,6 +14,7 @@
           class="form-control"
           placeholder="Descreva o processo"
           type="text"
+          data-testid="input-descricao"
         >
       </div>
 
@@ -26,6 +27,7 @@
           id="tipo"
           v-model="tipo"
           class="form-select"
+          data-testid="select-tipo"
         >
           <option
             v-for="tipoOption in TipoProcesso"
@@ -44,6 +46,7 @@
             <template
               v-for="unidade in unidadesStore.unidades"
               :key="unidade.sigla"
+              v-if="!unidadesStore.isLoading"
             >
               <div
                 :style="{ marginLeft: '0' }"
@@ -52,17 +55,23 @@
                 <!--suppress HtmlUnknownAttribute -->
                 <input
                   :id="`chk-${unidade.sigla}`"
-                  :checked="getEstadoSelecao(unidade) === true"
+                  v-model="unidadesSelecionadas"
+                  :value="unidade.codigo"
                   class="form-check-input"
                   type="checkbox"
-                  :indeterminate="getEstadoSelecao(unidade) === 'indeterminate'"
-                  @change="() => toggleUnidade(unidade)"
+                  :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
+                  :disabled="isUnidadeBloqueada(unidade.codigo)"
+                  :data-testid="`chk-${unidade.sigla}`"
                 >
                 <label
                   :for="`chk-${unidade.sigla}`"
                   class="form-check-label ms-2"
+                  :class="{ 'text-muted': isUnidadeBloqueada(unidade.codigo) }"
                 >
                   <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
+                  <span v-if="isUnidadeBloqueada(unidade.codigo)" class="badge bg-warning text-dark ms-2">
+                    Já em processo ativo
+                  </span>
                 </label>
               </div>
               <div
@@ -77,17 +86,22 @@
                     <!--suppress HtmlUnknownAttribute -->
                     <input
                       :id="`chk-${filha.sigla}`"
-                      :checked="getEstadoSelecao(filha) === true"
+                      v-model="unidadesSelecionadas"
+                      :value="filha.codigo"
                       class="form-check-input"
                       type="checkbox"
-                      :indeterminate="getEstadoSelecao(filha) === 'indeterminate'"
-                      @change="() => toggleUnidade(filha)"
+                      :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
+                      :disabled="isUnidadeBloqueada(filha.codigo)"
                     >
                     <label
                       :for="`chk-${filha.sigla}`"
                       class="form-check-label ms-2"
+                      :class="{ 'text-muted': isUnidadeBloqueada(filha.codigo) }"
                     >
                       <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
+                      <span v-if="isUnidadeBloqueada(filha.codigo)" class="badge bg-warning text-dark ms-2">
+                        Já em processo ativo
+                      </span>
                     </label>
                   </div>
 
@@ -102,16 +116,21 @@
                     >
                       <input
                         :id="`chk-${neta.sigla}`"
-                        :checked="isChecked(neta.codigo)"
+                        v-model="unidadesSelecionadas"
+                        :value="neta.codigo"
                         class="form-check-input"
                         type="checkbox"
-                        @change="() => toggleUnidade(neta)"
+                        :disabled="isUnidadeBloqueada(neta.codigo)"
                       >
                       <label
                         :for="`chk-${neta.sigla}`"
                         class="form-check-label ms-2"
+                        :class="{ 'text-muted': isUnidadeBloqueada(neta.codigo) }"
                       >
                         <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
+                        <span v-if="isUnidadeBloqueada(neta.codigo)" class="badge bg-warning text-dark ms-2">
+                          Já em processo ativo
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -132,6 +151,7 @@
           v-model="dataLimite"
           class="form-control"
           type="date"
+          data-testid="input-dataLimite"
         >
       </div>
       <button
@@ -267,7 +287,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {computed, nextTick, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -288,6 +308,7 @@ const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da un
 const descricao = ref<string>('')
 const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
 const dataLimite = ref<string>('')
+const unidadesBloqueadas = ref<number[]>([]) // Unidades que já participam de processos ativos
 const router = useRouter()
 const route = useRoute()
 const processosStore = useProcessosStore()
@@ -297,13 +318,35 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
 
+/**
+ * Extrai recursivamente todos os códigos de unidades de uma árvore hierárquica
+ * @param unidades Array de UnidadeParticipante (pode ter filhos)
+ * @returns Array com todos os códigos de unidades (raiz + filhos + netos...)
+ */
+function extrairCodigosUnidades(unidades: any[]): number[] {
+  const codigos: number[] = [];
+  for (const unidade of unidades) {
+    codigos.push(unidade.codUnidade);
+    if (unidade.filhos && unidade.filhos.length > 0) {
+      codigos.push(...extrairCodigosUnidades(unidade.filhos));
+    }
+  }
+  return codigos;
+}
+
 // Carregar processo se estiver editando
 onMounted(async () => {
+  // CRÍTICO: Carregar unidades primeiro
+  await unidadesStore.fetchUnidades();
+  console.log('[DEBUG Vue] Unidades da store carregadas:', unidadesStore.unidades.length);
+
   const idProcesso = route.query.idProcesso;
   if (idProcesso) {
     try {
+      console.log('[DEBUG Vue] Carregando processo:', idProcesso);
       await processosStore.fetchProcessoDetalhe(Number(idProcesso));
       const processo = processosStore.processoDetalhe; // Obter o processo detalhado da store
+      console.log('[DEBUG Vue] Processo carregado:', processo);
       if (processo) {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
@@ -311,7 +354,14 @@ onMounted(async () => {
         dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
 
         // Carregar unidades participantes do processo detalhe
-        unidadesSelecionadas.value = processo.unidades.map(up => up.codUnidade);
+        console.log('[DEBUG Vue] processo.unidades:', processo.unidades);
+        // CORRIGIDO: extrair recursivamente todos os códigos (raiz + filhos + netos)
+        unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
+        console.log('[DEBUG Vue] unidadesSelecionadas após extração:', unidadesSelecionadas.value);
+
+        // Forçar atualização do DOM
+        await nextTick();
+        console.log('[DEBUG Vue] nextTick concluído, DOM deve estar atualizado');
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
@@ -319,6 +369,27 @@ onMounted(async () => {
     }
   }
 })
+
+// Buscar unidades bloqueadas quando o tipo de processo mudar
+watch(tipo, async (novoTipo) => {
+  try {
+    const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
+    if (response.ok) {
+      unidadesBloqueadas.value = await response.json();
+      console.log('[DEBUG Vue] Unidades bloqueadas para tipo', novoTipo, ':', unidadesBloqueadas.value);
+    }
+  } catch (error) {
+    console.error('Erro ao buscar unidades bloqueadas:', error);
+  }
+}, { immediate: true });
+
+function isUnidadeBloqueada(codigo: number): boolean {
+  // Não bloquear se estamos editando e a unidade já estava selecionada
+  if (processoEditando.value && unidadesSelecionadas.value.includes(codigo)) {
+    return false;
+  }
+  return unidadesBloqueadas.value.includes(codigo);
+}
 
 function limparCampos() {
   descricao.value = ''
@@ -415,7 +486,7 @@ async function salvarProcesso() {
           'O processo foi salvo com sucesso!'
       );
     }
-    await router.push('/painel');
+    router.push('/painel');
     limparCampos();
   } catch (error) {
     notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
@@ -462,7 +533,7 @@ async function confirmarIniciarProcesso() {
           'Processo iniciado',
           'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
       );
-      await router.push('/painel');
+      router.push('/painel');
       limparCampos();
     } catch (error) {
       notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
@@ -491,7 +562,7 @@ async function confirmarRemocao() {
         mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
         testId: 'notificacao-remocao'
       });
-      await router.push('/painel');
+      router.push('/painel');
     } catch (error) {
       notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
       console.error('Erro ao remover processo:', error);

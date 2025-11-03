@@ -3,10 +3,10 @@
 Ator: ADMIN
 
 Pré-condições:
-● Usuário logado com perfil ADMIN.
-● Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com
+- Usuário logado com perfil ADMIN.
+- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com
 ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
-● Tela Painel sendo exibida.
+- Tela Painel sendo exibida.
 
 Fluxo principal:
 

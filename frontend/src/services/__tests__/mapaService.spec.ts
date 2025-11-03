@@ -34,9 +34,9 @@ describe('mapaService', () => {
     });
 
     it('salvarMapaCompleto deve chamar o endpoint correto e mapear a resposta', async () => {
-        mockedApiClient.put.mockResolvedValue({ data: {} });
+        mockedApiClient.post.mockResolvedValue({ data: {} });
         await mapaService.salvarMapaCompleto(1, {});
-        expect(mockedApiClient.put).toHaveBeenCalledWith('/subprocessos/1/mapa-completo', {});
+        expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-completo/salvar', {});
         expect(mapMapaCompletoDtoToModel).toHaveBeenCalled();
     });
 
@@ -48,9 +48,9 @@ describe('mapaService', () => {
     });
 
     it('salvarMapaAjuste deve chamar o endpoint correto', async () => {
-        mockedApiClient.put.mockResolvedValue({});
+        mockedApiClient.post.mockResolvedValue({});
         await mapaService.salvarMapaAjuste(1, {});
-        expect(mockedApiClient.put).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste', {});
+        expect(mockedApiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste/salvar', {});
     });
 
     it('verificarMapaVigente deve chamar o endpoint correto', async () => {

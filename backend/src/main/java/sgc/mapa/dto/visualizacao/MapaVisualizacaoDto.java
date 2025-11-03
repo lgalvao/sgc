@@ -17,7 +17,7 @@ public record MapaVisualizacaoDto(
     }
 
     public record UnidadeDto(
-        Long id,
+        Long codigo,
         String sigla,
         String nome
     ) {}

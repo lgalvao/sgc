@@ -14,38 +14,32 @@ import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.conhecimento.dto.ConhecimentoDto;
-import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AtividadeServiceTest {
-
     @InjectMocks
     private AtividadeService service;
-
     @Mock
     private AtividadeRepo atividadeRepo;
     @Mock
     private AtividadeMapper atividadeMapper;
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
-    @Mock
-    private ConhecimentoMapper conhecimentoMapper;
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock

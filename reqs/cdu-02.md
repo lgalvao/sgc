@@ -26,9 +26,9 @@ Fluxo principal:
    ■ Cabeçalhos das colunas deverão ser clicáveis, possibilitando ordenação em ordem crescente e decrescente.
    ■ Itens da tabela serão clicáveis com estas regras:
 
-   ● Para perfil ADMIN, clicar em um processo na situação 'Criado' mostra tela Cadastro de processo com os dados do
+   - Para perfil ADMIN, clicar em um processo na situação 'Criado' mostra tela Cadastro de processo com os dados do
    processo (ver caso de uso Manter processo).
-   ● Clicar em processos nas situações 'Em Andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o
+   - Clicar em processos nas situações 'Em Andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o
    perfil logado seja ADMIN ou GESTOR (ver caso de uso Detalhar processo), ou Detalhes do subprocesso, caso o perfil
    logado seja CHEFE ou SERVIDOR (ver caso de uso Detalhar subprocesso).
 
@@ -40,10 +40,10 @@ Fluxo principal:
 
    3.1. Campos da tabela
 
-   ● Data/Hora: Informação da data e da hora de geração do alerta
-   ● Processo: Descrição do processo a que se refere o alerta
-   ● Unidade: Unidade de origem do alerta
-   ● Descrição: Descrição do alerta
+   - Data/Hora: Informação da data e da hora de geração do alerta
+   - Processo: Descrição do processo a que se refere o alerta
+   - Unidade: Unidade de origem do alerta
+   - Descrição: Descrição do alerta
 
    3.2. Regras de exibição e funcionamento
 
@@ -51,7 +51,7 @@ Fluxo principal:
    ordenação clicando no cabeçalho.
    ■ Cabeçalhos da coluna Processo poderá ser clicado para alterar a ordenação dos dados da tabela.
 
-   ● Ordenação deve ser feita tendo como primeiro critério a descrição do processo (asc/desc) e em seguida a data/hora (
+   - Ordenação deve ser feita tendo como primeiro critério a descrição do processo (asc/desc) e em seguida a data/hora (
    desc).
    ■ Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
    ■ Na primeira visualização do alerta pelo usuário logado, este deverá ser marcado como visualizado para o usuário, de

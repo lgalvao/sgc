@@ -8,16 +8,15 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 
+/**
+ * Representa uma competência, conjunto de atividades e conhecimentos.
+ */
 @Entity
 @Table(name = "COMPETENCIA", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * Representa uma competência, que é um conjunto de conhecimentos, habilidades e atitudes
- * necessários para o desempenho de atividades.
- */
 public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo")
@@ -28,8 +27,9 @@ public class Competencia extends EntidadeBase {
 
     /**
      * Construtor para criar uma nova competência.
+     *
      * @param descricao A descrição da competência.
-     * @param mapa O mapa ao qual a competência pertence.
+     * @param mapa      O mapa ao qual a competência pertence.
      */
     public Competencia(String descricao, Mapa mapa) {
         this.descricao = descricao;
@@ -38,6 +38,7 @@ public class Competencia extends EntidadeBase {
 
     /**
      * Construtor de cópia.
+     *
      * @param competencia A competência a ser copiada.
      */
     public Competencia(Competencia competencia) {

@@ -3,16 +3,18 @@ package sgc.notificacao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.modelo.Alerta;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.processo.eventos.ProcessoIniciadoEvento;
+import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.SgrhService;
+import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
@@ -22,6 +24,7 @@ import sgc.unidade.modelo.TipoUnidade;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
 
 import static sgc.unidade.modelo.TipoUnidade.*;
 
@@ -32,6 +35,7 @@ import static sgc.unidade.modelo.TipoUnidade.*;
  * para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
  */
 @Component
+@Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
 public class EventoProcessoListener {
@@ -41,9 +45,10 @@ public class EventoProcessoListener {
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo repoSubprocesso;
+    private final Environment environment;
 
     /**
-     * Escuta e processa o evento {@link ProcessoIniciadoEvento}, disparado quando
+     * Escuta e processa o evento {@link EventoProcessoIniciado}, disparado quando
      * um novo processo de mapeamento ou revisão é iniciado.
      * <p>
      * Este método orquestra a criação de alertas e o envio de emails para todos
@@ -55,26 +60,26 @@ public class EventoProcessoListener {
      */
     @EventListener
     @Transactional
-    public void aoIniciarProcesso(ProcessoIniciadoEvento evento) {
-        log.info("Processando evento de processo iniciado: idProcesso={}, tipo={}",
-                evento.idProcesso(), evento.tipo());
+    public void aoIniciarProcesso(EventoProcessoIniciado evento) {
+        log.info("Processando evento de processo iniciado: codProcesso={}, tipo={}",
+                evento.codProcesso(), evento.tipo());
         try {
-            Processo processo = processoRepo.findById(evento.idProcesso())
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo não encontrado: ", evento.idProcesso()));
+            Processo processo = processoRepo.findById(evento.codProcesso())
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo não encontrado: ", evento.codProcesso()));
 
-            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.idProcesso());
+            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.codProcesso());
 
             if (subprocessos.isEmpty()) {
-                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.idProcesso());
+                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.codProcesso());
                 return;
             }
 
-            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.idProcesso());
+            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.codProcesso());
 
             // 1. Criar alertas diferenciados por tipo de unidade
             List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
                     processo,
-                    evento.idsUnidades(),
+                    evento.codUnidades(),
                     subprocessos
             );
             log.info("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
@@ -101,9 +106,16 @@ public class EventoProcessoListener {
 
         Long codigoUnidade = subprocesso.getUnidade().getCodigo();
         try {
-            UnidadeDto unidade = sgrhService.buscarUnidadePorCodigo(codigoUnidade)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Unidade não encontrada no SGRH: " + codigoUnidade));
+            Optional<UnidadeDto> unidadeOpt = sgrhService.buscarUnidadePorCodigo(codigoUnidade);
+            if (unidadeOpt.isEmpty()) {
+                boolean isE2E = Arrays.asList(environment.getActiveProfiles()).contains("e2e");
+                if (isE2E) {
+                    log.warn("Unidade não encontrada no SGRH: {} (ignorado no perfil e2e)", codigoUnidade);
+                    return;
+                }
+                throw new IllegalStateException("Unidade não encontrada no SGRH: %d".formatted(codigoUnidade));
+            }
+            UnidadeDto unidade = unidadeOpt.get();
 
             Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
             if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {
@@ -125,7 +137,7 @@ public class EventoProcessoListener {
             TipoProcesso tipoProcesso = processo.getTipo();
 
             if (OPERACIONAL.equals(tipoUnidade)) {
-                assunto = "Processo Iniciado - " + processo.getDescricao();
+                assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
@@ -133,7 +145,7 @@ public class EventoProcessoListener {
                         subprocesso.getDataLimiteEtapa1()
                 );
             } else if (INTERMEDIARIA.equals(tipoUnidade)) {
-                assunto = "Processo Iniciado em Unidades Subordinadas - " + processo.getDescricao();
+                assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
@@ -141,7 +153,7 @@ public class EventoProcessoListener {
                         subprocesso.getDataLimiteEtapa1()
                 );
             } else if (INTEROPERACIONAL.equals(tipoUnidade)) {
-                assunto = "Processo Iniciado - " + processo.getDescricao();
+                assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
@@ -154,8 +166,7 @@ public class EventoProcessoListener {
             }
 
             notificacaoService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-            log.info("E-mail enviado para a unidade {} ({})",
-                    unidade.sigla(), tipoUnidade);
+            log.info("E-mail enviado para a unidade {} ({})", unidade.sigla(), tipoUnidade);
 
             if (responsavelOpt.get().substitutoTitulo() != null) {
                 enviarEmailParaSubstituto(responsavelOpt.get().substitutoTitulo(), assunto, corpoHtml, unidade.nome());
@@ -172,8 +183,7 @@ public class EventoProcessoListener {
             UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
                 notificacaoService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
-                log.info("E-mail enviado para o substituto da unidade {}.",
-                        nomeUnidade);
+                log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {
             log.warn("Erro ao enviar e-mail para o substituto da unidade {}: {}", nomeUnidade, e.getClass().getSimpleName());

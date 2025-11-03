@@ -64,11 +64,11 @@ describe('mappers/atividades', () => {
         expect(model.descricao).toBe('Conhecimento Teste');
     });
 
-    it('mapCriarAtividadeRequestToDto should add idSubprocesso', () => {
+    it('mapCriarAtividadeRequestToDto should add codSubrocesso', () => {
         const request = { descricao: 'Nova Atividade' };
         const dto = mapCriarAtividadeRequestToDto(request, 123);
         expect(dto.descricao).toBe('Nova Atividade');
-        expect(dto.idSubprocesso).toBe(123);
+        expect(dto.codSubrocesso).toBe(123);
     });
 
     it('mapCriarConhecimentoRequestToDto should map correctly', () => {

@@ -16,6 +16,7 @@ import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.service.ImpactoCompetenciaService;
 
 import java.util.Collections;
 import java.util.List;

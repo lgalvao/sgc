@@ -81,7 +81,7 @@
 
     <!-- Modal de Histórico de Análise -->
     <HistoricoAnaliseModal
-      :id-subprocesso="idSubprocesso"
+      :cod-subrocesso="codSubrocesso"
       :mostrar="mostrarModalHistoricoAnalise"
       @fechar="fecharModalHistoricoAnalise"
     />
@@ -288,11 +288,11 @@ const podeVerImpacto = computed(() => {
   return podeVer && situacaoCorreta;
 });
 
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 const atividades = computed<Atividade[]>(() => {
-  if (idSubprocesso.value === undefined) return []
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  if (codSubrocesso.value === undefined) return []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -300,8 +300,8 @@ const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVI
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await atividadesStore.fetchAtividadesParaSubprocesso(idSubprocesso.value);
+  if (codSubrocesso.value) {
+    await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
   }
 });
 
@@ -314,7 +314,7 @@ function devolverCadastro() {
 }
 
 async function confirmarValidacao() {
-  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+  if (!codSubrocesso.value || !perfilSelecionado.value) return;
 
   const commonRequest = {
     observacoes: observacaoValidacao.value,
@@ -323,38 +323,38 @@ async function confirmarValidacao() {
   if (isHomologacao.value) {
     const req: HomologarCadastroRequest = { ...commonRequest };
     if (isRevisao.value) {
-        await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, req);
+        await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, req);
     } else {
-        await subprocessosStore.homologarCadastro(idSubprocesso.value, req);
+        await subprocessosStore.homologarCadastro(codSubrocesso.value, req);
     }
   } else {
       const req: AceitarCadastroRequest = { ...commonRequest };
       if (isRevisao.value) {
-          await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, req);
+          await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, req);
       } else {
-          await subprocessosStore.aceitarCadastro(idSubprocesso.value, req);
+          await subprocessosStore.aceitarCadastro(codSubrocesso.value, req);
       }
   }
 
   fecharModalValidar();
-  await router.push('/painel');
+  router.push('/painel');
 }
 
 async function confirmarDevolucao() {
-  if (!idSubprocesso.value || !perfilSelecionado.value) return;
+  if (!codSubrocesso.value || !perfilSelecionado.value) return;
   const req: DevolverCadastroRequest = {
     motivo: '', // Adicionar esta linha
     observacoes: observacaoDevolucao.value,
   };
 
   if (isRevisao.value) {
-      await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, req);
+      await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, req);
   } else {
-      await subprocessosStore.devolverCadastro(idSubprocesso.value, req);
+      await subprocessosStore.devolverCadastro(codSubrocesso.value, req);
   }
 
   fecharModalDevolver();
-  await router.push('/painel');
+  router.push('/painel');
 }
 
 function fecharModalValidar() {

@@ -18,6 +18,7 @@ import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.Collections;
 import java.util.List;

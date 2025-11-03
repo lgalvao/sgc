@@ -76,22 +76,22 @@ describe('atividadeService', () => {
     expect(result).toHaveProperty('mapped', true)
   })
 
-  it('atualizarAtividade should put and map response', async () => {
+  it('atualizarAtividade should post and map response', async () => {
     const request: Atividade = { codigo: 1, descricao: 'Atividade Atualizada', conhecimentos: [] }
     const responseDto = { ...request }
-    mockApi.put.mockResolvedValue({ data: responseDto })
+    mockApi.post.mockResolvedValue({ data: responseDto })
 
     const result = await service.atualizarAtividade(request.codigo, request)
 
-    expect(mockApi.put).toHaveBeenCalledWith(`/atividades/${request.codigo}`, request)
+    expect(mockApi.post).toHaveBeenCalledWith(`/atividades/${request.codigo}/atualizar`, request)
     expect(mappers.mapAtividadeDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
-  it('excluirAtividade should call delete', async () => {
-    mockApi.delete.mockResolvedValue({})
+  it('excluirAtividade should call post', async () => {
+    mockApi.post.mockResolvedValue({})
     await service.excluirAtividade(1)
-    expect(mockApi.delete).toHaveBeenCalledWith('/atividades/1')
+    expect(mockApi.post).toHaveBeenCalledWith('/atividades/1/excluir')
   })
 
   it('listarConhecimentos should fetch and map conhecimentos', async () => {
@@ -120,22 +120,22 @@ describe('atividadeService', () => {
     expect(result).toHaveProperty('mapped', true)
   })
 
-  it('atualizarConhecimento should put and map response', async () => {
+  it('atualizarConhecimento should post and map response', async () => {
     const request: Conhecimento = { id: 1, descricao: 'Conhecimento Atualizado' }
     const responseDto = { ...request }
-    mockApi.put.mockResolvedValue({ data: responseDto })
+    mockApi.post.mockResolvedValue({ data: responseDto })
 
     const result = await service.atualizarConhecimento(1, request.id, request)
 
-    expect(mockApi.put).toHaveBeenCalledWith(`/atividades/1/conhecimentos/${request.id}`, request)
+    expect(mockApi.post).toHaveBeenCalledWith(`/atividades/1/conhecimentos/${request.id}/atualizar`, request)
     expect(mappers.mapConhecimentoDtoToModel).toHaveBeenCalledWith(responseDto)
     expect(result).toHaveProperty('mapped', true)
   })
 
-  it('excluirConhecimento should call delete', async () => {
-    mockApi.delete.mockResolvedValue({})
+  it('excluirConhecimento should call post', async () => {
+    mockApi.post.mockResolvedValue({})
     await service.excluirConhecimento(1, 1)
-    expect(mockApi.delete).toHaveBeenCalledWith('/atividades/1/conhecimentos/1')
+    expect(mockApi.post).toHaveBeenCalledWith('/atividades/1/conhecimentos/1/excluir')
   })
 
     // Error handling tests
@@ -157,12 +157,12 @@ describe('atividadeService', () => {
 
   it('atualizarAtividade should throw error on failure', async () => {
     const request: Atividade = { codigo: 1, descricao: 'Atividade Atualizada', conhecimentos: [] }
-    mockApi.put.mockRejectedValue(new Error('Failed'))
+    mockApi.post.mockRejectedValue(new Error('Failed'))
     await expect(service.atualizarAtividade(1, request)).rejects.toThrow('Failed')
   })
 
   it('excluirAtividade should throw error on failure', async () => {
-    mockApi.delete.mockRejectedValue(new Error('Failed'))
+    mockApi.post.mockRejectedValue(new Error('Failed'))
     await expect(service.excluirAtividade(1)).rejects.toThrow('Failed')
   })
 
@@ -179,12 +179,12 @@ describe('atividadeService', () => {
 
   it('atualizarConhecimento should throw error on failure', async () => {
     const request: Conhecimento = { id: 1, descricao: 'Conhecimento Atualizado' }
-    mockApi.put.mockRejectedValue(new Error('Failed'))
+    mockApi.post.mockRejectedValue(new Error('Failed'))
     await expect(service.atualizarConhecimento(1, 1, request)).rejects.toThrow('Failed')
   })
 
   it('excluirConhecimento should throw error on failure', async () => {
-    mockApi.delete.mockRejectedValue(new Error('Failed'))
+    mockApi.post.mockRejectedValue(new Error('Failed'))
     await expect(service.excluirConhecimento(1, 1)).rejects.toThrow('Failed')
   })
 })

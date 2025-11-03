@@ -140,12 +140,12 @@ const situacaoUnidadeNoProcesso = computed(() => {
   return SubprocessoDetalhes.value?.situacao || SituacaoSubprocesso.NAO_INICIADO;
 });
 
-const idSubprocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
+const codSubrocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await mapaStore.fetchMapaCompleto(idSubprocesso.value);
+  if (codSubrocesso.value) {
+    await mapaStore.fetchMapaCompleto(codSubrocesso.value);
   }
 });
 
@@ -258,7 +258,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   try {
     // Chamar a store para atualizar a data limite
-    await processosStore.alterarDataLimiteSubprocesso();
+    await processosStore.alterarDataLimiteSubprocesso(SubprocessoDetalhes.value.codigo, { novaData: novaData });
 
     // Fechar modal
     fecharModalAlterarDataLimite();

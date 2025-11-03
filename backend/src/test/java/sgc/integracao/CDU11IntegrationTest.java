@@ -23,14 +23,14 @@ import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.SituacaoProcesso;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-11: Visualizar cadastro de atividades e conhecimentos")
 @Import(sgc.integracao.mocks.TestSecurityConfig.class)
 class CDU11IntegrationTest {
-    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{id}/cadastro";
+    private static final String API_SUBPROCESSOS_ID_CADASTRO = "/api/subprocessos/{codigo}/cadastro";
     private static final String UNIDADE_SIGLA_JSON_PATH = "$.unidadeSigla";
 
     @Autowired

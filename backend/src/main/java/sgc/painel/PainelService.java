@@ -9,12 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
+import sgc.processo.modelo.*;
+import sgc.sgrh.modelo.Perfil;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -36,7 +33,7 @@ public class PainelService {
      * <p>
      * - Se o perfil for 'ADMIN', todos os processos são retornados.
      * - Para outros perfis, os processos são filtrados pela unidade do usuário e
-     *   suas subordinadas. Processos no estado 'CRIADO' são omitidos.
+     * suas subordinadas. Processos no estado 'CRIADO' são omitidos.
      *
      * @param perfil        O perfil do usuário (obrigatório).
      * @param codigoUnidade O código da unidade do usuário (necessário para perfis não-ADMIN).
@@ -44,13 +41,13 @@ public class PainelService {
      * @return Uma página {@link Page} de {@link ProcessoResumoDto}.
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
-    public Page<ProcessoResumoDto> listarProcessos(String perfil, Long codigoUnidade, Pageable pageable) {
-        if (perfil == null || perfil.isBlank()) {
+    public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+        if (perfil == null) {
             throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
         }
 
         List<Processo> processos;
-        if ("ADMIN".equalsIgnoreCase(perfil)) {
+        if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll();
         } else {
             if (codigoUnidade == null) {
@@ -59,22 +56,20 @@ public class PainelService {
             List<Long> unidadeIds = getUnidadesSubordinadasIds(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-            List<Long> processoIds = unidadeProcessoRepo.findByUnidadeCodigoIn(unidadeIds)
-                .stream()
-                .map(UnidadeProcesso::getProcessoCodigo)
-                .distinct()
-                .collect(Collectors.toList());
+            List<Long> processoIds = unidadeProcessoRepo.findByCodUnidadeIn(unidadeIds)
+                    .stream()
+                    .map(UnidadeProcesso::getCodProcesso)
+                    .distinct()
+                    .collect(Collectors.toList());
 
             processos = processoRepo.findAllById(processoIds).stream()
-                .filter(p -> p.getSituacao() != SituacaoProcesso.CRIADO)
-                .collect(Collectors.toList());
+                    .filter(p -> p.getSituacao() != SituacaoProcesso.CRIADO)
+                    .collect(Collectors.toList());
         }
 
-        System.out.println("Processos encontrados antes do mapeamento: " + processos.size());
         List<ProcessoResumoDto> dtos = processos.stream()
-            .map(this::mapToProcessoResumoDto)
-            .collect(Collectors.toList());
-        System.out.println("DTOs de processo gerados: " + dtos.size());
+                .map(this::mapToProcessoResumoDto)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
@@ -94,13 +89,13 @@ public class PainelService {
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
             return alertaRepo.findByUsuarioDestino_TituloEleitoral(Long.parseLong(usuarioTitulo), pageable)
-                .map(this::mapToAlertaDto);
+                    .map(this::mapToAlertaDto);
         }
         if (codigoUnidade != null) {
             List<Long> unidadeIds = getUnidadesSubordinadasIds(codigoUnidade);
             unidadeIds.add(codigoUnidade);
             return alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, pageable)
-                .map(this::mapToAlertaDto);
+                    .map(this::mapToAlertaDto);
         }
         return alertaRepo.findAll(pageable).map(this::mapToAlertaDto);
     }
@@ -116,28 +111,28 @@ public class PainelService {
     }
 
     private ProcessoResumoDto mapToProcessoResumoDto(Processo processo) {
-        UnidadeProcesso up = unidadeProcessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().findFirst().orElse(null);
+        UnidadeProcesso up = unidadeProcessoRepo.findByCodProcesso((processo.getCodigo())).stream().findFirst().orElse(null);
         return ProcessoResumoDto.builder()
-            .codigo(processo.getCodigo())
-            .descricao(processo.getDescricao())
-            .situacao(processo.getSituacao())
-            .tipo(processo.getTipo().name())
-            .dataLimite(processo.getDataLimite())
-            .dataCriacao(processo.getDataCriacao())
-            .unidadeCodigo(up != null ? up.getUnidadeCodigo() : null)
-            .unidadeNome(up != null ? up.getNome() : null)
-            .build();
+                .codigo(processo.getCodigo())
+                .descricao(processo.getDescricao())
+                .situacao(processo.getSituacao())
+                .tipo(processo.getTipo().name())
+                .dataLimite(processo.getDataLimite())
+                .dataCriacao(processo.getDataCriacao())
+                .unidadeCodigo(up != null ? up.getCodUnidade() : null)
+                .unidadeNome(up != null ? up.getNome() : null)
+                .build();
     }
 
     private AlertaDto mapToAlertaDto(Alerta alerta) {
-        return new AlertaDto(
-            alerta.getCodigo(),
-            alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null,
-            alerta.getDescricao(),
-            alerta.getDataHora(),
-            alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null,
-            alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null,
-            alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null
-        );
+        return AlertaDto.builder()
+            .codigo(alerta.getCodigo())
+            .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
+            .descricao(alerta.getDescricao())
+            .dataHora(alerta.getDataHora())
+            .codUnidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null)
+            .codUunidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null)
+            .tituloUsuarioDestino(alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null)
+            .build();
     }
 }

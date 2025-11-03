@@ -57,10 +57,10 @@ describe('processoService', () => {
             await service.finalizarProcesso(1)
             expect(mockApi.post).toHaveBeenCalledWith('/processos/1/finalizar');})
 
-    it('excluirProcesso should call delete', async () => {
-            mockApi.delete.mockResolvedValue({})
+    it('excluirProcesso should call post', async () => {
+            mockApi.post.mockResolvedValue({})
             await service.excluirProcesso(1)
-            expect(mockApi.delete).toHaveBeenCalledWith('/processos/1');})
+            expect(mockApi.post).toHaveBeenCalledWith('/processos/1/excluir');})
 
     it('fetchProcessosFinalizados should get from the correct endpoint', async () => {
         mockApi.get.mockResolvedValue({ data: [] });
@@ -74,11 +74,11 @@ describe('processoService', () => {
         expect(mockApi.get).toHaveBeenCalledWith('/processos/1');
     });
 
-    it('atualizarProcesso should put to the correct endpoint', async () => {
+    it('atualizarProcesso should post to the correct endpoint', async () => {
         const request: AtualizarProcessoRequest = { codigo: 1, tipo: TipoProcesso.MAPEAMENTO, unidades: [], descricao: 'teste', dataLimiteEtapa1: '2025-12-31' };
-        mockApi.put.mockResolvedValue({ data: {} });
+        mockApi.post.mockResolvedValue({ data: {} });
         await service.atualizarProcesso(request.codigo, request);
-        expect(mockApi.put).toHaveBeenCalledWith(`/processos/${request.codigo}`, request);
+        expect(mockApi.post).toHaveBeenCalledWith(`/processos/${request.codigo}/atualizar`, request);
     });
 
     it('obterDetalhesProcesso should get from the correct endpoint', async () => {

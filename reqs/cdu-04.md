@@ -3,8 +3,8 @@
 Ator: ADMIN
 
 Pré-condições:
-● Login realizado com perfil ADMIN
-● Existência de processo de mapeamento na situação 'Criado'
+- Login realizado com perfil ADMIN
+- Existência de processo de mapeamento na situação 'Criado'
 
 Fluxo principal:
 

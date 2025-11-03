@@ -22,7 +22,8 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AtividadeControle.class)
@@ -31,13 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AtividadeControleTest {
     private static final String ATIVIDADE_TESTE = "Atividade Teste";
     private static final String API_ATIVIDADES = "/api/atividades";
-    private static final String API_ATIVIDADES_ID = "/api/atividades/{id}";
-    private static final String API_ATIVIDADES_ID_ATUALIZAR = "/api/atividades/{id}/atualizar";
-    private static final String API_ATIVIDADES_ID_EXCLUIR = "/api/atividades/{id}/excluir";
     private static final String API_ATIVIDADES_1 = "/api/atividades/1";
     private static final String API_ATIVIDADES_99 = "/api/atividades/99";
     private static final String NOVA_ATIVIDADE = "Nova Atividade";
     private static final String DESCRICAO_ATUALIZADA = "Descrição Atualizada";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -83,7 +82,7 @@ class AtividadeControleTest {
     }
 
     @Nested
-    @DisplayName("Testes para obter atividade por ID")
+    @DisplayName("Testes para obter atividade por código")
     class ObterAtividadePorId {
 
         @Test
@@ -91,7 +90,7 @@ class AtividadeControleTest {
         void deveRetornarAtividadePorId() throws Exception {
             var atividadeDto = new AtividadeDto(1L, null, ATIVIDADE_TESTE);
 
-            when(atividadeService.obterPorId(1L)).thenReturn(atividadeDto);
+            when(atividadeService.obterPorCodigo(1L)).thenReturn(atividadeDto);
 
             mockMvc.perform(get(API_ATIVIDADES_1))
                     .andExpect(status().isOk())
@@ -99,9 +98,9 @@ class AtividadeControleTest {
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
-            when(atividadeService.obterPorId(99L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
+            when(atividadeService.obterPorCodigo(99L)).thenThrow(new sgc.comum.erros.ErroDominioNaoEncontrado(""));
 
             mockMvc.perform(get(API_ATIVIDADES_99))
                     .andExpect(status().isNotFound());
@@ -163,7 +162,7 @@ class AtividadeControleTest {
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             var atividadeDto = new AtividadeDto(99L, null, "Tanto faz");
 
@@ -192,7 +191,7 @@ class AtividadeControleTest {
         }
 
         @Test
-        @DisplayName("Deve retornar 404 Not Found para ID inexistente")
+        @DisplayName("Deve retornar 404 Not Found para código inexistente")
         void deveRetornarNotFoundParaIdInexistente() throws Exception {
             doThrow(new sgc.comum.erros.ErroDominioNaoEncontrado("")).when(atividadeService).excluir(99L);
 
@@ -206,7 +205,7 @@ class AtividadeControleTest {
     class ConhecimentoEndpoints {
 
         private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
-        private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{id}";
+        private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{codigo}";
         private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
         private static final String API_CONHECIMENTOS_1_ATUALIZAR = "/api/atividades/1/conhecimentos/1/atualizar";
         private static final String API_CONHECIMENTOS_1_EXCLUIR = "/api/atividades/1/conhecimentos/1/excluir";
@@ -220,8 +219,8 @@ class AtividadeControleTest {
             when(atividadeService.listarConhecimentos(1L)).thenReturn(List.of(conhecimentoDto));
 
             mockMvc.perform(get(API_CONHECIMENTOS))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].codigo").value(1L));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codigo").value(1L));
         }
 
         @Test
@@ -233,11 +232,11 @@ class AtividadeControleTest {
             when(atividadeService.criarConhecimento(eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoSalvoDto);
 
             mockMvc.perform(post(API_CONHECIMENTOS).with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_CONHECIMENTOS_1))
-                .andExpect(jsonPath("$.codigo").value(1L));
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .andExpect(status().isCreated())
+                    .andExpect(header().string("Location", API_CONHECIMENTOS_1))
+                    .andExpect(jsonPath("$.codigo").value(1L));
         }
 
         @Test
@@ -248,10 +247,10 @@ class AtividadeControleTest {
             when(atividadeService.atualizarConhecimento(eq(1L), eq(1L), any(ConhecimentoDto.class))).thenReturn(conhecimentoDto);
 
             mockMvc.perform(post(API_CONHECIMENTOS_1_ATUALIZAR).with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(conhecimentoDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.descricao").value("Atualizado"));
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(conhecimentoDto)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.descricao").value("Atualizado"));
         }
 
         @Test
@@ -260,7 +259,7 @@ class AtividadeControleTest {
             doNothing().when(atividadeService).excluirConhecimento(1L, 1L);
 
             mockMvc.perform(post(API_CONHECIMENTOS_1_EXCLUIR).with(csrf()))
-                .andExpect(status().isNoContent());
+                    .andExpect(status().isNoContent());
 
             verify(atividadeService, times(1)).excluirConhecimento(1L, 1L);
         }

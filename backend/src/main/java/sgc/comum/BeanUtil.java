@@ -3,6 +3,7 @@ package sgc.comum;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,15 +14,7 @@ import org.springframework.stereotype.Component;
  * (como as factories de anotações de segurança) acessem beans de serviço.
  */
 @Component
-/**
- * Utilitário para acesso estático a beans gerenciados pelo Spring.
- * <p>
- * Esta classe implementa {@link ApplicationContextAware} para obter uma referência
- * ao contexto da aplicação Spring, permitindo que classes não gerenciadas
- * (como as factories de anotações de segurança) acessem beans de serviço.
- */
 public class BeanUtil implements ApplicationContextAware {
-
     private static ApplicationContext context;
 
     /**
@@ -32,7 +25,7 @@ public class BeanUtil implements ApplicationContextAware {
      * @throws BeansException se houver um erro ao processar o contexto.
      */
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
 

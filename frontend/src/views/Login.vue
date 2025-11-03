@@ -139,7 +139,7 @@ const handleLogin = async () => {
       if (perfilStore.perfisUnidades.length > 1) {
         loginStep.value = 2;
       } else if (perfilStore.perfisUnidades.length === 1) {
-        await router.push('/painel');
+        router.push('/painel');
       } else {
         notificacoesStore.erro(
           'Perfis indisponíveis',
@@ -155,7 +155,7 @@ const handleLogin = async () => {
   } else {
     if (parSelecionado.value) {
       await perfilStore.selecionarPerfilUnidade(Number(titulo.value), parSelecionado.value);
-      await router.push('/painel');
+      router.push('/painel');
     }
   }
 }

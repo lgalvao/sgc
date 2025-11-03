@@ -51,6 +51,7 @@
                 v-for="notificacao in notificacoesOrdenadas"
                 :key="notificacao.id"
                 :class="['list-group-item list-group-item-action', classeNotificacao(notificacao)]"
+                :data-testid="`notificacao-${notificacao.tipo}`"
               >
                 <div class="d-flex w-100 justify-content-between">
                   <div class="d-flex align-items-center">
