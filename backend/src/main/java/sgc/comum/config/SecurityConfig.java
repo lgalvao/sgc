@@ -16,7 +16,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@Profile("disabled-for-now")
+@Profile({"disabled-for-now", "!test"})
 @RequiredArgsConstructor
 public class SecurityConfig {
     /**
