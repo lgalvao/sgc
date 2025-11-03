@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { AlertaFormatado } from '@/types/tipos';
+import type {AlertaFormatado} from '@/types/tipos';
 
 defineProps<{
   alertas: AlertaFormatado[]

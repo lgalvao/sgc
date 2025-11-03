@@ -1,13 +1,15 @@
 -- Unidades (nível raiz e intermediárias primeiro)
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (2, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', NULL);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (200, 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', NULL);
 
 -- Unidades intermediárias (dependem de raiz)
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (3, 'Secretaria de Gestao de Pessoas', 'SGP', 'INTERMEDIARIA', 2);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (3, 'Coordenadoria de Administracao', 'COAD', 'INTERMEDIARIA', 2);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (6, 'Coordenadoria de Sistemas', 'COSIS', 'INTERMEDIARIA', 2);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (7, 'Coordenadoria de Suporte e Infraestrutura', 'COSINF', 'INTERMEDIARIA', 2);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (14, 'Coordenadoria Jurídica', 'COJUR', 'INTERMEDIARIA', 2);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (101, 'GESTOR-UNIT', 'GESTOR-UNIT', 'INTERMEDIARIA', 100);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (201, 'Coordenadoria de Atenção ao Servidor', 'CAS', 'INTEROPERACIONAL', 200);
 
 -- Unidades intermediárias (dependem de outras intermediárias)
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (4, 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 3);
@@ -22,6 +24,7 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VAL
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 14);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 2);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 101);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, unidade_superior_codigo) VALUES (202, 'Seção de Atenção ao Servidor', 'SAS', 'OPERACIONAL', 201);
 
 -- Usuários
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (1, 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10);
@@ -88,6 +91,94 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) V
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (123456789012, 'João Silva', 'joao.silva@tre-pe.jus.br', '8001', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (987654321098, 'Maria Santos', 'maria.santos@tre-pe.jus.br', '8002', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (111222333444, 'Pedro Oliveira', 'pedro.oliveira@tre-pe.jus.br', '8003', 2);
+
+-- ============================================================================
+-- DADOS DE TESTE PARA PROCESSOS DE REVISAO E DIAGNOSTICO
+-- ============================================================================
+
+-- 1. Criar um processo de MAPEAMENTO FINALIZADO para gerar mapas vigentes
+INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_finalizacao, data_limite) 
+VALUES (100, 'Mapeamento Base 2024 - FINALIZADO', 'MAPEAMENTO', 'FINALIZADO', CURRENT_DATE - 180, CURRENT_DATE - 30, CURRENT_DATE - 60);
+
+-- 2. Unidades participantes do processo 100
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+VALUES (100, 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 6);
+
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+VALUES (100, 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 6);
+
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo) 
+VALUES (100, 10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 6);
+
+-- 3. Criar mapas para essas unidades
+INSERT INTO SGC.MAPA (codigo) VALUES (1001);
+INSERT INTO SGC.MAPA (codigo) VALUES (1002);
+INSERT INTO SGC.MAPA (codigo) VALUES (1003);
+
+-- 4. Criar subprocessos para as unidades (ligando ao processo 100 e aos mapas)
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1, data_fim_etapa1, data_fim_etapa2) 
+VALUES (1001, 100, 8, 1001, 'HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1, data_fim_etapa1, data_fim_etapa2) 
+VALUES (1002, 100, 9, 1002, 'HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao, data_limite_etapa1, data_fim_etapa1, data_fim_etapa2) 
+VALUES (1003, 100, 10, 1003, 'HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 90);
+
+-- 5. Configurar mapas vigentes para as unidades (tabela UNIDADE_MAPA)
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES (8, 1001);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES (9, 1002);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo) VALUES (10, 1003);
+
+-- 6. Adicionar competências aos mapas para torná-los mais realistas
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10001, 1001, 'Desenvolvimento em Java', 'TECNICA', 'AVANCADO', TRUE);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10002, 1001, 'Desenvolvimento em Vue.js', 'TECNICA', 'INTERMEDIARIO', TRUE);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10003, 1002, 'Análise de Dados', 'TECNICA', 'AVANCADO', TRUE);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10004, 1002, 'Machine Learning', 'TECNICA', 'INTERMEDIARIO', FALSE);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10005, 1003, 'Segurança da Informação', 'TECNICA', 'AVANCADO', TRUE);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao, tipo, nivel, essencial) 
+VALUES (10006, 1003, 'Gestão de Projetos', 'COMPORTAMENTAL', 'INTERMEDIARIO', TRUE);
+
+-- 7. Criar servidores para as unidades 8, 9, 10 (necessário para DIAGNOSTICO)
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50001, 'João da Silva', 'Analista de Sistemas', 8);
+
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50002, 'Maria Oliveira', 'Desenvolvedora', 8);
+
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50003, 'Pedro Santos', 'Analista de Dados', 9);
+
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50004, 'Ana Costa', 'Cientista de Dados', 9);
+
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50005, 'Carlos Pereira', 'Especialista em Segurança', 10);
+
+INSERT INTO SGC.SERVIDOR (titulo_eleitoral, nome, cargo, unidade_codigo) 
+VALUES (50006, 'Juliana Lima', 'Gerente de Projetos', 10);
+
+-- ============================================================================
+-- RESUMO DOS DADOS CRIADOS:
+-- - Processo 100: MAPEAMENTO FINALIZADO (SEDESENV, SEDIA, SESEL)
+-- - Mapas vigentes: 1001 (SEDESENV), 1002 (SEDIA), 1003 (SESEL)
+-- - Servidores cadastrados nas 3 unidades
+-- 
+-- AGORA É POSSÍVEL:
+-- - Criar processo REVISAO incluindo unidades 8, 9, 10 (têm mapa vigente)
+-- - Criar processo DIAGNOSTICO incluindo unidades 8, 9, 10 (têm mapa + servidores)
+-- ============================================================================
+
 
 -- Perfis dos usuários (AUTORIZAÇÕES)
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES (1, 'SERVIDOR');

@@ -1,5 +1,6 @@
 package sgc.util;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import sgc.alerta.modelo.AlertaUsuarioRepo;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.SituacaoProcesso;
+import sgc.processo.modelo.UnidadeProcesso;
 import sgc.processo.modelo.UnidadeProcessoRepo;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.SubprocessoRepo;
@@ -34,6 +36,7 @@ public class E2eTestControle {
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
+    private final EntityManager entityManager;
 
     /**
      * Remove FORÇADAMENTE um processo, independente da situação.
@@ -71,7 +74,7 @@ public class E2eTestControle {
         // Busca todos os processos que têm a unidade através da tabela de junção
         var unidadesProcesso = unidadeProcessoRepo.findByCodUnidadeIn(List.of(codigoUnidade));
         var codigosProcesso = unidadesProcesso.stream()
-                .map(up -> up.getCodProcesso())
+                .map(UnidadeProcesso::getCodProcesso)
                 .distinct()
                 .toList();
 
@@ -133,14 +136,17 @@ public class E2eTestControle {
      */
     @PostMapping("/reset")
     @Transactional
-    public ResponseEntity<Void> resetCompleto() {
+    public ResponseEntity<Void> resetCompleto(EntityManager em) {
         // Deletar referências em ALERTA_USUARIO antes de deletar alertas
         alertaUsuarioRepo.deleteAll();
         alertaRepo.deleteAll();
+
         // Remover movimentações e subprocessos antes de processos (FKs)
         movimentacaoRepo.deleteAll();
         subprocessoRepo.deleteAll();
         processoRepo.deleteAll();
+        unidadeProcessoRepo.deleteAll();
+        
         return ResponseEntity.noContent().build();
     }
 
@@ -155,7 +161,7 @@ public class E2eTestControle {
     @PostMapping("/reset-and-reseed")
     @Transactional
     public ResponseEntity<String> resetAndReseed() {
-        resetCompleto();
+        resetCompleto(entityManager);
         return ResponseEntity.ok("Banco resetado. ATENÇÃO: Dados do import.sql não são recarregados automaticamente. Reinicie o backend para recarregar.");
     }
     
@@ -168,9 +174,9 @@ public class E2eTestControle {
         
         List<Map<String, Object>> result = unidadesProcesso.stream()
             .map(up -> Map.of(
-                "processo_codigo", (Object) up.getCodProcesso(),
-                "unidade_codigo", (Object) up.getCodUnidade(),
-                "nome", (Object) up.getNome(),
+                "processo_codigo", up.getCodProcesso(),
+                "unidade_codigo", up.getCodUnidade(),
+                "nome", up.getNome(),
                 "sigla", (Object) up.getSigla()
             ))
             .toList();

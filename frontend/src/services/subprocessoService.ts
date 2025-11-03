@@ -1,6 +1,6 @@
 import apiClient from '../axios-setup';
-import type { Competencia, MapaCompleto } from '@/types/tipos';
-import { mapMapaCompletoDtoToModel } from '@/mappers/mapas';
+import type {Competencia, MapaCompleto} from '@/types/tipos';
+import {mapMapaCompletoDtoToModel} from '@/mappers/mapas';
 
 interface ImportarAtividadesRequest {
   subprocessoOrigemId: number;

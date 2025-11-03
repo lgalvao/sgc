@@ -17,16 +17,12 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.sgrh.service.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -54,6 +50,7 @@ public class ProcessoService {
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
+    @SuppressWarnings("unused")
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
@@ -154,6 +151,16 @@ public class ProcessoService {
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
         Processo processoAtualizado = processoRepo.save(processo);
+
+        // Atualizar unidades participantes: remover antigas e adicionar novas
+        unidadeProcessoRepo.deleteByCodProcesso(codigo);
+        for (Long codigoUnidade : requisicao.unidades()) {
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoAtualizado, unidade);
+            unidadeProcessoRepo.save(unidadeProcesso);
+        }
+
         log.info("Processo {} atualizado com sucesso.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
@@ -469,12 +476,10 @@ public class ProcessoService {
             .toList();
         
         // Extrai todas as unidades desses processos
-        List<Long> codigosUnidadesBloqueadas = processosAtivos.stream()
+        return processosAtivos.stream()
             .flatMap(p -> unidadeProcessoRepo.findByCodProcesso(p.getCodigo()).stream())
             .map(UnidadeProcesso::getCodUnidade)
             .distinct()
             .toList();
-        
-        return codigosUnidadesBloqueadas;
     }
 }

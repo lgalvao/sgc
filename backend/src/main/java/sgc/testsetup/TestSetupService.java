@@ -3,19 +3,32 @@ package sgc.testsetup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.analise.modelo.Analise;
+import sgc.analise.modelo.AnaliseRepo;
+import sgc.analise.modelo.TipoAnalise;
+import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.AtividadeRepo;
+import sgc.competencia.modelo.Competencia;
+import sgc.competencia.modelo.CompetenciaAtividade;
+import sgc.competencia.modelo.CompetenciaAtividadeRepo;
+import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.conhecimento.modelo.Conhecimento;
+import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.mapa.modelo.Mapa;
+import sgc.mapa.modelo.MapaRepo;
+import sgc.mapa.modelo.UnidadeMapa;
+import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.modelo.*;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.subprocesso.modelo.*;
-import sgc.unidade.modelo.*;
-import sgc.mapa.modelo.*;
-import sgc.competencia.modelo.*;
-import sgc.atividade.modelo.*;
-import sgc.conhecimento.modelo.*;
-import sgc.sgrh.modelo.*;
-import sgc.analise.modelo.*;
+import sgc.unidade.modelo.Unidade;
+import sgc.unidade.modelo.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

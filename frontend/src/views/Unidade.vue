@@ -177,7 +177,7 @@ function visualizarMapa() {
     router.push({
       name: 'SubprocessoVisMapa',
       params: {
-        idProcesso: mapaVigente.value.subprocessoCodigo,
+        codProcesso: mapaVigente.value.subprocessoCodigo,
         siglaUnidade: sigla.value
       }
     });

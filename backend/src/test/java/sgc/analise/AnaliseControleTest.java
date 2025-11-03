@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -40,7 +39,6 @@ class AnaliseControleTest {
     private static final String ERRO_INESPERADO = "Erro inesperado";
     private static final String MESSAGE_JSON_PATH = "$.message";
     private static final String OCORREU_UM_ERRO_INESPERADO = "Ocorreu um erro inesperado. Contate o suporte.";
-    private static final String OBSERVACOES = "observacoes";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
     private static final String ANALISE_DE_CADASTRO = "Análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";
@@ -141,7 +139,6 @@ class AnaliseControleTest {
             analise.setObservacoes(NOVA_ANALISE_DE_CADASTRO);
             analise.setDataHora(LocalDateTime.now());
 
-            // Since the controller creates a new DTO, we can't use eq(). We'll use an ArgumentCaptor or any() for flexibility.
             when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())

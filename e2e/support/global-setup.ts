@@ -1,8 +1,10 @@
 // @ts-nocheck - File not currently in use (no globalSetup in playwright.config.ts)
+// noinspection JSUnusedGlobalSymbols
+
 import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -81,25 +81,17 @@ export const useProcessosStore = defineStore('processos', {
             await this.fetchProcessoDetalhe(idProcesso);
         },
         async processarCadastroBloco(payload: {
-            idProcesso: number,
+            codProcesso: number,
             unidades: string[],
             tipoAcao: 'aceitar' | 'homologar',
             unidadeUsuario: string
         }) {
             await processoService.processarAcaoEmBloco(payload);
             // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
-            await this.fetchProcessoDetalhe(payload.idProcesso);
+            await this.fetchProcessoDetalhe(payload.codProcesso);
         },
         async alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
             await processoService.alterarDataLimiteSubprocesso(id, dados);
-            await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
-        },
-        async aceitarMapa(id: number, dados: { observacoes: string }) {
-            await processoService.aceitarMapa(id, dados);
-            await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
-        },
-        async rejeitarMapa(id: number, dados: { motivo: string; observacoes: string }) {
-            await processoService.rejeitarMapa(id, dados);
             await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
         async apresentarSugestoes(id: number, dados: { sugestoes: string }) {

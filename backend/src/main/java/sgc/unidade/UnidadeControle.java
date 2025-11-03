@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.mapa.modelo.MapaRepo;
+import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -26,6 +29,7 @@ public class UnidadeControle {
     
     private final UnidadeRepo unidadeRepo;
     private final MapaRepo mapaRepo;
+    private final UsuarioRepo usuarioRepo;
 
     /**
      * Busca todas as unidades em estrutura hierárquica
@@ -51,6 +55,30 @@ public class UnidadeControle {
         boolean temMapaVigente = mapaRepo.findMapaVigenteByUnidade(codigoUnidade).isPresent();
         
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
+    }
+    
+    /**
+     * Busca servidores (usuários) de uma unidade específica
+     * Usado pelo frontend para validar se unidade tem servidores em processos de diagnóstico
+     * 
+     * @param codigoUnidade O código da unidade
+     * @return Lista de servidores da unidade
+     */
+    @GetMapping("/{codigoUnidade}/servidores")
+    public ResponseEntity<List<ServidorDto>> buscarServidoresPorUnidade(@PathVariable Long codigoUnidade) {
+        List<Usuario> usuarios = usuarioRepo.findByUnidadeCodigo(codigoUnidade);
+        
+        List<ServidorDto> servidores = usuarios.stream()
+            .map(u -> new ServidorDto(
+                u.getTituloEleitoral(),
+                u.getNome(),
+                String.valueOf(u.getTituloEleitoral()),
+                u.getEmail(),
+                u.getUnidade().getCodigo()
+            ))
+            .toList();
+        
+        return ResponseEntity.ok(servidores);
     }
     
     /**

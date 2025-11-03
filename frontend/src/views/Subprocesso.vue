@@ -53,17 +53,25 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {type Movimentacao, MapaCompleto, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
+import {
+  MapaCompleto,
+  type Movimentacao,
+  Perfil,
+  Servidor,
+  SituacaoSubprocesso,
+  TipoProcesso,
+  Unidade
+} from "@/types/tipos";
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import SubprocessoModal from '@/components/SubprocessoModal.vue';
 import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
 
-const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
+const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const router = useRouter()
-const idProcesso = computed(() => props.idProcesso)
+const codProcesso = computed(() => props.codProcesso)
 const siglaParam = computed<string | undefined>(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
@@ -143,7 +151,7 @@ const situacaoUnidadeNoProcesso = computed(() => {
 const codSubrocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await mapaStore.fetchMapaCompleto(codSubrocesso.value);
   }
@@ -203,7 +211,7 @@ function navegarParaMapa() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'SubprocessoVisMapa', params});
 }
 
@@ -212,7 +220,7 @@ function irParaAtividadesConhecimentos() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
   if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === unidadeOriginal.value?.codigo) {
@@ -229,7 +237,7 @@ function irParaDiagnosticoEquipe() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'DiagnosticoEquipe', params});
 }
 
@@ -238,7 +246,7 @@ function irParaOcupacoesCriticas() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'OcupacoesCriticas', params});
 }
 

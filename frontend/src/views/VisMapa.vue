@@ -467,7 +467,7 @@ import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.siglaUnidade as string)
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
@@ -506,7 +506,7 @@ const unidade = computed<Unidade | null>(() => {
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
 });
 
 const atividades = computed<Atividade[]>(() => {
@@ -517,9 +517,9 @@ const atividades = computed<Atividade[]>(() => {
 })
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como codSubrocesso
-  await mapaStore.fetchMapaCompleto(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  // Correção temporária: usando codProcesso como codSubrocesso
+  await mapaStore.fetchMapaCompleto(codProcesso.value);
 });
 
 const mapa = computed(() => {
@@ -652,9 +652,9 @@ async function confirmarSugestoes() {
         'Sugestões submetidas para análise da unidade superior'
     )
 
-    router.push({
+    await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -677,9 +677,9 @@ async function confirmarValidacao() {
         'Mapa validado e submetido para análise da unidade superior'
     )
 
-    router.push({
+    await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -703,7 +703,7 @@ async function confirmarAceitacao(observacoes?: string) {
   }
 
   fecharModalAceitar();
-  router.push({name: 'Painel'});
+  await router.push({name: 'Painel'});
 }
 
 
@@ -716,7 +716,7 @@ async function confirmarDevolucao() {
   });
 
   fecharModalDevolucao();
-  router.push({name: 'Painel'});
+  await router.push({name: 'Painel'});
 }
 </script>
 

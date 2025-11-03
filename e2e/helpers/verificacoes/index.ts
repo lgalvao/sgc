@@ -2,11 +2,9 @@
  * ÍNDICE DE VERIFICAÇÕES
  * Re-exporta todas as verificações organizadas por domínio
  */
-
 // Verificações básicas
 export {
     esperarMensagemSucesso as verificarMensagemSucesso,
-    esperarMensagemErro as verificarMensagemErro,
     verificarAlerta,
     esperarTextoVisivel,
     esperarElementoVisivel,
@@ -14,7 +12,7 @@ export {
     esperarBotaoVisivel,
     verificarUrl,
     esperarUrl,
-    verificarUrlDoPainel, // Corrigido: removido alias e adicionada função específica
+    verificarUrlDoPainel,
     verificarModalVisivel,
     verificarModalFechado,
     esperarNotificacaoLoginInvalido,
@@ -114,5 +112,3 @@ export {
 } from './verificacoes-ui';
 
 export * from './verificacoes-atividades';
-export * from './verificacoes-subprocesso';
-export * from './verificacoes-modais';

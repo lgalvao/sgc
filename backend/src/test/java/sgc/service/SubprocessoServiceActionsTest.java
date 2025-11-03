@@ -11,14 +11,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
+import sgc.mapa.service.ImpactoMapaService;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -26,8 +25,8 @@ import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoWorkflowService;
@@ -90,12 +89,11 @@ public class SubprocessoServiceActionsTest {
     private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidade;
-    private Unidade unidadeSuperior;
     private Usuario usuario;
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "US");
+        Unidade unidadeSuperior = new Unidade("Unidade Superior", "US");
         unidadeRepo.save(unidadeSuperior);
 
         unidade = new Unidade("Unidade Teste", "UT");

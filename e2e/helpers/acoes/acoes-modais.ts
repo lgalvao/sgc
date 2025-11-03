@@ -1,6 +1,7 @@
 import {Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento} from '../utils';
+import {extrairIdDoSeletor} from '../utils/utils';
 
 /**
  * AÇÕES ESPECÍFICAS PARA MODAIS
@@ -14,7 +15,7 @@ import {clicarElemento} from '../utils';
 export async function cancelarNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await clicarElemento([
-        modal.getByTestId(SELETORES.BTN_MODAL_CANCELAR),
+        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CANCELAR)),
         modal.getByRole('button', {name: TEXTOS.CANCELAR}),
         modal.locator('.btn-secondary'), // Fallback genérico
     ]);
@@ -27,7 +28,7 @@ export async function cancelarNoModal(page: Page): Promise<void> {
 export async function confirmarNoModal(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
     await clicarElemento([
-        modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
+        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CONFIRMAR)),
         modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
         modal.locator('.btn-primary'), // Fallback genérico
         modal.locator('.btn-success'), // Fallback genérico
@@ -43,7 +44,7 @@ export async function confirmarRemocaoNoModal(page: Page): Promise<void> {
     await clicarElemento([
         modal.getByRole('button', {name: TEXTOS.REMOVER}),
         modal.locator('.btn-danger'),
-        modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR), // Fallback para modais de confirmação genéricos
+        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CONFIRMAR)), // Fallback para modais de confirmação genéricos
         modal.getByRole('button', {name: TEXTOS.CONFIRMAR}),
     ]);
 }
@@ -53,7 +54,7 @@ export async function confirmarRemocaoNoModal(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function abrirDialogoRemocaoProcesso(page: Page): Promise<void> {
-    await clicarElemento([page.getByTestId(SELETORES.BTN_EXCLUIR), page.getByRole('button', {name: TEXTOS.REMOVER})]);
+    await clicarElemento([page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_EXCLUIR)), page.getByRole('button', {name: TEXTOS.REMOVER})]);
 }
 
 /**
@@ -62,7 +63,7 @@ export async function abrirDialogoRemocaoProcesso(page: Page): Promise<void> {
  */
 export async function clicarIniciarProcesso(page: Page): Promise<void> {
     await clicarElemento([
-        page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
+        page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)),
         page.getByRole('button', {name: TEXTOS.INICIAR_PROCESSO}),
     ]);
 }
@@ -90,9 +91,9 @@ export async function confirmarInicializacaoNoModal(page: Page): Promise<void> {
 export async function cancelarModal(page: Page): Promise<void> {
     const modalVisivel = page.locator('.modal.show');
     await clicarElemento([
-        modalVisivel.getByTestId(SELETORES.BTN_MODAL_CANCELAR).last(),
+        modalVisivel.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CANCELAR)).last(),
         modalVisivel.getByRole('button', {name: TEXTOS.CANCELAR}).last(),
-        modalVisivel.getByTestId(SELETORES.BTN_MODAL_FECHAR).last(),
+        modalVisivel.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_FECHAR)).last(),
         modalVisivel.getByRole('button', {name: 'Fechar'}).last(),
         modalVisivel.locator('[data-bs-dismiss="modal"]').last(),
     ]);

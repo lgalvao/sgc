@@ -73,7 +73,7 @@
 
     <!-- Modal de Impacto no Mapa -->
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :mostrar="mostrarModalImpacto"
       :sigla-unidade="siglaUnidade"
       @fechar="fecharModalImpacto"
@@ -230,12 +230,12 @@ import HistoricoAnaliseModal from '@/components/HistoricoAnaliseModal.vue'
 import {useSubprocessosStore} from "@/stores/subprocessos";
 
 const props = defineProps<{
-  idProcesso: number | string,
+  codProcesso: number | string,
   sigla: string
 }>()
 
 const unidadeId = computed(() => props.sigla)
-const idProcesso = computed(() => Number(props.idProcesso))
+const codProcesso = computed(() => Number(props.codProcesso))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -299,7 +299,7 @@ const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
   }
@@ -337,7 +337,7 @@ async function confirmarValidacao() {
   }
 
   fecharModalValidar();
-  router.push('/painel');
+  await router.push('/painel');
 }
 
 async function confirmarDevolucao() {
@@ -354,7 +354,7 @@ async function confirmarDevolucao() {
   }
 
   fecharModalDevolver();
-  router.push('/painel');
+  await router.push('/painel');
 }
 
 function fecharModalValidar() {

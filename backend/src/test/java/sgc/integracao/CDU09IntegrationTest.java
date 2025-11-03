@@ -9,9 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import sgc.integracao.mocks.TestThymeleafConfig;
-
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -25,22 +22,18 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -49,8 +42,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

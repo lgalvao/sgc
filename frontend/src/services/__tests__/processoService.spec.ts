@@ -1,5 +1,5 @@
-import {afterEach, beforeAll, beforeEach, describe, expect, it, vi, Mock} from 'vitest'
-import { createPinia, setActivePinia } from 'pinia';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, Mock, vi} from 'vitest'
+import {createPinia, setActivePinia} from 'pinia';
 import * as service from '../processoService'
 import apiClient from '@/axios-setup'
 
@@ -88,7 +88,7 @@ describe('processoService', () => {
     });
 
     it('processarAcaoEmBloco should post to the correct endpoint', async () => {
-        const payload = { idProcesso: 1, unidades: ['A'], tipoAcao: 'aceitar' as 'aceitar' | 'homologar', unidadeUsuario: 'B' };
+        const payload = { codProcesso: 1, unidades: ['A'], tipoAcao: 'aceitar' as 'aceitar' | 'homologar', unidadeUsuario: 'B' };
         mockApi.post.mockResolvedValue({});
         await service.processarAcaoEmBloco(payload);
         expect(mockApi.post).toHaveBeenCalledWith('/processos/1/acoes-em-bloco', payload);

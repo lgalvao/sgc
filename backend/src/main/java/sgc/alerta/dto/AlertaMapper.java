@@ -10,5 +10,6 @@ public interface AlertaMapper {
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")
+    @Mapping(target = "dataHoraLeitura", ignore = true)
     AlertaDto toDto(Alerta alerta);
 }

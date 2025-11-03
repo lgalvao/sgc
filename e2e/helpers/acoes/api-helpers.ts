@@ -1,6 +1,6 @@
-import { Page } from '@playwright/test';
-import { preencherFormularioProcesso, selecionarUnidadesPorSigla } from './acoes-processo';
-import { navegarParaCriacaoProcesso } from '../navegacao';
+import {Page} from '@playwright/test';
+import {preencherFormularioProcesso, selecionarUnidadesPorSigla} from '~/helpers';
+import {navegarParaCriacaoProcesso} from '~/helpers';
 
 /**
  * Cria um processo através da UI e retorna o ID do processo criado.
@@ -54,7 +54,7 @@ export async function limparProcessos(page: Page): Promise<void> {
     const processosParaLimpar = await page.locator('tr[data-testid="processo-teste"]').all();
     for (const processo of processosParaLimpar) {
         await processo.click();
-        await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/);
+        await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         await page.getByRole('button', { name: /Remover/i }).click();
         await page.locator('.modal.show').getByRole('button', { name: /Remover/i }).click();
         await page.waitForURL(/\/painel/);

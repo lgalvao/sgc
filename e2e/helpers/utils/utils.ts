@@ -1,6 +1,18 @@
 import {Locator, Page} from '@playwright/test';
 
 /**
+ * Extrai o ID de um seletor completo ou retorna o valor se já for um ID simples.
+ * Converte '[data-testid="id"]' para 'id' e '[data-testid="id"] tbody tr' para 'id'
+ * @param selector O seletor completo ou ID simples.
+ * @returns O ID extraído.
+ */
+export function extrairIdDoSeletor(selector: string): string {
+    if (!selector.includes('[data-testid=')) return selector;
+    const match = selector.match(/"([^"]+)"/);
+    return match ? match[1] : selector;
+}
+
+/**
  * Gera um nome único adicionando um timestamp a um prefixo.
  * @param prefixo O prefixo para o nome único.
  * @returns O nome único.
@@ -103,7 +115,7 @@ export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: 
             // continua para próximo fallback
         }
 
-        // 2) Tentar click forçado (force: true)
+        // 2) Tentar clique forçado (force: true)
         try {
             await first.click({force: true});
             return true;

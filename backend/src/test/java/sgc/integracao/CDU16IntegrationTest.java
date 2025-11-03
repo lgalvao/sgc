@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -21,21 +20,22 @@ import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.dto.AtividadeAjusteDto;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -48,7 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import sgc.integracao.mocks.TestThymeleafConfig;
 
 @SpringBootTest(classes = {Sgc.class, TestSecurityConfig.class, TestThymeleafConfig.class})
 @AutoConfigureMockMvc

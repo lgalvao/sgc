@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
+import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
 import * as mapaService from '@/services/mapaService';
 import apiClient from '@/axios-setup';
-import { mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel } from '@/mappers/mapas';
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel} from '@/mappers/mapas';
 
 vi.mock('@/axios-setup');
 vi.mock('@/mappers/mapas');

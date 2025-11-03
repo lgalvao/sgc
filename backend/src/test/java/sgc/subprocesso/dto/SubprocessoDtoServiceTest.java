@@ -15,9 +15,9 @@ import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.sgrh.modelo.Perfil;
-import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.modelo.Unidade;
 
 import java.util.Optional;

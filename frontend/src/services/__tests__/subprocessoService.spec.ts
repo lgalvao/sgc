@@ -1,9 +1,9 @@
 /// <reference types="vitest/globals" />
-import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
+import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
 import * as subprocessoService from '@/services/subprocessoService';
 import apiClient from '@/axios-setup';
-import { mapMapaCompletoDtoToModel } from '@/mappers/mapas';
-import type { Competencia } from '@/types/tipos';
+import {mapMapaCompletoDtoToModel} from '@/mappers/mapas';
+import type {Competencia} from '@/types/tipos';
 
 vi.mock('@/axios-setup');
 vi.mock('@/mappers/mapas');

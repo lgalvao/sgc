@@ -6,7 +6,7 @@ import type {
     ProcessoDetalhe,
     ProcessoResumo,
 } from '@/types/tipos';
-import { ApiError } from './ApiError';
+import {ApiError} from './ApiError';
 import axios from 'axios';
 
 async function handleError(error: unknown, context: string): Promise<never> {
@@ -89,15 +89,15 @@ export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe
 }
 
 export async function processarAcaoEmBloco(payload: {
-    idProcesso: number,
+    codProcesso: number,
     unidades: string[],
     tipoAcao: 'aceitar' | 'homologar',
     unidadeUsuario: string
 }): Promise<void> {
     try {
-        await apiClient.post(`/processos/${payload.idProcesso}/acoes-em-bloco`, payload);
+        await apiClient.post(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     } catch (error) {
-        return handleError(error, `processar ação em bloco para o processo ${payload.idProcesso}`);
+        return handleError(error, `processar ação em bloco para o processo ${payload.codProcesso}`);
     }
 }
 
@@ -106,22 +106,6 @@ export async function alterarDataLimiteSubprocesso(id: number, dados: { novaData
         await apiClient.post(`/processos/alterar-data-limite`, { id, ...dados });
     } catch (error) {
         return handleError(error, `alterar a data limite para o subprocesso ${id}`);
-    }
-}
-
-export async function aceitarMapa(id: number, dados: { observacoes: string }): Promise<void> {
-    try {
-        await apiClient.post(`/processos/aceitar-mapa`, { id, ...dados });
-    } catch (error) {
-        return handleError(error, `aceitar o mapa para o subprocesso ${id}`);
-    }
-}
-
-export async function rejeitarMapa(id: number, dados: { motivo: string; observacoes: string }): Promise<void> {
-    try {
-        await apiClient.post(`/processos/rejeitar-mapa`, { id, ...dados });
-    } catch (error) {
-        return handleError(error, `rejeitar o mapa para o subprocesso ${id}`);
     }
 }
 

@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.AnaliseRepo;
@@ -21,19 +20,19 @@ import sgc.atividade.modelo.AtividadeRepo;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -59,7 +58,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
-@Sql("/create-test-data.sql")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 class CDU14IntegrationTest {

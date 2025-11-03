@@ -6,9 +6,9 @@ Esta pasta contém os testes End-to-End (E2E) do projeto, que são responsáveis
 
 Os testes são escritos utilizando o [Playwright](https://playwright.dev/) e estão organizados da seguinte forma:
 
-- **`cdu-XX.spec.ts`**: Cada arquivo `spec.ts` corresponde a um Caso de Uso (CDU) documentado na pasta `/reqs`. Esses arquivos contêm os testes que verificam o comportamento esperado da aplicação para um determinado CDU.
+- **`cdu-XX.spec.ts`**: Cada arquivo `spec.ts` na pasta `cdu` corresponde a um Caso de Uso (CDU) documentado na pasta `/reqs`. Esses arquivos contêm os testes que verificam o comportamento esperado da aplicação para um determinado CDU.
 
-- **`cdu-XX-prep.spec.ts`**: Alguns CDUs requerem um estado específico da aplicação para serem testados. Os arquivos `-prep.spec.ts` são responsáveis por criar os dados necessários para esses testes. Eles geralmente contêm hooks `beforeAll` e `afterAll` para garantir que o ambiente de teste seja configurado e limpo corretamente.
+- **`cdu-XX-prep.spec.ts`** na pasta `prep`: A maioria dos CDUs requerem um estado específico da aplicação para serem testados. Os arquivos `-prep.spec.ts` fazem a preparação inicial antes do corpo do teste com `beforeAll` e `afterAll` para garantir que o ambiente de teste seja configurado e limpo corretamente.
 
 - **`support/`**: Esta pasta contém arquivos de configuração global para os testes.
     - **`vue-specific-setup.ts`**: Estende o executor de testes do Playwright com configurações específicas para o Vue.js, como a interceptação de requisições e o monitoramento de erros do Vue.

@@ -1,4 +1,4 @@
-import {afterEach, describe, expect, it, vi, type Mocked} from 'vitest'
+import {afterEach, describe, expect, it, type Mocked, vi} from 'vitest'
 import * as service from '../painelService'
 import api from '@/axios-setup'
 import * as processoMappers from '@/mappers/processos'

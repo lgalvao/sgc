@@ -19,23 +19,12 @@ export async function esperarMensagemSucesso(page: Page, mensagem: string): Prom
 }
 
 /**
- * Espera que uma mensagem de erro seja exibida.
- * @param page A instância da página do Playwright.
- * @param mensagem A mensagem a ser esperada.
- */
-export async function esperarMensagemErro(page: Page, mensagem: string): Promise<void> {
-    const notificacao = page.locator(SELETORES.NOTIFICACAO_ERRO);
-    await expect(notificacao).toBeVisible();
-    await expect(notificacao).toContainText(mensagem);
-}
-
-/**
  * Verifica se um alerta é exibido.
  * @param page A instância da página do Playwright.
  * @param texto O texto do alerta.
  */
 export async function verificarAlerta(page: Page, texto: string): Promise<void> {
-    const alerta = page.locator('[data-testid="notificacao-warning"]', { hasText: texto });
+    const alerta = page.locator('[data-testid="notificacao-warning"]', {hasText: texto});
     await expect(alerta).toBeVisible();
 }
 
@@ -51,19 +40,23 @@ export async function esperarTextoVisivel(page: Page, texto: string): Promise<vo
 /**
  * Espera que um elemento seja exibido na página.
  * @param page A instância da página do Playwright.
- * @param testId O test-id do elemento.
+ * @param testId O test-id do elemento (pode ser um ID simples ou seletor completo).
  */
 export async function esperarElementoVisivel(page: Page, testId: string): Promise<void> {
-    await expect(page.getByTestId(testId).first()).toBeVisible();
+    // Extrai o ID se receber um seletor completo como '[data-testid="id"]'
+    const idExtraido = testId.includes('[data-testid=') ? testId.match(/"([^"]+)"/)?.[1] || testId : testId;
+    await expect(page.getByTestId(idExtraido).first()).toBeVisible();
 }
 
 /**
  * Espera que um elemento não seja exibido na página.
  * @param page A instância da página do Playwright.
- * @param seletor O seletor do elemento.
+ * @param seletor O seletor do elemento (pode ser um ID simples ou seletor completo).
  */
 export async function esperarElementoInvisivel(page: Page, seletor: string): Promise<void> {
-    await expect(page.getByTestId(seletor).first()).not.toBeVisible();
+    // Extrai o ID se receber um seletor completo como '[data-testid="id"]'
+    const idExtraido = seletor.includes('[data-testid=') ? seletor.match(/"([^"]+)"/)?.[1] || seletor : seletor;
+    await expect(page.getByTestId(idExtraido).first()).not.toBeVisible();
 }
 
 /**
@@ -134,7 +127,7 @@ export async function esperarNotificacaoLoginInvalido(page: Page): Promise<void>
 /**
  * Verifica se a disponibilização foi concluída.
  * @param page A instância da página do Playwright.
- * @param modalSelector O seletor do modal.
+ * @param modalTestId
  * @param notificacaoTestId O test-id da notificação.
  */
 export async function verificarDisponibilizacaoConcluida(page: Page, modalTestId: string = 'disponibilizar-modal', notificacaoTestId: string = 'notificacao-disponibilizacao'): Promise<void> {

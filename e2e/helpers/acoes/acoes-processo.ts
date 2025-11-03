@@ -1,7 +1,8 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
 import {clicarElemento, preencherCampo} from '../utils';
-import {navegarParaCriacaoProcesso} from '../navegacao';
+import {navegarParaCriacaoProcesso} from '~/helpers';
+import {extrairIdDoSeletor} from '../utils/utils';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
@@ -10,13 +11,13 @@ import {navegarParaCriacaoProcesso} from '../navegacao';
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     // Aguardar a árvore de unidades carregar
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
 
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
         const alvo = page.locator(seletorCheckbox);
         if (await alvo.count() > 0) {
-            await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 15000});
+            await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 2000});
             const isDisabled = await page.isDisabled(seletorCheckbox);
             if (isDisabled) {
                 console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
@@ -43,7 +44,7 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
  * @returns O ID da unidade selecionada.
  */
 export async function selecionarUnidadeDisponivel(page: Page, index: number = 0): Promise<string> {
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 15000});
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
     const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
     const total = await disponiveis.count();
     if (total === 0) throw new Error('Nenhuma unidade disponível para seleção');
@@ -162,7 +163,7 @@ export async function iniciarProcessoMapeamento(page: Page): Promise<void> {
     }
 
     await clicarElemento([
-        page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO),
+        page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)),
         page.getByRole('button', {name: /iniciar processo/i})
     ]);
     console.log(`[DEBUG] iniciarProcessoMapeamento: Clicou em Iniciar processo`);
@@ -177,7 +178,7 @@ export async function confirmarIniciacaoProcesso(page: Page): Promise<void> {
     await modal.waitFor({state: 'visible', timeout: 10000});
 
     await clicarElemento([
-        modal.getByTestId(SELETORES.BTN_MODAL_CONFIRMAR),
+        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CONFIRMAR)),
         modal.getByRole('button', {name: /confirmar/i})
     ]);
 }
@@ -191,7 +192,7 @@ export async function cancelarIniciacaoProcesso(page: Page): Promise<void> {
     await modal.waitFor({state: 'visible', timeout: 10000});
 
     await clicarElemento([
-        modal.getByTestId(SELETORES.BTN_MODAL_CANCELAR),
+        modal.getByTestId(extrairIdDoSeletor(SELETORES.BTN_MODAL_CANCELAR)),
         modal.getByRole('button', {name: /cancelar/i})
     ]);
 }
@@ -235,7 +236,7 @@ export async function criarProcessoBasico(
     console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
     // Aguardar redirecionamento ao painel
-    await page.waitForURL(/\/painel/, {timeout: 15000});
+    await page.waitForURL(/\/painel/, {timeout: 1500});
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
 }
 
@@ -253,7 +254,7 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
     console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
 
     // Aguardar navegação para página de cadastro
-    await page.waitForURL(/\/processo\/cadastro\?idProcesso=\d+/, {timeout: 10000});
+    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 1500});
     console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
 
     // Aguardar formulário carregar com os dados do processo
@@ -596,7 +597,7 @@ export async function clicarUnidadeNaTabelaDetalhes(page: Page, nomeUnidade: str
  * @param page A instância da página do Playwright.
  */
 export async function clicarBotaoHistoricoAnalise(page: Page): Promise<void> {
-    await page.getByTestId(SELETORES.BTN_HISTORICO_ANALISE).click();
+    await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_HISTORICO_ANALISE)).click();
 }
 
 /**

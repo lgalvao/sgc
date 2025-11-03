@@ -12,6 +12,8 @@ public interface UnidadeProcessoRepo extends JpaRepository<UnidadeProcesso, Long
     List<UnidadeProcesso> findByCodProcesso(Long codProcesso);
     List<UnidadeProcesso> findBySigla(String sigla);
 
+    void deleteByCodProcesso(Long codProcesso);
+
     /**
      * Busca, dentre uma lista de códigos de unidade, quais já estão participando de algum processo ativo ('EM_ANDAMENTO').
      * @param codUnidades A lista de códigos de unidade a serem verificados.

@@ -1,5 +1,6 @@
 package sgc.sgrh;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,17 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
+import sgc.sgrh.dto.LoginResponse;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.modelo.UnidadeRepo;
-import sgc.sgrh.dto.LoginResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
-
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")

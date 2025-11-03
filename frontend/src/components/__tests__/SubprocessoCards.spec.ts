@@ -15,7 +15,7 @@ describe('SubprocessoCards.vue', () => {
     descricao: 'mapa de teste',
     unidade: { sigla: 'UNID_TESTE' } as Unidade,
     situacao: 'em_andamento',
-    idProcesso: 1,
+    codProcesso: 1,
     competencias: [],
     dataCriacao: new Date().toISOString(),
     dataDisponibilizacao: null,

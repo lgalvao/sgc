@@ -13,15 +13,11 @@ import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.processo.eventos.EventoSubprocessoDisponibilizado;
 import sgc.processo.eventos.EventoRevisaoSubprocessoDisponibilizada;
+import sgc.processo.eventos.EventoSubprocessoDisponibilizado;
 import sgc.sgrh.modelo.Usuario;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 

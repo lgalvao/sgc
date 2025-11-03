@@ -1,12 +1,11 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import sgc.processo.modelo.TipoProcesso;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

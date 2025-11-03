@@ -29,18 +29,3 @@ export async function fecharAlerta(page: Page): Promise<void> {
     await page.locator('.btn-close').click();
 }
 
-/**
- * Clica no botão "Cancelar" em um modal.
- * @param page A instância da página do Playwright.
- */
-export async function cancelarNoModal(page: Page): Promise<void> {
-    await page.locator('.modal.show .btn-secondary').click();
-}
-
-/**
- * Clica no botão "Confirmar" em um modal.
- * @param page A instância da página do Playwright.
- */
-export async function confirmarNoModal(page: Page): Promise<void> {
-    await page.locator('.modal.show .btn-primary').click();
-}

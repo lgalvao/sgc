@@ -7,7 +7,7 @@ import {esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel} from './verifi
  * @param page A instância da página do Playwright.
  */
 export async function verificarPaginaEdicaoProcesso(page: Page): Promise<void> {
-    await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+$/);
+    await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+$/);
 }
 
 /**
@@ -15,7 +15,7 @@ export async function verificarPaginaEdicaoProcesso(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarPaginaCadastroProcesso(page: Page): Promise<void> {
-    await expect(page).toHaveURL(/processo\/cadastro(\?idProcesso=\d+)?$/);
+    await expect(page).toHaveURL(/processo\/cadastro(\?codProcesso=\d+)?$/);
 }
 
 /**
@@ -41,7 +41,7 @@ export async function verificarNotificacaoErro(page: Page): Promise<void> {
         '.text-danger',          // Texto vermelho
         '.invalid-feedback:visible', // Feedback de validação do Bootstrap
     ];
-    
+
     let encontrado = false;
     for (const selector of erroSelectors) {
         const element = page.locator(selector).first();
@@ -50,7 +50,7 @@ export async function verificarNotificacaoErro(page: Page): Promise<void> {
             break;
         }
     }
-    
+
     if (!encontrado) {
         throw new Error('Nenhuma mensagem de erro encontrada na página');
     }
@@ -145,7 +145,7 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
 
     // Verificar que a linha do processo não está mais presente na tabela de processos.
     // Usar polling tolerante para lidar com timings assíncronos da UI
-    const timeoutMs = 10000;
+    const timeoutMs = 2000;
     const intervalMs = 500;
     const deadline = Date.now() + timeoutMs;
     let stillPresent = true;
@@ -305,7 +305,7 @@ export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoP
  * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarPermanenciaFormularioEdicao(page: Page, descricaoProcesso: string): Promise<void> {
-    await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+$/);
+    await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+$/);
     await expect(page.getByLabel('Descrição')).toHaveValue(descricaoProcesso);
 }
 
@@ -384,7 +384,7 @@ export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Pa
  */
 export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await expect(modal).toBeVisible({timeout: 10000});
+    await expect(modal).toBeVisible({timeout: 1500});
     await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
     await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
     await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);
@@ -406,8 +406,8 @@ export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<
 /**
  * Verifica se a página permanece na página de um processo.
  * @param page A instância da página do Playwright.
- * @param idProcesso O ID do processo.
+ * @param codProcesso O ID do processo.
  */
-export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {
-    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
+export async function verificarPermanenciaNaPaginaProcesso(page: Page, codProcesso: number): Promise<void> {
+    await expect(page).toHaveURL(new RegExp(`/processo/${codProcesso}`));
 }

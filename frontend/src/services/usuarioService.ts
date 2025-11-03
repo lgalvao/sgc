@@ -1,5 +1,11 @@
 import apiClient from '../axios-setup';
-import {AutenticacaoRequest, EntrarRequest, mapPerfilUnidadeToFrontend, PerfilUnidade, LoginResponse} from '@/mappers/sgrh';
+import {
+    AutenticacaoRequest,
+    EntrarRequest,
+    LoginResponse,
+    mapPerfilUnidadeToFrontend,
+    PerfilUnidade
+} from '@/mappers/sgrh';
 
 export async function autenticar(request: AutenticacaoRequest): Promise<boolean> {
   try {

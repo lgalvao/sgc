@@ -1,5 +1,5 @@
-import { expect, Page } from '@playwright/test';
-import { TEXTOS } from '~/helpers';
+import {expect, Page} from '@playwright/test';
+import {TEXTOS} from '~/helpers';
 
 /**
  * Fecha o modal de impactos no mapa.

@@ -1,6 +1,7 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {ROTULOS, SELETORES, TEXTOS, URLS} from '../dados';
-import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from 'e2e/helpers/index';
+import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/helpers';
+import {extrairIdDoSeletor} from '../utils/utils';
 
 /**
  * Verifica se um conhecimento em uma atividade específica está visível.
@@ -44,7 +45,7 @@ export async function verificarElementosPainel(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<void> {
-    await expect(page.getByTestId(SELETORES.BTN_CRIAR_PROCESSO).first()).not.toBeVisible();
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_CRIAR_PROCESSO)).first()).not.toBeVisible();
 }
 
 /**
@@ -54,11 +55,12 @@ export async function verificarAusenciaBotaoCriarProcesso(page: Page): Promise<v
  * @param visivel `true` se o processo deve estar visível, `false` caso contrário.
  */
 export async function verificarVisibilidadeProcesso(page: Page, nomeProcesso: string | RegExp, visivel: boolean): Promise<void> {
-    const processo = page.getByTestId(SELETORES.TABELA_PROCESSOS).locator('tr', {hasText: nomeProcesso});
+    const tabela = page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_PROCESSOS));
+    const processo = tabela.locator('tbody tr').filter({ has: tabela.locator('td').filter({ hasText: nomeProcesso }) });
     if (visivel) {
-        await expect(processo).toBeVisible();
+        await expect(processo).toBeVisible({ timeout: 2000 });
     } else {
-        await expect(processo).toBeHidden();
+        await expect(processo).toBeHidden({ timeout: 2000 });
     }
 }
 
@@ -316,7 +318,7 @@ export async function verificarAcaoHomologarVisivel(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarColunasTabelaAlertas(page: Page): Promise<void> {
-    const tabelaAlertas = page.getByTestId(SELETORES.TABELA_ALERTAS);
+    const tabelaAlertas = page.getByTestId(extrairIdDoSeletor(SELETORES.TABELA_ALERTAS));
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_DATA_HORA);
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_PROCESSO);
     await expect(tabelaAlertas).toContainText(TEXTOS.COLUNA_ORIGEM);
@@ -327,7 +329,7 @@ export async function verificarColunasTabelaAlertas(page: Page): Promise<void> {
  * @param page A instância da página do Playwright.
  */
 export async function verificarAlertasOrdenadosPorDataHora(page: Page): Promise<void> {
-    const linhasAlertas = page.locator(`[data-testid="${SELETORES.TABELA_ALERTAS}"] tbody tr`);
+    const linhasAlertas = page.locator(`${SELETORES.TABELA_ALERTAS} tbody tr`);
     const valoresDatas = await linhasAlertas.evaluateAll(linhas =>
         linhas.map(linha => {
             const textoData = (linha.children[0] as HTMLElement).innerText.trim();
@@ -433,9 +435,9 @@ export async function verificarCompetenciaNaoVisivel(page: Page, descricao: stri
  */
 export async function verificarListagemAtividadesEConhecimentos(page: Page): Promise<void> {
     // Verifica se há atividades; se houver, garante que pelo menos um card está visível.
-    const atividadesCount = await page.getByTestId(SELETORES.ITEM_ATIVIDADE).count();
+    const atividadesCount = await page.getByTestId(extrairIdDoSeletor(SELETORES.ITEM_ATIVIDADE)).count();
     if (atividadesCount > 0) {
-        await expect(page.getByTestId(SELETORES.ITEM_ATIVIDADE).first()).toBeVisible();
+        await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.ITEM_ATIVIDADE)).first()).toBeVisible();
     } else if ((await page.getByTestId('atividade-descricao').count()) > 0) {
         await expect(page.getByTestId('atividade-descricao').first()).toBeVisible();
     } else {
@@ -443,9 +445,9 @@ export async function verificarListagemAtividadesEConhecimentos(page: Page): Pro
     }
 
     // Verifica se há conhecimentos; se houver, garante que pelo menos um esteja visível.
-    const conhecimentosCount = await page.getByTestId(SELETORES.ITEM_CONHECIMENTO).count();
+    const conhecimentosCount = await page.getByTestId(extrairIdDoSeletor(SELETORES.ITEM_CONHECIMENTO)).count();
     if (conhecimentosCount > 0) {
-        await expect(page.getByTestId(SELETORES.ITEM_CONHECIMENTO).first()).toBeVisible();
+        await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.ITEM_CONHECIMENTO)).first()).toBeVisible();
     } else if ((await page.getByTestId('conhecimento-descricao').count()) > 0) {
         await expect(page.getByTestId('conhecimento-descricao').first()).toBeVisible();
     } else {
@@ -458,12 +460,12 @@ export async function verificarListagemAtividadesEConhecimentos(page: Page): Pro
  * @param page A instância da página do Playwright.
  */
 export async function verificarModoSomenteLeitura(page: Page): Promise<void> {
-    await expect(page.getByTestId(SELETORES.BTN_EDITAR_ATIVIDADE)).toHaveCount(0);
-    await expect(page.getByTestId(SELETORES.BTN_REMOVER_ATIVIDADE)).toHaveCount(0);
-    await expect(page.getByTestId(SELETORES.BTN_EDITAR_CONHECIMENTO)).toHaveCount(0);
-    await expect(page.getByTestId(SELETORES.BTN_REMOVER_CONHECIMENTO)).toHaveCount(0);
-    await expect(page.getByTestId(SELETORES.BTN_ADICIONAR_CONHECIMENTO)).toHaveCount(0);
-    await expect(page.getByTestId(SELETORES.BTN_ADICIONAR_ATIVIDADE)).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_EDITAR_ATIVIDADE))).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_REMOVER_ATIVIDADE))).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_EDITAR_CONHECIMENTO))).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_REMOVER_CONHECIMENTO))).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_ADICIONAR_CONHECIMENTO))).toHaveCount(0);
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_ADICIONAR_ATIVIDADE))).toHaveCount(0);
 }
 
 /**
@@ -487,26 +489,8 @@ export async function verificarCabecalhoUnidade(page: Page, siglaEsperada: strin
     }
 
     // Fallback: utilizar o test-id de info da unidade (mais estável entre variações de UI)
-    await expect(page.getByTestId(SELETORES.INFO_UNIDADE)).toBeVisible();
-    await expect(page.getByTestId(SELETORES.INFO_UNIDADE)).toContainText(siglaEsperada);
-}
-
-/**
- * Verifica se uma competência existe.
- * @param page A instância da página do Playwright.
- * @param descricao A descrição da competência.
- */
-export async function verificarCompetenciaExiste(page: Page, descricao: string): Promise<void> {
-    await expect(page.locator('.competencia-card', {hasText: descricao})).toBeVisible();
-}
-
-/**
- * Verifica se uma competência não existe.
- * @param page A instância da página do Playwright.
- * @param descricao A descrição da competência.
- */
-export async function verificarCompetenciaNaoExiste(page: Page, descricao: string): Promise<void> {
-    await expect(page.locator('.competencia-card', {hasText: descricao})).not.toBeVisible();
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.INFO_UNIDADE))).toBeVisible();
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.INFO_UNIDADE))).toContainText(siglaEsperada);
 }
 
 /**
@@ -557,7 +541,7 @@ export async function verificarDescricaoCompetencia(page: Page, descricaoCompete
  */
 export async function verificarPainelVisivel(page: Page): Promise<void> {
     await expect(page).toHaveURL(URLS.PAINEL);
-    await expect(page.getByTestId(SELETORES.TITULO_PROCESSOS)).toBeVisible();
+    await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.TITULO_PROCESSOS))).toBeVisible();
 }
 
 /**

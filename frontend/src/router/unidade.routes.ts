@@ -1,4 +1,4 @@
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
+import type {RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const unidadeRoutes: RouteRecordRaw[] = [
   {
@@ -17,7 +17,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/CadMapa.vue'),
     props: (route: RouteLocationNormalized) => ({
       sigla: route.params.siglaUnidade,
-      idProcesso: Number(route.query.idProcesso),
+      codProcesso: Number(route.query.codProcesso),
     }),
     meta: { title: 'Mapa' },
   },

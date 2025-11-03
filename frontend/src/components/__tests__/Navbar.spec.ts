@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
-import { createRouter, createWebHistory } from 'vue-router';
+import {mount} from '@vue/test-utils';
+import {beforeEach, describe, expect, it, type MockInstance, vi} from 'vitest';
+import {createRouter, createWebHistory} from 'vue-router';
 import Navbar from '@/components/Navbar.vue';
-import { initPinia } from '@/test-utils/helpers';
+import {initPinia} from '@/test-utils/helpers';
 
 // Mocks
 vi.mock('@/composables/usePerfil', () => ({

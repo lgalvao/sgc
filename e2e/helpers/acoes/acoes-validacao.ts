@@ -1,6 +1,6 @@
-import { expect, Page } from '@playwright/test';
-import { SELETORES, TEXTOS } from '../dados';
-import { preencherCampo } from '../utils';
+import {expect, Page} from '@playwright/test';
+import {SELETORES, TEXTOS} from '../dados';
+import {preencherCampo} from '../utils';
 
 /**
  * Apresenta sugestões em um processo.

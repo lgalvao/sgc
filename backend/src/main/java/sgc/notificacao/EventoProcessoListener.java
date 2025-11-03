@@ -2,9 +2,9 @@ package sgc.notificacao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
@@ -14,17 +14,17 @@ import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.TipoUnidade;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Arrays;
 
 import static sgc.unidade.modelo.TipoUnidade.*;
 

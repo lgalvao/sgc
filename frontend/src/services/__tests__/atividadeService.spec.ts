@@ -1,5 +1,5 @@
-import {afterEach, describe, expect, it, vi, beforeEach} from 'vitest'
-import { createPinia, setActivePinia } from 'pinia';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
+import {createPinia, setActivePinia} from 'pinia';
 import * as service from '../atividadeService'
 import * as mappers from '@/mappers/atividades'
 import {Atividade, Conhecimento} from '@/types/tipos'

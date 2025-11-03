@@ -8,33 +8,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
-import sgc.integracao.mocks.TestThymeleafConfig;
-import sgc.notificacao.NotificacaoService;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.processo.modelo.SituacaoProcesso;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.modelo.*;
 import sgc.subprocesso.service.SubprocessoNotificacaoService;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -42,15 +37,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 
 @SpringBootTest
 @AutoConfigureMockMvc

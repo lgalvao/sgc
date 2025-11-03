@@ -1,11 +1,14 @@
 package sgc.sgrh;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,10 +17,9 @@ import java.util.Map;
 @Profile("e2e")
 @RestController
 @RequestMapping("/api/test")
+@RequiredArgsConstructor
 public class TestSetupController {
-
-    @Autowired
-    private JdbcTemplate jdbc;
+    private final JdbcTemplate jdbc;
 
     @PostMapping("/usuarios")
     @Transactional
@@ -34,8 +36,7 @@ public class TestSetupController {
             jdbc.update("INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo) VALUES (?,?,?,?,?)",
                     titulo, nome, email, "0000", unidadeCodigo);
             Object perfisObj = body.get("perfis");
-            if (perfisObj instanceof List) {
-                List<?> perfis = (List<?>) perfisObj;
+            if (perfisObj instanceof List<?> perfis) {
                 for (Object p : perfis) {
                     jdbc.update("INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil) VALUES (?,?)", titulo, p.toString());
                 }
@@ -90,8 +91,7 @@ public class TestSetupController {
         Integer codigo = jdbc.queryForObject("SELECT CODIGO FROM SGC.PROCESSO WHERE descricao = ? LIMIT 1", Integer.class, descricao);
 
         Object unidadesObj = body.get("unidades");
-        if (unidadesObj instanceof List) {
-            List<?> unidades = (List<?>) unidadesObj;
+        if (unidadesObj instanceof List<?> unidades) {
             for (Object u : unidades) {
                 int unidadeCodigo = Integer.parseInt(u.toString());
                 jdbc.update("INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (?,?)", codigo, unidadeCodigo);
