@@ -80,16 +80,16 @@ tasks.withType<Test> {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     jvmArgs = listOf(
         "-Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
-        "-Dlogging.level.root=ERROR",
-        "-Dlogging.level.sgc=ERROR",
-        "-Dlogging.level.org.hibernate=ERROR",
-        "-Dlogging.level.org.springframework=ERROR",
+        "-Dlogging.level.root=INFO",
+        "-Dlogging.level.sgc=INFO",
+        "-Dlogging.level.org.hibernate=INFO",
+        "-Dlogging.level.org.springframework=INFO",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
