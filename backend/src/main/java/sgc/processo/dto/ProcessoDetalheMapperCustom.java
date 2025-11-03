@@ -3,17 +3,13 @@ package sgc.processo.dto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.UnidadeProcesso;
 import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementação customizada para mapeamento complexo de Processo para ProcessoDetalheDto.
@@ -82,7 +78,10 @@ public class ProcessoDetalheMapperCustom {
         }
 
         // Constroi a lista final de unidades a partir do mapa para garantir que as atualizações sejam refletidas
-        List<ProcessoDetalheDto.UnidadeParticipanteDto> unidades = new ArrayList<>(unidadesBySigla.values());
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> todasUnidades = new ArrayList<>(unidadesBySigla.values());
+
+        // Construir hierarquia de unidades (raízes com filhos)
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> unidades = construirHierarquiaUnidades(todasUnidades);
 
         // Mapeia os subprocessos para resumo
         List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
@@ -133,5 +132,43 @@ public class ProcessoDetalheMapperCustom {
             .podeHomologarCadastro(podeHomologarCadastro)
             .podeHomologarMapa(podeHomologarMapa)
             .build();
+    }
+
+    /**
+     * Constrói hierarquia de unidades participantes organizando-as em estrutura de árvore.
+     * Unidades raiz (sem superior) ficam no nível principal, e as demais são organizadas
+     * recursivamente como filhas de suas superiores.
+     */
+    private List<ProcessoDetalheDto.UnidadeParticipanteDto> construirHierarquiaUnidades(
+            List<ProcessoDetalheDto.UnidadeParticipanteDto> todasUnidades) {
+
+        if (todasUnidades == null || todasUnidades.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Criar mapa para acesso rápido por código
+        Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesPorCodigo = new HashMap<>();
+        for (ProcessoDetalheDto.UnidadeParticipanteDto unidade : todasUnidades) {
+            unidadesPorCodigo.put(unidade.getCodUnidade(), unidade);
+        }
+
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> raizes = new ArrayList<>();
+
+        // Percorrer todas as unidades e organizar em hierarquia
+        for (ProcessoDetalheDto.UnidadeParticipanteDto unidade : todasUnidades) {
+            if (unidade.getCodUnidadeSuperior() == null) {
+                // É raiz
+                raizes.add(unidade);
+            } else {
+                // Adicionar como filha da superior
+                ProcessoDetalheDto.UnidadeParticipanteDto superior = unidadesPorCodigo.get(unidade.getCodUnidadeSuperior());
+                if (superior != null) {
+                    // Adicionar aos filhos da superior
+                    superior.getFilhos().add(unidade);
+                }
+            }
+        }
+
+        return raizes;
     }
 }

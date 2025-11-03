@@ -2,18 +2,18 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.alerta.modelo.Alerta;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.modelo.Usuario;
-
-import java.time.LocalDateTime;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

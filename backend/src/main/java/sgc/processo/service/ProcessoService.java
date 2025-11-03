@@ -17,16 +17,12 @@ import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.processo.dto.*;
 import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.sgrh.service.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.TipoUnidade;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -54,6 +50,7 @@ public class ProcessoService {
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
+    @SuppressWarnings("unused")
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
@@ -115,6 +112,14 @@ public class ProcessoService {
 
         Processo processoSalvo = processoRepo.save(processo);
 
+        // Salvar snapshot das unidades participantes
+        for (Long codigoUnidade : requisicao.unidades()) {
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoSalvo, unidade);
+            unidadeProcessoRepo.save(unidadeProcesso);
+        }
+
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
@@ -146,6 +151,16 @@ public class ProcessoService {
         processo.setDataLimite(requisicao.dataLimiteEtapa1());
 
         Processo processoAtualizado = processoRepo.save(processo);
+
+        // Atualizar unidades participantes: remover antigas e adicionar novas
+        unidadeProcessoRepo.deleteByCodProcesso(codigo);
+        for (Long codigoUnidade : requisicao.unidades()) {
+            Unidade unidade = unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoAtualizado, unidade);
+            unidadeProcessoRepo.save(unidadeProcesso);
+        }
+
         log.info("Processo {} atualizado com sucesso.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
@@ -222,6 +237,19 @@ public class ProcessoService {
                 .toList();
     }
 
+    /**
+     * Retorna uma lista de todos os processos que estão na situação 'EM_ANDAMENTO'.
+     *
+     * @return Uma {@link List} de {@link ProcessoDto}.
+     */
+    @Transactional(readOnly = true)
+    public List<ProcessoDto> listarAtivos() {
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)
+            .stream()
+            .map(processoMapper::toDto)
+            .toList();
+    }
+
     // Métodos de Iniciação
     @Transactional
     public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
@@ -232,15 +260,21 @@ public class ProcessoService {
             throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
-        if (codsUnidades == null || codsUnidades.isEmpty()) {
-            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de mapeamento.");
+        // Buscar unidades já salvas no processo
+        List<UnidadeProcesso> unidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codigo);
+        if (unidadesProcesso.isEmpty()) {
+            throw new ErroNegocio("Não há unidades participantes definidas para este processo.");
         }
 
-        validarUnidadesNaoEmProcessosAtivos(codsUnidades);
+        List<Long> codigosUnidades = unidadesProcesso.stream()
+                .map(UnidadeProcesso::getCodUnidade)
+                .toList();
 
-        for (Long codigoUnidade : codsUnidades) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+        validarUnidadesNaoEmProcessosAtivos(codigosUnidades);
+
+        for (UnidadeProcesso up : unidadesProcesso) {
+            Unidade unidade = unidadeRepo.findById(up.getCodUnidade())
+                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", up.getCodUnidade()));
 
             criarSubprocessoParaMapeamento(processo, unidade);
         }
@@ -252,7 +286,7 @@ public class ProcessoService {
                 processo.getCodigo(),
                 processo.getTipo().name(),
                 LocalDateTime.now(),
-                codsUnidades
+                codigosUnidades
         ));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", codigo, codsUnidades.size());
@@ -425,5 +459,27 @@ public class ProcessoService {
             log.debug("Mapa vigente para unidade {} definido como mapa {}", codigoUnidade, mapaDoSubprocesso.getCodigo());
         }
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
+    }
+
+    /**
+     * Lista códigos de unidades que já participam de processos ativos (EM_ANDAMENTO) do tipo especificado.
+     *
+     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @return Lista de códigos de unidades bloqueadas
+     */
+    public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
+        TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
+
+        // Busca todos os processos EM_ANDAMENTO do tipo especificado
+        List<Processo> processosAtivos = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+            .filter(p -> p.getTipo() == tipoProcesso)
+            .toList();
+
+        // Extrai todas as unidades desses processos
+        return processosAtivos.stream()
+            .flatMap(p -> unidadeProcessoRepo.findByCodProcesso(p.getCodigo()).stream())
+            .map(UnidadeProcesso::getCodUnidade)
+            .distinct()
+            .toList();
     }
 }

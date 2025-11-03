@@ -1,10 +1,9 @@
 package sgc.analise.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.analise.modelo.TipoAnalise;
-
-import lombok.Getter;
 
 @Getter
 @Builder

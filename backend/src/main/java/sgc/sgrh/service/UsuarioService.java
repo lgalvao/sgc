@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.PerfilUnidade;
+import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
@@ -35,7 +35,7 @@ public class UsuarioService {
      * @return {@code true} para simular uma autenticação bem-sucedida.
      */
     public boolean autenticar(long tituloEleitoral, String senha) {
-        log.info("Simulando autenticação para: {}", tituloEleitoral);
+        log.info("Simulando autenticação para usuário: {}", tituloEleitoral);
         // Em um cenário real, aqui haveria a chamada para o AcessoAD.
         // Para esta simulação, consideramos sempre autenticado com sucesso.
         return true;
@@ -56,7 +56,7 @@ public class UsuarioService {
      */
     public List<PerfilUnidade> autorizar(long tituloEleitoral) {
         log.info("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
-        Usuario usuario = usuarioRepo.findByTituloEleitoral(tituloEleitoral)
+        Usuario usuario = usuarioRepo.findById(tituloEleitoral)
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", tituloEleitoral));
 
         Unidade unidade = usuario.getUnidade();

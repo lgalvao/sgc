@@ -67,7 +67,7 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import TreeTable from '@/components/TreeTable.vue'
 import ProcessoDetalhes from '@/components/ProcessoDetalhes.vue'
 import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
-import ModalAcaoBloco, { type UnidadeSelecao } from '@/components/ModalAcaoBloco.vue'
+import ModalAcaoBloco, {type UnidadeSelecao} from '@/components/ModalAcaoBloco.vue'
 import ModalFinalizacao from '@/components/ModalFinalizacao.vue'
 
 import {ProcessoDetalhe, UnidadeParticipante} from '@/types/tipos'
@@ -100,13 +100,13 @@ const unidadesSelecionadasBloco = ref<UnidadeSelecao[]>([])
 const mostrarAlertaSucesso = ref(false)
 const mostrarModalFinalizacao = ref(false)
 
-const idProcesso = computed(() =>
-    Number(route.params.idProcesso || route.params.id || route.query.idProcesso))
+const codProcesso = computed(() =>
+    Number(route.params.codProcesso || route.params.id || route.query.codProcesso))
 
 // Carregar detalhes do processo ao montar o componente
 onMounted(async () => {
-  if (idProcesso.value) {
-    await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  if (codProcesso.value) {
+    await processosStore.fetchProcessoDetalhe(codProcesso.value);
   }
 });
 
@@ -117,12 +117,12 @@ const unidadesParticipantes = computed<UnidadeParticipante[]>(() => {
 })
 
 const subprocessosElegiveis = computed(() => {
-  if (!idProcesso.value || !processo.value) return []
+  if (!codProcesso.value || !processo.value) return []
 
   if (perfilStore.perfilSelecionado === 'GESTOR') {
-    return processosStore.getSubprocessosElegiveisAceiteBloco(idProcesso.value, String(perfilStore.unidadeSelecionada) || '');
+    return processosStore.getSubprocessosElegiveisAceiteBloco(codProcesso.value, String(perfilStore.unidadeSelecionada) || '');
   } else if (perfilStore.perfilSelecionado === 'ADMIN') {
-    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value);
+    return processosStore.getSubprocessosElegiveisHomologacaoBloco(codProcesso.value);
   }
   return [];
 })
@@ -141,7 +141,7 @@ const colunasTabela = [
 ]
 
 const dadosFormatados = computed<TreeTableItem[]>(() => {
-  return formatarDadosParaArvore(participantesHierarquia.value, idProcesso.value)
+  return formatarDadosParaArvore(participantesHierarquia.value, codProcesso.value)
 })
 
 function formatarData(data: string | null): string {
@@ -153,10 +153,10 @@ function formatarData(data: string | null): string {
   return `${dia}/${mes}/${ano}`
 }
 
-function formatarDadosParaArvore(dados: UnidadeParticipante[], idProcesso: number): TreeTableItem[] {
+function formatarDadosParaArvore(dados: UnidadeParticipante[], codProcesso: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhos ? formatarDadosParaArvore(item.filhos, idProcesso) : []
+    const children = item.filhos ? formatarDadosParaArvore(item.filhos, codProcesso) : []
 
     let situacao = item.situacaoSubprocesso || 'Não iniciado';
     let dataLimite = formatarData(item.dataLimite || null);
@@ -179,10 +179,10 @@ function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value.toString(), siglaUnidade: String(item.sigla)}})
+      router.push({name: 'Subprocesso', params: {codProcesso: codProcesso.value.toString(), siglaUnidade: String(item.sigla)}})
     } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
       if (perfilStore.unidadeSelecionada === item.sigla) {
-        router.push({name: 'Subprocesso', params: {idProcesso: String(idProcesso.value), siglaUnidade: String(item.sigla)}})
+        router.push({name: 'Subprocesso', params: {codProcesso: String(codProcesso.value), siglaUnidade: String(item.sigla)}})
       }
     }
   }
@@ -206,7 +206,7 @@ async function executarFinalizacao() {
         'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
     );
 
-    router.push('/painel');
+    await router.push('/painel');
 
   } catch (error) {
     console.error('Erro ao finalizar processo:', error);
@@ -270,7 +270,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
     }
 
     await processosStore.processarCadastroBloco({
-      idProcesso: idProcesso.value,
+      codProcesso: codProcesso.value,
       unidades: unidadesSelecionadas,
       tipoAcao: tipoAcaoBloco.value,
       unidadeUsuario: String(perfilStore.unidadeSelecionada) || ''

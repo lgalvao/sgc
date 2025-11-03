@@ -167,8 +167,8 @@
 import {computed, onMounted, ref, watch} from 'vue'
 import {useProcessosStore} from '@/stores/processos'
 import {useAtividadesStore} from '@/stores/atividades'
-import {type Atividade, TipoProcesso, type ProcessoResumo, type UnidadeParticipante} from '@/types/tipos'
-import { useApi } from '@/composables/useApi';
+import {type Atividade, type ProcessoResumo, TipoProcesso, type UnidadeParticipante} from '@/types/tipos'
+import {useApi} from '@/composables/useApi';
 
 const props = defineProps<{
   mostrar: boolean,

@@ -52,7 +52,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil, type ProcessoResumo, type AlertaFormatado, Unidade, Servidor} from '@/types/tipos'
+import {type AlertaFormatado, Perfil, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import TabelaAlertas from '@/components/TabelaAlertas.vue';
 import {formatDateTimeBR} from '@/utils';
@@ -104,16 +104,16 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   
   // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
   if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'CRIADO') { 
-    router.push({name: 'CadProcesso', query: {idProcesso: String(processo.codigo)}})
+    router.push({name: 'CadProcesso', query: {codProcesso: String(processo.codigo)}})
     return;
   }
   
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: String(processo.codigo)}})
+    router.push({name: 'Processo', params: {codProcesso: String(processo.codigo)}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
+      router.push({name: 'Subprocesso', params: {codProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }

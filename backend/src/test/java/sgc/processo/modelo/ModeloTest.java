@@ -31,7 +31,7 @@ class ModeloTest {
         assertEquals(SituacaoProcesso.CRIADO, processo.getSituacao());
         assertEquals(TipoProcesso.MAPEAMENTO, processo.getTipo());
 
-        Processo processo2 = new Processo("Descricao", TipoProcesso.MAPEAMENTO, SituacaoProcesso.CRIADO, dataLimite);
+        Processo processo2 = new Processo(now, now, dataLimite, "Descricao", SituacaoProcesso.CRIADO, TipoProcesso.MAPEAMENTO);
         assertNotNull(processo2);
     }
 

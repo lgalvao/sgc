@@ -67,11 +67,9 @@ public class PainelService {
                     .collect(Collectors.toList());
         }
 
-        System.out.printf("Processos encontrados antes do mapeamento: %d%n", processos.size());
         List<ProcessoResumoDto> dtos = processos.stream()
                 .map(this::mapToProcessoResumoDto)
                 .collect(Collectors.toList());
-        System.out.printf("DTOs de processo gerados: %d%n", dtos.size());
 
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
@@ -132,9 +130,8 @@ public class PainelService {
             .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
             .descricao(alerta.getDescricao())
             .dataHora(alerta.getDataHora())
-            .codUnidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getCodigo() : null)
-            .codUunidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getCodigo() : null)
-            .tituloUsuarioDestino(alerta.getUsuarioDestino() != null ? String.valueOf(alerta.getUsuarioDestino().getTituloEleitoral()) : null)
+            .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
+            .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
             .build();
     }
 }

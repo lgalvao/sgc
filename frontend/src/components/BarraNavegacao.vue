@@ -80,10 +80,8 @@ const crumbs = computed((): Breadcrumb[] => {
         const { meta, name } = routeRecord;
 
         const shouldAddCrumb = () => {
-            if (name === 'Processo' && (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR)) {
-                return false;
-            }
-            return true;
+            return !(name === 'Processo' && (perfilUsuario === Perfil.CHEFE || perfilUsuario === Perfil.SERVIDOR));
+
         };
 
         if (meta.breadcrumb && shouldAddCrumb()) {

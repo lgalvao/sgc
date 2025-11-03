@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Perfil, SituacaoProcesso } from '@/types/tipos';
+import type {Perfil, SituacaoProcesso} from '@/types/tipos';
 
 defineProps<{
   mostrarBotoesBloco: boolean;

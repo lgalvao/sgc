@@ -8,7 +8,7 @@ const mockMapasStore = {
     mapaCompleto: {
         id: 1,
         unidade: 'SESEL',
-        idProcesso: 1,
+        codProcesso: 1,
         situacao: 'em_andamento',
         competencias: [
             { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
@@ -130,7 +130,7 @@ describe('useRevisaoStore', () => {
             mockMapasStore.mapaCompleto = {
                 id: 1,
                 unidade: 'SESEL',
-                idProcesso: 1,
+                codProcesso: 1,
                 situacao: 'em_andamento',
                 competencias: [
                     { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [10, 20] },
@@ -160,7 +160,7 @@ describe('useRevisaoStore', () => {
             mockMapasStore.mapaCompleto = {
                 id: 1,
                 unidade: 'SESEL',
-                idProcesso: 1,
+                codProcesso: 1,
                 situacao: 'em_andamento',
                 competencias: [
                     { codigo: 1, descricao: 'Competência 1', atividadesAssociadas: [20] },
@@ -180,7 +180,7 @@ describe('useRevisaoStore', () => {
             mockMapasStore.mapaCompleto = {
                 id: 1,
                 unidade: 'SESEL',
-                idProcesso: 1,
+                codProcesso: 1,
                 situacao: 'em_andamento',
                 competencias: [],
                 dataCriacao: new Date(),

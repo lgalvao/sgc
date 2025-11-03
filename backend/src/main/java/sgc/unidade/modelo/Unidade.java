@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.sgrh.modelo.Usuario;
-import java.util.HashSet;
-import java.util.Set;
-import sgc.processo.modelo.Processo;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
@@ -65,7 +62,4 @@ public class Unidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     private Unidade unidadeSuperior;
-
-    @ManyToMany(mappedBy = "unidades")
-    private Set<Processo> processos = new HashSet<>();
 }

@@ -1,5 +1,6 @@
 package sgc.sgrh;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,26 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
+import sgc.sgrh.dto.LoginResponse;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.service.UsuarioService;
 import sgc.unidade.modelo.UnidadeRepo;
-import sgc.sgrh.dto.LoginResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Date;
-
 import java.util.List;
-
-// Importações JJWT
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import javax.crypto.SecretKey;
-import sgc.comum.config.JwtTokenProvider; // Importar JwtTokenProvider
-import io.jsonwebtoken.io.Decoders; // Adicionar import
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -81,25 +72,19 @@ public class UsuarioControle {
         usuarioService.entrar(request);
         LoginResponse response = new LoginResponse(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
 
-        // Gerar JWT assinado para perfil e2e e jules
+        // Gerar JWT simulado para perfil e2e
         try {
-            long tempoExpiracaoMillis = 3600000; // 1 hora
-            Date agora = new Date();
-            Date expiracao = new Date(agora.getTime() + tempoExpiracaoMillis);
-
-            String token = Jwts.builder()
-                    .subject(request.getTituloEleitoral().toString())
-                    .claim("perfil", request.getPerfil())
-                    .claim("unidadeCodigo", request.getUnidadeCodigo())
-                    .issuedAt(agora)
-                    .expiration(expiracao)
-                    .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode("aW5jcmVkaXZlbG1lbnRlU2VjcmV0YUtleVBhcmFUb2tlbnNKV1RUZXN0ZXM=")))
-                    .compact();
-
-            response.setToken(token);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("tituloEleitoral", request.getTituloEleitoral());
+            claims.put("perfil", request.getPerfil());
+            claims.put("unidadeCodigo", request.getUnidadeCodigo());
+            String jsonClaims = objectMapper.writeValueAsString(claims);
+            String encodedClaims = Base64.getEncoder().encodeToString(jsonClaims.getBytes());
+            response.setToken(encodedClaims);
         } catch (Exception e) {
             // Logar o erro ou lançar uma exceção apropriada
-            System.err.println("Erro ao gerar token JWT: " + e.getMessage());
+            System.err.println("Erro ao gerar token simulado: " + e.getMessage());
             response.setToken("erro_geracao_token"); // Token de fallback em caso de erro
         }
 

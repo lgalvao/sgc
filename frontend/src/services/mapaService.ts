@@ -1,10 +1,6 @@
 import apiClient from '../axios-setup';
-import type { ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao } from '@/types/tipos';
-import {
-  mapImpactoMapaDtoToModel,
-  mapMapaAjusteDtoToModel,
-  mapMapaCompletoDtoToModel,
-} from '@/mappers/mapas';
+import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from '@/mappers/mapas';
 
 export async function obterMapaVisualizacao(codSubrocesso: number): Promise<MapaVisualizacao> {
   const response = await apiClient.get<MapaVisualizacao>(`/subprocessos/${codSubrocesso}/mapa-visualizacao`);
@@ -22,7 +18,7 @@ export const obterMapaCompleto = async (id: number): Promise<MapaCompleto> => {
 };
 
 export const salvarMapaCompleto = async (codSubprocesso: number, data: any): Promise<MapaCompleto> => {
-  const response = await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-completo`, data);
+  const response = await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-completo/salvar`, data);
   return mapMapaCompletoDtoToModel(response.data);
 };
 
@@ -32,15 +28,18 @@ export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
 };
 
 export const salvarMapaAjuste = async (codSubprocesso: number, data: any): Promise<void> => {
-  await apiClient.put(`/subprocessos/${codSubprocesso}/mapa-ajuste`, data);
+  await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-ajuste/salvar`, data);
 };
 
 export async function verificarMapaVigente(codigoUnidade: number): Promise<boolean> {
   try {
     const response = await apiClient.get(`/unidades/${codigoUnidade}/mapa-vigente`);
     return response.data.temMapaVigente;
-  } catch (error) {
-    console.error(`Erro ao verificar mapa vigente para a unidade ${codigoUnidade}:`, error);
+  } catch (error: any) {
+    // 404 é esperado quando a unidade não tem mapa vigente, não precisa logar
+    if (error?.response?.status !== 404) {
+      console.error(`Erro ao verificar mapa vigente para a unidade ${codigoUnidade}:`, error);
+    }
     return false;
   }
 }

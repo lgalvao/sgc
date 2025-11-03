@@ -208,13 +208,13 @@
     <!-- Modais -->
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
-      :id-subprocesso-destino="codSubrocesso"
+      :cod-subrocesso-destino="codSubrocesso"
       @fechar="mostrarModalImportar = false"
       @importar="handleImportAtividades"
     />
 
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :mostrar="mostrarModalImpacto"
       :sigla-unidade="siglaUnidade"
       @fechar="fecharModalImpacto"
@@ -395,12 +395,12 @@ interface AtividadeComEdicao extends Atividade {
 }
 
 const props = defineProps<{
-  idProcesso: number | string,
+  codProcesso: number | string,
   sigla: string
 }>()
 
 const unidadeId = computed(() => props.sigla)
-const idProcesso = computed(() => Number(props.idProcesso))
+const codProcesso = computed(() => Number(props.codProcesso))
 
 const atividadesStore = useAtividadesStore()
 const unidadesStore = useUnidadesStore()
@@ -569,7 +569,7 @@ const atividadesSemConhecimento = ref<Atividade[]>([])
 const confirmacaoModalRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
     await analisesStore.fetchAnalisesCadastro(codSubrocesso.value)
@@ -685,7 +685,7 @@ async function confirmarDisponibilizacao() {
   }
 
   fecharModalConfirmacao();
-  router.push('/painel');
+  await router.push('/painel');
 }
 
 function abrirModalImpacto() {

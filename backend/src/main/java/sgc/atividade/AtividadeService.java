@@ -70,7 +70,7 @@ public class AtividadeService {
         var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo())
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.mapaCodigo())));
 
-        var usuario = usuarioRepo.findByTituloEleitoral(Long.parseLong(username))
+        var usuario = usuarioRepo.findById(Long.parseLong(username))
                 .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", username));
 
         if (!usuario.equals(subprocesso.getUnidade().getTitular())) {

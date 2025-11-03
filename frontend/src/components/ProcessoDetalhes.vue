@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
+import type {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 defineProps<{
   descricao: string;

@@ -117,6 +117,7 @@
     <!-- Modal de Criar Nova Competência -->
     <div
       v-if="mostrarModalCriarNovaCompetencia"
+      data-testid="criar-competencia-modal"
       aria-labelledby="criarCompetenciaModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -230,6 +231,7 @@
     <!-- Modal de Disponibilizar -->
     <div
       v-if="mostrarModalDisponibilizar"
+      data-testid="disponibilizar-modal"
       aria-labelledby="disponibilizarModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -275,7 +277,7 @@
               <textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes"
+                data-testid="input-observacoes-disponibilizacao"
                 class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
@@ -373,7 +375,7 @@
     />
 
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :sigla-unidade="siglaUnidade"
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
@@ -392,8 +394,8 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import { usePerfil } from '@/composables/usePerfil'
-import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade, Servidor, Subprocesso} from '@/types/tipos'
+import {usePerfil} from '@/composables/usePerfil'
+import {Atividade, Competencia, Perfil, Servidor, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
@@ -408,7 +410,7 @@ const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const { servidorLogado } = usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
@@ -462,7 +464,7 @@ const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as U
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
   }

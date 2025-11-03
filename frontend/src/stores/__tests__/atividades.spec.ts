@@ -1,8 +1,8 @@
-import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
-import { useAtividadesStore } from '../atividades';
+import {createPinia, setActivePinia} from 'pinia';
+import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
+import {useAtividadesStore} from '../atividades';
 import * as mapaService from '@/services/mapaService';
-import { useNotificacoesStore } from '../notificacoes';
+import {useNotificacoesStore} from '../notificacoes';
 
 vi.mock('@/services/mapaService');
 vi.mock('../notificacoes');

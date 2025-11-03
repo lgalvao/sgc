@@ -11,8 +11,11 @@
 2. O sistema muda para a tela Cadastro de processo e apresenta um formulário contendo:
 
    2.1. Campo Descrição
+
    2.2. Campo Tipo do processo, com opções: 'Mapeamento', 'Revisão' e 'Diagnóstico'
+
    2.3. Quadro de Unidades participantes, contendo uma árvore de unidades com checkboxes para cada uma.
+
    2.3.1. A lista de unidades só deve incluir unidades que não estejam participando de um processo ativo do tipo
    selecionado.
 

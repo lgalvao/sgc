@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Primary
+@org.springframework.context.annotation.Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
 public class NotificacaoService {

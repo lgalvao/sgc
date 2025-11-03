@@ -90,6 +90,17 @@ public class ProcessoControle {
     }
 
     /**
+     * Lista todos os processos que estão com a situação 'EM_ANDAMENTO'.
+     *
+     * @return Um {@link ResponseEntity} com a lista de {@link ProcessoDto} ativos.
+     */
+    @GetMapping("/ativos")
+    @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
+    public ResponseEntity<List<ProcessoDto>> listarAtivos() {
+        return ResponseEntity.ok(processoService.listarAtivos());
+    }
+
+    /**
      * Retorna os detalhes completos de um processo, incluindo as unidades participantes
      * e o resumo de seus respectivos subprocessos.
      *
@@ -145,5 +156,19 @@ public class ProcessoControle {
     public ResponseEntity<?> finalizar(@PathVariable Long codigo) {
         processoService.finalizar(codigo);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado.
+     * Útil para desabilitar checkboxes no frontend durante criação/edição de processos.
+     *
+     * @param tipo Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @return Lista de códigos de unidades bloqueadas
+     */
+    @GetMapping("/unidades-bloqueadas")
+    @Operation(summary = "Lista unidades que já participam de processos ativos por tipo")
+    public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
+        List<Long> unidadesBloqueadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
+        return ResponseEntity.ok(unidadesBloqueadas);
     }
 }

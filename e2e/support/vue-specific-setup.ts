@@ -1,8 +1,8 @@
 import {ErrorReporter} from './error-reporter';
-import {Page, test} from '@playwright/test'; // Importar test diretamente
-import {parseDate} from '@/utils';
-import {existsSync, mkdirSync, writeFileSync} from 'fs'; // Importar fs
-import {join} from 'path'; // Importar path
+import {Page, test} from '@playwright/test';
+import {parseDate} from '~/helpers/utils/date-utils';
+import {existsSync, mkdirSync, writeFileSync} from 'fs';
+import {join} from 'path';
 
 // Definição de uma interface para a janela com propriedades customizadas
 interface CustomWindow extends Window {

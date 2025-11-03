@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
+import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
 import * as cadastroService from '@/services/cadastroService';
 import apiClient from '@/axios-setup';
 

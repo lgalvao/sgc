@@ -7,9 +7,9 @@ import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
-import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.service.SgrhService;
 import sgc.unidade.modelo.TipoUnidade;
 
 import java.util.List;

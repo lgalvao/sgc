@@ -3,17 +3,17 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.competencia.CompetenciaService;
 import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.competencia.CompetenciaService;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.mapa.service.MapaService;
 import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.mapa.service.MapaService;
 
 @Service
 @RequiredArgsConstructor

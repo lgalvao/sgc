@@ -3,13 +3,8 @@
  */
 export enum SituacaoProcesso {
     CRIADO = 'CRIADO',
-    EM_ELABORACAO = 'EM_ELABORACAO',
     FINALIZADO = 'FINALIZADO',
-    AGUARDANDO_INICIO = 'AGUARDANDO_INICIO',
     EM_ANDAMENTO = 'EM_ANDAMENTO',
-    CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
-    CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
 }
 
 /**
@@ -55,20 +50,6 @@ export interface Unidade {
 }
 
 /**
- * Representa um responsável por uma unidade.
- */
-export interface Responsavel {
-    usuarioTitulo: string;
-    unidadeCodigo: number;
-    tipo: string;
-    idServidor?: number;
-    dataInicio?: string;
-    dataFim?: string | null;
-    codigo?: number;
-    nome?: string;
-}
-
-/**
  * Representa o perfil de um usuário em uma unidade.
  */
 export interface PerfilUnidade {
@@ -78,41 +59,18 @@ export interface PerfilUnidade {
 }
 
 /**
- * Representa a requisição para entrar no sistema.
- */
-export interface EntrarRequest {
-    tituloEleitoral: number;
-    perfil: Perfil;
-    unidadeCodigo: number;
-}
-
-/**
  * Tipos de situação de um subprocesso.
  */
 export enum SituacaoSubprocesso {
     NAO_INICIADO = 'NAO_INICIADO',
-    AGUARDANDO_DEFINICAO_ATIVIDADES = 'AGUARDANDO_DEFINICAO_ATIVIDADES',
-    ATIVIDADES_EM_DEFINICAO = 'ATIVIDADES_EM_DEFINICAO',
-    AGUARDANDO_VALIDACAO_ATIVIDADES = 'AGUARDANDO_VALIDACAO_ATIVIDADES',
-    ATIVIDADES_EM_VALIDACAO = 'ATIVIDADES_EM_VALIDACAO',
-    ATIVIDADES_VALIDADAS = 'ATIVIDADES_VALIDADAS',
-    AGUARDANDO_REVISAO_ATIVIDADES = 'AGUARDANDO_REVISAO_ATIVIDADES',
-    ATIVIDADES_EM_REVISAO = 'ATIVIDADES_EM_REVISAO',
     ATIVIDADES_REVISADAS = 'ATIVIDADES_REVISADAS',
     AGUARDANDO_HOMOLOGACAO_ATIVIDADES = 'AGUARDANDO_HOMOLOGACAO_ATIVIDADES',
-    ATIVIDADES_EM_HOMOLOGACAO = 'ATIVIDADES_EM_HOMOLOGACAO',
     ATIVIDADES_HOMOLOGADAS = 'ATIVIDADES_HOMOLOGADAS',
-    AGUARDANDO_MAPEAMENTO = 'AGUARDANDO_MAPEAMENTO',
-    MAPEAMENTO_EM_ANDAMENTO = 'MAPEAMENTO_EM_ANDAMENTO',
     MAPEAMENTO_CONCLUIDO = 'MAPEAMENTO_CONCLUIDO',
-    AGUARDANDO_VALIDACAO_MAPA = 'AGUARDANDO_VALIDACAO_MAPA',
-    MAPA_EM_VALIDACAO = 'MAPA_EM_VALIDACAO',
     MAPA_VALIDADO = 'MAPA_VALIDADO',
     AGUARDANDO_AJUSTES_MAPA = 'AGUARDANDO_AJUSTES_MAPA',
-    MAPA_EM_AJUSTE = 'MAPA_EM_AJUSTE',
     MAPA_AJUSTADO = 'MAPA_AJUSTADO',
     AGUARDANDO_HOMOLOGACAO_MAPA = 'AGUARDANDO_HOMOLOGACAO_MAPA',
-    MAPA_EM_HOMOLOGACAO = 'MAPA_EM_HOMOLOGACAO',
     MAPA_HOMOLOGADO = 'MAPA_HOMOLOGADO',
     CONCLUIDO = 'CONCLUIDO',
     REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
@@ -140,7 +98,7 @@ export interface Mapa {
     codigo: number;
     descricao: string;
     unidade: Unidade;
-    idProcesso: number;
+    codProcesso: number;
     competencias: Competencia[];
     situacao: string;
     dataCriacao: string;
@@ -193,16 +151,6 @@ export interface Servidor {
     ramal: string;
 }
 
-export interface Alerta {
-    codigo: number;
-    processo: Processo;
-    dataHora: string;
-    unidadeOrigem: Unidade;
-    unidadeDestino: Unidade;
-    usuarioDestino: Servidor;
-    descricao: string;
-}
-
 export interface AlertaFormatado {
     codigo: number;
     processo: string;
@@ -225,11 +173,6 @@ export interface Movimentacao {
     unidadeDestino: Unidade;
     descricao: string;
     usuario: Servidor;
-}
-
-export interface ResultadoAnalise {
-    aprovado: boolean;
-    observacoes: string;
 }
 
 export interface AnaliseValidacao {
@@ -269,12 +212,6 @@ export interface UnidadeSnapshot {
     nome: string;
     sigla: string;
     filhas?: UnidadeSnapshot[];
-}
-
-export enum TipoResponsabilidade {
-    CHEFE = 'CHEFE',
-    GESTOR = 'GESTOR',
-    ATRIBUICAO = 'ATRIBUICAO',
 }
 
 export interface CriarAtividadeRequest {
@@ -397,7 +334,6 @@ export interface MapaCompleto {
 }
 
 export interface MapaAjuste {
-    // Definindo uma estrutura similar ao MapaCompleto, pode ser ajustada conforme a necessidade
     codigo: number;
     descricao: string;
     competencias: Competencia[];

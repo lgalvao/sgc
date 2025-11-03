@@ -35,8 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { Movimentacao } from '@/types/tipos';
-import { formatDateTimeBR } from '@/utils';
+import type {Movimentacao} from '@/types/tipos';
+import {formatDateTimeBR} from '@/utils';
 
 defineProps<{
   movimentacoes: Movimentacao[]
