@@ -1,6 +1,5 @@
 package sgc.util;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,6 @@ public class E2eTestControle {
     private final AlertaUsuarioRepo alertaUsuarioRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
-    private final EntityManager entityManager;
 
     /**
      * Remove FORÇADAMENTE um processo, independente da situação.
@@ -136,7 +134,7 @@ public class E2eTestControle {
      */
     @PostMapping("/reset")
     @Transactional
-    public ResponseEntity<Void> resetCompleto(EntityManager em) {
+    public ResponseEntity<Void> resetCompleto() {
         // Deletar referências em ALERTA_USUARIO antes de deletar alertas
         alertaUsuarioRepo.deleteAll();
         alertaRepo.deleteAll();
@@ -146,7 +144,7 @@ public class E2eTestControle {
         subprocessoRepo.deleteAll();
         processoRepo.deleteAll();
         unidadeProcessoRepo.deleteAll();
-        
+
         return ResponseEntity.noContent().build();
     }
 
@@ -161,26 +159,26 @@ public class E2eTestControle {
     @PostMapping("/reset-and-reseed")
     @Transactional
     public ResponseEntity<String> resetAndReseed() {
-        resetCompleto(entityManager);
+        resetCompleto();
         return ResponseEntity.ok("Banco resetado. ATENÇÃO: Dados do import.sql não são recarregados automaticamente. Reinicie o backend para recarregar.");
     }
-    
+
     /**
      * DEBUG: Verifica dados da tabela UNIDADE_PROCESSO
      */
     @GetMapping("/debug/unidade-processo/{processoId}")
     public ResponseEntity<List<Map<String, Object>>> debugUnidadeProcesso(@PathVariable Long processoId) {
         var unidadesProcesso = unidadeProcessoRepo.findByCodProcesso(processoId);
-        
+
         List<Map<String, Object>> result = unidadesProcesso.stream()
-            .map(up -> Map.of(
-                "processo_codigo", up.getCodProcesso(),
-                "unidade_codigo", up.getCodUnidade(),
-                "nome", up.getNome(),
-                "sigla", (Object) up.getSigla()
-            ))
-            .toList();
-            
+                .map(up -> Map.of(
+                        "processo_codigo", up.getCodProcesso(),
+                        "unidade_codigo", up.getCodUnidade(),
+                        "nome", up.getNome(),
+                        "sigla", (Object) up.getSigla()
+                ))
+                .toList();
+
         return ResponseEntity.ok(result);
     }
 }
