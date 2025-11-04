@@ -7,26 +7,27 @@ import java.util.List;
  * no mapa de competências devido a alterações no cadastro de atividades.
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
- * @param temImpactos               Indica se há algum impacto.
- * @param totalAtividadesInseridas  Total de atividades inseridas.
- * @param totalAtividadesRemovidas  Total de atividades removidas.
- * @param totalAtividadesAlteradas  Total de atividades alteradas.
+ *
+ * @param temImpactos                 Indica se há algum impacto.
+ * @param totalAtividadesInseridas    Total de atividades inseridas.
+ * @param totalAtividadesRemovidas    Total de atividades removidas.
+ * @param totalAtividadesAlteradas    Total de atividades alteradas.
  * @param totalCompetenciasImpactadas Total de competências impactadas.
- * @param atividadesInseridas       Lista de atividades inseridas.
- * @param atividadesRemovidas       Lista de atividades removidas.
- * @param atividadesAlteradas       Lista de atividades alteradas.
- * @param competenciasImpactadas    Lista de competências impactadas.
+ * @param atividadesInseridas         Lista de atividades inseridas.
+ * @param atividadesRemovidas         Lista de atividades removidas.
+ * @param atividadesAlteradas         Lista de atividades alteradas.
+ * @param competenciasImpactadas      Lista de competências impactadas.
  */
 public record ImpactoMapaDto(
-    boolean temImpactos,
-    int totalAtividadesInseridas,
-    int totalAtividadesRemovidas,
-    int totalAtividadesAlteradas,
-    int totalCompetenciasImpactadas,
-    List<AtividadeImpactadaDto> atividadesInseridas,
-    List<AtividadeImpactadaDto> atividadesRemovidas,
-    List<AtividadeImpactadaDto> atividadesAlteradas,
-    List<CompetenciaImpactadaDto> competenciasImpactadas
+        boolean temImpactos,
+        int totalAtividadesInseridas,
+        int totalAtividadesRemovidas,
+        int totalAtividadesAlteradas,
+        int totalCompetenciasImpactadas,
+        List<AtividadeImpactadaDto> atividadesInseridas,
+        List<AtividadeImpactadaDto> atividadesRemovidas,
+        List<AtividadeImpactadaDto> atividadesAlteradas,
+        List<CompetenciaImpactadaDto> competenciasImpactadas
 ) {
 
     // Compact constructor for defensive copying to ensure true immutability
@@ -39,6 +40,7 @@ public record ImpactoMapaDto(
 
     /**
      * Factory method for creating an ImpactoMapaDto with no impacts.
+     *
      * @return An empty ImpactoMapaDto.
      */
     public static ImpactoMapaDto semImpacto() {
@@ -55,17 +57,18 @@ public record ImpactoMapaDto(
             List<AtividadeImpactadaDto> atividadesAlteradas,
             List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
+        // TODO tentar maneira mais elegante de verificar se estao vazias?
         boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
         return new ImpactoMapaDto(
-            temImpactos,
-            atividadesInseridas.size(),
-            atividadesRemovidas.size(),
-            atividadesAlteradas.size(),
-            competenciasImpactadas.size(),
-            atividadesInseridas,
-            atividadesRemovidas,
-            atividadesAlteradas,
-            competenciasImpactadas
+                temImpactos,
+                atividadesInseridas.size(),
+                atividadesRemovidas.size(),
+                atividadesAlteradas.size(),
+                competenciasImpactadas.size(),
+                atividadesInseridas,
+                atividadesRemovidas,
+                atividadesAlteradas,
+                competenciasImpactadas
         );
     }
 }

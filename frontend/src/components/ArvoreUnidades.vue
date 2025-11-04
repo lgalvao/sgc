@@ -103,8 +103,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import type { Unidade } from '../types';
+import {computed, ref, watch} from 'vue';
+import type {Unidade} from '../types';
 
 interface Props {
   unidades: Unidade[];

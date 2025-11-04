@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.modelo.Conhecimento;
+import sgc.atividade.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
@@ -25,7 +25,7 @@ import sgc.mapa.modelo.MapaRepo;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.dto.ImportarAtividadesRequest;
+import sgc.subprocesso.dto.ImportarAtividadesReq;
 import sgc.subprocesso.modelo.MovimentacaoRepo;
 import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
@@ -133,7 +133,7 @@ class CDU08IntegrationTest {
         @Test
         @DisplayName("Deve importar atividades e conhecimentos com sucesso")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -167,7 +167,7 @@ class CDU08IntegrationTest {
             subprocessoDestino.setSituacao(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
             subprocessoRepo.save(subprocessoDestino);
 
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +178,7 @@ class CDU08IntegrationTest {
         @Test
         @DisplayName("Deve falhar ao importar de subprocesso inexistente")
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(9999L);
+            ImportarAtividadesReq request = new ImportarAtividadesReq(9999L);
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ class CDU08IntegrationTest {
             subprocessoOrigem.setMapa(mapaOrigemVazio);
             subprocessoRepo.save(subprocessoOrigem);
 
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ class CDU08IntegrationTest {
             Atividade atividadeExistente = new Atividade(subprocessoDestino.getMapa(), "Atividade 2");
             atividadeRepo.save(atividadeExistente);
 
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(subprocessoOrigem.getCodigo());
+            ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
             mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo()).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)

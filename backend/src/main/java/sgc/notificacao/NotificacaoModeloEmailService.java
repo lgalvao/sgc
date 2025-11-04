@@ -17,14 +17,13 @@ public class NotificacaoModeloEmailService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Constantes para títulos de e-mail
-    private static final String TITULO_PROCESSO_INICIADO = "Processo Iniciado - ";
-    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro Disponibilizado para Análise";
-    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro Devolvido para Ajustes";
-    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de Competências Disponibilizado";
+    private static final String TITULO_PROCESSO_INICIADO = "Processo iniciado - ";
+    private static final String TITULO_CADASTRO_DISPONIBILIZADO = "Cadastro disponibilizado para análise";
+    private static final String TITULO_CADASTRO_DEVOLVIDO = "Cadastro devolvido para ajustes";
+    private static final String TITULO_MAPA_DISPONIBILIZADO = "Mapa de competências disponibilizado";
     private static final String TITULO_MAPA_VALIDADO = "Mapa de Competências Validado";
     private static final String TITULO_PROCESSO_FINALIZADO = "Processo Finalizado - Mapas Vigentes";
-    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "SGC: Conclusão do processo ";
-
+    private static final String TITULO_PROCESSO_CONCLUSAO_SGC = "Processo finalizado: ";
 
     private final SpringTemplateEngine templateEngine;
 
@@ -68,9 +67,8 @@ public class NotificacaoModeloEmailService {
      * @param nomeUnidade          O nome da unidade que disponibilizou o cadastro.
      * @param nomeProcesso         O nome do processo associado.
      * @param quantidadeAtividades O número de atividades registradas.
-     * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeCadastroDisponibilizado(
+    public void criarEmailCadastroDisponibilizado(
             String nomeUnidade,
             String nomeProcesso,
             int quantidadeAtividades) {
@@ -81,7 +79,7 @@ public class NotificacaoModeloEmailService {
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("quantidadeAtividades", quantidadeAtividades);
 
-        return templateEngine.process("cadastro-disponibilizado", context);
+        templateEngine.process("cadastro-disponibilizado", context);
     }
 
     /**
@@ -94,9 +92,8 @@ public class NotificacaoModeloEmailService {
      * @param nomeProcesso O nome do processo associado.
      * @param motivo       O motivo da devolução.
      * @param observacoes  Detalhes ou observações adicionais.
-     * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeCadastroDevolvido(
+    public void criarEmailCadastroDevolvido(
             String nomeUnidade,
             String nomeProcesso,
             String motivo,
@@ -109,7 +106,7 @@ public class NotificacaoModeloEmailService {
         context.setVariable("motivo", motivo);
         context.setVariable("observacoes", observacoes);
 
-        return templateEngine.process("cadastro-devolvido", context);
+        templateEngine.process("cadastro-devolvido", context);
     }
 
     /**
@@ -121,9 +118,8 @@ public class NotificacaoModeloEmailService {
      * @param nomeUnidade         O nome da unidade que disponibilizou o mapa.
      * @param nomeProcesso        O nome do processo associado.
      * @param dataLimiteValidacao A data limite para a validação do mapa.
-     * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeMapaDisponibilizado(
+    public void criarEmailMapaDisponibilizado(
             String nomeUnidade,
             String nomeProcesso,
             LocalDateTime dataLimiteValidacao) {
@@ -134,7 +130,7 @@ public class NotificacaoModeloEmailService {
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("dataLimiteValidacao", dataLimiteValidacao.format(FORMATADOR));
 
-        return templateEngine.process("mapa-disponibilizado", context);
+        templateEngine.process("mapa-disponibilizado", context);
     }
 
     /**
@@ -144,18 +140,14 @@ public class NotificacaoModeloEmailService {
      *
      * @param nomeUnidade  O nome da unidade que validou o mapa.
      * @param nomeProcesso O nome do processo associado.
-     * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeMapaValidado(
-            String nomeUnidade,
-            String nomeProcesso) {
-
+    public void criarEmailMapaValidado(String nomeUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable("titulo", TITULO_MAPA_VALIDADO);
         context.setVariable("nomeUnidade", nomeUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
-        return templateEngine.process("mapa-validado", context);
+        templateEngine.process("mapa-validado", context);
     }
 
     /**
@@ -163,23 +155,18 @@ public class NotificacaoModeloEmailService {
      * <p>
      * Corresponde ao caso de uso CDU-21.
      *
-     * @param nomeProcesso     O nome do processo finalizado.
-     * @param dataFinalizacao  A data em que o processo foi finalizado.
-     * @param quantidadeMapas  O número de mapas que se tornaram vigentes.
-     * @return O conteúdo HTML do email.
+     * @param nomeProcesso    O nome do processo finalizado.
+     * @param dataFinalizacao A data em que o processo foi finalizado.
+     * @param quantidadeMapas O número de mapas que se tornaram vigentes.
      */
-    public String criarEmailDeProcessoFinalizado(
-            String nomeProcesso,
-            LocalDateTime dataFinalizacao,
-            int quantidadeMapas) {
-
+    public void criarEmailProcessoFinalizado(String nomeProcesso, LocalDateTime dataFinalizacao, int quantidadeMapas) {
         Context context = new Context();
         context.setVariable("titulo", TITULO_PROCESSO_FINALIZADO);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("dataFinalizacao", dataFinalizacao.format(FORMATADOR));
         context.setVariable("quantidadeMapas", quantidadeMapas);
 
-        return templateEngine.process("processo-finalizado", context);
+        templateEngine.process("processo-finalizado", context);
     }
 
     /**
@@ -192,10 +179,7 @@ public class NotificacaoModeloEmailService {
      * @param nomeProcesso O nome do processo concluído.
      * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeProcessoFinalizadoPorUnidade(
-            String siglaUnidade,
-            String nomeProcesso) {
-
+    public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
         Context context = new Context();
         context.setVariable("titulo", "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
         context.setVariable("siglaUnidade", siglaUnidade);
@@ -216,7 +200,7 @@ public class NotificacaoModeloEmailService {
      *                                   que participaram do processo.
      * @return O conteúdo HTML do email.
      */
-    public String criarEmailDeProcessoFinalizadoUnidadesSubordinadas(
+    public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
             String siglaUnidade,
             String nomeProcesso,
             List<String> siglasUnidadesSubordinadas) {

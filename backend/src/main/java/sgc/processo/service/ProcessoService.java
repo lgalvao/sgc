@@ -8,14 +8,19 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
 import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.dto.*;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
+import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -84,7 +89,7 @@ public class ProcessoService {
      * @param requisicao DTO contendo os dados para a criação do processo.
      * @return DTO do processo criado.
      * @throws ConstraintViolationException se a descrição ou as unidades participantes não forem fornecidas.
-     * @throws ErroDominioNaoEncontrado     se alguma das unidades especificadas não existir (para tipos REVISAO ou DIAGNOSTICO).
+     * @throws ErroEntidadeNaoEncontrada     se alguma das unidades especificadas não existir (para tipos REVISAO ou DIAGNOSTICO).
      */
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
@@ -98,7 +103,7 @@ public class ProcessoService {
         if (requisicao.tipo() == TipoProcesso.REVISAO || requisicao.tipo() == TipoProcesso.DIAGNOSTICO) {
             for (Long codigoUnidade : requisicao.unidades()) {
                 if (unidadeRepo.findById(codigoUnidade).isEmpty()) {
-                    throw new ErroDominioNaoEncontrado("Unidade", codigoUnidade);
+                    throw new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade);
                 }
             }
         }
@@ -115,7 +120,7 @@ public class ProcessoService {
         // Salvar snapshot das unidades participantes
         for (Long codigoUnidade : requisicao.unidades()) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoSalvo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
         }
@@ -134,13 +139,13 @@ public class ProcessoService {
      * @param codigo         O código do processo a ser atualizado.
      * @param requisicao DTO contendo os novos dados do processo.
      * @return DTO do processo atualizado.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o processo não for encontrado.
      * @throws IllegalStateException    se o processo não estiver na situação 'CRIADO'.
      */
     @Transactional
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoReq requisicao) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -156,7 +161,7 @@ public class ProcessoService {
         unidadeProcessoRepo.deleteByCodProcesso(codigo);
         for (Long codigoUnidade : requisicao.unidades()) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
             UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoAtualizado, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
         }
@@ -172,13 +177,13 @@ public class ProcessoService {
      * A remoção só é permitida se o processo estiver na situação 'CRIADO'.
      *
      * @param codigo O código do processo a ser removido.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o processo não for encontrado.
      * @throws IllegalStateException    se o processo não estiver na situação 'CRIADO'.
      */
     @Transactional
     public void apagar(Long codigo) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser removidos.");
@@ -210,13 +215,13 @@ public class ProcessoService {
      *
      * @param codProcesso O código do processo a ser detalhado.
      * @return DTO com os detalhes completos do processo.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o processo não for encontrado.
      */
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codProcesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
         List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
@@ -254,7 +259,7 @@ public class ProcessoService {
     @Transactional
     public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -274,7 +279,7 @@ public class ProcessoService {
 
         for (UnidadeProcesso up : unidadesProcesso) {
             Unidade unidade = unidadeRepo.findById(up.getCodUnidade())
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", up.getCodUnidade()));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", up.getCodUnidade()));
 
             criarSubprocessoParaMapeamento(processo, unidade);
         }
@@ -295,7 +300,7 @@ public class ProcessoService {
     @Transactional
     public void iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
@@ -310,7 +315,7 @@ public class ProcessoService {
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
             criarSubprocessoParaRevisao(processo, unidade);
         }
@@ -333,7 +338,7 @@ public class ProcessoService {
         log.info("Iniciando finalização do processo: código={}", codigo);
 
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);
@@ -399,7 +404,7 @@ public class ProcessoService {
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
 
         Long codMapaVigente = unidadeMapa.getMapaVigenteCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());

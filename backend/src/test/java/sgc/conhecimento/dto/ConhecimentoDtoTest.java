@@ -1,6 +1,7 @@
 package sgc.conhecimento.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.atividade.dto.ConhecimentoDto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

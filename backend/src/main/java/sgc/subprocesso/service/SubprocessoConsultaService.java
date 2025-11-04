@@ -3,7 +3,7 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 
@@ -18,11 +18,11 @@ public class SubprocessoConsultaService {
      *
      * @param codigo O código do subprocesso.
      * @return A entidade {@link Subprocesso} correspondente.
-     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     public Subprocesso getSubprocesso(Long codigo) {
         return subprocessoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     /**
@@ -31,13 +31,13 @@ public class SubprocessoConsultaService {
      *
      * @param codigo O código do subprocesso.
      * @return A entidade {@link Subprocesso} correspondente.
-     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado ou
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado ou
      *                                  se não possuir um mapa associado.
      */
     public Subprocesso getSubprocessoComMapa(Long codigo) {
         Subprocesso subprocesso = getSubprocesso(codigo);
         if (subprocesso.getMapa() == null) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
         }
         return subprocesso;
     }

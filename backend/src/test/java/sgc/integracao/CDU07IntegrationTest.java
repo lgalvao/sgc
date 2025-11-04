@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.comum.BeanUtil;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.modelo.Processo;
@@ -148,7 +148,7 @@ public class CDU07IntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve falhar ao buscar subprocesso inexistente")
         void falhaSubprocessoInexistente() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
         }
     }
 }

@@ -206,7 +206,7 @@ class CDU17IntegrationTest {
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
 
             // Verificar Limpeza do Histórico
-            List<Analise> analisesRestantes = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
+            List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
             assertThat(analisesRestantes).isEmpty();
         }
     }

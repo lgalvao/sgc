@@ -3,7 +3,6 @@ package sgc.subprocesso.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,12 +14,4 @@ import java.util.List;
 public record SalvarAjustesReq(
     @NotNull @Valid List<CompetenciaAjusteDto> competencias
 ) {
-    public SalvarAjustesReq {
-        competencias = new ArrayList<>(competencias);
-    }
-
-    @Override
-    public List<CompetenciaAjusteDto> competencias() {
-        return new ArrayList<>(competencias);
-    }
 }

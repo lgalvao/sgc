@@ -197,8 +197,8 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoCadastroDto_RecordConstructorAndAccessors() {
-        List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividades = List.of(
-                SubprocessoCadastroDto.AtividadeCadastroDTO.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividades = List.of(
+                SubprocessoCadastroDto.AtividadeCadastroDto.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
         );
         SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder().subprocessoId(1L).unidadeSigla(SIGLA).atividades(atividades).build();
 

@@ -62,12 +62,12 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de cadastro disponibilizado com os dados corretos")
-    void criarEmailDeCadastroDisponibilizado() {
+    void criarEmailCadastroDisponibilizado() {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
         int quantidadeAtividades = 10;
 
-        notificacaoModeloEmailService.criarEmailDeCadastroDisponibilizado(nomeUnidade, nomeProcesso, quantidadeAtividades);
+        notificacaoModeloEmailService.criarEmailCadastroDisponibilizado(nomeUnidade, nomeProcesso, quantidadeAtividades);
 
         assertEquals("cadastro-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -79,13 +79,13 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de cadastro devolvido com os dados corretos")
-    void criarEmailDeCadastroDevolvido() {
+    void criarEmailCadastroDevolvido() {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
         String motivo = "Motivo Teste";
         String observacoes = "Observações Teste";
 
-        notificacaoModeloEmailService.criarEmailDeCadastroDevolvido(nomeUnidade, nomeProcesso, motivo, observacoes);
+        notificacaoModeloEmailService.criarEmailCadastroDevolvido(nomeUnidade, nomeProcesso, motivo, observacoes);
 
         assertEquals("cadastro-devolvido", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -98,12 +98,12 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de mapa disponibilizado com os dados corretos")
-    void criarEmailDeMapaDisponibilizado() {
+    void criarEmailMapaDisponibilizado() {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
         LocalDateTime dataLimite = LocalDateTime.now();
 
-        notificacaoModeloEmailService.criarEmailDeMapaDisponibilizado(nomeUnidade, nomeProcesso, dataLimite);
+        notificacaoModeloEmailService.criarEmailMapaDisponibilizado(nomeUnidade, nomeProcesso, dataLimite);
 
         assertEquals("mapa-disponibilizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -115,11 +115,11 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de mapa validado com os dados corretos")
-    void criarEmailDeMapaValidado() {
+    void criarEmailMapaValidado() {
         String nomeUnidade = "Unidade Teste";
         String nomeProcesso = "Processo Teste";
 
-        notificacaoModeloEmailService.criarEmailDeMapaValidado(nomeUnidade, nomeProcesso);
+        notificacaoModeloEmailService.criarEmailMapaValidado(nomeUnidade, nomeProcesso);
 
         assertEquals("mapa-validado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -130,12 +130,12 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de processo finalizado com os dados corretos")
-    void criarEmailDeProcessoFinalizado() {
+    void criarEmailProcessoFinalizado() {
         String nomeProcesso = "Processo Teste";
         LocalDateTime dataFinalizacao = LocalDateTime.now();
         int quantidadeMapas = 5;
 
-        notificacaoModeloEmailService.criarEmailDeProcessoFinalizado(nomeProcesso, dataFinalizacao, quantidadeMapas);
+        notificacaoModeloEmailService.criarEmailProcessoFinalizado(nomeProcesso, dataFinalizacao, quantidadeMapas);
 
         assertEquals("processo-finalizado", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -147,11 +147,11 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de processo finalizado por unidade com os dados corretos")
-    void criarEmailDeProcessoFinalizadoPorUnidade() {
+    void criarEmailProcessoFinalizadoPorUnidade() {
         String siglaUnidade = "UT";
         String nomeProcesso = "Processo Teste";
 
-        notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(siglaUnidade, nomeProcesso);
+        notificacaoModeloEmailService.criarEmailProcessoFinalizadoPorUnidade(siglaUnidade, nomeProcesso);
 
         assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();
@@ -162,12 +162,12 @@ class NotificacaoModeloEmailServiceTest {
 
     @Test
     @DisplayName("Deve criar email de processo finalizado para unidades subordinadas com os dados corretos")
-    void criarEmailDeProcessoFinalizadoUnidadesSubordinadas() {
+    void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
         String siglaUnidade = "UT";
         String nomeProcesso = "Processo Teste";
         List<String> siglas = List.of("SUB1", "SUB2");
 
-        notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoUnidadesSubordinadas(siglaUnidade, nomeProcesso, siglas);
+        notificacaoModeloEmailService.criarEmailProcessoFinalizadoUnidadesSubordinadas(siglaUnidade, nomeProcesso, siglas);
 
         assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
         Context context = contextCaptor.getValue();

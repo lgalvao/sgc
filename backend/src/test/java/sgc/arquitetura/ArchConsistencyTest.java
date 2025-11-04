@@ -19,13 +19,13 @@ public class ArchConsistencyTest {
 
     @ArchTest
     static final ArchRule mapa_controller_should_only_access_mapa_service =
-        classes().that().haveNameMatching("sgc.mapa.MapaControle")
+        classes().that().haveNameMatching("sgc.mapa.MapaController")
                 .should().onlyAccessClassesThat().haveNameMatching("sgc.mapa.service.MapaService")
                 .orShould().accessClassesThat().resideOutsideOfPackage("sgc.mapa..");
 
     @ArchTest
     static final ArchRule processo_controller_should_only_access_processo_service =
-        classes().that().haveNameMatching("sgc.processo.ProcessoControle")
+        classes().that().haveNameMatching("sgc.processo.ProcessoController")
                 .should().onlyAccessClassesThat().haveNameMatching("sgc.processo.service.ProcessoService")
                 .orShould().accessClassesThat().resideOutsideOfPackage("sgc.processo..");
 

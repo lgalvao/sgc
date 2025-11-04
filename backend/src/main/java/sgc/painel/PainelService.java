@@ -42,6 +42,7 @@ public class PainelService {
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
     public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
+        // TODO usar exceção específica do sistema. Criar se precisar.
         if (perfil == null) {
             throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
         }
@@ -50,10 +51,9 @@ public class PainelService {
         if (perfil == Perfil.ADMIN) {
             processos = processoRepo.findAll();
         } else {
-            if (codigoUnidade == null) {
-                return Page.empty(pageable);
-            }
-            List<Long> unidadeIds = getUnidadesSubordinadasIds(codigoUnidade);
+            if (codigoUnidade == null) return Page.empty(pageable);
+
+            List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
             List<Long> processoIds = unidadeProcessoRepo.findByCodUnidadeIn(unidadeIds)
@@ -64,12 +64,12 @@ public class PainelService {
 
             processos = processoRepo.findAllById(processoIds).stream()
                     .filter(p -> p.getSituacao() != SituacaoProcesso.CRIADO)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         List<ProcessoResumoDto> dtos = processos.stream()
-                .map(this::mapToProcessoResumoDto)
-                .collect(Collectors.toList());
+                .map(this::paraProcessoResumoDto)
+                .toList();
 
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
@@ -89,28 +89,28 @@ public class PainelService {
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
             return alertaRepo.findByUsuarioDestino_TituloEleitoral(Long.parseLong(usuarioTitulo), pageable)
-                    .map(this::mapToAlertaDto);
+                    .map(this::paraAlertaDto);
         }
         if (codigoUnidade != null) {
-            List<Long> unidadeIds = getUnidadesSubordinadasIds(codigoUnidade);
+            List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
             return alertaRepo.findByUnidadeDestino_CodigoIn(unidadeIds, pageable)
-                    .map(this::mapToAlertaDto);
+                    .map(this::paraAlertaDto);
         }
-        return alertaRepo.findAll(pageable).map(this::mapToAlertaDto);
+        return alertaRepo.findAll(pageable).map(this::paraAlertaDto);
     }
 
-    private List<Long> getUnidadesSubordinadasIds(Long unidadeId) {
-        List<Unidade> subordinadas = unidadeRepo.findByUnidadeSuperiorCodigo(unidadeId);
+    private List<Long> obterIdsUnidadesSubordinadas(Long codUnidade) {
+        List<Unidade> subordinadas = unidadeRepo.findByUnidadeSuperiorCodigo(codUnidade);
         List<Long> ids = new ArrayList<>();
         for (Unidade u : subordinadas) {
             ids.add(u.getCodigo());
-            ids.addAll(getUnidadesSubordinadasIds(u.getCodigo()));
+            ids.addAll(obterIdsUnidadesSubordinadas(u.getCodigo()));
         }
         return ids;
     }
 
-    private ProcessoResumoDto mapToProcessoResumoDto(Processo processo) {
+    private ProcessoResumoDto paraProcessoResumoDto(Processo processo) {
         UnidadeProcesso up = unidadeProcessoRepo.findByCodProcesso((processo.getCodigo())).stream().findFirst().orElse(null);
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
@@ -124,7 +124,7 @@ public class PainelService {
                 .build();
     }
 
-    private AlertaDto mapToAlertaDto(Alerta alerta) {
+    private AlertaDto paraAlertaDto(Alerta alerta) {
         return AlertaDto.builder()
             .codigo(alerta.getCodigo())
             .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)

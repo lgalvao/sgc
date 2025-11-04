@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.modelo.Perfil;
@@ -92,7 +92,7 @@ class UsuarioServiceTest {
         when(usuarioRepo.findByTituloEleitoral(tituloEleitoral)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.autorizar(tituloEleitoral))
-            .isInstanceOf(ErroDominioNaoEncontrado.class)
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class)
             .hasMessageContaining("Usuário' com codigo '999' não encontrado");
     }
 

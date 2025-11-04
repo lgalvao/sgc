@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MapaIntegridadeService {
-
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
@@ -31,6 +30,7 @@ public class MapaIntegridadeService {
      *
      * @param codMapa O código do mapa a ser validado.
      */
+    // TODO essa validação está me parecendo inócua. Parece indicar partes ainda nao implementadas!
     public void validarIntegridadeMapa(Long codMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
@@ -42,7 +42,7 @@ public class MapaIntegridadeService {
         }
 
         for (Competencia competencia : competencias) {
-            if (competenciaAtividadeRepo.findByCompetencia_Codigo(competencia.getCodigo()).isEmpty()) {
+            if (competenciaAtividadeRepo.findByCompetenciaCodigo(competencia.getCodigo()).isEmpty()) {
                 log.warn("Competência {} sem atividades vinculadas no mapa {}", competencia.getCodigo(), codMapa);
             }
         }

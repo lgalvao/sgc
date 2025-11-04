@@ -13,8 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.sgrh.dto.AutenticacaoRequest;
-import sgc.sgrh.dto.EntrarRequest;
+import sgc.sgrh.dto.AutenticacaoReq;
+import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
@@ -52,7 +52,7 @@ class UsuarioControleIntegrationTest {
     @Test
     @DisplayName("Deve autenticar com sucesso")
     void autenticar_deveRetornarTrue() throws Exception {
-        AutenticacaoRequest request = AutenticacaoRequest.builder()
+        AutenticacaoReq request = AutenticacaoReq.builder()
             .tituloEleitoral(123456789101L)
             .senha("senha")
             .build();
@@ -96,7 +96,7 @@ class UsuarioControleIntegrationTest {
     @Test
     @DisplayName("Deve entrar com sucesso")
     void entrar_deveRetornarOk() throws Exception {
-        EntrarRequest request = EntrarRequest.builder()
+        EntrarReq request = EntrarReq.builder()
             .tituloEleitoral(123456789101L)
             .perfil(Perfil.CHEFE.toString())
             .unidadeCodigo(unidade.getCodigo())

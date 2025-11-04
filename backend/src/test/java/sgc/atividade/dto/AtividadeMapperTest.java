@@ -33,7 +33,7 @@ class AtividadeMapperTest {
     }
 
     @Test
-    void testToDTO() {
+    void testToDto() {
         Atividade atividade = new Atividade();
         atividade.setCodigo(1L);
         atividade.setDescricao(TEST_DESCRIPTION);
@@ -42,7 +42,7 @@ class AtividadeMapperTest {
         mapa.setCodigo(100L);
         atividade.setMapa(mapa);
 
-        AtividadeDto dto = mapper.toDTO(atividade);
+        AtividadeDto dto = mapper.toDto(atividade);
 
         assertEquals(1L, dto.codigo());
         assertEquals(100L, dto.mapaCodigo());

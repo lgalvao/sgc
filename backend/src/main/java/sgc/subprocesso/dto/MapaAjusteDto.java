@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import sgc.analise.modelo.Analise;
 import sgc.atividade.modelo.Atividade;
+import sgc.atividade.modelo.Conhecimento;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.conhecimento.modelo.Conhecimento;
 import sgc.subprocesso.modelo.Subprocesso;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class MapaAjusteDto {
     @NotNull @Valid private final List<CompetenciaAjusteDto> competencias;
     private final String justificativaDevolucao;
 
-    // TODO Parametros demais!
+    // TODO Parametros demais! Mudar para @Builder
     public static MapaAjusteDto of(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, List<CompetenciaAtividade> competenciaAtividades) {
         Long codMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";

@@ -10,10 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
 import sgc.atividade.dto.AtividadeMapper;
+import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.conhecimento.dto.ConhecimentoMapper;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.modelo.ConhecimentoRepo;
+import sgc.comum.erros.ErroAccessoNegado;
 import sgc.sgrh.modelo.Perfil;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
@@ -61,7 +61,7 @@ class SubprocessoDtoServiceTest {
         @Test
         @DisplayName("Deve lançar exceção se perfil for nulo")
         void obterDetalhes_PerfilNulo_LancaExcecao() {
-            assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, null, 1L));
+            assertThrows(ErroAccessoNegado.class, () -> service.obterDetalhes(1L, null, 1L));
         }
 
 
@@ -69,7 +69,7 @@ class SubprocessoDtoServiceTest {
         @DisplayName("Deve lançar exceção se usuário não tiver permissão")
         void obterDetalhes_SemPermissao_LancaExcecao() {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-            assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, Perfil.GESTOR, 2L));
+            assertThrows(ErroAccessoNegado.class, () -> service.obterDetalhes(1L, Perfil.GESTOR, 2L));
         }
     }
 }

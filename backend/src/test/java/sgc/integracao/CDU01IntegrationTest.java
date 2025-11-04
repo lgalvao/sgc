@@ -13,8 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.sgrh.dto.AutenticacaoRequest;
-import sgc.sgrh.dto.EntrarRequest;
+import sgc.sgrh.dto.AutenticacaoReq;
+import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
@@ -67,7 +67,7 @@ public class CDU01IntegrationTest {
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
             long tituloEleitoral = 123456789012L;
             String senha = "password";
-            AutenticacaoRequest authRequest = AutenticacaoRequest.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
+            AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Admin", "admin@email.com", "123", unidadeAdmin, Collections.singleton(Perfil.ADMIN)));
 
@@ -87,11 +87,11 @@ public class CDU01IntegrationTest {
                 .andExpect(jsonPath("$[0].siglaUnidade").value("ADM"));
 
             // Act & Assert: Etapa 3 - Entrar
-            EntrarRequest entrarRequest = EntrarRequest.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(unidadeAdmin.getCodigo()).build();
+            EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(unidadeAdmin.getCodigo()).build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(testUtil.toJson(entrarRequest)))
+                    .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isOk());
         }
 
@@ -100,7 +100,7 @@ public class CDU01IntegrationTest {
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
             long tituloEleitoral = 987654321098L;
             String senha = "password";
-            AutenticacaoRequest authRequest = AutenticacaoRequest.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
+            AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
             usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Múltiplo", "multiplo@email.com", "456", unidadeAdmin, Set.of(Perfil.ADMIN, Perfil.GESTOR)));
 
@@ -119,11 +119,11 @@ public class CDU01IntegrationTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
 
-            EntrarRequest entrarRequest = EntrarRequest.builder().tituloEleitoral(tituloEleitoral).perfil("GESTOR").unidadeCodigo(unidadeAdmin.getCodigo()).build();
+            EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("GESTOR").unidadeCodigo(unidadeAdmin.getCodigo()).build();
             mockMvc.perform(post(BASE_URL + "/entrar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(testUtil.toJson(entrarRequest)))
+                    .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isOk());
         }
 
@@ -150,13 +150,13 @@ public class CDU01IntegrationTest {
             // Arrange
             long tituloEleitoral = 111222333444L;
             long codigoUnidadeInexistente = 999L;
-            EntrarRequest entrarRequest = EntrarRequest.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(codigoUnidadeInexistente).build();
+            EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(codigoUnidadeInexistente).build();
 
             // Act & Assert
             mockMvc.perform(post(BASE_URL + "/entrar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(testUtil.toJson(entrarRequest)))
+                    .content(testUtil.toJson(entrarReq)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Unidade não encontrada com código: " + codigoUnidadeInexistente));
         }

@@ -18,9 +18,12 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
-    properties:
-      hibernate.hbm2ddl.import_files: import.sql
-      hibernate.hbm2ddl.import_files_sql_extractor: org.hibernate.tool.schema.internal.script.SingleLineSqlScriptExtractor
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      schema-locations:
+      platform: h2
   devtools:
     restart:
       enabled: false

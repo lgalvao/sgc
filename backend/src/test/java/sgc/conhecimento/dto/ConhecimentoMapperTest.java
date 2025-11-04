@@ -7,9 +7,11 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import sgc.atividade.dto.ConhecimentoDto;
+import sgc.atividade.dto.ConhecimentoMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.conhecimento.modelo.Conhecimento;
+import sgc.atividade.modelo.Conhecimento;
 
 import java.util.Optional;
 
@@ -32,7 +34,7 @@ class ConhecimentoMapperTest {
     }
 
     @Test
-    void testToDTO() {
+    void testToDto() {
         Conhecimento conhecimento = new Conhecimento();
         conhecimento.setCodigo(1L);
         conhecimento.setDescricao(TEST_DESCRIPTION);
@@ -41,7 +43,7 @@ class ConhecimentoMapperTest {
         atividade.setCodigo(100L);
         conhecimento.setAtividade(atividade);
 
-        ConhecimentoDto dto = mapper.toDTO(conhecimento);
+        ConhecimentoDto dto = mapper.toDto(conhecimento);
 
         assertEquals(1L, dto.codigo());
         assertEquals(100L, dto.atividadeCodigo());

@@ -3,21 +3,14 @@ spring:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
     driverClassName: org.h2.Driver
     username: sa
-    password: password
+    password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
+    hibernate.ddl-auto: create-drop
     defer-datasource-initialization: true
-  sql:
-    init:
-      mode: always
-      schema-locations:
-        - classpath:schema.sql
-      data-locations:
-        - classpath:data.sql
+  sql.init.mode: always
 aplicacao:
   email:
-    remetente: "test@example.com"
-    remetente-nome: "Test"
+    remetente: "sedoc@tre-pe.jus.br"
+    remetente-nome: "SEDOC"
     assunto-prefixo: "[SGC-TEST]"

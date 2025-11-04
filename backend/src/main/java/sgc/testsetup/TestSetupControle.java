@@ -11,6 +11,7 @@ import java.util.Map;
 @RequestMapping("/api/test-setup")
 @Profile("test") // Only active for 'test' Spring profile
 @RequiredArgsConstructor
+// TODO isso parece lixo!
 public class TestSetupControle {
     private final TestSetupService testSetupService;
 

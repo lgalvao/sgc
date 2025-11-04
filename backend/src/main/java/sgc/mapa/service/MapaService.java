@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -44,7 +44,7 @@ public class MapaService {
 
     @Transactional(readOnly = true)
     public Mapa obterPorCodigo(Long codigo) {
-        return repositorioMapa.findById(codigo).orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", codigo));
+        return repositorioMapa.findById(codigo).orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
     }
 
     public Mapa criar(Mapa mapa) {
@@ -60,12 +60,12 @@ public class MapaService {
                     existente.setDataHoraHomologado(mapa.getDataHoraHomologado());
                     return repositorioMapa.save(existente);
                 })
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", codigo));
     }
 
     public void excluir(Long codigo) {
         if (!repositorioMapa.existsById(codigo)) {
-            throw new ErroDominioNaoEncontrado("Mapa", codigo);
+            throw new ErroEntidadeNaoEncontrada("Mapa", codigo);
         }
         repositorioMapa.deleteById(codigo);
     }
@@ -77,20 +77,20 @@ public class MapaService {
      * @param codMapa        O código do mapa a ser buscado.
      * @param codSubprocesso O código do subprocesso associado (usado para compor o DTO de retorno).
      * @return Um {@link MapaCompletoDto} com todos os detalhes do mapa.
-     * @throws ErroDominioNaoEncontrado se o mapa não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
      */
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
         log.debug("Obtendo mapa completo: codigo={}, codSubprocesso={}", codMapa, codSubprocesso);
 
         Mapa mapa = repositorioMapa.findById(codMapa)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(codMapa)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
 
         List<Competencia> competencias = repositorioCompetencia.findByMapaCodigo(codMapa);
 
         List<CompetenciaMapaDto> competenciasDto = competencias.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetencia_Codigo(c.getCodigo()).stream().map(ca -> ca.getId().getCodAtividade()).toList();
+                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getCodAtividade()).toList();
 
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
@@ -126,13 +126,13 @@ public class MapaService {
      * @param request                O DTO com o estado completo do mapa.
      * @param usuarioTituloEleitoral O título de eleitor do usuário que está realizando a operação.
      * @return Um {@link MapaCompletoDto} representando o estado final do mapa salvo.
-     * @throws ErroDominioNaoEncontrado se o mapa ou uma competência a ser atualizada não forem encontrados.
+     * @throws ErroEntidadeNaoEncontrada se o mapa ou uma competência a ser atualizada não forem encontrados.
      */
     public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
 
         Mapa mapa = repositorioMapa.findById(codMapa)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado: %d".formatted(codMapa)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
 
         var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
@@ -167,7 +167,7 @@ public class MapaService {
                 log.debug("Nova competência criada: {}", competencia.getCodigo());
             } else {
                 competencia = repositorioCompetencia.findById(compDto.codigo())
-                        .orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada: %d".formatted(compDto.codigo())));
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.codigo())));
                 competencia.setDescricao(compDto.descricao());
                 competencia = repositorioCompetencia.save(competencia);
                 log.debug("Competência atualizada: {}", competencia.getCodigo());
@@ -180,7 +180,7 @@ public class MapaService {
         List<Competencia> competenciasFinais = repositorioCompetencia.findByMapaCodigo(codMapa);
         List<CompetenciaMapaDto> competenciasDtoFinais = competenciasFinais.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetencia_Codigo(c.getCodigo()).stream().map(ca -> ca.getId().getCodAtividade()).toList();
+                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getCodAtividade()).toList();
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
                             c.getDescricao(),

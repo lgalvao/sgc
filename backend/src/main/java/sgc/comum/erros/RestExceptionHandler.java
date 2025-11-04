@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
+// TODO essa classe me parece muito repetitiva. E os tratamentos não estão específicos o suficiente.
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final PolicyFactory SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
 
@@ -77,14 +78,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, message, subErrors));
     }
 
-    @ExceptionHandler(ErroDominioNaoEncontrado.class)
-    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroDominioNaoEncontrado ex) {
+    @ExceptionHandler(ErroEntidadeNaoEncontrada.class)
+    protected ResponseEntity<Object> handleErroDominioNaoEncontrado(ErroEntidadeNaoEncontrada ex) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.NOT_FOUND, sanitizar(ex.getMessage())));
     }
 
-    @ExceptionHandler(ErroDominioAccessoNegado.class)
-    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroDominioAccessoNegado ex) {
+    @ExceptionHandler(ErroAccessoNegado.class)
+    protected ResponseEntity<Object> handleErroDominioAccessoNegado(ErroAccessoNegado ex) {
         log.warn("Acesso negado: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.FORBIDDEN, sanitizar(ex.getMessage())));
     }
@@ -125,7 +126,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleGenericException(Exception ex) {
         log.error("Erro inesperado na aplicação: {}", ex.getMessage(), ex);
-        String message = "Ocorreu um erro inesperado. Contate o suporte.";
-        return buildResponseEntity(new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message));
+        return buildResponseEntity(new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 }

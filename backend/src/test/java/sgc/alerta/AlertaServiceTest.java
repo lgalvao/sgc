@@ -13,7 +13,7 @@ import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.alerta.modelo.AlertaUsuario;
 import sgc.alerta.modelo.AlertaUsuarioRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.service.SgrhService;
@@ -142,7 +142,7 @@ class AlertaServiceTest {
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroDominioNaoEncontrado.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
     }
 
     @Test
