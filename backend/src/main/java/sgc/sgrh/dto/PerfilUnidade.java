@@ -1,8 +1,7 @@
 package sgc.sgrh.dto;
 
 import lombok.*;
-import sgc.sgrh.Perfil;
-import sgc.unidade.modelo.Unidade;
+import sgc.sgrh.modelo.Perfil;
 
 @Getter
 @Setter
@@ -12,9 +11,9 @@ import sgc.unidade.modelo.Unidade;
 public class PerfilUnidade {
 
     private Perfil perfil;
-    private Unidade unidade;
+    private UnidadeDto unidade;
 
     public String getSiglaUnidade() {
-        return unidade.getSigla();
+        return unidade.sigla();
     }
 }

@@ -8,31 +8,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.Alerta;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.processo.SituacaoProcesso;
+import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.subprocesso.SubprocessoNotificacaoService;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import sgc.subprocesso.modelo.*;
+import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -40,8 +37,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
+@Import(TestThymeleafConfig.class)
 public class CDU20IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -79,6 +76,9 @@ public class CDU20IntegrationTest {
 
     @MockitoSpyBean
     private SubprocessoNotificacaoService subprocessoNotificacaoService;
+
+    @MockitoSpyBean
+    private NotificacaoService notificacaoService;
 
 
     private Subprocesso subprocesso;
@@ -133,6 +133,9 @@ public class CDU20IntegrationTest {
     @DisplayName("Devolução e aceite da validação do mapa com verificação do histórico")
     @WithMockChefe()
     void devolucaoEaceiteComVerificacaoHistorico() throws Exception {
+        // Desativa apenas o envio de e-mail, permitindo que a criação de alerta execute
+        doNothing().when(notificacaoService).enviarEmail(any(), any(), any());
+
         // Devolução do mapa
         DevolverValidacaoReq devolverReq = new DevolverValidacaoReq("Justificativa da devolução");
         mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
@@ -150,9 +153,9 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.getFirst().acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-        assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.getFirst().observacoes()).isEqualTo("Justificativa da devolução");
+        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+        assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
+        assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
 
         // Adicionar verificação de Movimentacao e Alerta após devolução
         List<Movimentacao> movimentacoesDevolucao = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -185,8 +188,8 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-        assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
+        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+        assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());

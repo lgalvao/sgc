@@ -31,41 +31,7 @@
       @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
     />
 
-
-    <!-- Seção de Movimentações do Processo -->
-    <div class="mt-4">
-      <h4>Movimentações do Processo</h4>
-      <div
-        v-if="movements.length === 0"
-        class="alert alert-info"
-      >
-        Nenhuma movimentação registrada para este subprocesso.
-      </div>
-      <table
-        v-else
-        class="table table-striped"
-      >
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Unidade Origem</th>
-            <th>Unidade Destino</th>
-            <th>Descrição</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="movement in movements"
-            :key="movement.codigo"
-          >
-            <td>{{ formatDateTimeBR(movement.dataHora) }}</td>
-            <td>{{ movement.unidadeOrigem }}</td>
-            <td>{{ movement.unidadeDestino }}</td>
-            <td>{{ movement.descricao }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <TabelaMovimentacoes :movimentacoes="movements" />
   </div>
 
   <SubprocessoModal
@@ -87,17 +53,25 @@ import {useMapasStore} from '@/stores/mapas'
 import {useServidoresStore} from '@/stores/servidores'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
-import {MapaCompleto, Movimentacao, Perfil, Servidor, SituacaoSubprocesso, TipoProcesso, Unidade} from "@/types/tipos";
-import {formatDateTimeBR} from '@/utils';
+import {
+  MapaCompleto,
+  type Movimentacao,
+  Perfil,
+  Servidor,
+  SituacaoSubprocesso,
+  TipoProcesso,
+  Unidade
+} from "@/types/tipos";
 import {useNotificacoesStore} from '@/stores/notificacoes';
 import SubprocessoHeader from '@/components/SubprocessoHeader.vue';
 import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import SubprocessoModal from '@/components/SubprocessoModal.vue';
+import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
 
-const props = defineProps<{ idProcesso: number; siglaUnidade: string }>();
+const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const router = useRouter()
-const idProcesso = computed(() => props.idProcesso)
+const codProcesso = computed(() => props.codProcesso)
 const siglaParam = computed<string | undefined>(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
@@ -158,7 +132,7 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
 
 const titularDetalhes = computed<Servidor | null>(() => {
   if (unidadeComResponsavelDinamico.value && unidadeComResponsavelDinamico.value.idServidorTitular) {
-    return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.idServidorTitular) || null;
+    return servidoresStore.getServidorById(Number(unidadeComResponsavelDinamico.value.idServidorTitular)) || null;
   }
   return null;
 });
@@ -174,12 +148,12 @@ const situacaoUnidadeNoProcesso = computed(() => {
   return SubprocessoDetalhes.value?.situacao || SituacaoSubprocesso.NAO_INICIADO;
 });
 
-const idSubprocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
+const codSubrocesso = computed(() => SubprocessoDetalhes.value?.unidadeCodigo);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await mapaStore.fetchMapaCompleto(idSubprocesso.value as number);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  if (codSubrocesso.value) {
+    await mapaStore.fetchMapaCompleto(codSubrocesso.value);
   }
 });
 
@@ -227,7 +201,6 @@ const dataLimiteAtual = computed<Date>(() => {
 });
 
 // Computed properties movidos para os componentes específicos
-
 const movements = computed<Movimentacao[]>(() => {
   if (!SubprocessoDetalhes.value) return [];
   return processosStore.getMovementsForSubprocesso(SubprocessoDetalhes.value.codigo);
@@ -238,7 +211,7 @@ function navegarParaMapa() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'SubprocessoVisMapa', params});
 }
 
@@ -247,10 +220,10 @@ function irParaAtividadesConhecimentos() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
-  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === sigla.value) {
+  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === unidadeOriginal.value?.codigo) {
     console.log('Navigating to SubprocessoCadastro with params:', params); // ADD THIS
     router.push({name: 'SubprocessoCadastro', params}); // Abre CadAtividades.vue
   } else {
@@ -264,7 +237,7 @@ function irParaDiagnosticoEquipe() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'DiagnosticoEquipe', params});
 }
 
@@ -273,7 +246,7 @@ function irParaOcupacoesCriticas() {
     return;
   }
 
-  const params = {idProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
+  const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
   router.push({name: 'OcupacoesCriticas', params});
 }
 
@@ -293,7 +266,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   try {
     // Chamar a store para atualizar a data limite
-    await processosStore.alterarDataLimiteSubprocesso();
+    await processosStore.alterarDataLimiteSubprocesso(SubprocessoDetalhes.value.codigo, { novaData: novaData });
 
     // Fechar modal
     fecharModalAlterarDataLimite();

@@ -14,11 +14,11 @@ import sgc.subprocesso.modelo.SubprocessoRepo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Serviço para gerenciar as análises de subprocessos.
  */
+@Service
+@RequiredArgsConstructor
 public class AnaliseService {
     private final AnaliseRepo analiseRepo;
     private final SubprocessoRepo subprocessoRepo;
@@ -45,25 +45,25 @@ public class AnaliseService {
     /**
      * Cria e persiste uma nova análise com base nos dados fornecidos.
      *
-     * @param request O DTO contendo todas as informações necessárias para criar a análise.
+     * @param req O DTO contendo todas as informações necessárias para criar a análise.
      * @return A entidade {@link Analise} que foi criada e salva no banco de dados.
      * @throws ErroDominioNaoEncontrado se o subprocesso associado à análise não for encontrado.
      */
     @Transactional
-    public Analise criarAnalise(CriarAnaliseRequestDto request) {
+    public Analise criarAnalise(CriarAnaliseRequestDto req) {
+        Subprocesso sp = subprocessoRepo.findById(req.getSubprocessoCodigo())
+            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", req.getSubprocessoCodigo()));
 
-        Subprocesso sp = subprocessoRepo.findById(request.subprocessoCodigo())
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", request.subprocessoCodigo()));
-
-        Analise a = new Analise();
-        a.setSubprocesso(sp);
-        a.setDataHora(LocalDateTime.now());
-        a.setObservacoes(request.observacoes());
-        a.setTipo(request.tipo());
-        a.setAcao(request.acao());
-        a.setUnidadeSigla(request.unidadeSigla());
-        a.setAnalistaUsuarioTitulo(request.analistaUsuarioTitulo());
-        a.setMotivo(request.motivo());
+        Analise a = Analise.builder()
+            .subprocesso(sp)
+            .dataHora(LocalDateTime.now())
+            .observacoes(req.getObservacoes())
+            .tipo(req.getTipo())
+            .acao(req.getAcao())
+            .unidadeSigla(req.getUnidadeSigla())
+            .analistaUsuarioTitulo(req.getAnalistaUsuarioTitulo())
+            .motivo(req.getMotivo())
+            .build();
 
         return analiseRepo.save(a);
     }

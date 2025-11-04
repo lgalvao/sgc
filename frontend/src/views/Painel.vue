@@ -36,50 +36,11 @@
           Alertas
         </div>
       </div>
-      <table
-        class="table"
-        data-testid="tabela-alertas"
-      >
-        <thead>
-          <tr>
-            <th
-              style="cursor: pointer;"
-              @click="ordenarAlertasPor('data')"
-            >
-              Data/Hora
-            </th>
-            <th>Descrição</th>
-            <th
-              style="cursor: pointer;"
-              @click="ordenarAlertasPor('processo')"
-            >
-              Processo
-            </th>
-            <th>Origem</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(alerta, index) in alertasOrdenados"
-            :key="index"
-            style="cursor: pointer;"
-            @click="marcarComoLido(alerta.codigo)"
-          >
-            <td>{{ alerta.dataFormatada }}</td>
-            <td>{{ alerta.descricao }}</td>
-            <td>{{ alerta.processoCodigo }}</td>
-            <td>{{ alerta.unidadeOrigemCodigo }}</td>
-          </tr>
-          <tr v-if="!alertasOrdenados || alertasOrdenados.length === 0">
-            <td
-              class="text-center text-muted"
-              colspan="4"
-            >
-              Nenhum alerta no momento.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <TabelaAlertas
+        :alertas="alertasOrdenados"
+        @ordenar="ordenarAlertasPor"
+        @marcar-como-lido="marcarComoLido"
+      />
     </div>
   </div>
 </template>
@@ -91,8 +52,9 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
 import {useRouter} from 'vue-router'
-import {Perfil, type ProcessoResumo} from '@/types/tipos'
+import {type AlertaFormatado, Perfil, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
+import TabelaAlertas from '@/components/TabelaAlertas.vue';
 import {formatDateTimeBR} from '@/utils';
 
 const perfil = usePerfilStore()
@@ -142,49 +104,55 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   
   // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
   if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'CRIADO') { 
-    router.push({name: 'CadProcesso', query: {idProcesso: processo.codigo}})
+    router.push({name: 'CadProcesso', query: {codProcesso: String(processo.codigo)}})
     return;
   }
   
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.codigo}})
+    router.push({name: 'Processo', params: {codProcesso: String(processo.codigo)}})
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {codProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }
   }
 }
 
-const alertasFormatados = computed(() => {
+const alertasFormatados = computed((): AlertaFormatado[] => {
   return alertas.value.map(alerta => {
+    const partes = alerta.descricao.split(' ');
+    const MOCK_UNIDADE: Unidade = { codigo: 0, nome: '', sigla: '' };
+    const MOCK_SERVIDOR: Servidor = { codigo: 0, nome: '', tituloEleitoral: '', unidade: MOCK_UNIDADE, email: '', ramal: '' };
     return {
-      codigo: alerta.codigo,
-      dataHora: new Date(alerta.dataHora), 
-      processoCodigo: alerta.processoCodigo,
-      unidadeOrigemCodigo: alerta.unidadeOrigemCodigo,
-      descricao: alerta.descricao,
-      dataFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
-    };
+      ...alerta,
+      mensagem: alerta.descricao,
+      data: alerta.dataHora,
+      dataHoraFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
+      origem: partes[0],
+      processo: partes[2],
+      unidadeOrigem: MOCK_UNIDADE,
+      unidadeDestino: MOCK_UNIDADE,
+      usuarioDestino: MOCK_SERVIDOR,
+    } as AlertaFormatado;
   });
 });
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
-const alertaCriterio = ref<'dataHora' | 'processoCodigo'>('dataHora');
+const alertaCriterio = ref<'data' | 'processo'>('data');
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 
 const alertasOrdenados = computed(() => {
   const lista = [...alertasFormatados.value];
   return lista.sort((a, b) => {
-    if (alertaCriterio.value === 'dataHora') {
-      const da = a.dataHora.getTime();
-      const db = b.dataHora.getTime();
+    if (alertaCriterio.value === 'data') {
+      const da = new Date(a.dataHora).getTime();
+      const db = new Date(b.dataHora).getTime();
       return alertaAsc.value ? da - db : db - da;
     } else {
-      const pa = (a.processoCodigo || '').toString().toLowerCase();
-      const pb = (b.processoCodigo || '').toString().toLowerCase();
+      const pa = (a.processo || '').toString().toLowerCase();
+      const pb = (b.processo || '').toString().toLowerCase();
       if (pa < pb) return alertaAsc.value ? -1 : 1;
       if (pa > pb) return alertaAsc.value ? 1 : -1;
       return 0;
@@ -194,17 +162,17 @@ const alertasOrdenados = computed(() => {
 
 function ordenarAlertasPor(campo: 'data' | 'processo') {
     if (campo === 'data') {
-        if (alertaCriterio.value === 'dataHora') {
+        if (alertaCriterio.value === 'data') {
             alertaAsc.value = !alertaAsc.value;
         } else {
-            alertaCriterio.value = 'dataHora';
+            alertaCriterio.value = 'data';
             alertaAsc.value = false;
         }
     } else {
-        if (alertaCriterio.value === 'processoCodigo') {
+        if (alertaCriterio.value === 'processo') {
             alertaAsc.value = !alertaAsc.value;
         } else {
-            alertaCriterio.value = 'processoCodigo';
+            alertaCriterio.value = 'processo';
             alertaAsc.value = true;
         }
     }

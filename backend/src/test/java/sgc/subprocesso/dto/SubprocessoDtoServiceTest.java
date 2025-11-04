@@ -14,9 +14,10 @@ import sgc.atividade.modelo.AtividadeRepo;
 import sgc.comum.erros.ErroDominioAccessoNegado;
 import sgc.conhecimento.dto.ConhecimentoMapper;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.subprocesso.SubprocessoDtoService;
+import sgc.sgrh.modelo.Perfil;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.modelo.Unidade;
 
 import java.util.Optional;
@@ -44,12 +45,11 @@ class SubprocessoDtoServiceTest {
     private ConhecimentoRepo conhecimentoRepo;
 
     private Subprocesso subprocesso;
-    private Unidade unidade;
 
     @BeforeEach
     void setUp() {
         subprocesso = new Subprocesso();
-        unidade = new Unidade();
+        Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         subprocesso.setUnidade(unidade);
     }
@@ -64,18 +64,12 @@ class SubprocessoDtoServiceTest {
             assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, null, 1L));
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção se perfil não for ADMIN, GESTOR ou CHEFE")
-        void obterDetalhes_PerfilInvalido_LancaExcecao() {
-            when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-            assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, "INVALIDO", 1L));
-        }
 
         @Test
         @DisplayName("Deve lançar exceção se usuário não tiver permissão")
         void obterDetalhes_SemPermissao_LancaExcecao() {
             when(subprocessoRepo.findById(1L)).thenReturn(Optional.of(subprocesso));
-            assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, "GESTOR", 2L));
+            assertThrows(ErroDominioAccessoNegado.class, () -> service.obterDetalhes(1L, Perfil.GESTOR, 2L));
         }
     }
 }

@@ -96,7 +96,7 @@ public class SubprocessoDetalheDto {
     @Getter
     @Builder
     public static class ResponsavelDto {
-        private final Long id;
+        private final Long codigo;
         private final String nome;
         private final String tipoResponsabilidade;
         private final String ramal;

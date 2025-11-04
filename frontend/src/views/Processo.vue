@@ -1,20 +1,11 @@
 <template>
   <div class="container mt-4">
     <div v-if="processo">
-      <span
-        class="badge bg-secondary mb-2"
-        style="border-radius: 0"
-      >Detalhes do processo</span>
-      <h2
-        class="display-6"
-        data-testid="processo-info"
-      >
-        {{ processo.descricao }}
-      </h2>
-      <div class="mb-4 mt-3">
-        <strong>Tipo:</strong> {{ processo.tipo }}<br>
-        <strong>Situação:</strong> {{ processo.situacao }}<br>
-      </div>
+      <ProcessoDetalhes
+        :descricao="processo.descricao"
+        :tipo="processo.tipo"
+        :situacao="processo.situacao"
+      />
 
       <TreeTable
         :columns="colunasTabela"
@@ -23,178 +14,29 @@
         @row-click="abrirDetalhesUnidade"
       />
 
-      <!-- Botões de ação em bloco -->
-      <div
-        v-if="mostrarBotoesBloco"
-        class="mt-3 d-flex gap-2"
-      >
-        <button
-          v-if="perfilStore.perfilSelecionado === 'GESTOR'"
-          class="btn btn-outline-primary"
-          data-testid="btn-aceitar-em-bloco"
-          @click="abrirModalAceitarBloco"
-        >
-          <i class="bi bi-check-circle me-1" />
-          Aceitar em bloco
-        </button>
-        <button
-          v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-          class="btn btn-outline-success"
-          data-testid="btn-abrir-modal-homologar-bloco"
-          @click="abrirModalHomologarBloco"
-        >
-          <i class="bi bi-check-all me-1" />
-          Homologar em bloco
-        </button>
-      </div>
+      <ProcessoAcoes
+        :mostrar-botoes-bloco="mostrarBotoesBloco"
+        :perfil="perfilStore.perfilSelecionado"
+        :situacao-processo="processo.situacao"
+        @aceitar-bloco="abrirModalAceitarBloco"
+        @homologar-bloco="abrirModalHomologarBloco"
+        @finalizar="finalizarProcesso"
+      />
     </div>
-    <button
-      v-if="perfilStore.perfilSelecionado === 'ADMIN' && processo?.situacao === SituacaoProcesso.EM_ANDAMENTO"
-      class="btn btn-danger mt-3"
-      data-testid="btn-finalizar-processo"
-      @click="finalizarProcesso"
-    >
-      Finalizar processo
-    </button>
 
-    <!-- Modal de confirmação -->
-    <div
-      v-if="mostrarModalBloco"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle text-primary' : 'bi bi-check-all text-success'" />
-              {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar cadastros em bloco' : 'Homologar cadastros em bloco' }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalBloco"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle" />
-              Selecione as unidades que terão seus cadastros {{
-                tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados'
-              }}:
-            </div>
-
-            <div class="table-responsive">
-              <table class="table table-bordered">
-                <thead class="table-light">
-                  <tr>
-                    <th>Selecionar</th>
-                    <th>Sigla</th>
-                    <th>Nome</th>
-                    <th>Situação Atual</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="unidade in unidadesSelecionadasBloco"
-                    :key="unidade.sigla"
-                  >
-                    <td>
-                      <input
-                        :id="'chk-' + unidade.sigla"
-                        v-model="unidade.selecionada"
-                        type="checkbox"
-                        class="form-check-input"
-                      >
-                    </td>
-                    <td><strong>{{ unidade.sigla }}</strong></td>
-                    <td>{{ unidade.nome }}</td>
-                    <td>{{ unidade.situacao }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="fecharModalBloco"
-            >
-              <i class="bi bi-x-circle" /> Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn"
-              :class="tipoAcaoBloco === 'aceitar' ? 'btn-primary' : 'btn-success'"
-              @click="confirmarAcaoBloco"
-            >
-              <i :class="tipoAcaoBloco === 'aceitar' ? 'bi bi-check-circle' : 'bi bi-check-all'" />
-              {{ tipoAcaoBloco === 'aceitar' ? 'Aceitar' : 'Homologar' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalBloco"
-      class="modal-backdrop fade show"
+    <ModalAcaoBloco
+      :mostrar="mostrarModalBloco"
+      :tipo="tipoAcaoBloco"
+      :unidades="unidadesSelecionadasBloco"
+      @fechar="fecharModalBloco"
+      @confirmar="confirmarAcaoBloco"
     />
 
-    <!-- Modal de finalização do processo CDU-21 -->
-    <div
-      v-if="mostrarModalFinalizacao"
-      class="modal fade show"
-      style="display: block;"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              <i class="bi bi-check-circle text-success" />
-              Finalização de processo
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="fecharModalFinalizacao"
-            />
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle" />
-              Confirma a finalização do processo <strong>{{ processo?.descricao }}</strong>?<br>
-              Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
-              participantes do processo.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-testid="btn-cancelar-finalizacao"
-              @click="fecharModalFinalizacao"
-            >
-              <i class="bi bi-x-circle" /> Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              data-testid="btn-confirmar-finalizacao"
-              @click="confirmarFinalizacao"
-            >
-              <i class="bi bi-check-circle" />
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="mostrarModalFinalizacao"
-      class="modal-backdrop fade show"
+    <ModalFinalizacao
+      :mostrar="mostrarModalFinalizacao"
+      :processo-descricao="processo?.descricao || ''"
+      @fechar="fecharModalFinalizacao"
+      @confirmar="confirmarFinalizacao"
     />
 
     <!-- Alerta de sucesso -->
@@ -223,7 +65,12 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 
 import TreeTable from '@/components/TreeTable.vue'
-import {ProcessoDetalhe, SituacaoProcesso, UnidadeParticipante} from '@/types/tipos'
+import ProcessoDetalhes from '@/components/ProcessoDetalhes.vue'
+import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
+import ModalAcaoBloco, {type UnidadeSelecao} from '@/components/ModalAcaoBloco.vue'
+import ModalFinalizacao from '@/components/ModalFinalizacao.vue'
+
+import {ProcessoDetalhe, UnidadeParticipante} from '@/types/tipos'
 
 interface TreeTableItem {
   id: number | string;
@@ -248,23 +95,18 @@ const notificacoesStore = useNotificacoesStore()
 const mostrarBotoesBloco = ref(false)
 const mostrarModalBloco = ref(false)
 const tipoAcaoBloco = ref<'aceitar' | 'homologar'>('aceitar')
-const unidadesSelecionadasBloco = ref<Array<{
-  sigla: string,
-  nome: string,
-  situacao: string,
-  selecionada: boolean
-}>>([])
+const unidadesSelecionadasBloco = ref<UnidadeSelecao[]>([])
 
 const mostrarAlertaSucesso = ref(false)
 const mostrarModalFinalizacao = ref(false)
 
-const idProcesso = computed(() =>
-    Number(route.params.idProcesso || route.params.id || route.query.idProcesso))
+const codProcesso = computed(() =>
+    Number(route.params.codProcesso || route.params.id || route.query.codProcesso))
 
 // Carregar detalhes do processo ao montar o componente
 onMounted(async () => {
-  if (idProcesso.value) {
-    await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  if (codProcesso.value) {
+    await processosStore.fetchProcessoDetalhe(codProcesso.value);
   }
 });
 
@@ -275,12 +117,12 @@ const unidadesParticipantes = computed<UnidadeParticipante[]>(() => {
 })
 
 const subprocessosElegiveis = computed(() => {
-  if (!idProcesso.value || !processo.value) return []
+  if (!codProcesso.value || !processo.value) return []
 
   if (perfilStore.perfilSelecionado === 'GESTOR') {
-    return processosStore.getSubprocessosElegiveisAceiteBloco(idProcesso.value, perfilStore.unidadeSelecionada || '');
+    return processosStore.getSubprocessosElegiveisAceiteBloco(codProcesso.value, String(perfilStore.unidadeSelecionada) || '');
   } else if (perfilStore.perfilSelecionado === 'ADMIN') {
-    return processosStore.getSubprocessosElegiveisHomologacaoBloco(idProcesso.value);
+    return processosStore.getSubprocessosElegiveisHomologacaoBloco(codProcesso.value);
   }
   return [];
 })
@@ -299,7 +141,7 @@ const colunasTabela = [
 ]
 
 const dadosFormatados = computed<TreeTableItem[]>(() => {
-  return formatarDadosParaArvore(participantesHierarquia.value, idProcesso.value)
+  return formatarDadosParaArvore(participantesHierarquia.value, codProcesso.value)
 })
 
 function formatarData(data: string | null): string {
@@ -311,10 +153,10 @@ function formatarData(data: string | null): string {
   return `${dia}/${mes}/${ano}`
 }
 
-function formatarDadosParaArvore(dados: UnidadeParticipante[], idProcesso: number): TreeTableItem[] {
+function formatarDadosParaArvore(dados: UnidadeParticipante[], codProcesso: number): TreeTableItem[] {
   if (!dados) return []
   return dados.map(item => {
-    const children = item.filhos ? formatarDadosParaArvore(item.filhos, idProcesso) : []
+    const children = item.filhos ? formatarDadosParaArvore(item.filhos, codProcesso) : []
 
     let situacao = item.situacaoSubprocesso || 'Não iniciado';
     let dataLimite = formatarData(item.dataLimite || null);
@@ -337,10 +179,10 @@ function abrirDetalhesUnidade(item: any) {
   if (item && item.clickable) {
     const perfilUsuario = perfilStore.perfilSelecionado;
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
-      router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
+      router.push({name: 'Subprocesso', params: {codProcesso: codProcesso.value.toString(), siglaUnidade: String(item.sigla)}})
     } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
       if (perfilStore.unidadeSelecionada === item.sigla) {
-        router.push({name: 'Subprocesso', params: {idProcesso: idProcesso.value, siglaUnidade: item.sigla}})
+        router.push({name: 'Subprocesso', params: {codProcesso: String(codProcesso.value), siglaUnidade: String(item.sigla)}})
       }
     }
   }
@@ -415,10 +257,10 @@ function confirmarFinalizacao() {
   executarFinalizacao()
 }
 
-async function confirmarAcaoBloco() {
+async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
   try {
     // Filtrar apenas unidades selecionadas
-    const unidadesSelecionadas = unidadesSelecionadasBloco.value
+    const unidadesSelecionadas = unidades
         .filter(u => u.selecionada)
         .map(u => u.sigla);
 
@@ -428,10 +270,10 @@ async function confirmarAcaoBloco() {
     }
 
     await processosStore.processarCadastroBloco({
-      idProcesso: idProcesso.value,
+      codProcesso: codProcesso.value,
       unidades: unidadesSelecionadas,
       tipoAcao: tipoAcaoBloco.value,
-      unidadeUsuario: perfilStore.unidadeSelecionada || ''
+      unidadeUsuario: String(perfilStore.unidadeSelecionada) || ''
     })
 
     mostrarAlertaSucesso.value = true
@@ -454,3 +296,4 @@ async function confirmarAcaoBloco() {
 watch(subprocessosElegiveis, (novosSubprocessos) => {
   mostrarBotoesBloco.value = novosSubprocessos.length > 0
 }, {immediate: true});
+</script>

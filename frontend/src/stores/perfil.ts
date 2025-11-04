@@ -7,19 +7,22 @@ export const usePerfilStore = defineStore('perfil', {
     state: () => ({
         servidorId: localStorage.getItem('idServidor') ? Number(localStorage.getItem('idServidor')) : null,
         perfilSelecionado: (localStorage.getItem('perfilSelecionado') || null) as Perfil | null,
-        unidadeSelecionada: (localStorage.getItem('unidadeSelecionada') || null) as string | null,
+        unidadeSelecionada: localStorage.getItem('unidadeSelecionada') ? Number(localStorage.getItem('unidadeSelecionada')) : null,
         perfisUnidades: [] as PerfilUnidade[],
     }),
     actions: {
-        setServidorId(novoId: number) {
-            this.servidorId = novoId;
-            localStorage.setItem('idServidor', novoId.toString());
+        setServidorId(novoId: string | number) {
+            this.servidorId = Number(novoId);
+            localStorage.setItem('idServidor', String(novoId));
         },
-        setPerfilUnidade(perfil: Perfil, unidadeSigla: string) {
+        setPerfilUnidade(perfil: Perfil, unidadeCodigo: number) {
             this.perfilSelecionado = perfil;
-            this.unidadeSelecionada = unidadeSigla;
+            this.unidadeSelecionada = unidadeCodigo;
             localStorage.setItem('perfilSelecionado', perfil);
-            localStorage.setItem('unidadeSelecionada', unidadeSigla);
+            localStorage.setItem('unidadeSelecionada', unidadeCodigo.toString());
+        },
+        setToken(token: string) {
+            localStorage.setItem('jwtToken', token);
         },
         async loginCompleto(tituloEleitoral: string, senha: string) {
             const tituloEleitoralNum = Number(tituloEleitoral);
@@ -36,13 +39,14 @@ export const usePerfilStore = defineStore('perfil', {
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
-                    await usuarioService.entrar({
+                    const loginResponse = await usuarioService.entrar({
                         tituloEleitoral: tituloEleitoralNum,
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
-                    this.setPerfilUnidade(perfilUnidadeSelecionado.perfil as Perfil, perfilUnidadeSelecionado.unidade.sigla);
-                    this.setServidorId(tituloEleitoralNum);
+                    this.setPerfilUnidade(loginResponse.perfil as Perfil, loginResponse.unidadeCodigo); // Usar loginResponse.codUnidade
+                    this.setServidorId(loginResponse.tituloEleitoral); // Usar loginResponse.tituloEleitoral
+                    this.setToken(loginResponse.token); // Adicionar esta linha
                 }
                 return true;
             }
@@ -55,13 +59,14 @@ export const usePerfilStore = defineStore('perfil', {
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
-            await usuarioService.entrar({
+            const loginResponse = await usuarioService.entrar({
                 tituloEleitoral: tituloEleitoral,
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
-            this.setPerfilUnidade(perfilUnidade.perfil as Perfil, perfilUnidade.unidade.sigla);
-            this.setServidorId(tituloEleitoral);
+            this.setPerfilUnidade(loginResponse.perfil as Perfil, loginResponse.unidadeCodigo);
+            this.setServidorId(loginResponse.tituloEleitoral);
+            this.setToken(loginResponse.token);
         }
     },
 });

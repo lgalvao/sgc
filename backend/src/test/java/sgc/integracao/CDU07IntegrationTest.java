@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -20,18 +19,14 @@ import sgc.comum.BeanUtil;
 import sgc.comum.erros.ErroDominioNaoEncontrado;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.SubprocessoDtoService;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.subprocesso.modelo.*;
+import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -153,7 +148,7 @@ public class CDU07IntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve falhar ao buscar subprocesso inexistente")
         void falhaSubprocessoInexistente() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, "ADMIN", null));
+            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
         }
     }
 }

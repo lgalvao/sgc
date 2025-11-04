@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
+import sgc.processo.modelo.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,14 +20,14 @@ class AtualizarProcessoReqTest {
         AtualizarProcessoReq req = new AtualizarProcessoReq(
             1L,
             "Test Description",
-            "TIPO_A",
+            TipoProcesso.MAPEAMENTO,
             LocalDateTime.now(),
             unidades
         );
 
         assertEquals(1L, req.codigo());
         assertEquals("Test Description", req.descricao());
-        assertEquals("TIPO_A", req.tipo());
+        assertEquals(TipoProcesso.MAPEAMENTO, req.tipo());
         assertNotNull(req.dataLimiteEtapa1());
         assertEquals(2, req.unidades().size());
         assertEquals(Long.valueOf(1L), req.unidades().get(0));
@@ -35,14 +36,14 @@ class AtualizarProcessoReqTest {
         req = new AtualizarProcessoReq(
             2L,
             "New Description",
-            "TIPO_B",
+            TipoProcesso.REVISAO,
             LocalDateTime.now().plusDays(1),
             new ArrayList<>(List.of(3L))
         );
 
         assertEquals(2L, req.codigo());
         assertEquals("New Description", req.descricao());
-        assertEquals("TIPO_B", req.tipo());
+        assertEquals(TipoProcesso.REVISAO, req.tipo());
         assertNotNull(req.dataLimiteEtapa1());
         assertEquals(1, req.unidades().size());
         assertEquals(Long.valueOf(3L), req.unidades().getFirst());

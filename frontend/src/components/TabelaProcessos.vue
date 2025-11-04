@@ -45,6 +45,7 @@
         <tr
           v-for="processo in processos"
           :key="processo.codigo"
+          :data-testid="`processo-row-${processo.codigo}`"
           class="clickable-row"
           style="cursor:pointer;"
           @click="emit('selecionarProcesso', processo)"

@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +21,7 @@ import sgc.competencia.modelo.CompetenciaRepo;
 import sgc.conhecimento.modelo.Conhecimento;
 import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
@@ -33,9 +33,11 @@ import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,11 +47,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockAdmin
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
-    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{id}/iniciar?tipo=REVISAO";
+    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{codigo}/iniciar?tipo=REVISAO";
 
     @Autowired
     private MockMvc mockMvc;
@@ -109,7 +111,7 @@ public class CDU05IntegrationTest {
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
-        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO.name(), dataLimiteEtapa1, unidades);
+        return new CriarProcessoReq(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
     }
 
     @Test
@@ -140,25 +142,25 @@ public class CDU05IntegrationTest {
         // 3. Buscar o subprocesso criado e verificar a cópia do mapa
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
-        Subprocesso subprocessoCriado = subprocessos.get(0);
+        Subprocesso subprocessoCriado = subprocessos.getFirst();
         Mapa mapaCopiado = subprocessoCriado.getMapa();
 
-        // 3.1. Verificar se o mapa copiado é uma nova instância (ID diferente)
+        // 3.1. Verificar se o mapa copiado é uma nova instância (código diferente)
         assertThat(mapaCopiado.getCodigo()).isNotNull();
         assertThat(mapaCopiado.getCodigo()).isNotEqualTo(mapaOriginal.getCodigo());
 
         // 3.2. Verificar se o conteúdo foi copiado
         List<Competencia> competenciasCopiadas = competenciaRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(competenciasCopiadas).hasSize(1);
-        assertThat(competenciasCopiadas.get(0).getDescricao()).isEqualTo(competenciaOriginal.getDescricao());
+        assertThat(competenciasCopiadas.getFirst().getDescricao()).isEqualTo(competenciaOriginal.getDescricao());
 
         List<Atividade> atividadesCopiadas = atividadeRepo.findByMapaCodigo(mapaCopiado.getCodigo());
         assertThat(atividadesCopiadas).hasSize(1);
-        assertThat(atividadesCopiadas.get(0).getDescricao()).isEqualTo(atividadeOriginal.getDescricao());
+        assertThat(atividadesCopiadas.getFirst().getDescricao()).isEqualTo(atividadeOriginal.getDescricao());
 
-        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.get(0).getCodigo());
+        List<Conhecimento> conhecimentosCopiados = conhecimentoRepo.findByAtividadeCodigo(atividadesCopiadas.getFirst().getCodigo());
         assertThat(conhecimentosCopiados).hasSize(1);
-        assertThat(conhecimentosCopiados.get(0).getDescricao()).isEqualTo(conhecimentoOriginal.getDescricao());
+        assertThat(conhecimentosCopiados.getFirst().getDescricao()).isEqualTo(conhecimentoOriginal.getDescricao());
     }
 
 
@@ -193,7 +195,7 @@ public class CDU05IntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())) // ID que não existe
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())) // código que não existe
                 .andExpect(status().isNotFound());
     }
 
@@ -226,6 +228,6 @@ public class CDU05IntegrationTest {
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(unidades)))
-                .andExpect(status().isConflict()); // Espera-se um erro de negócio
+                .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
     }
 }

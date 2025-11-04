@@ -1,6 +1,6 @@
-import { ref } from 'vue';
-import type { Ref } from 'vue';
-import type { AxiosError } from 'axios';
+import type {Ref} from 'vue';
+import {ref} from 'vue';
+import type {AxiosError} from 'axios';
 
 // Define a type for the error structure we expect from the API
 interface ApiError {
@@ -21,8 +21,7 @@ export function useApi<T>(
     data.value = null;
 
     try {
-      const result = await apiCall(...args);
-      data.value = result;
+        data.value = await apiCall(...args);
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       if (axiosError.response && axiosError.response.data) {

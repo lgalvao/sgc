@@ -59,3 +59,10 @@ export function mapUsuarioToFrontend(usuarioDto: any): Usuario {
     perfis: usuarioDto.perfis,
   };
 }
+
+export interface LoginResponse {
+  tituloEleitoral: number;
+  perfil: Perfil; // Usando o tipo Perfil já definido
+  unidadeCodigo: number;
+  token: string;
+}

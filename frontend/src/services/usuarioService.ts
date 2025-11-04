@@ -1,5 +1,11 @@
 import apiClient from '../axios-setup';
-import {AutenticacaoRequest, EntrarRequest, mapPerfilUnidadeToFrontend, PerfilUnidade} from '@/mappers/sgrh';
+import {
+    AutenticacaoRequest,
+    EntrarRequest,
+    LoginResponse,
+    mapPerfilUnidadeToFrontend,
+    PerfilUnidade
+} from '@/mappers/sgrh';
 
 export async function autenticar(request: AutenticacaoRequest): Promise<boolean> {
   try {
@@ -25,9 +31,10 @@ export async function autorizar(tituloEleitoral: number): Promise<PerfilUnidade[
   }
 }
 
-export async function entrar(request: EntrarRequest): Promise<void> {
+export async function entrar(request: EntrarRequest): Promise<LoginResponse> {
   try {
-    await apiClient.post<void>('/usuarios/entrar', request);
+    const response = await apiClient.post<LoginResponse>('/usuarios/entrar', request);
+    return response.data;
   } catch (error) {
     console.error('Erro ao entrar:', error);
     throw error;

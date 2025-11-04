@@ -3,14 +3,17 @@ package sgc.alerta.modelo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 /**
  * Repositório para a entidade {@link Alerta}.
  */
+@Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     /**
      * Busca alertas destinados a uma unidade específica, de forma paginada.
@@ -22,10 +25,24 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
 
     /**
      * Busca todos os alertas associados a um processo específico.
-     * @param processoCodigo O código do processo.
+     * @param codProcesso O código do processo.
      * @return Uma lista de alertas.
      */
-    List<Alerta> findByProcessoCodigo(Long processoCodigo);
+    List<Alerta> findByProcessoCodigo(Long codProcesso);
+
+    @Query("select a.codigo from Alerta a where a.processo.codigo = :proc")
+    List<Long> findIdsByProcessoCodigo(@Param("proc") Long processoCodigo);
+
+    @Query("select a.codigo from Alerta a where a.processo.codigo in :procs")
+    List<Long> findIdsByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
+
+    @Modifying
+    @Query("delete from Alerta a where a.processo.codigo = :proc")
+    void deleteByProcessoCodigo(@Param("proc") Long processoCodigo);
+
+    @Modifying
+    @Query("delete from Alerta a where a.processo.codigo in :procs")
+    void deleteByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
 
     /**
      * Busca alertas destinados a um usuário específico, de forma paginada.

@@ -80,13 +80,14 @@ function ordenarPor(campo: SortCriteria) {
 function abrirProcesso(processo: ProcessoResumo) {
   const perfilUsuario = perfil.perfilSelecionado;
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {idProcesso: processo.codigo.toString()}});
+    router.push({name: 'Processo', params: {codProcesso: processo.codigo.toString()}});
   } else { // CHEFE ou SERVIDOR
     const siglaUnidade = perfil.unidadeSelecionada;
     if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {idProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
+      router.push({name: 'Subprocesso', params: {codProcesso: processo.codigo, siglaUnidade: siglaUnidade}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }
   }
 }
+</script>

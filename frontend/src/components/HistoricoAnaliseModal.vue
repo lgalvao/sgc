@@ -73,7 +73,7 @@
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
 import {useAnalisesStore} from '@/stores/analises';
-import type {AnaliseValidacao, AnaliseCadastro} from '@/types/tipos';
+import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
 
@@ -81,7 +81,7 @@ type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const props = defineProps<{
   mostrar: boolean;
-  idSubprocesso: number | undefined;
+  codSubrocesso: number | undefined;
 }>();
 
 const emit = defineEmits(['fechar']);
@@ -92,8 +92,8 @@ const analises = ref<Analise[]>([]);
 watch(
   () => props.mostrar,
   newVal => {
-    if (newVal && props.idSubprocesso) {
-      analises.value = analisesStore.getAnalisesPorSubprocesso(props.idSubprocesso);
+    if (newVal && props.codSubrocesso) {
+      analises.value = analisesStore.getAnalisesPorSubprocesso(props.codSubrocesso);
     }
   },
   { immediate: true },

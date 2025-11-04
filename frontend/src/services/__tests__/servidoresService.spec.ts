@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ServidoresService } from '../servidoresService';
+import {describe, expect, it, vi} from 'vitest';
+import {ServidoresService} from '../servidoresService';
 import apiClient from '@/axios-setup';
 
 vi.mock('@/axios-setup', () => ({

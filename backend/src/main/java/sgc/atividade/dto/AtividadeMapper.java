@@ -15,9 +15,6 @@ import sgc.mapa.modelo.MapaRepo;
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Component
 @Mapper(componentModel = "spring")
-/**
- * Mapper (usando MapStruct) entre a entidade {@link Atividade} e seu DTO.
- */
 public abstract class AtividadeMapper {
     /**
      * Repositório de mapas, injetado para buscar a entidade Mapa durante o mapeamento.
@@ -27,6 +24,7 @@ public abstract class AtividadeMapper {
 
     /**
      * Converte uma entidade {@link Atividade} em um DTO {@link AtividadeDto}.
+     *
      * @param atividade A entidade a ser convertida.
      * @return O DTO correspondente.
      */
@@ -35,6 +33,7 @@ public abstract class AtividadeMapper {
 
     /**
      * Converte um DTO {@link AtividadeDto} em uma entidade {@link Atividade}.
+     *
      * @param atividadeDTO O DTO a ser convertido.
      * @return A entidade correspondente.
      */
@@ -43,13 +42,14 @@ public abstract class AtividadeMapper {
     public abstract Atividade toEntity(AtividadeDto atividadeDTO);
 
     /**
-     * Mapeia um ID de mapa para uma entidade {@link Mapa}.
-     * @param idMapa O ID do mapa.
+     * Mapeia um código de mapa para uma entidade {@link Mapa}.
+     *
+     * @param codMapa O código do mapa.
      * @return A entidade {@link Mapa} correspondente.
      * @throws ErroDominioNaoEncontrado se o mapa não for encontrado.
      */
-    public Mapa map(Long idMapa) {
-        if (idMapa == null) return null;
-        return mapaRepo.findById(idMapa).orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", idMapa));
+    public Mapa map(Long codMapa) {
+        if (codMapa == null) return null;
+        return mapaRepo.findById(codMapa).orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa", codMapa));
     }
 }

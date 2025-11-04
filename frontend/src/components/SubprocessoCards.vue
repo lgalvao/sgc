@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import {Mapa, TipoProcesso, MapaCompleto} from '@/types/tipos';
+import {Mapa, MapaCompleto, TipoProcesso} from '@/types/tipos';
 import {LABELS_SITUACAO, SITUACOES_MAPA} from '@/constants/situacoes';
 
 defineProps<{

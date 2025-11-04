@@ -3,17 +3,37 @@ import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroReques
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
+import {fetchSubprocessoDetalhe} from "@/services/subprocessoService";
 import {
-    aceitarRevisaoCadastro,
-    devolverRevisaoCadastro,
-    disponibilizarRevisaoCadastro,
-    fetchSubprocessoDetalhe,
-    homologarRevisaoCadastro,
-    disponibilizarCadastro,
-    devolverCadastro,
     aceitarCadastro,
-    homologarCadastro
-} from "@/services/subprocessoService";
+    aceitarRevisaoCadastro,
+    devolverCadastro,
+    devolverRevisaoCadastro,
+    disponibilizarCadastro,
+    disponibilizarRevisaoCadastro,
+    homologarCadastro,
+    homologarRevisaoCadastro
+} from "@/services/cadastroService";
+
+async function _executarAcao(
+    acao: () => Promise<any>,
+    sucessoMsg: string,
+    erroMsg: string
+): Promise<boolean> {
+    const notificacoes = useNotificacoesStore();
+    try {
+        await acao();
+        notificacoes.sucesso(sucessoMsg, `${sucessoMsg} com sucesso.`);
+        const processosStore = useProcessosStore();
+        if (processosStore.processoDetalhe) {
+            await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
+        }
+        return true;
+    } catch {
+        notificacoes.erro(erroMsg, `Não foi possível concluir a ação: ${erroMsg}.`);
+        return false;
+    }
+}
 
 export const useSubprocessosStore = defineStore('subprocessos', {
     state: () => ({
@@ -24,14 +44,14 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             const notificacoes = useNotificacoesStore();
             const perfilStore = usePerfilStore(); // Adicionar esta linha
             try {
-                // Obter perfil e unidadeCodigo do perfilStore
+                // Obter perfil e codUnidade do perfilStore
                 const perfil = perfilStore.perfilSelecionado;
-                const unidadeSelecionadaSigla = perfilStore.unidadeSelecionada;
+                const unidadeSelecionadaCodigo = perfilStore.unidadeSelecionada;
                 let unidadeCodigo: number | null = null;
 
-                if (perfil && unidadeSelecionadaSigla) {
+                if (perfil && unidadeSelecionadaCodigo) {
                     const perfilUnidade = perfilStore.perfisUnidades.find(pu =>
-                        pu.perfil === perfil && pu.unidade.sigla === unidadeSelecionadaSigla
+                        pu.perfil === perfil && pu.unidade.codigo === unidadeSelecionadaCodigo
                     );
                     if (perfilUnidade) {
                         unidadeCodigo = perfilUnidade.unidade.codigo;
@@ -48,123 +68,68 @@ export const useSubprocessosStore = defineStore('subprocessos', {
             }
         },
 
-        async disponibilizarCadastro(idSubprocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await disponibilizarCadastro(idSubprocesso);
-                notificacoes.sucesso('Cadastro disponibilizado', 'O cadastro foi enviado para a próxima etapa.');
-                // Atualizar o estado local para refletir a mudança
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
-            }
+        async disponibilizarCadastro(codSubrocesso: number) {
+            return _executarAcao(
+                () => disponibilizarCadastro(codSubrocesso),
+                'Cadastro disponibilizado',
+                'Erro ao disponibilizar'
+            );
         },
 
-        async disponibilizarRevisaoCadastro(idSubprocesso: number) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await disponibilizarRevisaoCadastro(idSubprocesso);
-                notificacoes.sucesso('Revisão disponibilizada', 'A revisão do cadastro foi enviada para a próxima etapa.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao disponibilizar', 'Não foi possível concluir a ação.');
-            }
+        async disponibilizarRevisaoCadastro(codSubrocesso: number) {
+            return _executarAcao(
+                () => disponibilizarRevisaoCadastro(codSubrocesso),
+                'Revisão disponibilizada',
+                'Erro ao disponibilizar'
+            );
         },
 
-        async devolverCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await devolverCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Cadastro devolvido', 'O cadastro foi devolvido para ajustes.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
-            }
+        async devolverCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
+            return _executarAcao(
+                () => devolverCadastro(codSubrocesso, req),
+                'Cadastro devolvido',
+                'Erro ao devolver'
+            );
         },
 
-        async aceitarCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await aceitarCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Cadastro aceito', 'A análise foi registrada com sucesso.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
-            }
+        async aceitarCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
+            return _executarAcao(
+                () => aceitarCadastro(codSubrocesso, req),
+                'Cadastro aceito',
+                'Erro ao aceitar'
+            );
         },
 
-        async homologarCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await homologarCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Cadastro homologado', 'O cadastro foi homologado com sucesso.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
-            }
+        async homologarCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
+            return _executarAcao(
+                () => homologarCadastro(codSubrocesso, req),
+                'Cadastro homologado',
+                'Erro ao homologar'
+            );
         },
 
-        async devolverRevisaoCadastro(idSubprocesso: number, req: DevolverCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await devolverRevisaoCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Revisão devolvida', 'A revisão do cadastro foi devolvida para ajustes.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao devolver', 'Não foi possível concluir a ação.');
-            }
+        async devolverRevisaoCadastro(codSubrocesso: number, req: DevolverCadastroRequest) {
+            return _executarAcao(
+                () => devolverRevisaoCadastro(codSubrocesso, req),
+                'Revisão devolvida',
+                'Erro ao devolver'
+            );
         },
 
-        async aceitarRevisaoCadastro(idSubprocesso: number, req: AceitarCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await aceitarRevisaoCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Revisão aceita', 'A análise da revisão foi registrada com sucesso.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao aceitar', 'Não foi possível registrar a análise.');
-            }
+        async aceitarRevisaoCadastro(codSubrocesso: number, req: AceitarCadastroRequest) {
+            return _executarAcao(
+                () => aceitarRevisaoCadastro(codSubrocesso, req),
+                'Revisão aceita',
+                'Erro ao aceitar'
+            );
         },
 
-        async homologarRevisaoCadastro(idSubprocesso: number, req: HomologarCadastroRequest) {
-            const notificacoes = useNotificacoesStore();
-            try {
-                await homologarRevisaoCadastro(idSubprocesso, req);
-                notificacoes.sucesso('Revisão homologada', 'A revisão do cadastro foi homologada com sucesso.');
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
-                }
-            } catch {
-                notificacoes.erro('Erro ao homologar', 'Não foi possível concluir a homologação.');
-            }
-        },
-
-        reset() {
-            this.subprocessoDetalhe = null;
-        },
-
-
+        async homologarRevisaoCadastro(codSubrocesso: number, req: HomologarCadastroRequest) {
+            return _executarAcao(
+                () => homologarRevisaoCadastro(codSubrocesso, req),
+                'Revisão homologada',
+                'Erro ao homologar'
+            );
+        }
     }
 });

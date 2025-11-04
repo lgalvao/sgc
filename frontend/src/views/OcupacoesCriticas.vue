@@ -216,8 +216,8 @@ import {useMapasStore} from '@/stores/mapas'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
-import {usePerfilStore} from '@/stores/perfil'
-import {Competencia, MapaCompleto} from '@/types/tipos'
+import {Competencia, MapaCompleto, Servidor, Subprocesso} from '@/types/tipos'
+import {usePerfil} from '@/composables/usePerfil'
 
 const route = useRoute()
 const router = useRouter()
@@ -225,9 +225,9 @@ const mapasStore = useMapasStore()
 const unidadesStore = useUnidadesStore()
 const processosStore = useProcessosStore()
 const notificacoesStore = useNotificacoesStore()
-const perfilStore = usePerfilStore()
+const { servidorLogado } = usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => route.params.siglaUnidade as string)
 
 const unidade = computed(() => unidadesStore.pesquisarUnidade(siglaUnidade.value))
@@ -236,9 +236,9 @@ const nomeUnidade = computed(() => unidade.value?.nome || '')
 const processoAtual = computed(() => processosStore.processoDetalhe);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
-  await mapasStore.fetchMapaCompleto(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  // Correção temporária: usando codProcesso como codSubrocesso
+  await mapasStore.fetchMapaCompleto(codProcesso.value);
 });
 
 const mapa = computed<MapaCompleto | null>(() => {
@@ -309,13 +309,26 @@ function confirmarFinalizacao() {
 
   // Registrar movimentação
   const subprocesso = processoAtual.value?.unidades.find(u => u.sigla === siglaUnidade.value);
-  if (subprocesso && unidade.value) {
-    const usuario = `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`;
+  if (subprocesso && unidade.value && servidorLogado.value) {
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: unidade.value
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...subprocesso,
+      codigo: subprocesso.codSubprocesso,
+      unidade: unidade.value,
+      situacao: subprocesso.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
     processosStore.addMovement({
-      usuario: usuario,
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
       unidadeOrigem: unidade.value,
-      unidadeDestino: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
-      descricao: 'Identificação de ocupações críticas finalizada'
+      unidadeDestino: { codigo: 0, nome: 'SEDOC', sigla: 'SEDOC' },
+      descricao: 'Identificação de ocupações críticas finalizada',
     });
   }
 

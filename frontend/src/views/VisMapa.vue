@@ -467,7 +467,7 @@ import AceitarMapaModal from '@/components/AceitarMapaModal.vue';
 const route = useRoute()
 const router = useRouter()
 const sigla = computed(() => route.params.siglaUnidade as string)
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const unidadesStore = useUnidadesStore()
 const mapaStore = useMapasStore()
 const atividadesStore = useAtividadesStore()
@@ -503,23 +503,23 @@ const unidade = computed<Unidade | null>(() => {
   return buscarUnidade(unidadesStore.unidades as Unidade[], sigla.value)
 })
 
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  // Correção temporária: usando idProcesso como idSubprocesso
-  await mapaStore.fetchMapaCompleto(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  // Correção temporária: usando codProcesso como codSubrocesso
+  await mapaStore.fetchMapaCompleto(codProcesso.value);
 });
 
 const mapa = computed(() => {
@@ -555,9 +555,9 @@ const temHistoricoAnalise = computed(() => {
 })
 
 const historicoAnalise = computed(() => {
-  if (!idSubprocesso.value) return []
+  if (!codSubrocesso.value) return []
 
-  return analisesStore.getAnalisesPorSubprocesso(idSubprocesso.value).map(analise => ({
+  return analisesStore.getAnalisesPorSubprocesso(codSubrocesso.value).map(analise => ({
     codigo: analise.codigo,
     data: new Date(analise.dataHora).toLocaleString('pt-BR'),
     unidade: (analise as any).unidadeSigla || (analise as any).unidade,
@@ -641,8 +641,9 @@ function verHistorico() {
 }
 
 async function confirmarSugestoes() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.apresentarSugestoes()
+    await processosStore.apresentarSugestoes(codSubrocesso.value, { sugestoes: sugestoes.value });
 
     fecharModalSugestoes()
 
@@ -653,7 +654,7 @@ async function confirmarSugestoes() {
 
     await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -665,8 +666,9 @@ async function confirmarSugestoes() {
 }
 
 async function confirmarValidacao() {
+  if (!codSubrocesso.value) return;
   try {
-    await processosStore.validarMapa()
+    await processosStore.validarMapa(codSubrocesso.value);
 
     fecharModalValidar()
 
@@ -677,7 +679,7 @@ async function confirmarValidacao() {
 
     await router.push({
       name: 'Subprocesso',
-      params: {idProcesso: idProcesso.value, siglaUnidade: sigla.value}
+      params: {codProcesso: codProcesso.value, siglaUnidade: sigla.value}
     })
 
   } catch {
@@ -689,15 +691,15 @@ async function confirmarValidacao() {
 }
 
 async function confirmarAceitacao(observacoes?: string) {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
 
   const perfil = perfilSelecionado.value;
   const isHomologacao = perfil === 'ADMIN';
 
   if (isHomologacao) {
-    await subprocessosStore.homologarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.homologarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   } else {
-    await subprocessosStore.aceitarRevisaoCadastro(idSubprocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
+    await subprocessosStore.aceitarRevisaoCadastro(codSubrocesso.value, {observacoes: observacoes || ''}); // Adicionar observacoes
   }
 
   fecharModalAceitar();
@@ -706,9 +708,9 @@ async function confirmarAceitacao(observacoes?: string) {
 
 
 async function confirmarDevolucao() {
-  if (!idSubprocesso.value) return;
+  if (!codSubrocesso.value) return;
 
-  await subprocessosStore.devolverRevisaoCadastro(idSubprocesso.value, {
+  await subprocessosStore.devolverRevisaoCadastro(codSubrocesso.value, {
     motivo: '', // Adicionar motivo
     observacoes: observacaoDevolucao.value,
   });

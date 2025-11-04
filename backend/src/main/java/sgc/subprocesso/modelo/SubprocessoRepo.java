@@ -14,9 +14,8 @@ import java.util.Optional;
  */
 @Repository
 public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
-
-    @Query("select s from Subprocesso s join fetch s.unidade u where s.processo.codigo = :processoCodigo")
-    List<Subprocesso> findByProcessoCodigoWithUnidade(@Param("processoCodigo") Long processoCodigo);
+    @Query("select s from Subprocesso s join fetch s.unidade u where s.processo.codigo = :codProcesso")
+    List<Subprocesso> findByProcessoCodigoWithUnidade(@Param("codProcesso") Long codProcesso);
 
     List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
 

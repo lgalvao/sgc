@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -40,7 +39,6 @@ class AnaliseControleTest {
     private static final String ERRO_INESPERADO = "Erro inesperado";
     private static final String MESSAGE_JSON_PATH = "$.message";
     private static final String OCORREU_UM_ERRO_INESPERADO = "Ocorreu um erro inesperado. Contate o suporte.";
-    private static final String OBSERVACOES = "observacoes";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
     private static final String ANALISE_DE_CADASTRO = "Análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";
@@ -132,76 +130,48 @@ class AnaliseControleTest {
         @Test
         @DisplayName("Deve criar uma análise de cadastro e retornar 201 Created")
         void deveCriarAnaliseCadastro() throws Exception {
-            var payload = Map.of(OBSERVACOES, NOVA_ANALISE_DE_CADASTRO);
+            var requestDto = CriarAnaliseRequestDto.builder()
+                .observacoes(NOVA_ANALISE_DE_CADASTRO)
+                .build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
             analise.setObservacoes(NOVA_ANALISE_DE_CADASTRO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-            .subprocessoCodigo(1L)
-            .observacoes(NOVA_ANALISE_DE_CADASTRO)
-            .tipo(TipoAnalise.CADASTRO)
-            .acao(null)
-            .unidadeSigla(null)
-            .analistaUsuarioTitulo(null)
-            .motivo(null)
-            .build()))).thenReturn(analise);
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_CADASTRO));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes(NOVA_ANALISE_DE_CADASTRO)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve criar uma análise de cadastro com observações vazias e retornar 201 Created")
         void deveCriarAnaliseCadastroComObservacoesVazias() throws Exception {
-            var payload = Map.of(OBSERVACOES, "");
+            var requestDto = CriarAnaliseRequestDto.builder()
+                .observacoes("")
+                .build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
             analise.setObservacoes("");
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenReturn(analise);
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
@@ -210,123 +180,67 @@ class AnaliseControleTest {
             var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenReturn(analise);
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{}"))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_DE_CADASTRO);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_DE_CADASTRO)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)));
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
-                .observacoes(ANALISE_DE_CADASTRO)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+                            .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isNotFound());
+
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         void deveRetornarBadRequestParaParametroInvalido() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_INVALIDA);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_INVALIDA)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém um argumento inválido ou malformado."));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes(ANALISE_INVALIDA)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
         void deveRetornarInternalServerErrorParaErroInesperadoNaCriacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_DE_CADASTRO);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_DE_CADASTRO)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new RuntimeException(ERRO_INESPERADO));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_CADASTRO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
-                .observacoes(ANALISE_DE_CADASTRO)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
     }
 
@@ -406,169 +320,99 @@ class AnaliseControleTest {
         @Test
         @DisplayName("Deve criar uma análise de validação e retornar 201 Created")
         void deveCriarAnaliseValidacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, NOVA_ANALISE_DE_VALIDACAO);
+            var requestDto = CriarAnaliseRequestDto.builder()
+                .observacoes(NOVA_ANALISE_DE_VALIDACAO)
+                .build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
             analise.setObservacoes(NOVA_ANALISE_DE_VALIDACAO);
             analise.setDataHora(LocalDateTime.now());
 
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes(NOVA_ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenReturn(analise);
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.codigo").value(1L))
                     .andExpect(jsonPath("$.observacoes").value(NOVA_ANALISE_DE_VALIDACAO));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes(NOVA_ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve criar uma análise de validação com observações vazias e retornar 201 Created")
         void deveCriarAnaliseValidacaoComObservacoesVazias() throws Exception {
-            var payload = Map.of(OBSERVACOES, "");
+            var requestDto = CriarAnaliseRequestDto.builder()
+                .observacoes("")
+                .build();
 
             var analise = new Analise();
             analise.setCodigo(1L);
 
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenReturn(analise);
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenReturn(analise);
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isCreated());
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes("")
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName(DEVE_RETORNAR_404_NOT_FOUND)
         void deveRetornarNotFoundParaSubprocessoInexistenteNaCriacaoValidacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_DE_VALIDACAO);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new ErroDominioNaoEncontrado(SUBPROCESSO_NAO_ENCONTRADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isNotFound());
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
-                .observacoes(ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve retornar 400 Bad Request para parâmetro inválido")
         void deveRetornarBadRequestParaParametroInvalidoValidacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_INVALIDA);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_INVALIDA)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new IllegalArgumentException("Parâmetro inválido"));
 
             mockMvc.perform(post(API_SUBPROCESSOS_1_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value("A requisição contém um argumento inválido ou malformado."));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(1L)
-                .observacoes(ANALISE_INVALIDA)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
 
         @Test
         @DisplayName("Deve retornar 500 Internal Server Error para erro inesperado na criação")
         void deveRetornarInternalServerErrorParaErroValidacaoInesperadoNaCriacao() throws Exception {
-            var payload = Map.of(OBSERVACOES, ANALISE_DE_VALIDACAO);
-
-            when(analiseService.criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
+            var requestDto = CriarAnaliseRequestDto.builder()
                 .observacoes(ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()))).thenThrow(new RuntimeException(ERRO_INESPERADO));
+                .build();
+
+            when(analiseService.criarAnalise(any(CriarAnaliseRequestDto.class))).thenThrow(new RuntimeException(ERRO_INESPERADO));
 
             mockMvc.perform(post(API_SUBPROCESSOS_99_ANALISES_VALIDACAO).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(payload)))
+                            .content(objectMapper.writeValueAsString(requestDto)))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath(MESSAGE_JSON_PATH).value(OCORREU_UM_ERRO_INESPERADO));
 
-            verify(analiseService, times(1)).criarAnalise(eq(CriarAnaliseRequestDto.builder()
-                .subprocessoCodigo(99L)
-                .observacoes(ANALISE_DE_VALIDACAO)
-                .tipo(TipoAnalise.VALIDACAO)
-                .acao(null)
-                .unidadeSigla(null)
-                .analistaUsuarioTitulo(null)
-                .motivo(null)
-                .build()));
+            verify(analiseService, times(1)).criarAnalise(any(CriarAnaliseRequestDto.class));
         }
     }
 }

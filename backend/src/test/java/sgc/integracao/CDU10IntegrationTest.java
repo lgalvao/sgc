@@ -9,8 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
@@ -27,19 +25,14 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
 import sgc.mapa.modelo.MapaRepo;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -48,7 +41,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @WithMockChefe
-@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class})
+@Import({TestSecurityConfig.class, WithMockChefeSecurityContextFactory.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
 class CDU10IntegrationTest {
@@ -88,8 +80,8 @@ class CDU10IntegrationTest {
     @Autowired
     private AlertaRepo alertaRepo;
 
-    @MockitoBean
-    private NotificacaoService notificacaoService;
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    private sgc.subprocesso.service.SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Unidade unidadeChefe;
     private Unidade unidadeSuperior;
@@ -151,16 +143,10 @@ class CDU10IntegrationTest {
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             // Assert Notificação
-            String assuntoEsperado = "SGC: Revisão do cadastro de atividades e conhecimentos da UT submetido para análise";
-            String corpoEsperado = String.format(
-                    "Prezado(a) responsável pela %s,%n" +
-                            "A revisão do cadastro de atividades e conhecimentos da %s no processo %s foi submetida para análise por essa unidade.%n" +
-                            "A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).",
-                    unidadeSuperior.getSigla(),
-                    unidadeChefe.getSigla(),
-                    subprocessoRevisao.getProcesso().getDescricao()
+            verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
+                org.mockito.ArgumentMatchers.any(Subprocesso.class),
+                org.mockito.ArgumentMatchers.any(Unidade.class)
             );
-            verify(notificacaoService).enviarEmail(eq(unidadeSuperior.getSigla()), eq(assuntoEsperado), eq(corpoEsperado));
         }
 
         @Test

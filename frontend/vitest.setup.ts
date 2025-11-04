@@ -1,22 +1,23 @@
 import {vi} from 'vitest';
 
-// Mock global do sessionStorage
-const mockSessionStorage = (() => {
+vi.stubGlobal('vi', vi);
+
+const localStorageMock = (() => {
     let store: { [key: string]: string } = {};
     return {
-        getItem: vi.fn((key: string) => store[key] || null),
-        setItem: vi.fn((key: string, value: string) => {
+        getItem: (key: string) => store[key] || null,
+        setItem: (key: string, value: string) => {
             store[key] = value.toString();
-        }),
-        removeItem: vi.fn((key: string) => {
-            delete store[key];
-        }),
-        clear: vi.fn(() => {
+        },
+        clear: () => {
             store = {};
-        }),
+        },
+        removeItem: (key: string) => {
+            delete store[key];
+        },
     };
 })();
 
-Object.defineProperty(window, 'sessionStorage', {
-    value: mockSessionStorage,
+Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
 });

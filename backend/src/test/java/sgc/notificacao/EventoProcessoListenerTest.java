@@ -9,14 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.AlertaService;
-import sgc.processo.eventos.ProcessoIniciadoEvento;
+import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.SgrhService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.subprocesso.modelo.SubprocessoRepo;
 import sgc.unidade.modelo.Unidade;
@@ -65,7 +65,7 @@ class EventoProcessoListenerTest {
 
     private Processo processo;
     private Subprocesso subprocessoOperacional;
-    private ProcessoIniciadoEvento evento;
+    private EventoProcessoIniciado evento;
 
     @BeforeEach
     void setUp() {
@@ -84,7 +84,7 @@ class EventoProcessoListenerTest {
         subprocessoOperacional.setUnidade(unidadeOperacional);
         subprocessoOperacional.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
 
-        evento = new ProcessoIniciadoEvento(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
+        evento = new EventoProcessoIniciado(1L, "INICIADO", LocalDateTime.now(), List.of(100L));
     }
 
     @Test

@@ -21,7 +21,7 @@
           :disabled="competencias.length === 0"
           class="btn btn-outline-success"
           data-testid="btn-disponibilizar-page"
-          @click="finalizarEdicao"
+          @click="abrirModalDisponibilizar"
         >
           Disponibilizar
         </button>
@@ -117,6 +117,7 @@
     <!-- Modal de Criar Nova Competência -->
     <div
       v-if="mostrarModalCriarNovaCompetencia"
+      data-testid="criar-competencia-modal"
       aria-labelledby="criarCompetenciaModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -230,6 +231,7 @@
     <!-- Modal de Disponibilizar -->
     <div
       v-if="mostrarModalDisponibilizar"
+      data-testid="disponibilizar-modal"
       aria-labelledby="disponibilizarModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -275,7 +277,7 @@
               <textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes"
+                data-testid="input-observacoes-disponibilizacao"
                 class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
@@ -373,7 +375,7 @@
     />
 
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :sigla-unidade="siglaUnidade"
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
@@ -382,7 +384,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
@@ -392,7 +394,8 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import {Atividade, Competencia, Perfil, SalvarMapaRequest, SituacaoSubprocesso, Unidade} from '@/types/tipos'
+import {usePerfil} from '@/composables/usePerfil'
+import {Atividade, Competencia, Perfil, Servidor, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
@@ -405,8 +408,9 @@ const processosStore = useProcessosStore()
 const revisaoStore = useRevisaoStore()
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
+const { servidorLogado } = usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
@@ -457,12 +461,12 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
 }
 
 const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
-const idSubprocesso = computed(() => subprocesso.value?.codUnidade);
+const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
-  if (idSubprocesso.value) {
-    await mapasStore.fetchMapaCompleto(idSubprocesso.value as number);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
+  if (codSubrocesso.value) {
+    await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
   }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
@@ -474,20 +478,13 @@ onMounted(async () => {
 });
 
 const atividades = computed<Atividade[]>(() => {
-  if (typeof idSubprocesso.value !== 'number') {
+  if (typeof codSubrocesso.value !== 'number') {
     return []
   }
-  return atividadesStore.getAtividadesPorSubprocesso(idSubprocesso.value) || []
+  return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value) || []
 })
-const mapaEmEdicao = ref<SalvarMapaRequest>({competencias: []});
-const competencias = ref<Competencia[]>([]);
 
-watch(mapaCompleto, (novoMapa) => {
-  if (novoMapa) {
-    competencias.value = JSON.parse(JSON.stringify(novoMapa.competencias));
-    mapaEmEdicao.value.competencias = JSON.parse(JSON.stringify(novoMapa.competencias));
-  }
-}, {immediate: true, deep: true});
+const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
@@ -511,6 +508,10 @@ const competenciaParaExcluir = ref<Competencia | null>(null)
 const dataLimiteValidacao = ref('')
 const observacoesDisponibilizacao = ref('')
 const notificacaoDisponibilizacao = ref('')
+
+function abrirModalDisponibilizar() {
+  mostrarModalDisponibilizar.value = true;
+}
 
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
@@ -580,51 +581,27 @@ function getConhecimentosModal(atividade: Atividade): string {
   return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
 }
 
-function adicionarOuAtualizarCompetencia() {
+function adicionarCompetenciaEFecharModal() {
   if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
 
+  const competencia: Competencia = {
+    codigo: competenciaSendoEditada.value?.codigo || 0,
+    descricao: novaCompetencia.value.descricao,
+    atividadesAssociadas: atividadesSelecionadas.value,
+  };
+
   if (competenciaSendoEditada.value) {
-    const index = mapaEmEdicao.value.competencias.findIndex(c => c.codigo === competenciaSendoEditada.value!.codigo);
-    if (index !== -1) {
-      mapaEmEdicao.value.competencias[index].descricao = novaCompetencia.value.descricao;
-      (mapaEmEdicao.value.competencias[index] as any).atividadesAssociadas = [...atividadesSelecionadas.value];
-    }
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
   } else {
-    mapaEmEdicao.value.competencias.push({
-      descricao: novaCompetencia.value.descricao,
-      atividades: atividades.value.filter(a => atividadesSelecionadas.value.includes(a.codigo)).map(a => ({
-        descricao: a.descricao,
-        conhecimentos: a.conhecimentos.map(c => ({descricao: c.descricao}))
-      }))
-    });
+    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
   }
 
-  if (idSubprocesso.value) {
-    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
-  }
-
-  if (subprocesso.value && subprocesso.value.situacaoSubprocesso === SituacaoSubprocesso.ATIVIDADES_HOMOLOGADAS) {
-    subprocesso.value.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_EM_ANDAMENTO;
-  }
-
+  // Limpar formulário
   novaCompetencia.value.descricao = '';
   atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
-}
 
-function adicionarCompetenciaEFecharModal() {
-  adicionarOuAtualizarCompetencia();
   fecharModalCriarNovaCompetencia();
-}
-
-function finalizarEdicao() {
-  if (idSubprocesso.value) {
-    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
-  }
-  mostrarModalDisponibilizar.value = true;
-  dataLimiteValidacao.value = '';
-  observacoesDisponibilizacao.value = '';
-  notificacaoDisponibilizacao.value = '';
 }
 
 function excluirCompetencia(codigo: number) {
@@ -637,10 +614,7 @@ function excluirCompetencia(codigo: number) {
 
 function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value) {
-    mapaEmEdicao.value.competencias = mapaEmEdicao.value.competencias.filter(comp => comp.codigo !== competenciaParaExcluir.value!.codigo);
-    if (idSubprocesso.value) {
-      mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
-    }
+    mapasStore.removerCompetencia(codSubrocesso.value as number, competenciaParaExcluir.value.codigo);
     fecharModalExcluirCompetencia();
   }
 }
@@ -651,13 +625,13 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
-  const competenciaIndex = mapaEmEdicao.value.competencias.findIndex(comp => comp.codigo === competenciaId);
-  if (competenciaIndex !== -1) {
-    const competencia = mapaEmEdicao.value.competencias[competenciaIndex] as any;
-    competencia.atividadesAssociadas = competencia.atividadesAssociadas.filter((id: number) => id !== atividadeId);
-    if (idSubprocesso.value) {
-      mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
-    }
+  const competencia = competencias.value.find(comp => comp.codigo === competenciaId);
+  if (competencia) {
+    const competenciaAtualizada = {
+      ...competencia,
+      atividadesAssociadas: competencia.atividadesAssociadas.filter(id => id !== atividadeId),
+    };
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaAtualizada);
   }
 }
 
@@ -668,7 +642,7 @@ function formatarData(data: string): string {
 }
 
 function disponibilizarMapa() {
-  if (!mapaEmEdicao.value || !unidade.value) {
+  if (!mapaCompleto.value || !unidade.value) {
     notificacaoDisponibilizacao.value = 'Erro: Mapa ou unidade não encontrados.'
     return
   }
@@ -676,14 +650,14 @@ function disponibilizarMapa() {
   const currentUnidade = unidade.value;
 
   // Validações conforme plano
-  const competenciasSemAtividades = mapaEmEdicao.value.competencias.filter(comp => (comp as any).atividadesAssociadas.length === 0);
+  const competenciasSemAtividades = mapaCompleto.value.competencias.filter(comp => comp.atividadesAssociadas.length === 0);
   if (competenciasSemAtividades.length > 0) {
     notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
     return;
   }
 
   const atividadesIds = atividades.value.map(a => a.codigo);
-  const atividadesAssociadas = mapaEmEdicao.value.competencias.flatMap(comp => (comp as any).atividadesAssociadas);
+  const atividadesAssociadas = mapaCompleto.value.competencias.flatMap(comp => comp.atividadesAssociadas);
   const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
 
   if (atividadesNaoAssociadas.length > 0) {
@@ -703,18 +677,28 @@ function disponibilizarMapa() {
     }
 
     // Registrar movimentação
+    const MOCK_SERVER: Servidor = {
+      ...servidorLogado.value,
+      unidade: currentUnidade
+    }
+    const MOCK_SUBPROCESSO: Subprocesso = {
+      ...sub,
+      codigo: sub.codSubprocesso,
+      unidade: currentUnidade,
+      situacao: sub.situacaoSubprocesso,
+      dataFimEtapa1: '',
+      dataLimiteEtapa2: '',
+      atividades: []
+    }
     processosStore.addMovement({
-      usuario: `${perfilStore.perfilSelecionado} - ${perfilStore.unidadeSelecionada}`,
+      subprocesso: MOCK_SUBPROCESSO,
+      usuario: MOCK_SERVER,
       unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
       unidadeDestino: currentUnidade,
       descricao: 'Disponibilização do mapa de competências'
     });
   }
 
-  // Atualizar mapa
-  if (idSubprocesso.value) {
-    mapasStore.salvarMapa(idSubprocesso.value, mapaEmEdicao.value);
-  }
 
   // Simular notificações por e-mail
   const notificacoesStore = useNotificacoesStore();

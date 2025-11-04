@@ -6,14 +6,25 @@ import type {
     ProcessoDetalhe,
     ProcessoResumo,
 } from '@/types/tipos';
+import {ApiError} from './ApiError';
+import axios from 'axios';
+
+async function handleError(error: unknown, context: string): Promise<never> {
+    if (axios.isAxiosError(error)) {
+        const { response } = error;
+        const message = response?.data?.message || `Erro em ${context}`;
+        const statusCode = response?.status || 500;
+        throw new ApiError(message, statusCode, response?.data);
+    }
+    throw new Error(`Erro desconhecido em ${context}`);
+}
 
 export async function criarProcesso(request: CriarProcessoRequest): Promise<Processo> {
   try {
     const response = await apiClient.post<Processo>('/processos', request);
     return response.data;
   } catch (error) {
-    console.error('Erro ao criar processo:', error);
-    throw error;
+    return handleError(error, 'criar processo');
   }
 }
 
@@ -22,8 +33,7 @@ export async function fetchProcessosFinalizados(): Promise<ProcessoResumo[]> {
     const response = await apiClient.get<ProcessoResumo[]>('/processos/finalizados');
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar processos finalizados:', error);
-    throw error;
+    return handleError(error, 'buscar processos finalizados');
   }
 }
 
@@ -31,8 +41,7 @@ export async function iniciarProcesso(id: number, tipo: string, unidadesIds: num
   try {
     await apiClient.post(`/processos/${id}/iniciar?tipo=${tipo}`, unidadesIds);
   } catch (error) {
-    console.error(`Erro ao iniciar o processo ${id}:`, error);
-    throw error;
+    return handleError(error, `iniciar o processo ${id}`);
   }
 }
 
@@ -40,8 +49,7 @@ export async function finalizarProcesso(id: number): Promise<void> {
   try {
     await apiClient.post(`/processos/${id}/finalizar`);
   } catch (error) {
-    console.error(`Erro ao finalizar o processo ${id}:`, error);
-    throw error;
+    return handleError(error, `finalizar o processo ${id}`);
   }
 }
 
@@ -50,27 +58,24 @@ export async function obterProcessoPorId(id: number): Promise<Processo> {
     const response = await apiClient.get<Processo>(`/processos/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Erro ao obter processo ${id}:`, error);
-    throw error;
+    return handleError(error, `obter processo ${id}`);
   }
 }
 
 export async function atualizarProcesso(codProcesso: number, request: AtualizarProcessoRequest): Promise<Processo> {
   try {
-    const response = await apiClient.put<Processo>(`/processos/${codProcesso}`, request);
+    const response = await apiClient.post<Processo>(`/processos/${codProcesso}/atualizar`, request);
     return response.data;
   } catch (error) {
-    console.error(`Erro ao atualizar processo ${codProcesso}:`, error);
-    throw error;
+    return handleError(error, `atualizar processo ${codProcesso}`);
   }
 }
 
 export async function excluirProcesso(codProcesso: number): Promise<void> {
   try {
-    await apiClient.delete(`/processos/${codProcesso}`);
+    await apiClient.post(`/processos/${codProcesso}/excluir`);
   } catch (error) {
-    console.error(`Erro ao excluir processo ${codProcesso}:`, error);
-    throw error;
+    return handleError(error, `excluir processo ${codProcesso}`);
   }
 }
 
@@ -79,21 +84,43 @@ export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe
     const response = await apiClient.get<ProcessoDetalhe>(`/processos/${id}/detalhes`);
     return response.data;
   } catch (error) {
-    console.error(`Erro ao obter detalhes do processo ${id}:`, error);
-    throw error;
+    return handleError(error, `obter detalhes do processo ${id}`);
   }
 }
 
 export async function processarAcaoEmBloco(payload: {
-    idProcesso: number,
+    codProcesso: number,
     unidades: string[],
     tipoAcao: 'aceitar' | 'homologar',
     unidadeUsuario: string
 }): Promise<void> {
     try {
-        await apiClient.post(`/processos/${payload.idProcesso}/acoes-em-bloco`, payload);
+        await apiClient.post(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     } catch (error) {
-        console.error(`Erro ao processar ação em bloco para o processo ${payload.idProcesso}:`, error);
-        throw error;
+        return handleError(error, `processar ação em bloco para o processo ${payload.codProcesso}`);
+    }
+}
+
+export async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/alterar-data-limite`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `alterar a data limite para o subprocesso ${id}`);
+    }
+}
+
+export async function apresentarSugestoes(id: number, dados: { sugestoes: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/apresentar-sugestoes`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `apresentar sugestões para o subprocesso ${id}`);
+    }
+}
+
+export async function validarMapa(id: number): Promise<void> {
+    try {
+        await apiClient.post(`/processos/validar-mapa`, { id });
+    } catch (error) {
+        return handleError(error, `validar o mapa para o subprocesso ${id}`);
     }
 }

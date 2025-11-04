@@ -10,32 +10,29 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.Sgc;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAcaoAnalise;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.processo.SituacaoProcesso;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
+import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
-import sgc.sgrh.UsuarioRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.subprocesso.dto.AceitarCadastroReq;
 import sgc.subprocesso.dto.DevolverCadastroReq;
 import sgc.subprocesso.dto.HomologarCadastroReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.subprocesso.modelo.*;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -48,9 +45,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = TestSecurityConfig.class)
+@SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @Transactional
 @DisplayName("CDU-13: Analisar cadastro de atividades e conhecimentos")
 public class CDU13IntegrationTest {
@@ -310,15 +308,15 @@ public class CDU13IntegrationTest {
 
             // First item in list is the most recent (ACEITE)
             sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-            assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE);
-            assertThat(aceite.observacoes()).isEqualTo(obsAceite);
-            assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
+            assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
             // Second item is the oldest (DEVOLUCAO)
             sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-            assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
-            assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
-            assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
+            assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }
 }

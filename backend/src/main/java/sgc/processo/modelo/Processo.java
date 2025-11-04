@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
-import sgc.processo.SituacaoProcesso;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Processo extends EntidadeBase {
-
     public Processo(String descricao, TipoProcesso tipo, SituacaoProcesso situacao, LocalDateTime dataLimite) {
         super();
         this.descricao = descricao;
@@ -27,20 +25,6 @@ public class Processo extends EntidadeBase {
         this.dataCriacao = LocalDateTime.now();
     }
 
-    /**
-     * Construtor de cópia.
-     */
-    public Processo(Processo outro) {
-        if (outro != null) {
-            super.setCodigo(outro.getCodigo());
-            this.descricao = outro.descricao;
-            this.tipo = outro.tipo;
-            this.situacao = outro.situacao;
-            this.dataLimite = outro.dataLimite;
-            this.dataCriacao = outro.dataCriacao;
-            this.dataFinalizacao = outro.dataFinalizacao;
-        }
-    }
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 

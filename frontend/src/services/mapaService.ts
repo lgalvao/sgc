@@ -1,27 +1,45 @@
-import apiClient from '@/axios-setup';
-import {mapMapaDtoToModel} from '@/mappers/mapas';
-import type {Mapa, SalvarMapaRequest} from '@/types/tipos';
+import apiClient from '../axios-setup';
+import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
+import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from '@/mappers/mapas';
 
-export const listarMapas = async (): Promise<Mapa[]> => {
-    const response = await apiClient.get('/mapas');
-    return response.data.map(mapMapaDtoToModel);
+export async function obterMapaVisualizacao(codSubrocesso: number): Promise<MapaVisualizacao> {
+  const response = await apiClient.get<MapaVisualizacao>(`/subprocessos/${codSubrocesso}/mapa-visualizacao`);
+  return response.data;
+}
+
+export const verificarImpactosMapa = async (id: number): Promise<ImpactoMapa> => {
+  const response = await apiClient.get(`/subprocessos/${id}/impactos-mapa`);
+  return mapImpactoMapaDtoToModel(response.data);
 };
 
-export const obterMapa = async (id: number): Promise<Mapa> => {
-    const response = await apiClient.get(`/mapas/${id}`);
-    return mapMapaDtoToModel(response.data);
+export const obterMapaCompleto = async (id: number): Promise<MapaCompleto> => {
+  const response = await apiClient.get(`/subprocessos/${id}/mapa-completo`);
+  return mapMapaCompletoDtoToModel(response.data);
 };
 
-export const criarMapa = async (mapa: SalvarMapaRequest): Promise<Mapa> => {
-    const response = await apiClient.post('/mapas', mapa);
-    return mapMapaDtoToModel(response.data);
+export const salvarMapaCompleto = async (codSubprocesso: number, data: any): Promise<MapaCompleto> => {
+  const response = await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-completo/salvar`, data);
+  return mapMapaCompletoDtoToModel(response.data);
 };
 
-export const atualizarMapa = async (codMapa: number, mapa: Mapa): Promise<Mapa> => {
-    const response = await apiClient.put(`/mapas/${codMapa}`, mapa);
-    return mapMapaDtoToModel(response.data);
+export const obterMapaAjuste = async (id: number): Promise<MapaAjuste> => {
+  const response = await apiClient.get(`/subprocessos/${id}/mapa-ajuste`);
+  return mapMapaAjusteDtoToModel(response.data);
 };
 
-export const excluirMapa = async (codMapa: number): Promise<void> => {
-    await apiClient.delete(`/mapas/${codMapa}`);
+export const salvarMapaAjuste = async (codSubprocesso: number, data: any): Promise<void> => {
+  await apiClient.post(`/subprocessos/${codSubprocesso}/mapa-ajuste/salvar`, data);
 };
+
+export async function verificarMapaVigente(codigoUnidade: number): Promise<boolean> {
+  try {
+    const response = await apiClient.get(`/unidades/${codigoUnidade}/mapa-vigente`);
+    return response.data.temMapaVigente;
+  } catch (error: any) {
+    // 404 é esperado quando a unidade não tem mapa vigente, não precisa logar
+    if (error?.response?.status !== 404) {
+      console.error(`Erro ao verificar mapa vigente para a unidade ${codigoUnidade}:`, error);
+    }
+    return false;
+  }
+}

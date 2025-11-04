@@ -12,17 +12,16 @@ import sgc.notificacao.NotificacaoModeloEmailService;
 import sgc.notificacao.NotificacaoService;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.UnidadeProcesso;
-import sgc.sgrh.SgrhService;
+import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.service.SgrhService;
 import sgc.unidade.modelo.TipoUnidade;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +53,7 @@ class ProcessoNotificacaoServiceTest {
         @DisplayName("Deve enviar e-mail para unidade final")
         void enviarNotificacoesDeFinalizacao_UnidadeFinal_EnviaEmail() {
             unidadeProcesso.setTipo(TipoUnidade.OPERACIONAL);
-            unidadeProcesso.setUnidadeCodigo(1L);
+            unidadeProcesso.setCodUnidade(1L);
 
             when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
             when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));
@@ -69,9 +68,9 @@ class ProcessoNotificacaoServiceTest {
         @DisplayName("Deve enviar e-mail para unidade intermediária")
         void enviarNotificacoesDeFinalizacao_UnidadeIntermediaria_EnviaEmail() {
             unidadeProcesso.setTipo(TipoUnidade.INTERMEDIARIA);
-            unidadeProcesso.setUnidadeCodigo(1L);
+            unidadeProcesso.setCodUnidade(1L);
             UnidadeProcesso subordinada = new UnidadeProcesso();
-            subordinada.setUnidadeSuperiorCodigo(1L);
+            subordinada.setCodUnidadeSuperior(1L);
 
             when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
             when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));

@@ -10,8 +10,8 @@ import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Movimentacao;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 import sgc.subprocesso.modelo.Subprocesso;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
@@ -77,9 +77,9 @@ class MapperTest {
 
         assertNotNull(dto);
         assertEquals(1L, dto.getCodigo());
-        assertEquals(100L, dto.getProcessoCodigo());
-        assertEquals(200L, dto.getUnidadeCodigo());
-        assertEquals(300L, dto.getMapaCodigo());
+        assertEquals(100L, dto.getCodProcesso());
+        assertEquals(200L, dto.getCodUnidade());
+        assertEquals(300L, dto.getCodMapa());
         assertEquals(SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, dto.getSituacao());
     }
 

@@ -44,8 +44,8 @@ export const useProcessosStore = defineStore('processos', {
             }
             return [];
         },
-        getMovementsForSubprocesso: (state) => (idSubprocesso: number) => {
-            return state.movements.filter(m => (m as any).idSubprocesso === idSubprocesso)
+        getMovementsForSubprocesso: (state) => (codSubrocesso: number) => {
+            return state.movements.filter(m => (m as any).codSubrocesso === codSubrocesso)
                 .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
         }
     },
@@ -81,44 +81,26 @@ export const useProcessosStore = defineStore('processos', {
             await this.fetchProcessoDetalhe(idProcesso);
         },
         async processarCadastroBloco(payload: {
-            idProcesso: number,
+            codProcesso: number,
             unidades: string[],
             tipoAcao: 'aceitar' | 'homologar',
             unidadeUsuario: string
         }) {
             await processoService.processarAcaoEmBloco(payload);
             // Após a ação em bloco, recarregar os detalhes do processo para refletir as mudanças
-            await this.fetchProcessoDetalhe(payload.idProcesso);
+            await this.fetchProcessoDetalhe(payload.codProcesso);
         },
-        async alterarDataLimiteSubprocesso() {
-            // Esta lógica deve ser movida para o backend.
-            console.warn('alterarDataLimiteSubprocesso: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.alterarDataLimiteSubprocesso(payload);
+        async alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
+            await processoService.alterarDataLimiteSubprocesso(id, dados);
+            await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
-        async aceitarMapa() {
-            // Esta lógica deve ser movida para o backend.
-            console.warn('aceitarMapa: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.aceitarMapa(payload);
+        async apresentarSugestoes(id: number, dados: { sugestoes: string }) {
+            await processoService.apresentarSugestoes(id, dados);
+            await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
-        async rejeitarMapa() {
-            // Esta lógica deve ser movida para o backend.
-            console.warn('rejeitarMapa: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.rejeitarMapa(payload);
-        },
-        async apresentarSugestoes() {
-            // Esta lógica deve ser movida para o backend.
-            console.warn('apresentarSugestoes: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.apresentarSugestoes(payload);
-        },
-        async validarMapa() {
-            // Esta lógica deve ser movida para o backend.
-            console.warn('validarMapa: Esta action deve chamar um endpoint de backend.');
-            // Exemplo de como seria se houvesse um serviço:
-            // await processoService.validarMapa(payload);
+        async validarMapa(id: number) {
+            await processoService.validarMapa(id);
+            await this.fetchProcessoDetalhe(this.processoDetalhe!.codigo);
         },
         addMovement(movement: Omit<Movimentacao, 'codigo' | 'dataHora'>) {
             const newMovement: Movimentacao = {

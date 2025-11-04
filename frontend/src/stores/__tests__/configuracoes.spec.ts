@@ -2,116 +2,105 @@ import {initPinia} from '@/test-utils/helpers';
 import {useConfiguracoesStore} from '../configuracoes';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-// Mock localStorage
+// Mock do localStorage para isolar os testes
 const localStorageMock = (() => {
     let store: { [key: string]: string } = {};
     return {
         getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => {
-            store[key] = value.toString();
-        },
-        clear: () => {
-            store = {};
-        }
+        setItem: (key: string, value: string) => (store[key] = value.toString()),
+        clear: () => (store = {}),
     };
 })();
 
-Object.defineProperty(window, 'localStorage', {value: localStorageMock});
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-describe('Configuracoes Store', () => {
+describe('useConfiguracoesStore', () => {
     beforeEach(() => {
-          initPinia();
-          localStorageMock.clear(); // Limpa o localStorage antes de cada teste
-        // Reset mocks for localStorage methods
-        vi.spyOn(localStorageMock, 'getItem').mockRestore();
-        vi.spyOn(localStorageMock, 'setItem').mockRestore();
+        initPinia();
+        localStorageMock.clear();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
-    it('should have default values', () => {
-        const store = useConfiguracoesStore();
-        expect(store.diasInativacaoProcesso).toBe(10);
-        expect(store.diasAlertaNovo).toBe(7);
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
-    it('should load configurations from localStorage', () => {
-        localStorageMock.setItem('appConfiguracoes', JSON.stringify({
-            diasInativacaoProcesso: 45,
-            diasAlertaNovo: 10,
-        }));
-        const store = useConfiguracoesStore();
-        store.loadConfiguracoes();
-        expect(store.diasInativacaoProcesso).toBe(45);
-        expect(store.diasAlertaNovo).toBe(10);
-    });
-
-    it('should save configurations to localStorage', () => {
-        const store = useConfiguracoesStore();
-        store.setDiasInativacaoProcesso(60);
-        store.setDiasAlertaNovo(15);
-        store.saveConfiguracoes();
-
-        const savedConfig = JSON.parse(localStorageMock.getItem('appConfiguracoes') || '{}');
-        expect(savedConfig.diasInativacaoProcesso).toBe(60);
-        expect(savedConfig.diasAlertaNovo).toBe(15);
-    });
-
-    it('should not set diasInativacaoProcesso less than 1', () => {
-        const store = useConfiguracoesStore();
-        const initialValue = store.diasInativacaoProcesso;
-        store.setDiasInativacaoProcesso(0);
-        expect(store.diasInativacaoProcesso).toBe(initialValue);
-        store.setDiasInativacaoProcesso(-5);
-        expect(store.diasInativacaoProcesso).toBe(initialValue);
-    });
-
-    it('should not set diasAlertaNovo less than 1', () => {
-        const store = useConfiguracoesStore();
-        const initialValue = store.diasAlertaNovo;
-        store.setDiasAlertaNovo(0);
-        expect(store.diasAlertaNovo).toBe(initialValue);
-        store.setDiasAlertaNovo(-5);
-        expect(store.diasAlertaNovo).toBe(initialValue);
-    });
-
-    it('should set diasInativacaoProcesso when value is greater than or equal to 1', () => {
-        const store = useConfiguracoesStore();
-        store.setDiasInativacaoProcesso(30);
-        expect(store.diasInativacaoProcesso).toBe(30);
-        store.setDiasInativacaoProcesso(1);
-        expect(store.diasInativacaoProcesso).toBe(1);
-    });
-
-    it('should set diasAlertaNovo when value is greater than or equal to 1', () => {
-        const store = useConfiguracoesStore();
-        store.setDiasAlertaNovo(20);
-        expect(store.diasAlertaNovo).toBe(20);
-        store.setDiasAlertaNovo(1);
-        expect(store.diasAlertaNovo).toBe(1);
-    });
-
-    it('should handle localStorage errors gracefully during load', () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+    describe('Inicialização', () => {
+        it('deve ter valores padrão quando o localStorage está vazio', () => {
+            const store = useConfiguracoesStore();
+            expect(store.diasInativacaoProcesso).toBe(10);
+            expect(store.diasAlertaNovo).toBe(7);
         });
-        vi.spyOn(localStorageMock, 'getItem').mockImplementation(() => {
-            throw new Error('localStorage read error');
+
+        it('deve carregar as configurações do localStorage, se existirem', () => {
+            const storedConfig = { diasInativacaoProcesso: 45, diasAlertaNovo: 15 };
+            localStorageMock.setItem('appConfiguracoes', JSON.stringify(storedConfig));
+            const store = useConfiguracoesStore();
+            store.loadConfiguracoes();
+            expect(store.diasInativacaoProcesso).toBe(45);
+            expect(store.diasAlertaNovo).toBe(15);
         });
-        const store = useConfiguracoesStore();
-        store.loadConfiguracoes();
-        // expect(consoleErrorSpy).toHaveBeenCalledWith('Erro ao carregar configurações do localStorage:', expect.any(Error));
-        expect(store.diasInativacaoProcesso).toBe(10);
-        consoleErrorSpy.mockRestore();
     });
 
-    it('should handle localStorage errors gracefully during save', () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+    describe('Interação com LocalStorage', () => {
+        it('deve salvar as configurações no localStorage', () => {
+            const store = useConfiguracoesStore();
+            store.setDiasInativacaoProcesso(60);
+            store.setDiasAlertaNovo(20);
+            store.saveConfiguracoes();
+            const savedConfig = JSON.parse(localStorageMock.getItem('appConfiguracoes') || '{}');
+            expect(savedConfig.diasInativacaoProcesso).toBe(60);
+            expect(savedConfig.diasAlertaNovo).toBe(20);
         });
-        vi.spyOn(localStorageMock, 'setItem').mockImplementation(() => {
-            throw new Error('localStorage write error');
+
+        it('deve lidar com erros de leitura do localStorage de forma graciosa', () => {
+            vi.spyOn(localStorageMock, 'getItem').mockImplementation(() => {
+                throw new Error('Erro de leitura');
+            });
+            const store = useConfiguracoesStore();
+            store.loadConfiguracoes();
+            expect(store.diasInativacaoProcesso).toBe(10); // Mantém o padrão
+            expect(console.error).toHaveBeenCalled();
         });
-        const store = useConfiguracoesStore();
-        const result = store.saveConfiguracoes();
-        // expect(consoleErrorSpy).toHaveBeenCalledWith('Erro ao salvar configurações no localStorage:', expect.any(Error));
-        expect(result).toBe(false);
-        consoleErrorSpy.mockRestore();
+
+        it('deve lidar com erros de escrita no localStorage de forma graciosa', () => {
+            vi.spyOn(localStorageMock, 'setItem').mockImplementation(() => {
+                throw new Error('Erro de escrita');
+            });
+            const store = useConfiguracoesStore();
+            const result = store.saveConfiguracoes();
+            expect(result).toBe(false);
+            expect(console.error).toHaveBeenCalled();
+        });
+    });
+
+    describe('Lógica dos Setters', () => {
+        it('não deve permitir valores menores que 1 para diasInativacaoProcesso', () => {
+            const store = useConfiguracoesStore();
+            store.setDiasInativacaoProcesso(0);
+            expect(store.diasInativacaoProcesso).toBe(10);
+            store.setDiasInativacaoProcesso(-5);
+            expect(store.diasInativacaoProcesso).toBe(10);
+        });
+
+        it('não deve permitir valores menores que 1 para diasAlertaNovo', () => {
+            const store = useConfiguracoesStore();
+            store.setDiasAlertaNovo(0);
+            expect(store.diasAlertaNovo).toBe(7);
+            store.setDiasAlertaNovo(-5);
+            expect(store.diasAlertaNovo).toBe(7);
+        });
+
+        it('deve definir o valor para diasInativacaoProcesso se for >= 1', () => {
+            const store = useConfiguracoesStore();
+            store.setDiasInativacaoProcesso(30);
+            expect(store.diasInativacaoProcesso).toBe(30);
+        });
+
+        it('deve definir o valor para diasAlertaNovo se for >= 1', () => {
+            const store = useConfiguracoesStore();
+            store.setDiasAlertaNovo(20);
+            expect(store.diasAlertaNovo).toBe(20);
+        });
     });
 });

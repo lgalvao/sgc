@@ -8,7 +8,6 @@ import lombok.Setter;
 import sgc.comum.modelo.EntidadeBase;
 import sgc.mapa.modelo.Mapa;
 import sgc.processo.modelo.Processo;
-import sgc.subprocesso.SituacaoSubprocesso;
 import sgc.unidade.modelo.Unidade;
 
 import java.time.LocalDateTime;
@@ -58,22 +57,6 @@ public class Subprocesso extends EntidadeBase {
         this.mapa = mapa;
         this.situacao = situacao;
         this.dataLimiteEtapa1 = dataLimiteEtapa1;
-    }
-
-    public Subprocesso(Subprocesso subprocesso) {
-        if (subprocesso != null) {
-            super.setCodigo(subprocesso.getCodigo());
-            this.processo = subprocesso.getProcesso();
-            this.unidade = subprocesso.getUnidade();
-            this.mapa = subprocesso.getMapa();
-            this.situacao = subprocesso.getSituacao();
-
-            this.dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
-            this.dataFimEtapa1 = subprocesso.getDataFimEtapa1();
-
-            this.dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
-            this.dataFimEtapa2 = subprocesso.getDataFimEtapa2();
-        }
     }
 
     public Mapa getMapa() {

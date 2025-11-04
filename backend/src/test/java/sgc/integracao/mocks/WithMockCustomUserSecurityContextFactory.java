@@ -5,8 +5,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import sgc.comum.BeanUtil;
-import sgc.sgrh.Perfil;
-import sgc.sgrh.Usuario;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
@@ -23,7 +23,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         // A responsabilidade de criar a Unidade agora é do próprio teste.
         Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "A Unidade de teste com ID %d não foi encontrada. Garanta quefoi criada no @BeforeEach do teste."
+                        "A Unidade de teste com código %d não foi encontrada. Garanta quefoi criada no @BeforeEach do teste."
                         .formatted(customUser.unidadeId()))
                 );
 

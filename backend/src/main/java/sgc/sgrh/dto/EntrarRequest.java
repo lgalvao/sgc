@@ -2,8 +2,8 @@ package sgc.sgrh.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import lombok.Builder;
+import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 @Value

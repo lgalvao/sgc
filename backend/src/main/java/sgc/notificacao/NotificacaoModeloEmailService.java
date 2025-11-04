@@ -197,7 +197,7 @@ public class NotificacaoModeloEmailService {
             String nomeProcesso) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_PROCESSO_CONCLUSAO_SGC + nomeProcesso);
+        context.setVariable("titulo", "%s%s".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
 
@@ -222,7 +222,7 @@ public class NotificacaoModeloEmailService {
             List<String> siglasUnidadesSubordinadas) {
 
         Context context = new Context();
-        context.setVariable("titulo", TITULO_PROCESSO_CONCLUSAO_SGC + nomeProcesso + " em unidades subordinadas");
+        context.setVariable("titulo", "%s%s em unidades subordinadas".formatted(TITULO_PROCESSO_CONCLUSAO_SGC, nomeProcesso));
         context.setVariable("siglaUnidade", siglaUnidade);
         context.setVariable("nomeProcesso", nomeProcesso);
         context.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);

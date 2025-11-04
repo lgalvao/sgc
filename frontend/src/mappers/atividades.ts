@@ -19,10 +19,10 @@ export function mapConhecimentoDtoToModel(dto: any): Conhecimento {
   };
 }
 
-export function mapCriarAtividadeRequestToDto(request: any, idSubprocesso: number): any {
+export function mapCriarAtividadeRequestToDto(request: any, codSubrocesso: number): any {
   return {
     ...request,
-    idSubprocesso,
+    codSubrocesso,
   };
 }
 

@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import sgc.subprocesso.SituacaoSubprocesso;
+import sgc.subprocesso.modelo.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 
@@ -15,10 +15,10 @@ public class SubprocessoDto {
     private Long codigo;
 
     @NotNull(message = "O código do processo é obrigatório")
-    private Long processoCodigo;
+    private Long codProcesso;
 
-    private Long unidadeCodigo;
-    private Long mapaCodigo;
+    private Long codUnidade;
+    private Long codMapa;
 
     private LocalDateTime dataLimiteEtapa1;
     private LocalDateTime dataFimEtapa1;

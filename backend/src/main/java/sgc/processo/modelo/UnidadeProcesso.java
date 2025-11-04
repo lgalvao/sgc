@@ -16,10 +16,10 @@ import sgc.unidade.modelo.TipoUnidade;
 @AllArgsConstructor
 public class UnidadeProcesso extends EntidadeBase {
     @Column(name = "processo_codigo")
-    private Long processoCodigo;
+    private Long codProcesso;
 
     @Column(name = "unidade_codigo")
-    private Long unidadeCodigo;
+    private Long codUnidade;
 
     @Column(name = "nome")
     private String nome;
@@ -38,4 +38,5 @@ public class UnidadeProcesso extends EntidadeBase {
     private String situacao;
 
     @Column(name = "unidade_superior_codigo")
-    private Long unidadeSuperiorCodigo;}
+    private Long codUnidadeSuperior;
+}

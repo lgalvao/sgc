@@ -9,21 +9,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.TestUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoRequest;
 import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.unidade.modelo.Unidade;
 import sgc.unidade.modelo.UnidadeRepo;
 
-import java.util.List;
+import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
 @DisplayName("Testes de Integração do UsuarioControle")
 class UsuarioControleIntegrationTest {
 
@@ -41,9 +40,6 @@ class UsuarioControleIntegrationTest {
 
     @Autowired
     private UnidadeRepo unidadeRepo;
-
-    @MockitoBean
-    private SgrhService sgrhService;
 
     private static final String API_URL = "/api/usuarios";
     private Unidade unidade;
@@ -68,6 +64,9 @@ class UsuarioControleIntegrationTest {
             .andExpect(jsonPath("$").value(true));
     }
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
     @Test
     @DisplayName("Deve autorizar e retornar perfis")
     void autorizar_deveRetornarPerfis() throws Exception {
@@ -75,10 +74,14 @@ class UsuarioControleIntegrationTest {
         Unidade unidadeSgp = unidadeRepo.save(new Unidade("Secretaria de Gestao de Pessoas", "SGP"));
         Long tituloEleitoral = 123456789101L;
 
-        List<PerfilDto> perfisMock = List.of(
-            new PerfilDto(tituloEleitoral.toString(), unidadeSgp.getCodigo(), unidadeSgp.getNome(), Perfil.CHEFE.name())
-        );
-        when(sgrhService.buscarPerfisUsuario(anyString())).thenReturn(perfisMock);
+        usuarioRepo.save(new Usuario(
+            tituloEleitoral,
+            "Usuário Teste",
+            "teste@sgc.com",
+            "123",
+            unidadeSgp,
+            Set.of(Perfil.CHEFE)
+        ));
 
         // When/Then
         mockMvc.perform(post(API_URL + "/autorizar")
