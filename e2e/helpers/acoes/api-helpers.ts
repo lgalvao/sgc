@@ -1,6 +1,5 @@
 import {Page} from '@playwright/test';
-import {preencherFormularioProcesso, selecionarUnidadesPorSigla} from '~/helpers';
-import {navegarParaCriacaoProcesso} from '~/helpers';
+import {navegarParaCriacaoProcesso, preencherFormularioProcesso, selecionarUnidadesPorSigla} from '~/helpers';
 
 /**
  * Cria um processo através da UI e retorna o ID do processo criado.

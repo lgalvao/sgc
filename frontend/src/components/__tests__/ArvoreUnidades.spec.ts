@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import type { Unidade } from '@/types/tipos';
+import {beforeEach, describe, expect, it} from 'vitest';
+import type {Unidade} from '@/types/tipos';
 
 /**
  * Testes para o componente ArvoreUnidades

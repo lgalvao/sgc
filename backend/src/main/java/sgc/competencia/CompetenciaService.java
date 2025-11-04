@@ -9,7 +9,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.modelo.Mapa;
 
 import java.util.List;
@@ -29,10 +29,12 @@ public class CompetenciaService {
     }
 
     public Competencia atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
-        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow(() -> new ErroDominioNaoEncontrado("Competência não encontrada"));
+        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow(
+                () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
+
         competencia.setDescricao(descricao);
 
-        List<CompetenciaAtividade> associacoesAntigas = competenciaAtividadeRepo.findByCompetencia_Codigo(codCompetencia);
+        List<CompetenciaAtividade> associacoesAntigas = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
         competenciaAtividadeRepo.deleteAll(associacoesAntigas);
 
         prepararCompetenciasAtividades(atividadesIds, competencia);
@@ -40,19 +42,20 @@ public class CompetenciaService {
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        List<CompetenciaAtividade> associacoes = competenciaAtividadeRepo.findByCompetencia_Codigo(codCompetencia);
+        List<CompetenciaAtividade> associacoes = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
         competenciaAtividadeRepo.deleteAll(associacoes);
         competenciaRepo.deleteById(codCompetencia);
     }
 
     private void prepararCompetenciasAtividades(List<Long> codAtividades, Competencia competencia) {
-        if (codAtividades != null && !codAtividades.isEmpty()) {
-            List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
-            for (Atividade atividade : atividades) {
-                competenciaAtividadeRepo.save(new CompetenciaAtividade(
-                        new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade)
-                );
-            }
+        if (codAtividades == null || codAtividades.isEmpty()) return;
+
+        List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
+        for (Atividade atividade : atividades) {
+            CompetenciaAtividade ca = new CompetenciaAtividade(
+                    new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade
+            );
+            competenciaAtividadeRepo.save(ca);
         }
     }
 }

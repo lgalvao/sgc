@@ -18,9 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MapaVinculoService {
-
-    private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
-    private final CompetenciaRepo repositorioCompetencia;
+    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
     /**
@@ -39,7 +38,7 @@ public class MapaVinculoService {
      *                           estar vinculadas à competência.
      */
     public void atualizarVinculosAtividades(Long codCompetencia, List<Long> novosCodsAtividades) {
-        List<CompetenciaAtividade> vinculosAtuais = repositorioCompetenciaAtividade.findByCompetencia_Codigo(codCompetencia);
+        List<CompetenciaAtividade> vinculosAtuais = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
         Set<Long> idsAtuais = vinculosAtuais.stream()
                 .map(v -> v.getId().getCodAtividade())
                 .collect(Collectors.toSet());
@@ -49,16 +48,16 @@ public class MapaVinculoService {
         // Remover os que não estão na nova lista
         vinculosAtuais.stream()
                 .filter(v -> !novosIds.contains(v.getId().getCodAtividade()))
-                .forEach(repositorioCompetenciaAtividade::delete);
+                .forEach(competenciaAtividadeRepo::delete);
 
         // Adicionar os que não estão na lista atual
-        Competencia competencia = repositorioCompetencia.findById(codCompetencia).orElseThrow();
+        Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow();
         novosIds.stream()
                 .filter(id -> !idsAtuais.contains(id))
                 .forEach(codAtividade -> atividadeRepo.findById(codAtividade).ifPresent(atividade -> {
                     CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(codAtividade, codCompetencia);
                     CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
-                    repositorioCompetenciaAtividade.save(vinculo);
+                    competenciaAtividadeRepo.save(vinculo);
                 }));
 
         log.debug("Atualizados {} vínculos para competência {}", novosCodsAtividades.size(), codCompetencia);

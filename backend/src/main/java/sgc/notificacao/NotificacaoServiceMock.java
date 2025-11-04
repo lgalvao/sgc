@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 @Profile("e2e")
 @Slf4j
 public class NotificacaoServiceMock extends NotificacaoService {
-
     public NotificacaoServiceMock() {
         super(null, null);
         log.info(">>> NotificacaoServiceMock ATIVADO - E-mails serão mockados <<<");

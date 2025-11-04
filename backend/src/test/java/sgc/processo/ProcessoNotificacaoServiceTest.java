@@ -57,7 +57,7 @@ class ProcessoNotificacaoServiceTest {
 
             when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
             when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));
-            when(notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
+            when(notificacaoModeloEmailService.criarEmailProcessoFinalizadoPorUnidade(any(), any())).thenReturn("html");
 
             service.enviarNotificacoesDeFinalizacao(processo, Collections.singletonList(unidadeProcesso));
 
@@ -74,7 +74,7 @@ class ProcessoNotificacaoServiceTest {
 
             when(sgrhService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(1L, new ResponsavelDto(1L, "123", "Titular", "456", "Substituto")));
             when(sgrhService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("123", new UsuarioDto("123", "Nome", "email@test.com", "mat", "cargo")));
-            when(notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("html");
+            when(notificacaoModeloEmailService.criarEmailProcessoFinalizadoUnidadesSubordinadas(any(), any(), any())).thenReturn("html");
 
             service.enviarNotificacoesDeFinalizacao(processo, List.of(unidadeProcesso, subordinada));
 

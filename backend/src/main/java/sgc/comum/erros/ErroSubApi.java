@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
+// TODO precisa mesmo esse erro? Se sim, documentar melhor.
 public class ErroSubApi {
     private String object;
     private String field;

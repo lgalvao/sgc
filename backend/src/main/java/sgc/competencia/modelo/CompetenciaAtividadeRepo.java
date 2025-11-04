@@ -21,7 +21,7 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
      * @return Lista de vínculos da competência com atividades
      */
     @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.id.codCompetencia = :codCompetencia")
-    List<CompetenciaAtividade> findByCompetencia_Codigo(@Param("codCompetencia") Long codCompetencia);
+    List<CompetenciaAtividade> findByCompetenciaCodigo(@Param("codCompetencia") Long codCompetencia);
 
     /**
      * Busca todos os vínculos de uma atividade.
@@ -77,5 +77,5 @@ public interface CompetenciaAtividadeRepo extends JpaRepository<CompetenciaAtivi
     void deleteByCompetenciaMapaCodigo(@Param("codMapa") Long codMapa);
 
     @Query("SELECT ca FROM CompetenciaAtividade ca WHERE ca.competencia.mapa.codigo = :codMapa")
-    List<CompetenciaAtividade> findByCompetencia_Mapa_Codigo(@Param("codMapa") Long codMapa);
+    List<CompetenciaAtividade> findByCompetenciaMapaCodigo(@Param("codMapa") Long codMapa);
 }

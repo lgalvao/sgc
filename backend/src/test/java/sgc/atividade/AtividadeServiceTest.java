@@ -12,10 +12,10 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.modelo.Conhecimento;
+import sgc.atividade.modelo.ConhecimentoRepo;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.modelo.Usuario;
 import sgc.sgrh.modelo.UsuarioRepo;
 import sgc.subprocesso.modelo.SituacaoSubprocesso;
@@ -87,7 +87,7 @@ class AtividadeServiceTest {
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
             when(usuarioRepo.findByTituloEleitoral(123L)).thenReturn(Optional.of(usuario));
 
-            assertThrows(ErroDominioAccessoNegado.class, () -> service.criar(atividadeDto, "123"));
+            assertThrows(ErroAccessoNegado.class, () -> service.criar(atividadeDto, "123"));
         }
 
         @Test
@@ -119,6 +119,6 @@ class AtividadeServiceTest {
     @DisplayName("Deve lançar exceção ao excluir conhecimento inexistente")
     void excluirConhecimento_Inexistente_LancaExcecao() {
         when(conhecimentoRepo.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ErroDominioNaoEncontrado.class, () -> service.excluirConhecimento(1L, 1L));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> service.excluirConhecimento(1L, 1L));
     }
 }

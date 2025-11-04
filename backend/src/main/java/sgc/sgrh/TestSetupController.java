@@ -18,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/test")
 @RequiredArgsConstructor
+// TODO Verificar se alguem esta usando esses endpoints
 public class TestSetupController {
     private final JdbcTemplate jdbc;
 

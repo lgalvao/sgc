@@ -3,8 +3,8 @@ package sgc.sgrh.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.sgrh.dto.EntrarRequest;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.modelo.Perfil;
@@ -51,13 +51,13 @@ public class UsuarioService {
      * @param tituloEleitoral O título de eleitor do usuário.
      * @return Uma {@link List} de {@link PerfilUnidade}, onde cada item representa
      *         um perfil que o usuário pode assumir em uma determinada unidade.
-     * @throws ErroDominioNaoEncontrado se uma unidade associada a um perfil não for
+     * @throws ErroEntidadeNaoEncontrada se uma unidade associada a um perfil não for
      *                                  encontrada no banco de dados local.
      */
     public List<PerfilUnidade> autorizar(long tituloEleitoral) {
         log.info("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
-        Usuario usuario = usuarioRepo.findById(tituloEleitoral)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", tituloEleitoral));
+        Usuario usuario = usuarioRepo.findByTituloEleitoral(tituloEleitoral)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
 
         Unidade unidade = usuario.getUnidade();
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name());
@@ -91,13 +91,13 @@ public class UsuarioService {
      * Este método de conveniência extrai os dados da requisição, constrói o
      * objeto {@link PerfilUnidade} e delega para o método principal de entrada.
      *
-     * @param request O DTO {@link EntrarRequest} contendo os dados da escolha do usuário.
-     * @throws ErroDominioNaoEncontrado se a unidade especificada na requisição não for encontrada.
+     * @param request O DTO {@link EntrarReq} contendo os dados da escolha do usuário.
+     * @throws ErroEntidadeNaoEncontrada se a unidade especificada na requisição não for encontrada.
      * @throws IllegalArgumentException se o perfil especificado na requisição for inválido.
      */
-    public void entrar(EntrarRequest request) {
+    public void entrar(EntrarReq request) {
         Unidade unidade = unidadeRepo.findById(request.getUnidadeCodigo())
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade não encontrada com código: " + request.getUnidadeCodigo()));
         Perfil perfil = Perfil.valueOf(request.getPerfil());
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), null, unidade.getTipo().name());
         PerfilUnidade pu = new PerfilUnidade(perfil, unidadeDto);

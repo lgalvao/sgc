@@ -153,7 +153,7 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoDevolucao).hasSize(1);
-        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+        assertThat(historicoDevolucao.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
         assertThat(historicoDevolucao.getFirst().getUnidadeSigla()).isNotNull();
         assertThat(historicoDevolucao.getFirst().getObservacoes()).isEqualTo("Justificativa da devolução");
 
@@ -188,7 +188,7 @@ public class CDU20IntegrationTest {
         });
 
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+        assertThat(historicoAceite.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(historicoAceite.getFirst().getUnidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite

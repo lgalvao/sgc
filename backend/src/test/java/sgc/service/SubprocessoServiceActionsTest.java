@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.analise.modelo.Analise;
 import sgc.analise.modelo.AnaliseRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
@@ -199,7 +199,7 @@ public class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.aceitarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test
@@ -238,7 +238,7 @@ public class SubprocessoServiceActionsTest {
 
         @Test
         void deveLancarExcecaoSeSubprocessoNaoEncontrado_homologar() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoWorkflowService.homologarRevisaoCadastro(999L, OBSERVACOES, usuario));
         }
 
         @Test

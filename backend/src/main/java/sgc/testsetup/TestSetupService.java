@@ -8,12 +8,12 @@ import sgc.analise.modelo.AnaliseRepo;
 import sgc.analise.modelo.TipoAnalise;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.atividade.modelo.Conhecimento;
+import sgc.atividade.modelo.ConhecimentoRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
 import sgc.mapa.modelo.UnidadeMapa;
@@ -32,8 +32,8 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+// TODO Precisamos mesmo dessa confusão toda?
 public class TestSetupService {
-
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
     private final UnidadeProcessoRepo unidadeProcessoRepo;

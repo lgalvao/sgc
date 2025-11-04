@@ -1,9 +1,9 @@
 package sgc.integracao.mocks;
 
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.mockito.Mockito;
 
 @Configuration
 public class TestConfig {

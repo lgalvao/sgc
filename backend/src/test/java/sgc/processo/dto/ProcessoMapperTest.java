@@ -2,6 +2,7 @@ package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.SituacaoProcesso;
 import sgc.processo.modelo.TipoProcesso;

@@ -9,7 +9,6 @@ import sgc.sgrh.modelo.Perfil;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PerfilUnidade {
-
     private Perfil perfil;
     private UnidadeDto unidade;
 

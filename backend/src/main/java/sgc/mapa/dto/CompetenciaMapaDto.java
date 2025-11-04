@@ -23,12 +23,8 @@ public record CompetenciaMapaDto(
     @NotNull(message = "Lista de atividades não pode ser nula")
     List<Long> atividadesCodigos  // IDs das atividades vinculadas à competência
 ) {
+    // TODO verificar a necessidade disso:
     public CompetenciaMapaDto {
         atividadesCodigos = new ArrayList<>(atividadesCodigos);
-    }
-
-    @Override
-    public List<Long> atividadesCodigos() {
-        return new ArrayList<>(atividadesCodigos);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
 import sgc.alerta.modelo.Alerta;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.eventos.EventoProcessoIniciado;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;
@@ -65,7 +65,7 @@ public class EventoProcessoListener {
                 evento.codProcesso(), evento.tipo());
         try {
             Processo processo = processoRepo.findById(evento.codProcesso())
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo não encontrado: ", evento.codProcesso()));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.codProcesso()));
 
             List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.codProcesso());
 

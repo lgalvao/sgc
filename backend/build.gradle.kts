@@ -83,9 +83,7 @@ tasks.withType<Test> {
         showStandardStreams = true
     }
 
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
     jvmArgs = listOf(
-        "-Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
         "-Dlogging.level.root=INFO",
         "-Dlogging.level.sgc=INFO",
         "-Dlogging.level.org.hibernate=INFO",
@@ -106,7 +104,7 @@ tasks.withType<Test> {
         if (byteBuddyAgentFile != null) {
             jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
         } else {
-            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
+            logger.warn("byte-buddy-agent nao encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
 }
@@ -121,8 +119,8 @@ tasks.withType<JavaCompile> {
 
 tasks.register<BootRun>("bootRunE2E") {
     group = "Application"
-    description = "Runs the application with the 'e2e' profile for end-to-end testing."
+    description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
     jvmArgs = listOf("-Dspring.profiles.active=e2e")
     mainClass.set("sgc.Sgc")
-    classpath = sourceSets.main.get().runtimeClasspath
+    classpath = sourceSets["main"].runtimeClasspath
 }

@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +46,7 @@ class AlertaControleTest {
 
     @Test
     void marcarComoLido_quandoAlertaNaoEncontrado_deveRetornarNotFound() throws Exception {
-        doThrow(new ErroDominioNaoEncontrado("Não encontrado"))
+        doThrow(new ErroEntidadeNaoEncontrada("Não encontrado"))
                 .when(alertaService).marcarComoLido(anyString(), anyLong());
 
         mockMvc.perform(post("/api/alertas/1/marcar-como-lido")

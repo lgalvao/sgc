@@ -1,8 +1,13 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {
-    SELETORES,
     clicarProcesso,
     esperarElementoVisivel,
+    loginComoAdmin,
+    loginComoChefe,
+    loginComoChefeStic,
+    loginComoGestor,
+    loginComoServidor,
+    SELETORES,
     verificarAlertasOrdenadosPorDataHora,
     verificarAusenciaBotaoCriarProcesso,
     verificarColunasTabelaAlertas,
@@ -10,7 +15,6 @@ import {
     verificarNavegacaoPaginaCadastroProcesso,
     verificarVisibilidadeProcesso,
 } from '~/helpers';
-import {loginComoAdmin, loginComoChefe, loginComoChefeStic, loginComoGestor, loginComoServidor,} from '~/helpers';
 
 test.describe('CDU-02: Visualizar Painel', () => {
     test.describe('Visibilidade de Componentes por Perfil', () => {

@@ -12,7 +12,7 @@ import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.MapaRepo;
@@ -69,7 +69,7 @@ class MapaServiceTest {
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(competenciaAtividadeRepo.findByCompetencia_Codigo(1L)).thenReturn(List.of(competenciaAtividade));
+        when(competenciaAtividadeRepo.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 
         MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
@@ -86,7 +86,7 @@ class MapaServiceTest {
         when(mapaRepo.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
-                .isInstanceOf(ErroDominioNaoEncontrado.class)
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessage("Mapa não encontrado: 1");
     }
 }

@@ -7,6 +7,7 @@ package sgc.comum.erros;
  * uma pré-condição ou estado do sistema (e.g., tentar iniciar um processo
  * que já está em andamento).
  */
+// TODO em vez dessa classe geral demais, melhor criar erros mais específicos.
 public class ErroNegocio extends RuntimeException {
     public ErroNegocio(String message) {
         super(message);

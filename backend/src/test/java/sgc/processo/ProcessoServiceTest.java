@@ -11,7 +11,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoMapper;
+import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.modelo.Processo;
 import sgc.processo.modelo.ProcessoRepo;

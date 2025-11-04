@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
  * (como as factories de anotações de segurança) acessem beans de serviço.
  */
 @Component
+// TODO essa classe está me cheirando a gambiarra. Precisa mesmo?
 public class BeanUtil implements ApplicationContextAware {
     private static ApplicationContext context;
 

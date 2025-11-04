@@ -30,11 +30,21 @@ public class CompetenciaAtividade implements Serializable {
     @EmbeddedId
     private Id id;
 
+    /**
+     * -- SETTER --
+     * Define a atividade da associação, garantindo a imutabilidade.
+     *
+     */
     @MapsId("codAtividade")
     @ManyToOne
     @JoinColumn(name = "atividade_codigo", insertable = false, updatable = false)
     private Atividade atividade;
 
+    /**
+     * -- GETTER --
+     * Retorna uma cópia da competência para garantir a imutabilidade.
+     *
+     */
     @MapsId("codCompetencia")
     @ManyToOne
     @JoinColumn(name = "competencia_codigo", insertable = false, updatable = false)
@@ -49,8 +59,8 @@ public class CompetenciaAtividade implements Serializable {
      */
     public CompetenciaAtividade(Id id, Competencia competencia, Atividade atividade) {
         this.id = new Id(id.getCodAtividade(), id.getCodCompetencia());
-        this.competencia = new Competencia(competencia);
-        this.atividade = new Atividade(atividade);
+        this.competencia = competencia;
+        this.atividade = atividade;
     }
 
     /**
@@ -69,41 +79,5 @@ public class CompetenciaAtividade implements Serializable {
      */
     public Id getId() {
         return new Id(this.id.getCodAtividade(), this.id.getCodCompetencia());
-    }
-
-    /**
-     * Define a competência da associação, garantindo a imutabilidade.
-     *
-     * @param competencia A competência.
-     */
-    public void setCompetencia(Competencia competencia) {
-        this.competencia = new Competencia(competencia);
-    }
-
-    /**
-     * Retorna uma cópia da competência para garantir a imutabilidade.
-     *
-     * @return A competência.
-     */
-    public Competencia getCompetencia() {
-        return new Competencia(this.competencia);
-    }
-
-    /**
-     * Define a atividade da associação, garantindo a imutabilidade.
-     *
-     * @param atividade A atividade.
-     */
-    public void setAtividade(Atividade atividade) {
-        this.atividade = new Atividade(atividade);
-    }
-
-    /**
-     * Retorna uma cópia da atividade para garantir a imutabilidade.
-     *
-     * @return A atividade.
-     */
-    public Atividade getAtividade() {
-        return new Atividade(this.atividade);
     }
 }

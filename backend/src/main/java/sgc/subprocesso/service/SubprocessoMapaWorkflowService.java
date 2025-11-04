@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.competencia.CompetenciaService;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
@@ -38,7 +38,7 @@ public class SubprocessoMapaWorkflowService {
      * @param request              O DTO com os dados completos do mapa a serem salvos.
      * @param tituloUsuario O título de eleitor do usuário que está realizando a operação.
      * @return O {@link MapaCompletoDto} representando o estado salvo do mapa.
-     * @throws sgc.comum.erros.ErroDominioNaoEncontrado se o subprocesso ou seu mapa não forem encontrados.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem encontrados.
      * @throws IllegalStateException se o subprocesso não estiver em uma situação
      *                               válida para a edição do mapa.
      */
@@ -82,7 +82,7 @@ public class SubprocessoMapaWorkflowService {
 
     private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
         Subprocesso subprocesso = repositorioSubprocesso.findById(codSubprocesso)
-            .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         SituacaoSubprocesso situacao = subprocesso.getSituacao();
         if (situacao != SituacaoSubprocesso.CADASTRO_HOMOLOGADO && situacao != SituacaoSubprocesso.MAPA_CRIADO) {
@@ -90,7 +90,7 @@ public class SubprocessoMapaWorkflowService {
         }
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não possui mapa associado");
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
         }
         return subprocesso;
     }

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
 import sgc.alerta.modelo.*;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.modelo.Processo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
@@ -58,7 +58,7 @@ public class AlertaService {
      * @param descricao         O texto descritivo do alerta.
      * @param dataLimite        A data limite para a ação relacionada ao alerta (pode ser nulo).
      * @return A entidade {@link Alerta} que foi criada e persistida.
-     * @throws ErroDominioNaoEncontrado se a unidade de destino não for encontrada.
+     * @throws ErroEntidadeNaoEncontrada se a unidade de destino não for encontrada.
      */
     @Transactional
     public Alerta criarAlerta(
@@ -71,7 +71,7 @@ public class AlertaService {
         log.debug("Criando alerta tipo={} para unidade.", tipoAlerta);
 
         Unidade unidadeDestino = unidadeRepo.findById(codUnidadeDestino)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codUnidadeDestino));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codUnidadeDestino));
 
         Alerta alerta = new Alerta();
         alerta.setProcesso(processo);
@@ -227,7 +227,7 @@ public class AlertaService {
      * @param codUnidadeOrigem  O código da unidade que disponibilizou o cadastro.
      * @param codUnidadeDestino O código da unidade que deve analisar o cadastro (destino).
      * @return O {@link Alerta} criado.
-     * @throws ErroDominioNaoEncontrado se a unidade de origem não for encontrada.
+     * @throws ErroEntidadeNaoEncontrada se a unidade de origem não for encontrada.
      */
     @Transactional
     public Alerta criarAlertaCadastroDisponibilizado(
@@ -236,7 +236,7 @@ public class AlertaService {
             Long codUnidadeDestino) {
 
         Unidade unidadeOrigem = unidadeRepo.findById(codUnidadeOrigem)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade de origem", codUnidadeOrigem));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de origem", codUnidadeOrigem));
 
         String descricao = String.format(
                 "Cadastro disponibilizado pela unidade %s no processo '%s'. Realize a análise do cadastro.",
@@ -290,7 +290,7 @@ public class AlertaService {
                                     unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);
                                     return novoUsuario;
                                 })
-                                .orElseThrow(() -> new ErroDominioNaoEncontrado("Usuário", titulo));
+                                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", titulo));
                     });
 
             AlertaUsuario alertaUsuario = new AlertaUsuario();
@@ -332,14 +332,14 @@ public class AlertaService {
      *
      * @param usuarioTituloStr O título de eleitor do usuário (em formato String).
      * @param alertaId         O código do alerta a ser marcado como lido.
-     * @throws ErroDominioNaoEncontrado se a associação entre o alerta e o usuário não for encontrada.
+     * @throws ErroEntidadeNaoEncontrada se a associação entre o alerta e o usuário não for encontrada.
      * @throws NumberFormatException se o {@code usuarioTituloStr} não for um número válido.
      */
     @Transactional
     public void marcarComoLido(String usuarioTituloStr, Long alertaId) {
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
         AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
-        AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(id).orElseThrow(() -> new ErroDominioNaoEncontrado(
+        AlertaUsuario alertaUsuario = alertaUsuarioRepo.findById(id).orElseThrow(() -> new ErroEntidadeNaoEncontrada(
                 "Não foi encontrado o alerta %d para o usuário %d".formatted(alertaId, usuarioTitulo))
         );
 

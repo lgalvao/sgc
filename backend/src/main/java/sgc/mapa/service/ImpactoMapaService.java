@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.comum.erros.ErroDominioAccessoNegado;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroAccessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
@@ -55,8 +55,8 @@ public class ImpactoMapaService {
      * @param usuario       O usuário autenticado que realiza a operação.
      * @return Um {@link ImpactoMapaDto} que encapsula todos os impactos encontrados.
      *         Retorna um DTO sem impactos se a unidade não possuir um mapa vigente.
-     * @throws ErroDominioNaoEncontrado se o subprocesso ou seu mapa não forem encontrados.
-     * @throws ErroDominioAccessoNegado se o usuário não tiver permissão para executar
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem encontrados.
+     * @throws ErroAccessoNegado se o usuário não tiver permissão para executar
      *                                  a operação na situação atual do subprocesso.
      */
     @Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class ImpactoMapaService {
         log.info("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
 
         Subprocesso subprocesso = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso", codSubprocesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
         verificarAcesso(usuario, subprocesso);
 
@@ -79,7 +79,7 @@ public class ImpactoMapaService {
         Mapa mapaVigente = mapaVigenteOpt.get();
         Mapa mapaSubprocesso = mapaRepo
                 .findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Mapa não encontrado para subprocesso", codSubprocesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", codSubprocesso));
 
         log.info("ImpactoMapaService - Mapa Vigente Código: {}", mapaVigente.getCodigo());
         log.info("ImpactoMapaService - Mapa Subprocesso Código: {}", mapaSubprocesso.getCodigo());
@@ -123,7 +123,7 @@ public class ImpactoMapaService {
 
     private void validarSituacao(SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
         if (!esperadas.contains(atual)) {
-            throw new ErroDominioAccessoNegado(mensagemErro);
+            throw new ErroAccessoNegado(mensagemErro);
         }
     }
 

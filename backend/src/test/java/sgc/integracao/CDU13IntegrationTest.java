@@ -171,7 +171,7 @@ public class CDU13IntegrationTest {
             List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
-            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(analiseRegistrada.getMotivo()).isEqualTo(motivoDevolucao);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
@@ -213,7 +213,7 @@ public class CDU13IntegrationTest {
             List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
-            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("222222222222"); // From @WithMockGestor
 
@@ -306,15 +306,15 @@ public class CDU13IntegrationTest {
 
             assertThat(historico).hasSize(2);
 
-            // First item in list is the most recent (ACEITE)
+            // First item in list is the most recent (ACEITE_MAPEAMENTO)
             sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
             assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-            // Second item is the oldest (DEVOLUCAO)
+            // Second item is the oldest (DEVOLUCAO_MAPEAMENTO)
             sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
             assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }

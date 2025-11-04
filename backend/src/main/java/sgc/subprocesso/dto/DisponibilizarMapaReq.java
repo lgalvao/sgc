@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
  */
 public record DisponibilizarMapaReq(
         String observacoes,  // Opcional
+
         @NotNull(message = "Data limite para validação é obrigatória")
         LocalDateTime dataLimiteEtapa2  // Obrigatório - prazo para validação
 ) {

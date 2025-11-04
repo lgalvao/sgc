@@ -3,7 +3,6 @@ package sgc.mapa.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,22 +10,14 @@ import java.util.List;
  * Usado para criar ou atualizar o mapa com todas as suas competências
  * e vínculos com atividades de uma vez.
  *
- * @param observacoes Observações gerais sobre o mapa.
+ * @param observacoes  Observações gerais sobre o mapa.
  * @param competencias Lista de competências do mapa.
  */
 public record SalvarMapaRequest(
-    String observacoes,
-    
-    @NotNull(message = "Lista de competências não pode ser nula")
-    @Valid
-    List<CompetenciaMapaDto> competencias
-) {
-    public SalvarMapaRequest {
-        competencias = new ArrayList<>(competencias);
-    }
+        String observacoes,
 
-    @Override
-    public List<CompetenciaMapaDto> competencias() {
-        return new ArrayList<>(competencias);
-    }
+        @NotNull(message = "Lista de competências não pode ser nula")
+        @Valid
+        List<CompetenciaMapaDto> competencias
+) {
 }

@@ -17,17 +17,17 @@ class RestExceptionHandlerTest {
     private RestExceptionHandler handler;
 
     @Test
-    @DisplayName("Deve tratar ErroDominioNaoEncontrado com status 404")
+    @DisplayName("Deve tratar ErroEntidadeNaoEncontrada com status 404")
     void handleErroDominioNaoEncontrado() {
-        ErroDominioNaoEncontrado ex = new ErroDominioNaoEncontrado("Teste");
+        ErroEntidadeNaoEncontrada ex = new ErroEntidadeNaoEncontrada("Teste");
         ResponseEntity<Object> response = handler.handleErroDominioNaoEncontrado(ex);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
-    @DisplayName("Deve tratar ErroDominioAccessoNegado com status 403")
+    @DisplayName("Deve tratar ErroAccessoNegado com status 403")
     void handleErroDominioAccessoNegado() {
-        ErroDominioAccessoNegado ex = new ErroDominioAccessoNegado("Teste");
+        ErroAccessoNegado ex = new ErroAccessoNegado("Teste");
         ResponseEntity<Object> response = handler.handleErroDominioAccessoNegado(ex);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }

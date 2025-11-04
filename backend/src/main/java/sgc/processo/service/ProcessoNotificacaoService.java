@@ -75,7 +75,7 @@ public class ProcessoNotificacaoService {
 
     private void enviarEmailUnidadeFinal(Processo processo, UnidadeProcesso unidade, String email) {
         String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
-        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
+        String html = notificacaoModeloEmailService.criarEmailProcessoFinalizadoPorUnidade(
             unidade.getSigla(),
             processo.getDescricao()
         );
@@ -96,7 +96,7 @@ public class ProcessoNotificacaoService {
         }
 
         String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
-        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoUnidadesSubordinadas(
+        String html = notificacaoModeloEmailService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
             unidadeIntermediaria.getSigla(),
             processo.getDescricao(),
             siglasSubordinadas

@@ -15,12 +15,12 @@ import sgc.Sgc;
 import sgc.alerta.modelo.AlertaRepo;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
+import sgc.atividade.modelo.Conhecimento;
+import sgc.atividade.modelo.ConhecimentoRepo;
 import sgc.competencia.modelo.Competencia;
 import sgc.competencia.modelo.CompetenciaAtividade;
 import sgc.competencia.modelo.CompetenciaAtividadeRepo;
 import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
@@ -144,8 +144,8 @@ class CDU10IntegrationTest {
 
             // Assert Notificação
             verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
-                org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                org.mockito.ArgumentMatchers.any(Unidade.class)
+                    org.mockito.ArgumentMatchers.any(Subprocesso.class),
+                    org.mockito.ArgumentMatchers.any(Unidade.class)
             );
         }
 

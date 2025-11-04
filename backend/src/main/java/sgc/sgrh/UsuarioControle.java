@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sgc.sgrh.dto.AutenticacaoRequest;
-import sgc.sgrh.dto.EntrarRequest;
-import sgc.sgrh.dto.LoginResponse;
+import sgc.sgrh.dto.AutenticacaoReq;
+import sgc.sgrh.dto.EntrarReq;
+import sgc.sgrh.dto.LoginResp;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.modelo.Perfil;
 import sgc.sgrh.service.UsuarioService;
@@ -25,7 +25,6 @@ import java.util.Map;
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 public class UsuarioControle {
-
     private final UsuarioService usuarioService;
     private final UnidadeRepo unidadeRepo;
 
@@ -39,7 +38,7 @@ public class UsuarioControle {
      *         {@code false} caso contrário.
      */
     @PostMapping("/autenticar")
-    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoRequest request) {
+    public ResponseEntity<Boolean> autenticar(@Valid @RequestBody AutenticacaoReq request) {
         boolean autenticado = usuarioService.autenticar(request.getTituloEleitoral(), request.getSenha());
         return ResponseEntity.ok(autenticado);
     }
@@ -68,9 +67,9 @@ public class UsuarioControle {
      * @return Um {@link ResponseEntity} com status 200 OK.
      */
     @PostMapping("/entrar")
-    public ResponseEntity<LoginResponse> entrar(@Valid @RequestBody EntrarRequest request) {
+    public ResponseEntity<LoginResp> entrar(@Valid @RequestBody EntrarReq request) {
         usuarioService.entrar(request);
-        LoginResponse response = new LoginResponse(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
+        LoginResp response = new LoginResp(request.getTituloEleitoral(), Perfil.valueOf(request.getPerfil()), request.getUnidadeCodigo());
 
         // Gerar JWT simulado para perfil e2e
         try {

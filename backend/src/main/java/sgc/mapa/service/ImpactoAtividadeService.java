@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.atividade.modelo.Atividade;
 import sgc.atividade.modelo.AtividadeRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.modelo.Conhecimento;
+import sgc.atividade.modelo.ConhecimentoRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.modelo.Mapa;
 import sgc.mapa.modelo.TipoImpactoAtividade;
@@ -63,31 +63,26 @@ public class ImpactoAtividadeService {
             List<Atividade> vigentes,
             Mapa mapaVigente) {
 
-        log.info("detectarAtividadesRemovidas - Atividades Atuais: {}", atuais.stream().map(a -> "%d:%s".formatted(a.getCodigo(), a.getDescricao())).collect(Collectors.joining(", ")));
-        log.info("detectarAtividadesRemovidas - Atividades Vigentes: {}", vigentes.stream().map(a -> "%d:%s".formatted(a.getCodigo(), a.getDescricao())).collect(Collectors.joining(", ")));
-
         List<AtividadeImpactadaDto> removidas = new ArrayList<>();
         Map<String, Atividade> atuaisMap = mapAtividadesByDescricao(atuais);
 
         for (Atividade vigente : vigentes) {
             if (!atuaisMap.containsKey(vigente.getDescricao())) {
-                removidas.add(new AtividadeImpactadaDto(
+                AtividadeImpactadaDto atividadeImpactadaDto = new AtividadeImpactadaDto(
                         vigente.getCodigo(),
                         vigente.getDescricao(),
                         TipoImpactoAtividade.REMOVIDA,
                         null,
                         impactoCompetenciaService.obterCompetenciasDaAtividade(vigente.getCodigo(), mapaVigente)
-                ));
+                );
+
+                removidas.add(atividadeImpactadaDto);
             }
         }
-        log.info("detectarAtividadesRemovidas - {} atividades removidas.", removidas.size());
         return removidas;
     }
 
     public List<AtividadeImpactadaDto> detectarAtividadesAlteradas(List<Atividade> atuais, List<Atividade> vigentes, Mapa mapaVigente) {
-        log.info("detectarAtividadesAlteradas - Atividades Atuais: {}", atuais.stream().map(a -> "%d:%s".formatted(a.getCodigo(), a.getDescricao())).collect(Collectors.joining(", ")));
-        log.info("detectarAtividadesAlteradas - Atividades Vigentes: {}", vigentes.stream().map(a -> "%d:%s".formatted(a.getCodigo(), a.getDescricao())).collect(Collectors.joining(", ")));
-
         List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
         Map<String, Atividade> vigentesMap = mapAtividadesByDescricao(vigentes);
 
@@ -108,17 +103,15 @@ public class ImpactoAtividadeService {
                 }
             }
         }
-        log.info("detectarAtividadesAlteradas - {} atividades alteradas.", alteradas.size());
         return alteradas;
     }
 
     private boolean conhecimentosDiferentes(List<Conhecimento> lista1, List<Conhecimento> lista2) {
-        if (lista1.size() != lista2.size()) {
-            return true;
-        }
+        if (lista1.size() != lista2.size()) return true;
 
         Set<String> descricoes1 = lista1.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
         Set<String> descricoes2 = lista2.stream().map(Conhecimento::getDescricao).collect(Collectors.toSet());
+
         return !descricoes1.equals(descricoes2);
     }
 }
