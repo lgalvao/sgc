@@ -10,14 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.service.UsuarioService;
-import sgc.unidade.modelo.TipoUnidade;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +72,7 @@ class UsuarioServiceTest {
     void autorizar_deveRetornarListaDePerfisUnidades() {
         long tituloEleitoral = 123456789L;
 
-        when(usuarioRepo.findByTituloEleitoral(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
 
         List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
 
@@ -80,7 +80,7 @@ class UsuarioServiceTest {
         assertThat(resultado).extracting(PerfilUnidade::getPerfil).containsExactlyInAnyOrder(Perfil.ADMIN, Perfil.CHEFE);
         assertThat(resultado).extracting(pu -> pu.getUnidade().sigla()).allMatch(sigla -> sigla.equals("SEDOC"));
 
-        verify(usuarioRepo, times(1)).findByTituloEleitoral(tituloEleitoral);
+        verify(usuarioRepo, times(1)).findById(tituloEleitoral);
         verifyNoInteractions(sgrhService, unidadeRepo);
     }
 
@@ -89,7 +89,7 @@ class UsuarioServiceTest {
     void autorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
         long tituloEleitoral = 999L;
 
-        when(usuarioRepo.findByTituloEleitoral(tituloEleitoral)).thenReturn(Optional.empty());
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.autorizar(tituloEleitoral))
             .isInstanceOf(ErroEntidadeNaoEncontrada.class)

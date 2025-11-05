@@ -12,16 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import sgc.comum.erros.RestExceptionHandler;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.ProcessoController;
 import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.model.TipoProcesso;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,15 +27,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("CDU-03: Manter processo")
 @WithMockAdmin
 @Import(TestSecurityConfig.class)
@@ -52,18 +49,6 @@ public class CDU03IntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private ProcessoService processoService;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProcessoController(processoService))
-                .setControllerAdvice(new RestExceptionHandler())
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .alwaysDo(print())
-                .build();
-    }
 
 
 
@@ -87,6 +72,7 @@ public class CDU03IntegrationTest {
         );
 
         mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
@@ -123,6 +109,7 @@ public class CDU03IntegrationTest {
         );
 
         MvcResult result = mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -138,6 +125,7 @@ public class CDU03IntegrationTest {
 
         // Re-add the assertion to keep the test failing, but now we get the output
         mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
@@ -178,6 +166,7 @@ public class CDU03IntegrationTest {
         );
 
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
@@ -198,6 +187,7 @@ public class CDU03IntegrationTest {
         );
 
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/atualizar", 999L) // código que não existe
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isNotFound()); // Ou outro status de erro apropriado
@@ -215,6 +205,7 @@ public class CDU03IntegrationTest {
         );
 
         MvcResult result = mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
                 .andExpect(status().isCreated())
@@ -223,7 +214,8 @@ public class CDU03IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Remover o processo
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId))
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId)
+                        .with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
 
         // 3. Tentar buscar o processo removido para confirmar que não existe mais
@@ -233,7 +225,8 @@ public class CDU03IntegrationTest {
 
     @Test
     void testRemoverProcesso_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L)) // código que não existe
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", 999L) // código que não existe
+                        .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

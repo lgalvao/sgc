@@ -6,26 +6,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.modelo.*;
+import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.modelo.Processo;
+import sgc.processo.model.Processo;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.TipoUnidade;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static sgc.alerta.modelo.TipoAlerta.*;
+import static sgc.alerta.model.TipoAlerta.*;
 
 /**
  * Serviço para gerenciar alertas do sistema.

@@ -1,5 +1,6 @@
 package sgc.util;
 
+// TODO me parece inutil essa classe.
 public class HtmlUtils {
     /**
      * Escapa caracteres HTML em uma string para exibição segura em páginas web.

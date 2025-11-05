@@ -1,8 +1,4 @@
-create table if not exists sgc.administrador
-(
-    usuario_titulo varchar(255) not null,
-    primary key (usuario_titulo)
-);
+CREATE SCHEMA IF NOT EXISTS sgc;
 
 create table if not exists sgc.usuario
 (
@@ -209,137 +205,98 @@ create table if not exists sgc.vinculacao_unidade
 );
 
 -- Foreign Keys
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_administrador_usuario') THEN
-        ALTER TABLE sgc.administrador ADD CONSTRAINT fk_administrador_usuario FOREIGN KEY (usuario_titulo) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_processo') THEN
-        ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_processo FOREIGN KEY (processo_codigo) REFERENCES sgc.processo;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_unidade_destino') THEN
-        ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_unidade_origem') THEN
-        ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_usuario_destino') THEN
-        ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_usuario_destino FOREIGN KEY (usuario_destino_titulo) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_usuario_alerta') THEN
-        ALTER TABLE sgc.alerta_usuario ADD CONSTRAINT fk_alerta_usuario_alerta FOREIGN KEY (alerta_codigo) REFERENCES sgc.alerta;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_alerta_usuario_usuario') THEN
-        ALTER TABLE sgc.alerta_usuario ADD CONSTRAINT fk_alerta_usuario_usuario FOREIGN KEY (usuario_titulo_eleitoral) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_analise_subprocesso') THEN
-        ALTER TABLE sgc.analise ADD CONSTRAINT fk_analise_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_atividade_mapa') THEN
-        ALTER TABLE sgc.atividade ADD CONSTRAINT fk_atividade_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_atribuicao_temporaria_unidade') THEN
-        ALTER TABLE sgc.atribuicao_temporaria ADD CONSTRAINT fk_atribuicao_temporaria_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_atribuicao_temporaria_usuario') THEN
-        ALTER TABLE sgc.atribuicao_temporaria ADD CONSTRAINT fk_atribuicao_temporaria_usuario FOREIGN KEY (usuario_titulo) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_competencia_mapa') THEN
-        ALTER TABLE sgc.competencia ADD CONSTRAINT fk_competencia_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_competencia_atividade_atividade') THEN
-        ALTER TABLE sgc.competencia_atividade ADD CONSTRAINT fk_competencia_atividade_atividade FOREIGN KEY (atividade_codigo) REFERENCES sgc.atividade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_competencia_atividade_competencia') THEN
-        ALTER TABLE sgc.competencia_atividade ADD CONSTRAINT fk_competencia_atividade_competencia FOREIGN KEY (competencia_codigo) REFERENCES sgc.competencia;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_conhecimento_atividade') THEN
-        ALTER TABLE sgc.conhecimento ADD CONSTRAINT fk_conhecimento_atividade FOREIGN KEY (atividade_codigo) REFERENCES sgc.atividade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_mapa_unidade') THEN
-        ALTER TABLE sgc.mapa ADD CONSTRAINT fk_mapa_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_movimentacao_subprocesso') THEN
-        ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_movimentacao_unidade_destino') THEN
-        ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_movimentacao_unidade_origem') THEN
-        ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_notificacao_subprocesso') THEN
-        ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_notificacao_unidade_destino') THEN
-        ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_notificacao_unidade_origem') THEN
-        ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_subprocesso_mapa') THEN
-        ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_subprocesso_processo') THEN
-        ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_processo FOREIGN KEY (processo_codigo) REFERENCES sgc.processo;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_subprocesso_unidade') THEN
-        ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_unidade_titular') THEN
-        ALTER TABLE sgc.unidade ADD CONSTRAINT fk_unidade_titular FOREIGN KEY (titular_titulo) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_unidade_superior') THEN
-        ALTER TABLE sgc.unidade ADD CONSTRAINT fk_unidade_superior FOREIGN KEY (unidade_superior_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_unidade_mapa_mapa_vigente') THEN
-        ALTER TABLE sgc.unidade_mapa ADD CONSTRAINT fk_unidade_mapa_mapa_vigente FOREIGN KEY (mapa_vigente_codigo) REFERENCES sgc.mapa;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_unidade_mapa_unidade') THEN
-        ALTER TABLE sgc.unidade_mapa ADD CONSTRAINT fk_unidade_mapa_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_usuario_unidade') THEN
-        ALTER TABLE sgc.usuario ADD CONSTRAINT fk_usuario_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_usuario_perfil_usuario') THEN
-        ALTER TABLE sgc.usuario_perfil ADD CONSTRAINT fk_usuario_perfil_usuario FOREIGN KEY (usuario_titulo_eleitoral) REFERENCES sgc.usuario;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_vinculacao_unidade_anterior') THEN
-        ALTER TABLE sgc.vinculacao_unidade ADD CONSTRAINT fk_vinculacao_unidade_anterior FOREIGN KEY (unidade_anterior_codigo) REFERENCES sgc.unidade;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_vinculacao_unidade_atual') THEN
-        ALTER TABLE sgc.vinculacao_unidade ADD CONSTRAINT fk_vinculacao_unidade_atual FOREIGN KEY (unidade_atual_codigo) REFERENCES sgc.unidade;
-    END IF;
-END $$;
+ALTER TABLE sgc.alerta DROP CONSTRAINT IF EXISTS fk_alerta_processo;
+ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_processo FOREIGN KEY (processo_codigo) REFERENCES sgc.processo;
+
+ALTER TABLE sgc.alerta DROP CONSTRAINT IF EXISTS fk_alerta_unidade_destino;
+ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.alerta DROP CONSTRAINT IF EXISTS fk_alerta_unidade_origem;
+ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.alerta DROP CONSTRAINT IF EXISTS fk_alerta_usuario_destino;
+ALTER TABLE sgc.alerta ADD CONSTRAINT fk_alerta_usuario_destino FOREIGN KEY (usuario_destino_titulo) REFERENCES sgc.usuario;
+
+ALTER TABLE sgc.alerta_usuario DROP CONSTRAINT IF EXISTS fk_alerta_usuario_alerta;
+ALTER TABLE sgc.alerta_usuario ADD CONSTRAINT fk_alerta_usuario_alerta FOREIGN KEY (alerta_codigo) REFERENCES sgc.alerta;
+
+ALTER TABLE sgc.alerta_usuario DROP CONSTRAINT IF EXISTS fk_alerta_usuario_usuario;
+ALTER TABLE sgc.alerta_usuario ADD CONSTRAINT fk_alerta_usuario_usuario FOREIGN KEY (usuario_titulo_eleitoral) REFERENCES sgc.usuario;
+
+ALTER TABLE sgc.analise DROP CONSTRAINT IF EXISTS fk_analise_subprocesso;
+ALTER TABLE sgc.analise ADD CONSTRAINT fk_analise_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
+
+ALTER TABLE sgc.atividade DROP CONSTRAINT IF EXISTS fk_atividade_mapa;
+ALTER TABLE sgc.atividade ADD CONSTRAINT fk_atividade_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
+
+ALTER TABLE sgc.atribuicao_temporaria DROP CONSTRAINT IF EXISTS fk_atribuicao_temporaria_unidade;
+ALTER TABLE sgc.atribuicao_temporaria ADD CONSTRAINT fk_atribuicao_temporaria_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.atribuicao_temporaria DROP CONSTRAINT IF EXISTS fk_atribuicao_temporaria_usuario;
+ALTER TABLE sgc.atribuicao_temporaria ADD CONSTRAINT fk_atribuicao_temporaria_usuario FOREIGN KEY (usuario_titulo) REFERENCES sgc.usuario;
+
+ALTER TABLE sgc.competencia DROP CONSTRAINT IF EXISTS fk_competencia_mapa;
+ALTER TABLE sgc.competencia ADD CONSTRAINT fk_competencia_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
+
+ALTER TABLE sgc.competencia_atividade DROP CONSTRAINT IF EXISTS fk_competencia_atividade_atividade;
+ALTER TABLE sgc.competencia_atividade ADD CONSTRAINT fk_competencia_atividade_atividade FOREIGN KEY (atividade_codigo) REFERENCES sgc.atividade;
+
+ALTER TABLE sgc.competencia_atividade DROP CONSTRAINT IF EXISTS fk_competencia_atividade_competencia;
+ALTER TABLE sgc.competencia_atividade ADD CONSTRAINT fk_competencia_atividade_competencia FOREIGN KEY (competencia_codigo) REFERENCES sgc.competencia;
+
+ALTER TABLE sgc.conhecimento DROP CONSTRAINT IF EXISTS fk_conhecimento_atividade;
+ALTER TABLE sgc.conhecimento ADD CONSTRAINT fk_conhecimento_atividade FOREIGN KEY (atividade_codigo) REFERENCES sgc.atividade;
+
+ALTER TABLE sgc.mapa DROP CONSTRAINT IF EXISTS fk_mapa_unidade;
+ALTER TABLE sgc.mapa ADD CONSTRAINT fk_mapa_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.movimentacao DROP CONSTRAINT IF EXISTS fk_movimentacao_subprocesso;
+ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
+
+ALTER TABLE sgc.movimentacao DROP CONSTRAINT IF EXISTS fk_movimentacao_unidade_destino;
+ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.movimentacao DROP CONSTRAINT IF EXISTS fk_movimentacao_unidade_origem;
+ALTER TABLE sgc.movimentacao ADD CONSTRAINT fk_movimentacao_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.notificacao DROP CONSTRAINT IF EXISTS fk_notificacao_subprocesso;
+ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES sgc.subprocesso;
+
+ALTER TABLE sgc.notificacao DROP CONSTRAINT IF EXISTS fk_notificacao_unidade_destino;
+ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_unidade_destino FOREIGN KEY (unidade_destino_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.notificacao DROP CONSTRAINT IF EXISTS fk_notificacao_unidade_origem;
+ALTER TABLE sgc.notificacao ADD CONSTRAINT fk_notificacao_unidade_origem FOREIGN KEY (unidade_origem_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.subprocesso DROP CONSTRAINT IF EXISTS fk_subprocesso_mapa;
+ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_mapa FOREIGN KEY (mapa_codigo) REFERENCES sgc.mapa;
+
+ALTER TABLE sgc.subprocesso DROP CONSTRAINT IF EXISTS fk_subprocesso_processo;
+ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_processo FOREIGN KEY (processo_codigo) REFERENCES sgc.processo;
+
+ALTER TABLE sgc.subprocesso DROP CONSTRAINT IF EXISTS fk_subprocesso_unidade;
+ALTER TABLE sgc.subprocesso ADD CONSTRAINT fk_subprocesso_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.unidade DROP CONSTRAINT IF EXISTS fk_unidade_titular;
+ALTER TABLE sgc.unidade ADD CONSTRAINT fk_unidade_titular FOREIGN KEY (titular_titulo) REFERENCES sgc.usuario;
+
+ALTER TABLE sgc.unidade DROP CONSTRAINT IF EXISTS fk_unidade_superior;
+ALTER TABLE sgc.unidade ADD CONSTRAINT fk_unidade_superior FOREIGN KEY (unidade_superior_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.unidade_mapa DROP CONSTRAINT IF EXISTS fk_unidade_mapa_mapa_vigente;
+ALTER TABLE sgc.unidade_mapa ADD CONSTRAINT fk_unidade_mapa_mapa_vigente FOREIGN KEY (mapa_vigente_codigo) REFERENCES sgc.mapa;
+
+ALTER TABLE sgc.unidade_mapa DROP CONSTRAINT IF EXISTS fk_unidade_mapa_unidade;
+ALTER TABLE sgc.unidade_mapa ADD CONSTRAINT fk_unidade_mapa_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.usuario DROP CONSTRAINT IF EXISTS fk_usuario_unidade;
+ALTER TABLE sgc.usuario ADD CONSTRAINT fk_usuario_unidade FOREIGN KEY (unidade_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.usuario_perfil DROP CONSTRAINT IF EXISTS fk_usuario_perfil_usuario;
+ALTER TABLE sgc.usuario_perfil ADD CONSTRAINT fk_usuario_perfil_usuario FOREIGN KEY (usuario_titulo_eleitoral) REFERENCES sgc.usuario;
+
+ALTER TABLE sgc.vinculacao_unidade DROP CONSTRAINT IF EXISTS fk_vinculacao_unidade_anterior;
+ALTER TABLE sgc.vinculacao_unidade ADD CONSTRAINT fk_vinculacao_unidade_anterior FOREIGN KEY (unidade_anterior_codigo) REFERENCES sgc.unidade;
+
+ALTER TABLE sgc.vinculacao_unidade DROP CONSTRAINT IF EXISTS fk_vinculacao_unidade_atual;
+ALTER TABLE sgc.vinculacao_unidade ADD CONSTRAINT fk_vinculacao_unidade_atual FOREIGN KEY (unidade_atual_codigo) REFERENCES sgc.unidade;

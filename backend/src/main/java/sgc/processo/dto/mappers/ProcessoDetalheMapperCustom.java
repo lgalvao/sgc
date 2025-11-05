@@ -5,11 +5,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.*;
 

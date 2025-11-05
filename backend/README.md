@@ -85,16 +85,16 @@ Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da
 ./gradlew :backend:build
 ```
 
-Para executar a aplicação em modo de desenvolvimento (utilizando o banco de dados em memória H2), ative o perfil `local`:
+Para executar a aplicação em modo de desenvolvimento (utilizando o banco de dados em memória H2), ative o perfil `e2e`:
 
 ```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local'
+./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
 ```
 
 Para executar o processo em segundo plano e liberar o terminal, adicione `&` ao final do comando:
 
 ```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local' &
+./gradlew :backend:bootRun --args='--spring.profiles.active=e2e' &
 ```
 
 A API estará disponível em `http://localhost:10000`.

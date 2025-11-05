@@ -9,17 +9,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.alerta.modelo.AlertaUsuario;
-import sgc.alerta.modelo.AlertaUsuarioRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.processo.modelo.Processo;
+import sgc.processo.model.Processo;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sgc.alerta.modelo.TipoAlerta.CADASTRO_DISPONIBILIZADO;
+import static sgc.alerta.model.TipoAlerta.CADASTRO_DISPONIBILIZADO;
 
 @Nested
 @ExtendWith(MockitoExtension.class)

@@ -19,7 +19,7 @@ import java.util.List;
 @EnableWebSecurity
 @Profile("e2e")
 public class ConfigSegurancaE2E {
-    @Bean
+    @Bean("e2eSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth

@@ -11,27 +11,27 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
+import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.modelo.Mapa;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoWorkflowService;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,16 +68,16 @@ public class SubprocessoServiceActionsTest {
     private AlertaRepo alertaRepo;
 
     @Autowired
-    private sgc.mapa.modelo.MapaRepo mapaRepo;
+    private sgc.mapa.model.MapaRepo mapaRepo;
 
     @Autowired
-    private sgc.subprocesso.modelo.MovimentacaoRepo movimentacaoRepo;
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private EntityManager entityManager;
 
     @MockitoBean
-    private NotificacaoService notificacaoService;
+    private NotificacaoEmailService notificacaoEmailService;
 
     @MockitoBean
     private ApplicationEventPublisher eventPublisher;
@@ -93,24 +93,11 @@ public class SubprocessoServiceActionsTest {
 
     @BeforeEach
     void setUp() {
-        Unidade unidadeSuperior = new Unidade("Unidade Superior", "US");
-        unidadeRepo.save(unidadeSuperior);
+        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
 
-        unidade = new Unidade("Unidade Teste", "UT");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidadeRepo.save(unidade);
-
-        Usuario chefe = new Usuario();
-        chefe.setTituloEleitoral(111122223333L);
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
-
-        usuario = new Usuario();
-        usuario.setTituloEleitoral(444455556666L);
-        usuario.setUnidade(unidade);
-        usuarioRepo.save(usuario);
+        Usuario chefe = usuarioRepo.findById(333333333333L).orElseThrow();
+        usuario = usuarioRepo.findById(1L).orElseThrow(); // Ana Paula Souza
     }
 
     private Processo criarProcesso(TipoProcesso tipo) {
@@ -165,8 +152,7 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            Unidade sedoc = new Unidade("SEDOC", "SEDOC");
-            unidadeRepo.save(sedoc);
+            Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
 
             subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
 

@@ -64,7 +64,6 @@ sgc/
 │   │   └── comum/        # Componentes compartilhados
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
-│       ├── application-local.yml   # Desenvolvimento (H2)
 │       ├── application-e2e.yml     # Testes E2E (H2 + data)
 │       └── data.sql                # Dados iniciais para testes
 │
@@ -124,9 +123,10 @@ cd sgc
 
 #### Terminal 1: Backend
 ```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local'
+./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
 ```
 - Usa H2 em memória (sem PostgreSQL necessário)
+- Carrega dados de teste do data.sql
 - API disponível em: `http://localhost:10000`
 - Swagger UI: `http://localhost:10000/swagger-ui.html`
 
@@ -140,7 +140,7 @@ npm run dev
 
 ### 3. Acesso ao Sistema
 
-**Usuários de teste (perfil `local` ou `e2e`):**
+**Usuários de teste (perfil `e2e`):**
 
 | Usuário | Título | Senha | Perfil | Unidade |
 |---------|--------|-------|--------|---------|
@@ -205,16 +205,13 @@ pkill java
 
 ## 📊 Perfis Spring
 
-O projeto usa **4 perfis distintos**:
+O projeto usa **3 perfis distintos**:
 
 | Perfil | Quando Usar | Banco | Carrega data.sql? | Porta |
 |--------|-------------|-------|-------------------|-------|
 | **default** | Produção/Homologação | PostgreSQL | ✅ | 10000 |
-| **local** | Desenvolvimento diário | H2 | ❌ | 10000 |
-| **e2e** | Testes E2E (Playwright) | H2 | ✅ | 10000 |
+| **e2e** | Desenvolvimento e Testes E2E | H2 | ✅ | 10000 |
 | **test** | Testes JUnit (auto) | H2 | ❌ | N/A |
-
-📖 **Guia completo:** [`reqs/PROFILES.md`](reqs/PROFILES.md)
 
 ### Comandos por Perfil
 
@@ -222,8 +219,8 @@ O projeto usa **4 perfis distintos**:
 # Produção (PostgreSQL)
 ./gradlew :backend:bootRun
 
-# Desenvolvimento (H2, sem dados)
-./gradlew :backend:bootRun --args='--spring.profiles.active=local'
+# Desenvolvimento (H2 + dados de teste)
+./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
 
 # Testes E2E (H2 + dados de teste)
 ./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'

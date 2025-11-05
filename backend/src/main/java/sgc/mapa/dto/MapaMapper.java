@@ -2,7 +2,7 @@ package sgc.mapa.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import sgc.mapa.modelo.Mapa;
+import sgc.mapa.model.Mapa;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Mapa e seu DTO.

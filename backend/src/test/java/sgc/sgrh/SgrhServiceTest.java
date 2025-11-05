@@ -10,7 +10,7 @@ import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.service.SgrhService;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Map;

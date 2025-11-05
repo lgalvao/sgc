@@ -12,30 +12,30 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.atividade.modelo.Conhecimento;
-import sgc.atividade.modelo.ConhecimentoRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.alerta.model.AlertaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.*;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -89,22 +89,14 @@ class CDU09IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "US");
-        unidadeRepo.save(unidadeSuperior);
-
-        unidadeChefe = new Unidade("Unidade Teste", "UT");
-        unidadeChefe.setUnidadeSuperior(unidadeSuperior);
-        var chefe = new Usuario();
-        chefe.setTituloEleitoral(333333333333L);
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        chefe = usuarioRepo.save(chefe);
-        unidadeChefe.setTitular(chefe);
-        unidadeRepo.save(unidadeChefe);
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidadeChefe = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
+        var chefe = usuarioRepo.findById(333333333333L).orElseThrow(); // Existing Chefe Teste
 
         Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoMapeamento);
 
-        var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());
+        var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
         subprocessoMapeamento = new Subprocesso(processoMapeamento, unidadeChefe, mapa, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processoMapeamento.getDataLimite());
         subprocessoRepo.save(subprocessoMapeamento);
     }
@@ -136,10 +128,10 @@ class CDU09IntegrationTest {
             assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
             assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
-            var alertas = alertaRepo.findAll();
+            var alertas = alertaRepo.findByProcessoCodigo(subprocessoMapeamento.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade UT submetido para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Cadastro de atividades e conhecimentos da unidade SEDESENV submetido para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
             verify(subprocessoNotificacaoService).notificarAceiteCadastro(
@@ -170,10 +162,7 @@ class CDU09IntegrationTest {
         @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
-            var outroChefe = new Usuario();
-            outroChefe.setTituloEleitoral(999999999999L);
-            outroChefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-            usuarioRepo.save(outroChefe);
+            // User 999999999999 already exists in data-postgresql.sql
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar", subprocessoMapeamento.getCodigo()))
                     .andExpect(status().isForbidden());

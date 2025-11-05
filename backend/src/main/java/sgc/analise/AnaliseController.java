@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.CriarAnaliseRequest;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.TipoAnalise;
+import sgc.analise.model.Analise;
+import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroNegocio;
 
 import java.util.List;

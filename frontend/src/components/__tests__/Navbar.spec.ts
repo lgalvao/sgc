@@ -16,7 +16,12 @@ vi.mock('@/stores/perfil', () => ({
     usePerfilStore: () => ({}),
 }));
 
-const routes = [{ path: '/', component: { template: '<div></div>' } }];
+const routes = [
+    { path: '/', component: { template: '<div></div>' } },
+    { path: '/painel', component: { template: '<div></div>' } },
+    { path: '/login', component: { template: '<div></div>' } },
+    { path: '/teste', component: { template: '<div></div>' } },
+];
 
 describe('Navbar.vue', () => {
     let router: ReturnType<typeof createRouter>;

@@ -10,9 +10,8 @@ export const ServidoresService = {
             const response = await apiClient.get(`/unidades/${codigoUnidade}/servidores`);
             return response.data;
         } catch (error: any) {
-            // 404 é esperado quando a unidade não tem servidores, não precisa logar
-            if (error?.response?.status !== 404) {
-                console.error(`Erro ao buscar servidores para a unidade ${codigoUnidade}:`, error);
+            if (error?.response?.status === 404) {
+                return [];
             }
             return [];
         }

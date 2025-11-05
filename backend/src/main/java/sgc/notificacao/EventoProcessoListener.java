@@ -8,25 +8,25 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaService;
-import sgc.alerta.modelo.Alerta;
+import sgc.alerta.model.Alerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.eventos.EventoProcessoIniciado;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.TipoUnidade;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.TipoUnidade;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static sgc.unidade.modelo.TipoUnidade.*;
+import static sgc.unidade.model.TipoUnidade.*;
 
 /**
  * Listener para eventos de processo.
@@ -40,8 +40,8 @@ import static sgc.unidade.modelo.TipoUnidade.*;
 @Slf4j
 public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
-    private final NotificacaoService notificacaoService;
-    private final NotificacaoModeloEmailService notificacaoModeloEmailService;
+    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoModelosService notificacaoModelosService;
     private final SgrhService sgrhService;
     private final ProcessoRepo processoRepo;
     private final SubprocessoRepo repoSubprocesso;
@@ -138,7 +138,7 @@ public class EventoProcessoListener {
 
             if (OPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
-                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -146,7 +146,7 @@ public class EventoProcessoListener {
                 );
             } else if (INTERMEDIARIA.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
-                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -154,7 +154,7 @@ public class EventoProcessoListener {
                 );
             } else if (INTEROPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
-                corpoHtml = notificacaoModeloEmailService.criarEmailDeProcessoIniciado(
+                corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
                         unidade.nome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
@@ -165,7 +165,7 @@ public class EventoProcessoListener {
                 return;
             }
 
-            notificacaoService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
+            notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
             log.info("E-mail enviado para a unidade {} ({})", unidade.sigla(), tipoUnidade);
 
             if (responsavelOpt.get().substitutoTitulo() != null) {
@@ -182,7 +182,7 @@ public class EventoProcessoListener {
         try {
             UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
             if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
-                notificacaoService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
+                notificacaoEmailService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {

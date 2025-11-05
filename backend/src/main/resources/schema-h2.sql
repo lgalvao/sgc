@@ -1,8 +1,4 @@
-create table if not exists sgc.administrador
-(
-    usuario_titulo varchar(255) not null,
-    primary key (usuario_titulo)
-);
+create schema if not exists sgc;
 
 create table if not exists sgc.usuario
 (
@@ -210,7 +206,6 @@ create table if not exists sgc.vinculacao_unidade
 
 
 -- Foreign Keys (H2 compatible)
-alter table if exists sgc.administrador add constraint if not exists fk_administrador_usuario foreign key (usuario_titulo) references sgc.usuario;
 alter table if exists sgc.alerta add constraint if not exists fk_alerta_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.alerta add constraint if not exists fk_alerta_unidade_destino foreign key (unidade_destino_codigo) references sgc.unidade;
 alter table if exists sgc.alerta add constraint if not exists fk_alerta_unidade_origem foreign key (unidade_origem_codigo) references sgc.unidade;

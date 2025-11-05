@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.modelo.Atividade;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 import java.util.Optional;
 

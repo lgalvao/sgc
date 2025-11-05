@@ -5,15 +5,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.alerta.modelo.AlertaUsuarioRepo;
-import sgc.comum.modelo.EntidadeBase;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.processo.modelo.UnidadeProcessoRepo;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.comum.model.EntidadeBase;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.processo.model.UnidadeProcessoRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,7 @@ import java.util.Map;
 @RequestMapping("/api/e2e")
 @RequiredArgsConstructor
 @Profile("e2e")
+// TODO verificar se precisamos mesmo desse controller
 public class E2eTestController {
     private final ProcessoRepo processoRepo;
     private final UnidadeProcessoRepo unidadeProcessoRepo;

@@ -5,9 +5,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.unidade.modelo.Unidade;
+import sgc.comum.BeanUtil;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
 
 import java.util.Set;
 
@@ -27,17 +29,22 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
 
 
 
-        Usuario principal = new Usuario();
-
-        principal.setTituloEleitoral(adminId);
-
-        principal.setNome("Admin User");
-
-        principal.setEmail("admin@example.com");
-
-        principal.setPerfis(Set.of(Perfil.ADMIN));
-
-        principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+        Usuario principal;
+        try {
+            UsuarioRepo usuarioRepo = BeanUtil.getBean(UsuarioRepo.class);
+            principal = usuarioRepo.findById(adminId).orElse(null);
+        } catch (Exception e) {
+            principal = null;
+        }
+        
+        if (principal == null) {
+            principal = new Usuario();
+            principal.setTituloEleitoral(adminId);
+            principal.setNome("Admin User");
+            principal.setEmail("admin@example.com");
+            principal.setPerfis(Set.of(Perfil.ADMIN));
+            principal.setUnidade(new Unidade("Unidade Mock", "UM"));
+        }
 
 
 

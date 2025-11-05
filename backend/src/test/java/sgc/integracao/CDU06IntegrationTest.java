@@ -17,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.modelo.*;
+import sgc.processo.model.*;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
 import sgc.sgrh.service.SgrhService;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -107,7 +107,7 @@ public class CDU06IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve detalhar processo com sucesso para Admin")
     void testDetalharProcesso_sucesso() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow(); // Use existing ADMIN-UNIT
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
@@ -128,7 +128,7 @@ public class CDU06IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
     void testPodeFinalizar_true_comAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Admin", "UA"));
+        Unidade unidade = unidadeRepo.findById(101L).orElseThrow(); // Use existing GESTOR-UNIT
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
@@ -140,7 +140,7 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
     void testPodeFinalizar_false_semAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Chefe", "UC"));
+        Unidade unidade = unidadeRepo.findById(102L).orElseThrow(); // Use existing SUB-UNIT
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
         setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
@@ -153,7 +153,7 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
     void testPodeHomologarCadastro_true() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Gestor", "UG"));
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // Use existing SEDESENV
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
@@ -166,7 +166,7 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
     void testPodeHomologarMapa_true() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Gestor", "UG"));
+        Unidade unidade = unidadeRepo.findById(9L).orElseThrow(); // Use existing SEDIA
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, processo.getDataLimite()));

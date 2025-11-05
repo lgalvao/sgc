@@ -11,23 +11,28 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.*;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,6 +67,16 @@ class CDU19IntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private MapaRepo mapaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -72,23 +87,21 @@ class CDU19IntegrationTest {
         // Limpar dados
         movimentacaoRepo.deleteAll();
         alertaRepo.deleteAll();
+        competenciaAtividadeRepo.deleteAll(); // Delete competencia_atividade first
+        competenciaRepo.deleteAll(); // Then delete competencias
+        atividadeRepo.deleteAll(); // Delete atividades
+        conhecimentoRepo.deleteAll(); // Delete conhecimentos
+        unidadeMapaRepo.deleteAll(); // Delete unidade_mapa before mapas
         subprocessoRepo.deleteAll();
         mapaRepo.deleteAll();
         processoRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
 
-        // Criar Unidades
-        unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "UNISUP"));
-        unidade = new Unidade("Unidade Subprocesso", "UNISUB");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
+        // Use existing units from data-postgresql.sql
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS as superior
+        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA as subunit
 
-        // Criar Usuário Chefe e associar à unidade
-        Usuario chefe = new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
+        // Use existing chefe user
+        Usuario chefe = usuarioRepo.findById(333333333333L).orElseThrow();
 
         // Criar Processo, Mapa e Subprocesso
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
@@ -155,7 +168,7 @@ class CDU19IntegrationTest {
 
             List<Alerta> alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
-            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da UNISUB aguardando análise");
+            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da SEDIA aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }

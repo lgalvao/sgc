@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 

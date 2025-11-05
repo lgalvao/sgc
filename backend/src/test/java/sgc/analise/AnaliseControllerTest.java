@@ -11,8 +11,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sgc.analise.dto.CriarAnaliseRequest;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.TipoAnalise;
+import sgc.analise.model.Analise;
+import sgc.analise.model.TipoAnalise;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import java.time.LocalDateTime;
@@ -38,7 +38,7 @@ class AnaliseControllerTest {
     private static final String API_SUBPROCESSOS_99_ANALISES_CADASTRO = "/api/subprocessos/99/analises-cadastro";
     private static final String ERRO_INESPERADO = "Erro inesperado";
     private static final String MESSAGE_JSON_PATH = "$.message";
-    private static final String OCORREU_UM_ERRO_INESPERADO = "Ocorreu um erro inesperado. Contate o suporte.";
+    private static final String OCORREU_UM_ERRO_INESPERADO = "Erro inesperado";
     private static final String NOVA_ANALISE_DE_CADASTRO = "Nova análise de cadastro";
     private static final String ANALISE_DE_CADASTRO = "Análise de cadastro";
     private static final String ANALISE_INVALIDA = "Análise inválida";

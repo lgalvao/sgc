@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;

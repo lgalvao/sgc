@@ -18,9 +18,9 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.modelo.Mapa;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaService;
-import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.model.Usuario;
 
 import java.util.List;
 

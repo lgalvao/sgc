@@ -7,7 +7,7 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

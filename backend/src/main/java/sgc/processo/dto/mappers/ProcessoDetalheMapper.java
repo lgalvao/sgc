@@ -4,9 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.subprocesso.model.Subprocesso;
 
 /**
  * Mapper (usando MapStruct) para converter a entidade Processo e suas associações para ProcessoDetalheDto.

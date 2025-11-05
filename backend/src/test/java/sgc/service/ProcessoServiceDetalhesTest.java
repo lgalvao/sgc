@@ -10,11 +10,11 @@ import org.mockito.quality.Strictness;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
-import sgc.processo.modelo.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.List;

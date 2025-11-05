@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.Processo;
-import sgc.sgrh.modelo.Usuario;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.processo.model.Processo;
+import sgc.sgrh.model.Usuario;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 // TODO em vez de IllegalArgumentException usar exceções de negócio específicas
 // TODO usar builder par instanciar os alertas. Considerar criar método auxiliar: codigo esta repetitivo
 public class SubprocessoNotificacaoService {
-    private final NotificacaoService notificacaoService;
+    private final NotificacaoEmailService notificacaoEmailService;
     private final AlertaRepo repositorioAlerta;
     private final UnidadeRepo unidadeRepo;
     private final TemplateEngine templateEngine;
@@ -67,13 +67,13 @@ public class SubprocessoNotificacaoService {
 
         String assuntoUnidade = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoUnidade = processarTemplate("email/disponibilizacao-mapa.html", variaveis);
-        notificacaoService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
+        notificacaoEmailService.enviarEmail(unidade.getSigla(), assuntoUnidade, corpoUnidade);
 
         String assuntoSuperior = String.format("SGC: Mapa de Competências da unidade %s disponibilizado para validação", siglaUnidade);
         String corpoSuperior = processarTemplate("email/disponibilizacao-mapa-superior.html", variaveis);
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            notificacaoService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
+            notificacaoEmailService.enviarEmail(superior.getSigla(), assuntoSuperior, corpoSuperior);
             superior = superior.getUnidadeSuperior();
         }
 
@@ -102,7 +102,7 @@ public class SubprocessoNotificacaoService {
             variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
             variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
 
-            notificacaoService.enviarEmail(
+            notificacaoEmailService.enviarEmail(
                     unidadeSuperior.getSigla(),
                     "SGC: Sugestões apresentadas para o mapa de competências da %s".formatted(sp.getUnidade().getSigla()),
                     processarTemplate("email/sugestoes-mapa.html", variaveis)
@@ -130,7 +130,7 @@ public class SubprocessoNotificacaoService {
             variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
             variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
 
-            notificacaoService.enviarEmail(
+            notificacaoEmailService.enviarEmail(
                     unidadeSuperior.getSigla(),
                     "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
                     processarTemplate("email/validacao-mapa.html", variaveis)
@@ -157,7 +157,7 @@ public class SubprocessoNotificacaoService {
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
 
-        notificacaoService.enviarEmail(
+        notificacaoEmailService.enviarEmail(
                 unidadeDevolucao.getSigla(),
                 "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " devolvida para ajustes",
                 processarTemplate("email/devolucao-validacao.html", variaveis)
@@ -185,7 +185,7 @@ public class SubprocessoNotificacaoService {
             variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
             variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
 
-            notificacaoService.enviarEmail(
+            notificacaoEmailService.enviarEmail(
                     unidadeSuperior.getSigla(),
                     "SGC: Validação do mapa de competências da " + sp.getUnidade().getSigla() + " submetida para análise",
                     processarTemplate("email/aceite-validacao.html", variaveis)
@@ -215,7 +215,7 @@ public class SubprocessoNotificacaoService {
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
         variaveis.put("motivo", motivo);
 
-        notificacaoService.enviarEmail(
+        notificacaoEmailService.enviarEmail(
                 unidadeDevolucao.getSigla(),
                 "SGC: Cadastro de atividades da " + sp.getUnidade().getSigla() + " devolvido para ajustes",
                 processarTemplate("email/devolucao-cadastro.html", variaveis)
@@ -253,7 +253,7 @@ public class SubprocessoNotificacaoService {
         // 1. Enviar E-mail (CDU-13 Item 10.7)
         String assunto = "SGC: Cadastro de atividades e conhecimentos da " + siglaUnidadeOrigem + " submetido para análise";
         String corpo = processarTemplate("email/aceite-cadastro.html", variaveis);
-        notificacaoService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
+        notificacaoEmailService.enviarEmail(unidadeDestino.getSigla(), assunto, corpo);
 
         criarEsalvarAlerta(
             "Cadastro de atividades e conhecimentos da unidade " + siglaUnidadeOrigem + " submetido para análise",
@@ -285,7 +285,7 @@ public class SubprocessoNotificacaoService {
 
         String assunto = String.format("SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes", siglaUnidadeSubprocesso);
         String corpo = processarTemplate("email/devolucao-revisao-cadastro.html", variaveis);
-        notificacaoService.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
+        notificacaoEmailService.enviarEmail(unidadeDevolucao.getSigla(), assunto, corpo);
 
         criarEsalvarAlerta(
             String.format("Cadastro de atividades e conhecimentos da unidade %s devolvido para ajustes", siglaUnidadeSubprocesso),
@@ -320,7 +320,7 @@ public class SubprocessoNotificacaoService {
         // CDU-14 Item 11.7: Notificação por e-mail
         String assunto = String.format("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise", siglaUnidadeSubprocesso);
         String corpo = processarTemplate("email/aceite-revisao-cadastro.html", variaveis);
-        notificacaoService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
+        notificacaoEmailService.enviarEmail(siglaUnidadeSuperior, assunto, corpo);
 
         criarEsalvarAlerta(
             String.format("Revisão do cadastro de atividades e conhecimentos da unidade %s submetida para análise", siglaUnidadeSubprocesso),
@@ -343,7 +343,7 @@ public class SubprocessoNotificacaoService {
         // Notificação por e-mail
         String assunto = String.format("SGC: Mapa de competências do processo %s homologado", descricaoProcesso);
         String corpo = processarTemplate("email/homologacao-mapa.html", variaveis);
-        notificacaoService.enviarEmail(sedoc.getSigla(), assunto, corpo);
+        notificacaoEmailService.enviarEmail(sedoc.getSigla(), assunto, corpo);
 
         // Alerta interno
         criarEsalvarAlerta(

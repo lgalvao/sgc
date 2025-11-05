@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.model.TipoProcesso;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

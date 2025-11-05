@@ -7,12 +7,12 @@ import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoDto;
 import sgc.atividade.dto.ConhecimentoMapper;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.atividade.modelo.ConhecimentoRepo;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 

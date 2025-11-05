@@ -36,10 +36,9 @@ export async function verificarMapaVigente(codigoUnidade: number): Promise<boole
     const response = await apiClient.get(`/unidades/${codigoUnidade}/mapa-vigente`);
     return response.data.temMapaVigente;
   } catch (error: any) {
-    // 404 é esperado quando a unidade não tem mapa vigente, não precisa logar
-    if (error?.response?.status !== 404) {
-      console.error(`Erro ao verificar mapa vigente para a unidade ${codigoUnidade}:`, error);
+    if (error?.response?.status === 404) {
+      return false;
     }
-    return false;
+    throw error;
   }
 }

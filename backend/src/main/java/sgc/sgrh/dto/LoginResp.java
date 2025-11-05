@@ -3,7 +3,7 @@ package sgc.sgrh.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sgc.sgrh.modelo.Perfil;
+import sgc.sgrh.model.Perfil;
 
 @Data
 @NoArgsConstructor

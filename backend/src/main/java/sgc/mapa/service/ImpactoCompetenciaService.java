@@ -2,14 +2,14 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.TipoImpactoCompetencia;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.TipoImpactoCompetencia;
 
 import java.util.*;
 import java.util.stream.Collectors;
