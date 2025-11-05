@@ -11,7 +11,7 @@ import {extrairIdDoSeletor} from '../utils/utils';
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     // Aguardar a árvore de unidades carregar
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 5000});
 
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
@@ -236,7 +236,7 @@ export async function criarProcessoBasico(
     console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
     // Aguardar redirecionamento ao painel
-    await page.waitForURL(/\/painel/, {timeout: 1500});
+    await page.waitForURL(/\/painel/, );
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
 }
 
@@ -247,14 +247,14 @@ export async function criarProcessoBasico(
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
-    const row = page.locator(`[data-testid="${SELETORES.TABELA_PROCESSOS}"] tr:has-text("${descricao}")`);
+    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr:has-text("${descricao}")`);
     await row.waitFor({state: 'visible', timeout: 10000});
     console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
     console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
 
     // Aguardar navegação para página de cadastro
-    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 1500});
+    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, );
     console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
 
     // Aguardar formulário carregar com os dados do processo

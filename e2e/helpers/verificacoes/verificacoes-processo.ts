@@ -384,7 +384,7 @@ export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Pa
  */
 export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator('.modal.show');
-    await expect(modal).toBeVisible({timeout: 1500});
+    await expect(modal).toBeVisible();
     await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
     await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
     await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);

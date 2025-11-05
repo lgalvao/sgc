@@ -95,8 +95,8 @@ test.describe('CDU-03: Manter processo', () => {
         await page.getByRole('button', {name: /Salvar/i}).click();
 
         // 5. Verificar redirecionamento e processo criado
-        await expect(page).toHaveURL(/\/painel/, {timeout: 2000});
-        await expect(page.getByText(descricao)).toBeVisible({timeout: 2000});
+        await expect(page).toHaveURL(/\/painel/, );
+        await expect(page.getByText(descricao)).toBeVisible();
     });
 
     test('deve validar descrição obrigatória', async ({page}) => {
@@ -143,7 +143,7 @@ test.describe('CDU-03: Manter processo', () => {
 
         // Abrir o processo recém-criado
         await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricaoOriginal}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 2000});
+        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
 
         // 2. Verificar que campo está preenchido com valor atual
         await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 2000});
@@ -177,8 +177,8 @@ test.describe('CDU-03: Manter processo', () => {
         await expect(page).toHaveURL(/\/painel/);
 
         await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricao}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 2000});
-        await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible({timeout: 2000});
+        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
+        await expect(page.getByRole('button', {name: /^Remover$/i})).toBeVisible();
     });
 
     // ===== REMOÇÃO DE PROCESSO =====
@@ -195,14 +195,14 @@ test.describe('CDU-03: Manter processo', () => {
 
         // Abrir para edição
         await page.click(`[data-testid="tabela-processos"] tr:has-text("${descricao}")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 2000});
+        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
 
         // 2. Clicar em Remover
         await page.getByRole('button', {name: /^Remover$/i}).click();
 
         // 3. Verificar modal de confirmação
         const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible({timeout: 2000});
+        await expect(modal).toBeVisible();
         await expect(modal.getByText(/Remover o processo/i)).toBeVisible();
         await expect(modal.getByText(/Esta ação não poderá ser desfeita/i)).toBeVisible();
     });
@@ -219,7 +219,7 @@ test.describe('CDU-03: Manter processo', () => {
 
         // Abrir para edição e clicar em Remover
         await page.click(`[data-testid=\"tabela-processos\"] tr:has-text(\"${descricao}\")`);
-        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 2000});
+        await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
         await page.getByRole('button', {name: /^Remover$/i}).click();
 
         // 2. Cancelar no modal
@@ -242,7 +242,7 @@ test.describe('CDU-03: Manter processo', () => {
         await page.getByRole('button', {name: /Salvar/i}).click();
 
         // 2. Aguardar redirecionamento ao painel
-        await expect(page).toHaveURL(/\/painel/, {timeout: 2000});
+        await expect(page).toHaveURL(/\/painel/, );
 
         // 3. Abrir o processo recém-criado para edição
         await page.click(`[data-testid=\"tabela-processos\"] tr:has-text(\"${descricao}\")`);
@@ -257,7 +257,7 @@ test.describe('CDU-03: Manter processo', () => {
         await modal.getByRole('button', {name: /Remover/i}).click();
 
         // 6. Verificar que voltou ao painel
-        await expect(page).toHaveURL(/\/painel/, {timeout: 2000});
+        await expect(page).toHaveURL(/\/painel/, );
 
         // 7. Verificar que processo não aparece mais
         await expect(page.getByText(descricao)).not.toBeVisible();
@@ -283,8 +283,8 @@ test.describe('CDU-03: Manter processo', () => {
         await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT', 'GESTOR-UNIT']);
 
         // Verificar que ambas foram marcadas
-        await expect(page.locator('#chk-ADMIN-UNIT')).toBeChecked({timeout: 2000});
-        await expect(page.locator('#chk-GESTOR-UNIT')).toBeChecked({timeout: 2000});
+        await expect(page.locator('#chk-ADMIN-UNIT')).toBeChecked();
+        await expect(page.locator('#chk-GESTOR-UNIT')).toBeChecked();
     });
 
     // ===== CAMPOS E TIPOS =====

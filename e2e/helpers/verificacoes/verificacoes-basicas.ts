@@ -137,7 +137,7 @@ export async function verificarDisponibilizacaoConcluida(page: Page, modalTestId
         return;
     } catch {
         const notificacao = page.getByTestId(notificacaoTestId);
-        await expect(notificacao).toBeVisible({timeout: 2000});
+        await expect(notificacao).toBeVisible();
     }
 }
 

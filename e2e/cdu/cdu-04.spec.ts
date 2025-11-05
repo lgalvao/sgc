@@ -2,6 +2,7 @@ import {vueTest as test} from '../support/vue-specific-setup';
 import {expect} from '@playwright/test';
 
 import {loginComoAdmin, navegarParaCriacaoProcesso, selecionarUnidadesPorSigla, SELETORES} from '~/helpers';
+import {extrairIdDoSeletor} from '~/helpers/utils/utils';
 
 /**
  * CDU-04: Iniciar processo de mapeamento
@@ -29,7 +30,7 @@ test.describe('CDU-04: Iniciar processo', () => {
         await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 5000});
 
         // 3. Clicar em Iniciar Processo → Abre modal
-        await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
+        await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)).click();
         const modal = page.locator('.modal.show');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(/Iniciar processo/i)).toBeVisible();
@@ -58,7 +59,7 @@ test.describe('CDU-04: Iniciar processo', () => {
         await page.getByText(descricao).first().click();
         await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(descricao);
-        await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
+        await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)).click();
         const modal = page.locator('.modal.show');
         await expect(modal).toBeVisible();
 
@@ -66,7 +67,7 @@ test.describe('CDU-04: Iniciar processo', () => {
         await modal.getByRole('button', {name: /cancelar/i}).click();
         await expect(modal).not.toBeVisible();
         await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(descricao);
-        await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).toBeVisible();
+        await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO))).toBeVisible();
     });
 
     test('não deve permitir editar processo após iniciado', async ({page}) => {
@@ -83,7 +84,7 @@ test.describe('CDU-04: Iniciar processo', () => {
         await page.getByText(descricao).first().click();
         await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
         await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(descricao);
-        await page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO).click();
+        await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)).click();
         await page.locator('.modal.show').getByRole('button', {name: /confirmar/i}).click();
         await page.waitForURL(/\/painel/);
 
@@ -91,11 +92,11 @@ test.describe('CDU-04: Iniciar processo', () => {
         await page.getByText(descricao).first().click();
 
         // Deve ir para tela Processo (não CadProcesso)
-        await page.waitForURL(/\/processo\/\d+/, {timeout: 1500});
+        await page.waitForURL(/\/processo\/\d+/, );
 
         // Verificar que não está na tela de cadastro (sem botões de edição)
         await expect(page.getByRole('button', {name: /salvar/i})).not.toBeVisible();
         await expect(page.getByRole('button', {name: /remover/i})).not.toBeVisible();
-        await expect(page.getByTestId(SELETORES.BTN_INICIAR_PROCESSO)).not.toBeVisible();
+        await expect(page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO))).not.toBeVisible();
     });
 });

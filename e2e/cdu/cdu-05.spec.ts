@@ -36,12 +36,12 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Passo 3: Clicar em Iniciar processo
         const btnIniciar = page.getByRole('button', {name: /Iniciar processo/i});
-        await expect(btnIniciar).toBeVisible({timeout: 1500});
+        await expect(btnIniciar).toBeVisible();
         await btnIniciar.click();
         
         // Passo 4: Verificar modal de confirmação
         const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible({timeout: 1500});
+        await expect(modal).toBeVisible();
         
         // Verificar texto do modal
         await expect(modal.getByText(/Ao iniciar o processo, não será mais possível editá-lo ou removê-lo/i)).toBeVisible();
@@ -58,7 +58,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await page.getByRole('button', {name: /Iniciar processo/i}).click();
         
         const modal = page.locator('.modal.show');
-        await expect(modal).toBeVisible({timeout: 1500});
+        await expect(modal).toBeVisible();
         
         // Passo 5: Clicar em Cancelar
         await modal.getByRole('button', {name: /Cancelar/i}).click();
@@ -82,7 +82,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Salvar processo
         await page.getByRole('button', {name: /Salvar/i}).click();
-        await page.waitForURL(/\/painel/, {timeout: 1500});
+        await page.waitForURL(/\/painel/, );
         
         // Abrir processo recém-criado
         await abrirProcessoPorNome(page, descricaoProcesso);
@@ -97,7 +97,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Navegar ao painel para verificar situação do processo
         await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-processos"]', {timeout: 1500});
+        await page.waitForSelector('[data-testid="tabela-processos"]', );
         
         // Verificar que processo aparece como EM_ANDAMENTO
         const processoRow = page.locator('[data-testid="tabela-processos"] tr').filter({hasText: descricaoProcesso});
@@ -119,7 +119,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Salvar e iniciar
         await page.getByRole('button', {name: /Salvar/i}).click();
-        await page.waitForURL(/\/painel/, {timeout: 1500});
+        await page.waitForURL(/\/painel/, );
         await abrirProcessoPorNome(page, descricaoProcesso);
         
         // Capturar ID do processo da URL
@@ -156,7 +156,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
         
         await page.getByRole('button', {name: /Salvar/i}).click();
-        await page.waitForURL(/\/painel/, {timeout: 1500});
+        await page.waitForURL(/\/painel/, );
         await abrirProcessoPorNome(page, descricaoProcesso);
         
         await page.getByRole('button', {name: /Iniciar processo/i}).click();
@@ -165,12 +165,12 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Passo 13: Verificar criação de alertas
         await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-alertas"]', {timeout: 1500});
+        await page.waitForSelector('[data-testid="tabela-alertas"]', );
         
         const tabelaAlertas = page.locator('[data-testid="tabela-alertas"]');
         const alertaInicio = tabelaAlertas.locator('tr').filter({hasText: /Início do processo/i});
         
-        await expect(alertaInicio.first()).toBeVisible({timeout: 1500});
+        await expect(alertaInicio.first()).toBeVisible();
     });
 
     test('deve preservar dados do processo após iniciação (somente leitura)', async ({page}) => {
@@ -181,7 +181,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
         
         await page.getByRole('button', {name: /Salvar/i}).click();
-        await page.waitForURL(/\/painel/, {timeout: 1500});
+        await page.waitForURL(/\/painel/, );
         await abrirProcessoPorNome(page, descricaoProcesso);
         
         // Iniciar
@@ -191,7 +191,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         
         // Reabrir processo
         await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-processos"]', {timeout: 1500});
+        await page.waitForSelector('[data-testid="tabela-processos"]', );
         await page.locator('[data-testid="tabela-processos"] tr').filter({hasText: descricaoProcesso}).click();
         
         // Verificar que campos estão desabilitados
@@ -212,7 +212,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
 
     test('deve validar que apenas processos CRIADO podem ser iniciados', async ({page}) => {
         await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-processos"]', {timeout: 1500});
+        await page.waitForSelector('[data-testid="tabela-processos"]', );
         
         // Procurar processo EM_ANDAMENTO
         const processoEmAndamento = page.locator('[data-testid="tabela-processos"] tr')

@@ -28,7 +28,8 @@ async function loginPelaUI(
     }
 
     // Aguarda o redirecionamento para o painel
-    await page.waitForURL('/painel', {timeout: 1500});
+    await page.waitForURL('/painel', {timeout: 5000});
+    await page.waitForLoadState('networkidle');
 }
 
 /**

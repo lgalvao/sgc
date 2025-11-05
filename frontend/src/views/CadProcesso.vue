@@ -607,6 +607,11 @@ function unidadeElegivel(unidade: Unidade): boolean {
     return false;
   }
   
+  // Se estamos editando e a unidade já está selecionada, sempre mostrar
+  if (processoEditando.value && unidadesSelecionadas.value.includes(unidade.codigo)) {
+    return true;
+  }
+  
   // Para REVISAO e DIAGNOSTICO: apenas unidades com mapa vigente
   if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
     return unidadesComMapaVigente.value.includes(unidade.codigo);

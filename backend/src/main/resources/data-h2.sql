@@ -245,6 +245,8 @@ INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
 VALUES (10, 1003);
 INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
 VALUES (102, 1004);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES (100, 1004); -- ADMIN-UNIT também tem mapa vigente para testes CDU-05
 
 -- 6. Adicionar competências aos mapas para torná-los mais realistas
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
