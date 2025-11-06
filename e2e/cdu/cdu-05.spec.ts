@@ -78,7 +78,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await navegarParaCriacaoProcesso(page);
         const descricaoProcesso = `Processo Revisão Teste ${Date.now()}`;
         await preencherFormularioProcesso(page, descricaoProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['CDU05-REV-UNIT']);
         
         // Salvar processo
         await page.getByRole('button', {name: /Salvar/i}).click();
@@ -115,7 +115,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await navegarParaCriacaoProcesso(page);
         const descricaoProcesso = `Processo Multi-Unidade ${Date.now()}`;
         await preencherFormularioProcesso(page, descricaoProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['CDU05-SUB-UNIT']);
         
         // Salvar e iniciar
         await page.getByRole('button', {name: /Salvar/i}).click();
@@ -153,7 +153,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await navegarParaCriacaoProcesso(page);
         const descricaoProcesso = `Processo Alertas ${Date.now()}`;
         await preencherFormularioProcesso(page, descricaoProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['CDU05-ALERT-UNIT']);
         
         await page.getByRole('button', {name: /Salvar/i}).click();
         await page.waitForURL(/\/painel/, );
@@ -178,7 +178,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await navegarParaCriacaoProcesso(page);
         const descricaoProcesso = `Processo Somente Leitura ${Date.now()}`;
         await preencherFormularioProcesso(page, descricaoProcesso, 'REVISAO', '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['ADMIN-UNIT']);
+        await selecionarUnidadesPorSigla(page, ['CDU05-READONLY-UNIT']);
         
         await page.getByRole('button', {name: /Salvar/i}).click();
         await page.waitForURL(/\/painel/, );

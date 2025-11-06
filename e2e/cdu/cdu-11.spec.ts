@@ -13,7 +13,7 @@ import {
     verificarAtividadeVisivel,
     verificarConhecimentoNaAtividade,
     verificarModoSomenteLeitura,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-11: Visualizar cadastro de atividades (somente leitura)', () => {
     let processo: any;

@@ -12,7 +12,7 @@ import {
     verificarAtividadesAssociadas,
     verificarCompetenciaNaoVisivel,
     verificarCompetenciaVisivel,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-15: Manter Mapa de Competências', () => {
     let processo: any;

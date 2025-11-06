@@ -32,6 +32,16 @@ export const useUnidadesStore = defineStore('unidades', {
             }
             return null
         },
+        pesquisarUnidadePorCodigo(this: ReturnType<typeof useUnidadesStore>, codigo: number, units: Unidade[] = this.unidades): Unidade | null {
+            for (const unit of units) {
+                if (unit.codigo === codigo) return unit
+                if (unit.filhas) {
+                    const found = this.pesquisarUnidadePorCodigo(codigo, unit.filhas)
+                    if (found) return found
+                }
+            }
+            return null
+        },
         getUnidadesSubordinadas(siglaUnidade: string): string[] {
             const unidadesEncontradas: string[] = [];
             const stack: Unidade[] = [];

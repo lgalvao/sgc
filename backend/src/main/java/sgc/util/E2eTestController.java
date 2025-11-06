@@ -37,6 +37,17 @@ public class E2eTestController {
     private final MovimentacaoRepo movimentacaoRepo;
 
     /**
+     * Deleta um processo por código, removendo também alertas e subprocessos relacionados.
+     * Endpoint direto para testes e2e.
+     */
+    @PostMapping("/processos/{codigo}/apagar")
+    @Transactional
+    public ResponseEntity<Void> apagarProcessoPorCodigo(@PathVariable Long codigo) {
+        apagarProcessosComAlertasESubprocessos(List.of(codigo));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Remove FORÇADAMENTE um processo, independente da situação.
      * Deleta alertas relacionados antes de deletar o processo.
      */

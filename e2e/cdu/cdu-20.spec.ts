@@ -17,7 +17,7 @@ import {
     verificarAcoesAnaliseGestor,
     verificarCadastroDevolvidoComSucesso,
     verificarModalHistoricoAnaliseAberto,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-20: Analisar validação de mapa de competências', () => {
     let processo: any;

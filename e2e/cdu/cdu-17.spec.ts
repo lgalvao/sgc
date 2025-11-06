@@ -14,7 +14,7 @@ import {
     verificarCampoObservacoesValor,
     verificarModalDisponibilizacaoVisivel,
     verificarModalFechado,
-} from '../helpers';
+} from '~/helpers';
 
 let processo: any;
 const siglaUnidade = 'SESEL';

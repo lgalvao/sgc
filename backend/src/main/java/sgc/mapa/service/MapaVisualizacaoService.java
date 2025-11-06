@@ -32,23 +32,12 @@ public class MapaVisualizacaoService {
     private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
-    /**
-     * Monta uma estrutura de dados aninhada de um mapa para fins de visualização.
-     * <p>
-     * Busca um subprocesso e seu mapa associado, e constrói um DTO que representa a hierarquia completa:
-     * Mapa -> Competências -> Atividades -> Conhecimentos.
-     *
-     * @param codSubprocesso O código do subprocesso a partir do qual o mapa será obtido.
-     * @return Um {@link MapaVisualizacaoDto} com a estrutura completa do mapa.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou o mapa associado não forem encontrados.
-     */
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         log.debug("Obtendo mapa para visualização do subprocesso: codigo={}", codSubprocesso);
 
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
-        // TODO nao é precipitadao lançar essa exceção aqui? Nem deveria acontecer se as camadas de cima fizerem sua parte.
         if (subprocesso.getMapa() == null) {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado.");
         }

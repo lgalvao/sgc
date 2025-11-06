@@ -1,6 +1,7 @@
 package sgc.unidade.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import sgc.sgrh.model.Usuario;
 @Getter
 @Setter
 @NoArgsConstructor
-// TODO em vez de criar todos os esses construtores diferentes, fazer os clientes usarem sempre o builder.
+@Builder
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
         super();

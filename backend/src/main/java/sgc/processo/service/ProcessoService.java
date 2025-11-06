@@ -20,6 +20,7 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
 import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoCriado;
@@ -118,13 +119,14 @@ public class ProcessoService {
 
         Processo processoSalvo = processoRepo.save(processo);
 
-        // Salvar snapshot das unidades participantes
+        // Registrar participação das unidades no processo
         for (Long codigoUnidade : requisicao.unidades()) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
-            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoSalvo, unidade);
+            UnidadeProcesso unidadeProcesso = criarAssociacaoUnidadeProcesso(processoSalvo, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
         }
+        unidadeProcessoRepo.flush();
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
         log.info("Processo '{}' (código {}) criado.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
@@ -160,12 +162,14 @@ public class ProcessoService {
 
         // Atualizar unidades participantes: remover antigas e adicionar novas
         unidadeProcessoRepo.deleteByCodProcesso(codigo);
+        unidadeProcessoRepo.flush();
         for (Long codigoUnidade : requisicao.unidades()) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
-            UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processoAtualizado, unidade);
+            UnidadeProcesso unidadeProcesso = criarAssociacaoUnidadeProcesso(processoAtualizado, unidade);
             unidadeProcessoRepo.save(unidadeProcesso);
         }
+        unidadeProcessoRepo.flush();
 
         log.info("Processo {} atualizado.", codigo);
 
@@ -378,21 +382,21 @@ public class ProcessoService {
         }
     }
 
-    private UnidadeProcesso criarSnapshotUnidadeProcesso(Processo processo, Unidade unidade) {
-        return new UnidadeProcesso(
-                processo.getCodigo(),
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                unidade.getTitular() != null ? String.valueOf(unidade.getTitular().getTituloEleitoral()) : null,
-                unidade.getTipo(),
-                "PENDENTE",
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
-        );
+    private UnidadeProcesso criarAssociacaoUnidadeProcesso(Processo processo, Unidade unidade) {
+        UnidadeProcesso up = new UnidadeProcesso();
+        up.setCodProcesso(processo.getCodigo());
+        up.setCodUnidade(unidade.getCodigo());
+        up.setNome(unidade.getNome());
+        up.setSigla(unidade.getSigla());
+        up.setTitularTitulo(unidade.getTitular() != null ? String.valueOf(unidade.getTitular().getTituloEleitoral()) : null);
+        up.setTipo(unidade.getTipo());
+        up.setSituacao("PENDENTE");
+        up.setCodUnidadeSuperior(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null);
+        return up;
     }
 
     private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {
-        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
+        UnidadeProcesso unidadeProcesso = criarAssociacaoUnidadeProcesso(processo, unidade);
         unidadeProcessoRepo.save(unidadeProcesso);
 
         if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
@@ -409,7 +413,7 @@ public class ProcessoService {
 
         Long codMapaVigente = unidadeMapa.getMapaVigenteCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
+        UnidadeProcesso unidadeProcesso = criarAssociacaoUnidadeProcesso(processo, unidade);
         unidadeProcessoRepo.save(unidadeProcesso);
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());

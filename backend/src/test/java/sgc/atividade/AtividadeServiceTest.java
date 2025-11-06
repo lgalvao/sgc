@@ -16,6 +16,7 @@ import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroSituacaoInvalida;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -97,7 +98,7 @@ class AtividadeServiceTest {
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
             when(usuarioRepo.findById(123L)).thenReturn(Optional.of(usuario));
 
-            assertThrows(IllegalStateException.class, () -> service.criar(atividadeDto, "123"));
+            assertThrows(ErroSituacaoInvalida.class, () -> service.criar(atividadeDto, "123"));
         }
     }
 

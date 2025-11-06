@@ -62,11 +62,9 @@ public class AtividadeController {
     @PostMapping
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
-        // TODO remover essa sanitização. Está poluindo
-        var sanitizedAtividadeDto = atividadeDto.sanitizar();
-        var salvo = atividadeService.criar(sanitizedAtividadeDto, userDetails.getUsername());
+        var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
         URI uri = URI.create("/api/atividades/%d".formatted(salvo.codigo()));
-        return ResponseEntity.created(uri).body(salvo.sanitizar());
+        return ResponseEntity.created(uri).body(salvo);
     }
 
 
@@ -80,9 +78,7 @@ public class AtividadeController {
     @PostMapping("/{codAtividade}/atualizar")
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeDto> atualizar(@PathVariable Long codAtividade, @Valid @RequestBody AtividadeDto atividadeDto) {
-        // TODO remover essa sanitização. Está poluindo
-        var sanitizedAtividadeDto = atividadeDto.sanitizar();
-        return ResponseEntity.ok(atividadeService.atualizar(codAtividade, sanitizedAtividadeDto));
+        return ResponseEntity.ok(atividadeService.atualizar(codAtividade, atividadeDto));
     }
 
     /**
@@ -124,11 +120,9 @@ public class AtividadeController {
     @PostMapping("/{codAtividade}/conhecimentos")
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long codAtividade, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        // TODO remover essa sanitização. Está poluindo
-        var sanitizedConhecimentoDto = conhecimentoDto.sanitizar();
-        var salvo = atividadeService.criarConhecimento(codAtividade, sanitizedConhecimentoDto);
+        var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.codigo()));
-        return ResponseEntity.created(uri).body(salvo.sanitizar());
+        return ResponseEntity.created(uri).body(salvo);
     }
 
     /**
@@ -142,9 +136,7 @@ public class AtividadeController {
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
     public ResponseEntity<ConhecimentoDto> atualizarConhecimento(@PathVariable Long codAtividade, @PathVariable Long codConhecimento, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
-        // TODO remover essa sanitização. Está poluindo
-        var sanitizedConhecimentoDto = conhecimentoDto.sanitizar();
-        return ResponseEntity.ok(atividadeService.atualizarConhecimento(codAtividade, codConhecimento, sanitizedConhecimentoDto));
+        return ResponseEntity.ok(atividadeService.atualizarConhecimento(codAtividade, codConhecimento, conhecimentoDto));
     }
 
     /**

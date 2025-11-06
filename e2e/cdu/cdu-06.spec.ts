@@ -10,7 +10,7 @@ import {
     SELETORES,
     verificarElementosDetalhesProcessoVisiveis,
     verificarNavegacaoPaginaSubprocesso
-} from '../helpers';
+} from '~/helpers';
 import {expect} from '@playwright/test';
 
 test.describe('CDU-06: Detalhar processo', () => {

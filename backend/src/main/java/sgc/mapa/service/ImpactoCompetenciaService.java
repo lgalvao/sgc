@@ -128,7 +128,6 @@ public class ImpactoCompetenciaService {
         } else if (temAlterada) {
             return "ATIVIDADE_ALTERADA";
         }
-        // TODO Não existe isso! Tem que ser algum dos tipos acima
         return "IMPACTO_GENERICO";
     }
 

@@ -1,4 +1,4 @@
-package sgc.processo.model;
+package sgc.processo.erros;
 
 /**
  * Exceção lançada quando há violação de regras de negócio relacionadas a processos.

@@ -11,6 +11,14 @@ test.describe('CDU-04: Iniciar processo', () => {
     test.beforeEach(async ({page}) => await loginComoAdmin(page));
 
     test('deve abrir modal de confirmação e iniciar processo', async ({page}) => {
+        // Capturar logs do console
+        const logs: string[] = [];
+        page.on('console', msg => {
+            if (msg.text().includes('[DEBUG')) {
+                logs.push(msg.text());
+            }
+        });
+        
         // 1. Criar processo com STIC
         const descricao = `Processo Iniciar ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
@@ -28,6 +36,14 @@ test.describe('CDU-04: Iniciar processo', () => {
 
         // Aguardar carregamento das unidades
         await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 5000});
+        
+        // Aguardar um pouco mais para logs serem gerados
+        await page.waitForTimeout(1000);
+        
+        // Imprimir logs capturados
+        console.log('=== LOGS DO NAVEGADOR ===');
+        logs.forEach(log => console.log(log));
+        console.log('=========================');
 
         // 3. Clicar em Iniciar Processo → Abre modal
         await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)).click();
@@ -45,13 +61,13 @@ test.describe('CDU-04: Iniciar processo', () => {
     });
 
     test('deve cancelar iniciação e permanecer na tela', async ({page}) => {
-        // 1. Criar processo com SGP
+        // 1. Criar processo com SEDESENV (unidade operacional)
         const descricao = `Processo Cancelar ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
         await page.fill(SELETORES.CAMPO_DESCRICAO, descricao);
         await page.selectOption(SELETORES.CAMPO_TIPO, 'MAPEAMENTO');
         await page.fill(SELETORES.CAMPO_DATA_LIMITE, '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['SGP']);
+        await selecionarUnidadesPorSigla(page, ['SEDESENV']);
         await page.getByRole('button', {name: /salvar/i}).click();
         await page.waitForURL(/\/painel/);
 
@@ -71,13 +87,13 @@ test.describe('CDU-04: Iniciar processo', () => {
     });
 
     test('não deve permitir editar processo após iniciado', async ({page}) => {
-        // 1. Criar e iniciar processo com COEDE
+        // 1. Criar e iniciar processo com SEDOC (unidade operacional)
         const descricao = `Processo Bloqueio ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);
         await page.fill(SELETORES.CAMPO_DESCRICAO, descricao);
         await page.selectOption(SELETORES.CAMPO_TIPO, 'MAPEAMENTO');
         await page.fill(SELETORES.CAMPO_DATA_LIMITE, '2025-12-31');
-        await selecionarUnidadesPorSigla(page, ['COEDE']);
+        await selecionarUnidadesPorSigla(page, ['SEDOC']);
         await page.getByRole('button', {name: /salvar/i}).click();
         await page.waitForURL(/\/painel/);
 

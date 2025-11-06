@@ -9,7 +9,7 @@ vi.mock('@/composables/usePerfil', () => ({
     usePerfil: () => ({
         servidorLogado: { value: { nome: 'Teste' } },
         perfilSelecionado: { value: 'ADMIN' },
-        unidadeSelecionada: { value: { sigla: 'ABC' } },
+        unidadeSelecionada: { value: 123 },
     }),
 }));
 vi.mock('@/stores/perfil', () => ({

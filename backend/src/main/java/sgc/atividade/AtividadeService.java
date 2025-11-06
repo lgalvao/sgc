@@ -11,6 +11,7 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroSituacaoInvalida;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
 
@@ -63,7 +64,7 @@ public class AtividadeService {
      * @return O {@link AtividadeDto} da atividade criada.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso ou o usuário não forem encontrados.
      * @throws ErroAccessoNegado         se o usuário não for o titular da unidade do subprocesso.
-     * @throws IllegalStateException     se o subprocesso já estiver finalizado.
+     * @throws ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
         var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo())
@@ -72,13 +73,14 @@ public class AtividadeService {
         var usuario = usuarioRepo.findById(Long.parseLong(tituloUsuario))
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
 
-        // TODO isso realmente vai acontecer, se a segurança estiver configurada corretamemte?
+        // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.
+        // Apesar da segurança estar configurada, mantemos esta verificação como proteção extra.
         if (!usuario.equals(subprocesso.getUnidade().getTitular())) {
             throw new ErroAccessoNegado("Usuário não autorizado a criar atividades para este subprocesso.");
         }
 
         if (subprocesso.getSituacao().isFinalizado()) {
-            throw new IllegalStateException("Subprocesso já está finalizado.");
+            throw new ErroSituacaoInvalida("Subprocesso já está finalizado.");
         }
 
         var entidade = atividadeMapper.toEntity(atividadeDto);

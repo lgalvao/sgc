@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
-import sgc.alerta.erros.AlteracaoStatusAlertaException;
+import sgc.alerta.erros.ErroAlteracaoAlerta;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
@@ -79,7 +79,7 @@ public class AlertaService {
         alerta.setDataHora(LocalDateTime.now());
         alerta.setUnidadeOrigem(null); // SEDOC não tem registro como unidade
         alerta.setUnidadeDestino(unidadeDestino);
-        alerta.setDescricao(sanitizeHtml(descricao));
+        alerta.setDescricao(descricao);
 
         Alerta alertaSalvo = repositorioAlerta.save(alerta);
         log.info("Alerta criado: código={}, tipo={}, unidade={}",
@@ -209,7 +209,7 @@ public class AlertaService {
                 }
             } catch (Exception e) {
                 log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
-                throw new AlteracaoStatusAlertaException(
+                throw new ErroAlteracaoAlerta(
                     "Falha ao criar alerta para a unidade " + codUnidade + ": " + e.getMessage(), e);
             }
         }
@@ -313,14 +313,6 @@ public class AlertaService {
         return data != null
                 ? String.format("%02d/%02d/%d", data.getDayOfMonth(), data.getMonthValue(), data.getYear())
                 : "Data não definida";
-    }
-
-    private String sanitizeHtml(String input) {
-        if (input == null) {
-            return null;
-        }
-        // Remove tags HTML básicas para uma sanitização simples
-        return input.replaceAll("<[^>]*>", "");
     }
 
     /**

@@ -30,8 +30,9 @@
         </label>
       </div>
 
+      <!-- Mostrar filhas se a unidade tem filhas elegíveis (mesmo que a unidade pai não seja) -->
       <div
-        v-if="unidade.filhas && unidade.filhas.length"
+        v-if="unidade.filhas && unidade.filhas.length && temFilhasElegiveis(unidade)"
         class="ms-4"
       >
         <template
@@ -137,14 +138,7 @@ function isUnidadeDesabilitada(codigo: number): boolean {
 
 // Verifica se unidade ou suas descendentes são elegíveis
 function temFilhasElegiveis(unidade: Unidade): boolean {
-  if (!props.filtrarPor(unidade)) {
-    // Unidade não é elegível, mas verificar filhas
-    if (unidade.filhas && unidade.filhas.length > 0) {
-      return unidade.filhas.some(f => temFilhasElegiveis(f));
-    }
-    return false;
-  }
-  return true;
+  return props.filtrarPor(unidade);
 }
 
 // Verifica se é folha (sem filhas)

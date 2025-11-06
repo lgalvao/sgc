@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
-import sgc.comum.BeanUtil;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.processo.model.*;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("CDU-02: Visualizar Painel")
-@Import({TestSecurityConfig.class, BeanUtil.class})
+@Import(TestSecurityConfig.class)
 public class CDU02IntegrationTest {
 
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";

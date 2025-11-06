@@ -109,7 +109,7 @@ class CDU21IntegrationTest {
         Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp2);
 
-        // 6. Create UnidadeProcesso snapshots
+        // 6. Criar associações de unidades ao processo
         unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeIntermediaria.getCodigo(), unidadeIntermediaria.getNome(), unidadeIntermediaria.getSigla(), String.valueOf(titularIntermediaria.getTituloEleitoral()), unidadeIntermediaria.getTipo(), "PARTICIPANTE", null));
         unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional1.getCodigo(), unidadeOperacional1.getNome(), unidadeOperacional1.getSigla(), String.valueOf(titularOp1.getTituloEleitoral()), unidadeOperacional1.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));
         unidadeProcessoRepo.save(new UnidadeProcesso(processo.getCodigo(), unidadeOperacional2.getCodigo(), unidadeOperacional2.getNome(), unidadeOperacional2.getSigla(), String.valueOf(titularOp2.getTituloEleitoral()), unidadeOperacional2.getTipo(), "HOMOLOGADO", unidadeIntermediaria.getCodigo()));

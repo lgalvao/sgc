@@ -10,6 +10,7 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.erros.ErroUnidadeNaoEncontrada;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -17,9 +18,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-// TODO esta classe está usando muitos strings fixos. Mudar para usar templates do thymeleaf
-// TODO em vez de IllegalArgumentException usar exceções de negócio específicas
-// TODO usar builder par instanciar os alertas. Considerar criar método auxiliar: codigo esta repetitivo
 public class SubprocessoNotificacaoService {
     private final NotificacaoEmailService notificacaoEmailService;
     private final AlertaRepo repositorioAlerta;
@@ -79,7 +77,7 @@ public class SubprocessoNotificacaoService {
 
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+                .orElseThrow(() -> new ErroUnidadeNaoEncontrada("Unidade 'SEDOC' não encontrada."));
 
         criarEsalvarAlerta(
             String.format("Mapa de competências da unidade %s disponibilizado para análise", siglaUnidade),
@@ -333,7 +331,7 @@ public class SubprocessoNotificacaoService {
 
     public void notificarHomologacaoMapa(Subprocesso sp) {
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
-                .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
+                .orElseThrow(() -> new ErroUnidadeNaoEncontrada("Unidade 'SEDOC' não encontrada."));
 
         String descricaoProcesso = sp.getProcesso().getDescricao();
 

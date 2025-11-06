@@ -1,9 +1,11 @@
 package sgc.sgrh.dto;
 
 /**
- * DTO para dados de servidor (usuário) retornados para o frontend
+ * DTO para dados de um usuário (servidor) retornados para o frontend.
+ * <p>
+ * Usado no endpoint GET /api/unidades/{codigoUnidade}/servidores para retornar
+ * a lista de usuários pertencentes a uma unidade específica.
  */
-// TODO esse dto deve ser removido, sendo usado apenas o UsuarioDto
 public record ServidorDto(
     Long codigo,
     String nome,

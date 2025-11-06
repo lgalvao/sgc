@@ -46,7 +46,7 @@
             v-if="!unidadesStore.isLoading"
             v-model="unidadesSelecionadas"
             :unidades="unidadesStore.unidades"
-            :desabilitadas="unidadesBloqueadas"
+            :desabilitadas="unidadesDesabilitadas"
             :filtrarPor="unidadeElegivel"
           />
           <div v-else class="text-center py-3">
@@ -202,7 +202,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue'
+import {computed, nextTick, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -258,6 +258,9 @@ onMounted(async () => {
   await unidadesStore.fetchUnidades();
   console.log('[DEBUG Vue] Unidades da store carregadas:', unidadesStore.unidades.length);
   
+  // Depois de carregar as unidades, carregar as validações do tipo atual
+  await carregarUnidadesValidas(tipo.value);
+  
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
@@ -271,11 +274,18 @@ onMounted(async () => {
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
 
+        // CRÍTICO: Carregar validações do tipo antes de atribuir unidades selecionadas
+        await carregarUnidadesValidas(processo.tipo);
+        
         // Carregar unidades participantes do processo detalhe
         console.log('[DEBUG Vue] processo.unidades:', processo.unidades);
         // CORRIGIDO: extrair recursivamente todos os códigos (raiz + filhos + netos)
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
         console.log('[DEBUG Vue] unidadesSelecionadas após extração:', unidadesSelecionadas.value);
+        
+        // Aguardar próximo tick para garantir que o v-model sincronizou
+        await nextTick();
+        console.log('[DEBUG Vue] Após nextTick, unidadesSelecionadas:', unidadesSelecionadas.value);
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
@@ -286,6 +296,11 @@ onMounted(async () => {
 
 // Buscar unidades bloqueadas e validar unidades quando o tipo de processo mudar
 watch(tipo, async (novoTipo) => {
+  // Se ainda não carregamos unidades, pular
+  if (unidadesStore.unidades.length === 0) {
+    return;
+  }
+  
   try {
     const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
     if (response.ok) {
@@ -298,7 +313,7 @@ watch(tipo, async (novoTipo) => {
   
   // Carregar validações específicas por tipo
   await carregarUnidadesValidas(novoTipo);
-}, { immediate: true });
+});
 
 // Função para carregar unidades válidas baseado no tipo de processo
 async function carregarUnidadesValidas(tipoProcesso: string) {
@@ -313,20 +328,20 @@ async function carregarUnidadesValidas(tipoProcesso: string) {
     );
     unidadesComMapaVigente.value = resultados.filter(r => r.temMapa).map(r => r.codigo);
     console.log('[DEBUG Vue] Unidades com mapa vigente:', unidadesComMapaVigente.value);
+    
+    if (tipoProcesso === 'DIAGNOSTICO') {
+      const resultados2 = await Promise.all(
+        todasUnidades.map(async (codigo) => ({
+          codigo,
+          temServidores: await unidadeTemServidores(codigo)
+        }))
+      );
+      unidadesComServidores.value = resultados2.filter(r => r.temServidores).map(r => r.codigo);
+      console.log('[DEBUG Vue] Unidades com servidores:', unidadesComServidores.value);
+    }
   } else {
+    // MAPEAMENTO: todas as unidades são válidas
     unidadesComMapaVigente.value = todasUnidades;
-  }
-  
-  if (tipoProcesso === 'DIAGNOSTICO') {
-    const resultados = await Promise.all(
-      todasUnidades.map(async (codigo) => ({
-        codigo,
-        temServidores: await unidadeTemServidores(codigo)
-      }))
-    );
-    unidadesComServidores.value = resultados.filter(r => r.temServidores).map(r => r.codigo);
-    console.log('[DEBUG Vue] Unidades com servidores:', unidadesComServidores.value);
-  } else {
     unidadesComServidores.value = todasUnidades;
   }
 }
@@ -335,9 +350,7 @@ async function carregarUnidadesValidas(tipoProcesso: string) {
 function extrairTodasUnidadesCodigos(unidades: Unidade[]): number[] {
   const codigos: number[] = [];
   for (const unidade of unidades) {
-    if (unidade.tipo !== 'INTERMEDIARIA') {
-      codigos.push(unidade.codigo);
-    }
+    codigos.push(unidade.codigo);
     if (unidade.filhas && unidade.filhas.length > 0) {
       codigos.push(...extrairTodasUnidadesCodigos(unidade.filhas));
     }
@@ -371,7 +384,6 @@ function isUnidadeValida(codigo: number | undefined): boolean {
 // Verifica se a unidade deve estar desabilitada
 function isUnidadeDesabilitada(codigo: number): boolean {
   // Desabilita apenas se estiver bloqueada (já em processo ativo)
-  // Unidades intermediárias e não-elegíveis ficam habilitadas para selecionar filhas em grupo
   return isUnidadeBloqueada(codigo);
 }
 
@@ -489,7 +501,7 @@ async function salvarProcesso() {
         unidades: unidadesFiltradas
       };
       console.log('[DEBUG Vue] Atualizando processo:', request);
-      await processoService.atualizarProcesso(processoEditando.value.codigo, request);
+      await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
       console.log('[DEBUG Vue] Processo atualizado');
 
       notificacoesStore.sucesso(
@@ -505,7 +517,7 @@ async function salvarProcesso() {
         unidades: unidadesFiltradas
       };
       console.log('[DEBUG Vue] Criando novo processo:', request);
-      await processoService.criarProcesso(request);
+      await processosStore.criarProcesso(request);
       console.log('[DEBUG Vue] Novo processo criado');
 
       notificacoesStore.sucesso(
@@ -600,14 +612,47 @@ async function confirmarRemocao() {
   fecharModalRemocao();
 }
 
-// Função para determinar se unidade é elegível para o processo
-function unidadeElegivel(unidade: Unidade): boolean {
-  // Unidades intermediárias nunca são elegíveis diretamente
-  if (unidade.tipo === 'INTERMEDIARIA') {
-    return false;
+// Computed que combina unidades bloqueadas com unidades não-elegíveis
+const unidadesDesabilitadas = computed(() => {
+  const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
+  const desabilitadas: number[] = [];
+  
+  // Se estamos editando, unidades atualmente selecionadas nunca devem ser desabilitadas
+  const unidadesProtegidas = processoEditando.value ? unidadesSelecionadas.value : [];
+  
+  for (const codigo of todasUnidades) {
+    // Se estamos editando e a unidade está selecionada, nunca desabilitar
+    if (unidadesProtegidas.includes(codigo)) {
+      continue;
+    }
+    
+    // Se está bloqueada, desabilitar
+    if (unidadesBloqueadas.value.includes(codigo)) {
+      desabilitadas.push(codigo);
+      continue;
+    }
+    
+    // Para REVISAO/DIAGNOSTICO: desabilitar se não tem mapa vigente
+    if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
+      if (!unidadesComMapaVigente.value.includes(codigo)) {
+        desabilitadas.push(codigo);
+      }
+    }
+    
+    // Para DIAGNOSTICO: desabilitar se não tem servidores
+    if (tipo.value === 'DIAGNOSTICO') {
+      if (!unidadesComServidores.value.includes(codigo)) {
+        desabilitadas.push(codigo);
+      }
+    }
   }
   
-  // Se estamos editando e a unidade já está selecionada, sempre mostrar
+  return desabilitadas;
+});
+
+// Função para determinar se unidade é elegível para o processo
+function unidadeElegivel(unidade: Unidade): boolean {
+  // Se estamos editando e a unidade está selecionada, sempre mostrar como elegível
   if (processoEditando.value && unidadesSelecionadas.value.includes(unidade.codigo)) {
     return true;
   }

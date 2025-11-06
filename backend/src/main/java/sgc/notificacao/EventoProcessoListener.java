@@ -33,12 +33,16 @@ import static sgc.unidade.model.TipoUnidade.*;
  * <p>
  * Processa eventos de processo iniciado, criando alertas e enviando e-mails
  * para as unidades participantes de forma diferenciada, conforme o tipo de unidade.
+ * <p>
+ * Nota: Este listener permanece no pacote 'notificacao' pois sua responsabilidade
+ * principal é orquestrar notificações (alertas e e-mails), não apenas escutar eventos.
+ * O pacote 'eventos' contém as definições das classes de evento (EventoProcessoIniciado, etc),
+ * enquanto este listener contém a lógica de reação aos eventos.
  */
 @Component
 @Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
-// TODO esse listener não ficaria melhor no pacote 'eventos'?
 public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;
@@ -114,7 +118,7 @@ public class EventoProcessoListener {
                     log.warn("Unidade não encontrada no SGRH: {} (ignorado no perfil e2e)", codigoUnidade);
                     return;
                 }
-                throw new IllegalStateException("Unidade não encontrada no SGRH: %d".formatted(codigoUnidade));
+                throw new ErroEntidadeNaoEncontrada("Unidade", "não encontrada no SGRH: %d".formatted(codigoUnidade));
             }
             UnidadeDto unidade = unidadeOpt.get();
 

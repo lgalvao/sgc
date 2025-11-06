@@ -8,6 +8,7 @@ export const usePerfilStore = defineStore('perfil', {
         servidorId: localStorage.getItem('idServidor') ? Number(localStorage.getItem('idServidor')) : null,
         perfilSelecionado: (localStorage.getItem('perfilSelecionado') || null) as Perfil | null,
         unidadeSelecionada: localStorage.getItem('unidadeSelecionada') ? Number(localStorage.getItem('unidadeSelecionada')) : null,
+        unidadeSelecionadaSigla: (localStorage.getItem('unidadeSelecionadaSigla') || null) as string | null,
         perfisUnidades: [] as PerfilUnidade[],
     }),
     actions: {

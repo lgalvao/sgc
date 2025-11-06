@@ -1,7 +1,7 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
 ## Visão Geral
-Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST modular para ser consumida pelo frontend. A arquitetura é organizada em pacotes que representam domínios de negócio específicos, promovendo alta coesão e baixo acoplamento. A comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio, o que garante a separação de responsabilidades.
+Este diretório contém o código-fonte do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é organizada em pacotes representando domínios específicos. Parte da comunicação entre os módulos centrais é realizada de forma reativa, através de eventos de domínio.
 
 ## Diagrama de Arquitetura
 O diagrama abaixo ilustra a arquitetura em camadas, destacando as dependências principais entre os pacotes.
@@ -23,7 +23,7 @@ graph TD
 
     subgraph "4. Camada de Domínio e Dados"
         Dominio[Entidades JPA & Repositórios]
-        IntegracaoRH[SGRH & Unidade]
+        IntegracaoSGRH[SGRH & Unidade]
     end
 
     subgraph "5. Módulos Reativos & Suporte"
@@ -41,7 +41,7 @@ graph TD
     Eventos --> Notificacao
     Eventos --> Alerta
 
-    IntegracaoRH -- Popula Dados --> Dominio
+    IntegracaoSGRH -- Popula Dados --> Dominio
 
     Comum -- Suporte Geral --> Servico & Dominio & Notificacao & Alerta
 ```
@@ -85,7 +85,7 @@ Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da
 ./gradlew :backend:build
 ```
 
-Para executar a aplicação em modo de desenvolvimento (utilizando o banco de dados em memória H2), ative o perfil `e2e`:
+Para executar a aplicação em modo de desenvolvimento e para testes e2e (utilizando o banco de dados em memória H2), ative o perfil `e2e`:
 
 ```bash
 ./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
@@ -107,8 +107,8 @@ A especificação OpenAPI em formato JSON pode ser encontrada em:
 [http://localhost:10000/api-docs](http://localhost:10000/api-docs)
 
 ## Padrões de Design e Boas Práticas
-- **Injeção de Dependências:** Utilizada extensivamente pelo Spring Framework.
-- **DTOs (Data Transfer Objects):** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
+- **Lombok:** Utilizado para reduzir código repetitivo.
+- **DTOs (sufixos `Dto`, `Req` e `Resp`:** Usados em toda a camada de controle para desacoplar a API das entidades JPA.
 - **Arquitetura Orientada a Eventos:** O `ApplicationEventPublisher` do Spring é usado para desacoplar os módulos `processo`, `alerta` e `notificacao`.
 - **Serviços Coesos:** Lógica de negócio complexa é dividida em serviços com responsabilidades únicas (ex: `MapaService` vs. `ImpactoMapaService`).
 - **Trilha de Auditoria:** A entidade `Movimentacao` garante um registro histórico completo das ações do workflow.

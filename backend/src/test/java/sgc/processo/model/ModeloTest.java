@@ -1,6 +1,7 @@
 package sgc.processo.model;
 
 import org.junit.jupiter.api.Test;
+import sgc.processo.erros.ErroProcesso;
 import sgc.unidade.model.TipoUnidade;
 
 import java.time.LocalDateTime;

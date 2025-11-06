@@ -14,7 +14,7 @@ import {
     verificarModalFinalizacaoFechado,
     verificarPermanenciaNaPaginaProcesso,
     verificarProcessoFinalizadoNoPainel,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-21: Finalizar processo', () => {
     async function setupProcessoEmAndamento(page) {

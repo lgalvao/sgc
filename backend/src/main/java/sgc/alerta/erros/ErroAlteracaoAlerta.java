@@ -6,12 +6,12 @@ package sgc.alerta.erros;
  * Ocorre quando operações como marcar como lido ou marcar como não lido
  * falham, impedindo a alteração do estado do alerta.
  */
-public class AlteracaoStatusAlertaException extends RuntimeException {
-    public AlteracaoStatusAlertaException(String message) {
+public class ErroAlteracaoAlerta extends RuntimeException {
+    public ErroAlteracaoAlerta(String message) {
         super(message);
     }
 
-    public AlteracaoStatusAlertaException(String message, Throwable cause) {
+    public ErroAlteracaoAlerta(String message, Throwable cause) {
         super(message, cause);
     }
 }

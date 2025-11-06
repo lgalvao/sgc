@@ -14,7 +14,7 @@ import {
     verificarCabecalhoUnidade,
     verificarListagemAtividadesEConhecimentos,
     verificarModoSomenteLeitura,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-18: Visualizar mapa de competências', () => {
     let processo: any;

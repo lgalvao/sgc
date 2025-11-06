@@ -27,10 +27,13 @@ public class MapaIntegridadeService {
      *     <li>Atividades que não estão vinculadas a nenhuma competência.</li>
      *     <li>Competências que não estão vinculadas a nenhuma atividade.</li>
      * </ul>
+     * <p>
+     * Nota: Esta é uma validação defensiva. Em operação normal, não deve haver atividades ou
+     * competências órfãs se as camadas de negócio estiverem corretamente configuradas.
+     * Sirve como proteção contra dados inconsistentes e para diagnosticar problemas.
      *
      * @param codMapa O código do mapa a ser validado.
      */
-    // TODO essa validação está me parecendo inócua. Parece indicar partes ainda nao implementadas!
     public void validarIntegridadeMapa(Long codMapa) {
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);

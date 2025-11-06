@@ -11,6 +11,7 @@ import {generateUniqueId} from '@/utils'
 import * as painelService from '../services/painelService'
 import {Page} from '@/services/painelService'
 import * as processoService from '../services/processoService'
+import {usePerfilStore} from "@/stores/perfil";
 
 export const useProcessosStore = defineStore('processos', {
     state: () => ({
@@ -63,9 +64,17 @@ export const useProcessosStore = defineStore('processos', {
         },
         async criarProcesso(payload: CriarProcessoRequest) {
             await processoService.criarProcesso(payload);
+            const perfilStore = usePerfilStore();
+            if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
+                await this.fetchProcessosPainel(perfilStore.perfilSelecionado, Number(perfilStore.unidadeSelecionada), 0, 10);
+            }
         },
         async atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
             await processoService.atualizarProcesso(idProcesso, payload);
+            const perfilStore = usePerfilStore();
+            if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
+                await this.fetchProcessosPainel(perfilStore.perfilSelecionado, Number(perfilStore.unidadeSelecionada), 0, 10);
+            }
         },
         async removerProcesso(idProcesso: number) {
             await processoService.excluirProcesso(idProcesso);

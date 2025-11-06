@@ -181,7 +181,7 @@ function abrirDetalhesUnidade(item: any) {
     if (perfilUsuario === 'ADMIN' || perfilUsuario === 'GESTOR') {
       router.push({name: 'Subprocesso', params: {codProcesso: codProcesso.value.toString(), siglaUnidade: String(item.sigla)}})
     } else if (perfilUsuario === 'CHEFE' || perfilUsuario === 'SERVIDOR') {
-      if (perfilStore.unidadeSelecionada === item.sigla) {
+      if (perfilStore.unidadeSelecionada === item.codUnidade) {
         router.push({name: 'Subprocesso', params: {codProcesso: String(codProcesso.value), siglaUnidade: String(item.sigla)}})
       }
     }

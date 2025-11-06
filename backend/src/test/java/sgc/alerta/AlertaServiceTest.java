@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.erros.AlteracaoStatusAlertaException;
+import sgc.alerta.erros.ErroAlteracaoAlerta;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
@@ -213,13 +213,13 @@ class AlertaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar AlteracaoStatusAlertaException quando falha ao criar alerta para unidade")
+    @DisplayName("Deve lançar ErroAlteracaoAlerta quando falha ao criar alerta para unidade")
     void criarAlertasProcessoIniciado_deveLancarExcecaoAoFalharCriacao() {
         UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "OPERACIONAL");
         when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
         when(repositorioUnidade.findById(unidade.getCodigo())).thenThrow(new RuntimeException("Erro ao buscar unidade"));
 
-        assertThrows(AlteracaoStatusAlertaException.class, () ->
+        assertThrows(ErroAlteracaoAlerta.class, () ->
             alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso))
         );
     }

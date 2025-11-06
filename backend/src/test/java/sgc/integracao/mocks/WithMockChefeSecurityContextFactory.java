@@ -4,7 +4,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import sgc.comum.BeanUtil;
+import org.springframework.stereotype.Component;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -12,35 +12,29 @@ import sgc.unidade.model.Unidade;
 
 import java.util.Set;
 
-
-
+@Component
 public class WithMockChefeSecurityContextFactory implements WithSecurityContextFactory<WithMockChefe> {
 
+    private final UsuarioRepo usuarioRepo;
 
+    public WithMockChefeSecurityContextFactory(UsuarioRepo usuarioRepo) {
+        this.usuarioRepo = usuarioRepo;
+    }
 
     @Override
-
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
-
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
         long chefeId;
 
         try {
-
             chefeId = Long.parseLong(annotation.value());
-
         } catch (NumberFormatException e) {
-
-            chefeId = 333333333333L; // Default value
-
+            chefeId = 333333333333L;
         }
-
-
 
         Usuario usuario;
         try {
-            UsuarioRepo usuarioRepo = BeanUtil.getBean(UsuarioRepo.class);
             usuario = usuarioRepo.findById(chefeId).orElse(null);
         } catch (Exception e) {
             usuario = null;
@@ -55,16 +49,12 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
             usuario.setUnidade(new Unidade("Unidade Mock", "UM"));
         }
 
-
-
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
 
         context.setAuthentication(token);
 
         return context;
-
     }
-
 }
 
 
