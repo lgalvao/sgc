@@ -517,13 +517,17 @@ async function salvarProcesso() {
         unidades: unidadesFiltradas
       };
       console.log('[DEBUG Vue] Criando novo processo:', request);
-      await processosStore.criarProcesso(request);
-      console.log('[DEBUG Vue] Novo processo criado');
+      const novoProcesso = await processosStore.criarProcesso(request);
+      console.log('[DEBUG Vue] Novo processo criado:', novoProcesso);
 
       notificacoesStore.sucesso(
           'Processo salvo',
           'O processo foi salvo!'
       );
+      
+      // Redirecionar para a página do novo processo
+      await router.push(`/processo/${novoProcesso.codigo}`);
+      return;
     }
     console.log('[DEBUG Vue] Redirecionando para painel...');
     await router.push('/painel');

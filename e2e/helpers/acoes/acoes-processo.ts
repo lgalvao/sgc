@@ -27,7 +27,6 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
         }
         
         await page.check(seletorCheckbox);
-        console.log(`[DEBUG] Checkbox "${sigla}" selecionado`);
     }
 }
 
