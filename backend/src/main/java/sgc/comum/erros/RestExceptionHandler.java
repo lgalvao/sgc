@@ -16,7 +16,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import sgc.alerta.erros.AlteracaoStatusAlertaException;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.model.ErroProcesso;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 
 import java.util.stream.Collectors;
 
@@ -117,10 +124,58 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitizar(ex.getMessage())));
     }
 
+    @ExceptionHandler(ErroRequisicaoSemCorpo.class)
+    protected ResponseEntity<Object> handleErroRequisicaoSemCorpo(ErroRequisicaoSemCorpo ex) {
+        log.warn("Requisição sem corpo: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroParametroPainelInvalido.class)
+    protected ResponseEntity<Object> handleErroParametroPainelInvalido(ErroParametroPainelInvalido ex) {
+        log.warn("Parâmetro inválido para painel: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.BAD_REQUEST, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroProcessoEmSituacaoInvalida.class)
+    protected ResponseEntity<Object> handleErroProcessoEmSituacaoInvalida(ErroProcessoEmSituacaoInvalida ex) {
+        log.warn("Processo em situação inválida: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroUnidadesNaoDefinidas.class)
+    protected ResponseEntity<Object> handleErroUnidadesNaoDefinidas(ErroUnidadesNaoDefinidas ex) {
+        log.warn("Unidades não definidas: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroMapaEmSituacaoInvalida.class)
+    protected ResponseEntity<Object> handleErroMapaEmSituacaoInvalida(ErroMapaEmSituacaoInvalida ex) {
+        log.warn("Mapa em situação inválida: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroAtividadesEmSituacaoInvalida.class)
+    protected ResponseEntity<Object> handleErroAtividadesEmSituacaoInvalida(ErroAtividadesEmSituacaoInvalida ex) {
+        log.warn("Atividades em situação inválida: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(ErroMapaNaoAssociado.class)
+    protected ResponseEntity<Object> handleErroMapaNaoAssociado(ErroMapaNaoAssociado ex) {
+        log.warn("Mapa não associado: {}", ex.getMessage());
+        return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
     @ExceptionHandler(ErroNegocio.class)
     protected ResponseEntity<Object> handleErroNegocio(ErroNegocio ex) {
         log.warn("Erro de negócio: {}", ex.getMessage());
         return buildResponseEntity(new ErroApi(HttpStatus.UNPROCESSABLE_ENTITY, sanitizar(ex.getMessage())));
+    }
+
+    @ExceptionHandler(AlteracaoStatusAlertaException.class)
+    protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(AlteracaoStatusAlertaException ex) {
+        log.error("Erro ao alterar status do alerta: {}", ex.getMessage(), ex);
+        return buildResponseEntity(new ErroApi(HttpStatus.CONFLICT, sanitizar(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)

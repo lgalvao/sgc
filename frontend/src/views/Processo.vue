@@ -46,7 +46,7 @@
       style="top: 20px; right: 20px; z-index: 9999;"
     >
       <i class="bi bi-check-circle" />
-      Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco com sucesso!
+      Cadastros {{ tipoAcaoBloco === 'aceitar' ? 'aceitos' : 'homologados' }} em bloco!
       <button
         type="button"
         class="btn-close"
@@ -203,7 +203,7 @@ async function executarFinalizacao() {
 
     notificacoesStore.sucesso(
         'Processo finalizado',
-        'O processo foi finalizado com sucesso. Todos os mapas de competências estão agora vigentes.'
+        'O processo foi finalizado. Todos os mapas de competências estão agora vigentes.'
     );
 
     await router.push('/painel');

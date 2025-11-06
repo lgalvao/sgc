@@ -3,6 +3,8 @@ import {ROTULOS, SELETORES, TEXTOS, URLS} from '../dados';
 import {esperarBotaoVisivel, esperarElementoVisivel, esperarTextoVisivel} from '~/helpers';
 import {extrairIdDoSeletor} from '../utils/utils';
 
+// TODO Por que chamar de 'verificacoes-ui.ts' se tudo nessas verificacoes é de ui? A quebra me parece arbitrária.
+
 /**
  * Verifica se um conhecimento em uma atividade específica está visível.
  * @param pageOrCard A instância da página ou um localizador do Playwright.

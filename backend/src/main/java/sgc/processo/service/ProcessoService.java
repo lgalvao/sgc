@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroNegocio;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.mapa.model.UnidadeMapa;
@@ -21,6 +20,8 @@ import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoCriado;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
@@ -126,7 +127,7 @@ public class ProcessoService {
         }
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
-        log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
+        log.info("Processo '{}' (código {}) criado.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
         return processoMapper.toDto(processoSalvo);
     }
@@ -166,7 +167,7 @@ public class ProcessoService {
             unidadeProcessoRepo.save(unidadeProcesso);
         }
 
-        log.info("Processo {} atualizado com sucesso.", codigo);
+        log.info("Processo {} atualizado.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
     }
@@ -190,7 +191,7 @@ public class ProcessoService {
         }
 
         processoRepo.deleteById(codigo);
-        log.info("Processo {} removido com sucesso.", codigo);
+        log.info("Processo {} removido.", codigo);
     }
 
     /**
@@ -262,13 +263,13 @@ public class ProcessoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
         // Buscar unidades já salvas no processo
         List<UnidadeProcesso> unidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codigo);
         if (unidadesProcesso.isEmpty()) {
-            throw new ErroNegocio("Não há unidades participantes definidas para este processo.");
+            throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
         }
 
         List<Long> codigosUnidades = unidadesProcesso.stream()
@@ -303,11 +304,11 @@ public class ProcessoService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
-            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de revisão.");
+            throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
         }
 
         validarUnidadesComMapasVigentes(codigosUnidades);
@@ -350,7 +351,7 @@ public class ProcessoService {
         processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, unidadeProcessoRepo.findByCodProcesso(processo.getCodigo()));
         publicadorEventos.publishEvent(new EventoProcessoFinalizado(this, processo.getCodigo()));
 
-        log.info("Processo finalizado com sucesso: código={}", codigo);
+        log.info("Processo finalizado: código={}", codigo);
     }
 
     // Métodos Privados Auxiliares

@@ -34,18 +34,4 @@ public class Competencia extends EntidadeBase {
         this.descricao = descricao;
         this.mapa = mapa;
     }
-
-    /**
-     * Construtor de cópia.
-     *
-     * @param competencia A competência a ser copiada.
-     */
-    public Competencia(Competencia competencia) {
-        if (competencia != null) {
-            super.setCodigo(competencia.getCodigo());
-            this.mapa = competencia.getMapa();
-            this.descricao = competencia.getDescricao();
-        }
-    }
-
 }

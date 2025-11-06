@@ -23,7 +23,7 @@ async function _executarAcao(
     const notificacoes = useNotificacoesStore();
     try {
         await acao();
-        notificacoes.sucesso(sucessoMsg, `${sucessoMsg} com sucesso.`);
+        notificacoes.sucesso(sucessoMsg, `${sucessoMsg}.`);
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
             await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);

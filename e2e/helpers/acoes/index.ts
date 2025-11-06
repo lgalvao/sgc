@@ -56,7 +56,6 @@ export {
     cancelarModal
 } from './acoes-modais';
 export * from './acoes-validacao';
-export * from './limpeza-testes';
-export * from './api-helpers';
+export * from '../utils/limpeza';
 export * from './acoes-mapa';
 export * from './acoes-modais';

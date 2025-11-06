@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Evento de domínio publicado quando um Processo é finalizado com sucesso.
+ * Evento de domínio publicado quando um Processo é finalizado.
  * <p>
  * Este evento sinaliza que todos os subprocessos foram homologados, os mapas
  * foram tornados vigentes e as notificações de conclusão foram enviadas.

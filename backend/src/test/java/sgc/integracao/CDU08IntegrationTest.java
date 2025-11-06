@@ -123,7 +123,7 @@ class CDU08IntegrationTest {
     @WithMockChefe("888888888888")
     class ImportacaoAtividades {
         @Test
-        @DisplayName("Deve importar atividades e conhecimentos com sucesso")
+        @DisplayName("Deve importar atividades e conhecimentos")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
@@ -131,7 +131,7 @@ class CDU08IntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("Atividades importadas com sucesso.")));
+                    .andExpect(jsonPath("$.message", is("Atividades importadas.")));
 
             List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).hasSize(2);

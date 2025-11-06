@@ -28,7 +28,6 @@ import java.util.Map;
 @RequestMapping("/api/e2e")
 @RequiredArgsConstructor
 @Profile("e2e")
-// TODO verificar se precisamos mesmo desse controller
 public class E2eTestController {
     private final ProcessoRepo processoRepo;
     private final UnidadeProcessoRepo unidadeProcessoRepo;
@@ -44,22 +43,7 @@ public class E2eTestController {
     @PostMapping("/processos/{codigo}/forcar-exclusao")
     @Transactional
     public ResponseEntity<Void> forcarExclusaoProcesso(@PathVariable Long codigo) {
-        // 1. Buscar IDs de alertas do processo
-        var alertaIds = alertaRepo.findIdsByProcessoCodigo(codigo);
-        // 2. Deletar referências de usuários aos alertas (resolve constraint)
-        if (!alertaIds.isEmpty()) {
-            alertaUsuarioRepo.deleteByIdAlertaCodigoIn(alertaIds);
-        }
-        // 3. Deletar alertas em bulk por processo (evita optimistic locking)
-        alertaRepo.deleteByProcessoCodigo(codigo);
-        // 4. Deletar movimentações vinculadas aos subprocessos (FK MOVIMENTACAO -> SUBPROCESSO)
-        subprocessoRepo.findByProcessoCodigo(codigo).forEach(sp -> {
-            movimentacaoRepo.findBySubprocessoCodigo(sp.getCodigo()).forEach(mv -> movimentacaoRepo.deleteById(mv.getCodigo()));
-            subprocessoRepo.deleteById(sp.getCodigo());
-        });
-        // 5. Deletar processo
-        processoRepo.deleteById(codigo);
-
+        apagarProcessosComAlertasESubprocessos(List.of(codigo));
         return ResponseEntity.noContent().build();
     }
 
@@ -77,23 +61,8 @@ public class E2eTestController {
                 .distinct()
                 .toList();
 
-        // Deleta alertas e processos
-
-        // TODO Esse trecho é duplicado a seguir
         if (!codigosProcesso.isEmpty()) {
-            var alertaIds = alertaRepo.findIdsByProcessoCodigoIn(codigosProcesso);
-            if (!alertaIds.isEmpty()) {
-                alertaUsuarioRepo.deleteByIdAlertaCodigoIn(alertaIds);
-            }
-            alertaRepo.deleteByProcessoCodigoIn(codigosProcesso);
-            // Remover movimentações e subprocessos antes do processo (FKs)
-            codigosProcesso.forEach(codProcesso -> {
-                subprocessoRepo.findByProcessoCodigo(codProcesso).forEach(sp -> {
-                    movimentacaoRepo.findBySubprocessoCodigo(sp.getCodigo()).forEach(mv -> movimentacaoRepo.deleteById(mv.getCodigo()));
-                    subprocessoRepo.deleteById(sp.getCodigo());
-                });
-                processoRepo.deleteById(codProcesso);
-            });
+            apagarProcessosComAlertasESubprocessos(codigosProcesso);
         }
 
         return ResponseEntity.noContent().build();
@@ -111,21 +80,8 @@ public class E2eTestController {
                 .map(EntidadeBase::getCodigo)
                 .toList();
 
-        // Deleta alertas e processos
         if (!codigosProcesso.isEmpty()) {
-            var alertaIds = alertaRepo.findIdsByProcessoCodigoIn(codigosProcesso);
-            if (!alertaIds.isEmpty()) {
-                alertaUsuarioRepo.deleteByIdAlertaCodigoIn(alertaIds);
-            }
-            alertaRepo.deleteByProcessoCodigoIn(codigosProcesso);
-            // Remover movimentações e subprocessos antes do processo (FKs)
-            codigosProcesso.forEach(codProcesso -> {
-                subprocessoRepo.findByProcessoCodigo(codProcesso).forEach(sp -> {
-                    movimentacaoRepo.findBySubprocessoCodigo(sp.getCodigo()).forEach(mv -> movimentacaoRepo.deleteById(mv.getCodigo()));
-                    subprocessoRepo.deleteById(sp.getCodigo());
-                });
-                processoRepo.deleteById(codProcesso);
-            });
+            apagarProcessosComAlertasESubprocessos(codigosProcesso);
         }
 
         return ResponseEntity.noContent().build();
@@ -183,5 +139,23 @@ public class E2eTestController {
                 .toList();
 
         return ResponseEntity.ok(result);
+    }
+
+    private void apagarProcessosComAlertasESubprocessos(List<Long> codigosProcesso) {
+        // 1. Buscar e deletar alertas
+        var alertaIds = alertaRepo.findIdsByProcessoCodigoIn(codigosProcesso);
+        if (!alertaIds.isEmpty()) {
+            alertaUsuarioRepo.deleteByIdAlertaCodigoIn(alertaIds);
+        }
+        alertaRepo.deleteByProcessoCodigoIn(codigosProcesso);
+        
+        // 2. Remover movimentações e subprocessos antes do processo (FKs)
+        codigosProcesso.forEach(codProcesso -> {
+            subprocessoRepo.findByProcessoCodigo(codProcesso).forEach(sp -> {
+                movimentacaoRepo.findBySubprocessoCodigo(sp.getCodigo()).forEach(mv -> movimentacaoRepo.deleteById(mv.getCodigo()));
+                subprocessoRepo.deleteById(sp.getCodigo());
+            });
+            processoRepo.deleteById(codProcesso);
+        });
     }
 }

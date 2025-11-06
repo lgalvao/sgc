@@ -268,6 +268,6 @@ public class SubprocessoCadastroController {
             @RequestBody @Valid ImportarAtividadesReq request
     ) {
         subprocessoMapaService.importarAtividades(codigo, request.subprocessoOrigemId());
-        return Map.of("message", "Atividades importadas com sucesso.");
+        return Map.of("message", "Atividades importadas.");
     }
 }

@@ -76,7 +76,7 @@ public class MapaControllerTest {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaService.listar()).thenReturn(List.of(mapa));
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS))
                 .andExpect(status().isOk())
@@ -90,7 +90,7 @@ public class MapaControllerTest {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isOk())
@@ -113,7 +113,7 @@ public class MapaControllerTest {
 
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaService.criar(any(Mapa.class))).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +130,7 @@ public class MapaControllerTest {
 
         when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -86,7 +86,7 @@ public class NotificacaoEmailService {
             enviarEmailAssincrono(emailDto)
                     .thenAccept(sucesso -> {
                         if (Boolean.TRUE.equals(sucesso)) {
-                            log.info("E-mail para {} enviado com sucesso.", emailDto.destinatario());
+                            log.info("E-mail para {} enviado.", emailDto.destinatario());
                         } else {
                             log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.destinatario(), MAX_TENTATIVAS);
                         }
@@ -110,7 +110,7 @@ public class NotificacaoEmailService {
      *
      * @param emailDto O DTO contendo os detalhes do email a ser enviado.
      * @return Um {@link CompletableFuture} que será concluído com {@code true} se o
-     * email for enviado com sucesso, ou {@code false} caso contrário.
+     * email for enviado, ou {@code false} caso contrário.
      */
     @Async
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
@@ -119,7 +119,7 @@ public class NotificacaoEmailService {
             try {
                 log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, emailDto.destinatario());
                 enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado com sucesso na tentativa {} para: {}", tentativa, emailDto.destinatario());
+                log.info("E-mail enviado na tentativa {} para: {}", tentativa, emailDto.destinatario());
                 return CompletableFuture.completedFuture(true);
             } catch (Exception e) {
                 excecaoFinal = e;

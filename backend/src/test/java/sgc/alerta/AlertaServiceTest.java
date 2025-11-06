@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.erros.AlteracaoStatusAlertaException;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
@@ -114,7 +115,7 @@ class AlertaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve marcar alerta como lido com sucesso")
+    @DisplayName("Deve marcar alerta como lido")
     void marcarComoLido_deveMarcarComoLido() {
         Long alertaId = 1L;
         String usuarioTituloStr = "123456789012";
@@ -209,6 +210,18 @@ class AlertaServiceTest {
         alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
 
         verify(repositorioAlerta, never()).save(any(Alerta.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar AlteracaoStatusAlertaException quando falha ao criar alerta para unidade")
+    void criarAlertasProcessoIniciado_deveLancarExcecaoAoFalharCriacao() {
+        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "OPERACIONAL");
+        when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
+        when(repositorioUnidade.findById(unidade.getCodigo())).thenThrow(new RuntimeException("Erro ao buscar unidade"));
+
+        assertThrows(AlteracaoStatusAlertaException.class, () ->
+            alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso))
+        );
     }
 
     @Test

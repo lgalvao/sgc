@@ -89,7 +89,7 @@ export async function verificarDialogoConfirmacaoRemocao(page: Page, descricaoPr
 }
 
 /**
- * Verifica se um processo foi removido com sucesso.
+ * Verifica se um processo foi removido.
  * @param page A instância da página do Playwright.
  * @param descricaoProcesso A descrição do processo.
  */
@@ -262,7 +262,7 @@ export async function verificarEmailFinalizacaoEnviado(page: Page): Promise<void
 }
 
 /**
- * Verifica se o cadastro foi devolvido com sucesso.
+ * Verifica se o cadastro foi devolvido.
  * @param page A instância da página do Playwright.
  */
 export async function verificarCadastroDevolvidoComSucesso(page: Page): Promise<void> {
@@ -271,7 +271,7 @@ export async function verificarCadastroDevolvidoComSucesso(page: Page): Promise<
 }
 
 /**
- * Verifica se o aceite foi registrado com sucesso.
+ * Verifica se o aceite foi registrado.
  * @param page A instância da página do Playwright.
  */
 export async function verificarAceiteRegistradoComSucesso(page: Page): Promise<void> {
@@ -289,7 +289,7 @@ export async function verificarDialogoConfirmacaoFechado(page: Page, descricaoPr
 }
 
 /**
- * Verifica se um processo foi iniciado com sucesso.
+ * Verifica se um processo foi iniciado.
  * @param page A instância da página do Playwright.
  * @param descricaoProcesso A descrição do processo.
  */
@@ -334,7 +334,7 @@ export async function verificarModalConfirmacaoInicializacao(page: Page, descric
 }
 
 /**
- * Verifica se um processo foi inicializado com sucesso.
+ * Verifica se um processo foi inicializado.
  * @param page A instância da página do Playwright.
  */
 export async function verificarProcessoInicializadoComSucesso(page: Page): Promise<void> {

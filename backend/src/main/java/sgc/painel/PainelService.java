@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
+import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.*;
 import sgc.sgrh.model.Perfil;
@@ -42,9 +43,8 @@ public class PainelService {
      * @throws IllegalArgumentException se o perfil for nulo or em branco.
      */
     public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
-        // TODO usar exceção específica do sistema. Criar se precisar.
         if (perfil == null) {
-            throw new IllegalArgumentException("O parâmetro 'perfil' é obrigatório");
+            throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
         List<Processo> processos;

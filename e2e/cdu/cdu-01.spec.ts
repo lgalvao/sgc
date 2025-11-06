@@ -11,7 +11,7 @@ import {
     verificarPainelChefeVisivel,
     verificarSelecaoPerfilVisivel,
 } from '~/helpers';
-import {USUARIOS} from '~/helpers/dados/constantes-teste';
+import {USUARIOS} from '~/helpers/dados/constantes';
 
 test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
     test.describe('Login Convencional (via UI)', () => {

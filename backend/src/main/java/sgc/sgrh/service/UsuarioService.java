@@ -37,7 +37,7 @@ public class UsuarioService {
     public boolean autenticar(long tituloEleitoral, String senha) {
         log.info("Simulando autenticação para usuário: {}", tituloEleitoral);
         // Em um cenário real, aqui haveria a chamada para o AcessoAD.
-        // Para esta simulação, consideramos sempre autenticado com sucesso.
+        // Para esta simulação, consideramos sempre autenticado.
         return true;
     }
 
@@ -81,7 +81,7 @@ public class UsuarioService {
     public void entrar(long tituloEleitoral, PerfilUnidade pu) {
         // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
         // Para esta simulação, apenas registramos a escolha.
-        log.info("Usuário entrou com sucesso. Perfil: {}, Unidade: {}",
+        log.info("Usuário entrou. Perfil: {}, Unidade: {}",
             pu.getPerfil(), pu.getSiglaUnidade());
     }
 

@@ -28,7 +28,6 @@ public class MapaAjusteDto {
     @NotNull @Valid private final List<CompetenciaAjusteDto> competencias;
     private final String justificativaDevolucao;
 
-    // TODO Parametros demais! Mudar para @Builder
     public static MapaAjusteDto of(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, List<CompetenciaAtividade> competenciaAtividades) {
         Long codMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";

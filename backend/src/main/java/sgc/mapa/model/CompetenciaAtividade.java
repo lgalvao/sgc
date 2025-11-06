@@ -30,21 +30,11 @@ public class CompetenciaAtividade implements Serializable {
     @EmbeddedId
     private Id id;
 
-    /**
-     * -- SETTER --
-     * Define a atividade da associação, garantindo a imutabilidade.
-     *
-     */
     @MapsId("codAtividade")
     @ManyToOne
     @JoinColumn(name = "atividade_codigo", insertable = false, updatable = false)
     private Atividade atividade;
 
-    /**
-     * -- GETTER --
-     * Retorna uma cópia da competência para garantir a imutabilidade.
-     *
-     */
     @MapsId("codCompetencia")
     @ManyToOne
     @JoinColumn(name = "competencia_codigo", insertable = false, updatable = false)

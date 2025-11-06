@@ -66,7 +66,7 @@ class AtividadeServiceTest {
     @DisplayName("Testes para criar atividade")
     class CriarAtividadeTests {
         @Test
-        @DisplayName("Deve criar atividade com sucesso")
+        @DisplayName("Deve criar atividade")
         void criar_Sucesso() {
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
             when(usuarioRepo.findById(123L)).thenReturn(Optional.of(usuario));
@@ -102,7 +102,7 @@ class AtividadeServiceTest {
     }
 
     @Test
-    @DisplayName("Deve excluir conhecimento com sucesso")
+    @DisplayName("Deve excluir conhecimento")
     void excluirConhecimento_Sucesso() {
         Conhecimento conhecimento = new Conhecimento();
         Atividade atividade = new Atividade();

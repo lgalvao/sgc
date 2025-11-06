@@ -38,6 +38,7 @@ import static sgc.unidade.model.TipoUnidade.*;
 @Profile("!e2e")
 @RequiredArgsConstructor
 @Slf4j
+// TODO esse listener não ficaria melhor no pacote 'eventos'?
 public class EventoProcessoListener {
     private final AlertaService servicoAlertas;
     private final NotificacaoEmailService notificacaoEmailService;

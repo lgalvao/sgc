@@ -20,7 +20,7 @@ import {
  * 📊 COBERTURA ATUAL: ~60-70% do CDU-03
  *
  * ✅ O QUE ESTÁ COBERTO (12 testes):
- * - Criar processo completo com sucesso (passos 1-7)
+ * - Criar processo completo (passos 1-7)
  * - Validar descrição obrigatória (passo 5.1)
  * - Validar ao menos uma unidade selecionada (passo 5.2)
  * - Selecionar unidades na árvore (passo 2.3)
@@ -77,7 +77,7 @@ test.describe('CDU-03: Manter processo', () => {
 
     // ===== CRIAÇÃO DE PROCESSO =====
 
-    test('deve criar processo com sucesso e redirecionar para o Painel', async ({page}) => {
+    test('deve criar processo e redirecionar para o Painel', async ({page}) => {
         const descricao = `Processo E2E ${Date.now()}`;
 
         // 1. Navegar para criação
@@ -231,7 +231,7 @@ test.describe('CDU-03: Manter processo', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/);
     });
 
-    test('deve remover processo com sucesso após confirmação', async ({page}) => {
+    test('deve remover processo após confirmação', async ({page}) => {
         // 1. Criar um processo novo para remover
         const descricao = `Processo para Remover ${Date.now()}`;
         await navegarParaCriacaoProcesso(page);

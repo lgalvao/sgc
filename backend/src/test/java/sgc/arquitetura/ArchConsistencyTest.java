@@ -33,7 +33,6 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule comum_package_should_not_contain_business_logic =
             noClasses().that().resideInAPackage("sgc.comum..")
-                    .and().haveNameNotMatching(".*HealthController")
                     .should().haveNameMatching(".*Controller")
                     .orShould().haveNameMatching(".*Service");
 }

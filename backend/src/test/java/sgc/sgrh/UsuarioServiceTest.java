@@ -61,7 +61,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve autenticar com sucesso")
+    @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() {
         boolean resultado = usuarioService.autenticar(123456789L, "senha");
         assertThat(resultado).isTrue();
@@ -97,7 +97,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve simular a entrada com sucesso")
+    @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
         long tituloEleitoral = 123456789L;
         UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name());

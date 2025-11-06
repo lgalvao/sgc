@@ -105,7 +105,7 @@ class CDU09IntegrationTest {
     @DisplayName("Testes para Disponibilizar Cadastro")
     class DisponibilizarCadastro {
         @Test
-        @DisplayName("Deve disponibilizar o cadastro com sucesso quando todas as condições são atendidas")
+        @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
             var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoMapeamento.getMapa()));
             Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");

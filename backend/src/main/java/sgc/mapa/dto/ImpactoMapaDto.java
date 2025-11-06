@@ -57,7 +57,6 @@ public record ImpactoMapaDto(
             List<AtividadeImpactadaDto> atividadesAlteradas,
             List<CompetenciaImpactadaDto> competenciasImpactadas
     ) {
-        // TODO tentar maneira mais elegante de verificar se estao vazias?
         boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
         return new ImpactoMapaDto(
                 temImpactos,

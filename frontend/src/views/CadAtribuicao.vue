@@ -90,7 +90,7 @@
           v-if="sucesso"
           class="alert alert-success mt-3"
         >
-          Atribuição criada com sucesso!
+          Atribuição criada!
         </div>
       </div>
     </div>

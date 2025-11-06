@@ -9,4 +9,4 @@ export {
     URLS,
     ROTULOS,
     DADOS_TESTE
-} from './constantes-teste';
+} from './constantes';

@@ -288,12 +288,12 @@ function adicionarOcupacao() {
     competenciasCriticas: []
   }
 
-  notificacoesStore.sucesso('Ocupação adicionada', 'Ocupação crítica adicionada com sucesso!')
+  notificacoesStore.sucesso('Ocupação adicionada', 'Ocupação crítica adicionada!')
 }
 
 function removerOcupacao(index: number) {
   ocupacoesCriticas.value.splice(index, 1)
-  notificacoesStore.sucesso('Ocupação removida', 'Ocupação crítica removida com sucesso!')
+  notificacoesStore.sucesso('Ocupação removida', 'Ocupação crítica removida!')
 }
 
 function finalizarIdentificacao() {
@@ -336,7 +336,7 @@ function confirmarFinalizacao() {
 
   notificacoesStore.sucesso(
       'Identificação finalizada',
-      'A identificação de ocupações críticas foi concluída com sucesso!'
+      'A identificação de ocupações críticas foi concluída!'
   )
 
   fecharModalConfirmacao()

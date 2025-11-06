@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Builder
-// TODO tem necessidade desses AccesslLevel aqui?
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
 public class MapaDto {
     private Long codigo;
     private LocalDateTime dataHoraDisponibilizado;

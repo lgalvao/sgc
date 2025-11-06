@@ -12,9 +12,11 @@ import sgc.mapa.model.CompetenciaAtividade;
 import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroNegocio;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.*;
 
 import java.util.List;
@@ -58,8 +60,7 @@ public class SubprocessoMapaService {
 
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA &&
                 sp.getSituacao() != SituacaoSubprocesso.MAPA_AJUSTADO) {
-            // TODO usar exceções mais específicas nessa classe toda
-            throw new ErroNegocio("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: %s".formatted(sp.getSituacao()));
+            throw new ErroMapaEmSituacaoInvalida("Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: %s".formatted(sp.getSituacao()));
         }
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
@@ -113,14 +114,14 @@ public class SubprocessoMapaService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de destino não encontrado: %d".formatted(codSubprocessoDestino)));
 
         if (spDestino.getSituacao() != SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO) {
-            throw new ErroNegocio("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
+            throw new ErroAtividadesEmSituacaoInvalida("Atividades só podem ser importadas para um subprocesso com cadastro em elaboração.");
         }
 
         Subprocesso spOrigem = subprocessoRepo.findById(codSubprocessoOrigem)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso de origem não encontrado: %d".formatted(codSubprocessoOrigem)));
 
         if (spOrigem.getMapa() == null || spDestino.getMapa() == null) {
-            throw new ErroNegocio("Subprocesso de origem ou destino não possui mapa associado.");
+            throw new ErroMapaNaoAssociado("Subprocesso de origem ou destino não possui mapa associado.");
         }
 
         List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());
@@ -158,9 +159,8 @@ public class SubprocessoMapaService {
                 spOrigem.getCodigo(),
                 spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
 
-        // TODO Estranho passar o destino duas vezes nesse construtor. Bug?
-        movimentacaoRepo.save(new Movimentacao(spDestino, spDestino.getUnidade(), spDestino.getUnidade(), descMovimentacao));
+        movimentacaoRepo.save(new Movimentacao(spDestino, spOrigem.getUnidade(), spDestino.getUnidade(), descMovimentacao));
 
-        log.info("Atividades importadas com sucesso do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
+        log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
     }
 }

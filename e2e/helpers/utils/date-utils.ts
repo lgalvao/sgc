@@ -22,7 +22,7 @@ export function parseDate(dateInput: string | number | Date | null | undefined):
     const s = dateInput.trim();
     if (!s) return null;
 
-    // Detecta ISO com tempo (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
+    // Detecta ISO com hora (ex.: 2023-10-01T00:00:00Z) ou somente data (YYYY-MM-DD)
     // Para strings somente-data (YYYY-MM-DD) devemos construir a Date em horário local
     // para evitar deslocamento de fuso horário que causa `getMonth()` diferente do esperado.
     const isoDateWithOptionalTimeRe = /^\d{4}-\d{2}-\d{2}(T.*)?$/;

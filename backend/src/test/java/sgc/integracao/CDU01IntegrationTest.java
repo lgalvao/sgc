@@ -63,7 +63,7 @@ public class CDU01IntegrationTest {
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
         @Test
-        @DisplayName("Deve realizar login completo com sucesso para usuário com um único perfil")
+        @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
             long tituloEleitoral = 111111111111L; // Admin Teste from data-postgresql.sql
             String senha = "password";
@@ -94,7 +94,7 @@ public class CDU01IntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve realizar login completo com sucesso para usuário com múltiplos perfis")
+        @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
             long tituloEleitoral = 999999999999L; // Usuario Multi Perfil from data-postgresql.sql (has ADMIN and GESTOR)
             String senha = "password";

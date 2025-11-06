@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.CriarAnaliseRequest;
 import sgc.analise.model.Analise;
 import sgc.analise.model.TipoAnalise;
-import sgc.comum.erros.ErroNegocio;
+import sgc.comum.erros.ErroRequisicaoSemCorpo;
 
 import java.util.List;
 import java.util.Map;
@@ -56,8 +56,7 @@ public class AnaliseController {
     public Analise criarAnaliseCadastro(@PathVariable("codSubprocesso") Long codSubprocesso,
                                         @RequestBody(required = false) Map<String, String> corpo) {
 
-        // TODO este tratamento está muito geral. E nem me parece bem um erro de negócio
-        if (corpo == null) throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
+        if (corpo == null) throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
 
         String observacoes = corpo.getOrDefault("observacoes", "");
 
@@ -105,8 +104,7 @@ public class AnaliseController {
     public Analise criarAnaliseValidacao(@PathVariable("codSubprocesso") Long codSubprocesso,
                                          @RequestBody(required = false) Map<String, String> corpo) {
 
-        // TODO este tratamento está muito geral. E nem me parece bem um erro de negócio
-        if (corpo == null) throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
+        if (corpo == null) throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
 
         String observacoes = corpo.getOrDefault("observacoes", "");
         CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()

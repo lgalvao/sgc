@@ -55,7 +55,7 @@ graph TD
   - **Assíncrono (`@Async`):** O envio é executado em uma thread separada.
   - **Persistência e Auditoria:** Salva um registro da `Notificacao` no banco de dados.
   - **Retentativas:** Em caso de falha, tenta reenviar o e-mail.
-- **`NotificacaoModeloEmailService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando Thymeleaf.
+- **`NotificacaoModelosService`**: Serviço utilitário focado em construir o corpo HTML dos e-mails usando Thymeleaf.
 - **`Notificacao`**: A entidade JPA que representa o registro de uma notificação enviada.
 
 ## Benefícios da Arquitetura

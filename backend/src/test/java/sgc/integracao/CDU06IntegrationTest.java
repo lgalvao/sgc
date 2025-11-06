@@ -105,7 +105,7 @@ public class CDU06IntegrationTest {
 
     @Test
     @WithMockAdmin
-    @DisplayName("Deve detalhar processo com sucesso para Admin")
+    @DisplayName("Deve detalhar processo para Admin")
     void testDetalharProcesso_sucesso() throws Exception {
         Unidade unidade = unidadeRepo.findById(100L).orElseThrow(); // Use existing ADMIN-UNIT
         unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));

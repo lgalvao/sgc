@@ -9,7 +9,7 @@ import sgc.mapa.model.Mapa;
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MapaMapper {
-    MapaDto toDTO(Mapa mapa);
+    MapaDto toDto(Mapa mapa);
 
     Mapa toEntity(MapaDto mapaDto);
 }

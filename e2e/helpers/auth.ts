@@ -1,5 +1,5 @@
 import {Page} from '@playwright/test';
-import {USUARIOS} from './dados/constantes-teste';
+import {USUARIOS} from './dados/constantes';
 
 /**
  * Realiza o login completo através da interface de usuário.
@@ -53,7 +53,6 @@ export async function loginComoGestor(page: Page) {
  * @param page A instância da página do Playwright.
  */
 export async function loginComoChefe(page: Page) {
-    // Usar um chefe específico como padrão
     await loginPelaUI(page, USUARIOS.CHEFE_SGP);
 }
 

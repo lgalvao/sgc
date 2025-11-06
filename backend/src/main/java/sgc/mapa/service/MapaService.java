@@ -6,15 +6,11 @@ import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,16 +23,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MapaService {
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder()
-            .toFactory();
+    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
+
+    private final MapaVinculoService mapaVinculoService;
 
     private final MapaRepo repositorioMapa;
     private final CompetenciaRepo repositorioCompetencia;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    private final MapaVinculoService mapaVinculoService;
     private final MapaIntegridadeService mapaIntegridadeService;
 
-    // Métodos CRUD consolidados
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
         return repositorioMapa.findAll();
@@ -90,7 +85,10 @@ public class MapaService {
 
         List<CompetenciaMapaDto> competenciasDto = competencias.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo()).stream().map(ca -> ca.getId().getCodAtividade()).toList();
+                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo())
+                            .stream()
+                            .map(ca -> ca.getId().getCodAtividade())
+                            .toList();
 
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
@@ -122,7 +120,7 @@ public class MapaService {
      * </ul>
      * Ao final, executa uma validação de integridade.
      *
-     * @param codMapa                 O código do mapa a ser salvo.
+     * @param codMapa                O código do mapa a ser salvo.
      * @param request                O DTO com o estado completo do mapa.
      * @param usuarioTituloEleitoral O título de eleitor do usuário que está realizando a operação.
      * @return Um {@link MapaCompletoDto} representando o estado final do mapa salvo.
@@ -168,6 +166,7 @@ public class MapaService {
             } else {
                 competencia = repositorioCompetencia.findById(compDto.codigo())
                         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.codigo())));
+
                 competencia.setDescricao(compDto.descricao());
                 competencia = repositorioCompetencia.save(competencia);
                 log.debug("Competência atualizada: {}", competencia.getCodigo());

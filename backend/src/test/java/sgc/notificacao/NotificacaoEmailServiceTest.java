@@ -46,7 +46,7 @@ class NotificacaoEmailServiceTest {
     }
 
     @Test
-    @DisplayName("Deve enviar e-mail HTML com sucesso")
+    @DisplayName("Deve enviar e-mail HTML")
     void enviarEmailHtml_deveEnviarComSucesso() throws Exception {
         when(enviadorDeEmail.createMimeMessage()).thenReturn(mimeMessageReal);
         when(repositorioNotificacao.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.dto.AlertaDto;
 import sgc.alerta.dto.AlertaMapper;
+import sgc.alerta.erros.AlteracaoStatusAlertaException;
 import sgc.alerta.model.*;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.model.Processo;
@@ -207,8 +208,9 @@ public class AlertaService {
                     log.warn("Tipo de unidade desconhecido: {} (unidade={})", tipoUnidade, codUnidade);
                 }
             } catch (Exception e) {
-                // TODO essa exceção precisa subir pra camada de controle
                 log.error("Erro ao criar alerta para a unidade {}: {}", codUnidade, e.getClass().getSimpleName(), e);
+                throw new AlteracaoStatusAlertaException(
+                    "Falha ao criar alerta para a unidade " + codUnidade + ": " + e.getMessage(), e);
             }
         }
 

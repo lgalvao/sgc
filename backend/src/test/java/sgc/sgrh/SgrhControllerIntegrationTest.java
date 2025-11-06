@@ -50,7 +50,7 @@ class SgrhControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve autenticar com sucesso")
+    @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() throws Exception {
         AutenticacaoReq request = AutenticacaoReq.builder()
             .tituloEleitoral(123456789101L)
@@ -84,7 +84,7 @@ class SgrhControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve entrar com sucesso")
+    @DisplayName("Deve entrar")
     void entrar_deveRetornarOk() throws Exception {
         EntrarReq request = EntrarReq.builder()
             .tituloEleitoral(123456789101L)

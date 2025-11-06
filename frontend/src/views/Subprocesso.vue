@@ -274,7 +274,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     // Mostrar notificação de sucesso
     notificacoesStore.sucesso(
         'Data limite alterada',
-        'A data limite foi alterada com sucesso!'
+        'A data limite foi alterada!'
     );
 
   } catch {

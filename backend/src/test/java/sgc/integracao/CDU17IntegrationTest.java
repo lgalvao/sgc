@@ -152,7 +152,7 @@ class CDU17IntegrationTest {
     class Sucesso {
 
         @Test
-        @DisplayName("Deve disponibilizar mapa com sucesso quando todos os dados estão corretos")
+        @DisplayName("Deve disponibilizar mapa quando todos os dados estão corretos")
         @WithMockAdmin
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
             // Arrange: Associar atividade e competência
@@ -175,7 +175,7 @@ class CDU17IntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado com sucesso."));
+                    .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado."));
 
             // Verificar o estado final no banco de dados
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));

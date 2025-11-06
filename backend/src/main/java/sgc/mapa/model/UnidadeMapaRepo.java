@@ -23,22 +23,6 @@ public interface UnidadeMapaRepo extends JpaRepository<UnidadeMapa, Long> {
     Optional<UnidadeMapa> findByUnidadeCodigo(Long unidadeCodigo);
 
     /**
-     * Busca os mapas vigentes de uma lista de unidades.
-     *
-     * @param unidadeCodigos Lista de códigos de unidade
-     * @return Lista de registros UnidadeMapa para as unidades especificadas
-     */
-    List<UnidadeMapa> findByUnidadeCodigoIn(List<Long> unidadeCodigos);
-
-    /**
-     * Busca todas as unidades que utilizam um mapa específico como vigente.
-     *
-     * @param mapaVigenteCodigo Código do mapa
-     * @return Lista de registros UnidadeMapa que apontam para este mapa
-     */
-    List<UnidadeMapa> findByMapaVigenteCodigo(Long mapaVigenteCodigo);
-
-    /**
      * Busca o mapa vigente de uma unidade com data de vigência.
      * Retorna o mais recente caso haja múltiplos registros (não deveria ocorrer devido à constraint).
      *

@@ -53,7 +53,7 @@ public class MapaController {
     public List<MapaDto> listar() {
         return mapaService.listar()
                 .stream()
-                .map(mapaMapper::toDTO)
+                .map(mapaMapper::toDto)
                 .toList();
     }
 
@@ -67,7 +67,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaService.obterPorCodigo(codigo);
-        return ResponseEntity.ok(mapaMapper.toDTO(mapa));
+        return ResponseEntity.ok(mapaMapper.toDto(mapa));
     }
 
     /**
@@ -87,7 +87,7 @@ public class MapaController {
         var entidade = mapaMapper.toEntity(sanitizedMapaDto);
         var salvo = mapaService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
     }
 
     /**
@@ -106,7 +106,7 @@ public class MapaController {
 
         var entidade = mapaMapper.toEntity(sanitizedMapaDto);
         var atualizado = mapaService.atualizar(codMapa, entidade);
-        return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
+        return ResponseEntity.ok(mapaMapper.toDto(atualizado));
     }
 
     /**

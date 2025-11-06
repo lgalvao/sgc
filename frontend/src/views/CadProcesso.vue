@@ -490,11 +490,11 @@ async function salvarProcesso() {
       };
       console.log('[DEBUG Vue] Atualizando processo:', request);
       await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-      console.log('[DEBUG Vue] Processo atualizado com sucesso');
+      console.log('[DEBUG Vue] Processo atualizado');
 
       notificacoesStore.sucesso(
           'Processo alterado',
-          'O processo foi alterado com sucesso!'
+          'O processo foi alterado!'
       );
     } else {
       // Criando novo processo
@@ -506,11 +506,11 @@ async function salvarProcesso() {
       };
       console.log('[DEBUG Vue] Criando novo processo:', request);
       await processoService.criarProcesso(request);
-      console.log('[DEBUG Vue] Novo processo criado com sucesso');
+      console.log('[DEBUG Vue] Novo processo criado');
 
       notificacoesStore.sucesso(
           'Processo salvo',
-          'O processo foi salvo com sucesso!'
+          'O processo foi salvo!'
       );
     }
     console.log('[DEBUG Vue] Redirecionando para painel...');
@@ -560,7 +560,7 @@ async function confirmarIniciarProcesso() {
       );
       notificacoesStore.sucesso(
           'Processo iniciado',
-          'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
+          'O processo foi iniciado! Notificações enviadas às unidades.'
       );
       await router.push('/painel');
       limparCampos();
