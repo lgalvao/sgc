@@ -50,14 +50,15 @@ import {useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 import {useMapasStore} from '@/stores/mapas'
-import {useServidoresStore} from '@/stores/servidores'
+import {useUsuariosStore} from '@/stores/usuarios'
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
+import {usePerfil} from '@/composables/usePerfil'
 import {
   MapaCompleto,
   type Movimentacao,
   Perfil,
-  Servidor,
+  Usuario,
   SituacaoSubprocesso,
   TipoProcesso,
   Unidade
@@ -76,10 +77,11 @@ const siglaParam = computed<string | undefined>(() => props.siglaUnidade)
 const unidadesStore = useUnidadesStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 const mapaStore = useMapasStore()
-const servidoresStore = useServidoresStore()
+const usuariosStore = useUsuariosStore()
 const processosStore = useProcessosStore()
 const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
+const {unidadeSelecionada: unidadeSelecionadaSigla} = usePerfil()
 
 const mostrarModalAlterarDataLimite = ref(false)
 
@@ -130,14 +132,14 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   return unidade;
 });
 
-const titularDetalhes = computed<Servidor | null>(() => {
+const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeComResponsavelDinamico.value && unidadeComResponsavelDinamico.value.idServidorTitular) {
-    return servidoresStore.getServidorById(Number(unidadeComResponsavelDinamico.value.idServidorTitular)) || null;
+    return usuariosStore.getUsuarioById(Number(unidadeComResponsavelDinamico.value.idServidorTitular)) || null;
   }
   return null;
 });
 
-const responsavelDetalhes = computed<Servidor | null>(() => {
+const responsavelDetalhes = computed<Usuario | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel) {
     return null;
   }
@@ -223,11 +225,11 @@ function irParaAtividadesConhecimentos() {
   const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
 
   // Verifica se o perfil é CHEFE e se a unidade do subprocesso é a unidade selecionada do perfil
-  if (perfilStore.perfilSelecionado === Perfil.CHEFE && perfilStore.unidadeSelecionada === unidadeOriginal.value?.codigo) {
-    console.log('Navigating to SubprocessoCadastro with params:', params); // ADD THIS
+  if (perfilStore.perfilSelecionado === Perfil.CHEFE && unidadeSelecionadaSigla.value === sigla.value) {
+    console.log('Navigating to SubprocessoCadastro with params:', params);
     router.push({name: 'SubprocessoCadastro', params}); // Abre CadAtividades.vue
   } else {
-    console.log('Navigating to SubprocessoVisCadastro with params:', params); // ADD THIS
+    console.log('Navigating to SubprocessoVisCadastro with params:', params);
     router.push({name: 'SubprocessoVisCadastro', params}); // Abre VisAtividades.vue
   }
 }

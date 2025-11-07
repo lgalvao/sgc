@@ -27,6 +27,7 @@ import {useRouter} from 'vue-router'
 
 import {useProcessosStore} from '@/stores/processos'
 import {usePerfilStore} from '@/stores/perfil'
+import {usePerfil} from '@/composables/usePerfil'
 import {Perfil, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import {formatDateTimeBR} from '@/utils';
@@ -35,7 +36,8 @@ type SortCriteria = keyof ProcessoResumo | 'dataFinalizacao';
 
 const router = useRouter()
 const processosStore = useProcessosStore()
-const perfil = usePerfilStore()
+const perfilStore = usePerfilStore()
+const {unidadeSelecionada} = usePerfil()
 
 const criterio = ref<SortCriteria>('descricao')
 const asc = ref(true)
@@ -78,13 +80,13 @@ function ordenarPor(campo: SortCriteria) {
 }
 
 function abrirProcesso(processo: ProcessoResumo) {
-  const perfilUsuario = perfil.perfilSelecionado;
+  const perfilUsuario = perfilStore.perfilSelecionado;
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
     router.push({name: 'Processo', params: {codProcesso: processo.codigo.toString()}});
   } else { // CHEFE ou SERVIDOR
-    const codUnidade = perfil.unidadeSelecionada;
-    if (codUnidade) {
-      router.push({name: 'Subprocesso', params: {codProcesso: processo.codigo, codUnidade: codUnidade}})
+    const sigla = unidadeSelecionada.value;
+    if (sigla) {
+      router.push({name: 'Subprocesso', params: {codProcesso: processo.codigo, siglaUnidade: sigla}})
     } else {
       console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
     }

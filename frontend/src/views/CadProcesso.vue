@@ -217,7 +217,7 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
 import * as mapaService from '@/services/mapaService';
-import {ServidoresService} from "@/services/servidoresService";
+import {UsuariosService} from "@/services/usuariosService";
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 
 const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
@@ -431,10 +431,10 @@ async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
 
 async function unidadeTemServidores(codigo: number): Promise<boolean> {
   try {
-    const servidores = await ServidoresService.buscarServidoresPorUnidade(codigo);
-    return servidores.length > 0;
+    const usuarios = await UsuariosService.buscarUsuariosPorUnidade(codigo);
+    return usuarios.length > 0;
   } catch (error) {
-    console.warn(`[DEBUG Vue] Não foi possível verificar servidores para unidade ${codigo}:`, error);
+    console.warn(`[DEBUG Vue] Não foi possível verificar usuários para unidade ${codigo}:`, error);
     return false;
   }
 }

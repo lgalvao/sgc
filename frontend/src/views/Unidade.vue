@@ -74,10 +74,10 @@ import {computed, onMounted} from 'vue'
 import {useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
-import {useServidoresStore} from '@/stores/servidores'
+import {useUsuariosStore} from '@/stores/usuarios'
 import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
-import {MapaCompleto, Servidor, Unidade} from '@/types/tipos';
+import {MapaCompleto, Usuario, Unidade} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
 const props = defineProps<{ codUnidade: number }>();
@@ -86,7 +86,7 @@ const router = useRouter()
 const codigo = computed(() => props.codUnidade)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
-const servidoresStore = useServidoresStore()
+const usuariosStore = useUsuariosStore()
 const mapasStore = useMapasStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
 
@@ -123,18 +123,18 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   // Se não houver atribuição temporária vigente, retorna a unidade original
   return unidade;
 });
-const titularDetalhes = computed<Servidor | null>(() => {
+const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
-    return servidoresStore.getServidorById(unidadeOriginal.value.idServidorTitular) || null;
+    return usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) || null;
   }
   return null;
 });
 
-const responsavelDetalhes = computed<Servidor | null>(() => {
+const responsavelDetalhes = computed<Usuario | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.codigo) {
     return null;
   }
-  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
+  return usuariosStore.getUsuarioById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
 });
 
 const mapaVigente = computed<MapaCompleto | null>(() => {

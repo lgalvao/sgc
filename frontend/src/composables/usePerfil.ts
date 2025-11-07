@@ -1,6 +1,6 @@
 import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
-import {useServidoresStore} from '@/stores/servidores';
+import {useUsuariosStore} from '@/stores/usuarios';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {Perfil, type PerfilUnidade, type Unidade} from '@/types/tipos';
@@ -25,15 +25,15 @@ function getPerfilDaUnidade(unidade: Unidade): Perfil {
 
 export function usePerfil() {
   const perfilStore = usePerfilStore();
-  const servidoresStore = useServidoresStore();
+  const usuariosStore = useUsuariosStore();
   const unidadesStore = useUnidadesStore();
   const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore();
 
   const unidadesFlat = computed<Unidade[]>(() => flattenUnidades(unidadesStore.unidades));
 
   const getPerfisDoServidor = (idServidor: number): PerfilUnidade[] => {
-    const servidor = servidoresStore.getServidorById(idServidor);
-    if (!servidor) return [];
+    const usuario = usuariosStore.getUsuarioById(idServidor);
+    if (!usuario) return [];
 
     const pares: PerfilUnidade[] = [];
 
@@ -75,17 +75,21 @@ export function usePerfil() {
   };
 
   const servidorLogado = computed(() => {
-    const servidor = servidoresStore.getServidorById(perfilStore.servidorId);
-    if (!servidor) return null;
+    const usuario = usuariosStore.getUsuarioById(perfilStore.servidorId);
+    if (!usuario) return null;
     return {
-      ...servidor,
+      ...usuario,
       perfil: perfilStore.perfilSelecionado,
       unidade: perfilStore.unidadeSelecionada,
     };
   });
 
   const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
-  const unidadeSelecionada = computed(() => perfilStore.unidadeSelecionada);
+  
+  const unidadeSelecionada = computed(() => {
+    const unidadeObj = unidadesFlat.value.find(u => u.codigo === perfilStore.unidadeSelecionada);
+    return unidadeObj?.sigla || perfilStore.unidadeSelecionada;
+  });
 
   return {
     servidorLogado,

@@ -37,7 +37,7 @@
             <a
               class="nav-link"
               href="#"
-              @click.prevent="navigateFromNavbar(`/unidade/${unidadeSelecionada}`)"
+              @click.prevent="navigateFromNavbar(`/unidade/${perfilStore.unidadeSelecionada}`)"
             >
               <i class="bi bi-person" /> Minha unidade
             </a>
@@ -65,31 +65,9 @@
         <ul class="navbar-nav align-items-center">
           <li class="nav-item me-3 d-flex align-items-center">
             <i class="bi bi-person-circle me-2 fs-5" />
-            <span
-              v-if="!isEditingProfile && servidorLogado"
-              class="nav-link"
-              style="cursor: pointer;"
-              @click="startEditingProfile"
-            >
+            <span class="nav-link">
               {{ perfilSelecionado }} - {{ unidadeSelecionada }}
             </span>
-
-            <select
-              v-else
-              ref="profileSelect"
-              :value="selectedProfileKey"
-              class="form-select form-select-sm"
-              @blur="stopEditingProfile"
-              @change="handleProfileChange"
-            >
-              <option
-                v-for="perfil in perfisDisponiveis"
-                :key="perfil.id"
-                :value="perfil.id"
-              >
-                {{ perfil.perfil }} - {{ perfil.unidade.sigla }} ({{ perfil.nome }})
-              </option>
-            </select>
           </li>
 
           <li
@@ -122,61 +100,19 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, ref} from 'vue';
+import {computed} from 'vue';
 import {useRouter} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';
-import {useServidoresStore} from '@/stores/servidores';
+import {useUsuariosStore} from '@/stores/usuarios';
 import {usePerfil} from '@/composables/usePerfil';
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const servidoresStore = useServidoresStore();
+const usuariosStore = useUsuariosStore();
 
-const {servidorLogado, perfilSelecionado, unidadeSelecionada, getPerfisDoServidor} = usePerfil();
+const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
-const isEditingProfile = ref(false);
-const profileSelect = ref<HTMLSelectElement | null>(null);
 
-const perfisDisponiveis = computed(() => {
-  return servidoresStore.servidores.flatMap(servidor => {
-    const pares = getPerfisDoServidor(Number(servidor.codigo));
-    return pares.map(par => ({
-      id: `${servidor.codigo}-${par.perfil}-${par.unidade.sigla}`,
-      servidorId: servidor.codigo,
-      nome: servidor.nome,
-      perfil: par.perfil,
-      unidade: par.unidade,
-    }));
-  });
-});
-
-const selectedProfileKey = computed(() => {
-  if (!servidorLogado.value || !perfilSelecionado.value || !unidadeSelecionada.value) return '';
-  return `${perfilStore.servidorId}-${perfilSelecionado.value}-${unidadeSelecionada.value}`;
-});
-
-const startEditingProfile = () => {
-  isEditingProfile.value = true;
-  nextTick(() => {
-    profileSelect.value?.focus();
-  });
-};
-
-const stopEditingProfile = () => {
-  isEditingProfile.value = false;
-};
-
-const handleProfileChange = (event: Event) => {
-  const selectedKey = (event.target as HTMLSelectElement).value;
-  const selectedPerfil = perfisDisponiveis.value.find(p => p.id === selectedKey);
-
-  if (selectedPerfil) {
-    perfilStore.setServidorId(selectedPerfil.servidorId);
-    perfilStore.setPerfilUnidade(selectedPerfil.perfil, selectedPerfil.unidade.codigo);
-    router.push('/painel');
-  }
-  stopEditingProfile();
-};
 
 function navigateFromNavbar(path: string) {
   sessionStorage.setItem('cameFromNavbar', '1');

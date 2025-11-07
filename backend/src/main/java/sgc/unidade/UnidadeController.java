@@ -57,4 +57,17 @@ public class UnidadeController {
         List<ServidorDto> servidores = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
         return ResponseEntity.ok(servidores);
     }
+
+    /**
+     * Busca usuários de uma unidade específica
+     * Endpoint padronizado para o novo padrão de nomenclatura
+     * 
+     * @param codigoUnidade O código da unidade
+     * @return Lista de usuários da unidade
+     */
+    @GetMapping("/{codigoUnidade}/usuarios")
+    public ResponseEntity<List<ServidorDto>> buscarUsuariosPorUnidade(@PathVariable Long codigoUnidade) {
+        List<ServidorDto> usuarios = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
+        return ResponseEntity.ok(usuarios);
+    }
 }

@@ -29,7 +29,7 @@ export enum Perfil {
 /**
  * Representa uma unidade organizacional.
  */
-export interface UnidadeResponsavel extends Servidor {
+export interface UnidadeResponsavel extends Usuario {
     usuarioTitulo?: string;
     unidadeCodigo?: number;
     tipo?: string;
@@ -142,7 +142,7 @@ export interface Subprocesso {
     codUnidade: number;
 }
 
-export interface Servidor {
+export interface Usuario {
     codigo: number;
     nome: string;
     tituloEleitoral: string;
@@ -157,7 +157,7 @@ export interface AlertaFormatado {
     dataHora: string;
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
-    usuarioDestino: Servidor;
+    usuarioDestino: Usuario;
     descricao: string;
     dataHoraFormatada: string;
     origem: string;
@@ -172,7 +172,7 @@ export interface Movimentacao {
     unidadeOrigem: Unidade;
     unidadeDestino: Unidade;
     descricao: string;
-    usuario: Servidor;
+    usuario: Usuario;
 }
 
 export interface AnaliseValidacao {
@@ -199,7 +199,7 @@ export interface AnaliseCadastro {
 
 export interface AtribuicaoTemporaria {
     codigo: number;
-    servidor: Servidor;
+    servidor: Usuario;
     unidade: Unidade;
     dataInicio: string;
     dataFim: string;

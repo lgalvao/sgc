@@ -103,8 +103,8 @@ import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import {useServidoresStore} from "@/stores/servidores";
-import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
+import {useUsuariosStore} from "@/stores/usuarios";
+import {AtribuicaoTemporaria, Usuario, Unidade} from '@/types/tipos'
 
 const props = defineProps<{ sigla: string }>()
 
@@ -113,7 +113,7 @@ const sigla = computed(() => props.sigla)
 const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
-const servidoresStore = useServidoresStore()
+const usuariosStore = useUsuariosStore()
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
@@ -139,17 +139,17 @@ const justificativa = ref("")
 const sucesso = ref(false)
 const erroServidor = ref("")
 
-const servidores = computed(() => servidoresStore.servidores);
+const usuarios = computed(() => usuariosStore.usuarios);
 
-const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade?.sigla === sigla.value)
+const usuariosDaUnidade = computed<Usuario[]>(() => {
+  return usuarios.value.filter(u => u.unidade?.sigla === sigla.value)
 })
 
-const servidoresElegiveis = computed<Servidor[]>(() => {
+const usuariosElegiveis = computed<Usuario[]>(() => {
   const titularId = unidade.value?.idServidorTitular
-  return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === servidor.codigo)
-    return servidor.codigo !== titularId && !jaTemAtribuicao
+  return usuariosDaUnidade.value.filter(usuario => {
+    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === usuario.codigo)
+    return usuario.codigo !== titularId && !jaTemAtribuicao
   })
 })
 

@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SgrhController {
     private final UsuarioService usuarioService;
+
+    /**
+     * Busca todos os usuários do sistema.
+     *
+     * @return Uma lista de todos os usuários cadastrados.
+     */
+    @GetMapping
+    public ResponseEntity<List<PerfilUnidade>> buscarTodosUsuarios() {
+        // Para fins de simulação, retorna uma lista vazia
+        // Em um ambiente real, buscaria do SGRH ou banco de dados
+        return ResponseEntity.ok(List.of());
+    }
 
     /**
      * Autentica um usuário com base no título de eleitor e senha.

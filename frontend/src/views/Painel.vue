@@ -51,7 +51,10 @@ import {storeToRefs} from 'pinia'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useAlertasStore} from '@/stores/alertas'
+import {useUsuariosStore} from '@/stores/usuarios'
+import {useUnidadesStore} from '@/stores/unidades'
 import {useRouter} from 'vue-router'
+import {usePerfil} from '@/composables/usePerfil'
 import {type AlertaFormatado, Perfil, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import TabelaAlertas from '@/components/TabelaAlertas.vue';
@@ -60,6 +63,9 @@ import {formatDateTimeBR} from '@/utils';
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
 const alertasStore = useAlertasStore()
+const usuariosStore = useUsuariosStore()
+const unidadesStore = useUnidadesStore()
+const {unidadeSelecionada: unidadeSelecionadaSigla} = usePerfil()
 
 const { processosPainel } = storeToRefs(processosStore)
 const { alertas } = storeToRefs(alertasStore)
@@ -69,7 +75,15 @@ const router = useRouter()
 const criterio = ref<keyof ProcessoResumo>('descricao')
 const asc = ref(true)
 
-onMounted(() => {
+onMounted(async () => {
+  // Carrega dados básicos necessários para a exibição
+  if (usuariosStore.usuarios.length === 0) {
+    await usuariosStore.fetchUsuarios();
+  }
+  if (unidadesStore.unidades.length === 0) {
+    await unidadesStore.fetchUnidades();
+  }
+  
   if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
     processosStore.fetchProcessosPainel(perfil.perfilSelecionado, Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
     alertasStore.fetchAlertas(perfil.servidorId?.toString() || '', Number(perfil.unidadeSelecionada), 0, 10); // Paginação inicial
@@ -111,7 +125,7 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
     router.push({name: 'Processo', params: {codProcesso: String(processo.codigo)}})
   } else { // CHEFE ou SERVIDOR
-    const siglaUnidade = perfil.unidadeSelecionada;
+    const siglaUnidade = unidadeSelecionadaSigla.value;
     if (siglaUnidade) {
       router.push({name: 'Subprocesso', params: {codProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
     } else {
