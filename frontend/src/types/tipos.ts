@@ -355,3 +355,19 @@ export interface DisponibilizarMapaRequest {
     dataLimite: string;
     observacoes: string;
 }
+
+export interface SubprocessoElegivel {
+    codSubprocesso: number;
+    unidadeNome: string;
+    unidadeSigla: string;
+    situacao: SituacaoSubprocesso;
+}
+
+export interface Servidor {
+    codigo: number;
+    nome: string;
+    tituloEleitoral: string;
+    unidade: Unidade;
+    email: string;
+    ramal: string;
+}

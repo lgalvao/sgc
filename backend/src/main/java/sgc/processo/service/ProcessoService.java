@@ -18,6 +18,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
@@ -491,5 +492,55 @@ public class ProcessoService {
             .map(UnidadeProcesso::getCodUnidade)
             .distinct()
             .toList();
+    }
+
+    /**
+     * Lista os subprocessos de um determinado processo que são elegíveis para ações
+     * em bloco (aceite/homologação), com base no perfil do usuário autenticado.
+     *
+     * @param codProcesso O código do processo.
+     * @return Uma lista de {@link SubprocessoElegivelDto}.
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
+
+        if (isAdmin) {
+            return subprocessos.stream()
+                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.REVISAO_SOLICITADA)
+                .map(this::toSubprocessoElegivelDto)
+                .toList();
+        }
+
+        // Se for GESTOR
+        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        Long codUnidadeUsuario = perfis.stream()
+            .findFirst()
+            .map(PerfilDto::unidadeCodigo)
+            .orElse(null);
+
+        if (codUnidadeUsuario == null) {
+            return List.of();
+        }
+
+        return subprocessos.stream()
+            .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
+            .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_FINALIZADO)
+            .map(this::toSubprocessoElegivelDto)
+            .toList();
+    }
+
+    private SubprocessoElegivelDto toSubprocessoElegivelDto(Subprocesso sp) {
+        return SubprocessoElegivelDto.builder()
+            .codSubprocesso(sp.getCodigo())
+            .unidadeNome(sp.getUnidade().getNome())
+            .unidadeSigla(sp.getUnidade().getSigla())
+            .situacao(sp.getSituacao())
+            .build();
     }
 }

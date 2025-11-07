@@ -10,6 +10,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
@@ -170,5 +171,19 @@ public class ProcessoController {
     public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
         List<Long> unidadesBloqueadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
         return ResponseEntity.ok(unidadesBloqueadas);
+    }
+
+    /**
+     * Retorna uma lista de subprocessos elegíveis para ações em bloco (aceite/homologação)
+     * para o usuário autenticado.
+     *
+     * @param codigo O código do processo.
+     * @return Lista de DTOs representando os subprocessos elegíveis.
+     */
+    @GetMapping("/{codigo}/subprocessos-elegiveis")
+    @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
+    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(@PathVariable Long codigo) {
+        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
+        return ResponseEntity.ok(elegiveis);
     }
 }
