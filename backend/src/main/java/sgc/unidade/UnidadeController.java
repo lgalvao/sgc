@@ -70,4 +70,15 @@ public class UnidadeController {
         List<ServidorDto> usuarios = unidadeService.buscarServidoresPorUnidade(codigoUnidade);
         return ResponseEntity.ok(usuarios);
     }
+
+    /**
+     * Busca uma unidade específica pela sua sigla.
+     * @param sigla A sigla da unidade.
+     * @return Os dados da unidade.
+     */
+    @GetMapping("/sigla/{sigla}")
+    public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(@PathVariable String sigla) {
+        UnidadeDto unidade = unidadeService.buscarPorSigla(sigla);
+        return ResponseEntity.ok(unidade);
+    }
 }

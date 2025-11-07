@@ -45,9 +45,9 @@
       </div>
     </div>
 
-    <!-- Adicionar atividade -->
     <form
       class="row g-2 align-items-center mb-4"
+      data-testid="form-nova-atividade"
       @submit.prevent="adicionarAtividade"
     >
       <div class="col">
@@ -75,7 +75,6 @@
       </div>
     </form>
 
-    <!-- Lista de atividades -->
     <div
       v-for="(atividade, idx) in atividades"
       :key="atividade.codigo || idx"
@@ -144,7 +143,6 @@
           </template>
         </div>
 
-        <!-- Conhecimentos da atividade -->
         <div class="mt-3 ms-3">
           <div
             v-for="(conhecimento, cidx) in atividade.conhecimentos"
@@ -175,6 +173,7 @@
           </div>
           <form
             class="row g-2 align-items-center"
+            data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento(idx)"
           >
             <div class="col">
@@ -205,7 +204,6 @@
       </div>
     </div>
 
-    <!-- Modais -->
     <ImportarAtividadesModal
       :mostrar="mostrarModalImportar"
       :cod-subrocesso-destino="codSubrocesso"
@@ -220,7 +218,6 @@
       @fechar="fecharModalImpacto"
     />
 
-    <!-- Modal de Confirmação de Disponibilização -->
     <div
       v-if="mostrarModalConfirmacao"
       ref="confirmacaoModalRef"
@@ -285,7 +282,6 @@
       class="modal-backdrop fade show"
     />
 
-    <!-- Modal de Histórico de Análise -->
     <div
       v-if="mostrarModalHistorico"
       class="modal fade show"
@@ -352,7 +348,6 @@
       class="modal-backdrop fade show"
     />
 
-    <!-- Modal de Edição de Conhecimento -->
     <EditarConhecimentoModal
       :mostrar="mostrarModalEdicaoConhecimento"
       :conhecimento="conhecimentoSendoEditado as Conhecimento"
@@ -381,7 +376,6 @@ import {
   type ProcessoResumo,
   SituacaoSubprocesso,
   TipoProcesso,
-  Unidade,
   type UnidadeParticipante
 } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
@@ -411,19 +405,7 @@ const notificacoesStore = useNotificacoesStore()
 const router = useRouter()
 useMapasStore()
 
-const unidade = computed(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
-    for (const u of unidades) {
-      if (u.sigla === sigla) return u
-      if (u.filhas && u.filhas.length) {
-        const encontrada = buscarUnidade(u.filhas, sigla)
-        if (encontrada) return encontrada
-      }
-    }
-  }
-
-  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value)
-})
+const unidade = computed(() => unidadesStore.unidade)
 
 const siglaUnidade = computed(() => unidade.value?.sigla || props.sigla)
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ''))
@@ -435,9 +417,7 @@ const atividades = computed<AtividadeComEdicao[]>({
     if (codSubrocesso.value === undefined) return []
     return atividadesStore.getAtividadesPorSubprocesso(codSubrocesso.value).map(a => ({...a, novoConhecimento: ''}));
   },
-  set: () => {
-    // Setter intencionalmente vazio para evitar mutações diretas.
-  }
+  set: () => {}
 })
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
@@ -535,8 +515,6 @@ function cancelarEdicaoAtividade() {
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
   notificacoesStore.sucesso('Importação Concluída', 'As atividades foram importadas para o seu mapa.');
-  // A store já foi atualizada pela ação de importação,
-  // então não precisamos buscar os dados novamente aqui.
 }
 
 const {perfilSelecionado} = usePerfil()
@@ -569,6 +547,7 @@ const atividadesSemConhecimento = ref<Atividade[]>([])
 const confirmacaoModalRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
+  await unidadesStore.fetchUnidade(props.sigla);
   await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await atividadesStore.fetchAtividadesParaSubprocesso(codSubrocesso.value);
