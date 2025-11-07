@@ -220,11 +220,11 @@ import * as mapaService from '@/services/mapaService';
 import {UsuariosService} from "@/services/usuariosService";
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 
-const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
+const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')
-const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
+const tipo = ref<string>('MAPEAMENTO')
 const dataLimite = ref<string>('')
-const unidadesBloqueadas = ref<number[]>([]) // Unidades que já participam de processos ativos
+const unidadesBloqueadas = ref<number[]>([])
 const unidadesComMapaVigente = ref<number[]>([])
 const unidadesComServidores = ref<number[]>([])
 const router = useRouter()
@@ -252,40 +252,26 @@ function extrairCodigosUnidades(unidades: any[]): number[] {
   return codigos;
 }
 
-// Carregar processo se estiver editando
 onMounted(async () => {
-  // CRÍTICO: Carregar unidades primeiro
   await unidadesStore.fetchUnidades();
-  console.log('[DEBUG Vue] Unidades da store carregadas:', unidadesStore.unidades.length);
-  
-  // Depois de carregar as unidades, carregar as validações do tipo atual
   await carregarUnidadesValidas(tipo.value);
   
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
-      console.log('[DEBUG Vue] Carregando processo:', codProcesso);
       await processosStore.fetchProcessoDetalhe(Number(codProcesso));
-      const processo = processosStore.processoDetalhe; // Obter o processo detalhado da store
-      console.log('[DEBUG Vue] Processo carregado:', processo);
+      const processo = processosStore.processoDetalhe;
       if (processo) {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
+        dataLimite.value = processo.dataLimite.split('T')[0];
 
-        // CRÍTICO: Carregar validações do tipo antes de atribuir unidades selecionadas
         await carregarUnidadesValidas(processo.tipo);
         
-        // Carregar unidades participantes do processo detalhe
-        console.log('[DEBUG Vue] processo.unidades:', processo.unidades);
-        // CORRIGIDO: extrair recursivamente todos os códigos (raiz + filhos + netos)
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
-        console.log('[DEBUG Vue] unidadesSelecionadas após extração:', unidadesSelecionadas.value);
         
-        // Aguardar próximo tick para garantir que o v-model sincronizou
         await nextTick();
-        console.log('[DEBUG Vue] Após nextTick, unidadesSelecionadas:', unidadesSelecionadas.value);
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
@@ -294,9 +280,7 @@ onMounted(async () => {
   }
 })
 
-// Buscar unidades bloqueadas e validar unidades quando o tipo de processo mudar
 watch(tipo, async (novoTipo) => {
-  // Se ainda não carregamos unidades, pular
   if (unidadesStore.unidades.length === 0) {
     return;
   }
@@ -305,43 +289,44 @@ watch(tipo, async (novoTipo) => {
     const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
     if (response.ok) {
       unidadesBloqueadas.value = await response.json();
-      console.log('[DEBUG Vue] Unidades bloqueadas para tipo', novoTipo, ':', unidadesBloqueadas.value);
     }
   } catch (error) {
     console.error('Erro ao buscar unidades bloqueadas:', error);
   }
   
-  // Carregar validações específicas por tipo
   await carregarUnidadesValidas(novoTipo);
 });
 
-// Função para carregar unidades válidas baseado no tipo de processo
+// TODO: Esta função executa múltiplas chamadas de API em um laço, o que é ineficiente.
+// A lógica de validação de unidades (verificar mapa vigente, existência de servidores)
+// deve ser movida para um único endpoint no backend que receba a lista de unidades
+// e retorne apenas as que são válidas para o tipo de processo.
 async function carregarUnidadesValidas(tipoProcesso: string) {
   const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
-  
-  if (tipoProcesso === 'REVISAO' || tipoProcesso === 'DIAGNOSTICO') {
-    const resultados = await Promise.all(
-      todasUnidades.map(async (codigo) => ({
-        codigo,
-        temMapa: await mapaService.verificarMapaVigente(codigo)
-      }))
-    );
-    unidadesComMapaVigente.value = resultados.filter(r => r.temMapa).map(r => r.codigo);
-    console.log('[DEBUG Vue] Unidades com mapa vigente:', unidadesComMapaVigente.value);
-    
-    if (tipoProcesso === 'DIAGNOSTICO') {
-      const resultados2 = await Promise.all(
-        todasUnidades.map(async (codigo) => ({
-          codigo,
-          temServidores: await unidadeTemServidores(codigo)
-        }))
-      );
-      unidadesComServidores.value = resultados2.filter(r => r.temServidores).map(r => r.codigo);
-      console.log('[DEBUG Vue] Unidades com servidores:', unidadesComServidores.value);
-    }
-  } else {
-    // MAPEAMENTO: todas as unidades são válidas
+
+  // Para MAPEAMENTO, todas as unidades são elegíveis por padrão.
+  if (tipoProcesso === 'MAPEAMENTO') {
     unidadesComMapaVigente.value = todasUnidades;
+    unidadesComServidores.value = todasUnidades;
+    return;
+  }
+  
+  // Para REVISAO e DIAGNOSTICO, precisamos verificar o mapa vigente.
+  const mapaChecks = todasUnidades.map(codigo =>
+    mapaService.verificarMapaVigente(codigo).then(temMapa => ({ codigo, temMapa }))
+  );
+  const mapaResultados = await Promise.all(mapaChecks);
+  unidadesComMapaVigente.value = mapaResultados.filter(r => r.temMapa).map(r => r.codigo);
+
+  // Para DIAGNOSTICO, precisamos verificar também os servidores.
+  if (tipoProcesso === 'DIAGNOSTICO') {
+    const servidorChecks = todasUnidades.map(codigo =>
+      unidadeTemServidores(codigo).then(temServidores => ({ codigo, temServidores }))
+    );
+    const servidorResultados = await Promise.all(servidorChecks);
+    unidadesComServidores.value = servidorResultados.filter(r => r.temServidores).map(r => r.codigo);
+  } else {
+    // Para REVISAO, não é necessário verificar servidores.
     unidadesComServidores.value = todasUnidades;
   }
 }
@@ -408,10 +393,8 @@ function isUnidadeIntermediaria(codigo: number): boolean {
 }
 
 function encontrarUnidadeRecursiva(codigo: number, unidades: Unidade[]): Unidade | null {
-  console.log('[DEBUG Vue] encontrarUnidadeRecursiva - codigo:', codigo, 'unidades:', unidades?.length);
   for (const unidade of unidades) {
     if (unidade.codigo === codigo) {
-      console.log('[DEBUG Vue] Unidade encontrada:', unidade);
       return unidade;
     }
     if (unidade.filhas && unidade.filhas.length > 0) {
@@ -421,7 +404,6 @@ function encontrarUnidadeRecursiva(codigo: number, unidades: Unidade[]): Unidade
       }
     }
   }
-  console.log('[DEBUG Vue] Unidade não encontrada para codigo:', codigo);
   return null;
 }
 
@@ -439,101 +421,59 @@ async function unidadeTemServidores(codigo: number): Promise<boolean> {
   }
 }
 
-// Validação simplificada - apenas filtra unidades intermediárias
-// A validação de mapa vigente e servidores já está sendo feita ao exibir a árvore
 async function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecionadas: number[]): Promise<number[]> {
-  console.log('[DEBUG Vue] validarUnidadesParaProcesso - tipos:', { tipoProcesso, unidadesSelecionadas });
-  console.log('[DEBUG Vue] unidadesStore.unidades:', unidadesStore.unidades);
-  
   const unidadesValidas = unidadesSelecionadas.filter(codigo => {
     const isIntermediaria = isUnidadeIntermediaria(codigo);
-    console.log(`[DEBUG Vue] Unidade ${codigo} - intermediária: ${isIntermediaria}`);
     return !isIntermediaria;
   });
   
-  console.log('[DEBUG Vue] Retornando unidadesValidas:', unidadesValidas);
   return unidadesValidas;
 }
 
 async function salvarProcesso() {
-  console.log('[DEBUG Vue] salvarProcesso chamado');
-  console.log('[DEBUG Vue] Dados atuais:', {
-    descricao: descricao.value,
-    tipo: tipo.value,
-    dataLimite: dataLimite.value,
-    unidades: unidadesSelecionadas.value.length,
-    unidadesSelecionadas: unidadesSelecionadas.value
-  });
-  console.log('[DEBUG Vue] unidadesStore.unidades.length:', unidadesStore.unidades.length);
-  console.log('[DEBUG Vue] unidadesStore.unidades:', unidadesStore.unidades);
-  
   if (!descricao.value || !dataLimite.value || unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
         'Dados incompletos',
         'Preencha todos os campos e selecione ao menos uma unidade.'
     );
-    return
+    return;
   }
 
   try {
-    console.log('[DEBUG Vue] Iniciando validação de unidades...');
     const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-    console.log('[DEBUG Vue] Unidades filtradas:', unidadesFiltradas);
 
     if (unidadesFiltradas.length === 0) {
-      console.warn('[DEBUG Vue] Nenhuma unidade válida após validação');
       notificacoesStore.erro(
           'Unidades inválidas',
           'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
       );
-      return
+      return;
     }
 
-    console.log('[DEBUG Vue] Prosseguindo com salvamento, processEditando:', !!processoEditando.value);
-    
     if (processoEditando.value) {
-      // Editando processo existente
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
         unidades: unidadesFiltradas
       };
-      console.log('[DEBUG Vue] Atualizando processo:', request);
       await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
-      console.log('[DEBUG Vue] Processo atualizado');
-
-      notificacoesStore.sucesso(
-          'Processo alterado',
-          'O processo foi alterado!'
-      );
+      notificacoesStore.sucesso('Processo alterado', 'O processo foi alterado!');
+      await router.push('/painel');
     } else {
-      // Criando novo processo
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
         unidades: unidadesFiltradas
       };
-      console.log('[DEBUG Vue] Criando novo processo:', request);
       const novoProcesso = await processosStore.criarProcesso(request);
-      console.log('[DEBUG Vue] Novo processo criado:', novoProcesso);
-
-      notificacoesStore.sucesso(
-          'Processo salvo',
-          'O processo foi salvo!'
-      );
-      
-      // Redirecionar para a página do novo processo
+      notificacoesStore.sucesso('Processo salvo', 'O processo foi salvo!');
       await router.push(`/processo/${novoProcesso.codigo}`);
-      return;
     }
-    console.log('[DEBUG Vue] Redirecionando para painel...');
-    await router.push('/painel');
     limparCampos();
   } catch (error) {
-    console.error('[DEBUG Vue] Erro capturado:', error);
     notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
     console.error('Erro ao salvar processo:', error);
   }
@@ -566,26 +506,26 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (processoEditando.value) {
-    try {
-      // Usa a action da store, passando os parâmetros necessários
-      await processosStore.iniciarProcesso(
-          processoEditando.value.codigo,
-          tipo.value as TipoProcesso, // Garante a tipagem correta
-          unidadesSelecionadas.value
-      );
-      notificacoesStore.sucesso(
-          'Processo iniciado',
-          'O processo foi iniciado! Notificações enviadas às unidades.'
-      );
-      await router.push('/painel');
-      limparCampos();
-    } catch (error) {
-      notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
-      console.error('Erro ao iniciar processo:', error);
-    }
-  } else {
+  if (!processoEditando.value) {
     notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
+    return;
+  }
+
+  try {
+    await processosStore.iniciarProcesso(
+        processoEditando.value.codigo,
+        tipo.value as TipoProcesso,
+        unidadesSelecionadas.value
+    );
+    notificacoesStore.sucesso(
+        'Processo iniciado',
+        'O processo foi iniciado! Notificações enviadas às unidades.'
+    );
+    await router.push('/painel');
+    limparCampos();
+  } catch (error) {
+    notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
+    console.error('Erro ao iniciar processo:', error);
   }
 }
 
@@ -616,58 +556,58 @@ async function confirmarRemocao() {
   fecharModalRemocao();
 }
 
-// Computed que combina unidades bloqueadas com unidades não-elegíveis
-const unidadesDesabilitadas = computed(() => {
+const unidadesStatus = computed(() => {
   const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
   const desabilitadas: number[] = [];
-  
-  // Se estamos editando, unidades atualmente selecionadas nunca devem ser desabilitadas
+  const elegiveis: number[] = [];
   const unidadesProtegidas = processoEditando.value ? unidadesSelecionadas.value : [];
-  
+
   for (const codigo of todasUnidades) {
-    // Se estamos editando e a unidade está selecionada, nunca desabilitar
+    let isElegivel = true;
+    let isDesabilitada = false;
+
     if (unidadesProtegidas.includes(codigo)) {
+      elegiveis.push(codigo);
       continue;
     }
-    
-    // Se está bloqueada, desabilitar
+
     if (unidadesBloqueadas.value.includes(codigo)) {
-      desabilitadas.push(codigo);
-      continue;
+      isElegivel = false;
+      isDesabilitada = true;
     }
-    
-    // Para REVISAO/DIAGNOSTICO: desabilitar se não tem mapa vigente
+
     if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
       if (!unidadesComMapaVigente.value.includes(codigo)) {
-        desabilitadas.push(codigo);
+        isElegivel = false;
+        isDesabilitada = true;
       }
     }
-    
-    // Para DIAGNOSTICO: desabilitar se não tem servidores
+
     if (tipo.value === 'DIAGNOSTICO') {
       if (!unidadesComServidores.value.includes(codigo)) {
-        desabilitadas.push(codigo);
+        isElegivel = false;
+        isDesabilitada = true;
       }
+    }
+
+    if (isElegivel) {
+      elegiveis.push(codigo);
+    }
+    if (isDesabilitada) {
+      desabilitadas.push(codigo);
     }
   }
   
-  return desabilitadas;
+  return {
+    desabilitadas,
+    elegiveis
+  };
 });
 
-// Função para determinar se unidade é elegível para o processo
+const unidadesDesabilitadas = computed(() => unidadesStatus.value.desabilitadas);
+
 function unidadeElegivel(unidade: Unidade): boolean {
-  // Se estamos editando e a unidade está selecionada, sempre mostrar como elegível
-  if (processoEditando.value && unidadesSelecionadas.value.includes(unidade.codigo)) {
-    return true;
-  }
-  
-  // Para REVISAO e DIAGNOSTICO: apenas unidades com mapa vigente
-  if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
-    return unidadesComMapaVigente.value.includes(unidade.codigo);
-  }
-  
-  // Para MAPEAMENTO: unidades que não estejam em outro processo ativo
-  return !unidadesBloqueadas.value.includes(unidade.codigo);
+  return unidadesStatus.value.elegiveis.includes(unidade.codigo);
 }
 
 // Função auxiliar para verificar se unidade ou suas filhas são elegíveis
