@@ -26,24 +26,18 @@ public class WithMockGestorSecurityContextFactory implements WithSecurityContext
     public SecurityContext createSecurityContext(WithMockGestor customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        long gestorId;
-
-        try {
-            gestorId = Long.parseLong(customUser.value());
-        } catch (NumberFormatException e) {
-            gestorId = 222222222222L;
-        }
+        String tituloGestor = customUser.value();
 
         Usuario principal;
         try {
-            principal = usuarioRepo.findById(gestorId).orElse(null);
+            principal = usuarioRepo.findById(tituloGestor).orElse(null);
         } catch (Exception e) {
             principal = null;
         }
         
         if (principal == null) {
             principal = new Usuario();
-            principal.setTituloEleitoral(gestorId);
+            principal.setTituloEleitoral(tituloGestor);
             principal.setNome("Gestor User");
             principal.setEmail("gestor@example.com");
             principal.setPerfis(Set.of(Perfil.GESTOR));

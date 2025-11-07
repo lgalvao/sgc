@@ -83,7 +83,7 @@ class CDU08IntegrationTest {
     @BeforeEach
     void setUp() {
         // Use existing user and units from data-postgresql.sql
-        Usuario chefe = usuarioRepo.findById(333333333333L).orElseThrow(); // Chefe Teste
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Chefe Teste
 
         Unidade unidadeOrigem = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
         Unidade unidadeDestino = unidadeRepo.findById(9L).orElseThrow(); // SEDIA

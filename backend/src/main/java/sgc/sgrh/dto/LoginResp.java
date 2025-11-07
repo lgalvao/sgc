@@ -9,12 +9,12 @@ import sgc.sgrh.model.Perfil;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResp {
-    private Long tituloEleitoral;
+    private String tituloEleitoral;
     private Perfil perfil;
     private Long unidadeCodigo;
     private String token;
 
-    public LoginResp(Long tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
+    public LoginResp(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
         this.tituloEleitoral = tituloEleitoral;
         this.perfil = perfil;
         this.unidadeCodigo = unidadeCodigo;

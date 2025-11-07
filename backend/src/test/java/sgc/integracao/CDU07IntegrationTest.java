@@ -46,8 +46,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-07: Detalhar Subprocesso")
 public class CDU07IntegrationTest {
     private static final String UNIDADE_SIGLA = "SESEL";
-    private static final long CHEFE_TITULO = 111111111111L;
-    private static final long OUTRO_CHEFE_TITULO = 333333333333L;
+    private static final String CHEFE_TITULO = "111111111111";
+    private static final String OUTRO_CHEFE_TITULO = "333333333333";
 
     @Autowired
     private MockMvc mockMvc;
@@ -85,7 +85,7 @@ public class CDU07IntegrationTest {
         movimentacaoRepo.save(movimentacao);
     }
 
-    private void setupSecurityContext(long tituloEleitoral, Unidade unidade, String... perfis) {
+    private void setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
         Usuario principal = new Usuario(
             tituloEleitoral,
             "Usuario de Teste",

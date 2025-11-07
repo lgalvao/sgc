@@ -11,10 +11,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -29,18 +29,21 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
-
     @InjectMocks
     private SubprocessoService service;
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
+
     @Mock
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 

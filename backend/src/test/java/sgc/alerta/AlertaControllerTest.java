@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sgc.alerta.erros.ErroAlteracaoAlerta;
+import sgc.alerta.erros.ErroAlerta;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -67,7 +67,7 @@ class AlertaControllerTest {
 
     @Test
     void marcarComoLido_quandoFalhaAlteracaoStatus_deveRetornarConflict() throws Exception {
-        doThrow(new ErroAlteracaoAlerta("Falha ao alterar status do alerta"))
+        doThrow(new ErroAlerta("Falha ao alterar status do alerta"))
                 .when(alertaService).marcarComoLido(anyString(), anyLong());
 
         mockMvc.perform(post("/api/alertas/1/marcar-como-lido")

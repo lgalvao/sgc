@@ -26,14 +26,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessoNotificacaoEmailServiceTest {
-
     @InjectMocks
     private ProcessoNotificacaoService service;
 
     @Mock
     private NotificacaoEmailService notificacaoEmailService;
+
     @Mock
     private NotificacaoModelosService notificacaoModelosService;
+
     @Mock
     private SgrhService sgrhService;
 

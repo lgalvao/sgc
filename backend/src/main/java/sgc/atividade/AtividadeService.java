@@ -70,7 +70,7 @@ public class AtividadeService {
         var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.mapaCodigo())));
 
-        var usuario = usuarioRepo.findById(Long.parseLong(tituloUsuario))
+        var usuario = usuarioRepo.findById(tituloUsuario)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));
 
         // Validação defensiva: garante que apenas o titular da unidade pode criar atividades.

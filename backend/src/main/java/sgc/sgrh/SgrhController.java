@@ -50,7 +50,7 @@ public class SgrhController {
      * @return Um {@link ResponseEntity} contendo a lista de {@link PerfilUnidade}.
      */
     @PostMapping("/autorizar")
-    public ResponseEntity<List<PerfilUnidade>> autorizar(@RequestBody Long tituloEleitoral) {
+    public ResponseEntity<List<PerfilUnidade>> autorizar(@RequestBody String tituloEleitoral) {
         List<PerfilUnidade> perfis = usuarioService.autorizar(tituloEleitoral);
         return ResponseEntity.ok(perfis);
     }

@@ -55,7 +55,7 @@ class AtividadeServiceTest {
     void setUp() {
         atividadeDto = new AtividadeDto(1L, 1L, "Descrição");
         usuario = new Usuario();
-        usuario.setTituloEleitoral(123L);
+        usuario.setTituloEleitoral("123");
         unidade = new Unidade();
         unidade.setTitular(usuario);
         subprocesso = new Subprocesso();
@@ -70,7 +70,7 @@ class AtividadeServiceTest {
         @DisplayName("Deve criar atividade")
         void criar_Sucesso() {
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
-            when(usuarioRepo.findById(123L)).thenReturn(Optional.of(usuario));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
             when(atividadeMapper.toEntity(atividadeDto)).thenReturn(new Atividade());
             when(atividadeRepo.save(any(Atividade.class))).thenReturn(new Atividade());
 
@@ -83,10 +83,10 @@ class AtividadeServiceTest {
         @DisplayName("Deve lançar exceção se usuário não for titular")
         void criar_NaoTitular_LancaExcecao() {
             Usuario outroUsuario = new Usuario();
-            outroUsuario.setTituloEleitoral(456L);
+            outroUsuario.setTituloEleitoral("456");
             unidade.setTitular(outroUsuario);
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
-            when(usuarioRepo.findById(123L)).thenReturn(Optional.of(usuario));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
 
             assertThrows(ErroAccessoNegado.class, () -> service.criar(atividadeDto, "123"));
         }
@@ -96,7 +96,7 @@ class AtividadeServiceTest {
         void criar_SubprocessoFinalizado_LancaExcecao() {
             subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
             when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
-            when(usuarioRepo.findById(123L)).thenReturn(Optional.of(usuario));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
 
             assertThrows(ErroSituacaoInvalida.class, () -> service.criar(atividadeDto, "123"));
         }

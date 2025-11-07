@@ -14,6 +14,16 @@ import java.util.Map;
 
 /**
  * Controlador REST para gerenciar alertas.
+ * <p>
+ * Este controller expõe apenas operações de leitura de alertas pelo usuário.
+ * A criação de alertas é feita internamente pelo sistema através de um listener
+ * de eventos de domínio (EventoProcessoListener), garantindo que alertas sejam
+ * gerados automaticamente e consistentemente ao longo do ciclo de vida dos processos.
+ * <p>
+ * Não há endpoint POST para criação de alertas neste controller porque:
+ * - Alertas são criados automaticamente em resposta a eventos do sistema
+ * - O cliente (frontend) não deve ter a responsabilidade de criar alertas
+ * - Isso garante integridade e consistência dos dados de alertas
  */
 @RestController
 @RequestMapping("/api/alertas")

@@ -96,8 +96,8 @@ public class SubprocessoServiceActionsTest {
         Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
 
-        Usuario chefe = usuarioRepo.findById(333333333333L).orElseThrow();
-        usuario = usuarioRepo.findById(1L).orElseThrow(); // Ana Paula Souza
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
+        usuario = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
     }
 
     private Processo criarProcesso(TipoProcesso tipo) {

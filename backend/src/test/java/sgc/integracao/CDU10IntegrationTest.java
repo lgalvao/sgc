@@ -91,7 +91,7 @@ class CDU10IntegrationTest {
     void setUp() {
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         unidadeChefe = unidadeRepo.findById(10L).orElseThrow(); // SESEL
-        var chefe = usuarioRepo.findById(333333333333L).orElseThrow(); // Existing Chefe Teste
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
 
         Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);

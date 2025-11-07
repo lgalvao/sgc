@@ -86,11 +86,11 @@ public class CDU13IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Usuario titular = usuarioRepo.findById(333333333333L).orElseThrow();
+        Usuario titular = usuarioRepo.findById("333333333333").orElseThrow();
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        Usuario gestorDaUnidade = usuarioRepo.findById(222222222222L).orElseThrow();
+        Usuario gestorDaUnidade = usuarioRepo.findById("222222222222").orElseThrow();
         unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-        Usuario adminUser = usuarioRepo.findById(111111111111L).orElseThrow();
+        Usuario adminUser = usuarioRepo.findById("111111111111").orElseThrow();
         Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
 
         Processo processo = new Processo();

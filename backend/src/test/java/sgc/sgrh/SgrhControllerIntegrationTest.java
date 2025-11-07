@@ -53,7 +53,7 @@ class SgrhControllerIntegrationTest {
     @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() throws Exception {
         AutenticacaoReq request = AutenticacaoReq.builder()
-            .tituloEleitoral(123456789101L)
+            .tituloEleitoral("123456789101")
             .senha("senha")
             .build();
 
@@ -87,7 +87,7 @@ class SgrhControllerIntegrationTest {
     @DisplayName("Deve entrar")
     void entrar_deveRetornarOk() throws Exception {
         EntrarReq request = EntrarReq.builder()
-            .tituloEleitoral(123456789101L)
+            .tituloEleitoral("123456789101")
             .perfil(Perfil.CHEFE.toString())
             .unidadeCodigo(unidade.getCodigo())
             .build();

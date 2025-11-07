@@ -184,7 +184,7 @@ public class SubprocessoWorkflowService {
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
-    public void apresentarSugestoes(Long codSubprocesso, String sugestoes, Long usuarioTituloEleitoral) {
+    public void apresentarSugestoes(Long codSubprocesso, String sugestoes, String usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -211,7 +211,7 @@ public class SubprocessoWorkflowService {
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
-    public void validarMapa(Long codSubprocesso, Long usuarioTituloEleitoral) {
+    public void validarMapa(Long codSubprocesso, String usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -341,7 +341,7 @@ public class SubprocessoWorkflowService {
      * @throws ErroValidacao            se o mapa apresentar inconsistências de associação.
      */
     @Transactional
-    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, Long usuarioTituloEleitoral) {
+    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, String usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -408,7 +408,7 @@ public class SubprocessoWorkflowService {
      * @throws IllegalStateException    se não for possível identificar a unidade superior.
      */
     @Transactional
-    public void aceitarCadastro(Long codSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
+    public void aceitarCadastro(Long codSubprocesso, String observacoes, String usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
 
@@ -452,7 +452,7 @@ public class SubprocessoWorkflowService {
      *                                  ou se a unidade 'SEDOC' não for encontrada.
      */
     @Transactional
-    public void homologarCadastro(Long codSubprocesso, String observacoes, Long usuarioTituloEleitoral) {
+    public void homologarCadastro(Long codSubprocesso, String observacoes, String usuarioTituloEleitoral) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
 

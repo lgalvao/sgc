@@ -52,7 +52,7 @@ class UsuarioServiceTest {
         unidadeMock.setCodigo(1L);
         unidadeMock.setTipo(TipoUnidade.INTERMEDIARIA);
         usuarioMock = new Usuario(
-            123456789L,
+            "123456789",
             "Usuário de Teste",
             "teste@email.com",
             "1234",
@@ -63,14 +63,14 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() {
-        boolean resultado = usuarioService.autenticar(123456789L, "senha");
+        boolean resultado = usuarioService.autenticar("123456789", "senha");
         assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("Deve retornar lista de perfis e unidades autorizados")
     void autorizar_deveRetornarListaDePerfisUnidades() {
-        long tituloEleitoral = 123456789L;
+        String tituloEleitoral = "123456789";
 
         when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
 
@@ -87,7 +87,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("Deve lançar exceção quando usuário não for encontrado")
     void autorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
-        long tituloEleitoral = 999L;
+        String tituloEleitoral = "999";
 
         when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.empty());
 
@@ -99,7 +99,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
-        long tituloEleitoral = 123456789L;
+        String tituloEleitoral = "123456789";
         UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name());
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 

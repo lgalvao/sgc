@@ -126,7 +126,7 @@ public class MapaService {
      * @return Um {@link MapaCompletoDto} representando o estado final do mapa salvo.
      * @throws ErroEntidadeNaoEncontrada se o mapa ou uma competência a ser atualizada não forem encontrados.
      */
-    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request, Long usuarioTituloEleitoral) {
+    public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
 
         Mapa mapa = mapaRepo.findById(codMapa)

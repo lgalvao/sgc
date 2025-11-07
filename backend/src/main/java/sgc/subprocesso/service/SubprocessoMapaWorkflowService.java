@@ -42,7 +42,7 @@ public class SubprocessoMapaWorkflowService {
      * @throws IllegalStateException se o subprocesso não estiver em uma situação
      *                               válida para a edição do mapa.
      */
-    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, Long tituloUsuario) {
+    public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
         log.info("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
 
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
@@ -62,19 +62,19 @@ public class SubprocessoMapaWorkflowService {
         return mapaDto;
     }
 
-    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, Long tituloUsuario) {
+    public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.adicionarCompetencia(subprocesso.getMapa(), request.descricao(), request.atividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
-    public MapaCompletoDto atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaReq request, Long tituloUsuario) {
+    public MapaCompletoDto atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
-    public MapaCompletoDto removerCompetencia(Long codSubprocesso, Long codCompetencia, Long tituloUsuario) {
+    public MapaCompletoDto removerCompetencia(Long codSubprocesso, Long codCompetencia, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         competenciaService.removerCompetencia(codCompetencia);
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);

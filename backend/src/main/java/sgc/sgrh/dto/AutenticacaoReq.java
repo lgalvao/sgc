@@ -16,7 +16,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class AutenticacaoReq {
     @NotNull(message = "O título eleitoral é obrigatório.")
-    Long tituloEleitoral;
+    String tituloEleitoral;
 
     @NotNull(message = "A senha é obrigatória.")
     String senha;

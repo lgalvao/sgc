@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -52,9 +53,9 @@ public class MapaControllerTest {
     @BeforeEach
     void setUp() {
         Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(123456789012L);
+        usuario.setTituloEleitoral("123456789012");
 
-        HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
+        HandlerMethodArgumentResolver authenticationPrincipalResolver = new AuthenticationPrincipalArgumentResolver();
 
         mockMvc = MockMvcBuilders.standaloneSetup(mapaController)
                 .setControllerAdvice(new sgc.comum.erros.RestExceptionHandler())
@@ -169,5 +170,4 @@ public class MapaControllerTest {
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNotFound());
     }
-
 }

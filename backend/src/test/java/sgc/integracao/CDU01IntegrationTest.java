@@ -65,7 +65,7 @@ public class CDU01IntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            long tituloEleitoral = 111111111111L; // Admin Teste from data-postgresql.sql
+            String tituloEleitoral = "111111111111"; // Admin Teste from data-postgresql.sql
             String senha = "password";
             AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
@@ -96,7 +96,7 @@ public class CDU01IntegrationTest {
         @Test
         @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            long tituloEleitoral = 999999999999L; // Usuario Multi Perfil from data-postgresql.sql (has ADMIN and GESTOR)
+            String tituloEleitoral = "999999999999"; // Usuario Multi Perfil from data-postgresql.sql (has ADMIN and GESTOR)
             String senha = "password";
             AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
 
@@ -127,7 +127,7 @@ public class CDU01IntegrationTest {
         @DisplayName("Deve falhar ao tentar autorizar com unidade inexistente retornada pelo SGRH")
         void testAutorizar_falhaUnidadeInexistente() throws Exception {
             // Arrange
-            long tituloEleitoral = 888888888888L; // Non-existent user
+            String tituloEleitoral = "888888888888"; // Non-existent user
 
             // O SgrhService não é mais mockado. A lógica agora busca um usuário no banco.
             // Se o usuário não existe, a exceção será lançada.
@@ -144,7 +144,7 @@ public class CDU01IntegrationTest {
         @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
         void testEntrar_falhaUnidadeInexistente() throws Exception {
             // Arrange
-            long tituloEleitoral = 111222333444L;
+            String tituloEleitoral = "111222333444";
             long codigoUnidadeInexistente = 999L;
             EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(codigoUnidadeInexistente).build();
 

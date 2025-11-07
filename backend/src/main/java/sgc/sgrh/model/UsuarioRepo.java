@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UsuarioRepo extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByTituloEleitoral(long l);
+public interface UsuarioRepo extends JpaRepository<Usuario, String> {
+    Optional<Usuario> findByTituloEleitoral(String tituloEleitoral);
     List<Usuario> findByUnidadeCodigo(Long codigoUnidade);
 }

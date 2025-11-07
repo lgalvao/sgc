@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import sgc.alerta.erros.ErroAlteracaoAlerta;
+import sgc.alerta.erros.ErroAlerta;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -156,8 +156,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return handleBusinessException(ex, HttpStatus.UNPROCESSABLE_ENTITY, "warn");
     }
 
-    @ExceptionHandler(ErroAlteracaoAlerta.class)
-    protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(ErroAlteracaoAlerta ex) {
+    @ExceptionHandler(ErroAlerta.class)
+    protected ResponseEntity<Object> handleAlteracaoStatusAlertaException(ErroAlerta ex) {
         return handleBusinessException(ex, HttpStatus.CONFLICT, "error");
     }
 

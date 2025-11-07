@@ -89,15 +89,15 @@ public class CDU20IntegrationTest {
     void setUp() {
         // Use existing units from data-postgresql.sql
         Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
-        Usuario adminMock = usuarioRepo.findById(111111111111L).orElseThrow();
+        Usuario adminMock = usuarioRepo.findById("111111111111").orElseThrow();
 
         unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
 
         // Use existing users
-        Usuario chefeMock = usuarioRepo.findById(333333333333L).orElseThrow();
-        Usuario gestorMock = usuarioRepo.findById(222222222222L).orElseThrow();
+        Usuario chefeMock = usuarioRepo.findById("333333333333").orElseThrow();
+        Usuario gestorMock = usuarioRepo.findById("222222222222").orElseThrow();
 
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
         subprocesso = subprocessoRepo.save(

@@ -98,7 +98,7 @@ public class CDU02IntegrationTest {
         alertaRepo.save(a);
     }
 
-    private void setupSecurityContext(long tituloEleitoral, Unidade unidade, String... perfis) {
+    private void setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
         Usuario principal = new Usuario(
             tituloEleitoral,
             "Usuario de Teste",
@@ -131,7 +131,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
         void testListarProcessos_GestorRaiz_VeTodos() throws Exception {
-            setupSecurityContext(1L, unidadeRaiz, "GESTOR");
+            setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
                             .param("unidade", unidadeRaiz.getCodigo().toString()))
@@ -142,7 +142,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("CHEFE da unidade Filha 1 deve ver processos da sua unidade e da Neta 1")
         void testListarProcessos_ChefeUnidadeFilha1_VeProcessosSubordinados() throws Exception {
-            setupSecurityContext(2L, unidadeFilha1, "CHEFE");
+            setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
                             .param("unidade", unidadeFilha1.getCodigo().toString()))
@@ -153,7 +153,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
         void testListarProcessos_ChefeUnidadeFilha2_NaoVeProcessosDeOutros() throws Exception {
-            setupSecurityContext(3L, unidadeFilha2, "CHEFE");
+            setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
                             .param("unidade", unidadeFilha2.getCodigo().toString()))
@@ -164,7 +164,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado'")
         void testListarProcessos_NaoAdmin_NaoVeProcessosCriados() throws Exception {
-            setupSecurityContext(1L, unidadeRaiz, "GESTOR");
+            setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
                             .param("unidade", unidadeRaiz.getCodigo().toString()))
@@ -180,7 +180,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")
         void testListarAlertas_UsuarioVeSeusAlertas() throws Exception {
-            setupSecurityContext(8L, unidadeRaiz, "GESTOR");
+            setupSecurityContext("8", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "8"))
                     .andExpect(status().isOk())
@@ -191,7 +191,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados à sua unidade")
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
-            setupSecurityContext(2L, unidadeFilha1, "CHEFE");
+            setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("unidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
@@ -202,7 +202,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
         void testListarAlertas_UsuarioNaoVeAlertasDeOutros() throws Exception {
-            setupSecurityContext(3L, unidadeFilha2, "CHEFE");
+            setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "3")
                             .param("unidade", unidadeFilha2.getCodigo().toString()))

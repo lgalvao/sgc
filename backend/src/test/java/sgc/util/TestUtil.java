@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TestUtil {
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String toJson(Object obj) {

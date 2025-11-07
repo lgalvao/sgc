@@ -101,9 +101,9 @@ class CDU14IntegrationTest {
     @BeforeEach
     void setUp() {
         unidade = unidadeRepo.findById(102L).orElseThrow();
-        admin = usuarioRepo.findById(111111111111L).orElseThrow();
-        gestor = usuarioRepo.findById(222222222222L).orElseThrow();
-        chefe = usuarioRepo.findById(333333333333L).orElseThrow();
+        admin = usuarioRepo.findById("111111111111").orElseThrow();
+        gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         // Configuração do Mock SgrhService
         when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString())).thenReturn(List.of(

@@ -42,6 +42,7 @@ class EventoProcessoListenerTest {
     private static final String SUBSTITUTO_EMAIL = "substituto@test.com";
     private static final String RAMAL_SUBSTITUTO = "67890";
     private static final String TECNICO = "Tecnico";
+
     @Mock
     private AlertaService alertaService;
 

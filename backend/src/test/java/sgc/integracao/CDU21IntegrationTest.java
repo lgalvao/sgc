@@ -88,9 +88,9 @@ class CDU21IntegrationTest {
         doNothing().when(notificacaoEmailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
         // 2. Use existing users
-        Usuario titularIntermediaria = usuarioRepo.findById(1L).orElseThrow(); // Ana Paula Souza
-        Usuario titularOp1 = usuarioRepo.findById(2L).orElseThrow(); // Carlos Henrique Lima
-        Usuario titularOp2 = usuarioRepo.findById(3L).orElseThrow(); // Fernanda Oliveira
+        Usuario titularIntermediaria = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
+        Usuario titularOp1 = usuarioRepo.findById("2").orElseThrow(); // Carlos Henrique Lima
+        Usuario titularOp2 = usuarioRepo.findById("3").orElseThrow(); // Fernanda Oliveira
 
         // 3. Use existing units
         Unidade unidadeIntermediaria = unidadeRepo.findById(3L).orElseThrow(); // COAD

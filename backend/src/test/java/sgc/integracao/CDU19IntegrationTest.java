@@ -101,7 +101,7 @@ class CDU19IntegrationTest {
         unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA as subunit
 
         // Use existing chefe user
-        Usuario chefe = usuarioRepo.findById(333333333333L).orElseThrow();
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         // Criar Processo, Mapa e Subprocesso
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));

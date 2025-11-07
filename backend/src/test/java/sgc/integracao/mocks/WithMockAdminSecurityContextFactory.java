@@ -26,18 +26,18 @@ public class WithMockAdminSecurityContextFactory implements WithSecurityContextF
     public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        Long adminId = 111111111111L;
+        String tituloAdmin = "111111111111";
 
         Usuario principal;
         try {
-            principal = usuarioRepo.findById(adminId).orElse(null);
+            principal = usuarioRepo.findById(tituloAdmin).orElse(null);
         } catch (Exception e) {
             principal = null;
         }
         
         if (principal == null) {
             principal = new Usuario();
-            principal.setTituloEleitoral(adminId);
+            principal.setTituloEleitoral(tituloAdmin);
             principal.setNome("Admin User");
             principal.setEmail("admin@example.com");
             principal.setPerfis(Set.of(Perfil.ADMIN));

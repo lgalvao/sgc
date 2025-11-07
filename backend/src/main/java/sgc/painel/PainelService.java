@@ -88,7 +88,7 @@ public class PainelService {
      */
     public Page<AlertaDto> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
         if (usuarioTitulo != null && !usuarioTitulo.isBlank()) {
-            return alertaRepo.findByUsuarioDestino_TituloEleitoral(Long.parseLong(usuarioTitulo), pageable)
+            return alertaRepo.findByUsuarioDestino_TituloEleitoral(usuarioTitulo, pageable)
                     .map(this::paraAlertaDto);
         }
         if (codigoUnidade != null) {

@@ -34,7 +34,7 @@ public class UsuarioService {
      * @param senha           A senha do usuário (atualmente ignorada na simulação).
      * @return {@code true} para simular uma autenticação bem-sucedida.
      */
-    public boolean autenticar(long tituloEleitoral, String senha) {
+    public boolean autenticar(String tituloEleitoral, String senha) {
         log.info("Simulando autenticação para usuário: {}", tituloEleitoral);
         // Em um cenário real, aqui haveria a chamada para o AcessoAD.
         // Para esta simulação, consideramos sempre autenticado.
@@ -54,7 +54,7 @@ public class UsuarioService {
      * @throws ErroEntidadeNaoEncontrada se uma unidade associada a um perfil não for
      *                                  encontrada no banco de dados local.
      */
-    public List<PerfilUnidade> autorizar(long tituloEleitoral) {
+    public List<PerfilUnidade> autorizar(String tituloEleitoral) {
         log.info("Buscando autorizações (perfis e unidades) para o usuário: {}", tituloEleitoral);
         Usuario usuario = usuarioRepo.findById(tituloEleitoral)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloEleitoral));
@@ -78,7 +78,7 @@ public class UsuarioService {
      * @param pu              O {@link PerfilUnidade} que representa o contexto de acesso
      *                        escolhido pelo usuário para a sessão.
      */
-    public void entrar(long tituloEleitoral, PerfilUnidade pu) {
+    public void entrar(String tituloEleitoral, PerfilUnidade pu) {
         // Em um cenário real, aqui seriam definidos o perfil e a unidade do usuário na sessão.
         // Para esta simulação, apenas registramos a escolha.
         log.info("Usuário entrou. Perfil: {}, Unidade: {}",

@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
 public class CDU06IntegrationTest {
-    private static final long TEST_USER_ID = 123456789L;
+    private static final String TEST_USER_ID = "123456789";
 
     @Autowired
     private MockMvc mockMvc;

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class Usuario implements Serializable, UserDetails {
     @Id
     @Column(name = "titulo_eleitoral")
-    private Long tituloEleitoral;
+    private String tituloEleitoral;
 
     @Column(name = "nome")
     private String nome;
@@ -69,10 +69,10 @@ public class Usuario implements Serializable, UserDetails {
 
     @Override
     public String getUsername() {
-        return String.valueOf(tituloEleitoral);
+        return tituloEleitoral;
     }
 
-    public Usuario(Long tituloEleitoral, String nome, String email, String ramal, Unidade unidade, Collection<Perfil> perfis) {
+    public Usuario(String tituloEleitoral, String nome, String email, String ramal, Unidade unidade, Collection<Perfil> perfis) {
         this.tituloEleitoral = tituloEleitoral;
         this.nome = nome;
         this.email = email;

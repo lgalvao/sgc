@@ -93,7 +93,7 @@ public class CDU16IntegrationTest {
     @BeforeEach
     void setUp() {
         // Use existing admin user from data-postgresql.sql
-        var admin = usuarioRepo.findById(111111111111L).orElseThrow();
+        var admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         Unidade unidade = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
 

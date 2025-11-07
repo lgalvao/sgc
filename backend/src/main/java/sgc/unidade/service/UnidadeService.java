@@ -38,7 +38,7 @@ public class UnidadeService {
             .map(u -> new ServidorDto(
                 u.getTituloEleitoral(),
                 u.getNome(),
-                String.valueOf(u.getTituloEleitoral()),
+                u.getTituloEleitoral(),
                 u.getEmail(),
                 u.getUnidade().getCodigo()
             ))

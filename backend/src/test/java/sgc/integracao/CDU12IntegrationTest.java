@@ -55,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU12IntegrationTest {
 
     private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA = "/api/subprocessos/{codigo}/impactos-mapa";
-    private static final String CHEFE_UT_USERNAME = "121212121212";
+    private static final String CHEFE_TITULO = "121212121212";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
     private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.totalAtividadesInseridas";
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
@@ -90,9 +90,9 @@ class CDU12IntegrationTest {
         // 1. Unidade e Chefe
         // Use existing data
         Unidade unidade = unidadeRepo.findById(12L).orElseThrow(); // SEJUR
-        Usuario chefe = usuarioRepo.findById(Long.parseLong(CHEFE_UT_USERNAME)).orElseThrow();
-        Usuario gestor = usuarioRepo.findById(222222222222L).orElseThrow();
-        Usuario admin = usuarioRepo.findById(111111111111L).orElseThrow();
+        Usuario chefe = usuarioRepo.findById(CHEFE_TITULO).orElseThrow();
+        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         // 2. Processo de Revisão
         Processo processoRevisao = new Processo(
@@ -145,7 +145,7 @@ class CDU12IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente")
         void semImpactos_QuandoCadastroIdentico() throws Exception {
             // Arrange: Copia as atividades do mapa vigente para o mapa do subprocesso
@@ -167,7 +167,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades inseridas")
         void deveDetectarAtividadesInseridas() throws Exception {
             // Arrange: Mantém as atividades vigentes e adiciona uma nova
@@ -186,7 +186,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades removidas e as competências relacionadas")
         void deveDetectarAtividadesRemovidas() throws Exception {
             // Arrange: Adiciona apenas uma das atividades vigentes, efetivamente removendo a outra.
@@ -204,7 +204,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades alteradas como uma remoção e uma inserção")
         void deveDetectarAtividadesAlteradas() throws Exception {
             // Arrange: Cria uma atividade com descrição diferente.
@@ -226,7 +226,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve identificar competências impactadas por remoções e alterações")
         void deveIdentificarCompetenciasImpactadas() throws Exception {
             // Arrange:
@@ -259,7 +259,7 @@ class CDU12IntegrationTest {
     class BordaEfalhas {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
             // Arrange
@@ -276,7 +276,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve retornar 404 para subprocesso inexistente")
         void deveRetornar404_QuandoSubprocessoNaoExiste() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, 9999L))
@@ -289,7 +289,7 @@ class CDU12IntegrationTest {
     class Acesso {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento'")
         void chefePodeAcessar_EmRevisaoCadastro() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -333,7 +333,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento'")
         void chefeNaoPodeAcessar_EmSituacaoIncorreta() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);

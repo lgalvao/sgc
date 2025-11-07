@@ -78,7 +78,7 @@ class CDU11IntegrationTest {
     void setUp() {
         // Unidade e Chefe
         unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
-        var chefe = usuarioRepo.findById(333333333333L).orElseThrow(); // Existing Chefe Teste
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
 
         // Processo
         processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));

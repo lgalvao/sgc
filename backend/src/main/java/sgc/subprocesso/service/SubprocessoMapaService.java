@@ -54,7 +54,7 @@ public class SubprocessoMapaService {
      *                                   para permitir o ajuste.
      */
     @Transactional
-    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, Long usuarioTituloEleitoral) {
+    public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
         Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 

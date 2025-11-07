@@ -31,7 +31,7 @@ public class AlertaUsuario implements Serializable {
     @EqualsAndHashCode
     public static class Chave implements Serializable {
         private Long alertaCodigo;
-        private Long usuarioTituloEleitoral;
+        private String usuarioTituloEleitoral;
     }
 
     @EmbeddedId

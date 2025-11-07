@@ -115,10 +115,10 @@ class CDU17IntegrationTest {
         processoRepo.deleteAll();
 
         // Use existing users from data-postgresql.sql
-        Usuario admin = usuarioRepo.findById(111111111111L).orElseThrow();
-        Usuario gestor = usuarioRepo.findById(222222222222L).orElseThrow();
-        Usuario titularUS = usuarioRepo.findById(1L).orElseThrow(); // Ana Paula Souza
-        Usuario titularUT = usuarioRepo.findById(2L).orElseThrow(); // Carlos Henrique Lima
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
+        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        Usuario titularUS = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
+        Usuario titularUT = usuarioRepo.findById("2").orElseThrow(); // Carlos Henrique Lima
 
         // Use existing units from data-postgresql.sql
         Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC

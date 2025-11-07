@@ -7,7 +7,7 @@ package sgc.sgrh.dto;
  * a lista de usuários pertencentes a uma unidade específica.
  */
 public record ServidorDto(
-    Long codigo,
+    String codigo,
     String nome,
     String tituloEleitoral,
     String email,

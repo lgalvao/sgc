@@ -50,7 +50,7 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
      * @param pageable        Informações de paginação.
      * @return Uma página de alertas.
      */
-    Page<Alerta> findByUsuarioDestino_TituloEleitoral(Long tituloEleitoral, Pageable pageable);
+    Page<Alerta> findByUsuarioDestino_TituloEleitoral(String tituloEleitoral, Pageable pageable);
 
     /**
      * Busca alertas destinados a uma lista de unidades, de forma paginada.

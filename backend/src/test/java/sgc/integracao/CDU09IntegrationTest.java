@@ -91,7 +91,7 @@ class CDU09IntegrationTest {
     void setUp() {
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         unidadeChefe = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-        var chefe = usuarioRepo.findById(333333333333L).orElseThrow(); // Existing Chefe Teste
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
 
         Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoMapeamento);

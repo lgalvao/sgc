@@ -29,8 +29,10 @@ class MapperTest {
 
     @Mock
     private ProcessoRepo processoRepo;
+
     @Mock
     private UnidadeRepo unidadeRepo;
+
     @Mock
     private MapaRepo mapaRepo;
 

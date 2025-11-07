@@ -25,24 +25,18 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        long chefeId;
-
-        try {
-            chefeId = Long.parseLong(annotation.value());
-        } catch (NumberFormatException e) {
-            chefeId = 333333333333L;
-        }
+        String tituloChefe = annotation.value();
 
         Usuario usuario;
         try {
-            usuario = usuarioRepo.findById(chefeId).orElse(null);
+            usuario = usuarioRepo.findById(tituloChefe).orElse(null);
         } catch (Exception e) {
             usuario = null;
         }
         
         if (usuario == null) {
             usuario = new Usuario();
-            usuario.setTituloEleitoral(chefeId);
+            usuario.setTituloEleitoral(tituloChefe);
             usuario.setNome("Chefe User");
             usuario.setEmail("chefe@example.com");
             usuario.setPerfis(Set.of(Perfil.CHEFE));

@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.erros.ErroAlteracaoAlerta;
+import sgc.alerta.erros.ErroAlerta;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.AlertaUsuario;
@@ -120,7 +120,7 @@ class AlertaServiceTest {
         Long alertaId = 1L;
         String usuarioTituloStr = "123456789012";
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, String.valueOf(usuarioTitulo));
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         alertaUsuario.setId(id);
         alertaUsuario.setDataHoraLeitura(null);
@@ -140,7 +140,7 @@ class AlertaServiceTest {
         Long alertaId = 1L;
         String usuarioTituloStr = "123456789012";
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, String.valueOf(usuarioTitulo));
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
@@ -219,8 +219,8 @@ class AlertaServiceTest {
         when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
         when(repositorioUnidade.findById(unidade.getCodigo())).thenThrow(new RuntimeException("Erro ao buscar unidade"));
 
-        assertThrows(ErroAlteracaoAlerta.class, () ->
-            alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso))
+        assertThrows(ErroAlerta.class, () ->
+                alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso))
         );
     }
 
