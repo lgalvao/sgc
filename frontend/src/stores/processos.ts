@@ -5,6 +5,7 @@ import {
     Movimentacao,
     ProcessoDetalhe,
     ProcessoResumo,
+    SubprocessoElegivel,
     TipoProcesso
 } from '@/types/tipos'
 import {generateUniqueId} from '@/utils'
@@ -17,29 +18,13 @@ export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
-        processoDetalhe: null as ProcessoDetalhe | null, // Para armazenar o processo detalhado
+        processoDetalhe: null as ProcessoDetalhe | null,
+        subprocessosElegiveis: [] as SubprocessoElegivel[],
         processosFinalizados: [] as ProcessoResumo[],
-        movements: [] as Movimentacao[] // Manter se ainda for usado para mocks internos ou outras lógicas
+        movements: [] as Movimentacao[]
     }),
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoResumo[] => {
-            // Se o processoDetalhe estiver carregado e for o processo correto, usar seus subprocessos
-            if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                return state.processoDetalhe.resumoSubprocessos;
-            }
-            // Caso contrário, retornar vazio ou buscar de outra forma se necessário
-            return [];
-        },
-        // Subprocessos elegíveis para aceitação em bloco (GESTOR)
-        getSubprocessosElegiveisAceiteBloco: (state) => (idProcesso: number, siglaUnidadeUsuario: string) => {
-            if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
-                return state.processoDetalhe.resumoSubprocessos.filter(s => s.unidadeNome === siglaUnidadeUsuario);
-            }
-            return [];
-        },
-
-        // Subprocessos elegíveis para homologação em bloco (ADMIN)
-        getSubprocessosElegiveisHomologacaoBloco: (state) => (idProcesso: number) => {
             if (state.processoDetalhe && state.processoDetalhe.codigo === idProcesso) {
                 return state.processoDetalhe.resumoSubprocessos;
             }
@@ -61,6 +46,9 @@ export const useProcessosStore = defineStore('processos', {
         },
         async fetchProcessoDetalhe(idProcesso: number) {
             this.processoDetalhe = await processoService.obterDetalhesProcesso(idProcesso);
+        },
+        async fetchSubprocessosElegiveis(idProcesso: number) {
+            this.subprocessosElegiveis = await processoService.fetchSubprocessosElegiveis(idProcesso);
         },
         async criarProcesso(payload: CriarProcessoRequest) {
             await processoService.criarProcesso(payload);

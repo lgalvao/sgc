@@ -5,6 +5,7 @@ import type {
     Processo,
     ProcessoDetalhe,
     ProcessoResumo,
+    SubprocessoElegivel,
 } from '@/types/tipos';
 import {ApiError} from './ApiError';
 import axios from 'axios';
@@ -98,6 +99,15 @@ export async function processarAcaoEmBloco(payload: {
         await apiClient.post(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     } catch (error) {
         return handleError(error, `processar ação em bloco para o processo ${payload.codProcesso}`);
+    }
+}
+
+export async function fetchSubprocessosElegiveis(codProcesso: number): Promise<SubprocessoElegivel[]> {
+    try {
+        const response = await apiClient.get<SubprocessoElegivel[]>(`/processos/${codProcesso}/subprocessos-elegiveis`);
+        return response.data;
+    } catch (error) {
+        return handleError(error, `buscar subprocessos elegíveis para o processo ${codProcesso}`);
     }
 }
 
