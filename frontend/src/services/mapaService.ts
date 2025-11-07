@@ -1,5 +1,5 @@
 import apiClient from '../axios-setup';
-import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
+import type {DisponibilizarMapaRequest, ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from '@/types/tipos';
 import {mapImpactoMapaDtoToModel, mapMapaAjusteDtoToModel, mapMapaCompletoDtoToModel,} from '@/mappers/mapas';
 
 export async function obterMapaVisualizacao(codSubrocesso: number): Promise<MapaVisualizacao> {
@@ -42,3 +42,7 @@ export async function verificarMapaVigente(codigoUnidade: number): Promise<boole
     throw error;
   }
 }
+
+export const disponibilizarMapa = async (codSubprocesso: number, data: DisponibilizarMapaRequest): Promise<void> => {
+  await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar`, data);
+};

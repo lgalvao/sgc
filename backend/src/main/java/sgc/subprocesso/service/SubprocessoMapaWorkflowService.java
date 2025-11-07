@@ -3,17 +3,26 @@ package sgc.subprocesso.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.comum.erros.ErroDominio;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.service.MapaService;
+import sgc.movimentacao.service.MovimentacaoService;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +30,11 @@ import sgc.subprocesso.model.SubprocessoRepo;
 public class SubprocessoMapaWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
     private final CompetenciaRepo repositorioCompetencia;
+    private final AtividadeRepo atividadeRepo;
     private final MapaService mapaService;
     private final CompetenciaService competenciaService;
+    private final MovimentacaoService movimentacaoService;
+    private final SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     /**
      * Salva o mapa de um subprocesso e atualiza o estado do workflow.
@@ -93,5 +105,52 @@ public class SubprocessoMapaWorkflowService {
             throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado");
         }
         return subprocesso;
+    }
+
+    public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        log.info("Disponibilizando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, usuario.getTituloEleitoral());
+
+        Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
+        validarMapaParaDisponibilizacao(subprocesso);
+
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO);
+        subprocesso.setDataLimiteEtapa2(request.dataLimite());
+        repositorioSubprocesso.save(subprocesso);
+
+        movimentacaoService.registrarMovimentacao(
+            subprocesso,
+            "Disponibilização do mapa de competências para validação.",
+            usuario
+        );
+
+        subprocessoNotificacaoService.notificarDisponibilizacaoMapa(subprocesso);
+
+        log.info("Subprocesso {} atualizado para MAPEAMENTO_CONCLUIDO e mapa disponibilizado.", codSubprocesso);
+    }
+
+    private void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
+        Long codMapa = subprocesso.getMapa().getCodigo();
+        var competencias = repositorioCompetencia.findByMapaCodigo(codMapa);
+
+        if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
+            throw new ErroDominio("Todas as competências devem estar associadas a pelo menos uma atividade.");
+        }
+
+        var atividadesDoSubprocesso = atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
+        var atividadesAssociadas = competencias.stream()
+            .flatMap(c -> c.getAtividades().stream())
+            .map(Atividade::getCodigo)
+            .collect(Collectors.toSet());
+
+        var atividadesNaoAssociadas = atividadesDoSubprocesso.stream()
+            .filter(a -> !atividadesAssociadas.contains(a.getCodigo()))
+            .toList();
+
+        if (!atividadesNaoAssociadas.isEmpty()) {
+            String nomesAtividades = atividadesNaoAssociadas.stream()
+                .map(Atividade::getDescricao)
+                .collect(Collectors.joining(", "));
+            throw new ErroDominio("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
+        }
     }
 }
