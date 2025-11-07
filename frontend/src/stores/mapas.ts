@@ -8,7 +8,8 @@ import {
     MapaAjuste,
     MapaCompleto,
     SalvarAjustesRequest,
-    SalvarMapaRequest
+    SalvarMapaRequest,
+    DisponibilizarMapaRequest
 } from "@/types/tipos";
 
 export const useMapasStore = defineStore('mapas', {
@@ -99,6 +100,17 @@ export const useMapasStore = defineStore('mapas', {
             } catch {
                 notificacoes.erro('Erro ao verificar impactos', 'Não foi possível carregar os impactos no mapa.');
                 this.impactoMapa = null;
+            }
+        },
+
+        async disponibilizarMapa(codSubrocesso: number, request: DisponibilizarMapaRequest) {
+            const notificacoes = useNotificacoesStore();
+            try {
+                await mapaService.disponibilizarMapa(codSubrocesso, request);
+                notificacoes.sucesso('Mapa disponibilizado', 'O mapa de competências foi disponibilizado para validação.');
+            } catch (error: any) {
+                notificacoes.erro('Erro ao disponibilizar', error.response.data.message);
+                throw error;
             }
         },
     }

@@ -350,3 +350,8 @@ export interface ImpactoMapa {
     atividadesAlteradas: Atividade[];
     competenciasImpactadas: Competencia[];
 }
+
+export interface DisponibilizarMapaRequest {
+    dataLimite: string;
+    observacoes: string;
+}
