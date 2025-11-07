@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import sgc.mapa.model.MapaRepo;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
@@ -101,6 +102,22 @@ public class UnidadeService {
             dto.codigoPai(),
             dto.tipo(),
             subunidadesCompletas
+        );
+    }
+
+    public UnidadeDto buscarPorSigla(String sigla) {
+        Unidade unidade = unidadeRepo.findBySigla(sigla)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com sigla " + sigla + " não encontrada"));
+
+        Long codigoPai = unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null;
+
+        return new UnidadeDto(
+            unidade.getCodigo(),
+            unidade.getNome(),
+            unidade.getSigla(),
+            codigoPai,
+            unidade.getTipo().name(),
+            List.of()
         );
     }
 }
