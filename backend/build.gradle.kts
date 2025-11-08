@@ -118,7 +118,12 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
+}
+
+tasks.withType<Test> {
+    jvmArgs("--enable-preview")
 }
 
 tasks.register<BootRun>("bootRunE2E") {
