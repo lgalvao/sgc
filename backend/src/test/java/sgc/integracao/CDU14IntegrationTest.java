@@ -9,35 +9,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.AnaliseRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -59,9 +58,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("CDU-14: Analisar revisão de cadastro de atividades e conhecimentos")
-@Sql("/create-test-data.sql")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class})
+@Import({TestSecurityConfig.class, sgc.integracao.mocks.TestThymeleafConfig.class, sgc.integracao.mocks.TestEventConfig.class})
+@org.springframework.transaction.annotation.Transactional
 class CDU14IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -91,6 +90,8 @@ class CDU14IntegrationTest {
     private CompetenciaAtividadeRepo competenciaAtividadeRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
     @MockitoBean
     private SgrhService sgrhService;
 
@@ -100,9 +101,9 @@ class CDU14IntegrationTest {
     @BeforeEach
     void setUp() {
         unidade = unidadeRepo.findById(102L).orElseThrow();
-        admin = usuarioRepo.findById(111111111111L).orElseThrow();
-        gestor = usuarioRepo.findById(222222222222L).orElseThrow();
-        chefe = usuarioRepo.findById(333333333333L).orElseThrow();
+        admin = usuarioRepo.findById("111111111111").orElseThrow();
+        gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         // Configuração do Mock SgrhService
         when(sgrhService.buscarPerfisUsuario(admin.getTituloEleitoral().toString())).thenReturn(List.of(
@@ -125,12 +126,11 @@ class CDU14IntegrationTest {
     // Métodos de setup
     private Long criarEComecarProcessoDeRevisao() throws Exception {
         ProcessoDto processoDto = criarEIniciarProcessoDeRevisao();
-        Long subprocessoId = obterSubprocessoId(processoDto.getCodigo());
 
-        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
+        Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
         sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(sp);
-        return subprocessoId;
+        return sp.getCodigo();
     }
 
 
@@ -156,7 +156,7 @@ class CDU14IntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findAll()).hasSize(2);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
@@ -181,7 +181,7 @@ class CDU14IntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findAll()).hasSize(2);
+            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(2);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
         }
     }
@@ -342,6 +342,9 @@ class CDU14IntegrationTest {
                         .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo()))))
                 .andExpect(status().isOk());
 
+        entityManager.flush();
+        entityManager.clear();
+
         // Associa o mapa de revisão (pré-carregado) ao subprocesso
         Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
         Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
@@ -349,14 +352,5 @@ class CDU14IntegrationTest {
         subprocessoRepo.save(sp);
 
         return processoDto;
-    }
-
-    private Long obterSubprocessoId(Long processoId) throws Exception {
-        String resJson = mockMvc.perform(get("/api/processos/{id}/detalhes", processoId)
-                        .with(user(chefe)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-
-        ProcessoDetalheDto detalhes = objectMapper.readValue(resJson, ProcessoDetalheDto.class);
-        return detalhes.getResumoSubprocessos().getFirst().getCodigo();
     }
 }

@@ -1,14 +1,63 @@
 import {Locator, Page} from '@playwright/test';
 
+/**
+ * Extrai o ID de um seletor completo ou retorna o valor se já for um ID simples.
+ * Converte '[data-testid="id"]' para 'id' e '[data-testid="id"] tbody tr' para 'id'
+ * @param selector O seletor completo ou ID simples.
+ * @returns O ID extraído.
+ */
+export function extrairIdDoSeletor(selector: string): string {
+    if (!selector.includes('[data-testid=')) return selector;
+    const match = selector.match(/"([^"]+)"/);
+    return match ? match[1] : selector;
+}
+
+/**
+ * Gera um nome único adicionando um timestamp a um prefixo.
+ * @param prefixo O prefixo para o nome único.
+ * @returns O nome único.
+ */
 export function gerarNomeUnico(prefixo: string): string {
     return `${prefixo} ${Date.now()}`;
 }
 
 /**
- * Localiza um elemento preferindo test-id e mantendo fallback por role/text/locator.
- * - testId: string | undefined — se fornecido, tenta `page.getByTestId(testId)`
- * - role: Playwright role string (ex: 'button') e name: texto para getByRole fallback
- * - locatorFallback: css selector ou locator string para fallback adicional
+ * Remove todos os processos que usam a unidade especificada.
+ * @param page A instância da página do Playwright.
+ * @param siglaUnidade A sigla da unidade.
+ */
+export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade: string): Promise<void> {
+    try {
+        // Mapeamento de siglas para códigos (STIC = 2)
+        const codigosUnidade: Record<string, number> = {
+            'STIC': 2,
+            'SGP': 3,
+            'COEDE': 4,
+            'SEMARE': 5,
+        };
+
+        const codigo = codigosUnidade[siglaUnidade];
+        if (!codigo) {
+            console.warn(`Unidade ${siglaUnidade} não mapeada para cleanup`);
+            return;
+        }
+
+        // Usar endpoint E2E (POST em vez de DELETE por questões de segurança)
+        await page.request.post(`http://localhost:10000/api/e2e/processos/unidade/${codigo}/limpar`);
+    } catch (error) {
+        // Falha silenciosa - se não conseguir limpar, teste tentará rodar mesmo assim
+        console.log('Aviso: Não foi possível limpar processos:', error);
+    }
+}
+
+/**
+ * Localiza um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
+ * @param pageOrLocator A instância da página ou um localizador do Playwright.
+ * @param testId O test-id do elemento.
+ * @param role A role do elemento.
+ * @param name O nome do elemento.
+ * @param locatorFallback Um seletor de fallback.
+ * @returns O localizador do elemento.
  */
 export async function localizarPorTestIdOuRole(pageOrLocator: Page | Locator, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<Locator> {
     const page = pageOrLocator as Page;
@@ -37,8 +86,13 @@ export async function localizarPorTestIdOuRole(pageOrLocator: Page | Locator, te
 }
 
 /**
- * Clica em um elemento preferindo test-id, com fallback para role/text/locator.
- * Retorna true se clicou com sucesso, false caso contrário.
+ * Clica em um elemento usando uma combinação de test-id, role, nome e um seletor de fallback.
+ * @param page A instância da página do Playwright.
+ * @param testId O test-id do elemento.
+ * @param role A role do elemento.
+ * @param name O nome do elemento.
+ * @param locatorFallback Um seletor de fallback.
+ * @returns `true` se o clique foi bem-sucedido, `false` caso contrário.
  */
 export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: string, name?: string, locatorFallback?: string): Promise<boolean> {
     const el = await localizarPorTestIdOuRole(page, testId, role, name, locatorFallback);
@@ -61,7 +115,7 @@ export async function clicarPorTestIdOuRole(page: Page, testId?: string, role?: 
             // continua para próximo fallback
         }
 
-        // 2) Tentar click forçado (force: true)
+        // 2) Tentar clique forçado (force: true)
         try {
             await first.click({force: true});
             return true;

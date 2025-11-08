@@ -14,6 +14,7 @@
           class="form-control"
           placeholder="Descreva o processo"
           type="text"
+          data-testid="input-descricao"
         >
       </div>
 
@@ -26,6 +27,7 @@
           id="tipo"
           v-model="tipo"
           class="form-select"
+          data-testid="select-tipo"
         >
           <option
             v-for="tipoOption in TipoProcesso"
@@ -40,85 +42,16 @@
       <div class="mb-3">
         <label class="form-label">Unidades participantes</label>
         <div class="border rounded p-3">
-          <div>
-            <template
-              v-for="unidade in unidadesStore.unidades"
-              :key="unidade.sigla"
-              v-if="!unidadesStore.isLoading"
-            >
-              <div
-                :style="{ marginLeft: '0' }"
-                class="form-check"
-              >
-                <!--suppress HtmlUnknownAttribute -->
-                <input
-                  :id="`chk-${unidade.sigla}`"
-                  v-model="unidadesSelecionadas"
-                  :value="unidade.codigo"
-                  class="form-check-input"
-                  type="checkbox"
-                  :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
-                >
-                <label
-                  :for="`chk-${unidade.sigla}`"
-                  class="form-check-label ms-2"
-                >
-                  <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-                </label>
-              </div>
-              <div
-                v-if="unidade.filhas && unidade.filhas.length"
-                class="ms-4"
-              >
-                <template
-                  v-for="filha in unidade.filhas"
-                  :key="filha.sigla"
-                >
-                  <div class="form-check">
-                    <!--suppress HtmlUnknownAttribute -->
-                    <input
-                      :id="`chk-${filha.sigla}`"
-                      v-model="unidadesSelecionadas"
-                      :value="filha.codigo"
-                      class="form-check-input"
-                      type="checkbox"
-                      :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
-                    >
-                    <label
-                      :for="`chk-${filha.sigla}`"
-                      class="form-check-label ms-2"
-                    >
-                      <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-                    </label>
-                  </div>
-
-                  <div
-                    v-if="filha.filhas && filha.filhas.length"
-                    class="ms-4"
-                  >
-                    <div
-                      v-for="neta in filha.filhas"
-                      :key="neta.sigla"
-                      class="form-check"
-                    >
-                      <input
-                        :id="`chk-${neta.sigla}`"
-                        v-model="unidadesSelecionadas"
-                        :value="neta.codigo"
-                        class="form-check-input"
-                        type="checkbox"
-                      >
-                      <label
-                        :for="`chk-${neta.sigla}`"
-                        class="form-check-label ms-2"
-                      >
-                        <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                      </label>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </template>
+          <ArvoreUnidades
+            v-if="!unidadesStore.isLoading"
+            v-model="unidadesSelecionadas"
+            :unidades="unidadesStore.unidades"
+            :desabilitadas="unidadesDesabilitadas"
+            :filtrarPor="unidadeElegivel"
+          />
+          <div v-else class="text-center py-3">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Carregando unidades...
           </div>
         </div>
       </div>
@@ -133,6 +66,7 @@
           v-model="dataLimite"
           class="form-control"
           type="date"
+          data-testid="input-dataLimite"
         >
       </div>
       <button
@@ -283,12 +217,16 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
 import * as mapaService from '@/services/mapaService';
-import {ServidoresService} from "@/services/servidoresService";
+import {UsuariosService} from "@/services/usuariosService";
+import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 
-const unidadesSelecionadas = ref<number[]>([]) // Agora armazena o código da unidade
+const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')
-const tipo = ref<string>('MAPEAMENTO') // Tipo agora é string, mapeado no backend
+const tipo = ref<string>('MAPEAMENTO')
 const dataLimite = ref<string>('')
+const unidadesBloqueadas = ref<number[]>([])
+const unidadesComMapaVigente = ref<number[]>([])
+const unidadesComServidores = ref<number[]>([])
 const router = useRouter()
 const route = useRoute()
 const processosStore = useProcessosStore()
@@ -314,34 +252,26 @@ function extrairCodigosUnidades(unidades: any[]): number[] {
   return codigos;
 }
 
-// Carregar processo se estiver editando
 onMounted(async () => {
-  // CRÍTICO: Carregar unidades primeiro
   await unidadesStore.fetchUnidades();
-  console.log('[DEBUG Vue] Unidades da store carregadas:', unidadesStore.unidades.length);
+  await carregarUnidadesValidas(tipo.value);
 
-  const idProcesso = route.query.idProcesso;
-  if (idProcesso) {
+  const codProcesso = route.query.codProcesso;
+  if (codProcesso) {
     try {
-      console.log('[DEBUG Vue] Carregando processo:', idProcesso);
-      await processosStore.fetchProcessoDetalhe(Number(idProcesso));
-      const processo = processosStore.processoDetalhe; // Obter o processo detalhado da store
-      console.log('[DEBUG Vue] Processo carregado:', processo);
+      await processosStore.fetchProcessoDetalhe(Number(codProcesso));
+      const processo = processosStore.processoDetalhe;
       if (processo) {
         processoEditando.value = processo;
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
-        dataLimite.value = processo.dataLimite.split('T')[0]; // Formatar para 'YYYY-MM-DD'
+        dataLimite.value = processo.dataLimite.split('T')[0];
 
-        // Carregar unidades participantes do processo detalhe
-        console.log('[DEBUG Vue] processo.unidades:', processo.unidades);
-        // CORRIGIDO: extrair recursivamente todos os códigos (raiz + filhos + netos)
+        await carregarUnidadesValidas(processo.tipo);
+
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
-        console.log('[DEBUG Vue] unidadesSelecionadas após extração:', unidadesSelecionadas.value);
 
-        // Forçar atualização do DOM
         await nextTick();
-        console.log('[DEBUG Vue] nextTick concluído, DOM deve estar atualizado');
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
@@ -349,6 +279,106 @@ onMounted(async () => {
     }
   }
 })
+
+watch(tipo, async (novoTipo) => {
+  if (unidadesStore.unidades.length === 0) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
+    if (response.ok) {
+      unidadesBloqueadas.value = await response.json();
+    }
+  } catch (error) {
+    console.error('Erro ao buscar unidades bloqueadas:', error);
+  }
+
+  await carregarUnidadesValidas(novoTipo);
+});
+
+// TODO: Esta função executa múltiplas chamadas de API em um laço, o que é ineficiente.
+// A lógica de validação de unidades (verificar mapa vigente, existência de servidores)
+// deve ser movida para um único endpoint no backend que receba a lista de unidades
+// e retorne apenas as que são válidas para o tipo de processo.
+async function carregarUnidadesValidas(tipoProcesso: string) {
+  const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
+
+  // Para MAPEAMENTO, todas as unidades são elegíveis por padrão.
+  if (tipoProcesso === 'MAPEAMENTO') {
+    unidadesComMapaVigente.value = todasUnidades;
+    unidadesComServidores.value = todasUnidades;
+    return;
+  }
+
+  // Para REVISAO e DIAGNOSTICO, precisamos verificar o mapa vigente.
+  const mapaChecks = todasUnidades.map(codigo =>
+    mapaService.verificarMapaVigente(codigo).then(temMapa => ({ codigo, temMapa }))
+  );
+  const mapaResultados = await Promise.all(mapaChecks);
+  unidadesComMapaVigente.value = mapaResultados.filter(r => r.temMapa).map(r => r.codigo);
+
+  // Para DIAGNOSTICO, precisamos verificar também os servidores.
+  if (tipoProcesso === 'DIAGNOSTICO') {
+    const servidorChecks = todasUnidades.map(codigo =>
+      unidadeTemServidores(codigo).then(temServidores => ({ codigo, temServidores }))
+    );
+    const servidorResultados = await Promise.all(servidorChecks);
+    unidadesComServidores.value = servidorResultados.filter(r => r.temServidores).map(r => r.codigo);
+  } else {
+    // Para REVISAO, não é necessário verificar servidores.
+    unidadesComServidores.value = todasUnidades;
+  }
+}
+
+// Extrai todos os códigos de unidades da árvore (incluindo filhas)
+function extrairTodasUnidadesCodigos(unidades: Unidade[]): number[] {
+  const codigos: number[] = [];
+  for (const unidade of unidades) {
+    codigos.push(unidade.codigo);
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      codigos.push(...extrairTodasUnidadesCodigos(unidade.filhas));
+    }
+  }
+  return codigos;
+}
+
+// Verifica se a unidade deve estar visível/habilitada baseado no tipo de processo
+function isUnidadeValida(codigo: number | undefined): boolean {
+  if (codigo === undefined) {
+    return false;
+  }
+
+  const tipoAtual = tipo.value;
+
+  if (tipoAtual === 'REVISAO' || tipoAtual === 'DIAGNOSTICO') {
+    if (!unidadesComMapaVigente.value.includes(codigo)) {
+      return false;
+    }
+  }
+
+  if (tipoAtual === 'DIAGNOSTICO') {
+    if (!unidadesComServidores.value.includes(codigo)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// Verifica se a unidade deve estar desabilitada
+function isUnidadeDesabilitada(codigo: number): boolean {
+  // Desabilita apenas se estiver bloqueada (já em processo ativo)
+  return isUnidadeBloqueada(codigo);
+}
+
+function isUnidadeBloqueada(codigo: number): boolean {
+  // Não bloquear se estamos editando e a unidade já estava selecionada
+  if (processoEditando.value && unidadesSelecionadas.value.includes(codigo)) {
+    return false;
+  }
+  return unidadesBloqueadas.value.includes(codigo);
+}
 
 function limparCampos() {
   descricao.value = ''
@@ -358,39 +388,44 @@ function limparCampos() {
 }
 
 function isUnidadeIntermediaria(codigo: number): boolean {
-  const unidade = unidadesStore.unidades.find(u => u.codigo === codigo);
+  const unidade = encontrarUnidadeRecursiva(codigo, unidadesStore.unidades);
   return unidade?.tipo === 'INTERMEDIARIA';
 }
 
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
+function encontrarUnidadeRecursiva(codigo: number, unidades: Unidade[]): Unidade | null {
+  for (const unidade of unidades) {
+    if (unidade.codigo === codigo) {
+      return unidade;
+    }
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      const encontrada = encontrarUnidadeRecursiva(codigo, unidade.filhas);
+      if (encontrada) {
+        return encontrada;
+      }
+    }
+  }
+  return null;
+}
+
 async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
   return await mapaService.verificarMapaVigente(codigo);
 }
 
-// TODO: Ajustar a lógica de validação de unidades para usar os códigos das unidades
 async function unidadeTemServidores(codigo: number): Promise<boolean> {
-  const servidores = await ServidoresService.buscarServidoresPorUnidade(codigo);
-  return servidores.length > 0;
+  try {
+    const usuarios = await UsuariosService.buscarUsuariosPorUnidade(codigo);
+    return usuarios.length > 0;
+  } catch (error) {
+    console.warn(`[DEBUG Vue] Não foi possível verificar usuários para unidade ${codigo}:`, error);
+    return false;
+  }
 }
 
 async function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecionadas: number[]): Promise<number[]> {
-  let unidadesValidas = unidadesSelecionadas.filter(codigo => !isUnidadeIntermediaria(codigo));
-
-  if (tipoProcesso === 'REVISAO' || tipoProcesso === 'DIAGNOSTICO') {
-    const resultados = await Promise.all(unidadesValidas.map(async codigo => ({
-      codigo,
-      temMapaVigente: await unidadeTemMapaVigente(codigo)
-    })));
-    unidadesValidas = resultados.filter(res => res.temMapaVigente).map(res => res.codigo);
-  }
-
-  if (tipoProcesso === 'DIAGNOSTICO') {
-    const resultadosServidores = await Promise.all(unidadesValidas.map(async codigo => ({
-      codigo,
-      temServidores: await unidadeTemServidores(codigo)
-    })));
-    unidadesValidas = resultadosServidores.filter(res => res.temServidores).map(res => res.codigo);
-  }
+  const unidadesValidas = unidadesSelecionadas.filter(codigo => {
+    const isIntermediaria = isUnidadeIntermediaria(codigo);
+    return !isIntermediaria;
+  });
 
   return unidadesValidas;
 }
@@ -401,51 +436,42 @@ async function salvarProcesso() {
         'Dados incompletos',
         'Preencha todos os campos e selecione ao menos uma unidade.'
     );
-    return
-  }
-
-  const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-
-  if (unidadesFiltradas.length === 0) {
-    notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
-    );
-    return
+    return;
   }
 
   try {
+    const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
+
+    if (unidadesFiltradas.length === 0) {
+      notificacoesStore.erro(
+          'Unidades inválidas',
+          'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+      );
+      return;
+    }
+
     if (processoEditando.value) {
-      // Editando processo existente
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
         unidades: unidadesFiltradas
       };
-      await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-
-      notificacoesStore.sucesso(
-          'Processo alterado',
-          'O processo foi alterado com sucesso!'
-      );
+      await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
+      notificacoesStore.sucesso('Processo alterado', 'O processo foi alterado!');
+      await router.push('/painel');
     } else {
-      // Criando novo processo
       const request: CriarProcessoRequest = {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
-        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`, // Formato ISO
+        dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
         unidades: unidadesFiltradas
       };
-      await processoService.criarProcesso(request);
-
-      notificacoesStore.sucesso(
-          'Processo salvo',
-          'O processo foi salvo com sucesso!'
-      );
+      await processosStore.criarProcesso(request);
+      notificacoesStore.sucesso('Processo salvo', 'O processo foi salvo!');
+      router.push(`/painel`);
     }
-    router.push('/painel');
     limparCampos();
   } catch (error) {
     notificacoesStore.erro('Erro ao salvar processo', 'Não foi possível salvar o processo. Verifique os dados e tente novamente.');
@@ -480,26 +506,26 @@ function fecharModalConfirmacao() {
 
 async function confirmarIniciarProcesso() {
   mostrarModalConfirmacao.value = false;
-  if (processoEditando.value) {
-    try {
-      // Usa a action da store, passando os parâmetros necessários
-      await processosStore.iniciarProcesso(
-          processoEditando.value.codigo,
-          tipo.value as TipoProcesso, // Garante a tipagem correta
-          unidadesSelecionadas.value
-      );
-      notificacoesStore.sucesso(
-          'Processo iniciado',
-          'O processo foi iniciado com sucesso! Notificações enviadas às unidades.'
-      );
-      router.push('/painel');
-      limparCampos();
-    } catch (error) {
-      notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
-      console.error('Erro ao iniciar processo:', error);
-    }
-  } else {
+  if (!processoEditando.value) {
     notificacoesStore.erro('Salve o processo', 'Você precisa salvar o processo antes de poder iniciá-lo.');
+    return;
+  }
+
+  try {
+    await processosStore.iniciarProcesso(
+        processoEditando.value.codigo,
+        tipo.value as TipoProcesso,
+        unidadesSelecionadas.value
+    );
+    notificacoesStore.sucesso(
+        'Processo iniciado',
+        'O processo foi iniciado! Notificações enviadas às unidades.'
+    );
+    await router.push('/painel');
+    limparCampos();
+  } catch (error) {
+    notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
+    console.error('Erro ao iniciar processo:', error);
   }
 }
 
@@ -521,7 +547,7 @@ async function confirmarRemocao() {
         mensagem: `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricao.value}${TEXTOS.PROCESSO_REMOVIDO_FIM}`,
         testId: 'notificacao-remocao'
       });
-      router.push('/painel');
+      await router.push('/painel');
     } catch (error) {
       notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
       console.error('Erro ao remover processo:', error);
@@ -530,62 +556,72 @@ async function confirmarRemocao() {
   fecharModalRemocao();
 }
 
-// Funções de manipulação de unidades (serão ajustadas em uma etapa posterior)
-function getTodasSubunidades(unidade: Unidade): number[] {
-  let subunidades: number[] = [];
-  if (unidade.filhas) {
-    for (const filha of unidade.filhas) {
-      subunidades.push(filha.codigo);
-      subunidades = subunidades.concat(getTodasSubunidades(filha));
+const unidadesStatus = computed(() => {
+  const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
+  const desabilitadas: number[] = [];
+  const elegiveis: number[] = [];
+  const unidadesProtegidas = processoEditando.value ? unidadesSelecionadas.value : [];
+
+  for (const codigo of todasUnidades) {
+    let isElegivel = true;
+    let isDesabilitada = false;
+
+    if (unidadesProtegidas.includes(codigo)) {
+      elegiveis.push(codigo);
+      continue;
+    }
+
+    if (unidadesBloqueadas.value.includes(codigo)) {
+      isElegivel = false;
+      isDesabilitada = true;
+    }
+
+    if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
+      if (!unidadesComMapaVigente.value.includes(codigo)) {
+        isElegivel = false;
+        isDesabilitada = true;
+      }
+    }
+
+    if (tipo.value === 'DIAGNOSTICO') {
+      if (!unidadesComServidores.value.includes(codigo)) {
+        isElegivel = false;
+        isDesabilitada = true;
+      }
+    }
+
+    if (isElegivel) {
+      elegiveis.push(codigo);
+    }
+    if (isDesabilitada) {
+      desabilitadas.push(codigo);
     }
   }
-  return subunidades;
+
+  return {
+    desabilitadas,
+    elegiveis
+  };
+});
+
+const unidadesDesabilitadas = computed(() => unidadesStatus.value.desabilitadas);
+
+function unidadeElegivel(unidade: Unidade): boolean {
+  return unidadesStatus.value.elegiveis.includes(unidade.codigo);
 }
 
-function isFolha(unidade: Unidade): boolean {
-  return !unidade.filhas || unidade.filhas.length === 0;
-}
-
-function isChecked(codigo: number): boolean {
-  return unidadesSelecionadas.value.includes(codigo);
-}
-
-function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
-  const selfSelected = isChecked(unidade.codigo);
-
-  if (isFolha(unidade)) {
-    return selfSelected;
-  }
-
-  const subunidades = getTodasSubunidades(unidade);
-  if (subunidades.length === 0) {
-    return selfSelected;
-  }
-  const selecionadas = subunidades.filter(codigo => isChecked(codigo)).length;
-
-  if (selecionadas === 0 && !selfSelected) {
-    return false;
-  }
-  if (selecionadas === subunidades.length && selfSelected) {
+// Função auxiliar para verificar se unidade ou suas filhas são elegíveis
+function temFilhasElegiveis(unidade: Unidade): boolean {
+  if (unidadeElegivel(unidade)) {
     return true;
   }
-  return 'indeterminate';
-}
 
-function toggleUnidade(unidade: Unidade) {
-  const todasSubunidades = [unidade.codigo, ...getTodasSubunidades(unidade)];
-  const todasEstaoSelecionadas = todasSubunidades.every(codigo => isChecked(codigo));
-
-  if (todasEstaoSelecionadas) {
-    unidadesSelecionadas.value = unidadesSelecionadas.value.filter(
-        codigo => !todasSubunidades.includes(codigo)
-    );
-  } else {
-    todasSubunidades.forEach(codigo => {
-      if (!unidadesSelecionadas.value.includes(codigo)) {
-        unidadesSelecionadas.value.push(codigo);
-      }
-    });
+  // Se a unidade não é elegível, verificar filhas
+  if (unidade.filhas && unidade.filhas.length > 0) {
+    return unidade.filhas.some(f => temFilhasElegiveis(f));
   }
+
+  return false;
 }
+
 </script>

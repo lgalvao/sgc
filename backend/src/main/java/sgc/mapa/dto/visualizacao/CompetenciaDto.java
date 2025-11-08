@@ -1,19 +1,10 @@
 package sgc.mapa.dto.visualizacao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public record CompetenciaDto(
-    Long codigo,
-    String descricao,
-    List<AtividadeDto> atividades
+        Long codigo,
+        String descricao,
+        List<AtividadeDto> atividades
 ) {
-    public CompetenciaDto {
-        atividades = new ArrayList<>(atividades);
-    }
-
-    @Override
-    public List<AtividadeDto> atividades() {
-        return new ArrayList<>(atividades);
-    }
 }

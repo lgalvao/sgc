@@ -73,7 +73,7 @@
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
 import {useAnalisesStore} from '@/stores/analises';
-import type {AnaliseValidacao, AnaliseCadastro} from '@/types/tipos';
+import type {AnaliseCadastro, AnaliseValidacao} from '@/types/tipos';
 import {format} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
 

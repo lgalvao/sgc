@@ -2,38 +2,36 @@ package sgc.service;
 
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.ProcessoMapper;
+import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
+import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.processo.modelo.*;
+import sgc.processo.model.*;
 import sgc.processo.service.ProcessoNotificacaoService;
 import sgc.processo.service.ProcessoService;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

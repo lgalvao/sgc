@@ -16,9 +16,15 @@ Este componente é um diálogo modal utilizado para realizar ações em massa (a
 
 ---
 
+## ArvoreUnidades.vue
+
+Este componente implementa uma árvore hierárquica de seleção de unidades com suporte a checkboxes com três estados (marcado, desmarcado, indeterminado). Ele é totalmente controlado via `v-model` e permite filtragem customizada de unidades através de uma função. A seleção é hierárquica: marcar uma unidade marca todas suas filhas automaticamente, e desmarcar remove todas as filhas. Unidades do tipo `INTEROPERACIONAL` podem permanecer marcadas mesmo quando nem todas suas filhas estão selecionadas, diferentemente de unidades `INTERMEDIARIA` que ficam em estado indeterminado nessa situação. O componente aceita as propriedades: `unidades` (array hierárquico de unidades), `modelValue` (array de códigos selecionados para v-model), `desabilitadas` (array de códigos de unidades desabilitadas) e `filtrarPor` (função para filtrar quais unidades são elegíveis). Emite `update:modelValue` quando a seleção muda. A hierarquia é exibida com indentação visual usando classes Bootstrap.
+
+---
+
 ## BarraNavegacao.vue
 
-Este componente fornece elementos de navegação, incluindo um botão "Voltar" e breadcrumbs dinâmicos. O botão "Voltar" é exibido em todas as páginas, exceto '/login' e '/painel', e aciona a função `router.back()`. Os breadcrumbs também são ocultados nas páginas '/login' e '/painel'. Os breadcrumbs são gerados dinamicamente com base na rota atual, incluindo parâmetros como `idProcesso` e `siglaUnidade`, e o `perfilSelecionado` do usuário. Ele também considera metadados `breadcrumb` definidos na configuração da rota para exibir o rótulo da página atual.
+Este componente fornece elementos de navegação, incluindo um botão "Voltar" e breadcrumbs dinâmicos. O botão "Voltar" é exibido em todas as páginas, exceto '/login' e '/painel', e aciona a função `router.back()`. Os breadcrumbs também são ocultados nas páginas '/login' e '/painel'. Os breadcrumbs são gerados dinamicamente com base na rota atual, incluindo parâmetros como `codProcesso` e `siglaUnidade`, e o `perfilSelecionado` do usuário. Ele também considera metadados `breadcrumb` definidos na configuração da rota para exibir o rótulo da página atual.
 
 ---
 

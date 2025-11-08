@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.Test;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -197,8 +197,8 @@ class SubprocessoDtoTest {
 
     @Test
     void SubprocessoCadastroDto_RecordConstructorAndAccessors() {
-        List<SubprocessoCadastroDto.AtividadeCadastroDTO> atividades = List.of(
-                SubprocessoCadastroDto.AtividadeCadastroDTO.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
+        List<SubprocessoCadastroDto.AtividadeCadastroDto> atividades = List.of(
+                SubprocessoCadastroDto.AtividadeCadastroDto.builder().codigo(1L).descricao("Atividade").conhecimentos(List.of()).build()
         );
         SubprocessoCadastroDto dto = SubprocessoCadastroDto.builder().subprocessoId(1L).unidadeSigla(SIGLA).atividades(atividades).build();
 

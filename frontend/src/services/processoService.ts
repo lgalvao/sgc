@@ -5,8 +5,9 @@ import type {
     Processo,
     ProcessoDetalhe,
     ProcessoResumo,
+    SubprocessoElegivel,
 } from '@/types/tipos';
-import { ApiError } from './ApiError';
+import {ApiError} from './ApiError';
 import axios from 'axios';
 
 async function handleError(error: unknown, context: string): Promise<never> {
@@ -89,14 +90,47 @@ export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe
 }
 
 export async function processarAcaoEmBloco(payload: {
-    idProcesso: number,
+    codProcesso: number,
     unidades: string[],
     tipoAcao: 'aceitar' | 'homologar',
     unidadeUsuario: string
 }): Promise<void> {
     try {
-        await apiClient.post(`/processos/${payload.idProcesso}/acoes-em-bloco`, payload);
+        await apiClient.post(`/processos/${payload.codProcesso}/acoes-em-bloco`, payload);
     } catch (error) {
-        return handleError(error, `processar ação em bloco para o processo ${payload.idProcesso}`);
+        return handleError(error, `processar ação em bloco para o processo ${payload.codProcesso}`);
+    }
+}
+
+export async function fetchSubprocessosElegiveis(codProcesso: number): Promise<SubprocessoElegivel[]> {
+    try {
+        const response = await apiClient.get<SubprocessoElegivel[]>(`/processos/${codProcesso}/subprocessos-elegiveis`);
+        return response.data;
+    } catch (error) {
+        return handleError(error, `buscar subprocessos elegíveis para o processo ${codProcesso}`);
+    }
+}
+
+export async function alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/alterar-data-limite`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `alterar a data limite para o subprocesso ${id}`);
+    }
+}
+
+export async function apresentarSugestoes(id: number, dados: { sugestoes: string }): Promise<void> {
+    try {
+        await apiClient.post(`/processos/apresentar-sugestoes`, { id, ...dados });
+    } catch (error) {
+        return handleError(error, `apresentar sugestões para o subprocesso ${id}`);
+    }
+}
+
+export async function validarMapa(id: number): Promise<void> {
+    try {
+        await apiClient.post(`/processos/validar-mapa`, { id });
+    } catch (error) {
+        return handleError(error, `validar o mapa para o subprocesso ${id}`);
     }
 }

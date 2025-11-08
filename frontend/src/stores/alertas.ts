@@ -32,7 +32,6 @@ export const useAlertasStore = defineStore('alertas', {
                 }
                 return true;
             } catch (error) {
-                console.error('Erro ao marcar alerta como lido:', error);
                 return false;
             }
         },

@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import sgc.comum.json.SanitizeHtml;
 
 /**
  * Request para devolver validação do mapa (CDU-20 item 7).
@@ -8,5 +9,7 @@ import jakarta.validation.constraints.NotBlank;
  * @param justificativa A justificativa para a devolução.
  */
 public record DevolverValidacaoReq(
-    @NotBlank String justificativa
+    @NotBlank
+    @SanitizeHtml
+    String justificativa
 ) {}

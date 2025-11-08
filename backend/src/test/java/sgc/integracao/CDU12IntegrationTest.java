@@ -10,35 +10,34 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividade.Id;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividade.Id;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.*;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
-import sgc.mapa.modelo.UnidadeMapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapa;
+import sgc.mapa.model.UnidadeMapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
@@ -56,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU12IntegrationTest {
 
     private static final String API_SUBPROCESSOS_ID_IMPACTOS_MAPA = "/api/subprocessos/{codigo}/impactos-mapa";
-    private static final String CHEFE_UT_USERNAME = "121212121212";
+    private static final String CHEFE_TITULO = "121212121212";
     private static final String TEM_IMPACTOS_JSON_PATH = "$.temImpactos";
     private static final String TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH = "$.totalAtividadesInseridas";
     private static final String TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH = "$.totalAtividadesRemovidas";
@@ -89,24 +88,11 @@ class CDU12IntegrationTest {
     @BeforeEach
     void setUp() {
         // 1. Unidade e Chefe
-        // Test data
-        Unidade unidade = new Unidade("Unidade de Teste", "UT");
-        Usuario chefe = new Usuario();
-        chefe.setTituloEleitoral(Long.parseLong(CHEFE_UT_USERNAME));
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
-
-        Usuario gestor = new Usuario();
-        gestor.setTituloEleitoral(222222222222L);
-        gestor.setPerfis(java.util.Set.of(Perfil.GESTOR));
-        usuarioRepo.save(gestor);
-
-        Usuario admin = new Usuario();
-        admin.setTituloEleitoral(111111111111L);
-        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
-        usuarioRepo.save(admin);
+        // Use existing data
+        Unidade unidade = unidadeRepo.findById(12L).orElseThrow(); // SEJUR
+        Usuario chefe = usuarioRepo.findById(CHEFE_TITULO).orElseThrow();
+        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         // 2. Processo de Revisão
         Processo processoRevisao = new Processo(
@@ -159,7 +145,7 @@ class CDU12IntegrationTest {
     class Sucesso {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente")
         void semImpactos_QuandoCadastroIdentico() throws Exception {
             // Arrange: Copia as atividades do mapa vigente para o mapa do subprocesso
@@ -181,7 +167,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades inseridas")
         void deveDetectarAtividadesInseridas() throws Exception {
             // Arrange: Mantém as atividades vigentes e adiciona uma nova
@@ -200,7 +186,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades removidas e as competências relacionadas")
         void deveDetectarAtividadesRemovidas() throws Exception {
             // Arrange: Adiciona apenas uma das atividades vigentes, efetivamente removendo a outra.
@@ -218,7 +204,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades alteradas como uma remoção e uma inserção")
         void deveDetectarAtividadesAlteradas() throws Exception {
             // Arrange: Cria uma atividade com descrição diferente.
@@ -240,7 +226,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve identificar competências impactadas por remoções e alterações")
         void deveIdentificarCompetenciasImpactadas() throws Exception {
             // Arrange:
@@ -273,7 +259,7 @@ class CDU12IntegrationTest {
     class BordaEfalhas {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
             // Arrange
@@ -290,7 +276,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve retornar 404 para subprocesso inexistente")
         void deveRetornar404_QuandoSubprocessoNaoExiste() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, 9999L))
@@ -303,7 +289,7 @@ class CDU12IntegrationTest {
     class Acesso {
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento'")
         void chefePodeAcessar_EmRevisaoCadastro() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -347,7 +333,7 @@ class CDU12IntegrationTest {
         }
 
         @Test
-        @WithMockChefe(CHEFE_UT_USERNAME)
+        @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE NÃO pode acessar se subprocesso está em situação diferente de 'Revisão do cadastro em andamento'")
         void chefeNaoPodeAcessar_EmSituacaoIncorreta() throws Exception {
             subprocessoRevisao.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);

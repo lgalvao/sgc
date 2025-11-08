@@ -35,7 +35,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 const atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
                 atividades.push(novaAtividade);
                 this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
-                notificacoes.sucesso('Atividade adicionada', 'A nova atividade foi adicionada com sucesso.');
+                notificacoes.sucesso('Atividade adicionada', 'A nova atividade foi adicionada.');
                 // Opcional: recarregar para garantir consistência total, mas a adição otimista já ajuda.
                 await this.fetchAtividadesParaSubprocesso(codSubrocesso);
             } catch {
@@ -49,7 +49,7 @@ export const useAtividadesStore = defineStore('atividades', {
                 let atividades = this.atividadesPorSubprocesso.get(codSubrocesso) || [];
                 atividades = atividades.filter(a => a.codigo !== atividadeId);
                 this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
-                useNotificacoesStore().sucesso('Atividade removida', 'A atividade foi removida com sucesso.');
+                useNotificacoesStore().sucesso('Atividade removida', 'A atividade foi removida.');
             } catch {
                 useNotificacoesStore().erro('Erro ao remover atividade', 'Não foi possível remover a atividade.');
             }
@@ -64,7 +64,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     atividade.conhecimentos.push(novoConhecimento);
                     this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
                 }
-                 useNotificacoesStore().sucesso('Conhecimento adicionado', 'O novo conhecimento foi adicionado com sucesso.');
+                 useNotificacoesStore().sucesso('Conhecimento adicionado', 'O novo conhecimento foi adicionado.');
             } catch {
                 useNotificacoesStore().erro('Erro ao adicionar conhecimento', 'Não foi possível salvar o novo conhecimento.');
             }
@@ -79,7 +79,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     atividade.conhecimentos = atividade.conhecimentos.filter(c => c.id !== conhecimentoId);
                     this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
                 }
-                useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido com sucesso.');
+                useNotificacoesStore().sucesso('Conhecimento removido', 'O conhecimento foi removido.');
             } catch {
                 useNotificacoesStore().erro('Erro ao remover conhecimento', 'Não foi possível remover o conhecimento.');
             }
@@ -89,7 +89,7 @@ export const useAtividadesStore = defineStore('atividades', {
             const notificacoes = useNotificacoesStore();
             try {
                 await subprocessoService.importarAtividades(codSubrocessoDestino, codSubrocessoOrigem);
-                notificacoes.sucesso('Atividades importadas', 'As atividades foram importadas com sucesso.');
+                notificacoes.sucesso('Atividades importadas', 'As atividades foram importadas.');
                 // Recarregar as atividades do subprocesso de destino para refletir a importação
                 await this.fetchAtividadesParaSubprocesso(codSubrocessoDestino);
             } catch {
@@ -107,7 +107,7 @@ export const useAtividadesStore = defineStore('atividades', {
                     atividades[index] = atividadeAtualizada;
                     this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
                 }
-                notificacoes.sucesso('Atividade atualizada', 'A atividade foi atualizada com sucesso.');
+                notificacoes.sucesso('Atividade atualizada', 'A atividade foi atualizada.');
             } catch {
                 notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar a atividade.');
             }
@@ -126,7 +126,7 @@ export const useAtividadesStore = defineStore('atividades', {
                         this.atividadesPorSubprocesso.set(codSubrocesso, atividades);
                     }
                 }
-                notificacoes.sucesso('Conhecimento atualizado', 'O conhecimento foi atualizado com sucesso.');
+                notificacoes.sucesso('Conhecimento atualizado', 'O conhecimento foi atualizado.');
             } catch {
                 notificacoes.erro('Erro ao atualizar', 'Não foi possível atualizar o conhecimento.');
             }

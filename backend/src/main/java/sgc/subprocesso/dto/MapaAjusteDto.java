@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import sgc.analise.modelo.Analise;
-import sgc.atividade.modelo.Atividade;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.analise.model.Analise;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.Conhecimento;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ public class MapaAjusteDto {
     @NotNull @Valid private final List<CompetenciaAjusteDto> competencias;
     private final String justificativaDevolucao;
 
-    // TODO Parametros demais!
     public static MapaAjusteDto of(Subprocesso sp, Analise analise, List<Competencia> competencias, List<Atividade> atividades, List<Conhecimento> conhecimentos, List<CompetenciaAtividade> competenciaAtividades) {
         Long codMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade() != null ? sp.getUnidade().getNome() : "";

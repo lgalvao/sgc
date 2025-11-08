@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import sgc.comum.json.SanitizeHtml;
 
 /**
  * Request para apresentar sugestões ao mapa de competências (CDU-19 item 8).
@@ -10,5 +11,6 @@ import jakarta.validation.constraints.NotBlank;
  */
 public record ApresentarSugestoesReq(
     @NotBlank(message = "As sugestões são obrigatórias")
+    @SanitizeHtml
     String sugestoes
 ) {}

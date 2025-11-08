@@ -6,10 +6,11 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
     timeout: 10000,
+    reporter: "dot",
     expect: {timeout: 5000},
     projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
     webServer: {
-        command: 'cd frontend ; npm run dev',
+        command: 'cd frontend && npm run dev',
         url: 'http://localhost:5173',
         timeout: 20000,
         reuseExistingServer: true

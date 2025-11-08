@@ -3,11 +3,11 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 
 import java.util.List;
 
@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MapaIntegridadeService {
-
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
@@ -28,6 +27,10 @@ public class MapaIntegridadeService {
      *     <li>Atividades que não estão vinculadas a nenhuma competência.</li>
      *     <li>Competências que não estão vinculadas a nenhuma atividade.</li>
      * </ul>
+     * <p>
+     * Nota: Esta é uma validação defensiva. Em operação normal, não deve haver atividades ou
+     * competências órfãs se as camadas de negócio estiverem corretamente configuradas.
+     * Sirve como proteção contra dados inconsistentes e para diagnosticar problemas.
      *
      * @param codMapa O código do mapa a ser validado.
      */
@@ -42,7 +45,7 @@ public class MapaIntegridadeService {
         }
 
         for (Competencia competencia : competencias) {
-            if (competenciaAtividadeRepo.findByCompetencia_Codigo(competencia.getCodigo()).isEmpty()) {
+            if (competenciaAtividadeRepo.findByCompetenciaCodigo(competencia.getCodigo()).isEmpty()) {
                 log.warn("Competência {} sem atividades vinculadas no mapa {}", competencia.getCodigo(), codMapa);
             }
         }

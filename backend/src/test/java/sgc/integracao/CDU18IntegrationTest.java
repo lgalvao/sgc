@@ -7,29 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,7 +75,7 @@ class CDU18IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
+        unidade = unidadeRepo.findById(11L).orElseThrow(); // Use existing SENIC
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDataLimite(LocalDateTime.now().plusMonths(1));

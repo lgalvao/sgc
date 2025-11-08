@@ -7,7 +7,7 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,11 +17,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SgrhService {
+    final UnidadeRepo unidadeRepo;
 
     // Mapa estático para controle de mocks em testes E2E
     public static final Map<String, List<PerfilDto>> perfisMock = new ConcurrentHashMap<>();
-
-    private final UnidadeRepo unidadeRepo;
 
     public Optional<UsuarioDto> buscarUsuarioPorTitulo(String titulo) {
         log.warn("MOCK SGRH: Buscando usuário por título.");

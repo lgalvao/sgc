@@ -10,53 +10,47 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroApi;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.DisponibilizarMapaReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-
-import java.util.Set;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -98,6 +92,8 @@ class CDU17IntegrationTest {
     private AnaliseRepo analiseRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidade;
     private Subprocesso subprocesso;
@@ -112,29 +108,22 @@ class CDU17IntegrationTest {
         alertaRepo.deleteAll();
         competenciaAtividadeRepo.deleteAll();
         atividadeRepo.deleteAll();
-        competenciaRepo.deleteAll();
+        competenciaRepo.deleteAll(); // Delete competencias before mapas
+        unidadeMapaRepo.deleteAll(); // Delete unidade_mapa before mapas
         subprocessoRepo.deleteAll();
         mapaRepo.deleteAll();
         processoRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
 
-        // Criar Usuários de Teste
-        usuarioRepo.save(new Usuario(111111111111L, "Admin User", "admin@example.com", "123", null, Set.of(Perfil.ADMIN)));
-        usuarioRepo.save(new Usuario(222222222222L, "Gestor User", "gestor@example.com", "123", null, Set.of(Perfil.GESTOR)));
-        Usuario titularUS = usuarioRepo.save(new Usuario(444444444444L, "Titular US", "titular.us@example.com", "123", null, Set.of(Perfil.CHEFE)));
-        Usuario titularUT = usuarioRepo.save(new Usuario(555555555555L, "Titular UT", "titular.ut@example.com", "123", null, Set.of(Perfil.CHEFE)));
+        // Use existing users from data-postgresql.sql
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
+        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
+        Usuario titularUS = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
+        Usuario titularUT = usuarioRepo.findById("2").orElseThrow(); // Carlos Henrique Lima
 
-        // Criar Unidades
-        unidadeRepo.save(new Unidade(SEDOC_LITERAL, SEDOC_LITERAL));
-        Unidade unidadeSuperior = new Unidade("Unidade Superior", "US");
-        unidadeSuperior.setTitular(titularUS);
-        unidadeRepo.save(unidadeSuperior);
-
-        unidade = new Unidade("Unidade de Teste", "UT");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade.setTitular(titularUT);
-        unidade = unidadeRepo.save(unidade);
+        // Use existing units from data-postgresql.sql
+        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
+        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
 
         // Criar Processo e Mapa
         // Dados de Teste
@@ -163,7 +152,7 @@ class CDU17IntegrationTest {
     class Sucesso {
 
         @Test
-        @DisplayName("Deve disponibilizar mapa com sucesso quando todos os dados estão corretos")
+        @DisplayName("Deve disponibilizar mapa quando todos os dados estão corretos")
         @WithMockAdmin
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
             // Arrange: Associar atividade e competência
@@ -186,7 +175,7 @@ class CDU17IntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado com sucesso."));
+                    .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado."));
 
             // Verificar o estado final no banco de dados
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
@@ -213,7 +202,7 @@ class CDU17IntegrationTest {
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
 
             // Verificar Limpeza do Histórico
-            List<Analise> analisesRestantes = analiseRepo.findBySubprocesso_Codigo(subprocesso.getCodigo());
+            List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
             assertThat(analisesRestantes).isEmpty();
         }
     }

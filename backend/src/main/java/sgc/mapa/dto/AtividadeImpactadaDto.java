@@ -1,8 +1,7 @@
 package sgc.mapa.dto;
 
-import sgc.mapa.modelo.TipoImpactoAtividade;
+import sgc.mapa.model.TipoImpactoAtividade;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,13 +17,10 @@ import java.util.List;
  * @param competenciasVinculadas Nomes das competências vinculadas a esta atividade.
  */
 public record AtividadeImpactadaDto(
-    Long codigo,
-    String descricao,
-    TipoImpactoAtividade tipoImpacto,  // INSERIDA, REMOVIDA, ALTERADA
-    String descricaoAnterior,  // Para ALTERADA (null para outros tipos)
-    List<String> competenciasVinculadas  // Nomes das competências vinculadas
+        Long codigo,
+        String descricao,
+        TipoImpactoAtividade tipoImpacto,  // INSERIDA, REMOVIDA, ALTERADA
+        String descricaoAnterior,  // Para ALTERADA (null para outros tipos)
+        List<String> competenciasVinculadas  // Nomes das competências vinculadas
 ) {
-    public AtividadeImpactadaDto {
-        competenciasVinculadas = new ArrayList<>(competenciasVinculadas);
-    }
 }

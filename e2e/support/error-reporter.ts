@@ -62,7 +62,7 @@ export class ErrorReporter {
     }
 
     public generateReport(): void {
-        const totalErrors = Object.values(this.errors).flat().length;
+        const totalErrors = Object.values(this.errors).flat().filter(err => !String(err.message || err.error || err).includes('ABORTED')).length;
         if (totalErrors === 0) return;
 
         console.error(`\n🚨 RELATÓRIO DE ERROS - ${totalErrors} erro(s) encontrado(s)`);
@@ -71,7 +71,10 @@ export class ErrorReporter {
             if (errors.length > 0) {
                 console.error(`\n📋 ${type.toUpperCase()} (${errors.length}):`);
                  
-                errors.forEach((error: any, i: number) => {
+                for (const error of errors) {
+                    const i: number = errors.indexOf(error);
+                    // if (error.message.includes('ABORTED')) continue;
+
                     let message = 'Erro desconhecido';
                     if ('message' in error && error.message) {
                         message = error.message;
@@ -81,7 +84,7 @@ export class ErrorReporter {
                     console.error(`  ${i + 1}. ${message}`);
                     if ('location' in error && typeof error.location === 'string') console.error(`     📍 ${error.location}`);
                     if ('url' in error && typeof error.url === 'string') console.error(`     🔗 ${error.url}`);
-                });
+                }
             }
         });
 

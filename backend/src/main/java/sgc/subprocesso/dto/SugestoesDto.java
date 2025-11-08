@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 /**
  * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).

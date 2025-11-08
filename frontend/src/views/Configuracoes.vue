@@ -68,7 +68,7 @@ onMounted(() => {
 
 const salvarConfiguracoes = () => {
   if (configuracoesStore.saveConfiguracoes()) {
-    mensagemSucesso.value = 'Configurações salvas com sucesso!';
+    mensagemSucesso.value = 'Configurações salvas!';
     setTimeout(() => {
       mensagemSucesso.value = '';
     }, 3000);

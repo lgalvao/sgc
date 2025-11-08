@@ -90,7 +90,7 @@
           v-if="sucesso"
           class="alert alert-success mt-3"
         >
-          Atribuição criada com sucesso!
+          Atribuição criada!
         </div>
       </div>
     </div>
@@ -103,17 +103,16 @@ import {useRouter} from 'vue-router'
 import {storeToRefs} from 'pinia'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
-import {useServidoresStore} from "@/stores/servidores";
-import {AtribuicaoTemporaria, Servidor, Unidade} from '@/types/tipos'
+import {useUsuariosStore} from "@/stores/usuarios";
+import {AtribuicaoTemporaria, Usuario, Unidade} from '@/types/tipos'
 
 const props = defineProps<{ sigla: string }>()
 
 const router = useRouter()
 const sigla = computed(() => props.sigla)
 const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
 const atribuicaoStore = useAtribuicaoTemporariaStore()
-const servidoresStore = useServidoresStore()
+const usuariosStore = useUsuariosStore()
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   for (const unidade of unidades) {
@@ -126,7 +125,7 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   return null
 }
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], sigla.value))
+const unidade = computed<Unidade | null>(() => buscarUnidade(unidadesStore.unidades, sigla.value))
 const atribuicoes = computed<AtribuicaoTemporaria[]>(() =>
     atribuicaoStore.atribuicoes
         ? atribuicaoStore.atribuicoes.filter((a: AtribuicaoTemporaria) => a.unidade.sigla === sigla.value)
@@ -139,17 +138,17 @@ const justificativa = ref("")
 const sucesso = ref(false)
 const erroServidor = ref("")
 
-const servidores = computed(() => servidoresStore.servidores);
+const usuarios = computed(() => usuariosStore.usuarios);
 
-const servidoresDaUnidade = computed<Servidor[]>(() => {
-  return servidores.value.filter(s => s.unidade?.sigla === sigla.value)
+const usuariosDaUnidade = computed<Usuario[]>(() => {
+  return usuarios.value.filter(u => u.unidade?.sigla === sigla.value)
 })
 
-const servidoresElegiveis = computed<Servidor[]>(() => {
+const servidoresElegiveis = computed<Usuario[]>(() => {
   const titularId = unidade.value?.idServidorTitular
-  return servidoresDaUnidade.value.filter(servidor => {
-    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === servidor.codigo)
-    return servidor.codigo !== titularId && !jaTemAtribuicao
+  return usuariosDaUnidade.value.filter(usuario => {
+    const jaTemAtribuicao = atribuicoes.value.some(a => a.servidor.codigo === usuario.codigo)
+    return usuario.codigo !== titularId && !jaTemAtribuicao
   })
 })
 
@@ -166,7 +165,7 @@ function criarAtribuicao() {
   }
   atribuicaoStore.criarAtribuicao({
     unidade: unidade.value as Unidade,
-    servidor: servidores.value.find(s => s.codigo === servidorSelecionado.value) as Servidor,
+    servidor: usuarios.value.find(s => s.codigo === servidorSelecionado.value) as Usuario,
     dataInicio: new Date().toISOString(),
     dataFim: new Date(dataTermino.value).toISOString(),
     dataTermino: new Date(dataTermino.value).toISOString(),

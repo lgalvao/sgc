@@ -9,17 +9,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.alerta.modelo.AlertaUsuario;
-import sgc.alerta.modelo.AlertaUsuarioRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.processo.modelo.Processo;
-import sgc.sgrh.service.SgrhService;
+import sgc.alerta.erros.ErroAlerta;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.model.Processo;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sgc.alerta.modelo.TipoAlerta.CADASTRO_DISPONIBILIZADO;
+import static sgc.alerta.model.TipoAlerta.CADASTRO_DISPONIBILIZADO;
 
 @Nested
 @ExtendWith(MockitoExtension.class)
@@ -114,12 +115,12 @@ class AlertaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve marcar alerta como lido com sucesso")
+    @DisplayName("Deve marcar alerta como lido")
     void marcarComoLido_deveMarcarComoLido() {
         Long alertaId = 1L;
         String usuarioTituloStr = "123456789012";
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, String.valueOf(usuarioTitulo));
         AlertaUsuario alertaUsuario = new AlertaUsuario();
         alertaUsuario.setId(id);
         alertaUsuario.setDataHoraLeitura(null);
@@ -139,10 +140,10 @@ class AlertaServiceTest {
         Long alertaId = 1L;
         String usuarioTituloStr = "123456789012";
         Long usuarioTitulo = Long.parseLong(usuarioTituloStr);
-        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, usuarioTitulo);
+        AlertaUsuario.Chave id = new AlertaUsuario.Chave(alertaId, String.valueOf(usuarioTitulo));
         when(repositorioAlertaUsuario.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroDominioNaoEncontrado.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
+        assertThrows(ErroEntidadeNaoEncontrada.class, () -> alertaService.marcarComoLido(usuarioTituloStr, alertaId));
     }
 
     @Test
@@ -209,6 +210,18 @@ class AlertaServiceTest {
         alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso));
 
         verify(repositorioAlerta, never()).save(any(Alerta.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroAlteracaoAlerta quando falha ao criar alerta para unidade")
+    void criarAlertasProcessoIniciado_deveLancarExcecaoAoFalharCriacao() {
+        UnidadeDto unidadeDto = new UnidadeDto(unidade.getCodigo(), "Unidade de Teste", "UNID-TESTE", 1L, "OPERACIONAL");
+        when(servicoSgrh.buscarUnidadePorCodigo(unidade.getCodigo())).thenReturn(Optional.of(unidadeDto));
+        when(repositorioUnidade.findById(unidade.getCodigo())).thenThrow(new RuntimeException("Erro ao buscar unidade"));
+
+        assertThrows(ErroAlerta.class, () ->
+                alertaService.criarAlertasProcessoIniciado(processo, List.of(subprocesso.getUnidade().getCodigo()), List.of(subprocesso))
+        );
     }
 
     @Test

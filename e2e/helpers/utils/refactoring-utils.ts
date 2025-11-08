@@ -1,5 +1,7 @@
 import {Locator} from '@playwright/test';
 
+// TODO esse arquivo pode ser mesclado com o 'utils.js' no mesmo diretorio...
+
 /**
  * Localiza um elemento a partir de uma lista de possíveis locators.
  * Retorna o primeiro locator que corresponde a um elemento visível na página.

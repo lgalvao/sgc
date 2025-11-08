@@ -2,8 +2,6 @@ export {
     preencherFormularioLogin,
     selecionarPerfil,
     fecharAlerta,
-    cancelarNoModal as cancelarNoModalLogin,
-    confirmarNoModal as confirmarNoModalLogin,
 } from './acoes-login';
 export * from './acoes-atividades';
 export {
@@ -43,7 +41,8 @@ export {
     confirmarIniciacaoProcesso,
     cancelarIniciacaoProcesso,
     criarProcessoBasico,
-    abrirProcessoPorNome
+    abrirProcessoPorNome,
+    selecionarUnidadeDisponivel
 } from './acoes-processo';
 export * from './acoes-mapa';
 export {
@@ -54,7 +53,9 @@ export {
     clicarIniciarProcesso,
     abrirModalInicializacaoProcesso,
     confirmarInicializacaoNoModal,
-    cancelarModal,
-    clicarBotaoHistoricoAnalise as clicarBotaoHistoricoAnaliseModal,
+    cancelarModal
 } from './acoes-modais';
 export * from './acoes-validacao';
+export * from '../utils/limpeza';
+export * from './acoes-mapa';
+export * from './acoes-modais';

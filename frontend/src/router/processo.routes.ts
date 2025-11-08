@@ -1,4 +1,4 @@
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
+import type {RouteLocationNormalized, RouteRecordRaw} from 'vue-router';
 
 const processoRoutes: RouteRecordRaw[] = [
   {
@@ -19,7 +19,7 @@ const processoRoutes: RouteRecordRaw[] = [
     name: 'Subprocesso',
     component: () => import('@/views/Subprocesso.vue'),
     props: (route: RouteLocationNormalized) => ({
-      idProcesso: Number(route.params.idProcesso),
+      codProcesso: Number(route.params.codProcesso),
       siglaUnidade: route.params.siglaUnidade,
     }),
     meta: { title: 'Processos da Unidade' },
@@ -30,7 +30,7 @@ const processoRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/CadMapa.vue'),
     props: (route: RouteLocationNormalized) => ({
       sigla: route.params.siglaUnidade,
-      idProcesso: Number(route.params.idProcesso),
+      codProcesso: Number(route.params.codProcesso),
     }),
     meta: { title: 'Mapa' },
   },
@@ -39,7 +39,7 @@ const processoRoutes: RouteRecordRaw[] = [
         name: 'SubprocessoVisMapa',
         component: () => import('@/views/VisMapa.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Visualização de Mapa'},
@@ -49,7 +49,7 @@ const processoRoutes: RouteRecordRaw[] = [
         name: 'SubprocessoCadastro',
         component: () => import('@/views/CadAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Cadastro'},
@@ -59,7 +59,7 @@ const processoRoutes: RouteRecordRaw[] = [
         name: 'SubprocessoVisCadastro',
         component: () => import('@/views/VisAtividades.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             sigla: route.params.siglaUnidade
         }),
         meta: {title: 'Visualização de Atividades'},
@@ -69,7 +69,7 @@ const processoRoutes: RouteRecordRaw[] = [
         name: 'DiagnosticoEquipe',
         component: () => import('@/views/DiagnosticoEquipe.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
         meta: {title: 'Diagnóstico da Equipe'},
@@ -79,7 +79,7 @@ const processoRoutes: RouteRecordRaw[] = [
         name: 'OcupacoesCriticas',
         component: () => import('@/views/OcupacoesCriticas.vue'),
         props: (route: RouteLocationNormalized) => ({
-            idProcesso: Number(route.params.idProcesso),
+            codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade
         }),
         meta: {title: 'Ocupações Críticas'},

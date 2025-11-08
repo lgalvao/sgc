@@ -4,22 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.mapa.modelo.Mapa;
-import sgc.processo.modelo.Processo;
+import sgc.mapa.model.Mapa;
+import sgc.processo.model.Processo;
 import sgc.subprocesso.dto.SubprocessoDto;
 import sgc.subprocesso.dto.SubprocessoMapper;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
         if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
             return emptyList();
@@ -134,7 +134,7 @@ public class SubprocessoService {
      * @param codigo             O código do subprocesso a ser atualizado.
      * @param subprocessoDto O DTO com os novos dados.
      * @return O {@link SubprocessoDto} da entidade atualizada.
-     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
     public SubprocessoDto atualizar(Long codigo, SubprocessoDto subprocessoDto) {
@@ -172,19 +172,19 @@ public class SubprocessoService {
                     var atualizado = repositorioSubprocesso.save(subprocesso);
                     return subprocessoMapper.toDTO(atualizado);
                 })
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Subprocesso não encontrado", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo));
     }
 
     /**
      * Exclui um subprocesso.
      *
      * @param codigo O código do subprocesso a ser excluído.
-     * @throws ErroDominioNaoEncontrado se o subprocesso não for encontrado.
+     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
     public void excluir(Long codigo) {
         if (!repositorioSubprocesso.existsById(codigo)) {
-            throw new ErroDominioNaoEncontrado("Subprocesso não encontrado", codigo);
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não encontrado", codigo);
         }
         repositorioSubprocesso.deleteById(codigo);
     }

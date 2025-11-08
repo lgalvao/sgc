@@ -8,16 +8,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaAtividade;
+import sgc.mapa.model.CompetenciaAtividadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 import sgc.mapa.service.MapaService;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +69,7 @@ class MapaServiceTest {
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(competenciaAtividadeRepo.findByCompetencia_Codigo(1L)).thenReturn(List.of(competenciaAtividade));
+        when(competenciaAtividadeRepo.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 
         MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
@@ -86,7 +86,7 @@ class MapaServiceTest {
         when(mapaRepo.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mapaService.obterMapaCompleto(1L, 100L))
-                .isInstanceOf(ErroDominioNaoEncontrado.class)
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
                 .hasMessage("Mapa não encontrado: 1");
     }
 }

@@ -7,17 +7,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.dto.PerfilUnidade;
 import sgc.sgrh.dto.UnidadeDto;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.sgrh.service.SgrhService;
 import sgc.sgrh.service.UsuarioService;
-import sgc.unidade.modelo.TipoUnidade;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +52,7 @@ class UsuarioServiceTest {
         unidadeMock.setCodigo(1L);
         unidadeMock.setTipo(TipoUnidade.INTERMEDIARIA);
         usuarioMock = new Usuario(
-            123456789L,
+            "123456789",
             "Usuário de Teste",
             "teste@email.com",
             "1234",
@@ -61,18 +61,18 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve autenticar com sucesso")
+    @DisplayName("Deve autenticar")
     void autenticar_deveRetornarTrue() {
-        boolean resultado = usuarioService.autenticar(123456789L, "senha");
+        boolean resultado = usuarioService.autenticar("123456789", "senha");
         assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("Deve retornar lista de perfis e unidades autorizados")
     void autorizar_deveRetornarListaDePerfisUnidades() {
-        long tituloEleitoral = 123456789L;
+        String tituloEleitoral = "123456789";
 
-        when(usuarioRepo.findByTituloEleitoral(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.of(usuarioMock));
 
         List<PerfilUnidade> resultado = usuarioService.autorizar(tituloEleitoral);
 
@@ -80,26 +80,26 @@ class UsuarioServiceTest {
         assertThat(resultado).extracting(PerfilUnidade::getPerfil).containsExactlyInAnyOrder(Perfil.ADMIN, Perfil.CHEFE);
         assertThat(resultado).extracting(pu -> pu.getUnidade().sigla()).allMatch(sigla -> sigla.equals("SEDOC"));
 
-        verify(usuarioRepo, times(1)).findByTituloEleitoral(tituloEleitoral);
+        verify(usuarioRepo, times(1)).findById(tituloEleitoral);
         verifyNoInteractions(sgrhService, unidadeRepo);
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando usuário não for encontrado")
     void autorizar_deveLancarExcecao_quandoUsuarioNaoEncontrado() {
-        long tituloEleitoral = 999L;
+        String tituloEleitoral = "999";
 
-        when(usuarioRepo.findByTituloEleitoral(tituloEleitoral)).thenReturn(Optional.empty());
+        when(usuarioRepo.findById(tituloEleitoral)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.autorizar(tituloEleitoral))
-            .isInstanceOf(ErroDominioNaoEncontrado.class)
+            .isInstanceOf(ErroEntidadeNaoEncontrada.class)
             .hasMessageContaining("Usuário' com codigo '999' não encontrado");
     }
 
     @Test
-    @DisplayName("Deve simular a entrada com sucesso")
+    @DisplayName("Deve simular a entrada")
     void entrar_deveExecutarSemErro() {
-        long tituloEleitoral = 123456789L;
+        String tituloEleitoral = "123456789";
         UnidadeDto unidadeDtoMock = new UnidadeDto(unidadeMock.getCodigo(), unidadeMock.getNome(), unidadeMock.getSigla(), null, unidadeMock.getTipo().name());
         PerfilUnidade perfilUnidade = new PerfilUnidade(Perfil.ADMIN, unidadeDtoMock);
 

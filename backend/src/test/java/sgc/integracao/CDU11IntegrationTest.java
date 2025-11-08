@@ -10,31 +10,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 
@@ -78,13 +77,8 @@ class CDU11IntegrationTest {
     @BeforeEach
     void setUp() {
         // Unidade e Chefe
-        unidade = new Unidade("Unidade Teste", "UT");
-        var chefe = new Usuario();
-        chefe.setTituloEleitoral(111122223333L);
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
+        unidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
 
         // Processo
         processo = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
@@ -120,7 +114,7 @@ class CDU11IntegrationTest {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.subprocessoId", is(subprocesso.getCodigo().intValue())))
-                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")))
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")))
                     .andExpect(jsonPath("$.atividades", hasSize(2)))
                     // Valida a primeira atividade e seu conhecimento
                     .andExpect(jsonPath("$.atividades[0].descricao", is("Analisar documentação")))
@@ -139,7 +133,7 @@ class CDU11IntegrationTest {
         void devePermitirAdminVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
 
         @Test
@@ -148,7 +142,7 @@ class CDU11IntegrationTest {
         void devePermitirGestorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
 
         @Test
@@ -157,7 +151,7 @@ class CDU11IntegrationTest {
         void devePermitirServidorVisualizarCadastro() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocesso.getCodigo()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("UT")));
+                    .andExpect(jsonPath(UNIDADE_SIGLA_JSON_PATH, is("SENIC")));
         }
     }
 

@@ -3,14 +3,14 @@ package sgc.processo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import sgc.notificacao.NotificacaoModeloEmailService;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.sgrh.service.SgrhService;
+import sgc.notificacao.NotificacaoEmailService;
+import sgc.notificacao.NotificacaoModelosService;
+import sgc.processo.model.Processo;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.unidade.modelo.TipoUnidade;
+import sgc.sgrh.service.SgrhService;
+import sgc.unidade.model.TipoUnidade;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ProcessoNotificacaoService {
-    private final NotificacaoService notificacaoService;
-    private final NotificacaoModeloEmailService notificacaoModeloEmailService;
+    private final NotificacaoEmailService notificacaoEmailService;
+    private final NotificacaoModelosService notificacaoModelosService;
     private final SgrhService sgrhService;
 
     /**
@@ -75,11 +75,11 @@ public class ProcessoNotificacaoService {
 
     private void enviarEmailUnidadeFinal(Processo processo, UnidadeProcesso unidade, String email) {
         String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
-        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoPorUnidade(
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
             unidade.getSigla(),
             processo.getDescricao()
         );
-        notificacaoService.enviarEmailHtml(email, assunto, html);
+        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização (unidade final) enviado para {} ({})", unidade.getSigla(), email);
     }
 
@@ -96,13 +96,13 @@ public class ProcessoNotificacaoService {
         }
 
         String assunto = String.format("SGC: Conclusão do processo %s em unidades subordinadas", processo.getDescricao());
-        String html = notificacaoModeloEmailService.criarEmailDeProcessoFinalizadoUnidadesSubordinadas(
+        String html = notificacaoModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
             unidadeIntermediaria.getSigla(),
             processo.getDescricao(),
             siglasSubordinadas
         );
 
-        notificacaoService.enviarEmailHtml(email, assunto, html);
+        notificacaoEmailService.enviarEmailHtml(email, assunto, html);
         log.info("E-mail de finalização (unidade intermediária) enviado para {} ({})", unidadeIntermediaria.getSigla(), email);
     }
 }

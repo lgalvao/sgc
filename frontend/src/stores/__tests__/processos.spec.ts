@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, type Mocked, vi } from 'vitest';
-import { useProcessosStore } from '../processos';
-import { SituacaoProcesso, TipoProcesso } from '@/types/tipos';
-import { initPinia } from '@/test-utils/helpers';
-import type { ProcessoDetalhe } from '@/types/tipos';
+import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
+import {useProcessosStore} from '../processos';
+import type {ProcessoDetalhe} from '@/types/tipos';
+import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {initPinia} from '@/test-utils/helpers';
 
 // Mocks
 vi.mock('@/services/painelService');

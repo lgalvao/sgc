@@ -1,7 +1,7 @@
 package sgc.analise.dto;
 
 import org.mapstruct.Mapper;
-import sgc.analise.modelo.Analise;
+import sgc.analise.model.Analise;
 
 /**
  * Mapper para converter a entidade {@link Analise} em DTOs.

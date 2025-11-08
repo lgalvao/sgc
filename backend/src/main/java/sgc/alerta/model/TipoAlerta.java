@@ -1,0 +1,11 @@
+package sgc.alerta.model;
+
+// TODO investigar esses dois tipos de interoperacional. Por quê?
+public enum TipoAlerta {
+    PROCESSO_INICIADO_OPERACIONAL,
+    PROCESSO_INICIADO_INTERMEDIARIA,
+    PROCESSO_INICIADO_INTEROPERACIONAL_OP,
+    PROCESSO_INICIADO_INTEROPERACIONAL_INT,
+    CADASTRO_DISPONIBILIZADO,
+    CADASTRO_DEVOLVIDO
+}
