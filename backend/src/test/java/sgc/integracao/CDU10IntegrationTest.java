@@ -18,8 +18,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
@@ -29,8 +27,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
@@ -38,6 +34,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -72,8 +69,6 @@ class CDU10IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -89,9 +84,9 @@ class CDU10IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        unidadeChefe = unidadeRepo.findById(10L).orElseThrow(); // SESEL
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
@@ -107,10 +102,11 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var competencia = new Competencia("Competência de Teste", subprocessoRevisao.getMapa());
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade = atividadeRepo.save(atividade);
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
@@ -134,7 +130,6 @@ class CDU10IntegrationTest {
             assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade SESEL submetida para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            // Assert Notificação
             verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
                     org.mockito.ArgumentMatchers.any(Subprocesso.class),
                     org.mockito.ArgumentMatchers.any(Unidade.class)
@@ -147,7 +142,6 @@ class CDU10IntegrationTest {
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade Vazia");
             atividadeRepo.save(atividade);
 
-            // Act & Assert
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isUnprocessableEntity());
 
@@ -163,8 +157,6 @@ class CDU10IntegrationTest {
         @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
-            // User 999999999999 already exists in data-postgresql.sql
-
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());
         }

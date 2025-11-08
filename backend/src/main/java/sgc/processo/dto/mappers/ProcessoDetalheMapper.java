@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoResumoDto;
 import sgc.processo.model.Processo;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
 
 /**
  * Mapper (usando MapStruct) para converter a entidade Processo e suas associações para ProcessoDetalheDto.
@@ -24,13 +24,11 @@ public interface ProcessoDetalheMapper {
 
     // Mapeamento de entidade para DTO de participante
     @Mapping(target = "filhos", ignore = true)
-
-    // Presume que filhos não vêm diretamente de UnidadeProcesso
     @Mapping(target = "situacaoSubprocesso", ignore = true)
     @Mapping(target = "dataLimite", ignore = true)
-    @Mapping(target = "codUnidade", source = "codUnidade")
-    @Mapping(target = "codUnidadeSuperior", source = "codUnidadeSuperior")
-    ProcessoDetalheDto.UnidadeParticipanteDto unidadeProcessoToUnidadeParticipanteDTO(UnidadeProcesso unidadeProcesso);
+    @Mapping(target = "codUnidade", source = "codigo")
+    @Mapping(target = "codUnidadeSuperior", source = "unidadeSuperior.codigo")
+    ProcessoDetalheDto.UnidadeParticipanteDto unidadeToUnidadeParticipanteDTO(Unidade unidade);
 
     // Mapeamento de subprocesso para DTO de resumo
     @Mapping(target = "codigo", source = "processo.codigo")

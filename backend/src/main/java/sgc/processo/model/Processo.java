@@ -6,8 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
+import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "PROCESSO", schema = "sgc")
@@ -44,4 +47,13 @@ public class Processo extends EntidadeBase {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoProcesso tipo;
+
+    @ManyToMany
+    @JoinTable(
+        name = "unidade_processo",
+        schema = "sgc",
+        joinColumns = @JoinColumn(name = "processo_codigo"),
+        inverseJoinColumns = @JoinColumn(name = "unidade_codigo")
+    )
+    private Set<Unidade> participantes = new HashSet<>();
 }

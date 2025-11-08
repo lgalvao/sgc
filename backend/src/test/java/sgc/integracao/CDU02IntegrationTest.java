@@ -19,7 +19,10 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.model.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
@@ -28,11 +31,11 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,8 +61,6 @@ public class CDU02IntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private UsuarioRepo usuarioRepo;
-    @Autowired
-    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     // Unidades
     private Unidade unidadeRaiz;
@@ -68,11 +69,9 @@ public class CDU02IntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Use existing units from data-h2.sql
-        unidadeRaiz = unidadeRepo.findById(2L).orElseThrow(); // STIC
-        unidadeFilha1 = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        unidadeFilha2 = unidadeRepo.findById(7L).orElseThrow(); // COSINF
-        // Processos and alertas are already in data-h2.sql (codes 200-203)
+        unidadeRaiz = unidadeRepo.findById(2L).orElseThrow();
+        unidadeFilha1 = unidadeRepo.findById(6L).orElseThrow();
+        unidadeFilha2 = unidadeRepo.findById(7L).orElseThrow();
     }
 
     private Processo criarProcesso(String descricao, SituacaoProcesso situacao, Unidade... participantes) {
@@ -81,10 +80,8 @@ public class CDU02IntegrationTest {
         p.setTipo(TipoProcesso.MAPEAMENTO);
         p.setSituacao(situacao);
         p.setDataLimite(LocalDateTime.now().plusDays(30));
+        p.setParticipantes(new HashSet<>(Arrays.asList(participantes)));
         processoRepo.save(p);
-        for (Unidade u : participantes) {
-            unidadeProcessoRepo.save(new UnidadeProcesso(p.getCodigo(), u.getCodigo(), u.getNome(), u.getSigla(), null, u.getTipo(), u.getSituacao().name(), u.getUnidadeSuperior() != null ? u.getUnidadeSuperior().getCodigo() : null));
-        }
         return p;
     }
 
@@ -125,7 +122,7 @@ public class CDU02IntegrationTest {
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "ADMIN"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(4)))); // Pelo menos os 4 processos CDU-02
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(4))));
         }
 
         @Test
@@ -134,9 +131,9 @@ public class CDU02IntegrationTest {
             setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
-                            .param("unidade", unidadeRaiz.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(3)))); // pelo menos processoRaiz, processoFilha1, processoNeta1
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(3))));
         }
 
         @Test
@@ -145,7 +142,7 @@ public class CDU02IntegrationTest {
             setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
-                            .param("unidade", unidadeFilha1.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(2))));
         }
@@ -156,7 +153,7 @@ public class CDU02IntegrationTest {
             setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
-                            .param("unidade", unidadeFilha2.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(0)));
         }
@@ -167,7 +164,7 @@ public class CDU02IntegrationTest {
             setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
-                            .param("unidade", unidadeRaiz.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado')]", hasSize(0)));
         }
@@ -193,7 +190,7 @@ public class CDU02IntegrationTest {
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
-                            .param("unidade", unidadeFilha1.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(1)))
                     .andExpect(jsonPath("$.content[0].descricao").value("Alerta para Unidade Filha 1"));
@@ -205,7 +202,7 @@ public class CDU02IntegrationTest {
             setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "3")
-                            .param("unidade", unidadeFilha2.getCodigo().toString()))
+                            .param("codigoUnidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(0)));
         }

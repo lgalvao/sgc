@@ -15,4 +15,6 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      */
 
     List<Processo> findBySituacao(SituacaoProcesso situacao);
+
+    List<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos);
 }

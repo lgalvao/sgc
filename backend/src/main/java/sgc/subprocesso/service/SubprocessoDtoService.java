@@ -14,8 +14,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -43,27 +41,12 @@ public class SubprocessoDtoService {
     private final AtividadeRepo atividadeRepo;
     private final ConhecimentoRepo repositorioConhecimento;
     private final CompetenciaRepo competenciaRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final AnaliseService analiseService;
     private final AtividadeMapper atividadeMapper;
     private final ConhecimentoMapper conhecimentoMapper;
     private final MovimentacaoMapper movimentacaoMapper;
     private final SubprocessoMapper subprocessoMapper;
 
-    /**
-     * Obtém os detalhes completos de um subprocesso, incluindo movimentações,
-     * atividades e conhecimentos.
-     * <p>
-     * O acesso é restrito a usuários ADMIN ou a usuários com perfil GESTOR/CHEFE
-     * que pertençam à mesma unidade do subprocesso.
-     *
-     * @param codigo            O código do subprocesso.
-     * @param perfil            O perfil do usuário que solicita os detalhes.
-     * @param codUnidadeUsuario O código da unidade do usuário.
-     * @return Um {@link SubprocessoDetalheDto} com os dados completos.
-     * @throws ErroAccessoNegado         se o usuário não tiver permissão.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
-     */
     @Transactional(readOnly = true)
     public SubprocessoDetalheDto obterDetalhes(Long codigo, Perfil perfil, Long codUnidadeUsuario) {
         if (perfil == null) {
@@ -94,14 +77,6 @@ public class SubprocessoDtoService {
         return SubprocessoDetalheDto.of(sp, movimentacoes, atividades.stream().map(atividadeMapper::toDto).collect(Collectors.toList()), conhecimentos.stream().map(conhecimentoMapper::toDto).collect(Collectors.toList()), movimentacaoMapper);
     }
 
-    /**
-     * Obtém os dados de cadastro de um subprocesso, incluindo a lista de
-     * atividades e seus respectivos conhecimentos.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Um {@link SubprocessoCadastroDto} com os dados de cadastro.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
-     */
     @Transactional(readOnly = true)
     public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
@@ -133,13 +108,6 @@ public class SubprocessoDtoService {
                 .build();
     }
 
-    /**
-     * Obtém as sugestões associadas a um subprocesso.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Um {@link SugestoesDto} contendo as sugestões.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
-     */
     @Transactional(readOnly = true)
     public SugestoesDto obterSugestoes(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
@@ -148,18 +116,6 @@ public class SubprocessoDtoService {
         return SugestoesDto.of(sp);
     }
 
-    /**
-     * Obtém todos os dados necessários para a tela de ajuste de mapa.
-     * <p>
-     * Este método agrega informações do subprocesso, da última análise de validação,
-     * e de todas as competências, atividades, conhecimentos e seus vínculos
-     * associados ao mapa do subprocesso.
-     *
-     * @param codSubprocesso O código do subprocesso.
-     * @return Um {@link MapaAjusteDto} com os dados consolidados para o ajuste.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
-     * @throws IllegalStateException     se o subprocesso não possuir um mapa associado.
-     */
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
@@ -177,17 +133,11 @@ public class SubprocessoDtoService {
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(codMapa);
         List<Conhecimento> conhecimentos = repositorioConhecimento.findByMapaCodigo(codMapa);
-        List<CompetenciaAtividade> competenciaAtividades = competenciaAtividadeRepo.findByMapaCodigo(codMapa);
 
 
-        return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos, competenciaAtividades);
+        return MapaAjusteDto.of(sp, analise, competencias, atividades, conhecimentos);
     }
 
-    /**
-     * Lista todos os subprocessos cadastrados no sistema.
-     *
-     * @return Uma {@link List} de {@link SubprocessoDto}.
-     */
     @Transactional(readOnly = true)
     public List<SubprocessoDto> listar() {
         return repositorioSubprocesso.findAll()

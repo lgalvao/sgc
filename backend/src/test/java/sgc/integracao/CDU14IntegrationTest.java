@@ -18,7 +18,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.mapa.model.Mapa;
@@ -86,8 +85,6 @@ class CDU14IntegrationTest {
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired
     private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
@@ -222,9 +219,7 @@ class CDU14IntegrationTest {
         void adminHomologaComImpactos() throws Exception {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
-            // Remover uma atividade existente do mapa do subprocesso
             Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
-            competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
 
             mockMvc.perform(post("/api/subprocessos/{id}/homologar-revisao-cadastro", subprocessoId)
@@ -269,13 +264,11 @@ class CDU14IntegrationTest {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
 
-            // Remover uma atividade existente do mapa do subprocesso
             Atividade atividadeExistente = atividadeRepo.findByMapaCodigo(sp.getMapa().getCodigo()).stream().findFirst().orElseThrow();
-            competenciaAtividadeRepo.deleteAll(competenciaAtividadeRepo.findByAtividadeCodigo(atividadeExistente.getCodigo()));
             atividadeRepo.delete(atividadeExistente);
 
             mockMvc.perform(get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
-                            .with(user(chefe))) // Trocado para CHEFE que tem a permissão
+                            .with(user(chefe)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.temImpactos", is(true)))
                     .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
@@ -345,7 +338,6 @@ class CDU14IntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Associa o mapa de revisão (pré-carregado) ao subprocesso
         Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processoDto.getCodigo()).stream().findFirst().orElseThrow();
         Mapa mapaRevisao = mapaRepo.findById(201L).orElseThrow();
         sp.setMapa(mapaRevisao);

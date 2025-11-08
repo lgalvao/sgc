@@ -4,14 +4,14 @@
     import lombok.RequiredArgsConstructor;
     import org.springframework.stereotype.Service;
     import sgc.movimentacao.model.Movimentacao;
-    import sgc.movimentacao.model.MovimentacaoRepo;
+    import sgc.movimentacao.model.MovimentacaoServiceRepo;
     import sgc.sgrh.model.Usuario;
     import sgc.subprocesso.model.Subprocesso;
 
     @Service
     @RequiredArgsConstructor
     public class MovimentacaoService {
-        private final MovimentacaoRepo movimentacaoRepo;
+        private final MovimentacaoServiceRepo movimentacaoRepo;
 
         public void registrarMovimentacao(Subprocesso subprocesso, String descricao, Usuario usuario) {
             Movimentacao movimentacao = new Movimentacao(

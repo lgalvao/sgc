@@ -6,11 +6,15 @@ import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.*;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +34,6 @@ public class MapaService {
 
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     @Transactional(readOnly = true)
     public List<Mapa> listar() {
@@ -65,15 +68,6 @@ public class MapaService {
         mapaRepo.deleteById(codigo);
     }
 
-    /**
-     * Obtém uma visão completa de um mapa, incluindo suas competências e as
-     * atividades vinculadas a cada uma.
-     *
-     * @param codMapa        O código do mapa a ser buscado.
-     * @param codSubprocesso O código do subprocesso associado (usado para compor o DTO de retorno).
-     * @return Um {@link MapaCompletoDto} com todos os detalhes do mapa.
-     * @throws ErroEntidadeNaoEncontrada se o mapa não for encontrado.
-     */
     @Transactional(readOnly = true)
     public MapaCompletoDto obterMapaCompleto(Long codMapa, Long codSubprocesso) {
         log.debug("Obtendo mapa completo: codigo={}, codSubprocesso={}", codMapa, codSubprocesso);
@@ -85,9 +79,8 @@ public class MapaService {
 
         List<CompetenciaMapaDto> competenciasDto = competencias.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo())
-                            .stream()
-                            .map(ca -> ca.getId().getCodAtividade())
+                    List<Long> idsAtividades = c.getAtividades().stream()
+                            .map(Atividade::getCodigo)
                             .toList();
 
                     return new CompetenciaMapaDto(
@@ -106,26 +99,6 @@ public class MapaService {
         );
     }
 
-    /**
-     * Salva o estado completo de um mapa.
-     * <p>
-     * Este método realiza uma operação de "upsert" para as competências e seus
-     * vínculos com atividades. Ele compara o estado recebido com o estado atual
-     * no banco de dados para:
-     * <ul>
-     *     <li>Criar novas competências.</li>
-     *     <li>Atualizar competências existentes.</li>
-     *     <li>Remover competências que não estão na requisição.</li>
-     *     <li>Atualizar os vínculos entre competências e atividades.</li>
-     * </ul>
-     * Ao final, executa uma validação de integridade.
-     *
-     * @param codMapa                O código do mapa a ser salvo.
-     * @param request                O DTO com o estado completo do mapa.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que está realizando a operação.
-     * @return Um {@link MapaCompletoDto} representando o estado final do mapa salvo.
-     * @throws ErroEntidadeNaoEncontrada se o mapa ou uma competência a ser atualizada não forem encontrados.
-     */
     public MapaCompletoDto salvarMapaCompleto(Long codMapa, SalvarMapaRequest request, String usuarioTituloEleitoral) {
         log.info("Salvando mapa completo: codigo={}, usuario={}", codMapa, usuarioTituloEleitoral);
 
@@ -150,7 +123,6 @@ public class MapaService {
         codsParaRemover.removeAll(idsNovos);
 
         for (Long codParaRemover : codsParaRemover) {
-            competenciaAtividadeRepo.deleteByCompetenciaCodigo(codParaRemover);
             competenciaRepo.deleteById(codParaRemover);
             log.debug("Competência {} removida do mapa {}", codParaRemover, codMapa);
         }
@@ -176,12 +148,12 @@ public class MapaService {
 
         mapaIntegridadeService.validarIntegridadeMapa(codMapa);
 
-        // Reconstruir o MapaCompletoDto para retorno
         List<Competencia> competenciasFinais = competenciaRepo.findByMapaCodigo(codMapa);
         List<CompetenciaMapaDto> competenciasDtoFinais = competenciasFinais.stream()
                 .map(c -> {
-                    List<Long> idsAtividades = competenciaAtividadeRepo.findByCompetenciaCodigo(c.getCodigo())
-                            .stream().map(ca -> ca.getId().getCodAtividade()).toList();
+                    List<Long> idsAtividades = c.getAtividades().stream()
+                            .map(Atividade::getCodigo)
+                            .toList();
 
                     return new CompetenciaMapaDto(
                             c.getCodigo(),
@@ -193,7 +165,7 @@ public class MapaService {
 
         return new MapaCompletoDto(
                 mapa.getCodigo(),
-                null, // codSubprocesso não está disponível aqui, deve ser tratado pelo chamador
+                null,
                 mapa.getObservacoesDisponibilizacao(),
                 competenciasDtoFinais
         );

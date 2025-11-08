@@ -35,24 +35,6 @@ public class SubprocessoMapaWorkflowService {
     private final MovimentacaoService movimentacaoService;
     private final SubprocessoNotificacaoService subprocessoNotificacaoService;
 
-    /**
-     * Salva o mapa de um subprocesso e atualiza o estado do workflow.
-     * <p>
-     * Valida se o subprocesso está em uma situação que permite
-     * a edição do mapa. Em seguida, delega a operação de salvar o mapa para o
-     * {@link MapaService}. Se for a primeira vez que competências estão sendo
-     * adicionadas a um mapa (ou seja, o mapa estava vazio), e o subprocesso
-     * estava na situação 'CADASTRO_HOMOLOGADO', o estado do subprocesso é
-     * avançado para 'MAPA_CRIADO'.
-     *
-     * @param codSubprocesso        O código do subprocesso.
-     * @param request              O DTO com os dados completos do mapa a serem salvos.
-     * @param tituloUsuario O título de eleitor do usuário que está realizando a operação.
-     * @return O {@link MapaCompletoDto} representando o estado salvo do mapa.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou seu mapa não forem encontrados.
-     * @throws IllegalStateException se o subprocesso não estiver em uma situação
-     *                               válida para a edição do mapa.
-     */
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
         log.info("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
 
@@ -112,8 +94,7 @@ public class SubprocessoMapaWorkflowService {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
         validarMapaParaDisponibilizacao(subprocesso);
 
-        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO);
-        subprocesso.setDataLimiteEtapa2(request.dataLimite());
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         repositorioSubprocesso.save(subprocesso);
 
         movimentacaoService.registrarMovimentacao(

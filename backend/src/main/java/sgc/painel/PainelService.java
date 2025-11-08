@@ -11,14 +11,15 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.painel.erros.ErroParametroPainelInvalido;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
 import sgc.sgrh.model.Perfil;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 public class PainelService {
     private final ProcessoRepo processoRepo;
     private final AlertaRepo alertaRepo;
-    private final UnidadeProcessoRepo unidadeProcessoRepo;
     private final UnidadeRepo unidadeRepo;
 
     /**
@@ -56,13 +56,7 @@ public class PainelService {
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-            List<Long> processoIds = unidadeProcessoRepo.findByCodUnidadeIn(unidadeIds)
-                    .stream()
-                    .map(UnidadeProcesso::getCodProcesso)
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            processos = processoRepo.findAllById(processoIds).stream()
+            processos = processoRepo.findDistinctByParticipantes_CodigoIn(unidadeIds).stream()
                     .filter(p -> p.getSituacao() != SituacaoProcesso.CRIADO)
                     .toList();
         }
@@ -111,7 +105,7 @@ public class PainelService {
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo) {
-        UnidadeProcesso up = unidadeProcessoRepo.findByCodProcesso((processo.getCodigo())).stream().findFirst().orElse(null);
+        Unidade participante = processo.getParticipantes().stream().findFirst().orElse(null);
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
@@ -119,8 +113,8 @@ public class PainelService {
                 .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
-                .unidadeCodigo(up != null ? up.getCodUnidade() : null)
-                .unidadeNome(up != null ? up.getNome() : null)
+                .unidadeCodigo(participante != null ? participante.getCodigo() : null)
+                .unidadeNome(participante != null ? participante.getNome() : null)
                 .build();
     }
 
