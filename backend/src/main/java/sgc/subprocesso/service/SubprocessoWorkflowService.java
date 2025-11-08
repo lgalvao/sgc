@@ -349,7 +349,7 @@ public class SubprocessoWorkflowService {
         subprocessoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
-        sp.setDataLimiteEtapa2(request.dataLimiteEtapa2());
+        sp.setDataLimiteEtapa2(request.getDataLimiteEtapa2());
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
@@ -592,7 +592,7 @@ public class SubprocessoWorkflowService {
 
         var impactos = impactoMapaService.verificarImpactos(codSubprocesso, usuario);
 
-        if (!impactos.temImpactos()) {
+        if (!impactos.isTemImpactos()) {
             // CDU-14 Item 12.2: Sem impactos
             sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
         } else {

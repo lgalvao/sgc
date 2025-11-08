@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import org.junit.jupiter.api.Test;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +22,7 @@ class SubprocessoDtoTest {
     void AceitarCadastroReq_RecordConstructorAndGetters() {
         AceitarCadastroReq req = new AceitarCadastroReq("Observações de aceite");
 
-        assertEquals("Observações de aceite", req.observacoes());
+        assertEquals("Observações de aceite", req.getObservacoes());
     }
 
     @Test
@@ -29,23 +30,23 @@ class SubprocessoDtoTest {
         LocalDateTime now = LocalDateTime.now();
         AnaliseValidacaoDto dto = new AnaliseValidacaoDto(1L, now, OBSERVACOES, null, null);
 
-        assertEquals(1L, dto.codigo());
-        assertEquals(now, dto.dataHora());
-        assertEquals(OBSERVACOES, dto.observacoes());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(now, dto.getDataHora());
+        assertEquals(OBSERVACOES, dto.getObservacoes());
     }
 
     @Test
     void ApresentarSugestoesReq_RecordConstructorAndGetters() {
         ApresentarSugestoesReq req = new ApresentarSugestoesReq("Sugestões importantes");
 
-        assertEquals("Sugestões importantes", req.sugestoes());
+        assertEquals("Sugestões importantes", req.getSugestoes());
     }
 
     @Test
     void ApresentarSugestoesReq_InvalidSugestoes_ThrowsException() {
         // Test will be handled by validation framework during actual usage
         ApresentarSugestoesReq req = new ApresentarSugestoesReq("");
-        assertEquals("", req.sugestoes());
+        assertEquals("", req.getSugestoes());
     }
 
     @Test
@@ -94,49 +95,49 @@ class SubprocessoDtoTest {
     void DevolverCadastroReq_RecordConstructorAndGetters() {
         DevolverCadastroReq req = new DevolverCadastroReq("Motivo", OBSERVACOES);
 
-        assertEquals("Motivo", req.motivo());
-        assertEquals(OBSERVACOES, req.observacoes());
+        assertEquals("Motivo", req.getMotivo());
+        assertEquals(OBSERVACOES, req.getObservacoes());
     }
 
     @Test
     void DevolverCadastroReq_InvalidMotivo_ThrowsException() {
         DevolverCadastroReq req = new DevolverCadastroReq("", OBSERVACOES);
-        assertEquals("", req.motivo());
+        assertEquals("", req.getMotivo());
     }
 
     @Test
     void DevolverValidacaoReq_RecordConstructorAndGetters() {
         DevolverValidacaoReq req = new DevolverValidacaoReq(JUSTIFICATIVA);
-        assertEquals(JUSTIFICATIVA, req.justificativa());
+        assertEquals(JUSTIFICATIVA, req.getJustificativa());
     }
 
     @Test
     void DevolverValidacaoReq_InvalidJustificativa_ThrowsException() {
         DevolverValidacaoReq req = new DevolverValidacaoReq("");
-        assertEquals("", req.justificativa());
+        assertEquals("", req.getJustificativa());
     }
 
     @Test
     void DisponibilizarMapaReq_RecordConstructorAndGetters() {
-        LocalDateTime dataLimite = LocalDateTime.now().plusDays(10);
-        DisponibilizarMapaReq req = new DisponibilizarMapaReq(OBSERVACOES, dataLimite);
+        LocalDate dataLimite = LocalDate.now().plusDays(10);
+        DisponibilizarMapaReq req = new DisponibilizarMapaReq(dataLimite, OBSERVACOES);
 
-        assertEquals(OBSERVACOES, req.observacoes());
-        assertEquals(dataLimite, req.dataLimiteEtapa2());
+        assertEquals(OBSERVACOES, req.getObservacoes());
+        assertEquals(dataLimite, req.getDataLimite());
     }
 
     @Test
     void DisponibilizarMapaReq_InvalidDataLimite_ThrowsException() {
         // Test will be handled by validation framework during actual usage
-        DisponibilizarMapaReq req = new DisponibilizarMapaReq(OBSERVACOES, null);
-        assertNull(req.dataLimiteEtapa2());
+        DisponibilizarMapaReq req = new DisponibilizarMapaReq(null, OBSERVACOES);
+        assertNull(req.getDataLimite());
     }
 
     @Test
     void HomologarCadastroReq_RecordConstructorAndGetters() {
         HomologarCadastroReq req = new HomologarCadastroReq("Observações");
 
-        assertEquals("Observações", req.observacoes());
+        assertEquals("Observações", req.getObservacoes());
     }
 
     @Test
@@ -176,15 +177,15 @@ class SubprocessoDtoTest {
                 "Descrição"
         );
 
-        assertEquals(1L, dto.codigo());
-        assertEquals(now, dto.dataHora());
-        assertEquals(1L, dto.unidadeOrigemCodigo());
-        assertEquals("SIGLA_ORIGEM", dto.unidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
-        assertEquals(2L, dto.unidadeDestinoCodigo());
-        assertEquals("SIGLA_DESTINO", dto.unidadeDestinoSigla());
-        assertEquals(UNIDADE, dto.unidadeDestinoNome());
-        assertEquals("Descrição", dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(now, dto.getDataHora());
+        assertEquals(1L, dto.getUnidadeOrigemCodigo());
+        assertEquals("SIGLA_ORIGEM", dto.getUnidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
+        assertEquals(2L, dto.getUnidadeDestinoCodigo());
+        assertEquals("SIGLA_DESTINO", dto.getUnidadeDestinoSigla());
+        assertEquals(UNIDADE, dto.getUnidadeDestinoNome());
+        assertEquals("Descrição", dto.getDescricao());
     }
 
     @Test
@@ -192,7 +193,7 @@ class SubprocessoDtoTest {
         List<CompetenciaAjusteDto> competencias = List.of(new CompetenciaAjusteDto(1L, "Competência", List.of()));
         SalvarAjustesReq req = new SalvarAjustesReq(competencias);
 
-        assertEquals(competencias, req.competencias());
+        assertEquals(competencias, req.getCompetencias());
     }
 
     @Test
@@ -259,8 +260,8 @@ class SubprocessoDtoTest {
         Object payload = new Object();
         SubprocessoDetalheDto.ElementoProcessoDto elemento = new SubprocessoDetalheDto.ElementoProcessoDto("TIPO", payload);
 
-        assertEquals("TIPO", elemento.tipo());
-        assertEquals(payload, elemento.payload());
+        assertEquals("TIPO", elemento.getTipo());
+        assertEquals(payload, elemento.getPayload());
     }
 
     @Test
@@ -296,8 +297,8 @@ class SubprocessoDtoTest {
     void SugestoesDto_RecordConstructorAndGetters() {
         SugestoesDto dto = new SugestoesDto("Sugestões", true, UNIDADE);
 
-        assertEquals("Sugestões", dto.sugestoes());
-        assertTrue(dto.sugestoesApresentadas());
-        assertEquals(UNIDADE, dto.unidadeNome());
+        assertEquals("Sugestões", dto.getSugestoes());
+        assertTrue(dto.isSugestoesApresentadas());
+        assertEquals(UNIDADE, dto.getUnidadeNome());
     }
 }

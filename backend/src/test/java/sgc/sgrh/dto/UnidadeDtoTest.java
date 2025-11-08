@@ -15,12 +15,12 @@ class UnidadeDtoTest {
         UnidadeDto dto = new UnidadeDto(1L, TEST_UNIT, "TU", null, TIPO, null);
 
         // Test getters (record provides accessors)
-        assertEquals(1L, dto.codigo());
-        assertEquals(TEST_UNIT, dto.nome());
-        assertEquals("TU", dto.sigla());
-        assertNull(dto.codigoPai());
-        assertEquals(TIPO, dto.tipo());
-        assertNull(dto.subunidades());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(TEST_UNIT, dto.getNome());
+        assertEquals("TU", dto.getSigla());
+        assertNull(dto.getCodigoPai());
+        assertEquals(TIPO, dto.getTipo());
+        assertNull(dto.getSubunidades());
     }
 
     @Test
@@ -29,11 +29,11 @@ class UnidadeDtoTest {
         UnidadeDto dto = new UnidadeDto(1L, TEST_UNIT, "TU", null, TIPO);
 
         // Test getters
-        assertEquals(1L, dto.codigo());
-        assertEquals(TEST_UNIT, dto.nome());
-        assertEquals("TU", dto.sigla());
-        assertNull(dto.codigoPai());
-        assertEquals(TIPO, dto.tipo());
-        assertNull(dto.subunidades());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(TEST_UNIT, dto.getNome());
+        assertEquals("TU", dto.getSigla());
+        assertNull(dto.getCodigoPai());
+        assertEquals(TIPO, dto.getTipo());
+        assertNull(dto.getSubunidades());
     }
 }

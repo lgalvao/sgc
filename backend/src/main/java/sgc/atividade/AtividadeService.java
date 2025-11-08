@@ -67,8 +67,8 @@ public class AtividadeService {
      * @throws ErroSituacaoInvalida      se o subprocesso já estiver finalizado.
      */
     public AtividadeDto criar(AtividadeDto atividadeDto, String tituloUsuario) {
-        var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.mapaCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.mapaCodigo())));
+        var subprocesso = subprocessoRepo.findByMapaCodigo(atividadeDto.getMapaCodigo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado para o mapa com código %d".formatted(atividadeDto.getMapaCodigo())));
 
         var usuario = usuarioRepo.findById(tituloUsuario)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário", tituloUsuario));

@@ -85,7 +85,7 @@ public class UnidadeService {
     }
     
     private UnidadeDto montarComSubunidades(UnidadeDto dto, Map<Long, List<UnidadeDto>> mapaFilhas) {
-        List<UnidadeDto> filhas = mapaFilhas.get(dto.codigo());
+        List<UnidadeDto> filhas = mapaFilhas.get(dto.getCodigo());
         if (filhas == null || filhas.isEmpty()) {
             return dto;
         }
@@ -96,11 +96,11 @@ public class UnidadeService {
         }
         
         return new UnidadeDto(
-            dto.codigo(),
-            dto.nome(),
-            dto.sigla(),
-            dto.codigoPai(),
-            dto.tipo(),
+            dto.getCodigo(),
+            dto.getNome(),
+            dto.getSigla(),
+            dto.getCodigoPai(),
+            dto.getTipo(),
             subunidadesCompletas
         );
     }

@@ -70,11 +70,11 @@ class MapaServiceTest {
         MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 
         assertThat(mapaCompleto).isNotNull();
-        assertThat(mapaCompleto.codigo()).isEqualTo(1L);
-        assertThat(mapaCompleto.subprocessoCodigo()).isEqualTo(100L);
-        assertThat(mapaCompleto.observacoes()).isEqualTo("Observações do Mapa");
-        assertThat(mapaCompleto.competencias()).hasSize(1);
-        assertThat(mapaCompleto.competencias().getFirst().descricao()).isEqualTo("Competência 1");
+        assertThat(mapaCompleto.getCodigo()).isEqualTo(1L);
+        assertThat(mapaCompleto.getSubprocessoCodigo()).isEqualTo(100L);
+        assertThat(mapaCompleto.getObservacoes()).isEqualTo("Observações do Mapa");
+        assertThat(mapaCompleto.getCompetencias()).hasSize(1);
+        assertThat(mapaCompleto.getCompetencias().getFirst().getDescricao()).isEqualTo("Competência 1");
     }
 
     @Test

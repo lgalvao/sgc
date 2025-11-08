@@ -1,5 +1,10 @@
 package sgc.mapa.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -8,15 +13,18 @@ import java.util.List;
  * <p>
  * Usado para operações agregadas de leitura e escrita do mapa no contexto de subprocessos.
  * <p>
- * Diferente de {@link MapaDto}, que é usado para operações CRUD simples do mapa e inclui
+ * Diferente de {@link sgc.mapa.dto.MapaDto}, que é usado para operações CRUD simples do mapa e inclui
  * metadados como datas de disponibilização e homologação. Este DTO se foca na estrutura
  * hierárquica mapa → competências → atividades, sendo mais adequado para operações que
  * manipulam a composição completa do mapa.
  */
-public record MapaCompletoDto(
-        Long codigo,
-        Long subprocessoCodigo,
-        String observacoes,
-        List<CompetenciaMapaDto> competencias
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MapaCompletoDto {
+    private Long codigo;
+    private Long subprocessoCodigo;
+    private String observacoes;
+    private List<CompetenciaMapaDto> competencias;
 }

@@ -11,9 +11,9 @@ class PerfilDtoTest {
         PerfilDto dto = new PerfilDto("12345678901", 1L, "SEDOC - Secretaria de Documentação", "ADMIN");
 
         // Test getters (record provides accessors)
-        assertEquals("12345678901", dto.usuarioTitulo());
-        assertEquals(1L, dto.unidadeCodigo());
-        assertEquals("SEDOC - Secretaria de Documentação", dto.unidadeNome());
-        assertEquals("ADMIN", dto.perfil());
+        assertEquals("12345678901", dto.getUsuarioTitulo());
+        assertEquals(1L, dto.getUnidadeCodigo());
+        assertEquals("SEDOC - Secretaria de Documentação", dto.getUnidadeNome());
+        assertEquals("ADMIN", dto.getPerfil());
     }
 }

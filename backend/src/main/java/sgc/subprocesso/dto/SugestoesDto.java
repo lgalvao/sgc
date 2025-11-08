@@ -1,24 +1,35 @@
 package sgc.subprocesso.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import sgc.subprocesso.model.Subprocesso;
 
 /**
  * DTO para retornar sugestões apresentadas ao mapa (CDU-20 item 5).
- *
- * @param sugestoes O texto das sugestões.
- * @param sugestoesApresentadas Indica se foram apresentadas sugestões.
- * @param unidadeNome O nome da unidade que apresentou as sugestões.
  */
-public record SugestoesDto(
-    String sugestoes,
-    boolean sugestoesApresentadas,
-    String unidadeNome
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SugestoesDto {
+    /** O texto das sugestões. */
+    private String sugestoes;
+    /** Indica se foram apresentadas sugestões. */
+    private boolean sugestoesApresentadas;
+    /** O nome da unidade que apresentou as sugestões. */
+    private String unidadeNome;
 
     public static SugestoesDto of(Subprocesso subprocesso) {
         String sugestoes = subprocesso.getMapa() != null ? subprocesso.getMapa().getSugestoes() : null;
         boolean sugestoesApresentadas = sugestoes != null && !sugestoes.trim().isEmpty();
         String nomeUnidade = subprocesso.getUnidade() != null ? subprocesso.getUnidade().getNome() : null;
-        return new SugestoesDto(sugestoes, sugestoesApresentadas, nomeUnidade);
+
+        return SugestoesDto.builder()
+            .sugestoes(sugestoes)
+            .sugestoesApresentadas(sugestoesApresentadas)
+            .unidadeNome(nomeUnidade)
+            .build();
     }
 }

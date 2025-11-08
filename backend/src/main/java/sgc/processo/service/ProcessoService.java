@@ -79,7 +79,7 @@ public class ProcessoService {
         List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()
                 .findFirst()
-                .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
+                .map(sgc.sgrh.dto.PerfilDto::getUnidadeCodigo)
                 .orElse(null);
 
         if (codUnidadeUsuario == null) {
@@ -91,23 +91,23 @@ public class ProcessoService {
 
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
-        if (requisicao.descricao() == null || requisicao.descricao().isBlank()) {
+        if (requisicao.getDescricao() == null || requisicao.getDescricao().isBlank()) {
             throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
         }
-        if (requisicao.unidades().isEmpty()) {
+        if (requisicao.getUnidades().isEmpty()) {
             throw new ConstraintViolationException("Pelo menos uma unidade participante deve ser selecionada.", null);
         }
 
         Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : requisicao.unidades()) {
+        for (Long codigoUnidade : requisicao.getUnidades()) {
             participantes.add(unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
         }
 
         Processo processo = new Processo();
-        processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
-        processo.setDataLimite(requisicao.dataLimiteEtapa1());
+        processo.setDescricao(requisicao.getDescricao());
+        processo.setTipo(requisicao.getTipo());
+        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.setDataCriacao(LocalDateTime.now());
         processo.setParticipantes(participantes);
@@ -129,12 +129,12 @@ public class ProcessoService {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
-        processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
-        processo.setDataLimite(requisicao.dataLimiteEtapa1());
+        processo.setDescricao(requisicao.getDescricao());
+        processo.setTipo(requisicao.getTipo());
+        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
 
         Set<Unidade> participantes = new HashSet<>();
-        for (Long codigoUnidade : requisicao.unidades()) {
+        for (Long codigoUnidade : requisicao.getUnidades()) {
             participantes.add(unidadeRepo.findById(codigoUnidade)
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
         }
@@ -413,7 +413,7 @@ public class ProcessoService {
         List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()
             .findFirst()
-            .map(PerfilDto::unidadeCodigo)
+            .map(PerfilDto::getUnidadeCodigo)
             .orElse(null);
 
         if (codUnidadeUsuario == null) {

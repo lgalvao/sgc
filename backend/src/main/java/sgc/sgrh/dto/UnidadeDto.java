@@ -1,23 +1,37 @@
 package sgc.sgrh.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
  * DTO para dados de unidade do SGRH.
  * Suporta estrutura hierárquica com subunidades.
  */
-public record UnidadeDto(
-        Long codigo,
-        String nome,
-        String sigla,
-        Long codigoPai,
-        String tipo,
-        List<UnidadeDto> subunidades  // Para árvore hierárquica
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UnidadeDto {
+    private Long codigo;
+    private String nome;
+    private String sigla;
+    private Long codigoPai;
+    private String tipo;
+    private List<UnidadeDto> subunidades;  // Para árvore hierárquica
+
     /**
      * Construtor sem subunidades.
      */
     public UnidadeDto(Long codigo, String nome, String sigla, Long codigoPai, String tipo) {
-        this(codigo, nome, sigla, codigoPai, tipo, null);
+        this.codigo = codigo;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.codigoPai = codigoPai;
+        this.tipo = tipo;
+        this.subunidades = null;
     }
 }

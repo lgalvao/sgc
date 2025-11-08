@@ -33,8 +33,8 @@ class SgrhServiceTest {
         Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorTitulo(TITULO);
 
         assertTrue(result.isPresent());
-        assertEquals(TITULO, result.get().titulo());
-        assertTrue(result.get().nome().contains("Usuário Mock"));
+        assertEquals(TITULO, result.get().getTitulo());
+        assertTrue(result.get().getNome().contains("Usuário Mock"));
     }
 
     @Test
@@ -43,8 +43,8 @@ class SgrhServiceTest {
         Optional<UsuarioDto> result = sgrhService.buscarUsuarioPorEmail(email);
 
         assertTrue(result.isPresent());
-        assertEquals("joao.silva", result.get().titulo()); // extracted from email (before @)
-        assertEquals(email, result.get().email());
+        assertEquals("joao.silva", result.get().getTitulo()); // extracted from email (before @)
+        assertEquals(email, result.get().getEmail());
     }
 
     @Test
@@ -56,8 +56,8 @@ class SgrhServiceTest {
         assertEquals(3, result.size());
         
         UsuarioDto primeiro = result.getFirst();
-        assertEquals(TITULO, primeiro.titulo());
-        assertEquals("joao.silva@tre-pe.jus.br", primeiro.email());
+        assertEquals(TITULO, primeiro.getTitulo());
+        assertEquals("joao.silva@tre-pe.jus.br", primeiro.getEmail());
     }
 
     @Test
@@ -65,8 +65,8 @@ class SgrhServiceTest {
         Optional<UnidadeDto> result = sgrhService.buscarUnidadePorCodigo(2L);
 
         assertTrue(result.isPresent());
-        assertEquals(2L, result.get().codigo());
-        assertEquals("Secretaria de Informática e Comunicações", result.get().nome());
+        assertEquals(2L, result.get().getCodigo());
+        assertEquals("Secretaria de Informática e Comunicações", result.get().getNome());
     }
 
     @Test
@@ -86,7 +86,7 @@ class SgrhServiceTest {
         // Should return SGP, COSIS, COSINF, COJUR (the direct children of STIC)
         assertTrue(result.size() >= 4);
         for (UnidadeDto unidade : result) {
-            assertEquals(2L, unidade.codigoPai()); // All should have STIC as parent
+            assertEquals(2L, unidade.getCodigoPai()); // All should have STIC as parent
         }
     }
 
@@ -98,7 +98,7 @@ class SgrhServiceTest {
         assertFalse(result.isEmpty());
         // Should return root units (with no parent)
         for (UnidadeDto unidade : result) {
-            assertNull(unidade.codigoPai()); // All in the list should be roots
+            assertNull(unidade.getCodigoPai()); // All in the list should be roots
         }
     }
 
@@ -107,9 +107,9 @@ class SgrhServiceTest {
         Optional<ResponsavelDto> result = sgrhService.buscarResponsavelUnidade(1L);
 
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().unidadeCodigo());
-        assertEquals(TITULO, result.get().titularTitulo());
-        assertEquals("987654321098", result.get().substitutoTitulo());
+        assertEquals(1L, result.get().getUnidadeCodigo());
+        assertEquals(TITULO, result.get().getTitularTitulo());
+        assertEquals("987654321098", result.get().getSubstitutoTitulo());
     }
 
     @Test
@@ -128,7 +128,7 @@ class SgrhServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         // Check if it contains expected profile
-        assertTrue(result.stream().anyMatch(p -> p.usuarioTitulo().equals(TITULO)));
+        assertTrue(result.stream().anyMatch(p -> p.getUsuarioTitulo().equals(TITULO)));
     }
 
     @Test

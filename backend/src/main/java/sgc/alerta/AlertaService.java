@@ -84,12 +84,12 @@ public class AlertaService {
         Alerta alertaSalvo = repositorioAlerta.save(alerta);
         try {
             Optional<ResponsavelDto> responsavel = sgrhService.buscarResponsavelUnidade(codUnidadeDestino);
-            if (responsavel.isPresent() && responsavel.get().titularTitulo() != null) {
-                criarAlertaUsuario(alertaSalvo, responsavel.get().titularTitulo(), codUnidadeDestino);
+            if (responsavel.isPresent() && responsavel.get().getTitularTitulo() != null) {
+                criarAlertaUsuario(alertaSalvo, responsavel.get().getTitularTitulo(), codUnidadeDestino);
 
                 // Se houver substituto, também o adiciona
-                if (responsavel.get().substitutoTitulo() != null) {
-                    criarAlertaUsuario(alertaSalvo, responsavel.get().substitutoTitulo(), codUnidadeDestino);
+                if (responsavel.get().getSubstitutoTitulo() != null) {
+                    criarAlertaUsuario(alertaSalvo, responsavel.get().getSubstitutoTitulo(), codUnidadeDestino);
                 }
             }
         } catch (Exception e) {
@@ -134,7 +134,7 @@ public class AlertaService {
                     log.warn("Unidade não encontrada no SGRH: {}", codUnidade);
                     continue;
                 }
-                TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().tipo());
+                TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidadeDtoOptional.get().getTipo());
                 String nomeProcesso = processo.getDescricao();
 
                 // Encontrar o subprocesso correspondente para obter a data limite
@@ -243,9 +243,9 @@ public class AlertaService {
                         return sgrhService.buscarUsuarioPorTitulo(tituloStr)
                                 .map(usuarioDto -> {
                                     Usuario novoUsuario = new Usuario()
-                                            .setTituloEleitoral(usuarioDto.titulo())
-                                            .setNome(usuarioDto.nome())
-                                            .setEmail(usuarioDto.email())
+                                            .setTituloEleitoral(usuarioDto.getTitulo())
+                                            .setNome(usuarioDto.getNome())
+                                            .setEmail(usuarioDto.getEmail())
                                             .setPerfis(java.util.Set.of(Perfil.CHEFE));
 
                                     unidadeRepo.findById(codUnidade).ifPresent(novoUsuario::setUnidade);

@@ -125,7 +125,7 @@ public class SubprocessoMapaController {
     ) {
         subprocessoMapaService.salvarAjustesMapa(
                 codigo,
-                request.competencias(),
+                request.getCompetencias(),
                 usuario.getTituloEleitoral()
         );
     }

@@ -1,10 +1,18 @@
 package sgc.mapa.dto.visualizacao;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-public record AtividadeDto(
-        Long codigo,
-        String descricao,
-        List<ConhecimentoDto> conhecimentos
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AtividadeDto {
+    private Long codigo;
+    private String descricao;
+    private List<ConhecimentoDto> conhecimentos;
 }

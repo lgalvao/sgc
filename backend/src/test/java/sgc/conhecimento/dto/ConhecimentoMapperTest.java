@@ -45,9 +45,9 @@ class ConhecimentoMapperTest {
 
         ConhecimentoDto dto = mapper.toDto(conhecimento);
 
-        assertEquals(1L, dto.codigo());
-        assertEquals(100L, dto.atividadeCodigo());
-        assertEquals(DESC, dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(100L, dto.getAtividadeCodigo());
+        assertEquals(DESC, dto.getDescricao());
     }
 
     @Test

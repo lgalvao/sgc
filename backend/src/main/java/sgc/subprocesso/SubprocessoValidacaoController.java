@@ -52,8 +52,8 @@ public class SubprocessoValidacaoController {
 
         subprocessoWorkflowService.disponibilizarMapa(
                 codigo,
-                request.observacoes(),
-                request.dataLimiteEtapa2(),
+                request.getObservacoes(),
+                request.getDataLimite().atStartOfDay(),
                 usuario
         );
         return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
@@ -76,7 +76,7 @@ public class SubprocessoValidacaoController {
 
         subprocessoWorkflowService.apresentarSugestoes(
                 codigo,
-                request.sugestoes(),
+                request.getSugestoes(),
                 usuario.getTituloEleitoral()
         );
     }
@@ -137,7 +137,7 @@ public class SubprocessoValidacaoController {
     ) {
         subprocessoWorkflowService.devolverValidacao(
                 codigo,
-                request.justificativa(),
+                request.getJustificativa(),
                 usuario
         );
     }

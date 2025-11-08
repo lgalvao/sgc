@@ -1,13 +1,21 @@
 package sgc.sgrh.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO para dados de responsável (titular/substituto) de uma unidade.
  */
-public record ResponsavelDto(
-    Long unidadeCodigo,
-    String titularTitulo,
-    String titularNome,
-    String substitutoTitulo,
-    String substitutoNome
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResponsavelDto {
+    private Long unidadeCodigo;
+    private String titularTitulo;
+    private String titularNome;
+    private String substitutoTitulo;
+    private String substitutoNome;
 }

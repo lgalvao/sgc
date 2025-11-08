@@ -42,7 +42,7 @@ public class SubprocessoMapaWorkflowService {
 
         Long codMapa = subprocesso.getMapa().getCodigo();
         boolean eraVazio = repositorioCompetencia.findByMapaCodigo(codMapa).isEmpty();
-        boolean temNovasCompetencias = !request.competencias().isEmpty();
+        boolean temNovasCompetencias = !request.getCompetencias().isEmpty();
 
         MapaCompletoDto mapaDto = mapaService.salvarMapaCompleto(codMapa, request, tituloUsuario);
 
@@ -57,13 +57,13 @@ public class SubprocessoMapaWorkflowService {
 
     public MapaCompletoDto adicionarCompetencia(Long codSubprocesso, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        competenciaService.adicionarCompetencia(subprocesso.getMapa(), request.descricao(), request.atividadesIds());
+        competenciaService.adicionarCompetencia(subprocesso.getMapa(), request.getDescricao(), request.getAtividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
     public MapaCompletoDto atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaReq request, String tituloUsuario) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        competenciaService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
+        competenciaService.atualizarCompetencia(codCompetencia, request.getDescricao(), request.getAtividadesIds());
         return mapaService.obterMapaCompleto(subprocesso.getMapa().getCodigo(), codSubprocesso);
     }
 
