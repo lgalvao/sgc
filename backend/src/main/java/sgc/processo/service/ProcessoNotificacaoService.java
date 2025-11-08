@@ -47,7 +47,7 @@ public class ProcessoNotificacaoService {
         List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
         Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(
-            responsaveis.values().stream().map(ResponsavelDto::titularTitulo).distinct().toList()
+            responsaveis.values().stream().map(ResponsavelDto::getTitularTitulo).distinct().toList()
         );
 
         for (Unidade unidade : unidadesParticipantes) {
@@ -55,11 +55,11 @@ public class ProcessoNotificacaoService {
                 ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
                     .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
 
-                UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.titularTitulo()))
-                    .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.titularTitulo())));
+                UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.getTitularTitulo()))
+                    .orElseThrow(() -> new IllegalStateException("Usuário titular não encontrado: %s".formatted(responsavel.getTitularTitulo())));
 
-                String emailTitular = Optional.ofNullable(titular.email()).filter(e -> !e.isBlank())
-                    .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.nome())));
+                String emailTitular = Optional.ofNullable(titular.getEmail()).filter(e -> !e.isBlank())
+                    .orElseThrow(() -> new IllegalStateException("E-mail não cadastrado para o titular %s".formatted(titular.getNome())));
 
                 if (unidade.getTipo() == TipoUnidade.OPERACIONAL || unidade.getTipo() == TipoUnidade.INTEROPERACIONAL) {
                     enviarEmailUnidadeFinal(processo, unidade, emailTitular);

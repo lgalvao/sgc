@@ -28,7 +28,7 @@ public class ImpactoCompetenciaService {
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
-            Atividade atividade = atividadeRepo.findById(atividadeDto.codigo()).orElse(null);
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
             for (Competencia comp : atividade.getCompetencias()) {
@@ -38,13 +38,13 @@ public class ImpactoCompetenciaService {
                                     comp.getCodigo(),
                                     comp.getDescricao()));
 
-                    acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.descricao()));
+                    acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.getDescricao()));
                 }
             }
         }
 
         for (AtividadeImpactadaDto atividadeDto : alteradas) {
-            Atividade atividade = atividadeRepo.findById(atividadeDto.codigo()).orElse(null);
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
             if (atividade == null) continue;
 
             for (Competencia comp : atividade.getCompetencias()) {
@@ -57,8 +57,8 @@ public class ImpactoCompetenciaService {
 
                     String detalhe = String.format(
                             "Atividade alterada: '%s' → '%s'",
-                            atividadeDto.descricaoAnterior(),
-                            atividadeDto.descricao());
+                            atividadeDto.getDescricaoAnterior(),
+                            atividadeDto.getDescricao());
                     acumulador.adicionarImpacto(detalhe);
                 }
             }

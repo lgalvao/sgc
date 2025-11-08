@@ -105,7 +105,7 @@ public class MapaService {
         Mapa mapa = mapaRepo.findById(codMapa)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado: %d".formatted(codMapa)));
 
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
         mapa.setObservacoesDisponibilizacao(sanitizedObservacoes);
         mapa = mapaRepo.save(mapa);
 
@@ -114,8 +114,8 @@ public class MapaService {
                 .map(Competencia::getCodigo)
                 .collect(Collectors.toSet());
 
-        Set<Long> idsNovos = request.competencias().stream()
-                .map(CompetenciaMapaDto::codigo)
+        Set<Long> idsNovos = request.getCompetencias().stream()
+                .map(CompetenciaMapaDto::getCodigo)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -127,23 +127,23 @@ public class MapaService {
             log.debug("Competência {} removida do mapa {}", codParaRemover, codMapa);
         }
 
-        for (CompetenciaMapaDto compDto : request.competencias()) {
+        for (CompetenciaMapaDto compDto : request.getCompetencias()) {
             Competencia competencia;
-            if (compDto.codigo() == null) {
+            if (compDto.getCodigo() == null) {
                 competencia = new Competencia();
                 competencia.setMapa(mapa);
-                competencia.setDescricao(compDto.descricao());
+                competencia.setDescricao(compDto.getDescricao());
                 competencia = competenciaRepo.save(competencia);
                 log.debug("Nova competência criada: {}", competencia.getCodigo());
             } else {
-                competencia = competenciaRepo.findById(compDto.codigo())
-                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.codigo())));
+                competencia = competenciaRepo.findById(compDto.getCodigo())
+                        .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.getCodigo())));
 
-                competencia.setDescricao(compDto.descricao());
+                competencia.setDescricao(compDto.getDescricao());
                 competencia = competenciaRepo.save(competencia);
                 log.debug("Competência atualizada: {}", competencia.getCodigo());
             }
-            mapaVinculoService.atualizarVinculosAtividades(competencia.getCodigo(), compDto.atividadesCodigos());
+            mapaVinculoService.atualizarVinculosAtividades(competencia.getCodigo(), compDto.getAtividadesCodigos());
         }
 
         mapaIntegridadeService.validarIntegridadeMapa(codMapa);

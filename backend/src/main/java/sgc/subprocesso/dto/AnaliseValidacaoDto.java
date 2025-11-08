@@ -1,20 +1,28 @@
 package sgc.subprocesso.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 /**
  * DTO para histórico de análise de validação (CDU-20 item 6).
- *
- * @param codigo O código da análise.
- * @param dataHora A data e hora da análise.
- * @param observacoes As observações registradas.
- * @param acao A ação realizada (e.g., APROVADO, DEVOLVIDO).
- * @param unidadeSigla A sigla da unidade que realizou a análise.
  */
-public record AnaliseValidacaoDto(
-    Long codigo,
-    LocalDateTime dataHora,
-    String observacoes,
-    String acao,
-    String unidadeSigla
-) {}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AnaliseValidacaoDto {
+    /** O código da análise. */
+    private Long codigo;
+    /** A data e hora da análise. */
+    private LocalDateTime dataHora;
+    /** As observações registradas. */
+    private String observacoes;
+    /** A ação realizada (e.g., APROVADO, DEVOLVIDO). */
+    private String acao;
+    /** A sigla da unidade que realizou a análise. */
+    private String unidadeSigla;
+}

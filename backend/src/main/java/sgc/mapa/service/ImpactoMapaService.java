@@ -101,7 +101,7 @@ public class ImpactoMapaService {
         ImpactoMapaDto impactos = ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
 
         log.info("ImpactoMapaService - Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
-                impactos.temImpactos(), impactos.totalAtividadesInseridas(), impactos.totalAtividadesRemovidas(), impactos.totalAtividadesAlteradas());
+                impactos.isTemImpactos(), impactos.getTotalAtividadesInseridas(), impactos.getTotalAtividadesRemovidas(), impactos.getTotalAtividadesAlteradas());
         return impactos;
     }
 

@@ -67,24 +67,24 @@ public class EventoProcessoListener {
     @Transactional
     public void aoIniciarProcesso(EventoProcessoIniciado evento) {
         log.info("Processando evento de processo iniciado: codProcesso={}, tipo={}",
-                evento.codProcesso(), evento.tipo());
+                evento.getCodProcesso(), evento.getTipo());
         try {
-            Processo processo = processoRepo.findById(evento.codProcesso())
-                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.codProcesso()));
+            Processo processo = processoRepo.findById(evento.getCodProcesso())
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo não encontrado: ", evento.getCodProcesso()));
 
-            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.codProcesso());
+            List<Subprocesso> subprocessos = repoSubprocesso.findByProcessoCodigoWithUnidade(evento.getCodProcesso());
 
             if (subprocessos.isEmpty()) {
-                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.codProcesso());
+                log.warn("Nenhum subprocesso encontrado para o processo {}", evento.getCodProcesso());
                 return;
             }
 
-            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.codProcesso());
+            log.info("Encontrados {} subprocessos para o processo {}", subprocessos.size(), evento.getCodProcesso());
 
             // 1. Criar alertas diferenciados por tipo de unidade
             List<Alerta> alertas = servicoAlertas.criarAlertasProcessoIniciado(
                     processo,
-                    evento.codUnidades(),
+                    evento.getCodUnidades(),
                     subprocessos
             );
             log.info("Criados {} alertas para o processo {}", alertas.size(), processo.getCodigo());
@@ -123,28 +123,28 @@ public class EventoProcessoListener {
             UnidadeDto unidade = unidadeOpt.get();
 
             Optional<ResponsavelDto> responsavelOpt = sgrhService.buscarResponsavelUnidade(codigoUnidade);
-            if (responsavelOpt.isEmpty() || responsavelOpt.get().titularTitulo() == null) {
+            if (responsavelOpt.isEmpty() || responsavelOpt.get().getTitularTitulo() == null) {
                 log.warn("Responsável não encontrado para a unidade {}.",
-                        unidade.nome());
+                        unidade.getNome());
                 return;
             }
 
-            UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavelOpt.get().titularTitulo()).orElse(null);
-            if (titular == null || titular.email() == null || titular.email().isBlank()) {
+            UsuarioDto titular = sgrhService.buscarUsuarioPorTitulo(responsavelOpt.get().getTitularTitulo()).orElse(null);
+            if (titular == null || titular.getEmail() == null || titular.getEmail().isBlank()) {
                 log.warn("E-mail não encontrado para o titular da unidade {}.",
-                        unidade.nome());
+                        unidade.getNome());
                 return;
             }
 
             String assunto;
             String corpoHtml;
-            TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidade.tipo());
+            TipoUnidade tipoUnidade = TipoUnidade.valueOf(unidade.getTipo());
             TipoProcesso tipoProcesso = processo.getTipo();
 
             if (OPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
-                        unidade.nome(),
+                        unidade.getNome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
@@ -152,7 +152,7 @@ public class EventoProcessoListener {
             } else if (INTERMEDIARIA.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado em Unidades Subordinadas - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
-                        unidade.nome(),
+                        unidade.getNome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
@@ -160,7 +160,7 @@ public class EventoProcessoListener {
             } else if (INTEROPERACIONAL.equals(tipoUnidade)) {
                 assunto = "Processo Iniciado - %s".formatted(processo.getDescricao());
                 corpoHtml = notificacaoModelosService.criarEmailDeProcessoIniciado(
-                        unidade.nome(),
+                        unidade.getNome(),
                         processo.getDescricao(),
                         tipoProcesso.name(),
                         subprocesso.getDataLimiteEtapa1()
@@ -170,11 +170,11 @@ public class EventoProcessoListener {
                 return;
             }
 
-            notificacaoEmailService.enviarEmailHtml(titular.email(), assunto, corpoHtml);
-            log.info("E-mail enviado para a unidade {} ({})", unidade.sigla(), tipoUnidade);
+            notificacaoEmailService.enviarEmailHtml(titular.getEmail(), assunto, corpoHtml);
+            log.info("E-mail enviado para a unidade {} ({})", unidade.getSigla(), tipoUnidade);
 
-            if (responsavelOpt.get().substitutoTitulo() != null) {
-                enviarEmailParaSubstituto(responsavelOpt.get().substitutoTitulo(), assunto, corpoHtml, unidade.nome());
+            if (responsavelOpt.get().getSubstitutoTitulo() != null) {
+                enviarEmailParaSubstituto(responsavelOpt.get().getSubstitutoTitulo(), assunto, corpoHtml, unidade.getNome());
             }
 
         } catch (Exception e) {
@@ -186,8 +186,8 @@ public class EventoProcessoListener {
                                            String corpoHtml, String nomeUnidade) {
         try {
             UsuarioDto substituto = sgrhService.buscarUsuarioPorTitulo(tituloSubstituto).orElse(null);
-            if (substituto != null && substituto.email() != null && !substituto.email().isBlank()) {
-                notificacaoEmailService.enviarEmailHtml(substituto.email(), assunto, corpoHtml);
+            if (substituto != null && substituto.getEmail() != null && !substituto.getEmail().isBlank()) {
+                notificacaoEmailService.enviarEmailHtml(substituto.getEmail(), assunto, corpoHtml);
                 log.info("E-mail enviado para o substituto da unidade {}.", nomeUnidade);
             }
         } catch (Exception e) {

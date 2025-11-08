@@ -31,16 +31,16 @@ class EventosTest {
                 1L, "MAPEAMENTO", LocalDateTime.now(), List.of(1L, 2L)
         );
 
-        assertEquals(1L, evento.codProcesso());
-        assertEquals("MAPEAMENTO", evento.tipo());
-        assertNotNull(evento.dataHoraInicio());
-        assertEquals(List.of(1L, 2L), evento.codUnidades());
+        assertEquals(1L, evento.getCodProcesso());
+        assertEquals("MAPEAMENTO", evento.getTipo());
+        assertNotNull(evento.getDataHoraInicio());
+        assertEquals(List.of(1L, 2L), evento.getCodUnidades());
     }
 
     @Test
     void subprocessoDisponibilizadoEvento_Getters() {
         EventoSubprocessoDisponibilizado evento = new EventoSubprocessoDisponibilizado(1L);
 
-        assertEquals(1L, evento.codSubprocesso());
+        assertEquals(1L, evento.getCodSubprocesso());
     }
 }

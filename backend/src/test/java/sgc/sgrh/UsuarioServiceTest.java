@@ -78,7 +78,7 @@ class UsuarioServiceTest {
 
         assertThat(resultado).hasSize(2);
         assertThat(resultado).extracting(PerfilUnidade::getPerfil).containsExactlyInAnyOrder(Perfil.ADMIN, Perfil.CHEFE);
-        assertThat(resultado).extracting(pu -> pu.getUnidade().sigla()).allMatch(sigla -> sigla.equals("SEDOC"));
+        assertThat(resultado).extracting(pu -> pu.getUnidade().getSigla()).allMatch(sigla -> sigla.equals("SEDOC"));
 
         verify(usuarioRepo, times(1)).findById(tituloEleitoral);
         verifyNoInteractions(sgrhService, unidadeRepo);

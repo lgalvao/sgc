@@ -13,6 +13,6 @@ public class PerfilUnidade {
     private UnidadeDto unidade;
 
     public String getSiglaUnidade() {
-        return unidade.sigla();
+        return unidade.getSigla();
     }
 }

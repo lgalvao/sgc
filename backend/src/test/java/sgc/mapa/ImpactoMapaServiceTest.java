@@ -83,7 +83,7 @@ class ImpactoMapaServiceTest {
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
         assertThat(result).isNotNull();
-        assertThat(result.temImpactos()).isFalse();
+        assertThat(result.isTemImpactos()).isFalse();
     }
 
     @Test
@@ -121,8 +121,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
-        assertThat(result.temImpactos()).isTrue();
-        assertThat(result.totalAtividadesRemovidas()).isEqualTo(1);
+        assertThat(result.isTemImpactos()).isTrue();
+        assertThat(result.getTotalAtividadesRemovidas()).isEqualTo(1);
     }
 
     @Test
@@ -151,7 +151,7 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
-        assertThat(result.temImpactos()).isFalse();
+        assertThat(result.isTemImpactos()).isFalse();
     }
 
     @Test
@@ -187,8 +187,8 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
-        assertThat(result.temImpactos()).isTrue();
-        assertThat(result.totalAtividadesInseridas()).isEqualTo(1);
+        assertThat(result.isTemImpactos()).isTrue();
+        assertThat(result.getTotalAtividadesInseridas()).isEqualTo(1);
     }
 
     @Test
@@ -233,7 +233,7 @@ class ImpactoMapaServiceTest {
 
         ImpactoMapaDto result = impactoMapaServico.verificarImpactos(100L, usuario);
 
-        assertThat(result.temImpactos()).isTrue();
-        assertThat(result.totalAtividadesAlteradas()).isEqualTo(1);
+        assertThat(result.isTemImpactos()).isTrue();
+        assertThat(result.getTotalAtividadesAlteradas()).isEqualTo(1);
     }
 }

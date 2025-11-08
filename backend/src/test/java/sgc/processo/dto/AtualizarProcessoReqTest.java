@@ -25,13 +25,13 @@ class AtualizarProcessoReqTest {
             unidades
         );
 
-        assertEquals(1L, req.codigo());
-        assertEquals("Test Description", req.descricao());
-        assertEquals(TipoProcesso.MAPEAMENTO, req.tipo());
-        assertNotNull(req.dataLimiteEtapa1());
-        assertEquals(2, req.unidades().size());
-        assertEquals(Long.valueOf(1L), req.unidades().get(0));
-        assertEquals(Long.valueOf(2L), req.unidades().get(1));
+        assertEquals(1L, req.getCodigo());
+        assertEquals("Test Description", req.getDescricao());
+        assertEquals(TipoProcesso.MAPEAMENTO, req.getTipo());
+        assertNotNull(req.getDataLimiteEtapa1());
+        assertEquals(2, req.getUnidades().size());
+        assertEquals(Long.valueOf(1L), req.getUnidades().get(0));
+        assertEquals(Long.valueOf(2L), req.getUnidades().get(1));
 
         req = new AtualizarProcessoReq(
             2L,
@@ -41,11 +41,11 @@ class AtualizarProcessoReqTest {
             new ArrayList<>(List.of(3L))
         );
 
-        assertEquals(2L, req.codigo());
-        assertEquals("New Description", req.descricao());
-        assertEquals(TipoProcesso.REVISAO, req.tipo());
-        assertNotNull(req.dataLimiteEtapa1());
-        assertEquals(1, req.unidades().size());
-        assertEquals(Long.valueOf(3L), req.unidades().getFirst());
+        assertEquals(2L, req.getCodigo());
+        assertEquals("New Description", req.getDescricao());
+        assertEquals(TipoProcesso.REVISAO, req.getTipo());
+        assertNotNull(req.getDataLimiteEtapa1());
+        assertEquals(1, req.getUnidades().size());
+        assertEquals(Long.valueOf(3L), req.getUnidades().getFirst());
     }
 }

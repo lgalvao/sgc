@@ -37,6 +37,7 @@ import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -143,9 +144,9 @@ class CDU17IntegrationTest {
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
             analiseRepo.save(analiseAntiga);
 
-            LocalDateTime dataLimite = LocalDateTime.now().plusDays(10);
+            LocalDate dataLimite = LocalDate.now().plusDays(10);
             String observacoes = "Observações de teste para o mapa.";
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(dataLimite, observacoes);
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -190,7 +191,7 @@ class CDU17IntegrationTest {
             competencia.setAtividades(Set.of(atividade));
             competenciaRepo.save(competencia);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -206,7 +207,7 @@ class CDU17IntegrationTest {
             subprocesso.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -223,7 +224,7 @@ class CDU17IntegrationTest {
             competencia.setAtividades(Set.of(dummyActivity));
             competenciaRepo.save(competencia);
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             String responseBody = mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -248,7 +249,7 @@ class CDU17IntegrationTest {
             competenciaRepo.save(competencia);
             competenciaRepo.save(new Competencia("Competência Solta", mapa));
 
-            DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())

@@ -63,7 +63,7 @@ public class AtividadeController {
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeDto> criar(@Valid @RequestBody AtividadeDto atividadeDto, @AuthenticationPrincipal UserDetails userDetails) {
         var salvo = atividadeService.criar(atividadeDto, userDetails.getUsername());
-        URI uri = URI.create("/api/atividades/%d".formatted(salvo.codigo()));
+        URI uri = URI.create("/api/atividades/%d".formatted(salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }
 
@@ -121,7 +121,7 @@ public class AtividadeController {
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<ConhecimentoDto> criarConhecimento(@PathVariable Long codAtividade, @Valid @RequestBody ConhecimentoDto conhecimentoDto) {
         var salvo = atividadeService.criarConhecimento(codAtividade, conhecimentoDto);
-        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.codigo()));
+        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, salvo.getCodigo()));
         return ResponseEntity.created(uri).body(salvo);
     }
 

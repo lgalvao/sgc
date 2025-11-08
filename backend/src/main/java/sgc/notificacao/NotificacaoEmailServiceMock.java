@@ -35,7 +35,7 @@ public class NotificacaoEmailServiceMock extends NotificacaoEmailService {
     
     @Override
     public CompletableFuture<Boolean> enviarEmailAssincrono(EmailDto emailDto) {
-        log.debug("[MOCK E2E] E-mail assíncrono NÃO enviado - Para: {}", emailDto.destinatario());
+        log.debug("[MOCK E2E] E-mail assíncrono NÃO enviado - Para: {}", emailDto.getDestinatario());
         return CompletableFuture.completedFuture(true);
     }
 }

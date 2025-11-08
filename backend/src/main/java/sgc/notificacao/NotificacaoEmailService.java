@@ -72,8 +72,8 @@ public class NotificacaoEmailService {
     }
 
     private void processarEnvioDeEmail(EmailDto emailDto) {
-        if (!isEmailValido(emailDto.destinatario())) {
-            log.error("Endereço de e-mail inválido, envio cancelado: {}", emailDto.destinatario());
+        if (!isEmailValido(emailDto.getDestinatario())) {
+            log.error("Endereço de e-mail inválido, envio cancelado: {}", emailDto.getDestinatario());
             return;
         }
 
@@ -81,23 +81,23 @@ public class NotificacaoEmailService {
             Notificacao notificacao = criarEntidadeNotificacao(emailDto);
             repositorioNotificacao.save(notificacao);
             log.info("Notificação persistida no banco - Código: {}, Destinatário: {}",
-                    notificacao.getCodigo(), emailDto.destinatario());
+                    notificacao.getCodigo(), emailDto.getDestinatario());
 
             enviarEmailAssincrono(emailDto)
                     .thenAccept(sucesso -> {
                         if (Boolean.TRUE.equals(sucesso)) {
-                            log.info("E-mail para {} enviado.", emailDto.destinatario());
+                            log.info("E-mail para {} enviado.", emailDto.getDestinatario());
                         } else {
-                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.destinatario(), MAX_TENTATIVAS);
+                            log.error("Falha ao enviar e-mail para {} após {} tentativas.", emailDto.getDestinatario(), MAX_TENTATIVAS);
                         }
                     })
                     .exceptionally(ex -> {
-                        log.error("Erro inesperado ao enviar e-mail para: {}", emailDto.destinatario(), ex);
+                        log.error("Erro inesperado ao enviar e-mail para: {}", emailDto.getDestinatario(), ex);
                         return null;
                     });
 
         } catch (Exception e) {
-            log.error("Erro ao processar notificação para {}: {}", emailDto.destinatario(), e.getMessage(), e);
+            log.error("Erro ao processar notificação para {}: {}", emailDto.getDestinatario(), e.getMessage(), e);
         }
     }
 
@@ -117,14 +117,14 @@ public class NotificacaoEmailService {
         Exception excecaoFinal = null;
         for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
             try {
-                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, emailDto.destinatario());
+                log.debug("Tentativa {} de {} para enviar e-mail para: {}", tentativa, MAX_TENTATIVAS, emailDto.getDestinatario());
                 enviarEmailSmtp(emailDto);
-                log.info("E-mail enviado na tentativa {} para: {}", tentativa, emailDto.destinatario());
+                log.info("E-mail enviado na tentativa {} para: {}", tentativa, emailDto.getDestinatario());
                 return CompletableFuture.completedFuture(true);
             } catch (Exception e) {
                 excecaoFinal = e;
                 log.warn("Falha na tentativa {} de {} ao enviar e-mail para {}: {}",
-                        tentativa, MAX_TENTATIVAS, emailDto.destinatario(), e.getMessage());
+                        tentativa, MAX_TENTATIVAS, emailDto.getDestinatario(), e.getMessage());
                 if (tentativa < MAX_TENTATIVAS) {
                     try {
                         Thread.sleep(ESPERA_ENTRE_TENTATIVAS_MS * tentativa);
@@ -136,7 +136,7 @@ public class NotificacaoEmailService {
                 }
             }
         }
-        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS, emailDto.destinatario(), excecaoFinal);
+        log.error("Não foi possível enviar o e-mail para {} após {} tentativas.", MAX_TENTATIVAS, emailDto.getDestinatario(), excecaoFinal);
         return CompletableFuture.completedFuture(false);
     }
 
@@ -145,19 +145,19 @@ public class NotificacaoEmailService {
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
         helper.setFrom(new InternetAddress(remetente, nomeRemetente));
-        helper.setTo(emailDto.destinatario());
-        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.assunto());
+        helper.setTo(emailDto.getDestinatario());
+        String assuntoCompleto = "%s %s".formatted(prefixoAssunto, emailDto.getAssunto());
         helper.setSubject(assuntoCompleto);
-        helper.setText(emailDto.corpo(), emailDto.html());
+        helper.setText(emailDto.getCorpo(), emailDto.isHtml());
 
         enviadorDeEmail.send(mensagem);
-        log.debug("E-mail enviado via SMTP para: {} - Assunto: {}", emailDto.destinatario(), assuntoCompleto);
+        log.debug("E-mail enviado via SMTP para: {} - Assunto: {}", emailDto.getDestinatario(), assuntoCompleto);
     }
 
     private Notificacao criarEntidadeNotificacao(EmailDto emailDto) {
         Notificacao notificacao = new Notificacao();
         notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.destinatario(), emailDto.assunto(), emailDto.corpo());
+        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", emailDto.getDestinatario(), emailDto.getAssunto(), emailDto.getCorpo());
         if (conteudo.length() > 500) {
             conteudo = "%s...".formatted(conteudo.substring(0, 497));
         }

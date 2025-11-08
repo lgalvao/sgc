@@ -149,13 +149,13 @@ class MapperTest {
         MovimentacaoDto dto = movimentacaoMapper.toDTO(entity);
 
         assertNotNull(dto);
-        assertEquals(1L, dto.codigo());
-        assertEquals(100L, dto.unidadeOrigemCodigo());
-        assertEquals("ORIGEM", dto.unidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
-        assertEquals(200L, dto.unidadeDestinoCodigo());
-        assertEquals("DESTINO", dto.unidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
-        assertEquals("Descrição da movimentação", dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(100L, dto.getUnidadeOrigemCodigo());
+        assertEquals("ORIGEM", dto.getUnidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
+        assertEquals(200L, dto.getUnidadeDestinoCodigo());
+        assertEquals("DESTINO", dto.getUnidadeDestinoSigla());
+        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
+        assertEquals("Descrição da movimentação", dto.getDescricao());
     }
 }

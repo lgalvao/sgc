@@ -125,8 +125,8 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.getMotivo());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverCadastro(
                 codigo,
@@ -150,7 +150,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarCadastro(
                 codigo,
@@ -172,7 +172,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.homologarCadastro(
                 codigo,
@@ -195,8 +195,8 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody DevolverCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.motivo());
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedMotivo = HTML_SANITIZER_POLICY.sanitize(request.getMotivo());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.devolverRevisaoCadastro(
                 codigo,
@@ -219,7 +219,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody AceitarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.aceitarRevisaoCadastro(
                 codigo,
@@ -244,7 +244,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @Valid @RequestBody HomologarCadastroReq request,
             @AuthenticationPrincipal Usuario usuario) {
-        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.observacoes());
+        var sanitizedObservacoes = HTML_SANITIZER_POLICY.sanitize(request.getObservacoes());
 
         subprocessoWorkflowService.homologarRevisaoCadastro(
                 codigo,
@@ -267,7 +267,7 @@ public class SubprocessoCadastroController {
             @PathVariable Long codigo,
             @RequestBody @Valid ImportarAtividadesReq request
     ) {
-        subprocessoMapaService.importarAtividades(codigo, request.subprocessoOrigemId());
+        subprocessoMapaService.importarAtividades(codigo, request.getSubprocessoOrigemId());
         return Map.of("message", "Atividades importadas.");
     }
 }
