@@ -7,6 +7,7 @@ import {
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
+    MapaVisualizacao,
     SalvarAjustesRequest,
     SalvarMapaRequest,
     DisponibilizarMapaRequest
@@ -17,12 +18,23 @@ export const useMapasStore = defineStore('mapas', {
         mapaCompleto: null as MapaCompleto | null,
         mapaAjuste: null as MapaAjuste | null,
         impactoMapa: null as ImpactoMapa | null,
+        mapaVisualizacao: null as MapaVisualizacao | null,
     }),
 
     getters: {
     },
 
     actions: {
+        async fetchMapaVisualizacao(codSubrocesso: number) {
+            const notificacoes = useNotificacoesStore()
+            try {
+                this.mapaVisualizacao = await mapaService.obterMapaVisualizacao(codSubrocesso);
+            } catch {
+                notificacoes.erro('Erro ao buscar mapa', 'Não foi possível carregar a visualização do mapa.');
+                this.mapaVisualizacao = null;
+            }
+        },
+
         async fetchMapaCompleto(codSubrocesso: number) {
             const notificacoes = useNotificacoesStore()
             try {

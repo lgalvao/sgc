@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.comum.erros.ErroDominio;
+import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.service.CompetenciaService;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
@@ -21,7 +21,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,7 +132,7 @@ public class SubprocessoMapaWorkflowService {
         var competencias = repositorioCompetencia.findByMapaCodigo(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
-            throw new ErroDominio("Todas as competências devem estar associadas a pelo menos uma atividade.");
+            throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
         }
 
         var atividadesDoSubprocesso = atividadeRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
@@ -150,7 +149,7 @@ public class SubprocessoMapaWorkflowService {
             String nomesAtividades = atividadesNaoAssociadas.stream()
                 .map(Atividade::getDescricao)
                 .collect(Collectors.joining(", "));
-            throw new ErroDominio("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
+            throw new ErroValidacao("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
         }
     }
 }
