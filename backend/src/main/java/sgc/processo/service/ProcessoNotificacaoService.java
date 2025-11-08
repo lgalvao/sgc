@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.notificacao.NotificacaoModelosService;
 import sgc.processo.model.Processo;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UsuarioDto;
 import sgc.sgrh.service.SgrhService;
 import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class ProcessoNotificacaoService {
      * @param processo              O processo que foi finalizado.
      * @param unidadesParticipantes A lista de unidades que participaram do processo.
      */
-    public void enviarNotificacoesDeFinalizacao(Processo processo, List<UnidadeProcesso> unidadesParticipantes) {
+    public void enviarNotificacoesDeFinalizacao(Processo processo, List<Unidade> unidadesParticipantes) {
         log.info("Enviando notificações de finalização para o processo {}", processo.getCodigo());
 
         if (unidadesParticipantes.isEmpty()) {
@@ -44,15 +44,15 @@ public class ProcessoNotificacaoService {
             return;
         }
 
-        List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(UnidadeProcesso::getCodUnidade).toList();
+        List<Long> todosCodigosUnidades = unidadesParticipantes.stream().map(Unidade::getCodigo).toList();
         Map<Long, ResponsavelDto> responsaveis = sgrhService.buscarResponsaveisUnidades(todosCodigosUnidades);
         Map<String, UsuarioDto> usuarios = sgrhService.buscarUsuariosPorTitulos(
             responsaveis.values().stream().map(ResponsavelDto::titularTitulo).distinct().toList()
         );
 
-        for (UnidadeProcesso unidade : unidadesParticipantes) {
+        for (Unidade unidade : unidadesParticipantes) {
             try {
-                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodUnidade()))
+                ResponsavelDto responsavel = Optional.ofNullable(responsaveis.get(unidade.getCodigo()))
                     .orElseThrow(() -> new IllegalStateException("Responsável não encontrado para a unidade %s".formatted(unidade.getSigla())));
 
                 UsuarioDto titular = Optional.ofNullable(usuarios.get(responsavel.titularTitulo()))
@@ -73,7 +73,7 @@ public class ProcessoNotificacaoService {
         }
     }
 
-    private void enviarEmailUnidadeFinal(Processo processo, UnidadeProcesso unidade, String email) {
+    private void enviarEmailUnidadeFinal(Processo processo, Unidade unidade, String email) {
         String assunto = String.format("SGC: Conclusão do processo %s", processo.getDescricao());
         String html = notificacaoModelosService.criarEmailProcessoFinalizadoPorUnidade(
             unidade.getSigla(),
@@ -83,10 +83,10 @@ public class ProcessoNotificacaoService {
         log.info("E-mail de finalização (unidade final) enviado para {} ({})", unidade.getSigla(), email);
     }
 
-    private void enviarEmailUnidadeIntermediaria(Processo processo, UnidadeProcesso unidadeIntermediaria, String email, List<UnidadeProcesso> todasUnidades) {
+    private void enviarEmailUnidadeIntermediaria(Processo processo, Unidade unidadeIntermediaria, String email, List<Unidade> todasUnidades) {
         List<String> siglasSubordinadas = todasUnidades.stream()
-            .filter(u -> u.getCodUnidadeSuperior() != null && u.getCodUnidadeSuperior().equals(unidadeIntermediaria.getCodUnidade()))
-            .map(UnidadeProcesso::getSigla)
+            .filter(u -> u.getUnidadeSuperior() != null && u.getUnidadeSuperior().getCodigo().equals(unidadeIntermediaria.getCodigo()))
+            .map(Unidade::getSigla)
             .sorted()
             .toList();
 

@@ -19,8 +19,6 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroApi;
 import sgc.integracao.mocks.TestSecurityConfig;
@@ -33,8 +31,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.DisponibilizarMapaReq;
 import sgc.subprocesso.model.*;
@@ -69,7 +65,6 @@ class CDU17IntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Repositórios
     @Autowired
     private ProcessoRepo processoRepo;
     @Autowired
@@ -82,8 +77,6 @@ class CDU17IntegrationTest {
     private AtividadeRepo atividadeRepo;
     @Autowired
     private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
@@ -103,30 +96,19 @@ class CDU17IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Limpar dados antes de cada teste
         movimentacaoRepo.deleteAll();
         alertaRepo.deleteAll();
-        competenciaAtividadeRepo.deleteAll();
         atividadeRepo.deleteAll();
-        competenciaRepo.deleteAll(); // Delete competencias before mapas
-        unidadeMapaRepo.deleteAll(); // Delete unidade_mapa before mapas
+        competenciaRepo.deleteAll();
+        unidadeMapaRepo.deleteAll();
         subprocessoRepo.deleteAll();
         mapaRepo.deleteAll();
         processoRepo.deleteAll();
 
-        // Use existing users from data-postgresql.sql
-        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
-        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
-        Usuario titularUS = usuarioRepo.findById("1").orElseThrow(); // Ana Paula Souza
-        Usuario titularUT = usuarioRepo.findById("2").orElseThrow(); // Carlos Henrique Lima
+        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow();
+        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidade = unidadeRepo.findById(8L).orElseThrow();
 
-        // Use existing units from data-postgresql.sql
-        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
-        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-
-        // Criar Processo e Mapa
-        // Dados de Teste
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDescricao("Processo de Teste");
@@ -134,17 +116,15 @@ class CDU17IntegrationTest {
         processo = processoRepo.save(processo);
         mapa = mapaRepo.save(new Mapa());
 
-        // Criar Subprocesso
         subprocesso = new Subprocesso();
         subprocesso.setProcesso(processo);
         subprocesso.setUnidade(unidade);
         subprocesso.setMapa(mapa);
-        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA); // Estado inicial válido
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        // Criar Atividade e Competência
         atividade = atividadeRepo.save(new Atividade(mapa, "Atividade de Teste"));
-        competencia = competenciaRepo.save(new Competencia(mapa, "Competência de Teste"));
+        competencia = competenciaRepo.save(new Competencia("Competência de Teste", mapa));
     }
 
     @Nested
@@ -155,11 +135,9 @@ class CDU17IntegrationTest {
         @DisplayName("Deve disponibilizar mapa quando todos os dados estão corretos")
         @WithMockAdmin
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
-            // Arrange: Associar atividade e competência
-            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
 
-            // Arrange: Adicionar uma análise de validação antiga para testar a limpeza
             Analise analiseAntiga = new Analise();
             analiseAntiga.setSubprocesso(subprocesso);
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
@@ -169,7 +147,6 @@ class CDU17IntegrationTest {
             String observacoes = "Observações de teste para o mapa.";
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(observacoes, dataLimite);
 
-            // Act & Assert
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -177,7 +154,6 @@ class CDU17IntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("Mapa de competências disponibilizado."));
 
-            // Verificar o estado final no banco de dados
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
             assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite);
@@ -185,7 +161,6 @@ class CDU17IntegrationTest {
             Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow(() -> new AssertionError("Mapa não encontrado após atualização."));
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
 
-            // Verificar Movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             Movimentacao mov = movimentacoes.getFirst();
@@ -193,7 +168,6 @@ class CDU17IntegrationTest {
             assertThat(mov.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(mov.getDescricao()).isEqualTo("Disponibilização do mapa de competências para validação");
 
-            // Verificar Alerta
             Optional<Alerta> alertaOpt = alertaRepo.findAll().stream().findFirst();
             assertThat(alertaOpt).isPresent();
             Alerta alerta = alertaOpt.get();
@@ -201,7 +175,6 @@ class CDU17IntegrationTest {
             assertThat(alerta.getUnidadeOrigem().getSigla()).isEqualTo(SEDOC_LITERAL);
             assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
 
-            // Verificar Limpeza do Histórico
             List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
             assertThat(analisesRestantes).isEmpty();
         }
@@ -214,9 +187,8 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
-            // Arrange: Associar atividade e competência para passar na validação de negócio
-            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
@@ -247,11 +219,9 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
-            // Arrange: Associar a competência do setup a uma atividade dummy para isolar a falha.
             Atividade dummyActivity = atividadeRepo.save(new Atividade(mapa, "Dummy Activity"));
-            var id = new CompetenciaAtividade.Id(dummyActivity.getCodigo(), competencia.getCodigo());
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, dummyActivity));
-            // A 'atividade' principal (criada no setUp) permanece não associada.
+            competencia.setAtividades(Set.of(dummyActivity));
+            competenciaRepo.save(competencia);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 
@@ -262,7 +232,6 @@ class CDU17IntegrationTest {
                     .andExpect(status().isUnprocessableEntity())
                     .andReturn().getResponse().getContentAsString();
 
-            // Assert: Desserializar a resposta e verificar os detalhes do erro
             ErroApi erroApi = objectMapper.readValue(responseBody, ErroApi.class);
             assertThat(erroApi.getDetails()).isNotNull();
 
@@ -275,10 +244,9 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
-            // Arrange: Associar a atividade, mas deixar uma competência solta
-            var id = new CompetenciaAtividade.Id(atividade.getCodigo(), competencia.getCodigo());
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(id, competencia, atividade));
-            competenciaRepo.save(new Competencia(mapa, "Competência Solta"));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
+            competenciaRepo.save(new Competencia("Competência Solta", mapa));
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(OBS_LITERAL, LocalDateTime.now().plusDays(10));
 

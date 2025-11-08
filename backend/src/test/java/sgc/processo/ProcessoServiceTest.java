@@ -17,7 +17,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.model.UnidadeProcessoRepo;
 import sgc.processo.service.ProcessoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
@@ -38,9 +37,6 @@ public class ProcessoServiceTest {
 
     @Mock
     private UnidadeRepo unidadeRepo;
-
-    @Mock
-    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     @Mock
     private ApplicationEventPublisher publicadorDeEventos;

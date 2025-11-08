@@ -18,7 +18,6 @@ import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
@@ -27,7 +26,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
@@ -36,7 +34,6 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -70,8 +67,6 @@ class CDU19IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    @Autowired
     private AtividadeRepo atividadeRepo;
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
@@ -84,26 +79,21 @@ class CDU19IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Limpar dados
         movimentacaoRepo.deleteAll();
         alertaRepo.deleteAll();
-        competenciaAtividadeRepo.deleteAll(); // Delete competencia_atividade first
-        competenciaRepo.deleteAll(); // Then delete competencias
-        atividadeRepo.deleteAll(); // Delete atividades
-        conhecimentoRepo.deleteAll(); // Delete conhecimentos
-        unidadeMapaRepo.deleteAll(); // Delete unidade_mapa before mapas
+        competenciaRepo.deleteAll();
+        atividadeRepo.deleteAll();
+        conhecimentoRepo.deleteAll();
+        unidadeMapaRepo.deleteAll();
         subprocessoRepo.deleteAll();
         mapaRepo.deleteAll();
         processoRepo.deleteAll();
 
-        // Use existing units from data-postgresql.sql
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS as superior
-        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA as subunit
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidade = unidadeRepo.findById(9L).orElseThrow();
 
-        // Use existing chefe user
         Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
-        // Criar Processo, Mapa e Subprocesso
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
         Mapa mapa = mapaRepo.save(new Mapa());
         subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());
@@ -118,17 +108,14 @@ class CDU19IntegrationTest {
         @DisplayName("Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
         @WithMockChefe
         void testApresentarSugestoes_Sucesso() throws Exception {
-            // Cenário
             String sugestoes = "Minha sugestão de teste";
 
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/apresentar-sugestoes", subprocesso.getCodigo())
                     .with(csrf())
                     .contentType("application/json")
                     .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
@@ -151,12 +138,10 @@ class CDU19IntegrationTest {
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")
         @WithMockChefe
         void testValidarMapa_Sucesso() throws Exception {
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
                     .with(csrf()))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
 

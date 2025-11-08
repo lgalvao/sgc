@@ -1,18 +1,24 @@
 package sgc.unidade.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
+import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "UNIDADE", schema = "sgc")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Unidade extends EntidadeBase {
     public Unidade(String nome, String sigla) {
@@ -54,4 +60,8 @@ public class Unidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     private Unidade unidadeSuperior;
+
+    @ManyToMany(mappedBy = "participantes")
+    @Builder.Default
+    private Set<Processo> processos = new HashSet<>();
 }

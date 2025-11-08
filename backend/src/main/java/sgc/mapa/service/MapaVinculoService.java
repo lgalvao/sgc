@@ -3,10 +3,9 @@ package sgc.mapa.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 
 import java.util.HashSet;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MapaVinculoService {
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
 
@@ -38,27 +36,12 @@ public class MapaVinculoService {
      *                           estar vinculadas à competência.
      */
     public void atualizarVinculosAtividades(Long codCompetencia, List<Long> novosCodsAtividades) {
-        List<CompetenciaAtividade> vinculosAtuais = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
-        Set<Long> idsAtuais = vinculosAtuais.stream()
-                .map(v -> v.getId().getCodAtividade())
-                .collect(Collectors.toSet());
-
-        Set<Long> novosIds = new HashSet<>(novosCodsAtividades);
-
-        // Remover os que não estão na nova lista
-        vinculosAtuais.stream()
-                .filter(v -> !novosIds.contains(v.getId().getCodAtividade()))
-                .forEach(competenciaAtividadeRepo::delete);
-
-        // Adicionar os que não estão na lista atual
         Competencia competencia = competenciaRepo.findById(codCompetencia).orElseThrow();
-        novosIds.stream()
-                .filter(id -> !idsAtuais.contains(id))
-                .forEach(codAtividade -> atividadeRepo.findById(codAtividade).ifPresent(atividade -> {
-                    CompetenciaAtividade.Id id = new CompetenciaAtividade.Id(codAtividade, codCompetencia);
-                    CompetenciaAtividade vinculo = new CompetenciaAtividade(id, competencia, atividade);
-                    competenciaAtividadeRepo.save(vinculo);
-                }));
+
+        Set<Atividade> novasAtividades = new HashSet<>(atividadeRepo.findAllById(novosCodsAtividades));
+
+        competencia.setAtividades(novasAtividades);
+        competenciaRepo.save(competencia);
 
         log.debug("Atualizados {} vínculos para competência {}", novosCodsAtividades.size(), codCompetencia);
     }

@@ -16,8 +16,6 @@ import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
@@ -28,8 +26,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
@@ -43,6 +39,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -82,9 +79,6 @@ public class CDU16IntegrationTest {
     private CompetenciaRepo competenciaRepo;
 
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
-    @Autowired
     private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
@@ -92,10 +86,9 @@ public class CDU16IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing admin user from data-postgresql.sql
         var admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        Unidade unidade = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
+        Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
 
         Processo processo = new Processo(
                 "Processo de Revisão",
@@ -115,11 +108,11 @@ public class CDU16IntegrationTest {
         );
         subprocessoRepo.save(subprocesso);
 
-        Competencia c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        Competencia c1 = new Competencia("Competência 1", mapa);
         atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
         Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade1.getCodigo()), c1, atividade1));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade2.getCodigo()), c1, atividade2));
+        c1.setAtividades(Set.of(atividade1, atividade2));
+        competenciaRepo.save(c1);
     }
 
     @Test

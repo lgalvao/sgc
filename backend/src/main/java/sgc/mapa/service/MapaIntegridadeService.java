@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.List;
 public class MapaIntegridadeService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     /**
      * Valida a integridade de um mapa, verificando se existem atividades ou competências órfãs.
@@ -39,13 +37,13 @@ public class MapaIntegridadeService {
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(codMapa);
 
         for (Atividade atividade : atividades) {
-            if (!competenciaAtividadeRepo.existsByAtividadeCodigo(atividade.getCodigo())) {
+            if (atividade.getCompetencias().isEmpty()) {
                 log.warn("Atividade {} não vinculada a nenhuma competência no mapa {}", atividade.getCodigo(), codMapa);
             }
         }
 
         for (Competencia competencia : competencias) {
-            if (competenciaAtividadeRepo.findByCompetenciaCodigo(competencia.getCodigo()).isEmpty()) {
+            if (competencia.getAtividades().isEmpty()) {
                 log.warn("Competência {} sem atividades vinculadas no mapa {}", competencia.getCodigo(), codMapa);
             }
         }

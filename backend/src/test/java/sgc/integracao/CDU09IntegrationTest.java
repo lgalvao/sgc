@@ -18,8 +18,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
@@ -30,8 +28,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
@@ -39,6 +35,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -72,8 +69,6 @@ class CDU09IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -89,9 +84,9 @@ class CDU09IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
-        unidadeChefe = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-        var chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Existing Chefe Teste
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidadeChefe = unidadeRepo.findById(8L).orElseThrow();
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         Processo processoMapeamento = new Processo("Processo de Mapeamento", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoMapeamento);
@@ -107,10 +102,11 @@ class CDU09IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoMapeamento.getMapa()));
+            var competencia = new Competencia("Competência de Teste", subprocessoMapeamento.getMapa());
             Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
             atividade = atividadeRepo.save(atividade);
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar", subprocessoMapeamento.getCodigo()))
@@ -162,8 +158,6 @@ class CDU09IntegrationTest {
         @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize o cadastro")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
-            // User 999999999999 already exists in data-postgresql.sql
-
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar", subprocessoMapeamento.getCodigo()))
                     .andExpect(status().isForbidden());
         }

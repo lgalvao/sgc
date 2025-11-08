@@ -5,7 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sgc.atividade.model.Atividade;
 import sgc.comum.model.EntidadeBase;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Representa uma competência, conjunto de atividades e conhecimentos.
@@ -34,4 +38,7 @@ public class Competencia extends EntidadeBase {
         this.descricao = descricao;
         this.mapa = mapa;
     }
+
+    @ManyToMany(mappedBy = "competencias")
+    private Set<Atividade> atividades = new HashSet<>();
 }

@@ -5,5 +5,5 @@
     import org.springframework.stereotype.Repository;
 
     @Repository
-    public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
+    public interface MovimentacaoServiceRepo extends JpaRepository<Movimentacao, Long> {
     }

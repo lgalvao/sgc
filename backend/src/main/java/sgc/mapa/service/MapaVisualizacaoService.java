@@ -8,8 +8,6 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.visualizacao.AtividadeDto;
@@ -30,7 +28,6 @@ public class MapaVisualizacaoService {
     private final SubprocessoRepo subprocessoRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
         log.debug("Obtendo mapa para visualização do subprocesso: codigo={}", codSubprocesso);
@@ -48,10 +45,7 @@ public class MapaVisualizacaoService {
         List<Competencia> competencias = competenciaRepo.findByMapaCodigo(subprocesso.getMapa().getCodigo());
 
         List<CompetenciaDto> competenciasDto = competencias.stream().map(competencia -> {
-            List<Atividade> atividades = competenciaAtividadeRepo.findByCompetenciaCodigo(competencia.getCodigo())
-                .stream()
-                .map(CompetenciaAtividade::getAtividade)
-                .toList();
+            List<Atividade> atividades = competencia.getAtividades().stream().toList();
 
             List<AtividadeDto> atividadesDto = atividades.stream().map(atividade -> {
                 List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividadeCodigo(atividade.getCodigo());

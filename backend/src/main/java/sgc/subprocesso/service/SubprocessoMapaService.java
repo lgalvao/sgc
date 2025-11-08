@@ -8,8 +8,6 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
@@ -19,7 +17,10 @@ import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,30 +30,8 @@ public class SubprocessoMapaService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final AtividadeRepo atividadeRepo;
     private final ConhecimentoRepo conhecimentoRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final CompetenciaRepo competenciaRepo;
 
-    /**
-     * Salva os ajustes realizados em um mapa de competências após a fase de validação.
-     * <p>
-     * Este método executa as seguintes ações:
-     * <ul>
-     *     <li>Valida se o subprocesso está em uma situação que permite ajustes.</li>
-     *     <li>Atualiza as descrições das competências e atividades conforme os dados recebidos.</li>
-     *     <li>Remove todos os vínculos existentes entre competências e atividades do mapa.</li>
-     *     <li>Recria os vínculos com base na nova estrutura fornecida.</li>
-     *     <li>Altera a situação do subprocesso para 'MAPA_AJUSTADO'.</li>
-     * </ul>
-     *
-     * @param codSubprocesso         O código do subprocesso cujo mapa está sendo ajustado.
-     * @param competencias           A lista de competências com suas atividades aninhadas,
-     *                               representando o estado final do mapa.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que realiza a operação.
-     * @throws ErroEntidadeNaoEncontrada se o subprocesso ou alguma das entidades
-     *                                   (competência, atividade) não forem encontradas.
-     * @throws IllegalStateException     se o subprocesso não estiver na situação correta
-     *                                   para permitir o ajuste.
-     */
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias, String usuarioTituloEleitoral) {
         Subprocesso sp = subprocessoRepo.findById(codSubprocesso)
@@ -65,49 +44,27 @@ public class SubprocessoMapaService {
 
         log.info("Salvando ajustes para o mapa do subprocesso {}...", codSubprocesso);
 
-        // Atualiza as descrições
-        for (CompetenciaAjusteDto compDto : competencias) {
-            competenciaRepo.findById(compDto.getCodCompetencia()).ifPresent(c -> c.setDescricao(compDto.getNome()));
-            for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
-                atividadeRepo.findById(ativDto.getCodAtividade()).ifPresent(a -> a.setDescricao(ativDto.getNome()));
-            }
-        }
-
-        // Recria os Vínculos
-        competenciaAtividadeRepo.deleteByCompetenciaMapaCodigo(sp.getMapa().getCodigo());
-
         for (CompetenciaAjusteDto compDto : competencias) {
             var competencia = competenciaRepo.findById(compDto.getCodCompetencia())
                     .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Competência não encontrada: %d".formatted(compDto.getCodCompetencia())));
 
+            competencia.setDescricao(compDto.getNome());
+
+            Set<Atividade> atividades = new HashSet<>();
             for (AtividadeAjusteDto ativDto : compDto.getAtividades()) {
                 var atividade = atividadeRepo.findById(ativDto.getCodAtividade())
                         .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Atividade não encontrada: " + ativDto.getCodAtividade()));
-
-                var id = new CompetenciaAtividade.Id(ativDto.getCodAtividade(), compDto.getCodCompetencia());
-                CompetenciaAtividade novoLink = new CompetenciaAtividade(id, competencia, atividade);
-                competenciaAtividadeRepo.save(novoLink);
+                atividade.setDescricao(ativDto.getNome());
+                atividades.add(atividade);
             }
+            competencia.setAtividades(atividades);
+            competenciaRepo.save(competencia);
         }
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_AJUSTADO);
         subprocessoRepo.save(sp);
     }
 
-    /**
-     * Importa atividades de um subprocesso de origem para um subprocesso de destino.
-     * <p>
-     * A importação clona as atividades e seus respectivos conhecimentos. Uma
-     * atividade só é importada se uma outra com a mesma descrição ainda não
-     * existir no mapa de destino.
-     *
-     * @param codSubprocessoDestino O código do subprocesso para o qual as atividades serão importadas.
-     * @param codSubprocessoOrigem  O código do subprocesso do qual as atividades serão copiadas.
-     * @throws ErroEntidadeNaoEncontrada se um dos subprocessos não for encontrado.
-     * @throws IllegalStateException     se o subprocesso de destino não estiver na
-     *                                   situação 'CADASTRO_EM_ANDAMENTO', ou se um
-     *                                   dos subprocessos não tiver um mapa associado.
-     */
     @Transactional
     public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
         Subprocesso spDestino = subprocessoRepo.findById(codSubprocessoDestino)
@@ -126,7 +83,7 @@ public class SubprocessoMapaService {
 
         List<Atividade> atividadesOrigem = atividadeRepo.findByMapaCodigo(spOrigem.getMapa().getCodigo());
         if (atividadesOrigem == null || atividadesOrigem.isEmpty()) {
-            return; // Nada a importar
+            return;
         }
 
         List<String> descricoesExistentes = atividadeRepo.findByMapaCodigo(spDestino.getMapa().getCodigo())
@@ -136,7 +93,7 @@ public class SubprocessoMapaService {
 
         for (Atividade atividadeOrigem : atividadesOrigem) {
             if (descricoesExistentes.contains(atividadeOrigem.getDescricao())) {
-                continue; // Pula a importação se a atividade já existe
+                continue;
             }
 
             Atividade novaAtividade = new Atividade();

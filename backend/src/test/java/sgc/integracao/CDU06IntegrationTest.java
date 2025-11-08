@@ -17,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.model.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
@@ -30,7 +33,9 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -59,9 +64,6 @@ public class CDU06IntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
-    @Autowired
-    private UnidadeProcessoRepo unidadeProcessoRepo;
-
     @MockitoBean
     private SgrhService sgrhService;
 
@@ -89,26 +91,17 @@ public class CDU06IntegrationTest {
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
-        // Mock crucial para a verificação de segurança
         when(sgrhService.buscarPerfisUsuario(anyString()))
                 .thenReturn(List.of(new PerfilDto(String.valueOf(TEST_USER_ID), unidade.getCodigo(), unidade.getNome(), perfil.name())));
-    }
-
-    private UnidadeProcesso createUnidadeProcesso(Unidade unidade, Processo processo) {
-        UnidadeProcesso up = new UnidadeProcesso();
-        up.setCodProcesso(processo.getCodigo());
-        up.setCodUnidade(unidade.getCodigo());
-        up.setNome(unidade.getNome());
-        up.setSigla(unidade.getSigla());
-        return up;
     }
 
     @Test
     @WithMockAdmin
     @DisplayName("Deve detalhar processo para Admin")
     void testDetalharProcesso_sucesso() throws Exception {
-        Unidade unidade = unidadeRepo.findById(100L).orElseThrow(); // Use existing ADMIN-UNIT
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
@@ -128,8 +121,9 @@ public class CDU06IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
     void testPodeFinalizar_true_comAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.findById(101L).orElseThrow(); // Use existing GESTOR-UNIT
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
@@ -140,8 +134,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
     void testPodeFinalizar_false_semAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.findById(102L).orElseThrow(); // Use existing SUB-UNIT
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(102L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
@@ -153,8 +148,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
     void testPodeHomologarCadastro_true() throws Exception {
-        Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // Use existing SEDESENV
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
 
@@ -166,8 +162,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
     void testPodeHomologarMapa_true() throws Exception {
-        Unidade unidade = unidadeRepo.findById(9L).orElseThrow(); // Use existing SEDIA
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(9L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, processo.getDataLimite()));
 

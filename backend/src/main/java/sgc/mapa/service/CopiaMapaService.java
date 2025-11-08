@@ -8,8 +8,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
@@ -19,10 +17,6 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 
-/**
- * Serviço responsável por copiar um mapa vigente para outra unidade.
- * A implementação deve clonar o mapa e suas atividades/conhecimentos mantendo integridade.
- */
 @Service
 @RequiredArgsConstructor
 public class CopiaMapaService {
@@ -31,22 +25,8 @@ public class CopiaMapaService {
     private final ConhecimentoRepo conhecimentoRepo;
     private final UnidadeRepo repositorioUnidade;
     private final CompetenciaRepo competenciaRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
     private final sgc.subprocesso.model.SubprocessoRepo subprocessoRepo;
 
-    /**
-     * Realiza uma cópia profunda de um mapa para uma nova unidade.
-     * <p>
-     * Este método cria uma nova instância de {@link Mapa} para a unidade de destino
-     * e, em seguida, clona todas as suas {@link Competencia}s, {@link Atividade}s e
-     * {@link Conhecimento}s associados, garantindo que as novas entidades estejam
-     * corretamente vinculadas ao novo mapa.
-     *
-     * @param codMapaOrigem     O código do mapa a ser copiado.
-     * @param codUnidadeDestino O código da unidade para a qual o mapa será copiado.
-     * @return O novo {@link Mapa} criado e persistido.
-     * @throws IllegalArgumentException se o mapa de origem ou a unidade de destino não forem encontrados.
-     */
     @Transactional
     public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Long codUnidadeDestino) {
         Mapa fonte = repositorioMapa.findById(codMapaOrigem)
@@ -93,32 +73,20 @@ public class CopiaMapaService {
         }
 
         List<Competencia> competenciasFonte = competenciaRepo.findByMapaCodigo(fonte.getCodigo());
-        Map<Long, Competencia> mapa = new HashMap<>();
         if (competenciasFonte != null && !competenciasFonte.isEmpty()) {
             for (Competencia competenciaFonte : competenciasFonte) {
                 Competencia novaCompetencia = new Competencia()
                         .setDescricao(competenciaFonte.getDescricao())
                         .setMapa(mapaSalvo);
 
-                Competencia competenciaSalva = competenciaRepo.save(novaCompetencia);
-                mapa.put(competenciaFonte.getCodigo(), competenciaSalva);
-            }
-        }
-
-        List<CompetenciaAtividade> associacoesFonte = competenciaAtividadeRepo.findByCompetenciaMapaCodigo(fonte.getCodigo());
-        if (associacoesFonte != null && !associacoesFonte.isEmpty()) {
-            List<CompetenciaAtividade> novasAssociacoes = new ArrayList<>();
-            for (CompetenciaAtividade associacaoFonte : associacoesFonte) {
-                Competencia novaCompetencia = mapa.get(associacaoFonte.getCompetencia().getCodigo());
-                Atividade novaAtividade = mapaDeAtividades.get(associacaoFonte.getAtividade().getCodigo());
-                if (novaCompetencia != null && novaAtividade != null) {
-                    novasAssociacoes.add(new CompetenciaAtividade(
-                            new CompetenciaAtividade.Id(novaCompetencia.getCodigo(), novaAtividade.getCodigo()),
-                            novaCompetencia,
-                            novaAtividade));
+                Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
+                for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
+                    novasAtividadesAssociadas.add(mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
                 }
+                novaCompetencia.setAtividades(novasAtividadesAssociadas);
+
+                competenciaRepo.save(novaCompetencia);
             }
-            competenciaAtividadeRepo.saveAll(novasAssociacoes);
         }
 
         return mapaSalvo;

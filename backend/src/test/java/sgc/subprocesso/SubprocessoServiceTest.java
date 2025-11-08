@@ -13,7 +13,6 @@ import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.subprocesso.model.Subprocesso;
@@ -23,6 +22,7 @@ import sgc.subprocesso.service.SubprocessoService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -43,9 +43,6 @@ class SubprocessoServiceTest {
 
     @Mock
     private CompetenciaRepo competenciaRepo;
-
-    @Mock
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     private Subprocesso subprocesso;
 
@@ -79,7 +76,6 @@ class SubprocessoServiceTest {
         @DisplayName("Deve lançar exceção se competência não estiver associada")
         void validarAssociacoesMapa_CompetenciaNaoAssociada_LancaExcecao() {
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Competencia()));
-            when(competenciaAtividadeRepo.countByCompetenciaCodigo(null)).thenReturn(0L);
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }
@@ -87,8 +83,11 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve lançar exceção se atividade não estiver associada")
         void validarAssociacoesMapa_AtividadeNaoAssociada_LancaExcecao() {
+            Atividade atividade = new Atividade();
+            Competencia competencia = new Competencia();
+            competencia.setAtividades(Set.of(atividade));
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(competencia));
             when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Atividade()));
-            when(competenciaAtividadeRepo.countByAtividadeCodigo(null)).thenReturn(0L);
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }

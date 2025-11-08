@@ -6,13 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +20,11 @@ import java.util.List;
 public class CompetenciaService {
     private final CompetenciaRepo competenciaRepo;
     private final AtividadeRepo atividadeRepo;
-    private final CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     public void adicionarCompetencia(Mapa mapa, String descricao, List<Long> atividadesIds) {
         Competencia competencia = new Competencia(descricao, mapa);
-        competenciaRepo.save(competencia);
         prepararCompetenciasAtividades(atividadesIds, competencia);
+        competenciaRepo.save(competencia);
     }
 
     public Competencia atualizarCompetencia(Long codCompetencia, String descricao, List<Long> atividadesIds) {
@@ -33,17 +32,12 @@ public class CompetenciaService {
                 () -> new ErroEntidadeNaoEncontrada("Competência não encontrada"));
 
         competencia.setDescricao(descricao);
-
-        List<CompetenciaAtividade> associacoesAntigas = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
-        competenciaAtividadeRepo.deleteAll(associacoesAntigas);
-
+        competencia.getAtividades().clear();
         prepararCompetenciasAtividades(atividadesIds, competencia);
         return competenciaRepo.save(competencia);
     }
 
     public void removerCompetencia(Long codCompetencia) {
-        List<CompetenciaAtividade> associacoes = competenciaAtividadeRepo.findByCompetenciaCodigo(codCompetencia);
-        competenciaAtividadeRepo.deleteAll(associacoes);
         competenciaRepo.deleteById(codCompetencia);
     }
 
@@ -51,11 +45,6 @@ public class CompetenciaService {
         if (codAtividades == null || codAtividades.isEmpty()) return;
 
         List<Atividade> atividades = atividadeRepo.findAllById(codAtividades);
-        for (Atividade atividade : atividades) {
-            CompetenciaAtividade ca = new CompetenciaAtividade(
-                    new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade
-            );
-            competenciaAtividadeRepo.save(ca);
-        }
+        competencia.setAtividades(new HashSet<>(atividades));
     }
 }

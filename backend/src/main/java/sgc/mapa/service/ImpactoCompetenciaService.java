@@ -2,9 +2,9 @@ package sgc.mapa.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
@@ -18,18 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ImpactoCompetenciaService {
     private final CompetenciaRepo repositorioCompetencia;
-    private final CompetenciaAtividadeRepo repositorioCompetenciaAtividade;
+    private final AtividadeRepo atividadeRepo;
 
-    /**
-     * Analisa as atividades removidas e alteradas para identificar quais competências
-     * do mapa vigente são impactadas.
-     *
-     * @param mapaVigente O mapa original contra o qual a comparação é feita.
-     * @param removidas   A lista de atividades que foram removidas.
-     * @param alteradas   A lista de atividades que foram alteradas.
-     * @return Uma lista de {@link CompetenciaImpactadaDto} detalhando cada competência
-     *         impactada e as razões do impacto.
-     */
     public List<CompetenciaImpactadaDto> identificarCompetenciasImpactadas(
             Mapa mapaVigente,
             List<AtividadeImpactadaDto> removidas,
@@ -37,34 +27,28 @@ public class ImpactoCompetenciaService {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
-        for (AtividadeImpactadaDto atividade : removidas) {
-            List<CompetenciaAtividade> vinculos = repositorioCompetenciaAtividade
-                    .findByAtividadeCodigo(atividade.codigo());
+        for (AtividadeImpactadaDto atividadeDto : removidas) {
+            Atividade atividade = atividadeRepo.findById(atividadeDto.codigo()).orElse(null);
+            if (atividade == null) continue;
 
-            for (CompetenciaAtividade vinculo : vinculos) {
-                Competencia comp = repositorioCompetencia
-                        .findById(vinculo.getId().getCodCompetencia())
-                        .orElse(null);
-
-                if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
+            for (Competencia comp : atividade.getCompetencias()) {
+                if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
                                     comp.getCodigo(),
                                     comp.getDescricao()));
 
-                    acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividade.descricao()));
+                    acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.descricao()));
                 }
             }
         }
 
-        for (AtividadeImpactadaDto atividade : alteradas) {
-            List<CompetenciaAtividade> vinculos = repositorioCompetenciaAtividade.findByAtividadeCodigo(atividade.codigo());
-            for (CompetenciaAtividade vinculo : vinculos) {
-                Competencia comp = repositorioCompetencia
-                        .findById(vinculo.getId().getCodCompetencia())
-                        .orElse(null);
+        for (AtividadeImpactadaDto atividadeDto : alteradas) {
+            Atividade atividade = atividadeRepo.findById(atividadeDto.codigo()).orElse(null);
+            if (atividade == null) continue;
 
-                if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
+            for (Competencia comp : atividade.getCompetencias()) {
+                if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),
                                     x -> new CompetenciaImpactoAcumulador(
@@ -73,8 +57,8 @@ public class ImpactoCompetenciaService {
 
                     String detalhe = String.format(
                             "Atividade alterada: '%s' → '%s'",
-                            atividade.descricaoAnterior(),
-                            atividade.descricao());
+                            atividadeDto.descricaoAnterior(),
+                            atividadeDto.descricao());
                     acumulador.adicionarImpacto(detalhe);
                 }
             }
@@ -89,28 +73,13 @@ public class ImpactoCompetenciaService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    /**
-     * Obtém as descrições de todas as competências associadas a uma atividade
-     * dentro do escopo de um mapa específico.
-     *
-     * @param codAtividade O código da atividade.
-     * @param mapaVigente O mapa ao qual as competências devem pertencer.
-     * @return Uma lista das descrições das competências associadas.
-     */
     public List<String> obterCompetenciasDaAtividade(Long codAtividade, Mapa mapaVigente) {
-        return repositorioCompetenciaAtividade
-                .findByAtividadeCodigo(codAtividade)
-                .stream()
-                .map(ca -> {
-                    Competencia comp = repositorioCompetencia
-                            .findById(ca.getId().getCodCompetencia())
-                            .orElse(null);
-                    if (comp != null && comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
-                        return comp.getDescricao();
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
+        Atividade atividade = atividadeRepo.findById(codAtividade).orElse(null);
+        if (atividade == null) return Collections.emptyList();
+
+        return atividade.getCompetencias().stream()
+                .filter(c -> c.getMapa().getCodigo().equals(mapaVigente.getCodigo()))
+                .map(Competencia::getDescricao)
                 .toList();
     }
 

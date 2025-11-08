@@ -8,9 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import sgc.atividade.model.Atividade;
 import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaAtividade;
-import sgc.mapa.model.CompetenciaAtividadeRepo;
 import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
@@ -21,6 +20,7 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,15 +36,11 @@ class MapaServiceTest {
     @Mock
     private CompetenciaRepo competenciaRepo;
 
-    @Mock
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
     @InjectMocks
     private MapaService mapaService;
 
     private Mapa mapa;
     private Competencia competencia;
-    private CompetenciaAtividade competenciaAtividade;
 
     @BeforeEach
     void setUp() {
@@ -61,15 +57,15 @@ class MapaServiceTest {
         competencia.setDescricao("Competência 1");
         competencia.setMapa(mapa);
 
-        competenciaAtividade = new CompetenciaAtividade();
-        competenciaAtividade.setId(new CompetenciaAtividade.Id(1L, 1L));
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(1L);
+        competencia.setAtividades(Set.of(atividade));
     }
 
     @Test
     void obterMapaCompleto_deveRetornarMapaCompleto_quandoMapaExistir() {
         when(mapaRepo.findById(1L)).thenReturn(Optional.of(mapa));
         when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(List.of(competencia));
-        when(competenciaAtividadeRepo.findByCompetenciaCodigo(1L)).thenReturn(List.of(competenciaAtividade));
 
         MapaCompletoDto mapaCompleto = mapaService.obterMapaCompleto(1L, 100L);
 

@@ -385,7 +385,7 @@ public class ProcessoService {
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
         TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
-        
+
         return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
             .filter(p -> p.getTipo() == tipoProcesso)
             .flatMap(p -> p.getParticipantes().stream())
