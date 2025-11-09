@@ -105,7 +105,9 @@ public class CDU05IntegrationTest {
 
         // Define o mapa como vigente para a unidade
         UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidade(unidade);
         unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
+        unidadeMapa.setMapaVigente(mapaOriginal);
         unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
         unidadeMapaRepo.save(unidadeMapa);
     }
