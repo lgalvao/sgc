@@ -12,14 +12,16 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaCompletoDto;
 import sgc.mapa.dto.SalvarMapaRequest;
 import sgc.mapa.service.MapaService;
-import sgc.movimentacao.service.MovimentacaoService;
 import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
 import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
+import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.model.SubprocessoMovimentacaoRepo;
+
 
 import java.util.stream.Collectors;
 
@@ -32,8 +34,9 @@ public class SubprocessoMapaWorkflowService {
     private final AtividadeRepo atividadeRepo;
     private final MapaService mapaService;
     private final CompetenciaService competenciaService;
-    private final MovimentacaoService movimentacaoService;
     private final SubprocessoNotificacaoService subprocessoNotificacaoService;
+    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
+
 
     public MapaCompletoDto salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request, String tituloUsuario) {
         log.info("Salvando mapa do subprocesso: codSubprocesso={}, usuario={}", codSubprocesso, tituloUsuario);
@@ -97,7 +100,7 @@ public class SubprocessoMapaWorkflowService {
         subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
         repositorioSubprocesso.save(subprocesso);
 
-        movimentacaoService.registrarMovimentacao(
+        registrarMovimentacao(
             subprocesso,
             "Disponibilização do mapa de competências para validação.",
             usuario
@@ -132,5 +135,16 @@ public class SubprocessoMapaWorkflowService {
                 .collect(Collectors.joining(", "));
             throw new ErroValidacao("Todas as atividades devem estar associadas a pelo menos uma competência. Atividades pendentes: " + nomesAtividades);
         }
+    }
+
+    public void registrarMovimentacao(Subprocesso subprocesso, String descricao, Usuario usuario) {
+        Movimentacao movimentacao = new Movimentacao(
+            subprocesso,
+            subprocesso.getUnidade(),
+            subprocesso.getUnidade(),
+            descricao,
+            usuario
+        );
+        movimentacaoRepo.save(movimentacao);
     }
 }

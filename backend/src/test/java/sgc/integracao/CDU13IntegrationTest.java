@@ -72,7 +72,7 @@ public class CDU13IntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private AnaliseRepo analiseRepo;
@@ -107,7 +107,7 @@ public class CDU13IntegrationTest {
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado
-        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior, "Disponibilização inicial");
+        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior, "Disponibilização inicial", adminUser);
         movimentacaoRepo.save(movimentacaoInicial);
     }
 

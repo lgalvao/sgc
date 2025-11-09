@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class SubprocessoWorkflowService {
     private final SubprocessoRepo repositorioSubprocesso;
-    private final MovimentacaoRepo repositorioMovimentacao;
+    private final SubprocessoMovimentacaoRepo repositorioMovimentacao;
     private final ApplicationEventPublisher publicadorDeEventos;
     private final UnidadeRepo unidadeRepo;
     private final AnaliseService analiseService;
@@ -65,7 +65,8 @@ public class SubprocessoWorkflowService {
                 sp,
                 sp.getUnidade(),
                 unidadeSuperior,
-                "Disponibilização do cadastro de atividades")
+                "Disponibilização do cadastro de atividades",
+                usuario)
         );
 
         subprocessoNotificacaoService.notificarAceiteCadastro(sp, unidadeSuperior);
@@ -97,7 +98,7 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeSuperior = sp.getUnidade() != null ? sp.getUnidade().getUnidadeSuperior() : null;
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização da revisão do cadastro de atividades"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), unidadeSuperior, "Disponibilização da revisão do cadastro de atividades", usuario));
         analiseService.removerPorSubprocesso(sp.getCodigo());
 
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeSuperior);
@@ -166,7 +167,7 @@ public class SubprocessoWorkflowService {
         repositorioSubprocesso.save(sp);
 
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC").orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada."));
-        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sp.getUnidade(), "Disponibilização do mapa de competências para validação", usuario));
 
         subprocessoNotificacaoService.notificarDisponibilizacaoMapa(sp);
     }
@@ -180,11 +181,11 @@ public class SubprocessoWorkflowService {
      *
      * @param codSubprocesso          O código do subprocesso.
      * @param sugestoes              O texto com as sugestões.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que apresenta as sugestões.
+     * @param usuario O usuário que apresenta as sugestões.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
-    public void apresentarSugestoes(Long codSubprocesso, String sugestoes, String usuarioTituloEleitoral) {
+    public void apresentarSugestoes(Long codSubprocesso, String sugestoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -195,7 +196,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Sugestões apresentadas para o mapa de competências"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Sugestões apresentadas para o mapa de competências", usuario));
         analiseService.removerPorSubprocesso(sp.getCodigo());
         subprocessoNotificacaoService.notificarSugestoes(sp);
     }
@@ -207,11 +208,11 @@ public class SubprocessoWorkflowService {
      * movimentação, limpa análises anteriores e notifica a unidade superior.
      *
      * @param codSubprocesso          O código do subprocesso.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que valida o mapa.
+     * @param usuario O usuário que valida o mapa.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
-    public void validarMapa(Long codSubprocesso, String usuarioTituloEleitoral) {
+    public void validarMapa(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -219,7 +220,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa2(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Validação do mapa de competências"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade().getUnidadeSuperior(), "Validação do mapa de competências", usuario));
         subprocessoNotificacaoService.notificarValidacao(sp);
     }
 
@@ -255,7 +256,8 @@ public class SubprocessoWorkflowService {
                 sp,
                 sp.getUnidade().getUnidadeSuperior(),
                 unidadeDevolucao,
-                "Devolução da validação do mapa de competências para ajustes")
+                "Devolução da validação do mapa de competências para ajustes",
+                usuario)
         );
 
         sp.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
@@ -298,7 +300,7 @@ public class SubprocessoWorkflowService {
             sp.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
             repositorioSubprocesso.save(sp);
         } else {
-            repositorioMovimentacao.save(new Movimentacao(sp, unidadeSuperior, proximaUnidade, "Mapa de competências validado"));
+            repositorioMovimentacao.save(new Movimentacao(sp, unidadeSuperior, proximaUnidade, "Mapa de competências validado", usuario));
             sp.setSituacao(SituacaoSubprocesso.MAPA_VALIDADO);
             repositorioSubprocesso.save(sp);
             subprocessoNotificacaoService.notificarAceite(sp);
@@ -314,7 +316,7 @@ public class SubprocessoWorkflowService {
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      */
     @Transactional
-    public void homologarValidacao(Long codSubprocesso) {
+    public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -324,7 +326,7 @@ public class SubprocessoWorkflowService {
         Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
                 .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Mapa de competências homologado"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Mapa de competências homologado", usuario));
         subprocessoNotificacaoService.notificarHomologacaoMapa(sp);
     }
 
@@ -336,12 +338,12 @@ public class SubprocessoWorkflowService {
      *
      * @param codSubprocesso          O código do subprocesso.
      * @param request                O DTO com os dados da submissão.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que está submetendo.
+     * @param usuario O usuário que está submetendo.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      * @throws ErroValidacao            se o mapa apresentar inconsistências de associação.
      */
     @Transactional
-    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, String usuarioTituloEleitoral) {
+    public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoReq request, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: %d".formatted(codSubprocesso)));
 
@@ -353,7 +355,7 @@ public class SubprocessoWorkflowService {
         sp.setDataFimEtapa1(java.time.LocalDateTime.now());
         repositorioSubprocesso.save(sp);
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade(), "Disponibilização do mapa de competências para validação"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade(), sp.getUnidade(), "Disponibilização do mapa de competências para validação", usuario));
         subprocessoNotificacaoService.notificarDisponibilizacaoMapa(sp);
     }
 
@@ -386,7 +388,7 @@ public class SubprocessoWorkflowService {
 
         Unidade unidadeDevolucao = sp.getUnidade();
 
-        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), unidadeDevolucao, "Devolução do cadastro de atividades para ajustes: " + motivo));
+        repositorioMovimentacao.save(new Movimentacao(sp, sp.getUnidade().getUnidadeSuperior(), unidadeDevolucao, "Devolução do cadastro de atividades para ajustes: " + motivo, usuario));
         sp.setSituacao(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         repositorioSubprocesso.save(sp);
@@ -403,12 +405,12 @@ public class SubprocessoWorkflowService {
      *
      * @param codSubprocesso          O código do subprocesso.
      * @param observacoes            Observações sobre o aceite.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário que está aceitando.
+     * @param usuario O usuário que está aceitando.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      * @throws IllegalStateException    se não for possível identificar a unidade superior.
      */
     @Transactional
-    public void aceitarCadastro(Long codSubprocesso, String observacoes, String usuarioTituloEleitoral) {
+    public void aceitarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
 
@@ -418,7 +420,7 @@ public class SubprocessoWorkflowService {
                 .tipo(TipoAnalise.CADASTRO)
                 .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                 .siglaUnidade(sp.getUnidade().getUnidadeSuperior().getSigla())
-                .tituloUsuario(String.valueOf(usuarioTituloEleitoral))
+                .tituloUsuario(String.valueOf(usuario.getTituloEleitoral()))
                 .motivo(null)
                 .build());
 
@@ -428,7 +430,7 @@ public class SubprocessoWorkflowService {
             throw new IllegalStateException("Não foi possível identificar a unidade superior para enviar a análise.");
         }
 
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Cadastro de atividades e conhecimentos aceito"));
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeOrigem, unidadeDestino, "Cadastro de atividades e conhecimentos aceito", usuario));
 
         // Notificar unidade superior
         subprocessoNotificacaoService.notificarAceiteCadastro(sp, unidadeDestino);
@@ -446,13 +448,13 @@ public class SubprocessoWorkflowService {
      *
      * @param codSubprocesso          O código do subprocesso.
      * @param observacoes            Observações da homologação.
-     * @param usuarioTituloEleitoral O título de eleitor do usuário (ADMIN) que homologa.
+     * @param usuario O usuário (ADMIN) que homologa.
      * @throws ErroEntidadeNaoEncontrada se o subprocesso não for encontrado.
      * @throws IllegalStateException    se o subprocesso não estiver na situação correta
      *                                  ou se a unidade 'SEDOC' não for encontrada.
      */
     @Transactional
-    public void homologarCadastro(Long codSubprocesso, String observacoes, String usuarioTituloEleitoral) {
+    public void homologarCadastro(Long codSubprocesso, String observacoes, Usuario usuario) {
         Subprocesso sp = repositorioSubprocesso.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso não encontrado: " + codSubprocesso));
 
@@ -464,7 +466,7 @@ public class SubprocessoWorkflowService {
                 .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
         // A homologação é uma ação final do ADMIN (SEDOC), a movimentação é registrada na própria unidade.
-        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
+        repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado", usuario));
         sp.setSituacao(SituacaoSubprocesso.CADASTRO_HOMOLOGADO);
         repositorioSubprocesso.save(sp);
     }
@@ -506,7 +508,7 @@ public class SubprocessoWorkflowService {
         Unidade unidadeDestino = unidadeRepo.findById(sp.getUnidade().getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
 
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Devolução do cadastro de atividades e conhecimentos para ajustes"));
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Devolução do cadastro de atividades e conhecimentos para ajustes", usuario));
 
         if (unidadeDestino.equals(sp.getUnidade())) {
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -554,7 +556,7 @@ public class SubprocessoWorkflowService {
         Unidade unidadeDestino = unidadeRepo.findById(unidadeAnalise.getUnidadeSuperior().getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade de destino não encontrada."));
 
-        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita"));
+        repositorioMovimentacao.save(new Movimentacao(sp, unidadeAnalise, unidadeDestino, "Revisão do cadastro de atividades e conhecimentos aceita", usuario));
 
         subprocessoNotificacaoService.notificarAceiteRevisaoCadastro(sp, unidadeDestino);
 
@@ -600,7 +602,7 @@ public class SubprocessoWorkflowService {
             Unidade sedoc = unidadeRepo.findBySigla("SEDOC")
                     .orElseThrow(() -> new IllegalStateException("Unidade 'SEDOC' não encontrada para registrar a homologação."));
 
-            repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado"));
+            repositorioMovimentacao.save(new Movimentacao(sp, sedoc, sedoc, "Cadastro de atividades e conhecimentos homologado", usuario));
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
 

@@ -58,7 +58,7 @@ public class CDU07IntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Autowired
     private SubprocessoDtoService subprocessoDtoService;
 
@@ -81,7 +81,10 @@ public class CDU07IntegrationTest {
         subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
-        Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado");
+        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade, List.of(Perfil.SERVIDOR));
+        usuarioRepo.save(usuario);
+
+        Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);
         movimentacaoRepo.save(movimentacao);
     }
 

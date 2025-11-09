@@ -19,7 +19,7 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.SubprocessoElegivelDto;
-import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
+import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import sgc.sgrh.model.Usuario;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +55,9 @@ public class ProcessoService {
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
-    private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    private final ProcessoDetalheMapper processoDetalheMapper;
     private final MapaRepo mapaRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
+    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ProcessoNotificacaoService processoNotificacaoService;
@@ -172,7 +173,7 @@ public class ProcessoService {
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
 
-        return processoDetalheMapperCustom.toDetailDTO(processo);
+        return processoDetalheMapper.toDetailDTO(processo);
     }
 
     @Transactional(readOnly = true)
@@ -317,7 +318,7 @@ public class ProcessoService {
             Mapa mapa = mapaRepo.save(new Mapa());
             Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
             Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
+            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
         }
     }
 
@@ -330,7 +331,7 @@ public class ProcessoService {
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
+        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
     }
 
     private void validarFinalizacaoProcesso(Processo processo) {

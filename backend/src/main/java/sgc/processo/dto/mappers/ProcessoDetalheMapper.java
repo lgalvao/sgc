@@ -1,5 +1,6 @@
 package sgc.processo.dto.mappers;
 
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import sgc.processo.dto.ProcessoDetalheDto;
@@ -11,7 +12,8 @@ import sgc.unidade.model.Unidade;
 /**
  * Mapper (usando MapStruct) para converter a entidade Processo e suas associações para ProcessoDetalheDto.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {})
+@DecoratedWith(ProcessoDetalheMapperCustom.class)
 public interface ProcessoDetalheMapper {
     @Mapping(target = "unidades", ignore = true) // Mapeamento customizado necessário
     @Mapping(target = "resumoSubprocessos", ignore = true)

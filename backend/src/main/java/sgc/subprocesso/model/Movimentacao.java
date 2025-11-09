@@ -1,11 +1,16 @@
 package sgc.subprocesso.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sgc.comum.model.EntidadeBase;
+import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
@@ -15,7 +20,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Movimentacao extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo")
@@ -35,16 +39,21 @@ public class Movimentacao extends EntidadeBase {
     @Column(name = "descricao")
     private String descricao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_codigo")
+    private Usuario usuario;
+
     /**
      * Construtor de conveniência para registrar uma nova movimentação.
      * A data e hora são preenchidas automaticamente.
      */
-    public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao) {
+    public Movimentacao(Subprocesso subprocesso, Unidade unidadeOrigem, Unidade unidadeDestino, String descricao, Usuario usuario) {
         super();
         this.subprocesso = subprocesso;
         this.unidadeOrigem = unidadeOrigem;
         this.unidadeDestino = unidadeDestino;
         this.descricao = descricao;
+        this.usuario = usuario;
         this.dataHora = LocalDateTime.now();
     }
 
@@ -55,7 +64,8 @@ public class Movimentacao extends EntidadeBase {
                              unidadeDestino=%s,
                              unidadeOrigem=%s,
                              dataHora=%s,
-                             subprocesso=%s}
-                """.formatted(descricao, unidadeDestino, unidadeOrigem, dataHora, subprocesso);
+                             subprocesso=%s,
+                             usuario=%s}
+                """.formatted(descricao, unidadeDestino, unidadeOrigem, dataHora, subprocesso, usuario);
     }
 }

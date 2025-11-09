@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
 import sgc.atividade.model.Atividade;
 import sgc.integracao.mocks.TestThymeleafConfig;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("CDU-15: Manter Mapa de Competências")
 @Import(TestThymeleafConfig.class)
+@ActiveProfiles("test")
 class CDU15IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";

@@ -129,7 +129,7 @@ public class SubprocessoServiceActionsTest {
             Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
             Subprocesso subprocesso = criarSubprocesso(processo, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO);
 
-            subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.aceitarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Optional<Analise> analise = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()).stream().findFirst();
             assertTrue(analise.isPresent());
@@ -154,7 +154,7 @@ public class SubprocessoServiceActionsTest {
 
             Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // Use existing SEDOC
 
-            subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario.getTituloEleitoral());
+            subprocessoWorkflowService.homologarCadastro(subprocesso.getCodigo(), OBSERVACOES, usuario);
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após homologação."));
             assertEquals(SituacaoSubprocesso.CADASTRO_HOMOLOGADO, spAtualizado.getSituacao());

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import sgc.sgrh.model.Usuario;
 
 class ModeloTest {
     @Test
@@ -105,9 +106,12 @@ class ModeloTest {
         
         Unidade unidadeDestino = new Unidade();
         unidadeDestino.setCodigo(2L);
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123456789012");
         
         Movimentacao movimentacao = new Movimentacao(
-            subprocesso, unidadeOrigem, unidadeDestino, "Descrição de movimentação"
+            subprocesso, unidadeOrigem, unidadeDestino, "Descrição de movimentação", usuario
         );
         
         assertEquals(subprocesso.getCodigo(), movimentacao.getSubprocesso().getCodigo());
