@@ -77,7 +77,7 @@ public class SubprocessoValidacaoController {
         subprocessoWorkflowService.apresentarSugestoes(
                 codigo,
                 request.getSugestoes(),
-                usuario.getTituloEleitoral()
+                usuario
         );
     }
 
@@ -91,7 +91,7 @@ public class SubprocessoValidacaoController {
 
     @Operation(summary = "Valida o mapa de competências da unidade")
     public void validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.validarMapa(codigo, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.validarMapa(codigo, usuario);
     }
 
     /**
@@ -169,7 +169,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa a validação do mapa")
     public void homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.homologarValidacao(codigo);
+        subprocessoWorkflowService.homologarValidacao(codigo, usuario);
     }
 
     /**
@@ -187,6 +187,6 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid SubmeterMapaAjustadoReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        subprocessoWorkflowService.submeterMapaAjustado(codigo, request, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.submeterMapaAjustado(codigo, request, usuario);
     }
 }

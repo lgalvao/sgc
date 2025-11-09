@@ -64,7 +64,7 @@ public class SubprocessoCadastroController {
      * @param usuario        O usuário autenticado que está realizando a ação.
      * @return Um {@link ResponseEntity} com uma mensagem de sucesso.
      */
-    @PostMapping("/{codigo}/disponibilizar")
+    @PostMapping("/{codigo}/cadastro/disponibilizar")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<RespostaDto> disponibilizarCadastro(
             @PathVariable("codigo") Long codSubprocesso,
@@ -155,7 +155,7 @@ public class SubprocessoCadastroController {
         subprocessoWorkflowService.aceitarCadastro(
                 codigo,
                 sanitizedObservacoes,
-                usuario.getTituloEleitoral()
+                usuario
         );
     }
 
@@ -177,7 +177,7 @@ public class SubprocessoCadastroController {
         subprocessoWorkflowService.homologarCadastro(
                 codigo,
                 sanitizedObservacoes,
-                usuario.getTituloEleitoral()
+                usuario
         );
     }
 

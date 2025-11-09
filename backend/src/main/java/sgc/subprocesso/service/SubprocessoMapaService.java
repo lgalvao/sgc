@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SubprocessoMapaService {
     private final SubprocessoRepo subprocessoRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
+    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final AtividadeRepo atividadeRepo;
     private final ConhecimentoRepo conhecimentoRepo;
     private final CompetenciaRepo competenciaRepo;
@@ -116,7 +116,7 @@ public class SubprocessoMapaService {
                 spOrigem.getCodigo(),
                 spOrigem.getUnidade() != null ? spOrigem.getUnidade().getSigla() : "N/A");
 
-        movimentacaoRepo.save(new Movimentacao(spDestino, spOrigem.getUnidade(), spDestino.getUnidade(), descMovimentacao));
+        movimentacaoRepo.save(new Movimentacao(spDestino, spOrigem.getUnidade(), spDestino.getUnidade(), descMovimentacao, null));
 
         log.info("Atividades importadas do subprocesso {} para {}", codSubprocessoOrigem, codSubprocessoDestino);
     }
