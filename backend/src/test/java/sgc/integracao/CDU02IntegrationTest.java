@@ -96,14 +96,18 @@ public class CDU02IntegrationTest {
     }
 
     private void setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
-        Usuario principal = new Usuario(
-            tituloEleitoral,
-            "Usuario de Teste",
-            "teste@sgc.com",
-            "123",
-            unidade,
-            Arrays.stream(perfis).map(Perfil::valueOf).collect(Collectors.toList())
-        );
+        Usuario principal = usuarioRepo.findById(tituloEleitoral)
+                .orElseGet(() -> {
+                    Usuario newUser = new Usuario(
+                            tituloEleitoral,
+                            "Usuario de Teste",
+                            "teste@sgc.com",
+                            "123",
+                            unidade,
+                            Arrays.stream(perfis).map(Perfil::valueOf).collect(Collectors.toList())
+                    );
+                    return usuarioRepo.save(newUser);
+                });
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
             principal, null, principal.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();

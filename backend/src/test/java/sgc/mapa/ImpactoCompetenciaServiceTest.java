@@ -67,9 +67,9 @@ class ImpactoCompetenciaServiceTest {
             AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
-            competencia.setAtividades(Set.of(atividade));
+            atividade.setCompetencias(Set.of(competencia));
 
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
+            when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
 
             List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovidaDto), Collections.emptyList());
 

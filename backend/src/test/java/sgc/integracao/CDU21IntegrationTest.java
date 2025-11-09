@@ -33,6 +33,7 @@ import sgc.sgrh.service.SgrhService;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.subprocesso.service.SubprocessoNotificacaoService;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -76,6 +77,9 @@ class CDU21IntegrationTest {
 
     @MockitoBean
     private NotificacaoEmailService notificacaoEmailService;
+
+    @MockitoBean
+    private SubprocessoNotificacaoService subprocessoNotificacaoService;
 
     private Processo processo;
     private Unidade unidadeOperacional1;

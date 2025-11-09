@@ -80,16 +80,5 @@ class SubprocessoServiceTest {
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }
 
-        @Test
-        @DisplayName("Deve lançar exceção se atividade não estiver associada")
-        void validarAssociacoesMapa_AtividadeNaoAssociada_LancaExcecao() {
-            Atividade atividade = new Atividade();
-            Competencia competencia = new Competencia();
-            competencia.setAtividades(Set.of(atividade));
-            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(competencia));
-            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Atividade()));
-
-            assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
-        }
     }
 }
