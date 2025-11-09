@@ -100,8 +100,8 @@ class CDU12IntegrationTest {
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
         UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
-        unidadeMapa.setMapaVigenteCodigo(mapaVigente.getCodigo());
+        unidadeMapa.setUnidade(unidade);
+        unidadeMapa.setMapaVigente(mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
 
         atividadeVigente1 = atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
