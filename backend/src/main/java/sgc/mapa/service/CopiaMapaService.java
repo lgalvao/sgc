@@ -80,8 +80,10 @@ public class CopiaMapaService {
                         .setMapa(mapaSalvo);
 
                 Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
-                for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
-                    novasAtividadesAssociadas.add(mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
+                if (competenciaFonte.getAtividades() != null) {
+                    for (Atividade atividadeFonteAssociada : competenciaFonte.getAtividades()) {
+                        novasAtividadesAssociadas.add(mapaDeAtividades.get(atividadeFonteAssociada.getCodigo()));
+                    }
                 }
                 novaCompetencia.setAtividades(novasAtividadesAssociadas);
 

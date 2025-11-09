@@ -158,12 +158,9 @@ VALUES ('Processo teste revisão CDU-05', 'REVISAO', 'CRIADO', CURRENT_DATE, CUR
 INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
 VALUES ('Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 180);
 
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (2, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (4, 100);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (5, 9);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 2);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (4, 100);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (5, 9);
 
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (777, 'Chefe STIC Teste', 'chefe.stic@tre-pe.jus.br', '7777', 2);
@@ -180,17 +177,10 @@ INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_
 VALUES (100, 'Mapeamento Base 2024 - FINALIZADO', 'MAPEAMENTO', 'FINALIZADO', CURRENT_DATE - 180, CURRENT_DATE - 30,
         CURRENT_DATE - 60);
 
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (100, 8);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (100, 9);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (100, 10);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (100, 102);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 8);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 9);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 10);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 102);
 
 INSERT INTO SGC.MAPA (codigo)
 VALUES (1001);
@@ -224,8 +214,6 @@ INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codig
 VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
         CURRENT_DATE - 90);
 
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (8, 1001);
 INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
 VALUES (9, 1002);
 INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
@@ -377,16 +365,11 @@ VALUES (203, 'Processo Criado CDU02', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURR
 INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
 VALUES (205, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
 
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (200, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (201, 6);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (202, 8);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (203, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (205, 100);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (200, 2);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (201, 6);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (202, 8);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (203, 2);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (205, 100);
 
 INSERT INTO SGC.ALERTA (descricao, processo_codigo, usuario_destino_titulo, data_hora)
 VALUES ('Alerta para Gestor', 200, 8, CURRENT_TIMESTAMP);

@@ -26,9 +26,6 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(true)
-                .podeHomologarCadastro(true)
-                .podeHomologarMapa(true)
                 .build();
 
         return dto;

@@ -20,4 +20,6 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+
+    List<Competencia> findByAtividades_Codigo(Long codigo);
 }

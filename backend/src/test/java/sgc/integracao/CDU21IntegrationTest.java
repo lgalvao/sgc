@@ -105,6 +105,18 @@ class CDU21IntegrationTest {
         Subprocesso sp2 = new Subprocesso(processo, unidadeOperacional2, mapa2, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite());
         subprocessoRepo.save(sp2);
 
+        Mapa mapaVigentePlaceholder = mapaRepo.save(new Mapa());
+        UnidadeMapa um1 = new UnidadeMapa();
+        um1.setUnidadeCodigo(unidadeOperacional1.getCodigo());
+        um1.setMapaVigenteCodigo(mapaVigentePlaceholder.getCodigo());
+        unidadeMapaRepo.save(um1);
+
+        UnidadeMapa um2 = new UnidadeMapa();
+        um2.setUnidadeCodigo(unidadeOperacional2.getCodigo());
+        um2.setMapaVigenteCodigo(mapaVigentePlaceholder.getCodigo());
+        unidadeMapaRepo.save(um2);
+
+
         when(sgrhService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
             unidadeIntermediaria.getCodigo(), new ResponsavelDto(unidadeIntermediaria.getCodigo(), String.valueOf(titularIntermediaria.getTituloEleitoral()), "Titular Intermediaria", null, null),
             unidadeOperacional1.getCodigo(), new ResponsavelDto(unidadeOperacional1.getCodigo(), String.valueOf(titularOp1.getTituloEleitoral()), "Titular Op1", null, null),

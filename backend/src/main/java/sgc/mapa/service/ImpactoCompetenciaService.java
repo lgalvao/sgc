@@ -28,10 +28,8 @@ public class ImpactoCompetenciaService {
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
         for (AtividadeImpactadaDto atividadeDto : removidas) {
-            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
-            if (atividade == null) continue;
-
-            for (Competencia comp : atividade.getCompetencias()) {
+            List<Competencia> competenciasAssociadas = repositorioCompetencia.findByAtividades_Codigo(atividadeDto.getCodigo());
+            for (Competencia comp : competenciasAssociadas) {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
@@ -44,10 +42,8 @@ public class ImpactoCompetenciaService {
         }
 
         for (AtividadeImpactadaDto atividadeDto : alteradas) {
-            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
-            if (atividade == null) continue;
-
-            for (Competencia comp : atividade.getCompetencias()) {
+            List<Competencia> competenciasAssociadas = repositorioCompetencia.findByAtividades_Codigo(atividadeDto.getCodigo());
+            for (Competencia comp : competenciasAssociadas) {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),

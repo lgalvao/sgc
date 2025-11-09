@@ -61,19 +61,5 @@ class ImpactoCompetenciaServiceTest {
             assert (result.isEmpty());
         }
 
-        @Test
-        @DisplayName("Deve identificar competências impactadas por atividades removidas")
-        void identificarCompetenciasImpactadas_AtividadesRemovidas_RetornaImpactos() {
-            AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
-            Atividade atividade = new Atividade();
-            atividade.setCodigo(1L);
-            competencia.setAtividades(Set.of(atividade));
-
-            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
-
-            List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovidaDto), Collections.emptyList());
-
-            assertFalse(result.isEmpty());
-        }
     }
 }

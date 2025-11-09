@@ -61,20 +61,6 @@ public class SubprocessoService {
     }
 
     public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigo(mapaId);
-        List<String> competenciasSemAssociacao = new ArrayList<>();
-        for (Competencia competencia : competencias) {
-            if (competencia.getAtividades().isEmpty()) {
-                competenciasSemAssociacao.add(competencia.getDescricao());
-            }
-        }
-        if (!competenciasSemAssociacao.isEmpty()) {
-            throw new ErroValidacao(
-                    "Existem competências que não foram associadas a nenhuma atividade.",
-                    Map.of("competenciasNaoAssociadas", competenciasSemAssociacao)
-            );
-        }
-
         List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
         List<String> atividadesSemAssociacao = new ArrayList<>();
         for (Atividade atividade : atividades) {

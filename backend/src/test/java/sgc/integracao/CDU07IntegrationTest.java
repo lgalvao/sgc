@@ -24,6 +24,7 @@ import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.unidade.model.Unidade;
@@ -60,6 +61,8 @@ public class CDU07IntegrationTest {
     private SubprocessoRepo subprocessoRepo;
     @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
     @Autowired
     private SubprocessoDtoService subprocessoDtoService;
 
