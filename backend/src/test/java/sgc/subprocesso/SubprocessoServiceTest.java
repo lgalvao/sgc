@@ -8,41 +8,41 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroValidacao;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
-import sgc.mapa.modelo.Mapa;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoServiceTest {
-
     @InjectMocks
     private SubprocessoService service;
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private ConhecimentoRepo conhecimentoRepo;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
-    @Mock
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
 
     private Subprocesso subprocesso;
 
@@ -76,7 +76,6 @@ class SubprocessoServiceTest {
         @DisplayName("Deve lançar exceção se competência não estiver associada")
         void validarAssociacoesMapa_CompetenciaNaoAssociada_LancaExcecao() {
             when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Competencia()));
-            when(competenciaAtividadeRepo.countByCompetenciaCodigo(null)).thenReturn(0L);
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }
@@ -84,8 +83,11 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve lançar exceção se atividade não estiver associada")
         void validarAssociacoesMapa_AtividadeNaoAssociada_LancaExcecao() {
+            Atividade atividade = new Atividade();
+            Competencia competencia = new Competencia();
+            competencia.setAtividades(Set.of(atividade));
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(competencia));
             when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Atividade()));
-            when(competenciaAtividadeRepo.countByAtividadeCodigo(null)).thenReturn(0L);
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }

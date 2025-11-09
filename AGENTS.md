@@ -1,83 +1,18 @@
-# Orientações para Agentes
+## Regras para Agentes
 
-Este documento fornece instruções e dicas para agentes de IA que trabalham neste repositório.
+- O sistema deve ter todos os nomes e mensagens em português brasileiro
+- Ao executar o gradle evite usar `--no-daemon` a não ser que seja estritamente necessário
+- O nome das execões do sistema segue sempre o padrao 'ErroXxxx', por exemplo `ErroEntidadeNaoEncontrada`
 
-## Para executar o Backend
+### Se for rodar testes e2e (playwright)
 
-Para executar o backend em modo de desenvolvimento, use o seguinte comando a partir do diretório raiz:
+- Rode sempre o mínimo de testes possível. Por exemplo, o comando abaixo roda apenas os primeiros cinco testes em
+  `/cdu`, de `/cdu/cdu-01.spec.ts` até `/cdu/cdu-05.spec.ts` focando apenas nos últimos que falharam:
 
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local'
-```
-
-Este comando utiliza o perfil `local` do Spring, que configura a aplicação para usar um banco de dados H2 em memória,
-não exigindo um PostgreSQL externo.
-
-Para manter o backend em execução sem bloquear o terminal, adicione `&` ao final do comando.
-
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=local' &
-```
-
-## Executando o Frontend
-
-Para executar o frontend em modo de desenvolvimento, navegue até o diretório `frontend` e use o seguinte comando:
-
-```bash
-npm run dev
-```
-
-Perceba que isso irá 'travar' o console, adicione '&' ao final para rodar em segundo plano.
-
-## Testes de Frontend
-
-### Testes de Unidade
-
-Para executar os testes de unidade do frontend, navegue até o diretório `frontend` e use o seguinte comando:
-
-```bash
-npm run test:unit
-```
-
-### Testes E2E (End-to-End)
-
-**IMPORTANTE: A execução dos testes E2E requer uma configuração específica.**
-
-A suíte de testes E2E usa o Playwright para interagir com a aplicação. A configuração do Playwright (`playwright.config.ts`) é responsável por iniciar o servidor de desenvolvimento do **frontend** (`npm run dev`), mas **NÃO** gerencia o ciclo de vida do backend.
-
-**Procedimento para Execução Correta:**
-
-1.  **Inicie o Backend Manualmente:** Antes de rodar os testes, você **deve** iniciar o servidor backend em um terminal separado. Use o perfil `jules`, que é configurado para o ambiente de teste.
-
-    ```bash
-    cd /app
-    ./gradlew :backend:bootRun --args='--spring.profiles.active=jules' > backend.log 2>&1 &
+    ```shell
+    npx playwright test /cdu/cdu-0[1-5] --last-failed
     ```
 
-2.  **Verifique se o Backend Iniciou:** Aguarde alguns segundos e verifique o `backend.log` para confirmar que o servidor iniciou com sucesso (procure pela mensagem "Started Sgc").
-
-3.  **Execute os Testes E2E:** Com o backend rodando, execute o comando do Playwright a partir do **diretório raiz**.
-
-    ```bash
-    npm run test:e2e
-    ```
-
-4.  **Pare o Backend Manualmente:** Após a conclusão dos testes, lembre-se de parar o processo do backend que você iniciou.
-
-    ```bash
-    kill %1
-    ```
-
-**Resumo:** O Playwright cuida do frontend, mas o backend precisa ser gerenciado manualmente. Tentar configurar o Playwright para gerenciar ambos os servidores provou ser instável e leva a timeouts.
-
-## Informações Gerais do Backend
-
-O backend utiliza **Java 21**.
-
-## Testes de Backend
-
-Para executar todos os testes de backend, use o seguinte comando a partir do diretório raiz. (Isso usará como default o task `agentTest` que filtra os stack traces)  
-
-```bash
-./gradlew :backend:test
-```
+### Se for corrigir ou ajustar testes e2e (playwright)
+-  Não usar timeouts explicitos.
+-  Considerar que timeouts indicam que os elemntos não estão visíveis de fato, por questões de expectativas dos testes ou defeitos no sistema em si

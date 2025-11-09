@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // Type Checking
     "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -8,15 +7,11 @@
     "skipLibCheck": true,
     "allowJs": true,
     "checkJs": true,
-
-    // Modules
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-
-    // Language & Environment
     "target": "ESNext",
     "lib": [
       "ESNext",
@@ -27,18 +22,12 @@
     "types": [
       "vitest/globals",
       "node",
-      "vite/client",
-      "@playwright/test"
+      "vite/client"
     ],
-
-    // Project
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      "~/*": [
-        "e2e/*"
       ]
     },
     "forceConsistentCasingInFileNames": true
@@ -51,8 +40,6 @@
     "spec/**/*.ts",
     "spec/**/*.d.ts",
     "vitest.setup.ts",
-    "../playwright.config.ts",
-    "../e2e/**/*.ts",
     "vite.config.ts"
   ],
   "exclude": [

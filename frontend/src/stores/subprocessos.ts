@@ -3,7 +3,7 @@ import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroReques
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
-import { fetchSubprocessoDetalhe } from "@/services/subprocessoService";
+import {fetchSubprocessoDetalhe} from "@/services/subprocessoService";
 import {
     aceitarCadastro,
     aceitarRevisaoCadastro,
@@ -23,7 +23,7 @@ async function _executarAcao(
     const notificacoes = useNotificacoesStore();
     try {
         await acao();
-        notificacoes.sucesso(sucessoMsg, `${sucessoMsg} com sucesso.`);
+        notificacoes.sucesso(sucessoMsg, `${sucessoMsg}.`);
         const processosStore = useProcessosStore();
         if (processosStore.processoDetalhe) {
             await processosStore.fetchProcessoDetalhe(processosStore.processoDetalhe.codigo);
@@ -130,12 +130,6 @@ export const useSubprocessosStore = defineStore('subprocessos', {
                 'Revisão homologada',
                 'Erro ao homologar'
             );
-        },
-
-        reset() {
-            this.subprocessoDetalhe = null;
-        },
-
-
+        }
     }
 });

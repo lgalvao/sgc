@@ -9,46 +9,35 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.alerta.modelo.AlertaRepo;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.alerta.model.AlertaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.notificacao.NotificacaoService;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -80,8 +69,6 @@ class CDU10IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-    @Autowired
     private UsuarioRepo usuarioRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -97,22 +84,14 @@ class CDU10IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeSuperior = new Unidade("Unidade Superior", "US");
-        unidadeRepo.save(unidadeSuperior);
-
-        unidadeChefe = new Unidade("Unidade Teste", "UT");
-        unidadeChefe.setUnidadeSuperior(unidadeSuperior);
-        var chefe = new Usuario();
-        chefe.setTituloEleitoral(333333333333L);
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        chefe = usuarioRepo.save(chefe);
-        unidadeChefe.setTitular(chefe);
-        unidadeRepo.save(unidadeChefe);
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidadeChefe = unidadeRepo.findById(10L).orElseThrow();
+        var chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
         Processo processoRevisao = new Processo("Processo de Revisão", TipoProcesso.REVISAO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now().plusDays(30));
         processoRepo.save(processoRevisao);
 
-        var mapa = mapaRepo.save(new sgc.mapa.modelo.Mapa());
+        var mapa = mapaRepo.save(new sgc.mapa.model.Mapa());
         subprocessoRevisao = new Subprocesso(processoRevisao, unidadeChefe, mapa, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, processoRevisao.getDataLimite());
         subprocessoRepo.save(subprocessoRevisao);
     }
@@ -121,12 +100,13 @@ class CDU10IntegrationTest {
     @DisplayName("Testes para Disponibilizar Revisão do Cadastro")
     class DisponibilizarRevisaoCadastro {
         @Test
-        @DisplayName("Deve disponibilizar a revisão do cadastro com sucesso quando todas as condições são atendidas")
+        @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var competencia = new Competencia("Competência de Teste", subprocessoRevisao.getMapa());
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade = atividadeRepo.save(atividade);
-            competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(competencia.getCodigo(), atividade.getCodigo()), competencia, atividade));
+            competencia.setAtividades(Set.of(atividade));
+            competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
@@ -144,16 +124,15 @@ class CDU10IntegrationTest {
             assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeChefe.getCodigo());
             assertThat(movimentacao.getUnidadeDestino().getCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
-            var alertas = alertaRepo.findAll();
+            var alertas = alertaRepo.findByProcessoCodigo(subprocessoRevisao.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             var alerta = alertas.getFirst();
-            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade UT submetida para análise");
+            assertThat(alerta.getDescricao()).isEqualTo("Revisão do cadastro de atividades e conhecimentos da unidade SESEL submetida para análise");
             assertThat(alerta.getUnidadeDestino()).isEqualTo(unidadeSuperior);
 
-            // Assert Notificação
             verify(subprocessoNotificacaoService).notificarAceiteRevisaoCadastro(
-                org.mockito.ArgumentMatchers.any(Subprocesso.class),
-                org.mockito.ArgumentMatchers.any(Unidade.class)
+                    org.mockito.ArgumentMatchers.any(Subprocesso.class),
+                    org.mockito.ArgumentMatchers.any(Unidade.class)
             );
         }
 
@@ -163,7 +142,6 @@ class CDU10IntegrationTest {
             Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade Vazia");
             atividadeRepo.save(atividade);
 
-            // Act & Assert
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isUnprocessableEntity());
 
@@ -179,11 +157,6 @@ class CDU10IntegrationTest {
         @WithMockChefe("999999999999")
         @DisplayName("Não deve permitir que um CHEFE de outra unidade disponibilize a revisão")
         void naoDevePermitirChefeDeOutraUnidadeDisponibilizar() throws Exception {
-            var outroChefe = new Usuario();
-            outroChefe.setTituloEleitoral(999999999999L);
-            outroChefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-            usuarioRepo.save(outroChefe);
-
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                     .andExpect(status().isForbidden());
         }

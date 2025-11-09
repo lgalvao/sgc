@@ -13,33 +13,28 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.AnaliseRepo;
-import sgc.analise.modelo.TipoAcaoAnalise;
+import sgc.analise.model.Analise;
+import sgc.analise.model.AnaliseRepo;
+import sgc.analise.model.TipoAcaoAnalise;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.AceitarCadastroReq;
 import sgc.subprocesso.dto.DevolverCadastroReq;
 import sgc.subprocesso.dto.HomologarCadastroReq;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,7 +72,7 @@ public class CDU13IntegrationTest {
     private UsuarioRepo usuarioRepo;
 
     @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
 
     @Autowired
     private AnaliseRepo analiseRepo;
@@ -91,39 +86,12 @@ public class CDU13IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Usuario titular = new Usuario();
-        titular.setTituloEleitoral(333333333333L);
-        titular.setNome("Chefe da Unidade");
-        titular.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(titular);
-
-        unidadeSuperior = new Unidade("Unidade Superior", "UO_SUP");
-        unidadeRepo.save(unidadeSuperior);
-
-        Usuario gestorDaUnidade = new Usuario();
-        gestorDaUnidade.setTituloEleitoral(222222222222L);
-        gestorDaUnidade.setNome("Gestor da Unidade");
-        gestorDaUnidade.setUnidade(unidadeSuperior);
-        gestorDaUnidade.setPerfis(java.util.Set.of(Perfil.GESTOR));
-        usuarioRepo.save(gestorDaUnidade);
-
-        unidadeSuperior.setTitular(gestorDaUnidade);
-        unidadeRepo.save(unidadeSuperior);
-
-        unidade = new Unidade("Unidade de Teste", "UO_TESTE");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade.setTitular(titular);
-        unidadeRepo.save(unidade);
-
-        Usuario adminUser = new Usuario();
-        adminUser.setTituloEleitoral(111111111111L);
-        adminUser.setNome("Administrador");
-        adminUser.setPerfis(java.util.Set.of(Perfil.ADMIN));
-        usuarioRepo.save(adminUser);
-
-        Unidade sedoc = new Unidade("Secretaria de Documentação", "SEDOC");
-        sedoc.setTitular(adminUser);
-        unidadeRepo.save(sedoc);
+        Usuario titular = usuarioRepo.findById("333333333333").orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        Usuario gestorDaUnidade = usuarioRepo.findById("222222222222").orElseThrow();
+        unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
+        Usuario adminUser = usuarioRepo.findById("111111111111").orElseThrow();
+        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
 
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -139,7 +107,7 @@ public class CDU13IntegrationTest {
         subprocessoRepo.save(subprocesso);
 
         // Movimentação inicial para simular o estado
-        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior, "Disponibilização inicial");
+        Movimentacao movimentacaoInicial = new Movimentacao(subprocesso, unidade, unidadeSuperior, "Disponibilização inicial", adminUser);
         movimentacaoRepo.save(movimentacaoInicial);
     }
 
@@ -149,7 +117,7 @@ public class CDU13IntegrationTest {
 
         @Test
         @DisplayName("Deve devolver cadastro, registrar análise corretamente e alterar situação")
-        @WithMockGestor
+        @WithMockGestor("666666666666")
             // Simula um usuário com perfil de gestor
         void devolverCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
@@ -176,7 +144,7 @@ public class CDU13IntegrationTest {
             List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
-            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(analiseRegistrada.getMotivo()).isEqualTo(motivoDevolucao);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
             assertThat(analiseRegistrada.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
@@ -197,7 +165,7 @@ public class CDU13IntegrationTest {
 
         @Test
         @DisplayName("Deve aceitar cadastro, registrar análise e mover para unidade superior")
-        @WithMockGestor
+        @WithMockGestor("666666666666")
         void aceitarCadastro_deveFuncionarCorretamente() throws Exception {
             // Given
             String observacoes = "Cadastro parece OK.";
@@ -218,9 +186,9 @@ public class CDU13IntegrationTest {
             List<Analise> analises = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
             assertThat(analises).hasSize(1);
             Analise analiseRegistrada = analises.getFirst();
-            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
-            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("222222222222"); // From @WithMockGestor
+            assertThat(analiseRegistrada.getAnalistaUsuarioTitulo()).isEqualTo("666666666666"); // From @WithMockGestor("666666666666")
 
             // 2. Verificar a movimentação
             List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
@@ -275,7 +243,7 @@ public class CDU13IntegrationTest {
 
         @Test
         @DisplayName("Deve retornar o histórico de devoluções e aceites ordenado")
-        @WithMockGestor
+        @WithMockGestor("666666666666")
         void getHistorico_deveRetornarAcoesOrdenadas() throws Exception {
             // Given: First, a manager returns the process for adjustments
             String motivoDevolucao = "Incompleto";
@@ -311,15 +279,15 @@ public class CDU13IntegrationTest {
 
             assertThat(historico).hasSize(2);
 
-            // First item in list is the most recent (ACEITE)
+            // First item in list is the most recent (ACEITE_MAPEAMENTO)
             sgc.analise.dto.AnaliseHistoricoDto aceite = historico.getFirst();
-            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE);
+            assertThat(aceite.getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
             assertThat(aceite.getObservacoes()).isEqualTo(obsAceite);
             assertThat(aceite.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-            // Second item is the oldest (DEVOLUCAO)
+            // Second item is the oldest (DEVOLUCAO_MAPEAMENTO)
             sgc.analise.dto.AnaliseHistoricoDto devolucao = historico.get(1);
-            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO);
+            assertThat(devolucao.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
             assertThat(devolucao.getObservacoes()).isEqualTo(obsDevolucao);
             assertThat(devolucao.getUnidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
         }

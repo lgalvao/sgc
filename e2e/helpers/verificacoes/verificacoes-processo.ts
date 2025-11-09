@@ -3,26 +3,24 @@ import {SELETORES, TEXTOS, URLS} from '../dados';
 import {esperarMensagemSucesso, esperarUrl, verificarUrlDoPainel} from './verificacoes-basicas';
 
 /**
- * VERIFICAÇÕES ESPECÍFICAS DE PROCESSOS
- * Funções compostas para verificações relacionadas ao domínio de processos
- */
-
-/**
- * Verifica se está na página de edição de processo
+ * Verifica se a página atual é a de edição de processo.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarPaginaEdicaoProcesso(page: Page): Promise<void> {
-    await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+$/);
+    await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+$/);
 }
 
 /**
- * Verifica se está na página de cadastro de processo
+ * Verifica se a página atual é a de cadastro de processo.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarPaginaCadastroProcesso(page: Page): Promise<void> {
-    await expect(page).toHaveURL(/processo\/cadastro(\?idProcesso=\d+)?$/);
+    await expect(page).toHaveURL(/processo\/cadastro(\?codProcesso=\d+)?$/);
 }
 
 /**
- * Verifica se campos obrigatórios de formulário são exibidos
+ * Verifica se os campos obrigatórios do formulário de processo estão visíveis.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarCamposObrigatoriosFormulario(page: Page): Promise<void> {
     await expect(page.getByLabel('Descrição')).toBeVisible();
@@ -31,14 +29,37 @@ export async function verificarCamposObrigatoriosFormulario(page: Page): Promise
 }
 
 /**
- * Verifica se uma notificação de erro é exibida
+ * Verifica se uma notificação de erro está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarNotificacaoErro(page: Page): Promise<void> {
-    await expect(page.locator(SELETORES.NOTIFICACAO_ERRO)).toBeVisible();
+    // As notificações aparecem como alerts do Bootstrap ou mensagens inline
+    // Vamos verificar se há alguma mensagem de erro visível
+    const erroSelectors = [
+        '.alert.alert-danger',  // Bootstrap alert
+        '[role="alert"]',        // ARIA alert
+        '.text-danger',          // Texto vermelho
+        '.invalid-feedback:visible', // Feedback de validação do Bootstrap
+    ];
+
+    let encontrado = false;
+    for (const selector of erroSelectors) {
+        const element = page.locator(selector).first();
+        if (await element.isVisible({timeout: 5000}).catch(() => false)) {
+            encontrado = true;
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        throw new Error('Nenhuma mensagem de erro encontrada na página');
+    }
 }
 
 /**
- * Verificar se processo aparece na listagem do painel
+ * Aguarda que um processo apareça na tabela de processos.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function aguardarProcessoNoPainel(page: Page, descricaoProcesso: string): Promise<void> {
     await page.waitForURL(URLS.PAINEL);
@@ -47,7 +68,10 @@ export async function aguardarProcessoNoPainel(page: Page, descricaoProcesso: st
 }
 
 /**
- * Verifica se processo editado aparece na listagem e o original não
+ * Verifica se um processo editado aparece na tabela e o original não.
+ * @param page A instância da página do Playwright.
+ * @param descricaoOriginal A descrição original do processo.
+ * @param descricaoEditada A nova descrição do processo.
  */
 export async function verificarProcessoEditado(page: Page, descricaoOriginal: string, descricaoEditada: string): Promise<void> {
     await expect(page).toHaveURL(URLS.PAINEL);
@@ -56,14 +80,18 @@ export async function verificarProcessoEditado(page: Page, descricaoOriginal: st
 }
 
 /**
- * Verifica se diálogo de confirmação de remoção aparece
+ * Verifica se o diálogo de confirmação de remoção está visível.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarDialogoConfirmacaoRemocao(page: Page, descricaoProcesso: string): Promise<void> {
     await expect(page.getByText(`Remover o processo '${descricaoProcesso}'? Esta ação não poderá ser desfeita.`)).toBeVisible();
 }
 
 /**
- * Verifica se processo foi removido com sucesso
+ * Verifica se um processo foi removido.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
     const mensagemEsperada = `${TEXTOS.PROCESSO_REMOVIDO_INICIO}${descricaoProcesso}${TEXTOS.PROCESSO_REMOVIDO_FIM}`;
@@ -117,7 +145,7 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
 
     // Verificar que a linha do processo não está mais presente na tabela de processos.
     // Usar polling tolerante para lidar com timings assíncronos da UI
-    const timeoutMs = 10000;
+    const timeoutMs = 2000;
     const intervalMs = 500;
     const deadline = Date.now() + timeoutMs;
     let stillPresent = true;
@@ -152,21 +180,24 @@ export async function verificarProcessoRemovidoComSucesso(page: Page, descricaoP
 }
 
 /**
- * Verifica a visibilidade do botão de finalização de processo.
+ * Verifica se o botão "Finalizar processo" está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoFinalizarProcessoVisivel(page: Page): Promise<void> {
     await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).toBeVisible();
 }
 
 /**
- * Verifica a ausência do botão de finalização de processo.
+ * Verifica se o botão "Finalizar processo" não está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoFinalizarProcessoInvisivel(page: Page): Promise<void> {
     await expect(page.getByRole('button', {name: TEXTOS.FINALIZAR_PROCESSO})).not.toBeVisible();
 }
 
 /**
- * Verifica se o modal de finalização está visível com textos corretos.
+ * Verifica se o modal de finalização de processo está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarModalFinalizacaoProcesso(page: Page): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
@@ -179,21 +210,25 @@ export async function verificarModalFinalizacaoProcesso(page: Page): Promise<voi
 }
 
 /**
- * Garante que o modal de finalização foi fechado.
+ * Verifica se o modal de finalização de processo não está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarModalFinalizacaoFechado(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
 }
 
 /**
- * Verifica a notificação de bloqueio de finalização.
+ * Verifica se a notificação de bloqueio de finalização está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarFinalizacaoBloqueada(page: Page): Promise<void> {
     await expect(page.locator('.notification')).toContainText(TEXTOS.FINALIZACAO_BLOQUEADA);
 }
 
 /**
- * Confirma que o processo foi finalizado com sucesso no painel.
+ * Verifica se um processo está com o status "Finalizado" no painel.
+ * @param page A instância da página do Playwright.
+ * @param nomeProcesso O nome do processo.
  */
 export async function verificarProcessoFinalizadoNoPainel(page: Page, nomeProcesso: string): Promise<void> {
     const linhaProcesso = page.locator(`table[data-testid="${SELETORES.TABELA_PROCESSOS}"] tbody tr`).filter({hasText: nomeProcesso});
@@ -201,21 +236,24 @@ export async function verificarProcessoFinalizadoNoPainel(page: Page, nomeProces
 }
 
 /**
- * Verifica se a notificação de sucesso contém o texto esperado após finalização.
+ * Verifica se a mensagem de sucesso de finalização está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarMensagemFinalizacaoSucesso(page: Page): Promise<void> {
     await esperarMensagemSucesso(page, TEXTOS.PROCESSO_FINALIZADO);
 }
 
 /**
- * Verifica se a notificação informa que os mapas estão vigentes.
+ * Verifica se a notificação de mapas vigentes está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarMapasVigentesNotificacao(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.NOTIFICACAO_SUCESSO)).toContainText(TEXTOS.MAPAS_VIGENTES);
 }
 
 /**
- * Garante que a notificação de envio de email está visível.
+ * Verifica se a notificação de e-mail enviado está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarEmailFinalizacaoEnviado(page: Page): Promise<void> {
     const notificacaoEmail = page.locator(SELETORES.NOTIFICACAO_EMAIL).first();
@@ -223,9 +261,9 @@ export async function verificarEmailFinalizacaoEnviado(page: Page): Promise<void
     await expect(notificacaoEmail).toContainText(TEXTOS.EMAIL_ENVIADO);
 }
 
-
 /**
- * Verifica se o cadastro foi devolvido para ajustes com sucesso.
+ * Verifica se o cadastro foi devolvido.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarCadastroDevolvidoComSucesso(page: Page): Promise<void> {
     await esperarMensagemSucesso(page, TEXTOS.CADASTRO_DEVOLVIDO_AJUSTES);
@@ -233,7 +271,8 @@ export async function verificarCadastroDevolvidoComSucesso(page: Page): Promise<
 }
 
 /**
- * Verifica se o aceite foi registrado com sucesso.
+ * Verifica se o aceite foi registrado.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarAceiteRegistradoComSucesso(page: Page): Promise<void> {
     await esperarMensagemSucesso(page, TEXTOS.ACEITE_REGISTRADO);
@@ -241,14 +280,18 @@ export async function verificarAceiteRegistradoComSucesso(page: Page): Promise<v
 }
 
 /**
- * Verifica se diálogo de confirmação foi fechado
+ * Verifica se o diálogo de confirmação de remoção não está visível.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarDialogoConfirmacaoFechado(page: Page, descricaoProcesso: string): Promise<void> {
     await expect(page.getByText(`Remover o processo '${descricaoProcesso}'? Esta ação não poderá ser desfeita.`)).not.toBeVisible();
 }
 
 /**
- * Verifica se processo foi iniciado com sucesso
+ * Verifica se um processo foi iniciado.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoProcesso: string): Promise<void> {
     await expect(page.getByText(TEXTOS.PROCESSO_INICIADO)).toBeVisible();
@@ -257,22 +300,29 @@ export async function verificarProcessoIniciadoComSucesso(page: Page, descricaoP
 }
 
 /**
- * Verifica se formulário permanece na tela de edição
+ * Verifica se a página permanece no formulário de edição.
+ * @param page A instância da página do Playwright.
+ * @param descricaoProcesso A descrição do processo.
  */
 export async function verificarPermanenciaFormularioEdicao(page: Page, descricaoProcesso: string): Promise<void> {
-    await expect(page).toHaveURL(/\/processo\/cadastro\?idProcesso=\d+$/);
+    await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+$/);
     await expect(page.getByLabel('Descrição')).toHaveValue(descricaoProcesso);
 }
 
 /**
- * Verifica se confirmação de inicialização aparece
+ * Verifica se o modal de confirmação de inicialização está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarConfirmacaoInicializacao(page: Page): Promise<void> {
     await expect(page.getByText(TEXTOS.CONFIRMACAO_INICIAR_PROCESSO)).toBeVisible();
 }
 
 /**
- * Verifica modal de confirmação de inicialização de processo
+ * Verifica o conteúdo do modal de confirmação de inicialização.
+ * @param page A instância da página do Playwright.
+ * @param descricao A descrição do processo.
+ * @param tipo O tipo do processo.
+ * @param numUnidades O número de unidades.
  */
 export async function verificarModalConfirmacaoInicializacao(page: Page, descricao: string, tipo: string, numUnidades: number): Promise<void> {
     const modal = page.locator(SELETORES.MODAL_VISIVEL);
@@ -284,7 +334,8 @@ export async function verificarModalConfirmacaoInicializacao(page: Page, descric
 }
 
 /**
- * Verifica sucesso na inicialização do processo
+ * Verifica se um processo foi inicializado.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarProcessoInicializadoComSucesso(page: Page): Promise<void> {
     await esperarUrl(page, URLS.PAINEL);
@@ -293,20 +344,24 @@ export async function verificarProcessoInicializadoComSucesso(page: Page): Promi
 
 /**
  * Verifica o valor do campo de descrição.
+ * @param page A instância da página do Playwright.
+ * @param valor O valor esperado.
  */
 export async function verificarValorCampoDescricao(page: Page, valor: string): Promise<void> {
     await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(valor);
 }
 
 /**
- * Verifica se o botão 'Iniciar processo' está visível.
+ * Verifica se o botão "Iniciar processo" está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarBotaoIniciarProcessoVisivel(page: Page): Promise<void> {
     await expect(page.locator(`[data-testid="${SELETORES.BTN_INICIAR_PROCESSO}"]`)).toBeVisible();
 }
 
 /**
- * Verifica se o modal de confirmação de iniciar processo está visível e com os textos corretos.
+ * Verifica se o modal de confirmação de iniciar processo está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).toBeVisible();
@@ -316,12 +371,43 @@ export async function verificarModalConfirmacaoIniciarProcessoVisivel(page: Page
 }
 
 /**
- * Verifica se o modal de confirmação de iniciar processo está invisível.
+ * Verifica se o modal de confirmação de iniciar processo não está visível.
+ * @param page A instância da página do Playwright.
  */
 export async function verificarModalConfirmacaoIniciarProcessoInvisivel(page: Page): Promise<void> {
     await expect(page.locator(SELETORES.MODAL_VISIVEL)).not.toBeVisible();
 }
 
-export async function verificarPermanenciaNaPaginaProcesso(page: Page, idProcesso: number): Promise<void> {
-    await expect(page).toHaveURL(new RegExp(`/processo/${idProcesso}`));
+/**
+ * Verifica o conteúdo do modal de confirmação de iniciação.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarModalConfirmacaoIniciacaoProcesso(page: Page): Promise<void> {
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible();
+    await expect(modal.locator('.modal-title')).toContainText(/iniciar processo/i);
+    await expect(modal.locator('.modal-body')).toContainText(/não será mais possível editá-lo ou removê-lo/i);
+    await expect(modal.locator('.modal-body')).toContainText(/todas as unidades participantes serão notificadas/i);
+    await expect(modal.getByRole('button', {name: /confirmar/i})).toBeVisible();
+    await expect(modal.getByRole('button', {name: /cancelar/i})).toBeVisible();
+}
+
+/**
+ * Verifica se um processo está bloqueado para edição.
+ * @param page A instância da página do Playwright.
+ */
+export async function verificarProcessoBloqueadoParaEdicao(page: Page): Promise<void> {
+    // Verificar que botões de edição não estão disponíveis
+    await expect(page.getByRole('button', {name: /^salvar$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', {name: /^remover$/i})).not.toBeVisible();
+    await expect(page.getByRole('button', {name: /^iniciar processo$/i})).not.toBeVisible();
+}
+
+/**
+ * Verifica se a página permanece na página de um processo.
+ * @param page A instância da página do Playwright.
+ * @param codProcesso O ID do processo.
+ */
+export async function verificarPermanenciaNaPaginaProcesso(page: Page, codProcesso: number): Promise<void> {
+    await expect(page).toHaveURL(new RegExp(`/processo/${codProcesso}`));
 }

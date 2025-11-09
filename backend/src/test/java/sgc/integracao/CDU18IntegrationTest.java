@@ -7,32 +7,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
-import sgc.conhecimento.modelo.Conhecimento;
-import sgc.conhecimento.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -68,15 +66,12 @@ class CDU18IntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
 
-    @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
     private Subprocesso subprocesso;
     private Unidade unidade;
 
     @BeforeEach
     void setUp() {
-        unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
+        unidade = unidadeRepo.findById(11L).orElseThrow();
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDataLimite(LocalDateTime.now().plusMonths(1));
@@ -95,7 +90,6 @@ class CDU18IntegrationTest {
         subprocesso = subprocessoRepo.save(subprocesso);
 
 
-        // Create data
         Atividade atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
         Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
 
@@ -107,15 +101,13 @@ class CDU18IntegrationTest {
         atividade2.getConhecimentos().add(conhecimento3);
         atividadeRepo.saveAll(List.of(atividade1, atividade2));
 
-        Competencia competencia1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
-        Competencia competencia2 = competenciaRepo.save(new Competencia("Competência 2", mapa));
+        Competencia competencia1 = new Competencia("Competência 1", mapa);
+        competencia1.setAtividades(Set.of(atividade1));
+        competenciaRepo.save(competencia1);
 
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(
-            new CompetenciaAtividade.Id(atividade1.getCodigo(), competencia1.getCodigo()), competencia1, atividade1
-        ));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(
-            new CompetenciaAtividade.Id(atividade2.getCodigo(), competencia2.getCodigo()), competencia2, atividade2
-        ));
+        Competencia competencia2 = new Competencia("Competência 2", mapa);
+        competencia2.setAtividades(Set.of(atividade2));
+        competenciaRepo.save(competencia2);
     }
 
     @Test
@@ -128,12 +120,10 @@ class CDU18IntegrationTest {
             .andExpect(jsonPath("$.unidade.nome").value(unidade.getNome()))
             .andExpect(jsonPath("$.competencias").isArray())
             .andExpect(jsonPath("$.competencias.length()").value(2))
-            // Competencia 1
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades.length()").value(1))
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos.length()").value(2))
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos[?(@.descricao == 'Conhecimento 1.1')]").exists())
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 1')].atividades[?(@.descricao == 'Atividade 1')].conhecimentos[?(@.descricao == 'Conhecimento 1.2')]").exists())
-            // Competencia 2
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades.length()").value(1))
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades[?(@.descricao == 'Atividade 2')].conhecimentos.length()").value(1))
             .andExpect(jsonPath("$.competencias[?(@.descricao == 'Competência 2')].atividades[?(@.descricao == 'Atividade 2')].conhecimentos[?(@.descricao == 'Conhecimento 2.1')]").exists());

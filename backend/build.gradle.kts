@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
@@ -36,7 +38,6 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
-//    testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
 
     // MapStruct
     implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
@@ -75,13 +76,22 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2)
+
+    testLogging {
+        events("skipped", "failed")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStackTraces = true
+        showCauses = true
+        showStandardStreams = false
+        stackTraceFilters = setOf(TestStackTraceFilter.ENTRY_POINT)
+    }
+
     jvmArgs = listOf(
-        "-Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
         "-Dlogging.level.root=ERROR",
-        "-Dlogging.level.sgc=ERROR",
+        "-Dlogging.level.sgc=INFO",
         "-Dlogging.level.org.hibernate=ERROR",
         "-Dlogging.level.org.springframework=ERROR",
+        "-Dlogging.level.org.springframework.boot.autoconfigure.condition=ERROR",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
@@ -98,7 +108,7 @@ tasks.withType<Test> {
         if (byteBuddyAgentFile != null) {
             jvmArgs("-javaagent:${byteBuddyAgentFile.path}")
         } else {
-            logger.warn("byte-buddy-agent nao foi encontrado. Avisos do Mockito podem continuar aparecendo.")
+            logger.warn("byte-buddy-agent nao encontrado. Avisos do Mockito podem continuar aparecendo.")
         }
     }
 }
@@ -108,13 +118,18 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
+}
+
+tasks.withType<Test> {
+    jvmArgs("--enable-preview")
 }
 
 tasks.register<BootRun>("bootRunE2E") {
     group = "Application"
-    description = "Runs the application with the 'e2e' profile for end-to-end testing."
+    description = "Roda a aplicação com perfil 'e2e' para testes ponta a ponta."
     jvmArgs = listOf("-Dspring.profiles.active=e2e")
     mainClass.set("sgc.Sgc")
-    classpath = sourceSets.main.get().runtimeClasspath
+    classpath = sourceSets["main"].runtimeClasspath
 }

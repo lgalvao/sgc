@@ -26,7 +26,7 @@ Adotamos uma **arquitetura semântica em 3 camadas**:
 
 1.  **Planejamento:**
     *   Identifique o fluxo do usuário (Pré-condição → Ação → Verificação).
-    *   Liste os textos e seletores necessários. Se não existirem, adicione-os primeiro ao `constantes-teste.ts` e, se for um seletor novo, adicione o `data-testid` correspondente no código-fonte da aplicação.
+    *   Liste os textos e seletores necessários. Se não existirem, adicione-os primeiro ao `constantes.ts` e, se for um seletor novo, adicione o `data-testid` correspondente no código-fonte da aplicação.
 
 2.  **Criação de Helpers (Ações e Verificações):**
     *   Crie funções semânticas nos diretórios `acoes/` ou `verificacoes/`. Ex: `registrarAceiteRevisao(page, observacao)`, `verificarCadastroDevolvidoComSucesso(page)`.
@@ -80,7 +80,7 @@ await clicarElemento([
 2.  **Analise o Contexto:** O Playwright gera um diretório `test-results/`. Dentro dele, o arquivo `error-context.md` (ou similar) contém um snapshot do DOM no momento da falha, que é essencial para o diagnóstico.
 3.  **Use `page.pause()`:** Se precisar inspecionar a página em um ponto específico, adicione `await page.pause()` no seu helper para pausar a execução e abrir o inspetor do Playwright.
 4.  **Verifique as Camadas:**
-    *   O seletor está errado? → `constantes-teste.ts`.
+    *   O seletor está errado? → `constantes.ts`.
     *   A lógica de interação falhou? → Helper de `acoes/` ou `verificacoes/`.
     *   O fluxo está errado? → `spec.ts`.
 

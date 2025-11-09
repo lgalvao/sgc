@@ -8,33 +8,43 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
-import sgc.comum.erros.ErroNegocio;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
-import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapa;
+import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.dto.*;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.mappers.ProcessoDetalheMapper;
+import sgc.processo.dto.mappers.ProcessoMapper;
+import sgc.processo.erros.ErroProcesso;
+import sgc.processo.erros.ErroProcessoEmSituacaoInvalida;
+import sgc.processo.erros.ErroUnidadesNaoDefinidas;
 import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.sgrh.service.SgrhService;
-import sgc.sgrh.dto.PerfilDto;
 import sgc.processo.eventos.EventoProcessoFinalizado;
 import sgc.processo.eventos.EventoProcessoIniciado;
-import sgc.processo.modelo.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.TipoUnidade;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.dto.PerfilDto;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.TipoUnidade;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Set;
+import sgc.sgrh.model.Usuario;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +52,18 @@ import java.util.Optional;
 public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final UnidadeRepo unidadeRepo;
-    private final UnidadeProcessoRepo unidadeProcessoRepo;
     private final SubprocessoRepo subprocessoRepo;
     private final ApplicationEventPublisher publicadorEventos;
     private final ProcessoMapper processoMapper;
-    private final ProcessoDetalheMapperCustom processoDetalheMapperCustom;
+    private final ProcessoDetalheMapper processoDetalheMapper;
     private final MapaRepo mapaRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
+    private final SubprocessoMovimentacaoRepo movimentacaoRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
 
+    @SuppressWarnings("unused")
     public boolean checarAcesso(Authentication authentication, Long codProcesso) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
@@ -67,11 +77,10 @@ public class ProcessoService {
             return false;
         }
 
-        // Para gestores, verifica se a unidade dele participa do processo.
         List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()
                 .findFirst()
-                .map(sgc.sgrh.dto.PerfilDto::unidadeCodigo)
+                .map(sgc.sgrh.dto.PerfilDto::getUnidadeCodigo)
                 .orElse(null);
 
         if (codUnidadeUsuario == null) {
@@ -81,139 +90,92 @@ public class ProcessoService {
         return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidadeUsuario);
     }
 
-    /**
-     * Cria um novo processo de mapeamento de competências.
-     *
-     * @param requisicao DTO contendo os dados para a criação do processo.
-     * @return DTO do processo criado.
-     * @throws ConstraintViolationException se a descrição ou as unidades participantes não forem fornecidas.
-     * @throws ErroDominioNaoEncontrado     se alguma das unidades especificadas não existir (para tipos REVISAO ou DIAGNOSTICO).
-     */
     @Transactional
     public ProcessoDto criar(CriarProcessoReq requisicao) {
-        if (requisicao.descricao() == null || requisicao.descricao().isBlank()) {
+        if (requisicao.getDescricao() == null || requisicao.getDescricao().isBlank()) {
             throw new ConstraintViolationException("A descrição do processo é obrigatória.", null);
         }
-        if (requisicao.unidades().isEmpty()) {
+        if (requisicao.getUnidades().isEmpty()) {
             throw new ConstraintViolationException("Pelo menos uma unidade participante deve ser selecionada.", null);
         }
 
-        if (requisicao.tipo() == TipoProcesso.REVISAO || requisicao.tipo() == TipoProcesso.DIAGNOSTICO) {
-            for (Long codigoUnidade : requisicao.unidades()) {
-                if (unidadeRepo.findById(codigoUnidade).isEmpty()) {
-                    throw new ErroDominioNaoEncontrado("Unidade", codigoUnidade);
-                }
-            }
+        Set<Unidade> participantes = new HashSet<>();
+        for (Long codigoUnidade : requisicao.getUnidades()) {
+            participantes.add(unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
         }
 
-        Processo processo = new Processo()
-                .setDescricao(requisicao.descricao())
-                .setTipo(requisicao.tipo())
-                .setDataLimite(requisicao.dataLimiteEtapa1())
-                .setSituacao(SituacaoProcesso.CRIADO)
-                .setDataCriacao(LocalDateTime.now());
+        Processo processo = new Processo();
+        processo.setDescricao(requisicao.getDescricao());
+        processo.setTipo(requisicao.getTipo());
+        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setDataCriacao(LocalDateTime.now());
+        processo.setParticipantes(participantes);
 
         Processo processoSalvo = processoRepo.save(processo);
 
         publicadorEventos.publishEvent(new EventoProcessoCriado(this, processoSalvo.getCodigo()));
-        log.info("Processo '{}' (código {}) criado com sucesso.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
+        log.info("Processo '{}' (código {}) criado.", processoSalvo.getDescricao(), processoSalvo.getCodigo());
 
         return processoMapper.toDto(processoSalvo);
     }
 
-    /**
-     * Atualiza os dados de um processo existente.
-     * <p>
-     * A atualização só é permitida se o processo estiver na situação 'CRIADO'.
-     *
-     * @param codigo         O código do processo a ser atualizado.
-     * @param requisicao DTO contendo os novos dados do processo.
-     * @return DTO do processo atualizado.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
-     * @throws IllegalStateException    se o processo não estiver na situação 'CRIADO'.
-     */
     @Transactional
     public ProcessoDto atualizar(Long codigo, AtualizarProcessoReq requisicao) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser editados.");
         }
 
-        processo.setDescricao(requisicao.descricao());
-        processo.setTipo(requisicao.tipo());
-        processo.setDataLimite(requisicao.dataLimiteEtapa1());
+        processo.setDescricao(requisicao.getDescricao());
+        processo.setTipo(requisicao.getTipo());
+        processo.setDataLimite(requisicao.getDataLimiteEtapa1());
+
+        Set<Unidade> participantes = new HashSet<>();
+        for (Long codigoUnidade : requisicao.getUnidades()) {
+            participantes.add(unidadeRepo.findById(codigoUnidade)
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade)));
+        }
+        processo.setParticipantes(participantes);
 
         Processo processoAtualizado = processoRepo.save(processo);
-        log.info("Processo {} atualizado com sucesso.", codigo);
+        log.info("Processo {} atualizado.", codigo);
 
         return processoMapper.toDto(processoAtualizado);
     }
 
-    /**
-     * Remove um processo do sistema.
-     * <p>
-     * A remoção só é permitida se o processo estiver na situação 'CRIADO'.
-     *
-     * @param codigo O código do processo a ser removido.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
-     * @throws IllegalStateException    se o processo não estiver na situação 'CRIADO'.
-     */
     @Transactional
     public void apagar(Long codigo) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
             throw new IllegalStateException("Apenas processos na situação 'CRIADO' podem ser removidos.");
         }
 
         processoRepo.deleteById(codigo);
-        log.info("Processo {} removido com sucesso.", codigo);
+        log.info("Processo {} removido.", codigo);
     }
 
-    /**
-     * Busca um processo pelo seu código.
-     *
-     * @param codigo O código do processo.
-     * @return Um {@link Optional} contendo o {@link ProcessoDto} se encontrado,
-     * ou vazio caso contrário.
-     */
     @Transactional(readOnly = true)
     public Optional<ProcessoDto> obterPorId(Long codigo) {
         return processoRepo.findById(codigo).map(processoMapper::toDto);
     }
 
-    /**
-     * Obtém os detalhes completos de um processo, incluindo suas unidades
-     * participantes e o estado de seus subprocessos.
-     * <p>
-     * O acesso a este método é protegido e requer que o usuário seja 'ADMIN' ou
-     * tenha acesso à unidade participante do processo, conforme verificado por
-     * {@link #checarAcesso(Authentication, Long)}.
-     *
-     * @param codProcesso O código do processo a ser detalhado.
-     * @return DTO com os detalhes completos do processo.
-     * @throws ErroDominioNaoEncontrado se o processo não for encontrado.
-     */
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
     public ProcessoDetalheDto obterDetalhes(Long codProcesso) {
         Processo processo = processoRepo.findById(codProcesso)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codProcesso));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
-        List<UnidadeProcesso> listaUnidadesProcesso = unidadeProcessoRepo.findByCodProcesso(codProcesso);
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
 
-        return processoDetalheMapperCustom.toDetailDTO(processo, listaUnidadesProcesso, subprocessos);
+        return processoDetalheMapper.toDetailDTO(processo);
     }
 
-    /**
-     * Retorna uma lista de todos os processos que estão na situação 'FINALIZADO'.
-     *
-     * @return Uma {@link List} de {@link ProcessoDto}.
-     */
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarFinalizados() {
         return processoRepo.findBySituacao(SituacaoProcesso.FINALIZADO)
@@ -222,26 +184,35 @@ public class ProcessoService {
                 .toList();
     }
 
-    // Métodos de Iniciação
+    @Transactional(readOnly = true)
+    public List<ProcessoDto> listarAtivos() {
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)
+            .stream()
+            .map(processoMapper::toDto)
+            .toList();
+    }
+
     @Transactional
     public void iniciarProcessoMapeamento(Long codigo, List<Long> codsUnidades) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
-        if (codsUnidades == null || codsUnidades.isEmpty()) {
-            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de mapeamento.");
+        Set<Unidade> participantes = processo.getParticipantes();
+        if (participantes.isEmpty()) {
+            throw new ErroUnidadesNaoDefinidas("Não há unidades participantes definidas para este processo.");
         }
 
-        validarUnidadesNaoEmProcessosAtivos(codsUnidades);
+        List<Long> codigosUnidades = participantes.stream()
+                .map(Unidade::getCodigo)
+                .toList();
 
-        for (Long codigoUnidade : codsUnidades) {
-            Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+        validarUnidadesNaoEmProcessosAtivos(codigosUnidades);
 
+        for (Unidade unidade : participantes) {
             criarSubprocessoParaMapeamento(processo, unidade);
         }
 
@@ -252,7 +223,7 @@ public class ProcessoService {
                 processo.getCodigo(),
                 processo.getTipo().name(),
                 LocalDateTime.now(),
-                codsUnidades
+                codigosUnidades
         ));
 
         log.info("Processo de mapeamento {} iniciado para {} unidades.", codigo, codsUnidades.size());
@@ -261,14 +232,14 @@ public class ProcessoService {
     @Transactional
     public void iniciarProcessoRevisao(Long codigo, List<Long> codigosUnidades) {
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         if (processo.getSituacao() != SituacaoProcesso.CRIADO) {
-            throw new ErroNegocio("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroProcessoEmSituacaoInvalida("Apenas processos na situação 'CRIADO' podem ser iniciados.");
         }
 
         if (codigosUnidades == null || codigosUnidades.isEmpty()) {
-            throw new ErroNegocio("A lista de unidades é obrigatória para iniciar o processo de revisão.");
+            throw new ErroUnidadesNaoDefinidas("A lista de unidades é obrigatória para iniciar o processo de revisão.");
         }
 
         validarUnidadesComMapasVigentes(codigosUnidades);
@@ -276,7 +247,7 @@ public class ProcessoService {
 
         for (Long codigoUnidade : codigosUnidades) {
             Unidade unidade = unidadeRepo.findById(codigoUnidade)
-                    .orElseThrow(() -> new ErroDominioNaoEncontrado("Unidade", codigoUnidade));
+                    .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade", codigoUnidade));
 
             criarSubprocessoParaRevisao(processo, unidade);
         }
@@ -299,7 +270,7 @@ public class ProcessoService {
         log.info("Iniciando finalização do processo: código={}", codigo);
 
         Processo processo = processoRepo.findById(codigo)
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Processo", codigo));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
 
         validarFinalizacaoProcesso(processo);
         tornarMapasVigentes(processo);
@@ -308,17 +279,21 @@ public class ProcessoService {
         processo.setDataFinalizacao(LocalDateTime.now());
 
         processoRepo.save(processo);
-        processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, unidadeProcessoRepo.findByCodProcesso(processo.getCodigo()));
+        processoNotificacaoService.enviarNotificacoesDeFinalizacao(processo, new ArrayList<>(processo.getParticipantes()));
         publicadorEventos.publishEvent(new EventoProcessoFinalizado(this, processo.getCodigo()));
 
-        log.info("Processo finalizado com sucesso: código={}", codigo);
+        log.info("Processo finalizado: código={}", codigo);
     }
 
-    // Métodos Privados Auxiliares
     private void validarUnidadesNaoEmProcessosAtivos(List<Long> codsUnidades) {
-        List<Long> unidadesProcesso = unidadeProcessoRepo.findUnidadesInProcessosAtivos(codsUnidades);
-        if (!unidadesProcesso.isEmpty()) {
-            throw new ErroProcesso("As seguintes unidades já participam de outro processo ativo: %s".formatted(unidadesProcesso));
+        List<Long> unidadesBloqueadas = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+            .flatMap(p -> p.getParticipantes().stream())
+            .map(Unidade::getCodigo)
+            .filter(codsUnidades::contains)
+            .distinct()
+            .toList();
+        if (!unidadesBloqueadas.isEmpty()) {
+            throw new ErroProcesso("As seguintes unidades já participam de outro processo ativo: %s".formatted(unidadesBloqueadas));
         }
     }
 
@@ -338,43 +313,25 @@ public class ProcessoService {
         }
     }
 
-    private UnidadeProcesso criarSnapshotUnidadeProcesso(Processo processo, Unidade unidade) {
-        return new UnidadeProcesso(
-                processo.getCodigo(),
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                unidade.getTitular() != null ? String.valueOf(unidade.getTitular().getTituloEleitoral()) : null,
-                unidade.getTipo(),
-                "PENDENTE",
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
-        );
-    }
-
     private void criarSubprocessoParaMapeamento(Processo processo, Unidade unidade) {
-        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
-        unidadeProcessoRepo.save(unidadeProcesso);
-
         if (TipoUnidade.OPERACIONAL.equals(unidade.getTipo()) || TipoUnidade.INTEROPERACIONAL.equals(unidade.getTipo())) {
             Mapa mapa = mapaRepo.save(new Mapa());
             Subprocesso subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
             Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado"));
+            movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo iniciado", null));
         }
     }
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
-                .orElseThrow(() -> new ErroDominioNaoEncontrado("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
 
-        Long codMapaVigente = unidadeMapa.getMapaVigenteCodigo();
+        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
-        UnidadeProcesso unidadeProcesso = criarSnapshotUnidadeProcesso(processo, unidade);
-        unidadeProcessoRepo.save(unidadeProcesso);
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
-        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado"));
+        movimentacaoRepo.save(new Movimentacao(subprocessoSalvo, null, unidade, "Processo de revisão iniciado", null));
     }
 
     private void validarFinalizacaoProcesso(Processo processo) {
@@ -410,20 +367,73 @@ public class ProcessoService {
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
 
         for (Subprocesso subprocesso : subprocessos) {
-            Long codigoUnidade = Optional.ofNullable(subprocesso.getUnidade()).map(Unidade::getCodigo)
+            Unidade unidade = Optional.ofNullable(subprocesso.getUnidade())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem unidade associada.".formatted(subprocesso.getCodigo())));
 
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
-                    .orElse(new UnidadeMapa(codigoUnidade));
-
-            unidadeMapa.setMapaVigenteCodigo(mapaDoSubprocesso.getCodigo());
+            UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
+                    .orElse(new UnidadeMapa());
+            unidadeMapa.setUnidade(unidade);
+            unidadeMapa.setMapaVigente(mapaDoSubprocesso);
             unidadeMapa.setDataVigencia(LocalDateTime.now());
             unidadeMapaRepo.save(unidadeMapa);
-            log.debug("Mapa vigente para unidade {} definido como mapa {}", codigoUnidade, mapaDoSubprocesso.getCodigo());
+            log.debug("Mapa vigente para unidade {} definido como mapa {}", unidade.getCodigo(), mapaDoSubprocesso.getCodigo());
         }
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
+    }
+
+    public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
+        TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
+
+        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
+            .filter(p -> p.getTipo() == tipoProcesso)
+            .flatMap(p -> p.getParticipantes().stream())
+            .map(Unidade::getCodigo)
+            .distinct()
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
+    public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
+
+        if (isAdmin) {
+            return subprocessos.stream()
+                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_AJUSTADO)
+                .map(this::toSubprocessoElegivelDto)
+                .toList();
+        }
+
+        List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
+        Long codUnidadeUsuario = perfis.stream()
+            .findFirst()
+            .map(PerfilDto::getUnidadeCodigo)
+            .orElse(null);
+
+        if (codUnidadeUsuario == null) {
+            return List.of();
+        }
+
+        return subprocessos.stream()
+            .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
+            .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO)
+            .map(this::toSubprocessoElegivelDto)
+            .toList();
+    }
+
+    private SubprocessoElegivelDto toSubprocessoElegivelDto(Subprocesso sp) {
+        return SubprocessoElegivelDto.builder()
+            .codSubprocesso(sp.getCodigo())
+            .unidadeNome(sp.getUnidade().getNome())
+            .unidadeSigla(sp.getUnidade().getSigla())
+            .situacao(sp.getSituacao())
+            .build();
     }
 }

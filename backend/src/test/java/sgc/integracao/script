@@ -1,0 +1,1 @@
+gradle :backend:test 2>&1 | Where-Object { $_ -notmatch "at java\.base/" } | Out-File -FilePath "test-results.txt"

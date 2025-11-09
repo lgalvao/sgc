@@ -1,0 +1,168 @@
+package sgc.util;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.comum.model.EntidadeBase;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Controller com endpoints auxiliares para testes E2E.
+ * <p>
+ * ⚠️ ATENÇÃO: Ativo APENAS no perfil 'e2e'.
+ * Estes endpoints permitem operações destrutivas para facilitar testes idempotentes.
+ */
+@RestController
+@RequestMapping("/api/e2e")
+@RequiredArgsConstructor
+@Profile("e2e")
+public class E2eTestController {
+    private final ProcessoRepo processoRepo;
+    private final AlertaRepo alertaRepo;
+    private final AlertaUsuarioRepo alertaUsuarioRepo;
+    private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
+
+    /**
+     * Deleta um processo por código, removendo também alertas e subprocessos relacionados.
+     * Endpoint direto para testes e2e.
+     */
+    @PostMapping("/processos/{codigo}/apagar")
+    @Transactional
+    public ResponseEntity<Void> apagarProcessoPorCodigo(@PathVariable Long codigo) {
+        apagarProcessosComAlertasESubprocessos(List.of(codigo));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Remove FORÇADAMENTE um processo, independente da situação.
+     * Deleta alertas relacionados antes de deletar o processo.
+     */
+    @PostMapping("/processos/{codigo}/forcar-exclusao")
+    @Transactional
+    public ResponseEntity<Void> forcarExclusaoProcesso(@PathVariable Long codigo) {
+        apagarProcessosComAlertasESubprocessos(List.of(codigo));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Remove FORÇADAMENTE todos os processos que contenham a unidade especificada.
+     * Usa código de unidade (ex: STIC = 2).
+     */
+    @PostMapping("/processos/unidade/{codigoUnidade}/limpar")
+    @Transactional
+    public ResponseEntity<Void> forcarExclusaoProcessosComUnidade(@PathVariable Long codigoUnidade) {
+        List<Processo> processos = processoRepo.findDistinctByParticipantes_CodigoIn(List.of(codigoUnidade));
+        var codigosProcesso = processos.stream()
+                .map(Processo::getCodigo)
+                .distinct()
+                .toList();
+
+        if (!codigosProcesso.isEmpty()) {
+            apagarProcessosComAlertasESubprocessos(codigosProcesso);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Remove FORÇADAMENTE todos os processos com situação EM_ANDAMENTO.
+     * Evita que testes deixem "lixo" que bloqueie testes subsequentes.
+     */
+    @PostMapping("/limpar-processos-em-andamento")
+    @Transactional
+    public ResponseEntity<Void> limparProcessosEmAndamento() {
+        var processosEmAndamento = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+        var codigosProcesso = processosEmAndamento.stream()
+                .map(EntidadeBase::getCodigo)
+                .toList();
+
+        if (!codigosProcesso.isEmpty()) {
+            apagarProcessosComAlertasESubprocessos(codigosProcesso);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Reset completo: remove TODOS os processos do sistema.
+     * Útil para iniciar suíte de testes com banco limpo.
+     */
+    @PostMapping("/reset")
+    @Transactional
+    public ResponseEntity<Void> resetCompleto() {
+        alertaUsuarioRepo.deleteAll();
+        alertaRepo.deleteAll();
+
+        movimentacaoRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        processoRepo.deleteAll();
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Reset + Reseed: Remove todos os processos e recarrega dados do import.sql.
+     * ⚠️ IMPORTANTE: O Hibernate só executa import.sql automaticamente no startup.
+     * Este endpoint **não** recarrega os dados - apenas limpa o banco.
+     * <p>
+     * Para testes idempotentes, o backend deve ser reiniciado entre execuções
+     * OU os testes devem criar seus próprios dados de teste.
+     */
+    @PostMapping("/reset-and-reseed")
+    @Transactional
+    public ResponseEntity<String> resetAndReseed() {
+        resetCompleto();
+        return ResponseEntity.ok("Banco resetado. ATENÇÃO: Dados do import.sql não são recarregados automaticamente. Reinicie o backend para recarregar.");
+    }
+
+    /**
+     * DEBUG: Verifica dados da tabela UNIDADE_PROCESSO
+     */
+    @GetMapping("/debug/unidade-processo/{processoId}")
+    public ResponseEntity<List<Map<String, Object>>> debugUnidadeProcesso(@PathVariable Long processoId) {
+        Processo processo = processoRepo.findById(processoId).orElse(null);
+        if (processo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Map<String, Object>> result = processo.getParticipantes().stream()
+                .map(up -> Map.of(
+                        "processo_codigo", processo.getCodigo(),
+                        "unidade_codigo", up.getCodigo(),
+                        "nome", up.getNome(),
+                        "sigla", (Object) up.getSigla()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+    private void apagarProcessosComAlertasESubprocessos(List<Long> codigosProcesso) {
+        var alertaIds = alertaRepo.findIdsByProcessoCodigoIn(codigosProcesso);
+        if (!alertaIds.isEmpty()) {
+            alertaUsuarioRepo.deleteByIdAlertaCodigoIn(alertaIds);
+        }
+        alertaRepo.deleteByProcessoCodigoIn(codigosProcesso);
+
+        codigosProcesso.forEach(codProcesso -> {
+            subprocessoRepo.findByProcessoCodigo(codProcesso).forEach(sp -> {
+                movimentacaoRepo.findBySubprocessoCodigo(sp.getCodigo()).forEach(mv -> movimentacaoRepo.deleteById(mv.getCodigo()));
+                subprocessoRepo.deleteById(sp.getCodigo());
+            });
+            processoRepo.deleteById(codProcesso);
+        });
+    }
+}

@@ -7,15 +7,15 @@
     "type": "git",
     "url": "git+https://github.com/lgalvao/sgc.git"
   },
-  "license": "ISC",
   "author": "Leonardo Galvao",
-  "type": "commonjs",
-  "main": "index.js",
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.9.2",
     "playwright": "^1.56.1",
-    "@playwright/test": "^1.56.1"
+    "typescript": "^5.9.3"
   }
 }

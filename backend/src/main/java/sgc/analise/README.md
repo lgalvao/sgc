@@ -6,7 +6,7 @@ Este pacote é responsável por registrar o **histórico de decisões** tomadas 
 A implementação utiliza um **modelo de dados genérico**, onde uma única entidade `Analise` é usada para registrar todos os tipos de análise. Um enum, `TipoAnalise`, é usado para diferenciar os contextos (ex: `CADASTRO` vs. `VALIDACAO`).
 
 ## Arquitetura e Componentes
-O `AnaliseService` é invocado pelo `SubprocessoService` sempre que uma transição de estado que requer uma justificativa ocorre (ex: `devolverCadastro`). A API exposta pelo `AnaliseControle` permite ao frontend registrar novas análises e consultar o histórico de um subprocesso, usando endpoints distintos para cada tipo de análise.
+O `AnaliseService` é invocado pelo `SubprocessoService` sempre que uma transição de estado que requer uma justificativa ocorre (ex: `devolverCadastro`). A API exposta pelo `AnaliseController` permite ao frontend registrar novas análises e consultar o histórico de um subprocesso, usando endpoints distintos para cada tipo de análise.
 
 ```mermaid
 graph TD
@@ -16,7 +16,7 @@ graph TD
 
     subgraph "Módulo de Análise"
         Service(AnaliseService)
-        Controle(AnaliseControle)
+        Controle(AnaliseController)
         subgraph "Modelo de Dados Genérico"
             Analise[Analise]
             TipoAnalise[TipoAnalise Enum]
@@ -39,10 +39,10 @@ graph TD
 ## Componentes Principais
 - **`AnaliseService`**: Centraliza a lógica de negócio para criar os registros de análise, independentemente do tipo. É chamado por serviços de nível superior para garantir que as ações de workflow sejam devidamente auditadas.
 - **`AnaliseControle`**: Expõe endpoints REST distintos para o frontend criar e consultar o histórico de cada tipo de análise de um subprocesso.
-  - `GET /api/subprocessos/{id}/analises-cadastro`
-  - `POST /api/subprocessos/{id}/analises-cadastro`
-  - `GET /api/subprocessos/{id}/analises-validacao`
-  - `POST /api/subprocessos/{id}/analises-validacao`
+  - `GET /api/subprocessos/{codigo}/analises-cadastro`
+  - `POST /api/subprocessos/{codigo}/analises-cadastro`
+  - `GET /api/subprocessos/{codigo}/analises-validacao`
+  - `POST /api/subprocessos/{codigo}/analises-validacao`
 - **`Analise`**: Entidade JPA genérica que modela um registro de análise. Está vinculada a um `Subprocesso` e armazena a ação realizada, as observações, o autor e o `TipoAnalise`.
 - **`AnaliseRepo`**: Repositório Spring Data para a persistência da entidade `Analise`.
 - **`TipoAnalise`**: Enum que diferencia os contextos de análise (`CADASTRO`, `VALIDACAO`).

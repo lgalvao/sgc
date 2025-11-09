@@ -1,6 +1,6 @@
-import { initPinia } from '@/test-utils/helpers';
-import { useConfiguracoesStore } from '../configuracoes';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {initPinia} from '@/test-utils/helpers';
+import {useConfiguracoesStore} from '../configuracoes';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 // Mock do localStorage para isolar os testes
 const localStorageMock = (() => {

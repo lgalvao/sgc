@@ -8,19 +8,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDetalheMapperCustom;
 import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.*;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
+import sgc.processo.dto.mappers.ProcessoDetalheMapperCustom;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,9 +35,6 @@ public class ProcessoServiceDetalhesTest {
 
     @Mock
     private ProcessoRepo processoRepo;
-
-    @Mock
-    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
@@ -56,17 +56,12 @@ public class ProcessoServiceDetalhesTest {
         when(p.getDataLimite()).thenReturn(dataLimite);
         when(p.getDataFinalizacao()).thenReturn(null);
 
-        UnidadeProcesso up = new UnidadeProcesso();
-        up.setCodigo(10L);
-        up.setNome(DIRETORIA_X);
-        up.setSigla("DX");
-        up.setSituacao("PENDENTE");
-        up.setCodUnidadeSuperior(null);
-
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("DX");
         unidade.setNome(DIRETORIA_X);
+
+        when(p.getParticipantes()).thenReturn(Set.of(unidade));
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -102,10 +97,9 @@ public class ProcessoServiceDetalhesTest {
                 .build();
 
         when(processoRepo.findById(1L)).thenReturn(Optional.of(p));
-        when(unidadeProcessoRepo.findByCodProcesso(1L)).thenReturn(List.of(up));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
         when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigo(1L, 10L)).thenReturn(true);
-        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p), anyList(), anyList()))
+        Mockito.lenient().when(processoDetalheMapperCustom.toDetailDTO(eq(p)))
                 .thenReturn(processoDetalheDTO);
 
     }

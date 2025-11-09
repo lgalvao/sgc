@@ -11,27 +11,31 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.modelo.*;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.service.SgrhService;
-import sgc.sgrh.modelo.Usuario;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.PerfilDto;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.service.SgrhService;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -46,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-06: Detalhar processo")
 public class CDU06IntegrationTest {
-    private static final long TEST_USER_ID = 123456789L;
+    private static final String TEST_USER_ID = "123456789";
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,9 +63,6 @@ public class CDU06IntegrationTest {
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;
-
-    @Autowired
-    private UnidadeProcessoRepo unidadeProcessoRepo;
 
     @MockitoBean
     private SgrhService sgrhService;
@@ -90,26 +91,17 @@ public class CDU06IntegrationTest {
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
-        // Mock crucial para a verificação de segurança
         when(sgrhService.buscarPerfisUsuario(anyString()))
                 .thenReturn(List.of(new PerfilDto(String.valueOf(TEST_USER_ID), unidade.getCodigo(), unidade.getNome(), perfil.name())));
     }
 
-    private UnidadeProcesso createUnidadeProcesso(Unidade unidade, Processo processo) {
-        UnidadeProcesso up = new UnidadeProcesso();
-        up.setCodProcesso(processo.getCodigo());
-        up.setCodUnidade(unidade.getCodigo());
-        up.setNome(unidade.getNome());
-        up.setSigla(unidade.getSigla());
-        return up;
-    }
-
     @Test
     @WithMockAdmin
-    @DisplayName("Deve detalhar processo com sucesso para Admin")
+    @DisplayName("Deve detalhar processo para Admin")
     void testDetalharProcesso_sucesso() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Teste", "UT"));
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(100L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
@@ -129,8 +121,9 @@ public class CDU06IntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve mostrar 'podeFinalizar' como true para Admin com subprocessos homologados")
     void testPodeFinalizar_true_comAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Admin", "UA"));
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(101L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
@@ -141,8 +134,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeFinalizar' como false para não Admin")
     void testPodeFinalizar_false_semAdmin() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Chefe", "UC"));
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(102L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.CHEFE);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_HOMOLOGADO, processo.getDataLimite()));
 
@@ -154,8 +148,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
     void testPodeHomologarCadastro_true() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Gestor", "UG"));
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO, processo.getDataLimite()));
 
@@ -167,8 +162,9 @@ public class CDU06IntegrationTest {
     @Test
     @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
     void testPodeHomologarMapa_true() throws Exception {
-        Unidade unidade = unidadeRepo.save(new Unidade("Unidade Gestor", "UG"));
-        unidadeProcessoRepo.save(createUnidadeProcesso(unidade, processo));
+        Unidade unidade = unidadeRepo.findById(9L).orElseThrow();
+        processo.setParticipantes(new HashSet<>(Set.of(unidade)));
+        processoRepo.save(processo);
         setupSecurityContext(unidade, Perfil.GESTOR);
         subprocessoRepo.save(new Subprocesso(processo, unidade, null, SituacaoSubprocesso.MAPA_VALIDADO, processo.getDataLimite()));
 

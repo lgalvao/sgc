@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { useApi } from '../useApi';
+import {describe, expect, it, vi} from 'vitest';
+import {useApi} from '../useApi';
 
 describe('useApi', () => {
   it('should set isLoading to true while the api call is in progress', async () => {

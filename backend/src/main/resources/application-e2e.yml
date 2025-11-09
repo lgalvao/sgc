@@ -1,0 +1,55 @@
+# Configuração para testes E2E (End-to-End) com Playwright
+# Usa H2 em memória com dados de teste carregados do data.sql
+server:
+  port: 10000
+  error:
+    include-exception: true
+    include-stacktrace: always
+    whitelabel.enabled: true
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:sgcdb;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS SGC
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      schema-locations:
+      platform: h2
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      cors:
+        allowed-origins: "*"
+  health:
+    mail:
+      enabled: false
+
+logging:
+  level:
+    sgc: INFO
+    sgc.notificacao: WARN
+    org.springframework: INFO
+    org.springframework.jdbc: ERROR
+    org.springframework.boot.autoconfigure: ERROR
+    org.hibernate.SQL: INFO
+    org.springframework.mail: ERROR
+    org.springframework.boot.actuate.mail: ERROR
+  file:
+    name: sgc_e2e.log

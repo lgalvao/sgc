@@ -117,6 +117,7 @@
     <!-- Modal de Criar Nova Competência -->
     <div
       v-if="mostrarModalCriarNovaCompetencia"
+      data-testid="criar-competencia-modal"
       aria-labelledby="criarCompetenciaModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -230,6 +231,7 @@
     <!-- Modal de Disponibilizar -->
     <div
       v-if="mostrarModalDisponibilizar"
+      data-testid="disponibilizar-modal"
       aria-labelledby="disponibilizarModalLabel"
       aria-modal="true"
       class="modal fade show"
@@ -275,7 +277,7 @@
               <textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
-                data-testid="input-observacoes"
+                data-testid="input-observacoes-disponibilizacao"
                 class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
@@ -373,7 +375,7 @@
     />
 
     <ImpactoMapaModal
-      :id-processo="idProcesso"
+      :id-processo="codProcesso"
       :sigla-unidade="siglaUnidade"
       :mostrar="mostrarModalImpacto"
       @fechar="fecharModalImpacto"
@@ -392,8 +394,8 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
 import {useRevisaoStore} from '@/stores/revisao'
 import {useUnidadesStore} from '@/stores/unidades'
-import { usePerfil } from '@/composables/usePerfil'
-import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade, Servidor, Subprocesso} from '@/types/tipos'
+import {usePerfil} from '@/composables/usePerfil'
+import {Atividade, Competencia, Perfil, Servidor, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
@@ -408,7 +410,7 @@ const unidadesStore = useUnidadesStore()
 const {unidades} = storeToRefs(unidadesStore)
 const { servidorLogado } = usePerfil()
 
-const idProcesso = computed(() => Number(route.params.idProcesso))
+const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
 
 const subprocesso = computed(() => {
@@ -462,7 +464,7 @@ const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as U
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(idProcesso.value);
+  await processosStore.fetchProcessoDetalhe(codProcesso.value);
   if (codSubrocesso.value) {
     await mapasStore.fetchMapaCompleto(codSubrocesso.value as number);
   }
@@ -639,92 +641,19 @@ function formatarData(data: string): string {
   return `${dia}/${mes}/${ano}`
 }
 
-function disponibilizarMapa() {
-  if (!mapaCompleto.value || !unidade.value) {
-    notificacaoDisponibilizacao.value = 'Erro: Mapa ou unidade não encontrados.'
-    return
+async function disponibilizarMapa() {
+  if (!codSubrocesso.value) return
+
+  try {
+    await mapasStore.disponibilizarMapa(codSubrocesso.value, {
+      dataLimite: dataLimiteValidacao.value,
+      observacoes: observacoesDisponibilizacao.value,
+    })
+    fecharModalDisponibilizar()
+    // TODO: Adicionar redirecionamento para o painel
+  } catch (error) {
+    // O erro já é tratado e notificado pelo store
   }
-
-  const currentUnidade = unidade.value;
-
-  // Validações conforme plano
-  const competenciasSemAtividades = mapaCompleto.value.competencias.filter(comp => comp.atividadesAssociadas.length === 0);
-  if (competenciasSemAtividades.length > 0) {
-    notificacaoDisponibilizacao.value = `Erro: As seguintes competências não têm atividades associadas: ${competenciasSemAtividades.map(c => c.descricao).join(', ')}`;
-    return;
-  }
-
-  const atividadesIds = atividades.value.map(a => a.codigo);
-  const atividadesAssociadas = mapaCompleto.value.competencias.flatMap(comp => comp.atividadesAssociadas);
-  const atividadesNaoAssociadas = atividadesIds.filter(id => !atividadesAssociadas.includes(id));
-
-  if (atividadesNaoAssociadas.length > 0) {
-    const descricoesNaoAssociadas = atividadesNaoAssociadas.map(id => descricaoAtividade(id)).join(', ');
-    notificacaoDisponibilizacao.value = `Erro: As seguintes atividades não estão associadas a nenhuma competência: ${descricoesNaoAssociadas}`;
-    return;
-  }
-
-  // Alterar situação do subprocesso para 'Mapa disponibilizado' (CDU-17)
-  const sub = subprocesso.value;
-  if (sub) {
-    sub.situacaoSubprocesso = SituacaoSubprocesso.MAPEAMENTO_CONCLUIDO;
-    sub.dataLimite = dataLimiteValidacao.value;
-    if (observacoesDisponibilizacao.value) {
-      // O DTO não tem mais um campo de observações direto, isso precisaria ser tratado
-      // em uma movimentação ou em um campo específico se existir no backend.
-    }
-
-    // Registrar movimentação
-    const MOCK_SERVER: Servidor = {
-      ...servidorLogado.value,
-      unidade: currentUnidade
-    }
-    const MOCK_SUBPROCESSO: Subprocesso = {
-      ...sub,
-      codigo: sub.codSubprocesso,
-      unidade: currentUnidade,
-      situacao: sub.situacaoSubprocesso,
-      dataFimEtapa1: '',
-      dataLimiteEtapa2: '',
-      atividades: []
-    }
-    processosStore.addMovement({
-      subprocesso: MOCK_SUBPROCESSO,
-      usuario: MOCK_SERVER,
-      unidadeOrigem: {codigo: 0, nome: 'SEDOC', sigla: 'SEDOC'},
-      unidadeDestino: currentUnidade,
-      descricao: 'Disponibilização do mapa de competências'
-    });
-  }
-
-
-  // Simular notificações por e-mail
-  const notificacoesStore = useNotificacoesStore();
-  notificacoesStore.email(
-      'SGC: Mapa de competências disponibilizado',
-      `Responsável pela ${currentUnidade.sigla}`,
-      `Prezado(a) responsável pela ${currentUnidade.sigla},\n\nO mapa de competências foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.\n\nAcompanhe o processo no sistema SGC.`
-  );
-
-  // Simular notificações para superiores
-  notificacoesStore.email(
-      `SGC: Mapa de competências disponibilizado - ${currentUnidade.sigla}`,
-      'Unidades superiores',
-      `Prezado(a) responsável,\n\nO mapa de competências da ${currentUnidade.sigla} foi disponibilizado para validação.\n\nAcompanhe o processo no sistema SGC.`
-  );
-
-  // A criação de alertas agora é responsabilidade do backend
-
-  // Excluir sugestões e histórico de análise (CDU-17 item 19)
-  // A ser implementado no backend
-
-  notificacaoDisponibilizacao.value = `Mapa de competências da unidade ${currentUnidade.sigla} foi disponibilizado para validação até ${formatarData(dataLimiteValidacao.value)}.`;
-
-  // Fechar modal e redirecionar para Painel
-  setTimeout(() => {
-    fecharModalDisponibilizar();
-    // Aqui seria o redirecionamento para Painel, mas como é simulação, apenas fechamos o modal
-  }, 2000);
 }
 
 function fecharModalDisponibilizar() {

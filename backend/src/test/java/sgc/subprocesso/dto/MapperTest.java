@@ -6,15 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,8 +29,10 @@ class MapperTest {
 
     @Mock
     private ProcessoRepo processoRepo;
+
     @Mock
     private UnidadeRepo unidadeRepo;
+
     @Mock
     private MapaRepo mapaRepo;
 
@@ -147,13 +149,13 @@ class MapperTest {
         MovimentacaoDto dto = movimentacaoMapper.toDTO(entity);
 
         assertNotNull(dto);
-        assertEquals(1L, dto.codigo());
-        assertEquals(100L, dto.unidadeOrigemCodigo());
-        assertEquals("ORIGEM", dto.unidadeOrigemSigla());
-        assertEquals("Unidade Origem", dto.unidadeOrigemNome());
-        assertEquals(200L, dto.unidadeDestinoCodigo());
-        assertEquals("DESTINO", dto.unidadeDestinoSigla());
-        assertEquals("Unidade Destino", dto.unidadeDestinoNome());
-        assertEquals("Descrição da movimentação", dto.descricao());
+        assertEquals(1L, dto.getCodigo());
+        assertEquals(100L, dto.getUnidadeOrigemCodigo());
+        assertEquals("ORIGEM", dto.getUnidadeOrigemSigla());
+        assertEquals("Unidade Origem", dto.getUnidadeOrigemNome());
+        assertEquals(200L, dto.getUnidadeDestinoCodigo());
+        assertEquals("DESTINO", dto.getUnidadeDestinoSigla());
+        assertEquals("Unidade Destino", dto.getUnidadeDestinoNome());
+        assertEquals("Descrição da movimentação", dto.getDescricao());
     }
 }

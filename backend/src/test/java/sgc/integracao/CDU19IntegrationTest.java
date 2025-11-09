@@ -7,41 +7,38 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.modelo.Alerta;
-import sgc.alerta.modelo.AlertaRepo;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.CompetenciaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.subprocesso.model.*;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import sgc.integracao.mocks.TestSecurityConfig;
-import sgc.integracao.mocks.TestThymeleafConfig;
-import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,6 +64,14 @@ class CDU19IntegrationTest {
     private AlertaRepo alertaRepo;
     @Autowired
     private MapaRepo mapaRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
+    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -74,28 +79,21 @@ class CDU19IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Limpar dados
         movimentacaoRepo.deleteAll();
         alertaRepo.deleteAll();
+        competenciaRepo.deleteAll();
+        atividadeRepo.deleteAll();
+        conhecimentoRepo.deleteAll();
+        unidadeMapaRepo.deleteAll();
         subprocessoRepo.deleteAll();
         mapaRepo.deleteAll();
         processoRepo.deleteAll();
-        usuarioRepo.deleteAll();
-        unidadeRepo.deleteAll();
 
-        // Criar Unidades
-        unidadeSuperior = unidadeRepo.save(new Unidade("Unidade Superior", "UNISUP"));
-        unidade = new Unidade("Unidade Subprocesso", "UNISUB");
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidade = unidadeRepo.findById(9L).orElseThrow();
 
-        // Criar Usuário Chefe e associar à unidade
-        Usuario chefe = new Usuario(333333333333L, "Chefe", "chefe@email.com", "1234", unidade, Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
-        unidade.setTitular(chefe);
-        unidadeRepo.save(unidade);
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
 
-        // Criar Processo, Mapa e Subprocesso
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
         Mapa mapa = mapaRepo.save(new Mapa());
         subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());
@@ -110,17 +108,14 @@ class CDU19IntegrationTest {
         @DisplayName("Deve apresentar sugestões, alterar status, mas não criar movimentação ou alerta")
         @WithMockChefe
         void testApresentarSugestoes_Sucesso() throws Exception {
-            // Cenário
             String sugestoes = "Minha sugestão de teste";
 
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/apresentar-sugestoes", subprocesso.getCodigo())
                     .with(csrf())
                     .contentType("application/json")
                     .content("{\"sugestoes\": \"" + sugestoes + "\"}"))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_COM_SUGESTOES);
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
@@ -143,12 +138,10 @@ class CDU19IntegrationTest {
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")
         @WithMockChefe
         void testValidarMapa_Sucesso() throws Exception {
-            // Ação
             mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
                     .with(csrf()))
                 .andExpect(status().isOk());
 
-            // Verificações
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_VALIDADO);
 
@@ -160,7 +153,7 @@ class CDU19IntegrationTest {
 
             List<Alerta> alertas = alertaRepo.findAll();
             assertThat(alertas).hasSize(1);
-            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da UNISUB aguardando análise");
+            assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da SEDIA aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         }
     }

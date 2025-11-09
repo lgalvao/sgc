@@ -1,5 +1,12 @@
 package sgc.mapa.dto;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -7,38 +14,44 @@ import java.util.List;
  * no mapa de competências devido a alterações no cadastro de atividades.
  * <p>
  * CDU-12 - Verificar impactos no mapa de competências
- * @param temImpactos               Indica se há algum impacto.
- * @param totalAtividadesInseridas  Total de atividades inseridas.
- * @param totalAtividadesRemovidas  Total de atividades removidas.
- * @param totalAtividadesAlteradas  Total de atividades alteradas.
- * @param totalCompetenciasImpactadas Total de competências impactadas.
- * @param atividadesInseridas       Lista de atividades inseridas.
- * @param atividadesRemovidas       Lista de atividades removidas.
- * @param atividadesAlteradas       Lista de atividades alteradas.
- * @param competenciasImpactadas    Lista de competências impactadas.
  */
-public record ImpactoMapaDto(
-    boolean temImpactos,
-    int totalAtividadesInseridas,
-    int totalAtividadesRemovidas,
-    int totalAtividadesAlteradas,
-    int totalCompetenciasImpactadas,
-    List<AtividadeImpactadaDto> atividadesInseridas,
-    List<AtividadeImpactadaDto> atividadesRemovidas,
-    List<AtividadeImpactadaDto> atividadesAlteradas,
-    List<CompetenciaImpactadaDto> competenciasImpactadas
-) {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // to encourage use of factory methods
+public class ImpactoMapaDto {
 
-    // Compact constructor for defensive copying to ensure true immutability
-    public ImpactoMapaDto {
-        atividadesInseridas = List.copyOf(atividadesInseridas);
-        atividadesRemovidas = List.copyOf(atividadesRemovidas);
-        atividadesAlteradas = List.copyOf(atividadesAlteradas);
-        competenciasImpactadas = List.copyOf(competenciasImpactadas);
+    private boolean temImpactos;
+    private int totalAtividadesInseridas;
+    private int totalAtividadesRemovidas;
+    private int totalAtividadesAlteradas;
+    private int totalCompetenciasImpactadas;
+    private List<AtividadeImpactadaDto> atividadesInseridas;
+    private List<AtividadeImpactadaDto> atividadesRemovidas;
+    private List<AtividadeImpactadaDto> atividadesAlteradas;
+    private List<CompetenciaImpactadaDto> competenciasImpactadas;
+
+    // Custom setters for defensive copying
+    public void setAtividadesInseridas(List<AtividadeImpactadaDto> atividadesInseridas) {
+        this.atividadesInseridas = (atividadesInseridas == null) ? List.of() : List.copyOf(atividadesInseridas);
+    }
+
+    public void setAtividadesRemovidas(List<AtividadeImpactadaDto> atividadesRemovidas) {
+        this.atividadesRemovidas = (atividadesRemovidas == null) ? List.of() : List.copyOf(atividadesRemovidas);
+    }
+
+    public void setAtividadesAlteradas(List<AtividadeImpactadaDto> atividadesAlteradas) {
+        this.atividadesAlteradas = (atividadesAlteradas == null) ? List.of() : List.copyOf(atividadesAlteradas);
+    }
+
+    public void setCompetenciasImpactadas(List<CompetenciaImpactadaDto> competenciasImpactadas) {
+        this.competenciasImpactadas = (competenciasImpactadas == null) ? List.of() : List.copyOf(competenciasImpactadas);
     }
 
     /**
      * Factory method for creating an ImpactoMapaDto with no impacts.
+     *
      * @return An empty ImpactoMapaDto.
      */
     public static ImpactoMapaDto semImpacto() {
@@ -57,15 +70,15 @@ public record ImpactoMapaDto(
     ) {
         boolean temImpactos = !atividadesInseridas.isEmpty() || !atividadesRemovidas.isEmpty() || !atividadesAlteradas.isEmpty() || !competenciasImpactadas.isEmpty();
         return new ImpactoMapaDto(
-            temImpactos,
-            atividadesInseridas.size(),
-            atividadesRemovidas.size(),
-            atividadesAlteradas.size(),
-            competenciasImpactadas.size(),
-            atividadesInseridas,
-            atividadesRemovidas,
-            atividadesAlteradas,
-            competenciasImpactadas
+                temImpactos,
+                atividadesInseridas.size(),
+                atividadesRemovidas.size(),
+                atividadesAlteradas.size(),
+                competenciasImpactadas.size(),
+                List.copyOf(atividadesInseridas),
+                List.copyOf(atividadesRemovidas),
+                List.copyOf(atividadesAlteradas),
+                List.copyOf(competenciasImpactadas)
         );
     }
 }

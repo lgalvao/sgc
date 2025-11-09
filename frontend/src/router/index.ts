@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory, createMemoryHistory } from 'vue-router';
-import type { RouteRecordRaw } from 'vue-router';
+import type {RouteRecordRaw} from 'vue-router';
+import {createMemoryHistory, createRouter, createWebHistory} from 'vue-router';
 import processoRoutes from './processo.routes';
 import unidadeRoutes from './unidade.routes';
 import mainRoutes from './main.routes';
-import { usePerfilStore } from '@/stores/perfil';
+import {usePerfilStore} from '@/stores/perfil';
 
 const routes: RouteRecordRaw[] = [
   ...mainRoutes,

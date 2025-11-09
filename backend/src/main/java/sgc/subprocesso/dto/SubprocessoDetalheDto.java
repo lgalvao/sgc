@@ -1,11 +1,14 @@
 package sgc.subprocesso.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import sgc.atividade.dto.AtividadeDto;
-import sgc.conhecimento.dto.ConhecimentoDto;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.atividade.dto.ConhecimentoDto;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.util.HtmlUtils;
 
 import java.time.LocalDateTime;
@@ -103,9 +106,12 @@ public class SubprocessoDetalheDto {
         private final String email;
     }
 
-    public record ElementoProcessoDto(
-            String tipo,
-            Object payload
-    ) {
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ElementoProcessoDto {
+        private String tipo;
+        private Object payload;
     }
 }

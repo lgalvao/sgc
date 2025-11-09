@@ -37,7 +37,7 @@ export function mapMapaVisualizacaoToAtividades(dto: MapaVisualizacao): Atividad
 export function mapMapaDtoToModel(dto: any): Mapa {
   return {
     codigo: dto.codigo,
-    idProcesso: dto.idProcesso,
+    codProcesso: dto.codProcesso,
     unidade: dto.unidade,
     situacao: dto.situacao,
     dataCriacao: dto.dataCriacao,

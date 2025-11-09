@@ -1,6 +1,6 @@
 import apiClient from '../axios-setup';
-import type { Competencia, MapaCompleto } from '@/types/tipos';
-import { mapMapaCompletoDtoToModel } from '@/mappers/mapas';
+import type {Competencia, MapaCompleto} from '@/types/tipos';
+import {mapMapaCompletoDtoToModel} from '@/mappers/mapas';
 
 interface ImportarAtividadesRequest {
   subprocessoOrigemId: number;
@@ -8,12 +8,7 @@ interface ImportarAtividadesRequest {
 
 export async function importarAtividades(codSubrocessoDestino: number, codSubrocessoOrigem: number): Promise<void> {
   const request: ImportarAtividadesRequest = { subprocessoOrigemId: codSubrocessoOrigem };
-  try {
-    await apiClient.post(`/subprocessos/${codSubrocessoDestino}/importar-atividades`, request);
-  } catch (error) {
-    console.error(`Erro ao importar atividades para o subprocesso ${codSubrocessoDestino}:`, error);
-    throw error;
-  }
+  await apiClient.post(`/subprocessos/${codSubrocessoDestino}/importar-atividades`, request);
 }
 
 export async function fetchSubprocessoDetalhe(id: number, perfil: string, unidadeCodigo: number) {
@@ -30,11 +25,11 @@ export const adicionarCompetencia = async (codSubprocesso: number, competencia: 
 }
 
 export const atualizarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
-    const response = await apiClient.put(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}`, competencia);
+    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`, competencia);
     return mapMapaCompletoDtoToModel(response.data);
 }
 
 export const removerCompetencia = async (codSubprocesso: number, idCompetencia: number): Promise<MapaCompleto> => {
-    const response = await apiClient.delete(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}`);
+    const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}/remover`);
     return mapMapaCompletoDtoToModel(response.data);
 }

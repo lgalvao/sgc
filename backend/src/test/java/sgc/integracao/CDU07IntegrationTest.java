@@ -12,31 +12,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.comum.BeanUtil;
-import sgc.comum.erros.ErroDominioNaoEncontrado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.subprocesso.modelo.Movimentacao;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,13 +42,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Sgc.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, BeanUtil.class})
+@Import(TestSecurityConfig.class)
 @Transactional
 @DisplayName("CDU-07: Detalhar Subprocesso")
 public class CDU07IntegrationTest {
-    private static final String UNIDADE_SIGLA = "UT";
-    private static final long CHEFE_TITULO = 111111111111L;
-    private static final long OUTRO_CHEFE_TITULO = 333333333333L;
+    private static final String UNIDADE_SIGLA = "SESEL";
+    private static final String CHEFE_TITULO = "111111111111";
+    private static final String OUTRO_CHEFE_TITULO = "333333333333";
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,7 +59,7 @@ public class CDU07IntegrationTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
+    private SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Autowired
     private SubprocessoDtoService subprocessoDtoService;
 
@@ -74,11 +69,8 @@ public class CDU07IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade("Unidade de Teste", UNIDADE_SIGLA);
-        unidadeRepo.save(unidade);
-
-        outraUnidade = new Unidade("Outra Unidade", "OUT");
-        unidadeRepo.save(outraUnidade);
+        unidade = unidadeRepo.findById(10L).orElseThrow(); // SESEL
+        outraUnidade = unidadeRepo.findById(11L).orElseThrow(); // SENIC
 
         Processo processo = new Processo();
         processo.setDescricao("Processo de Teste");
@@ -90,11 +82,14 @@ public class CDU07IntegrationTest {
         subprocesso = new Subprocesso(processo, unidade, null, SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO, processo.getDataLimite());
         subprocessoRepo.save(subprocesso);
 
-        Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado");
+        Usuario usuario = new Usuario("999999999999", "Usuário Movimentação", "mov@test.com", "123", unidade, List.of(Perfil.SERVIDOR));
+        usuarioRepo.save(usuario);
+
+        Movimentacao movimentacao = new Movimentacao(subprocesso, null, unidade, "Subprocesso iniciado", usuario);
         movimentacaoRepo.save(movimentacao);
     }
 
-    private void setupSecurityContext(long tituloEleitoral, Unidade unidade, String... perfis) {
+    private void setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
         Usuario principal = new Usuario(
             tituloEleitoral,
             "Usuario de Teste",
@@ -120,7 +115,7 @@ public class CDU07IntegrationTest {
             mockMvc.perform(get("/api/subprocessos/{id}", subprocesso.getCodigo())
                         .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.unidade.nome").value("Unidade de Teste"))
+                .andExpect(jsonPath("$.unidade.nome").value("Se&ccedil;&atilde;o de Sistemas Eleitorais"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO.name()))
                 .andExpect(jsonPath("$.localizacaoAtual").value(UNIDADE_SIGLA))
                 .andExpect(jsonPath("$.movimentacoes[0].descricao").value("Subprocesso iniciado"));
@@ -153,7 +148,7 @@ public class CDU07IntegrationTest {
         @WithMockAdmin
         @DisplayName("Deve falhar ao buscar subprocesso inexistente")
         void falhaSubprocessoInexistente() {
-            assertThrows(ErroDominioNaoEncontrado.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> subprocessoDtoService.obterDetalhes(999L, Perfil.ADMIN, null));
         }
     }
 }
