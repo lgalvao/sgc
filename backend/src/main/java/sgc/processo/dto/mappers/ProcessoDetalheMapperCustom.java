@@ -1,6 +1,9 @@
 package sgc.processo.dto.mappers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.sgrh.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.model.Subprocesso;
@@ -26,12 +29,31 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(true)
-                .podeHomologarCadastro(true)
-                .podeHomologarMapa(true)
+                .podeFinalizar(isCurrentUserAdmin())
+                .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
+                .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
                 .build();
 
         return dto;
+    }
+
+    private boolean isCurrentUserChefeOuCoordenador(Processo processo) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        Usuario user = (Usuario) authentication.getPrincipal();
+        return processo.getParticipantes().stream()
+                .anyMatch(unidade -> unidade.getCodigo().equals(user.getUnidade().getCodigo()));
+    }
+
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     protected void montarHierarquiaUnidades(ProcessoDetalheDto dto,
