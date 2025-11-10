@@ -14,16 +14,11 @@ import java.util.Optional;
 public interface MapaRepo extends JpaRepository<Mapa, Long> {
     /**
      * Busca o mapa vigente de uma unidade.
-     * Um mapa é considerado vigente quando está registrado na tabela UNIDADE_MAPA.
      *
      * @param unidadeCodigo Código da unidade
      * @return Optional contendo o mapa vigente se existir
      */
-    @Query("""
-        SELECT m FROM Mapa m
-        JOIN UnidadeMapa um ON um.mapaVigente.codigo = m.codigo
-        WHERE um.unidadeCodigo = :unidadeCodigo
-        """)
+    @Query("SELECT u.mapaVigente FROM Unidade u WHERE u.codigo = :unidadeCodigo")
     Optional<Mapa> findMapaVigenteByUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
     
     /**

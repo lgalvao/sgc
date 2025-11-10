@@ -13,26 +13,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
-import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapaRepo;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.*;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,27 +38,13 @@ class CDU19IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private ProcessoRepo processoRepo;
-    @Autowired
     private SubprocessoRepo subprocessoRepo;
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
     private AlertaRepo alertaRepo;
-    @Autowired
-    private MapaRepo mapaRepo;
-    @Autowired
-    private CompetenciaRepo competenciaRepo;
-    @Autowired
-    private AtividadeRepo atividadeRepo;
-    @Autowired
-    private ConhecimentoRepo conhecimentoRepo;
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -79,24 +52,19 @@ class CDU19IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        movimentacaoRepo.deleteAll();
-        alertaRepo.deleteAll();
-        competenciaRepo.deleteAll();
-        atividadeRepo.deleteAll();
-        conhecimentoRepo.deleteAll();
-        unidadeMapaRepo.deleteAll();
-        subprocessoRepo.deleteAll();
-        mapaRepo.deleteAll();
-        processoRepo.deleteAll();
+        // Use dados pré-carregados do data-h2.sql (CDU-19 test data)
+        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
+        unidade = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
+        subprocesso = subprocessoRepo.findById(1900L).orElseThrow();
 
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
-        unidade = unidadeRepo.findById(9L).orElseThrow();
+        // Limpa movimentações e alertas relacionados ao subprocesso de teste
+        movimentacaoRepo.deleteAll(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1900L));
+        alertaRepo.deleteAll(alertaRepo.findByProcessoCodigo(1900L));
 
-        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow();
-
-        Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
-        Mapa mapa = mapaRepo.save(new Mapa());
-        subprocesso = new Subprocesso(processo, unidade, mapa, SituacaoSubprocesso.MAPA_DISPONIBILIZADO, LocalDateTime.now());
+        // Garante que o subprocesso está no estado correto
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
+        subprocesso.getMapa().setSugestoes(null);
+        subprocesso.getMapa().setSugestoesApresentadas(false);
         subprocessoRepo.save(subprocesso);
     }
 
@@ -125,7 +93,7 @@ class CDU19IntegrationTest {
             assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Sugestões apresentadas para o mapa de competências");
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
-            List<Alerta> alertas = alertaRepo.findAll();
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
         }
     }
@@ -151,7 +119,7 @@ class CDU19IntegrationTest {
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidade.getSigla());
             assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());
 
-            List<Alerta> alertas = alertaRepo.findAll();
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             assertThat(alertas.getFirst().getDescricao()).contains("Validação do mapa de competências da SEDIA aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperior.getSigla());

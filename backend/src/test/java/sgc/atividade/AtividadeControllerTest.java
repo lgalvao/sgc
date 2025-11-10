@@ -204,9 +204,7 @@ class AtividadeControllerTest {
     @Nested
     @DisplayName("Testes para CRUD de Conhecimentos aninhados")
     class ConhecimentoEndpoints {
-
         private static final String API_CONHECIMENTOS = "/api/atividades/1/conhecimentos";
-        private static final String API_CONHECIMENTOS_ID = "/api/atividades/1/conhecimentos/{codigo}";
         private static final String API_CONHECIMENTOS_1 = "/api/atividades/1/conhecimentos/1";
         private static final String API_CONHECIMENTOS_1_ATUALIZAR = "/api/atividades/1/conhecimentos/1/atualizar";
         private static final String API_CONHECIMENTOS_1_EXCLUIR = "/api/atividades/1/conhecimentos/1/excluir";

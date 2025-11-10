@@ -18,12 +18,10 @@ import sgc.analise.model.AnaliseRepo;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapaRepo;
-import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
 import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.model.Perfil;
@@ -79,8 +77,6 @@ class CDU14IntegrationTest {
     private MapaRepo mapaRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
     @Autowired

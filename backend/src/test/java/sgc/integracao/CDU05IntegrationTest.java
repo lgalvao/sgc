@@ -18,15 +18,13 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
-import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
@@ -66,9 +64,6 @@ public class CDU05IntegrationTest {
     private MapaRepo mapaRepo;
 
     @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
-
-    @Autowired
     private SubprocessoRepo subprocessoRepo;
 
     @Autowired
@@ -104,12 +99,8 @@ public class CDU05IntegrationTest {
         conhecimentoRepo.save(conhecimentoOriginal);
 
         // Define o mapa como vigente para a unidade
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setUnidade(unidade);
-        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
-        unidadeMapa.setMapaVigente(mapaOriginal);
-        unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
-        unidadeMapaRepo.save(unidadeMapa);
+        unidade.setMapaVigente(mapaOriginal);
+        unidadeRepo.save(unidade);
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {

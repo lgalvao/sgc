@@ -25,10 +25,10 @@ public class ProcessoDetalheDto {
     private LocalDateTime dataFinalizacao;
 
     @Builder.Default
-    private List<UnidadeParticipanteDto> unidades = new ArrayList<>();
+    private final List<UnidadeParticipanteDto> unidades = new ArrayList<>();
 
     @Builder.Default
-    private List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
+    private final List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
 
     private boolean podeFinalizar;
     private boolean podeHomologarCadastro;
@@ -47,6 +47,6 @@ public class ProcessoDetalheDto {
         private LocalDateTime dataLimite;
 
         @Builder.Default
-        private List<UnidadeParticipanteDto> filhos = new ArrayList<>();
+        private final List<UnidadeParticipanteDto> filhos = new ArrayList<>();
     }
 }

@@ -13,11 +13,9 @@ import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.unidade.model.Unidade;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Controller com endpoints auxiliares para testes E2E.

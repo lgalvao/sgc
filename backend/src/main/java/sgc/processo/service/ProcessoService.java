@@ -11,14 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
-import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.mapa.service.CopiaMapaService;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.*;
 import sgc.processo.dto.mappers.ProcessoDetalheMapper;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.erros.ErroProcesso;
@@ -39,12 +33,7 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import sgc.sgrh.model.Usuario;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +47,6 @@ public class ProcessoService {
     private final ProcessoDetalheMapper processoDetalheMapper;
     private final MapaRepo mapaRepo;
     private final SubprocessoMovimentacaoRepo movimentacaoRepo;
-    private final UnidadeMapaRepo unidadeMapaRepo;
     private final CopiaMapaService servicoDeCopiaDeMapa;
     private final ProcessoNotificacaoService processoNotificacaoService;
     private final SgrhService sgrhService;
@@ -171,8 +159,6 @@ public class ProcessoService {
         Processo processo = processoRepo.findById(codProcesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codProcesso));
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
-
         return processoDetalheMapper.toDetailDTO(processo);
     }
 
@@ -187,9 +173,9 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     public List<ProcessoDto> listarAtivos() {
         return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)
-            .stream()
-            .map(processoMapper::toDto)
-            .toList();
+                .stream()
+                .map(processoMapper::toDto)
+                .toList();
     }
 
     @Transactional
@@ -287,24 +273,24 @@ public class ProcessoService {
 
     private void validarUnidadesNaoEmProcessosAtivos(List<Long> codsUnidades) {
         List<Long> unidadesBloqueadas = processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
-            .flatMap(p -> p.getParticipantes().stream())
-            .map(Unidade::getCodigo)
-            .filter(codsUnidades::contains)
-            .distinct()
-            .toList();
+                .flatMap(p -> p.getParticipantes().stream())
+                .map(Unidade::getCodigo)
+                .filter(codsUnidades::contains)
+                .distinct()
+                .toList();
         if (!unidadesBloqueadas.isEmpty()) {
             throw new ErroProcesso("As seguintes unidades já participam de outro processo ativo: %s".formatted(unidadesBloqueadas));
         }
     }
 
     private void validarUnidadesComMapasVigentes(List<Long> codigosUnidades) {
-        List<Long> unidadesComMapaVigente = unidadeMapaRepo.findCodigosUnidadesComMapaVigente(codigosUnidades);
+        List<Unidade> unidades = unidadeRepo.findAllById(codigosUnidades);
+        List<Long> unidadesSemMapa = unidades.stream()
+                .filter(u -> u.getMapaVigente() == null)
+                .map(Unidade::getCodigo)
+                .toList();
 
-        if (unidadesComMapaVigente.size() < codigosUnidades.size()) {
-            List<Long> unidadesSemMapa = codigosUnidades.stream()
-                    .filter(c -> !unidadesComMapaVigente.contains(c))
-                    .toList();
-
+        if (!unidadesSemMapa.isEmpty()) {
             List<String> siglasUnidadesSemMapa = unidadeRepo.findSiglasByCodigos(unidadesSemMapa);
             throw new ErroProcesso(String.format(
                     "As seguintes unidades não possuem mapa vigente e não podem participar de um processo de revisão: %s",
@@ -323,13 +309,10 @@ public class ProcessoService {
     }
 
     private void criarSubprocessoParaRevisao(Processo processo, Unidade unidade) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
-
-        if (unidadeMapa.getMapaVigente() == null) {
+        if (unidade.getMapaVigente() == null) {
             throw new ErroProcesso("Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
         }
-        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
+        Long codMapaVigente = unidade.getMapaVigente().getCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
 
         Subprocesso subprocesso = new Subprocesso(processo, unidade, mapaCopiado, SituacaoSubprocesso.NAO_INICIADO, processo.getDataLimite());
@@ -351,8 +334,8 @@ public class ProcessoService {
                 .filter(sp -> sp.getSituacao() != SituacaoSubprocesso.MAPA_HOMOLOGADO)
                 .map(sp -> {
                     String identificador = sp.getUnidade() != null
-                        ? sp.getUnidade().getSigla()
-                        : String.format("Subprocesso %d", sp.getCodigo());
+                            ? sp.getUnidade().getSigla()
+                            : String.format("Subprocesso %d", sp.getCodigo());
                     return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
                 })
                 .toList();
@@ -379,12 +362,9 @@ public class ProcessoService {
             Mapa mapaDoSubprocesso = Optional.ofNullable(subprocesso.getMapa())
                     .orElseThrow(() -> new ErroProcesso("Subprocesso %d sem mapa associado.".formatted(subprocesso.getCodigo())));
 
-            UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
-                    .orElse(new UnidadeMapa());
-            unidadeMapa.setUnidade(unidade);
-            unidadeMapa.setMapaVigente(mapaDoSubprocesso);
-            unidadeMapa.setDataVigencia(LocalDateTime.now());
-            unidadeMapaRepo.save(unidadeMapa);
+            unidade.setMapaVigente(mapaDoSubprocesso);
+            unidade.setDataVigenciaMapaAtual(LocalDateTime.now());
+            unidadeRepo.save(unidade);
             log.debug("Mapa vigente para unidade {} definido como mapa {}", unidade.getCodigo(), mapaDoSubprocesso.getCodigo());
         }
         log.info("Mapas de {} subprocessos foram definidos como vigentes.", subprocessos.size());
@@ -392,13 +372,13 @@ public class ProcessoService {
 
     public List<Long> listarUnidadesBloqueadasPorTipo(String tipo) {
         TipoProcesso tipoProcesso = TipoProcesso.valueOf(tipo);
-        
+
         return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO).stream()
-            .filter(p -> p.getTipo() == tipoProcesso)
-            .flatMap(p -> p.getParticipantes().stream())
-            .map(Unidade::getCodigo)
-            .distinct()
-            .toList();
+                .filter(p -> p.getTipo() == tipoProcesso)
+                .flatMap(p -> p.getParticipantes().stream())
+                .map(Unidade::getCodigo)
+                .distinct()
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -412,34 +392,34 @@ public class ProcessoService {
 
         if (isAdmin) {
             return subprocessos.stream()
-                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_AJUSTADO)
-                .map(this::toSubprocessoElegivelDto)
-                .toList();
+                    .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_AJUSTADO)
+                    .map(this::toSubprocessoElegivelDto)
+                    .toList();
         }
 
         List<PerfilDto> perfis = sgrhService.buscarPerfisUsuario(username);
         Long codUnidadeUsuario = perfis.stream()
-            .findFirst()
-            .map(PerfilDto::getUnidadeCodigo)
-            .orElse(null);
+                .findFirst()
+                .map(PerfilDto::getUnidadeCodigo)
+                .orElse(null);
 
         if (codUnidadeUsuario == null) {
             return List.of();
         }
 
         return subprocessos.stream()
-            .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
-            .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO)
-            .map(this::toSubprocessoElegivelDto)
-            .toList();
+                .filter(sp -> sp.getUnidade() != null && sp.getUnidade().getCodigo().equals(codUnidadeUsuario))
+                .filter(sp -> sp.getSituacao() == SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO)
+                .map(this::toSubprocessoElegivelDto)
+                .toList();
     }
 
     private SubprocessoElegivelDto toSubprocessoElegivelDto(Subprocesso sp) {
         return SubprocessoElegivelDto.builder()
-            .codSubprocesso(sp.getCodigo())
-            .unidadeNome(sp.getUnidade().getNome())
-            .unidadeSigla(sp.getUnidade().getSigla())
-            .situacao(sp.getSituacao())
-            .build();
+                .codSubprocesso(sp.getCodigo())
+                .unidadeNome(sp.getUnidade().getNome())
+                .unidadeSigla(sp.getUnidade().getSigla())
+                .situacao(sp.getSituacao())
+                .build();
     }
 }
