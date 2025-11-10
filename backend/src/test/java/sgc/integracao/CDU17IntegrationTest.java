@@ -137,8 +137,8 @@ class CDU17IntegrationTest {
         @DisplayName("Deve disponibilizar mapa quando todos os dados estão corretos")
         @WithMockAdmin
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
-            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
-            competenciaRepo.save(competencia);
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
 
             Analise analiseAntiga = new Analise();
             analiseAntiga.setSubprocesso(subprocesso);
@@ -189,8 +189,8 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
-            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
-            competenciaRepo.save(competencia);
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
@@ -221,9 +221,8 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
-            // Apenas a 'competencia' está associada a uma atividade, a 'atividade' principal do teste não está.
-            Atividade dummyActivity = atividadeRepo.save(new Atividade(mapa, "Dummy Activity"));
-            dummyActivity.setCompetencias(new HashSet<>(Set.of(competencia)));
+            Atividade dummyActivity = new Atividade(mapa, "Dummy Activity");
+            dummyActivity.getCompetencias().add(competencia);
             atividadeRepo.save(dummyActivity);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
@@ -247,8 +246,8 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
-            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
-            competenciaRepo.save(competencia);
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
             competenciaRepo.save(new Competencia("Competência Solta", mapa));
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);

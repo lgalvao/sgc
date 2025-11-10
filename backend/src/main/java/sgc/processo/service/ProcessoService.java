@@ -326,6 +326,9 @@ public class ProcessoService {
         UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Configuração de mapa vigente não encontrada para a unidade", unidade.getSigla()));
 
+        if (unidadeMapa.getMapaVigente() == null) {
+            throw new ErroProcesso("Unidade %s não possui mapa vigente.".formatted(unidade.getSigla()));
+        }
         Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
         Mapa mapaCopiado = servicoDeCopiaDeMapa.copiarMapaParaUnidade(codMapaVigente, unidade.getCodigo());
 
@@ -346,9 +349,12 @@ public class ProcessoService {
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
         List<String> pendentes = subprocessos.stream()
                 .filter(sp -> sp.getSituacao() != SituacaoSubprocesso.MAPA_HOMOLOGADO)
-                .map(sp -> String.format("%s (Situação: %s)",
-                        sp.getUnidade() != null ? sp.getUnidade().getSigla() : "Subprocesso %d".formatted(sp.getCodigo()),
-                        sp.getSituacao()))
+                .map(sp -> {
+                    String identificador = sp.getUnidade() != null
+                        ? sp.getUnidade().getSigla()
+                        : String.format("Subprocesso %d", sp.getCodigo());
+                    return String.format("%s (Situação: %s)", identificador, sp.getSituacao());
+                })
                 .toList();
 
         if (!pendentes.isEmpty()) {

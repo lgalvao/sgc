@@ -103,11 +103,10 @@ class CDU09IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
-            var competencia = new Competencia("Competência de Teste", subprocessoMapeamento.getMapa());
-            Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
-            atividade = atividadeRepo.save(atividade);
-            competencia.setAtividades(Set.of(atividade));
-            competenciaRepo.save(competencia);
+            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoMapeamento.getMapa()));
+            var atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", subprocessoMapeamento.getCodigo()).with(csrf()))

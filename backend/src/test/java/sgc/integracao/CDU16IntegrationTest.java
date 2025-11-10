@@ -108,11 +108,12 @@ public class CDU16IntegrationTest {
         );
         subprocessoRepo.save(subprocesso);
 
-        Competencia c1 = new Competencia("Competência 1", mapa);
-        atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
-        c1.setAtividades(Set.of(atividade1, atividade2));
-        competenciaRepo.save(c1);
+        var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        atividade1 = new Atividade(mapa, "Atividade 1");
+        var atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade1.getCompetencias().add(c1);
+        atividade2.getCompetencias().add(c1);
+        atividadeRepo.saveAll(List.of(atividade1, atividade2));
     }
 
     @Test
