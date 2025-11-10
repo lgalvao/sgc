@@ -67,9 +67,14 @@ class ImpactoCompetenciaServiceTest {
             AtividadeImpactadaDto atividadeRemovidaDto = new AtividadeImpactadaDto(1L, "Atividade Removida", TipoImpactoAtividade.REMOVIDA, null, Collections.emptyList());
             Atividade atividade = new Atividade();
             atividade.setCodigo(1L);
+
+            // Establish the bidirectional relationship for the mock
+            competencia.setAtividades(Set.of(atividade));
             atividade.setCompetencias(Set.of(competencia));
 
+            // Mock the repository calls
             when(competenciaRepo.findByMapaCodigo(mapa.getCodigo())).thenReturn(Collections.singletonList(competencia));
+            when(atividadeRepo.findById(1L)).thenReturn(Optional.of(atividade));
 
             List<CompetenciaImpactadaDto> result = service.identificarCompetenciasImpactadas(mapa, Collections.singletonList(atividadeRemovidaDto), Collections.emptyList());
 
