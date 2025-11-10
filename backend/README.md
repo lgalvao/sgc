@@ -52,12 +52,19 @@ graph TD
 - **Responsabilidade:** Atua como o orquestrador central. Gerencia o ciclo de vida dos processos de alto nível (ex: "Mapeamento Anual de Competências") e dispara eventos de domínio (`ProcessoIniciadoEvento`) para notificar outros módulos, mantendo o sistema desacoplado.
 
 ### 2. `subprocesso` (Máquina de Estados e Controladores Especializados)
-- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma **máquina de estados**, transitando as tarefas entre diferentes situações (ex: de `PENDENTE_CADASTRO` para `MAPA_AJUSTADO`) e mantendo um histórico imutável de todas as ações através da entidade `Movimentacao`. Para melhor organização, o controlador original foi dividido em `SubprocessoCrudControle` (operações CRUD), `SubprocessoCadastroControle` (ações de workflow da etapa de cadastro), `SubprocessoMapaControle` (operações relacionadas ao mapa) e `SubprocessoValidacaoControle` (ações de workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de salvamento do mapa no contexto do workflow.
 
-### 3. `mapa`, `competencia`, `atividade` (Domínio Principal)
+- **Responsabilidade:** Gerencia o fluxo de trabalho detalhado para cada unidade organizacional. Funciona como uma *
+  *máquina de estados**, transitando as tarefas entre diferentes situações e mantendo um histórico imutável de todas as
+  ações através da entidade `Movimentacao`. Para melhor organização, o controlador foi dividido em
+  `SubprocessoCrudController` (operações CRUD), `SubprocessoCadastroController` (ações de workflow da etapa de
+  cadastro), `SubprocessoMapaController` (operações relacionadas ao mapa) e `SubprocessoValidacaoController` (ações de
+  workflow da etapa de validação). O `SubprocessoMapaWorkflowService` foi introduzido para gerenciar a lógica de
+  salvamento do mapa no contexto do workflow.
+
+### 3. `mapa` e `atividade` (Domínio Principal)
 - **Responsabilidade:** Gerenciam os artefatos centrais do sistema.
-- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências.
-- **`competencia`:** Define as competências que compõem um mapa.
+- **`mapa`:** Orquestra a criação, cópia e análise de impacto dos Mapas de Competências. Contém a lógica para gerenciar
+  competências através do `CompetenciaService`.
 - **`atividade`:** Define as atividades associadas às competências. Este módulo também é responsável por gerenciar os **conhecimentos** vinculados a cada atividade.
 
 ### 4. `analise` (Auditoria e Revisão)
@@ -73,11 +80,12 @@ graph TD
 - **`unidade`:** Modela a hierarquia organizacional (secretarias, seções, etc.). É apenas um modelo de dados, sem lógica de negócio.
 - **`sgrh`:** Define os modelos internos (`Usuario`, `Perfil`) e atua como uma fachada (`SgrhService`) para consultar dados de um sistema de RH externo (atualmente simulado).
 
-### 7. `comum`, `config` e `util` (Componentes Transversais)
+### 7. `comum` e `util` (Componentes Transversais)
 - **Responsabilidade:** Estes pacotes contêm código de suporte utilizado por toda a aplicação.
-- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro, a `EntidadeBase` para entidades JPA e a lógica do `Painel`.
-- **`config`**: Fornece classes de configuração do Spring, como `SecurityConfig` e `ThymeleafConfig`.
-- **`util`**: Contém classes de utilidade, como `HtmlUtils`.
+- **`comum`**: Centraliza o tratador global de exceções (`RestExceptionHandler`), classes de erro customizadas e a
+  `EntidadeBase` para entidades JPA. Contém também configurações do Spring (`config`) e suporte para serialização JSON (
+  `json`).
+- **`util`**: Contém classes de utilidade diversas.
 
 ## Como Construir e Executar
 Para construir o projeto e rodar os testes, utilize o Gradle Wrapper a partir da raiz do repositório:
