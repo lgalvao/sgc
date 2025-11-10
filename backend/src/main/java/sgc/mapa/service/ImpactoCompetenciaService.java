@@ -33,7 +33,7 @@ public class ImpactoCompetenciaService {
             if (atividade == null) continue;
 
             for (Competencia comp : competenciasDoMapa) {
-                if (comp.getAtividades().contains(atividade)) {
+                if (comp.getAtividades().stream().anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
                                     comp.getCodigo(),

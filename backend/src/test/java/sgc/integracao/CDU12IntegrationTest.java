@@ -100,6 +100,8 @@ class CDU12IntegrationTest {
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
         UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
+        unidadeMapa.setMapaVigenteCodigo(mapaVigente.getCodigo());
         unidadeMapa.setUnidade(unidade);
         unidadeMapa.setMapaVigente(mapaVigente);
         unidadeMapaRepo.save(unidadeMapa);
@@ -124,7 +126,9 @@ class CDU12IntegrationTest {
     }
 
     private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {
+        competencia.getAtividades().add(atividade);
         atividade.getCompetencias().add(competencia);
+        competenciaRepo.save(competencia);
         atividadeRepo.save(atividade);
     }
 
