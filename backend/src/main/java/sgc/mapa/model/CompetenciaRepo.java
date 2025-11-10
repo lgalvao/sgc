@@ -13,13 +13,11 @@ import java.util.List;
 @Repository
 public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
     /**
-     * Busca todas as competências de um mapa.
+     * Busca todas as competências de um mapa, incluindo suas atividades associadas.
      *
      * @param mapaCodigo Código do mapa
      * @return Lista de competências do mapa
      */
-    @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
+    @Query("SELECT DISTINCT c FROM Competencia c LEFT JOIN FETCH c.atividades WHERE c.mapa.codigo = :mapaCodigo")
     List<Competencia> findByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
-
-    List<Competencia> findByAtividades_Codigo(Long codigo);
 }

@@ -73,11 +73,12 @@ class SubprocessoServiceTest {
     @DisplayName("Testes para validarAssociacoesMapa")
     class ValidarAssociacoesMapaTests {
         @Test
-        @DisplayName("Deve lançar exceção se atividade não estiver associada")
-        void validarAssociacoesMapa_AtividadeNaoAssociada_LancaExcecao() {
-            when(atividadeRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Atividade()));
+        @DisplayName("Deve lançar exceção se competência não estiver associada")
+        void validarAssociacoesMapa_CompetenciaNaoAssociada_LancaExcecao() {
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Competencia()));
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }
+
     }
 }

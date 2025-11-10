@@ -98,10 +98,12 @@ class CDU12IntegrationTest {
 
         Mapa mapaVigente = new Mapa();
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
-        mapaRepo.save(mapaVigente);
+        mapaVigente = mapaRepo.save(mapaVigente);
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setUnidade(unidade);
+        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
         unidadeMapa.setMapaVigente(mapaVigente);
+        unidadeMapa.setMapaVigenteCodigo(mapaVigente.getCodigo());
         unidadeMapaRepo.save(unidadeMapa);
 
         atividadeVigente1 = atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
@@ -124,8 +126,8 @@ class CDU12IntegrationTest {
     }
 
     private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {
-        competencia.getAtividades().add(atividade);
-        competenciaRepo.save(competencia);
+        atividade.getCompetencias().add(competencia);
+        atividadeRepo.save(atividade);
     }
 
     @Nested

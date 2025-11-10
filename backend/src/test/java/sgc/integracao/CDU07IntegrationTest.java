@@ -62,9 +62,9 @@ public class CDU07IntegrationTest {
     @Autowired
     private SubprocessoMovimentacaoRepo movimentacaoRepo;
     @Autowired
-    private UsuarioRepo usuarioRepo;
-    @Autowired
     private SubprocessoDtoService subprocessoDtoService;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
     private Unidade unidade;

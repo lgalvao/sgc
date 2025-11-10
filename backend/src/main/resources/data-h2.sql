@@ -215,6 +215,8 @@ VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DAT
         CURRENT_DATE - 90);
 
 INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
+VALUES (8, 1001);
+INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
 VALUES (9, 1002);
 INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
 VALUES (10, 1003);

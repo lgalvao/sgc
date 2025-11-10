@@ -26,7 +26,6 @@ import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
 import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -40,6 +39,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -137,7 +137,7 @@ class CDU17IntegrationTest {
         @DisplayName("Deve disponibilizar mapa quando todos os dados estão corretos")
         @WithMockAdmin
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
-            competencia.setAtividades(new java.util.HashSet<>(Set.of(atividade)));
+            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
             competenciaRepo.save(competencia);
 
             Analise analiseAntiga = new Analise();
@@ -158,7 +158,7 @@ class CDU17IntegrationTest {
 
             Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow(() -> new AssertionError("Subprocesso não encontrado após atualização."));
             assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_DISPONIBILIZADO);
-            assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite);
+            assertThat(spAtualizado.getDataLimiteEtapa2()).isEqualTo(dataLimite.atStartOfDay());
 
             Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow(() -> new AssertionError("Mapa não encontrado após atualização."));
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
@@ -189,7 +189,7 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa com usuário sem permissão (não ADMIN)")
         @WithMockGestor
         void disponibilizarMapa_semPermissao_retornaForbidden() throws Exception {
-            competencia.setAtividades(new java.util.HashSet<>(Set.of(atividade)));
+            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
             competenciaRepo.save(competencia);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
@@ -221,9 +221,10 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
+            // Apenas a 'competencia' está associada a uma atividade, a 'atividade' principal do teste não está.
             Atividade dummyActivity = atividadeRepo.save(new Atividade(mapa, "Dummy Activity"));
-            competencia.setAtividades(new java.util.HashSet<>(Set.of(dummyActivity)));
-            competenciaRepo.save(competencia);
+            dummyActivity.setCompetencias(new HashSet<>(Set.of(competencia)));
+            atividadeRepo.save(dummyActivity);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 
@@ -246,6 +247,18 @@ class CDU17IntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
+            competencia.setAtividades(new HashSet<>(Set.of(atividade)));
+            competenciaRepo.save(competencia);
+            competenciaRepo.save(new Competencia("Competência Solta", mapa));
+
+            DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
+
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.details.competenciasNaoAssociadas").exists());
         }
     }
 }

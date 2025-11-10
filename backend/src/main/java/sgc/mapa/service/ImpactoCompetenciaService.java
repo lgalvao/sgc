@@ -26,24 +26,34 @@ public class ImpactoCompetenciaService {
             List<AtividadeImpactadaDto> alteradas) {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
+        List<Competencia> competenciasDoMapa = repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
 
+        // Itera sobre as competências do mapa vigente para criar um mapa de pesquisa por descrição
+        Map<String, Competencia> mapaCompetencias = competenciasDoMapa.stream()
+                .collect(Collectors.toMap(Competencia::getDescricao, comp -> comp));
+
+        // Processa as atividades removidas
         for (AtividadeImpactadaDto atividadeDto : removidas) {
-            List<Competencia> competenciasAssociadas = repositorioCompetencia.findByAtividades_Codigo(atividadeDto.getCodigo());
-            for (Competencia comp : competenciasAssociadas) {
-                if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
+            // Para cada competência que estava vinculada à atividade removida (informação vinda do DTO)
+            for (String descComp : atividadeDto.getCompetenciasVinculadas()) {
+                // Se a competência ainda existe no mapa vigente
+                if (mapaCompetencias.containsKey(descComp)) {
+                    Competencia comp = mapaCompetencias.get(descComp);
+                    // Acumula o impacto
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
                                     comp.getCodigo(),
                                     comp.getDescricao()));
-
                     acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.getDescricao()));
                 }
             }
         }
 
         for (AtividadeImpactadaDto atividadeDto : alteradas) {
-            List<Competencia> competenciasAssociadas = repositorioCompetencia.findByAtividades_Codigo(atividadeDto.getCodigo());
-            for (Competencia comp : competenciasAssociadas) {
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
+            if (atividade == null) continue;
+
+            for (Competencia comp : atividade.getCompetencias()) {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),
