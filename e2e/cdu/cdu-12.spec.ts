@@ -13,7 +13,7 @@ import {
     verificarMensagemNenhumImpacto,
     verificarModalImpactosAberto,
     verificarModalImpactosFechado
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-12: Verificar impactos no mapa de competências', () => {
     const UNIDADE_SESEL = 'SESEL';

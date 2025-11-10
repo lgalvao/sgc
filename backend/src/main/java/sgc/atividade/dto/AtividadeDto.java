@@ -1,36 +1,28 @@
 package sgc.atividade.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import sgc.comum.json.SanitizeHtml;
 
 /**
  * DTO para Atividade usado nas APIs (entrada/saída).
  * Contém apenas campos primários e referências por codigo para evitar expor entidades JPA.
- *
- * @param codigo     O código da atividade.
- * @param mapaCodigo O código do mapa ao qual a atividade pertence.
- * @param descricao  A descrição da atividade.
  */
-// TODO mudar para Builder e rever esse sanitizado aqui, parece poluição
-public record AtividadeDto(
-        Long codigo,
-        Long mapaCodigo,
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AtividadeDto {
+    /** O código da atividade. */
+    private Long codigo;
+    /** O código do mapa ao qual a atividade pertence. */
+    private Long mapaCodigo;
 
-        @NotBlank(message = "Descrição não pode ser vazia")
-        String descricao)
-
-{
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
-
-    /**
-     * Sanitiza a descrição da atividade para remover HTML potencialmente malicioso.
-     *
-     * @return Um novo DTO com a descrição sanitizada.
-     */
-    public AtividadeDto sanitizar() {
-        // TODO remover essa sanitização. Está poluindo
-        String sanitizedDescricao = HTML_SANITIZER_POLICY.sanitize(this.descricao);
-        return new AtividadeDto(this.codigo, this.mapaCodigo, sanitizedDescricao);
-    }
+    /** A descrição da atividade. */
+    @NotBlank(message = "Descrição não pode ser vazia")
+    @SanitizeHtml
+    private String descricao;
 }

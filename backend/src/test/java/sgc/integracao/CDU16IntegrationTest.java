@@ -13,36 +13,33 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaAtividade;
-import sgc.competencia.modelo.CompetenciaAtividadeRepo;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
 import sgc.subprocesso.dto.SubmeterMapaAjustadoReq;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -82,9 +79,6 @@ public class CDU16IntegrationTest {
     private CompetenciaRepo competenciaRepo;
 
     @Autowired
-    private CompetenciaAtividadeRepo competenciaAtividadeRepo;
-
-    @Autowired
     private UsuarioRepo usuarioRepo;
 
     private Subprocesso subprocesso;
@@ -92,14 +86,9 @@ public class CDU16IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        var admin = new Usuario();
-        admin.setTituloEleitoral(111111111111L);
-        admin.setPerfis(java.util.Set.of(Perfil.ADMIN));
-        usuarioRepo.save(admin);
-        unidadeRepo.save(new Unidade("SEDOC", "SEDOC"));
+        var admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        Unidade unidade = new Unidade("Unidade Teste", "UT");
-        unidadeRepo.save(unidade);
+        Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
 
         Processo processo = new Processo(
                 "Processo de Revisão",
@@ -119,11 +108,11 @@ public class CDU16IntegrationTest {
         );
         subprocessoRepo.save(subprocesso);
 
-        Competencia c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        Competencia c1 = new Competencia("Competência 1", mapa);
         atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
         Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade1.getCodigo()), c1, atividade1));
-        competenciaAtividadeRepo.save(new CompetenciaAtividade(new CompetenciaAtividade.Id(c1.getCodigo(), atividade2.getCodigo()), c1, atividade2));
+        c1.setAtividades(Set.of(atividade1, atividade2));
+        competenciaRepo.save(c1);
     }
 
     @Test

@@ -189,26 +189,26 @@ describe('useUnidadesStore', () => {
             expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
             expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         });
-        it('pesquisarUnidade should find SEDOC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDOC');
+        it('pesquisarUnidadePorSigla should find SEDOC unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('SEDOC');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Seção de Desenvolvimento Organizacional e Capacitação');
         });
 
-        it('pesquisarUnidade should find STIC unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('STIC');
+        it('pesquisarUnidadePorSigla should find STIC unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('STIC');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Secretaria de Informática e Comunicações');
         });
 
-        it('pesquisarUnidade should find nested SEDESENV unit by sigla', () => {
-            const unidade = unidadesStore.pesquisarUnidade('SEDESENV');
+        it('pesquisarUnidadePorSigla should find nested SEDESENV unit by sigla', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('SEDESENV');
             expect(unidade).toBeDefined();
             expect(unidade?.nome).toBe('Seção de Desenvolvimento de Sistemas');
         });
 
-        it('pesquisarUnidade should return null if unit not found', () => {
-            const unidade = unidadesStore.pesquisarUnidade('NONEXISTENT');
+        it('pesquisarUnidadePorSigla should return null if unit not found', () => {
+            const unidade = unidadesStore.pesquisarUnidadePorSigla('NONEXISTENT');
             expect(unidade).toBeNull();
         });
 

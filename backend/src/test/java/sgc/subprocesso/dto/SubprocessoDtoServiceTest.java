@@ -11,14 +11,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.analise.AnaliseService;
 import sgc.atividade.dto.AtividadeMapper;
 import sgc.atividade.dto.ConhecimentoMapper;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.atividade.modelo.ConhecimentoRepo;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
-import sgc.sgrh.modelo.Perfil;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 import sgc.subprocesso.service.SubprocessoDtoService;
-import sgc.unidade.modelo.Unidade;
+import sgc.unidade.model.Unidade;
 
 import java.util.Optional;
 

@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.CriarAnaliseRequest;
-import sgc.analise.modelo.Analise;
-import sgc.analise.modelo.TipoAnalise;
-import sgc.comum.erros.ErroNegocio;
+import sgc.analise.model.Analise;
+import sgc.analise.model.TipoAnalise;
+import sgc.comum.erros.ErroRequisicaoSemCorpo;
 
 import java.util.List;
 import java.util.Map;
@@ -55,24 +55,7 @@ public class AnaliseController {
     @Operation(summary = "Cria uma nova análise de cadastro")
     public Analise criarAnaliseCadastro(@PathVariable("codSubprocesso") Long codSubprocesso,
                                         @RequestBody(required = false) Map<String, String> corpo) {
-
-        // TODO este tratamento está muito geral. E nem me parece bem um erro de negócio
-        if (corpo == null) throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
-
-        String observacoes = corpo.getOrDefault("observacoes", "");
-
-        // TODO este código repete quase igual no método 'criarAnaliseValidacao'
-        CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
-                .codSubprocesso(codSubprocesso)
-                .observacoes(observacoes)
-                .tipo(TipoAnalise.CADASTRO)
-                .acao(null)
-                .siglaUnidade(corpo.get("siglaUnidade"))
-                .tituloUsuario(corpo.get("tituloUsuario"))
-                .motivo(corpo.get("motivo"))
-                .build();
-
-        return analiseService.criarAnalise(criarAnaliseRequest);
+        return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.CADASTRO);
     }
 
     /**
@@ -104,15 +87,18 @@ public class AnaliseController {
     @Operation(summary = "Cria uma nova análise de validação")
     public Analise criarAnaliseValidacao(@PathVariable("codSubprocesso") Long codSubprocesso,
                                          @RequestBody(required = false) Map<String, String> corpo) {
+        return criarAnaliseInterna(codSubprocesso, corpo, TipoAnalise.VALIDACAO);
+    }
 
-        // TODO este tratamento está muito geral. E nem me parece bem um erro de negócio
-        if (corpo == null) throw new ErroNegocio("O corpo da requisição não pode ser nulo.");
+    private Analise criarAnaliseInterna(Long codSubprocesso, Map<String, String> corpo, TipoAnalise tipo) {
+        if (corpo == null) throw new ErroRequisicaoSemCorpo("O corpo da requisição não pode ser nulo.");
 
         String observacoes = corpo.getOrDefault("observacoes", "");
+
         CriarAnaliseRequest criarAnaliseRequest = CriarAnaliseRequest.builder()
                 .codSubprocesso(codSubprocesso)
                 .observacoes(observacoes)
-                .tipo(TipoAnalise.VALIDACAO)
+                .tipo(tipo)
                 .acao(null)
                 .siglaUnidade(corpo.get("siglaUnidade"))
                 .tituloUsuario(corpo.get("tituloUsuario"))

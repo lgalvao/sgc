@@ -17,7 +17,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Profile("!e2e")
+@Profile("!e2e & !test")
 public class ConfigSeguranca {
     /**
      * Configura a cadeia de filtros de segurança para a aplicação.
@@ -35,7 +35,7 @@ public class ConfigSeguranca {
      * @return o {@link SecurityFilterChain} configurado.
      * @throws Exception se ocorrer um erro durante a configuração.
      */
-    @Bean
+    @Bean("defaultSecurityFilterChain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth

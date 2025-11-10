@@ -290,7 +290,7 @@ function confirmarFinalizacao() {
 
   notificacoesStore.sucesso(
       'Diagnóstico finalizado',
-      'O diagnóstico da equipe foi concluído com sucesso!'
+      'O diagnóstico da equipe foi concluído!'
   )
 
   fecharModalConfirmacao()

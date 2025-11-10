@@ -13,25 +13,25 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.atividade.modelo.Conhecimento;
-import sgc.atividade.modelo.ConhecimentoRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.ImportarAtividadesReq;
-import sgc.subprocesso.modelo.MovimentacaoRepo;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,19 +82,11 @@ class CDU08IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Usuario chefe = new Usuario();
-        chefe.setTituloEleitoral(888888888888L);
-        chefe.setNome("Chefe de Teste");
-        chefe.setPerfis(java.util.Set.of(Perfil.CHEFE));
-        usuarioRepo.save(chefe);
+        // Use existing user and units from data-postgresql.sql
+        Usuario chefe = usuarioRepo.findById("333333333333").orElseThrow(); // Chefe Teste
 
-        Unidade unidadeOrigem = new Unidade("UNIDADE-CDU08-ORIGEM", "U08O");
-        unidadeOrigem.setTitular(chefe);
-        unidadeRepo.save(unidadeOrigem);
-
-        Unidade unidadeDestino = new Unidade("UNIDADE-CDU08-DESTINO", "U08D");
-        unidadeDestino.setTitular(chefe);
-        unidadeRepo.save(unidadeDestino);
+        Unidade unidadeOrigem = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
+        Unidade unidadeDestino = unidadeRepo.findById(9L).orElseThrow(); // SEDIA
 
         Mapa mapaOrigem = new Mapa();
         mapaRepo.save(mapaOrigem);
@@ -131,7 +123,7 @@ class CDU08IntegrationTest {
     @WithMockChefe("888888888888")
     class ImportacaoAtividades {
         @Test
-        @DisplayName("Deve importar atividades e conhecimentos com sucesso")
+        @DisplayName("Deve importar atividades e conhecimentos")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
             ImportarAtividadesReq request = new ImportarAtividadesReq(subprocessoOrigem.getCodigo());
 
@@ -139,7 +131,7 @@ class CDU08IntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("Atividades importadas com sucesso.")));
+                    .andExpect(jsonPath("$.message", is("Atividades importadas.")));
 
             List<Atividade> atividadesDestino = atividadeRepo.findByMapaCodigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).hasSize(2);
@@ -156,7 +148,7 @@ class CDU08IntegrationTest {
             assertThat(conhecimentos2).hasSize(2);
             assertThat(conhecimentos2.stream().map(Conhecimento::getDescricao).toList()).containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
 
-            List<sgc.subprocesso.modelo.Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
+            List<sgc.subprocesso.model.Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
         }

@@ -70,27 +70,33 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {computed, onMounted} from 'vue'
 import {useRouter} from 'vue-router'
 import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfilStore} from '@/stores/perfil'
-import {useServidoresStore} from '@/stores/servidores'
+import {useUsuariosStore} from '@/stores/usuarios'
 import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
-import {MapaCompleto, Servidor, Unidade} from '@/types/tipos';
+import {MapaCompleto, Usuario, Unidade} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
-const props = defineProps<{ siglaUnidade: string }>();
+const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter()
-const sigla = computed(() => props.siglaUnidade)
+const codigo = computed(() => props.codUnidade)
 const unidadesStore = useUnidadesStore()
 const perfilStore = usePerfilStore()
-const servidoresStore = useServidoresStore()
+const usuariosStore = useUsuariosStore()
 const mapasStore = useMapasStore()
-const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore() // Instanciar
+const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
 
-const unidadeOriginal = computed<Unidade | null>(() => unidadesStore.pesquisarUnidade(sigla.value) || null)
+onMounted(async () => {
+  if (unidadesStore.unidades.length === 0) {
+    await unidadesStore.fetchUnidades();
+  }
+});
+
+const unidadeOriginal = computed<Unidade | null>(() => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null)
 
 const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   const unidade = unidadeOriginal.value;
@@ -117,18 +123,18 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   // Se não houver atribuição temporária vigente, retorna a unidade original
   return unidade;
 });
-const titularDetalhes = computed<Servidor | null>(() => {
+const titularDetalhes = computed<Usuario | null>(() => {
   if (unidadeOriginal.value && unidadeOriginal.value.idServidorTitular) {
-    return servidoresStore.getServidorById(unidadeOriginal.value.idServidorTitular) || null;
+    return usuariosStore.getUsuarioById(unidadeOriginal.value.idServidorTitular) || null;
   }
   return null;
 });
 
-const responsavelDetalhes = computed<Servidor | null>(() => {
+const responsavelDetalhes = computed<Usuario | null>(() => {
   if (!unidadeComResponsavelDinamico.value || !unidadeComResponsavelDinamico.value.responsavel || !unidadeComResponsavelDinamico.value.responsavel.codigo) {
     return null;
   }
-  return servidoresStore.getServidorById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
+  return usuariosStore.getUsuarioById(unidadeComResponsavelDinamico.value.responsavel.codigo) || null;
 });
 
 const mapaVigente = computed<MapaCompleto | null>(() => {
@@ -136,7 +142,7 @@ const mapaVigente = computed<MapaCompleto | null>(() => {
 })
 
 function irParaCriarAtribuicao() {
-  router.push({path: `/unidade/${sigla.value}/atribuicao`})
+  router.push({path: `/unidade/${codigo.value}/atribuicao`})
 }
 
 const dadosFormatadosSubordinadas = computed(() => {
@@ -147,7 +153,7 @@ const dadosFormatadosSubordinadas = computed(() => {
 const colunasTabela = [{key: 'nome', label: 'Unidade'}]
 
 interface UnidadeFormatada {
-  id: string;
+  id: number;
   nome: string;
   expanded: boolean;
   children?: UnidadeFormatada[];
@@ -159,7 +165,7 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   return dados.map(item => {
     const children = item.filhas ? formatarDadosParaArvore(item.filhas) : []
     return {
-      id: item.sigla,
+      id: item.codigo,
       nome: item.sigla + ' - ' + item.nome,
       expanded: true,
       ...(children.length > 0 && {children})
@@ -168,17 +174,17 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
 }
 
 function navegarParaUnidadeSubordinada(item: { id: unknown }) {
-  if (item && typeof item.id === 'string') router.push({path: `/unidade/${item.id}`});
+  if (item && typeof item.id === 'number') router.push({path: `/unidade/${item.id}`});
 }
 
 
 function visualizarMapa() {
-  if (mapaVigente.value) {
+  if (mapaVigente.value && unidadeOriginal.value) {
     router.push({
       name: 'SubprocessoVisMapa',
       params: {
         codProcesso: mapaVigente.value.subprocessoCodigo,
-        siglaUnidade: sigla.value
+        siglaUnidade: unidadeOriginal.value.sigla
       }
     });
   }

@@ -13,15 +13,17 @@ import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDto;
 import sgc.processo.dto.mappers.ProcessoMapper;
 import sgc.processo.eventos.EventoProcessoCriado;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
-import sgc.unidade.modelo.Unidade;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,6 +34,9 @@ import static org.mockito.Mockito.*;
 public class ProcessoServiceTest {
     @Mock
     private ProcessoRepo processoRepo;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @Mock
     private ApplicationEventPublisher publicadorDeEventos;
@@ -54,6 +59,9 @@ public class ProcessoServiceTest {
         u2.setCodigo(2L);
         u2.setNome("Unidade 2");
         u2.setSigla("U2");
+
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(u1));
+        when(unidadeRepo.findById(2L)).thenReturn(Optional.of(u2));
 
         when(processoRepo.save(any(Processo.class))).thenAnswer(invocation -> {
             Processo p = invocation.getArgument(0);

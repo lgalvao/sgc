@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sgc.analise.dto.AnaliseMapper;
 import sgc.analise.dto.AnaliseValidacaoHistoricoDto;
-import sgc.analise.modelo.TipoAnalise;
-import sgc.sgrh.modelo.Usuario;
+import sgc.analise.model.TipoAnalise;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoWorkflowService;
@@ -27,9 +25,6 @@ import java.util.List;
 @Transactional
 @Tag(name = "Subprocessos", description = "Endpoints para gerenciamento do workflow de subprocessos")
 public class SubprocessoValidacaoController {
-    // TODO limpar a sanitização desse controlador
-    private static final PolicyFactory SANITIZADOR_HTML = new HtmlPolicyBuilder().toFactory();
-
     private final SubprocessoWorkflowService subprocessoWorkflowService;
     private final SubprocessoDtoService subprocessoDtoService;
     private final sgc.analise.AnaliseService analiseService;
@@ -55,14 +50,13 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid DisponibilizarMapaReq request,
             @AuthenticationPrincipal Usuario usuario) {
 
-        var sanitizedObservacoes = SANITIZADOR_HTML.sanitize(request.observacoes());
         subprocessoWorkflowService.disponibilizarMapa(
                 codigo,
-                sanitizedObservacoes,
-                request.dataLimiteEtapa2(),
+                request.getObservacoes(),
+                request.getDataLimite().atStartOfDay(),
                 usuario
         );
-        return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado com sucesso."));
+        return ResponseEntity.ok(new RespostaDto("Mapa de competências disponibilizado."));
     }
 
     /**
@@ -80,11 +74,10 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid ApresentarSugestoesReq request,
             @AuthenticationPrincipal Usuario usuario) {
 
-        var sanitizedSugestoes = SANITIZADOR_HTML.sanitize(request.sugestoes());
         subprocessoWorkflowService.apresentarSugestoes(
                 codigo,
-                sanitizedSugestoes,
-                usuario.getTituloEleitoral()
+                request.getSugestoes(),
+                usuario
         );
     }
 
@@ -98,7 +91,7 @@ public class SubprocessoValidacaoController {
 
     @Operation(summary = "Valida o mapa de competências da unidade")
     public void validarMapa(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.validarMapa(codigo, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.validarMapa(codigo, usuario);
     }
 
     /**
@@ -142,11 +135,9 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid DevolverValidacaoReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-        var sanitizedJustificativa = SANITIZADOR_HTML.sanitize(request.justificativa());
-
         subprocessoWorkflowService.devolverValidacao(
                 codigo,
-                sanitizedJustificativa,
+                request.getJustificativa(),
                 usuario
         );
     }
@@ -178,7 +169,7 @@ public class SubprocessoValidacaoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Homologa a validação do mapa")
     public void homologarValidacao(@PathVariable Long codigo, @AuthenticationPrincipal Usuario usuario) {
-        subprocessoWorkflowService.homologarValidacao(codigo);
+        subprocessoWorkflowService.homologarValidacao(codigo, usuario);
     }
 
     /**
@@ -196,9 +187,6 @@ public class SubprocessoValidacaoController {
             @RequestBody @Valid SubmeterMapaAjustadoReq request,
             @AuthenticationPrincipal Usuario usuario
     ) {
-
-        var sanitizedObservacoes = SANITIZADOR_HTML.sanitize(request.observacoes());
-        var sanitizedRequest = new SubmeterMapaAjustadoReq(sanitizedObservacoes, request.dataLimiteEtapa2());
-        subprocessoWorkflowService.submeterMapaAjustado(codigo, sanitizedRequest, usuario.getTituloEleitoral());
+        subprocessoWorkflowService.submeterMapaAjustado(codigo, request, usuario);
     }
 }

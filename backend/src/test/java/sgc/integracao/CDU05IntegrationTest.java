@@ -14,25 +14,25 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
-import sgc.atividade.modelo.Conhecimento;
-import sgc.atividade.modelo.ConhecimentoRepo;
-import sgc.competencia.modelo.Competencia;
-import sgc.competencia.modelo.CompetenciaRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
+import sgc.atividade.model.Conhecimento;
+import sgc.atividade.model.ConhecimentoRepo;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.mapa.modelo.UnidadeMapa;
-import sgc.mapa.modelo.UnidadeMapaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.mapa.model.UnidadeMapa;
+import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -88,8 +88,7 @@ public class CDU05IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidade = new Unidade("Test Unit", "TU");
-        unidadeRepo.save(unidade);
+        unidade = unidadeRepo.findById(13L).orElseThrow(); // SEPRO
 
         // Cria um mapa detalhado para ser copiado
         mapaOriginal = new Mapa();
@@ -105,7 +104,10 @@ public class CDU05IntegrationTest {
         conhecimentoRepo.save(conhecimentoOriginal);
 
         // Define o mapa como vigente para a unidade
-        UnidadeMapa unidadeMapa = new UnidadeMapa(unidade.getCodigo());
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidade(unidade);
+        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
+        unidadeMapa.setMapaVigente(mapaOriginal);
         unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
         unidadeMapaRepo.save(unidadeMapa);
     }
@@ -166,9 +168,8 @@ public class CDU05IntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_unidadeSemMapaVigente_falha() throws Exception {
-        // 1. Criar uma unidade e um processo sem associar um mapa vigente
-        Unidade unidadeSemMapa = new Unidade("Unidade Sem Mapa", "USM");
-        unidadeRepo.save(unidadeSemMapa);
+        // 1. Use existing unit without mapa vigente
+        Unidade unidadeSemMapa = unidadeRepo.findById(14L).orElseThrow(); // COJUR
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());

@@ -14,7 +14,7 @@ import {
     verificarModalFinalizacaoFechado,
     verificarPermanenciaNaPaginaProcesso,
     verificarProcessoFinalizadoNoPainel,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-21: Finalizar processo', () => {
     async function setupProcessoEmAndamento(page) {
@@ -26,7 +26,7 @@ test.describe('CDU-21: Finalizar processo', () => {
     }
 
     test.describe('Administrador', () => {
-        test('deve finalizar processo com sucesso', async ({page}) => {
+        test('deve finalizar processo', async ({page}) => {
             const {nomeProcesso, processo} = await setupProcessoEmAndamento(page);
             await loginComoAdmin(page);
             await navegarParaProcessoPorId(page, processo.processo.codigo);
@@ -35,7 +35,7 @@ test.describe('CDU-21: Finalizar processo', () => {
             await abrirModalFinalizacaoProcesso(page);
             await confirmarFinalizacaoNoModal(page);
 
-            await verificarMensagemSucesso(page, 'Processo finalizado com sucesso');
+            await verificarMensagemSucesso(page, 'Processo finalizado');
             await verificarProcessoFinalizadoNoPainel(page, nomeProcesso);
         });
 

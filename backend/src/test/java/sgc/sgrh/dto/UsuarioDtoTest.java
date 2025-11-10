@@ -11,10 +11,10 @@ class UsuarioDtoTest {
         UsuarioDto dto = new UsuarioDto("12345678901", "João Silva", "joao.silva@tre-pe.jus.br", "MAT001", "Analista Judiciário");
 
         // Test getters (record provides accessors)
-        assertEquals("12345678901", dto.titulo());
-        assertEquals("João Silva", dto.nome());
-        assertEquals("joao.silva@tre-pe.jus.br", dto.email());
-        assertEquals("MAT001", dto.matricula());
-        assertEquals("Analista Judiciário", dto.cargo());
+        assertEquals("12345678901", dto.getTitulo());
+        assertEquals("João Silva", dto.getNome());
+        assertEquals("joao.silva@tre-pe.jus.br", dto.getEmail());
+        assertEquals("MAT001", dto.getMatricula());
+        assertEquals("Analista Judiciário", dto.getCargo());
     }
 }

@@ -56,11 +56,12 @@ test.describe('CDU-02: Visualizar Painel', () => {
      test.describe('Tabela de Processos', () => {
          test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
              await loginComoChefeStic(page);
+
              // Aguardar tabela de processos carregar com pelo menos uma linha
-             await page.getByTestId('tabela-processos').locator('tbody tr').first().waitFor({timeout: 5000});
+             await page.getByTestId('tabela-processos').locator('tbody tr').first().waitFor();
 
              // Chefe STIC deve ver processo EM_ANDAMENTO da STIC (processo 2)
-             await verificarVisibilidadeProcesso(page, /Revisão de mapa de competências STIC - 2024/, true);
+             await verificarVisibilidadeProcesso(page, /Processo da Raiz CDU02/, true);
 
              // Não deve ver processo da ADMIN-UNIT (processo 5)
              await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);

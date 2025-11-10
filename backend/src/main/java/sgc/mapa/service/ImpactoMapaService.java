@@ -4,24 +4,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.Atividade;
-import sgc.atividade.modelo.AtividadeRepo;
+import sgc.atividade.model.Atividade;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.AtividadeImpactadaDto;
 import sgc.mapa.dto.CompetenciaImpactadaDto;
 import sgc.mapa.dto.ImpactoMapaDto;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.sgrh.modelo.Usuario;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.subprocesso.modelo.SubprocessoRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
+import sgc.sgrh.model.Usuario;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SubprocessoRepo;
 
 import java.util.List;
 import java.util.Optional;
 
-import static sgc.subprocesso.modelo.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 /**
  * Interface do serviço responsável por detectar impactos no mapa de competências
@@ -101,7 +101,7 @@ public class ImpactoMapaService {
         ImpactoMapaDto impactos = ImpactoMapaDto.comImpactos(inseridas, removidas, alteradas, competenciasImpactadas);
 
         log.info("ImpactoMapaService - Análise de impactos concluída: tem={}, inseridas={}, removidas={}, alteradas={}",
-                impactos.temImpactos(), impactos.totalAtividadesInseridas(), impactos.totalAtividadesRemovidas(), impactos.totalAtividadesAlteradas());
+                impactos.isTemImpactos(), impactos.getTotalAtividadesInseridas(), impactos.getTotalAtividadesRemovidas(), impactos.getTotalAtividadesAlteradas());
         return impactos;
     }
 

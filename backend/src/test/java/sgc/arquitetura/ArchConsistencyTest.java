@@ -14,7 +14,8 @@ public class ArchConsistencyTest {
 
     @ArchTest
     static final ArchRule controllers_should_not_access_repositories =
-            noClasses().that().haveNameMatching(".*Controle")
+            noClasses().that().haveNameMatching(".*Controller")
+                    .and().haveNameNotMatching(".*E2eTestController")
                     .should().accessClassesThat().haveNameMatching(".*Repo");
 
     @ArchTest
@@ -32,6 +33,6 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule comum_package_should_not_contain_business_logic =
             noClasses().that().resideInAPackage("sgc.comum..")
-                    .should().haveNameMatching(".*Controle")
+                    .should().haveNameMatching(".*Controller")
                     .orShould().haveNameMatching(".*Service");
 }

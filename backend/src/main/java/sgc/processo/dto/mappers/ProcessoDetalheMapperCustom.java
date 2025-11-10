@@ -1,176 +1,95 @@
 package sgc.processo.dto.mappers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import sgc.sgrh.model.Usuario;
 import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.UnidadeProcesso;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/**
- * Implementação customizada para mapeamento complexo de Processo para ProcessoDetalheDto.
- * Esta classe implementa a lógica de associação entre unidades de processo e subprocessos,
- * que não pode ser feita automaticamente pelo MapStruct.
- */
-@Component
-public class ProcessoDetalheMapperCustom {
+public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapper {
 
-    private final ProcessoDetalheMapper processoDetalheMapper;
+    @Autowired
+    private ProcessoDetalheMapper delegate;
 
-    public ProcessoDetalheMapperCustom(ProcessoDetalheMapper processoDetalheMapper) {
-        this.processoDetalheMapper = processoDetalheMapper;
+    @Override
+    public ProcessoDetalheDto toDetailDTO(Processo processo) {
+        ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
+                .codigo(processo.getCodigo())
+                .descricao(processo.getDescricao())
+                .situacao(processo.getSituacao())
+                .tipo(processo.getTipo().name())
+                .dataCriacao(processo.getDataCriacao())
+                .dataFinalizacao(processo.getDataFinalizacao())
+                .dataLimite(processo.getDataLimite())
+                .podeFinalizar(isCurrentUserAdmin())
+                .podeHomologarCadastro(isCurrentUserChefeOuCoordenador(processo))
+                .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
+                .build();
+
+        return dto;
     }
 
-    /**
-     * Converte um Processo com suas associações para ProcessoDetalheDto,
-     * mapeando corretamente as unidades de processo e subprocessos.
-     */
-    public ProcessoDetalheDto toDetailDTO(Processo p,
-                                          List<UnidadeProcesso> unidadesProcesso,
-                                          List<Subprocesso> subprocessos) {
-        if (p == null) return null;
-
-        // Mapeia os dados básicos do processo usando MapStruct
-        ProcessoDetalheDto dto = processoDetalheMapper.toDetailDTO(p);
-
-        Map<String, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesBySigla = new HashMap<>();
-
-        // Mapeia as unidades de processo
-        if (unidadesProcesso != null) {
-            for (UnidadeProcesso up : unidadesProcesso) {
-                ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.unidadeProcessoToUnidadeParticipanteDTO(up);
-                if (unit.getSigla() != null) {
-                    unidadesBySigla.put(unit.getSigla(), unit);
-                }
-            }
-        }
-
-        // Associa as informações dos subprocessos às unidades
-        if (subprocessos != null) {
-            for (Subprocesso sp : subprocessos) {
-                String sigla = (sp.getUnidade() != null) ? sp.getUnidade().getSigla() : null;
-
-                if (sigla != null && unidadesBySigla.containsKey(sigla)) {
-                    // Atualiza a unidade existente com informações do subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDto existingUnit = unidadesBySigla.get(sigla);
-                    ProcessoDetalheDto.UnidadeParticipanteDto updatedUnit = ProcessoDetalheDto.UnidadeParticipanteDto.builder()
-                        .codUnidade(existingUnit.getCodUnidade())
-                        .nome(existingUnit.getNome())
-                        .sigla(existingUnit.getSigla())
-                        .codUnidadeSuperior(existingUnit.getCodUnidadeSuperior())
-                        .situacaoSubprocesso(sp.getSituacao()) // Novo valor
-                        .dataLimite(sp.getDataLimiteEtapa1())   // Novo valor
-                        .filhos(existingUnit.getFilhos())
-                        .build();
-                    unidadesBySigla.put(sigla, updatedUnit); // Atualizar no mapa
-                } else {
-                    // Cria uma nova unidade participante baseada no subprocesso
-                    ProcessoDetalheDto.UnidadeParticipanteDto unit = processoDetalheMapper.subprocessoToUnidadeParticipanteDTO(sp);
-                    if (unit.getSigla() != null) {
-                        unidadesBySigla.put(unit.getSigla(), unit);
-                    }
-                }
-            }
-        }
-
-        // Constroi a lista final de unidades a partir do mapa para garantir que as atualizações sejam refletidas
-        List<ProcessoDetalheDto.UnidadeParticipanteDto> todasUnidades = new ArrayList<>(unidadesBySigla.values());
-
-        // Construir hierarquia de unidades (raízes com filhos)
-        List<ProcessoDetalheDto.UnidadeParticipanteDto> unidades = construirHierarquiaUnidades(todasUnidades);
-
-        // Mapeia os subprocessos para resumo
-        List<ProcessoResumoDto> resumoSubprocessos = new ArrayList<>();
-        if (subprocessos != null) {
-            for (Subprocesso sp : subprocessos) {
-                ProcessoResumoDto resumoDto = processoDetalheMapper.subprocessoToProcessoResumoDto(sp);
-                resumoSubprocessos.add(resumoDto);
-            }
-        }
-
-        // Lógica para os botões condicionais
+    private boolean isCurrentUserChefeOuCoordenador(Processo processo) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        boolean allSubprocessosHomologados = subprocessos != null && !subprocessos.isEmpty() && subprocessos.stream()
-                .allMatch(sp -> sp.getSituacao() == SituacaoSubprocesso.MAPA_HOMOLOGADO);
-
-        boolean podeFinalizar = isAdmin
-                && p.getSituacao() == SituacaoProcesso.EM_ANDAMENTO
-                && allSubprocessosHomologados;
-
-        final Set<SituacaoSubprocesso> situacoesHomologacaoCadastro = Set.of(
-            SituacaoSubprocesso.CADASTRO_DISPONIBILIZADO,
-            SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
-        );
-        boolean podeHomologarCadastro = subprocessos != null && subprocessos.stream()
-                .anyMatch(sp -> situacoesHomologacaoCadastro.contains(sp.getSituacao()));
-
-        final Set<SituacaoSubprocesso> situacoesHomologacaoMapa = Set.of(
-            SituacaoSubprocesso.MAPA_VALIDADO,
-            SituacaoSubprocesso.MAPA_COM_SUGESTOES
-        );
-        boolean podeHomologarMapa = subprocessos != null && subprocessos.stream()
-                .anyMatch(sp -> situacoesHomologacaoMapa.contains(sp.getSituacao()));
-
-        return ProcessoDetalheDto.builder()
-            .codigo(dto.getCodigo())
-            .descricao(dto.getDescricao())
-            .tipo(dto.getTipo())
-            .situacao(dto.getSituacao())
-            .dataLimite(dto.getDataLimite())
-            .dataCriacao(dto.getDataCriacao())
-            .dataFinalizacao(dto.getDataFinalizacao())
-            .unidades(unidades)
-            .resumoSubprocessos(resumoSubprocessos)
-            .podeFinalizar(podeFinalizar)
-            .podeHomologarCadastro(podeHomologarCadastro)
-            .podeHomologarMapa(podeHomologarMapa)
-            .build();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        Usuario user = (Usuario) authentication.getPrincipal();
+        return processo.getParticipantes().stream()
+                .anyMatch(unidade -> unidade.getCodigo().equals(user.getUnidade().getCodigo()));
     }
 
-    /**
-     * Constrói hierarquia de unidades participantes organizando-as em estrutura de árvore.
-     * Unidades raiz (sem superior) ficam no nível principal, e as demais são organizadas
-     * recursivamente como filhas de suas superiores.
-     */
-    private List<ProcessoDetalheDto.UnidadeParticipanteDto> construirHierarquiaUnidades(
-            List<ProcessoDetalheDto.UnidadeParticipanteDto> todasUnidades) {
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
 
-        if (todasUnidades == null || todasUnidades.isEmpty()) {
-            return Collections.emptyList();
+    protected void montarHierarquiaUnidades(ProcessoDetalheDto dto,
+                                          Processo processo,
+                                          List<Subprocesso> subprocessos) {
+        Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
+        for (Unidade participante : processo.getParticipantes()) {
+            mapaUnidades.put(participante.getCodigo(), delegate.unidadeToUnidadeParticipanteDTO(participante));
         }
 
-        // Criar mapa para acesso rápido por código
-        Map<Long, ProcessoDetalheDto.UnidadeParticipanteDto> unidadesPorCodigo = new HashMap<>();
-        for (ProcessoDetalheDto.UnidadeParticipanteDto unidade : todasUnidades) {
-            unidadesPorCodigo.put(unidade.getCodUnidade(), unidade);
+        for (Subprocesso sp : subprocessos) {
+            ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto = mapaUnidades.get(sp.getUnidade().getCodigo());
         }
 
-        List<ProcessoDetalheDto.UnidadeParticipanteDto> raizes = new ArrayList<>();
-
-        // Percorrer todas as unidades e organizar em hierarquia
-        for (ProcessoDetalheDto.UnidadeParticipanteDto unidade : todasUnidades) {
-            if (unidade.getCodUnidadeSuperior() == null) {
-                // É raiz
-                raizes.add(unidade);
-            } else {
-                // Adicionar como filha da superior
-                ProcessoDetalheDto.UnidadeParticipanteDto superior = unidadesPorCodigo.get(unidade.getCodUnidadeSuperior());
-                if (superior != null) {
-                    // Adicionar aos filhos da superior
-                    superior.getFilhos().add(unidade);
+        // Monta a hierarquia
+        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
+            if (unidadeDto.getCodUnidadeSuperior() != null) {
+                ProcessoDetalheDto.UnidadeParticipanteDto pai = mapaUnidades.get(unidadeDto.getCodUnidadeSuperior());
+                if (pai != null) {
+                    pai.getFilhos().add(unidadeDto);
                 }
             }
         }
 
-        return raizes;
+        // Adiciona apenas as unidades raiz ao DTO final
+        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
+            if (unidadeDto.getCodUnidadeSuperior() == null) {
+                dto.getUnidades().add(unidadeDto);
+            }
+        }
+
+        // Ordena as unidades e seus filhos
+        Comparator<ProcessoDetalheDto.UnidadeParticipanteDto> comparator = Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla);
+        dto.getUnidades().sort(comparator);
+        for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
+            unidadeDto.getFilhos().sort(comparator);
+        }
     }
 }

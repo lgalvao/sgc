@@ -18,7 +18,7 @@ import {
 } from '../helpers';
 
 test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
-    test('deve disponibilizar a revisão com sucesso após corrigir atividades incompletas', async ({page}) => {
+    test('deve disponibilizar a revisão após corrigir atividades incompletas', async ({page}) => {
         const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-10'), 'REVISAO', '2025-12-31', [1]);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
@@ -36,7 +36,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
         // Adiciona conhecimento à atividade que estava incompleta
         await adicionarConhecimentoNaAtividade(page, nomeAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
-        // Disponibiliza com sucesso
+        // Disponibiliza
         await disponibilizarCadastro(page);
 
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');
@@ -59,7 +59,7 @@ test.describe('CDU-10: Disponibilizar revisão do cadastro', () => {
 
         // 2. GESTOR devolve o cadastro em revisão
         await devolverCadastro(page, processo, nomeUnidade, motivoDevolucao);
-        await verificarMensagemSucesso(page, 'Cadastro devolvido com sucesso');
+        await verificarMensagemSucesso(page, 'Cadastro devolvido');
         await verificarUrlDoPainel(page);
 
         // 3. CHEFE verifica o histórico de análise

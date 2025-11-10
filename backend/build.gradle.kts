@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
@@ -77,17 +79,19 @@ tasks.withType<Test> {
 
     testLogging {
         events("skipped", "failed")
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
-        showStandardStreams = true
+        showStandardStreams = false
+        stackTraceFilters = setOf(TestStackTraceFilter.ENTRY_POINT)
     }
 
     jvmArgs = listOf(
-        "-Dlogging.level.root=INFO",
+        "-Dlogging.level.root=ERROR",
         "-Dlogging.level.sgc=INFO",
-        "-Dlogging.level.org.hibernate=INFO",
-        "-Dlogging.level.org.springframework=INFO",
+        "-Dlogging.level.org.hibernate=ERROR",
+        "-Dlogging.level.org.springframework=ERROR",
+        "-Dlogging.level.org.springframework.boot.autoconfigure.condition=ERROR",
         "-Dspring.jpa.show-sql=false",
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
@@ -114,7 +118,12 @@ tasks.withType<JavaCompile> {
         isIncremental = true
         isFork = true
         encoding = "UTF-8"
+        compilerArgs.add("--enable-preview")
     }
+}
+
+tasks.withType<Test> {
+    jvmArgs("--enable-preview")
 }
 
 tasks.register<BootRun>("bootRunE2E") {

@@ -2,7 +2,7 @@ package sgc.alerta.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import sgc.alerta.modelo.Alerta;
+import sgc.alerta.model.Alerta;
 
 @Mapper(componentModel = "spring")
 public interface AlertaMapper {

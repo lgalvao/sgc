@@ -2,6 +2,9 @@ package sgc.mapa.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,22 +12,33 @@ import java.util.List;
 /**
  * DTO que representa uma competência no contexto do mapa completo.
  * Contém os dados da competência e os códigos das atividades vinculadas.
- *
- * @param codigo O código da competência (pode ser nulo para novas competências).
- * @param descricao A descrição da competência.
- * @param atividadesCodigos Lista com os códigos das atividades vinculadas à competência.
  */
-public record CompetenciaMapaDto(
-    Long codigo,  // null quando for nova competência
-    
+@Data
+@Builder
+@NoArgsConstructor
+public class CompetenciaMapaDto {
+    /** O código da competência (pode ser nulo para novas competências). */
+    private Long codigo;
+
+    /** A descrição da competência. */
     @NotBlank(message = "Descrição da competência é obrigatória")
-    String descricao,
-    
+    private String descricao;
+
+    /** Lista com os códigos das atividades vinculadas à competência. */
     @NotNull(message = "Lista de atividades não pode ser nula")
-    List<Long> atividadesCodigos  // IDs das atividades vinculadas à competência
-) {
-    // TODO verificar a necessidade disso:
-    public CompetenciaMapaDto {
-        atividadesCodigos = new ArrayList<>(atividadesCodigos);
+    private List<Long> atividadesCodigos;
+
+    public CompetenciaMapaDto(Long codigo, String descricao, List<Long> atividadesCodigos) {
+        this.codigo = codigo;
+        this.descricao = descricao;
+        this.setAtividadesCodigos(atividadesCodigos);
+    }
+
+    public void setAtividadesCodigos(List<Long> atividadesCodigos) {
+        this.atividadesCodigos = (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
+    }
+
+    public List<Long> getAtividadesCodigos() {
+        return (atividadesCodigos == null) ? null : new ArrayList<>(atividadesCodigos);
     }
 }

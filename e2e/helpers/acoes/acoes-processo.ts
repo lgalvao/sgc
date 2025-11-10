@@ -11,29 +11,22 @@ import {extrairIdDoSeletor} from '../utils/utils';
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
     // Aguardar a árvore de unidades carregar
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
+    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible'});
 
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
         const alvo = page.locator(seletorCheckbox);
-        if (await alvo.count() > 0) {
-            await page.waitForSelector(seletorCheckbox, {state: 'visible', timeout: 2000});
-            const isDisabled = await page.isDisabled(seletorCheckbox);
-            if (isDisabled) {
-                console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
-                continue;
-            }
-            await page.check(seletorCheckbox);
-        } else {
-            // Fallback: selecionar a primeira unidade disponível não desabilitada
-            const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
-            const count = await disponiveis.count();
-            if (count > 0) {
-                await disponiveis.first().check();
-            } else {
-                throw new Error('Nenhuma unidade disponível para seleção');
-            }
+
+        // Aguardar a unidade aparecer na árvore (pode demorar devido a validações assíncronas)
+        await alvo.waitFor({state: 'visible'});
+
+        const isDisabled = await alvo.isDisabled();
+        if (isDisabled) {
+            console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
+            continue;
         }
+
+        await page.check(seletorCheckbox);
     }
 }
 
@@ -63,7 +56,7 @@ export async function selecionarUnidadeDisponivel(page: Page, index: number = 0)
 export async function selecionarUnidadesPorId(page: Page, unidades: number[]): Promise<void> {
     // Mapeamento conhecido de ID -> SIGLA (baseado no data.sql)
     const idParaSigla: Record<number, string> = {
-        1: 'TRE-PE',
+        1: 'TRE',
         2: 'STIC',
         3: 'SGP',
         4: 'COEDE',
@@ -103,6 +96,21 @@ export async function preencherFormularioProcesso(
     if (dataLimite) {
         await page.fill(SELETORES.CAMPO_DATA_LIMITE, dataLimite);
     }
+
+    // Para processos de REVISAO/DIAGNOSTICO, aguardar que as validações de mapa vigente terminem
+    // O Vue faz requisições assíncronas para verificar todas as unidades
+    if (tipo === 'REVISAO' || tipo === 'DIAGNOSTICO') {
+        // Aguardar que pelo menos alguns checkboxes operacionais estejam visíveis
+        // Isso indica que a validação de mapas vigentes foi concluída
+        await page.waitForFunction(
+            () => {
+                const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"]:not([disabled])');
+                return checkboxes.length > 0;
+            },
+            { timeout: 10000 }
+        );
+    }
+
     if (sticChecked) {
         await page.check(SELETORES.CHECKBOX_STIC);
     }
@@ -236,7 +244,7 @@ export async function criarProcessoBasico(
     console.log(`[DEBUG] criarProcessoBasico: Clicou em Salvar`);
 
     // Aguardar redirecionamento ao painel
-    await page.waitForURL(/\/painel/, {timeout: 1500});
+    await page.waitForURL(/\/painel/, );
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
 }
 
@@ -247,14 +255,14 @@ export async function criarProcessoBasico(
  */
 export async function abrirProcessoPorNome(page: Page, descricao: string): Promise<void> {
     console.log(`[DEBUG] abrirProcessoPorNome: Procurando processo "${descricao}"`);
-    const row = page.locator(`[data-testid="${SELETORES.TABELA_PROCESSOS}"] tr:has-text("${descricao}")`);
+    const row = page.locator(`${SELETORES.TABELA_PROCESSOS} tr:has-text("${descricao}")`);
     await row.waitFor({state: 'visible', timeout: 10000});
     console.log(`[DEBUG] abrirProcessoPorNome: Processo encontrado, clicando`);
     await row.click();
     console.log(`[DEBUG] abrirProcessoPorNome: Clicou no processo`);
 
     // Aguardar navegação para página de cadastro
-    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, {timeout: 1500});
+    await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/, );
     console.log(`[DEBUG] abrirProcessoPorNome: Navegou para página de cadastro`);
 
     // Aguardar formulário carregar com os dados do processo

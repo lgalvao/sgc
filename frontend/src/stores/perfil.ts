@@ -8,6 +8,7 @@ export const usePerfilStore = defineStore('perfil', {
         servidorId: localStorage.getItem('idServidor') ? Number(localStorage.getItem('idServidor')) : null,
         perfilSelecionado: (localStorage.getItem('perfilSelecionado') || null) as Perfil | null,
         unidadeSelecionada: localStorage.getItem('unidadeSelecionada') ? Number(localStorage.getItem('unidadeSelecionada')) : null,
+        unidadeSelecionadaSigla: (localStorage.getItem('unidadeSelecionadaSigla') || null) as string | null,
         perfisUnidades: [] as PerfilUnidade[],
     }),
     actions: {
@@ -34,11 +35,6 @@ export const usePerfilStore = defineStore('perfil', {
                 // Se houver apenas uma opção, seleciona automaticamente
                 if (perfisUnidades.length === 1) {
                     const perfilUnidadeSelecionado = perfisUnidades[0];
-                    console.log('Dados para entrar (loginCompleto):', {
-                        tituloEleitoral: tituloEleitoralNum,
-                        perfil: perfilUnidadeSelecionado.perfil,
-                        unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
-                    });
                     const loginResponse = await usuarioService.entrar({
                         tituloEleitoral: tituloEleitoralNum,
                         perfil: perfilUnidadeSelecionado.perfil,
@@ -54,11 +50,6 @@ export const usePerfilStore = defineStore('perfil', {
         },
 
         async selecionarPerfilUnidade(tituloEleitoral: number, perfilUnidade: PerfilUnidade) {
-            console.log('Dados para entrar (selecionarPerfilUnidade):', {
-                tituloEleitoral: tituloEleitoral,
-                perfil: perfilUnidade.perfil,
-                unidadeCodigo: perfilUnidade.unidade.codigo,
-            });
             const loginResponse = await usuarioService.entrar({
                 tituloEleitoral: tituloEleitoral,
                 perfil: perfilUnidade.perfil,

@@ -12,15 +12,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.dto.MapaDto;
 import sgc.mapa.dto.MapaMapper;
-import sgc.mapa.modelo.Mapa;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaService;
-import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.model.Usuario;
 
 import java.util.List;
 
@@ -52,9 +53,9 @@ public class MapaControllerTest {
     @BeforeEach
     void setUp() {
         Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(123456789012L);
+        usuario.setTituloEleitoral("123456789012");
 
-        HandlerMethodArgumentResolver authenticationPrincipalResolver = new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver();
+        HandlerMethodArgumentResolver authenticationPrincipalResolver = new AuthenticationPrincipalArgumentResolver();
 
         mockMvc = MockMvcBuilders.standaloneSetup(mapaController)
                 .setControllerAdvice(new sgc.comum.erros.RestExceptionHandler())
@@ -76,7 +77,7 @@ public class MapaControllerTest {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaService.listar()).thenReturn(List.of(mapa));
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS))
                 .andExpect(status().isOk())
@@ -90,7 +91,7 @@ public class MapaControllerTest {
         MapaDto mapaDto = MapaDto.builder().codigo(1L).build();
 
         when(mapaService.obterPorCodigo(1L)).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(get(API_MAPAS_1))
                 .andExpect(status().isOk())
@@ -113,7 +114,7 @@ public class MapaControllerTest {
 
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
         when(mapaService.criar(any(Mapa.class))).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +131,7 @@ public class MapaControllerTest {
 
         when(mapaService.atualizar(eq(1L), any(Mapa.class))).thenReturn(mapa);
         when(mapaMapper.toEntity(any(MapaDto.class))).thenReturn(mapa);
-        when(mapaMapper.toDTO(any(Mapa.class))).thenReturn(mapaDto);
+        when(mapaMapper.toDto(any(Mapa.class))).thenReturn(mapaDto);
 
         mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -169,5 +170,4 @@ public class MapaControllerTest {
         mockMvc.perform(post(API_MAPAS_1_EXCLUIR))
                 .andExpect(status().isNotFound());
     }
-
 }

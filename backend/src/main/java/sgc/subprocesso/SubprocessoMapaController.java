@@ -15,11 +15,12 @@ import sgc.mapa.dto.visualizacao.MapaVisualizacaoDto;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaService;
 import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.sgrh.modelo.Usuario;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.dto.CompetenciaReq;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
 import sgc.subprocesso.dto.MapaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
-import sgc.subprocesso.modelo.Subprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 import sgc.subprocesso.service.SubprocessoDtoService;
 import sgc.subprocesso.service.SubprocessoMapaService;
@@ -124,7 +125,7 @@ public class SubprocessoMapaController {
     ) {
         subprocessoMapaService.salvarAjustesMapa(
                 codigo,
-                request.competencias(),
+                request.getCompetencias(),
                 usuario.getTituloEleitoral()
         );
     }
@@ -204,5 +205,17 @@ public class SubprocessoMapaController {
     ) {
         MapaCompletoDto mapa = subprocessoMapaWorkflowService.removerCompetencia(codigo, codCompetencia, usuario.getTituloEleitoral());
         return ResponseEntity.ok(mapa);
+    }
+
+    @PostMapping("/{codigo}/disponibilizar")
+    @Transactional
+    @Operation(summary = "Disponibiliza o mapa de competências para validação")
+    public ResponseEntity<Void> disponibilizarMapa(
+        @PathVariable Long codigo,
+        @RequestBody @Valid DisponibilizarMapaRequest request,
+        @AuthenticationPrincipal Usuario usuario
+    ) {
+        subprocessoMapaWorkflowService.disponibilizarMapa(codigo, request, usuario);
+        return ResponseEntity.ok().build();
     }
 }

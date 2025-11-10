@@ -4,10 +4,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sgc.atividade.modelo.Atividade;
+import sgc.atividade.model.Atividade;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.modelo.Mapa;
-import sgc.mapa.modelo.MapaRepo;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.MapaRepo;
 
 /**
  * Mapper (usando MapStruct) entre a entidade Atividade e seu DTO.

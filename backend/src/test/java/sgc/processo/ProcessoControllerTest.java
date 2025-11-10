@@ -17,9 +17,9 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
-import sgc.processo.modelo.ErroProcesso;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
+import sgc.processo.erros.ErroProcesso;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.processo.service.ProcessoService;
 
 import java.time.LocalDateTime;
@@ -90,7 +90,7 @@ public class ProcessoControllerTest {
 
         verify(processoService).criar(criarCaptor.capture());
         CriarProcessoReq capturado = criarCaptor.getValue();
-        assertEquals(NOVO_PROCESSO, capturado.descricao());
+        assertEquals(NOVO_PROCESSO, capturado.getDescricao());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class ProcessoControllerTest {
 
         verify(processoService).atualizar(eq(1L), atualizarCaptor.capture());
         AtualizarProcessoReq capturado = atualizarCaptor.getValue();
-        assertEquals(PROCESSO_ATUALIZADO, capturado.descricao());
+        assertEquals(PROCESSO_ATUALIZADO, capturado.getDescricao());
     }
 
     @Test

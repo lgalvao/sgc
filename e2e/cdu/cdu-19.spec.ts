@@ -17,7 +17,7 @@ import {
     TEXTOS,
     validarMapa,
     verificarModalHistoricoAnaliseAberto,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-19: Validar mapa de competências', () => {
     let processo: any;

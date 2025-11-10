@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.MapaDto;
@@ -24,24 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
 public class MapaController {
-    private static final PolicyFactory HTML_SANITIZER_POLICY = new HtmlPolicyBuilder().toFactory();
-
     private final MapaService mapaService;
     private final MapaMapper mapaMapper;
-
-    private MapaDto sanitizarEMapearMapaDto(MapaDto mapaDto) {
-        var sanitizedObservacoesDisponibilizacao = HTML_SANITIZER_POLICY.sanitize(mapaDto.getObservacoesDisponibilizacao());
-        var sanitizedSugestoes = HTML_SANITIZER_POLICY.sanitize(mapaDto.getSugestoes());
-
-        return MapaDto.builder()
-                .codigo(mapaDto.getCodigo())
-                .dataHoraDisponibilizado(mapaDto.getDataHoraDisponibilizado())
-                .observacoesDisponibilizacao(sanitizedObservacoesDisponibilizacao)
-                .sugestoesApresentadas(mapaDto.getSugestoesApresentadas())
-                .dataHoraHomologado(mapaDto.getDataHoraHomologado())
-                .sugestoes(sanitizedSugestoes)
-                .build();
-    }
 
     /**
      * Retorna uma lista com todos os mapas de competências.
@@ -53,7 +35,7 @@ public class MapaController {
     public List<MapaDto> listar() {
         return mapaService.listar()
                 .stream()
-                .map(mapaMapper::toDTO)
+                .map(mapaMapper::toDto)
                 .toList();
     }
 
@@ -67,13 +49,11 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaDto> obterPorId(@PathVariable Long codigo) {
         var mapa = mapaService.obterPorCodigo(codigo);
-        return ResponseEntity.ok(mapaMapper.toDTO(mapa));
+        return ResponseEntity.ok(mapaMapper.toDto(mapa));
     }
 
     /**
      * Cria um novo mapa de competências.
-     * <p>
-     * Os campos de texto do DTO são sanitizados para remover HTML antes da persistência.
      *
      * @param mapaDto O DTO com os dados do mapa a ser criado.
      * @return Um {@link ResponseEntity} com status 201 Created, o URI do novo mapa
@@ -82,18 +62,14 @@ public class MapaController {
     @PostMapping
     @Operation(summary = "Cria um novo mapa")
     public ResponseEntity<MapaDto> criar(@Valid @RequestBody MapaDto mapaDto) {
-        var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
-
-        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
+        var entidade = mapaMapper.toEntity(mapaDto);
         var salvo = mapaService.criar(entidade);
         URI uri = URI.create("/api/mapas/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(mapaMapper.toDTO(salvo));
+        return ResponseEntity.created(uri).body(mapaMapper.toDto(salvo));
     }
 
     /**
      * Atualiza um mapa de competências existente.
-     * <p>
-     * Os campos de texto do DTO são sanitizados para remover HTML antes da atualização.
      *
      * @param codMapa O código do mapa a ser atualizado.
      * @param mapaDto O DTO com os novos dados do mapa.
@@ -102,11 +78,9 @@ public class MapaController {
     @PostMapping("/{codMapa}/atualizar")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody MapaDto mapaDto) {
-        var sanitizedMapaDto = sanitizarEMapearMapaDto(mapaDto);
-
-        var entidade = mapaMapper.toEntity(sanitizedMapaDto);
+        var entidade = mapaMapper.toEntity(mapaDto);
         var atualizado = mapaService.atualizar(codMapa, entidade);
-        return ResponseEntity.ok(mapaMapper.toDTO(atualizado));
+        return ResponseEntity.ok(mapaMapper.toDto(atualizado));
     }
 
     /**

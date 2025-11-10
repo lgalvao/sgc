@@ -2,8 +2,8 @@ package sgc.analise.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import sgc.analise.modelo.TipoAcaoAnalise;
-import sgc.analise.modelo.TipoAnalise;
+import sgc.analise.model.TipoAcaoAnalise;
+import sgc.analise.model.TipoAnalise;
 
 import java.time.LocalDateTime;
 

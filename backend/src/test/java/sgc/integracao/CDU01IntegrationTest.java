@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
-import sgc.sgrh.modelo.Perfil;
-import sgc.sgrh.modelo.Usuario;
-import sgc.sgrh.modelo.UsuarioRepo;
-import sgc.unidade.modelo.Unidade;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
+import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.model.Unidade;
+import sgc.unidade.model.UnidadeRepo;
 import sgc.util.TestUtil;
 
 import java.util.Collections;
@@ -56,20 +56,18 @@ public class CDU01IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        unidadeAdmin = unidadeRepo.save(new Unidade("Unidade Admin", "ADM"));
+        unidadeAdmin = unidadeRepo.findById(100L).orElseThrow(); // Use existing ADMIN-UNIT from data-postgresql.sql
     }
 
     @Nested
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
         @Test
-        @DisplayName("Deve realizar login completo com sucesso para usuário com um único perfil")
+        @DisplayName("Deve realizar login completo para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
-            long tituloEleitoral = 123456789012L;
+            String tituloEleitoral = "111111111111"; // Admin Teste from data-postgresql.sql
             String senha = "password";
             AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
-
-            usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Admin", "admin@email.com", "123", unidadeAdmin, Collections.singleton(Perfil.ADMIN)));
 
             mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
@@ -84,7 +82,7 @@ public class CDU01IntegrationTest {
                     .content(String.valueOf(tituloEleitoral)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
-                .andExpect(jsonPath("$[0].siglaUnidade").value("ADM"));
+                .andExpect(jsonPath("$[0].siglaUnidade").value("ADMIN-UNIT"));
 
             // Act & Assert: Etapa 3 - Entrar
             EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(unidadeAdmin.getCodigo()).build();
@@ -96,13 +94,11 @@ public class CDU01IntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve realizar login completo com sucesso para usuário com múltiplos perfis")
+        @DisplayName("Deve realizar login completo para usuário com múltiplos perfis")
         void testLoginCompleto_sucessoUsuarioMultiplosPerfis() throws Exception {
-            long tituloEleitoral = 987654321098L;
+            String tituloEleitoral = "999999999999"; // Usuario Multi Perfil from data-postgresql.sql (has ADMIN and GESTOR)
             String senha = "password";
             AutenticacaoReq authRequest = AutenticacaoReq.builder().tituloEleitoral(tituloEleitoral).senha(senha).build();
-
-            usuarioRepo.save(new Usuario(tituloEleitoral, "Usuário Múltiplo", "multiplo@email.com", "456", unidadeAdmin, Set.of(Perfil.ADMIN, Perfil.GESTOR)));
 
             mockMvc.perform(post(BASE_URL + "/autenticar")
                     .with(csrf())
@@ -131,7 +127,7 @@ public class CDU01IntegrationTest {
         @DisplayName("Deve falhar ao tentar autorizar com unidade inexistente retornada pelo SGRH")
         void testAutorizar_falhaUnidadeInexistente() throws Exception {
             // Arrange
-            long tituloEleitoral = 111222333444L;
+            String tituloEleitoral = "888888888888"; // Non-existent user
 
             // O SgrhService não é mais mockado. A lógica agora busca um usuário no banco.
             // Se o usuário não existe, a exceção será lançada.
@@ -148,7 +144,7 @@ public class CDU01IntegrationTest {
         @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
         void testEntrar_falhaUnidadeInexistente() throws Exception {
             // Arrange
-            long tituloEleitoral = 111222333444L;
+            String tituloEleitoral = "111222333444";
             long codigoUnidadeInexistente = 999L;
             EntrarReq entrarReq = EntrarReq.builder().tituloEleitoral(tituloEleitoral).perfil("ADMIN").unidadeCodigo(codigoUnidadeInexistente).build();
 

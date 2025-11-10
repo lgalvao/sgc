@@ -177,4 +177,10 @@ const collapseAll = () => {
 const handleTreeRowClick = (clickedItem: TreeItem) => {
   emit('row-click', clickedItem)
 }
+
+defineExpose({
+  internalData,
+  findItemById,
+  toggleExpand,
+})
 </script>

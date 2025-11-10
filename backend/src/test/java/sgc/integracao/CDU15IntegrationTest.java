@@ -5,19 +5,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
-import sgc.atividade.modelo.Atividade;
+import sgc.atividade.model.Atividade;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockGestor;
 import sgc.mapa.dto.CompetenciaMapaDto;
 import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.modelo.Mapa;
-import sgc.processo.modelo.Processo;
-import sgc.processo.modelo.SituacaoProcesso;
-import sgc.processo.modelo.TipoProcesso;
-import sgc.subprocesso.modelo.SituacaoSubprocesso;
-import sgc.subprocesso.modelo.Subprocesso;
-import sgc.unidade.modelo.Unidade;
+import sgc.mapa.model.Mapa;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.unidade.model.Unidade;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("CDU-15: Manter Mapa de Competências")
 @Import(TestThymeleafConfig.class)
+@ActiveProfiles("test")
 class CDU15IntegrationTest extends BaseIntegrationTest {
 
     private static final String API_SUBPROCESSO_MAPA = "/api/subprocessos/{codigo}/mapa";
@@ -40,7 +42,7 @@ class CDU15IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Unidade unidade = unidadeRepo.save(new Unidade("Teste", "TST"));
+        Unidade unidade = unidadeRepo.findById(10L).orElseThrow(); // Use existing SESEL
 
         Processo processo = new Processo();
         processo.setDescricao("Processo Teste");

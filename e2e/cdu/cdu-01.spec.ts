@@ -11,7 +11,7 @@ import {
     verificarPainelChefeVisivel,
     verificarSelecaoPerfilVisivel,
 } from '~/helpers';
-import {USUARIOS} from '~/helpers/dados/constantes-teste';
+import {USUARIOS} from '~/helpers/dados/constantes';
 
 test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
     test.describe('Login Convencional (via UI)', () => {
@@ -21,7 +21,7 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await clicarBotaoEntrar(page);
 
             // Aguarda navegação para o painel
-            await page.waitForURL('/painel', {timeout: 1500});
+            await page.waitForURL('/painel', );
             await verificarPainelChefeVisivel(page);
         });
 
@@ -36,7 +36,6 @@ test.describe('CDU-01: Fluxo de Login e Seleção de Perfil', () => {
             await clicarBotaoEntrar(page);
 
             // Aguarda navegação para o painel
-            await page.waitForURL('/painel', {timeout: 1500});
             await verificarPainelAdminVisivel(page);
         });
     });

@@ -10,6 +10,7 @@ import sgc.processo.dto.AtualizarProcessoReq;
 import sgc.processo.dto.CriarProcessoReq;
 import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.dto.ProcessoDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
 import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
@@ -129,12 +130,12 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long codigo,
-            @RequestParam(name = "tipo") sgc.processo.modelo.TipoProcesso tipo,
+            @RequestParam(name = "tipo") sgc.processo.model.TipoProcesso tipo,
             @RequestBody(required = false) List<Long> unidades) {
 
-        if (tipo == sgc.processo.modelo.TipoProcesso.REVISAO) {
+        if (tipo == sgc.processo.model.TipoProcesso.REVISAO) {
             processoService.iniciarProcessoRevisao(codigo, unidades);
-        } else if (tipo == sgc.processo.modelo.TipoProcesso.MAPEAMENTO) {
+        } else if (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
             processoService.iniciarProcessoMapeamento(codigo, unidades);
         } else {
             return ResponseEntity.badRequest().build();
@@ -170,5 +171,19 @@ public class ProcessoController {
     public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
         List<Long> unidadesBloqueadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
         return ResponseEntity.ok(unidadesBloqueadas);
+    }
+
+    /**
+     * Retorna uma lista de subprocessos elegíveis para ações em bloco (aceite/homologação)
+     * para o usuário autenticado.
+     *
+     * @param codigo O código do processo.
+     * @return Lista de DTOs representando os subprocessos elegíveis.
+     */
+    @GetMapping("/{codigo}/subprocessos-elegiveis")
+    @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
+    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(@PathVariable Long codigo) {
+        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
+        return ResponseEntity.ok(elegiveis);
     }
 }

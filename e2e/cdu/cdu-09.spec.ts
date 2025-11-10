@@ -22,7 +22,7 @@ import {
 } from '../helpers';
 
 test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
-    test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar com sucesso', async ({page}) => {
+    test('deve avisar sobre atividades sem conhecimentos e depois disponibilizar', async ({page}) => {
         const {processo} = await criarProcessoCompleto(page, gerarNomeUnico('PROCESSO CDU-09'), 'Mapeamento', '2025-12-31', [1]);
         await loginComoChefe(page);
         await navegarParaProcessoPorId(page, processo.codigo);
@@ -49,7 +49,7 @@ test.describe('CDU-09: Disponibilizar cadastro de atividades', () => {
         // Adiciona conhecimento à atividade que estava incompleta
         await adicionarConhecimentoNaAtividade(page, nomeAtividadeIncompleta, gerarNomeUnico('Conhecimento Adicionado'));
 
-        // Disponibiliza com sucesso
+        // Disponibiliza
         await disponibilizarCadastro(page);
 
         await verificarMensagemSucesso(page, 'Disponibilização solicitada');

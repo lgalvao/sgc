@@ -7,12 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.atividade.modelo.AtividadeRepo;
+import sgc.atividade.model.AtividadeRepo;
 import sgc.integracao.mocks.TestConfig;
-import sgc.mapa.modelo.MapaRepo;
-import sgc.processo.modelo.ProcessoRepo;
-import sgc.subprocesso.modelo.SubprocessoRepo;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.mapa.model.MapaRepo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.subprocesso.model.SubprocessoRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 @SpringBootTest
 @AutoConfigureMockMvc

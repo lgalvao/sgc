@@ -1,29 +1,51 @@
-# Status da Correção dos Testes de Backend
+# Problemas Pendentes
 
-## Resumo do Progresso
+## Testes de Integração Falhando
 
-O objetivo era corrigir a suíte de testes do backend, que apresentava 119 falhas iniciais. As seguintes ações foram tomadas:
+Após uma série de correções que resolveram a maioria das falhas nos testes de backend, os seguintes problemas persistem:
 
-1.  **Configuração do Banco de Dados de Teste:**
-    *   Criei o diretório `backend/src/test/resources` para arquivos de configuração específicos de teste.
-    *   Adicionei um `application.yml` configurando um banco de dados H2 em memória para o perfil de teste.
+### 1. `CDU05IntegrationTest` - Iniciar Processo de Revisão
 
-2.  **Resolução de Conflitos de Configuração:**
-    *   Resolvi uma `UnreachableFilterChainException` adicionando o perfil `@Profile("!test")` à classe `E2eSecurityConfig.java` para evitar que ela seja carregada durante os testes.
-    *   Adicionei um mock do `JavaMailSender` e as propriedades de email (`aplicacao.email.remetente`, `aplicacao.email.remetente-nome`, `aplicacao.email.assunto-prefixo`) que estavam faltando no ambiente de teste para resolver `PlaceholderResolutionException`.
+- **Falhas:** `testIniciarProcessoRevisao_processoJaIniciado_falha` e `testIniciarProcessoRevisao_sucesso`.
+- **Sintoma:** A API retorna um erro `500 Internal Server Error` em vez dos códigos de status de erro de negócio esperados (ex: 422, 409) ou de sucesso (200).
+- **Investigação:**
+    - A causa raiz parece ser uma `ConstraintViolationException` não tratada no `ProcessoService` quando se tenta criar a `UnidadeMapa` sem as informações corretas.
+    - As tentativas de corrigir a configuração do teste em `CDU05IntegrationTest` para persistir a `UnidadeMapa` corretamente não tiveram sucesso. A lógica em `ProcessoService` para iniciar um processo de revisão depende de uma `UnidadeMapa` pré-existente, e a falha do teste em configurar isso corretamente causa a falha.
 
-3.  **Inicialização do Banco de Dados:**
-    *   Copiei e corrigi a sintaxe do script `import.sql` para ser compatível com o H2.
-    *   Resolvi uma condição de corrida entre a criação do esquema e a inserção dos dados (erro "Table not found") adicionando a propriedade `spring.jpa.defer-datasource-initialization: true` ao `application.yml` de teste.
+### 2. `ImpactoCompetenciaService` e `CDU12IntegrationTest`
 
-## Problema Atual
+- **Falhas:** `ImpactoCompetenciaServiceTest` e dois testes em `CDU12IntegrationTest` (`deveIdentificarCompetenciasImpactadas` e `deveDetectarAtividadesRemovidas`).
+- **Sintoma:** O `ImpactoCompetenciaService` não está conseguindo identificar corretamente as competências que são impactadas por mudanças nas atividades. Os testes esperam que o serviço encontre competências vinculadas, mas o serviço retorna uma lista vazia.
+- **Investigação:**
+    - O problema central é a forma como o serviço e os testes estão tratando a relação `@ManyToMany` entre `Competencia` e `Atividade`.
+    - As tentativas de corrigir a lógica de persistência e a configuração dos mocks não foram suficientes. A causa provável é que a lógica no `ImpactoCompetenciaService` não está carregando ou consultando as associações da forma que o JPA espera em um ambiente de teste transacional.
 
-Após resolver os problemas de inicialização do `ApplicationContext`, a execução de um único teste (`CDU01IntegrationTest`) para verificar a correção falhou com a seguinte mensagem:
+### 3. `CDU02IntegrationTest` - Visibilidade de Alertas e Processos
 
-```
-> No tests found for given includes: [sgc.integracao.cdu01.CDU01IntegrationTest](--tests filter)
-```
+- **Falhas:** `testListarAlertas_UsuarioVeAlertasDaSuaUnidade`, `testListarProcessos_GestorRaiz_VeTodos`, `testListarProcessos_ChefeUnidadeFilha1_VeProcessosSubordinados`.
+- **Sintoma:** As consultas para listar alertas e processos não estão retornando o número esperado de resultados.
+- **Investigação:**
+    - A tentativa de corrigir o `setupSecurityContext` para usar um `Usuario` persistido não resolveu o problema.
+    - A causa provável é um problema na lógica de consulta do `AlertaRepo` e `ProcessoRepo`, que não está filtrando corretamente os resultados com base na unidade do usuário e na hierarquia de unidades.
 
-A investigação revelou que o caminho do pacote usado no comando do Gradle estava incorreto. O arquivo de teste está localizado em `backend/src/test/java/sgc/integracao/CDU01IntegrationTest.java`, o que significa que o FQN (Fully Qualified Name) correto para o teste é `sgc.integracao.CDU01IntegrationTest`.
+### 4. `CDU09IntegrationTest` - Disponibilizar Cadastro
 
-O próximo passo seria reexecutar o teste com o nome de pacote correto. No entanto, seguindo a instrução do usuário, o trabalho de depuração será interrompido para salvar o progresso.
+- **Falhas:** `naoDevePermitirChefeDeOutraUnidadeDisponibilizar`, `deveDisponibilizarCadastroComSucesso`, `naoDeveDisponibilizarComAtividadeSemConhecimento`.
+- **Sintoma:** A API retorna `400 Bad Request` em vez dos códigos de status esperados (403, 200, 422).
+- **Investigação:** A causa raiz não foi investigada.
+
+### 5. `CDU17IntegrationTest` - Disponibilizar Mapa de Competências
+
+- **Falha:** `disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest`.
+- **Sintoma:** O teste falha com uma asserção de que o `details` do erro da API não deve ser nulo.
+- **Investigação:** A tentativa de corrigir a persistência da relação entre `Atividade` e `Competencia` não resolveu o problema.
+
+### 6. `CDU21IntegrationTest` - Finalizar Processo
+
+- **Falha:** `finalizarProcesso_ComSucesso_DeveAtualizarStatusENotificarUnidades`.
+- **Sintoma:** A API retorna `500 Internal Server Error` em vez de `200 OK`.
+- **Investigação:** A causa raiz não foi investigada.
+
+## Próximos Passos Sugeridos
+
+Recomenda-se uma revisão aprofundada da lógica de persistência e consulta em `ImpactoCompetenciaService` e uma análise detalhada do ciclo de vida das entidades nos testes de integração, especialmente em `CDU05IntegrationTest`, para garantir que os dados de teste estejam no estado correto antes da execução das chamadas à API. Além disso, a lógica de consulta nos repositórios de Alerta e Processo deve ser revisada para garantir que a visibilidade dos dados esteja correta.

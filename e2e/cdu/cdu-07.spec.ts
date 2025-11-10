@@ -14,7 +14,7 @@ import {
     SELETORES,
     verificarCardAcaoInvisivel,
     verificarCardAcaoVisivel,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-07: Detalhar subprocesso', () => {
     let processo: any;

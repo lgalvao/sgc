@@ -1,6 +1,6 @@
 import {ErrorReporter} from './error-reporter';
 import {Page, test} from '@playwright/test';
-import {parseDate} from '~/helpers/utils/date-utils';
+
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import {join} from 'path';
 
@@ -11,7 +11,6 @@ interface CustomWindow extends Window {
     waitForVue?: () => Promise<void>;
 
     postMessage(message: any, targetOrigin: string, transfer?: Transferable[]): void;
-
     postMessage(message: any, options?: WindowPostMessageOptions): void;
 
     __coverage__?: any;
@@ -22,44 +21,6 @@ declare const window: CustomWindow;
 export const vueTest = test.extend<{ page: Page }>({
     page: async ({page}, use, _testInfo) => {
         const errorReporter = new ErrorReporter();
-
-        // Interceptar e modificar subprocessos.json
-        await page.route('**/subprocessos.json', async route => {
-            const response = await page.request.fetch(route.request());
-            let json = await response.json();
-
-            // Processar cada subprocesso para converter datas
-            json = json.map((pu: any) => ({
-                ...pu,
-                dataLimiteEtapa1: pu.dataLimiteEtapa1 ? parseDate(pu.dataLimiteEtapa1) : null,
-                dataFimEtapa1: pu.dataFimEtapa1 ? parseDate(pu.dataFimEtapa1) : null,
-                dataLimiteEtapa2: pu.dataLimiteEtapa2 ? parseDate(pu.dataLimiteEtapa2) : null,
-                dataFimEtapa2: pu.dataFimEtapa2 ? parseDate(pu.dataFimEtapa2) : null,
-            }));
-
-            await route.fulfill({
-                response,
-                body: JSON.stringify(json),
-            });
-        });
-
-        // Interceptar e modificar processos.json
-        await page.route('**/processos.json', async route => {
-            const response = await page.request.fetch(route.request());
-            let json = await response.json();
-
-            // Processar cada processo para converter datas
-            json = json.map((p: any) => ({
-                ...p,
-                dataLimite: p.dataLimite ? parseDate(p.dataLimite) : null,
-                dataFinalizacao: p.dataFinalizacao ? parseDate(p.dataFinalizacao) : null,
-            }));
-
-            await route.fulfill({
-                response,
-                body: JSON.stringify(json),
-            });
-        });
 
         await page.addInitScript(() => {
             const originalConsoleError = console.error;

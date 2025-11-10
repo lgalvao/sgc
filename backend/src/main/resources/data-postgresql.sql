@@ -282,3 +282,10 @@ INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil)
 VALUES (999999999999, 'ADMIN');
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil)
 VALUES (999999999999, 'GESTOR');
+
+-- Reset sequences to avoid primary key conflicts
+SELECT setval(pg_get_serial_sequence('sgc.unidade', 'codigo'), (SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc.unidade), false);
+SELECT setval(pg_get_serial_sequence('sgc.processo', 'codigo'), (SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc.processo), false);
+SELECT setval(pg_get_serial_sequence('sgc.subprocesso', 'codigo'), (SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc.subprocesso), false);
+SELECT setval(pg_get_serial_sequence('sgc.mapa', 'codigo'), (SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc.mapa), false);
+SELECT setval(pg_get_serial_sequence('sgc.competencia', 'codigo'), (SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc.competencia), false);

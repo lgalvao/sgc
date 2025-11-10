@@ -7,7 +7,7 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
-import sgc.unidade.modelo.UnidadeRepo;
+import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,7 +71,7 @@ public class SgrhService {
     public List<UnidadeDto> buscarSubunidades(Long codigoPai) {
         log.warn("MOCK SGRH: Buscando subunidades.");
         return criarUnidadesMock().values().stream()
-                .filter(u -> codigoPai.equals(u.codigoPai()))
+                .filter(u -> codigoPai.equals(u.getCodigoPai()))
                 .collect(Collectors.toList());
     }
 
@@ -80,22 +80,22 @@ public class SgrhService {
         Map<Long, UnidadeDto> todasUnidades = criarUnidadesMock();
         Map<Long, List<UnidadeDto>> subunidadesPorPai = new HashMap<>();
         for (UnidadeDto unidade : todasUnidades.values()) {
-            if (unidade.codigoPai() != null) {
-                subunidadesPorPai.computeIfAbsent(unidade.codigoPai(), x -> new ArrayList<>()).add(unidade);
+            if (unidade.getCodigoPai() != null) {
+                subunidadesPorPai.computeIfAbsent(unidade.getCodigoPai(), x -> new ArrayList<>()).add(unidade);
             }
         }
         return todasUnidades.values().stream()
-                .filter(u -> u.codigoPai() == null)
+                .filter(u -> u.getCodigoPai() == null)
                 .map(u -> construirArvore(u, subunidadesPorPai))
                 .collect(Collectors.toList());
     }
 
     private UnidadeDto construirArvore(UnidadeDto unidade, Map<Long, List<UnidadeDto>> subunidadesPorPai) {
-        List<UnidadeDto> filhos = subunidadesPorPai.getOrDefault(unidade.codigo(), Collections.emptyList())
+        List<UnidadeDto> filhos = subunidadesPorPai.getOrDefault(unidade.getCodigo(), Collections.emptyList())
                 .stream()
                 .map(filho -> construirArvore(filho, subunidadesPorPai))
                 .toList();
-        return new UnidadeDto(unidade.codigo(), unidade.nome(), unidade.sigla(), unidade.codigoPai(), unidade.tipo(), filhos.isEmpty() ? null : filhos);
+        return new UnidadeDto(unidade.getCodigo(), unidade.getNome(), unidade.getSigla(), unidade.getCodigoPai(), unidade.getTipo(), filhos.isEmpty() ? null : filhos);
     }
 
     public Optional<ResponsavelDto> buscarResponsavelUnidade(Long unidadeCodigo) {

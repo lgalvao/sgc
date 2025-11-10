@@ -16,7 +16,7 @@ import {
     verificarConhecimentoNaAtividade,
     verificarConhecimentoNaoVisivelNaAtividade,
     verificarPaginaCadastroAtividades,
-} from '../helpers';
+} from '~/helpers';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     test('deve adicionar, editar e remover atividades e conhecimentos', async ({page}) => {
