@@ -1,51 +1,39 @@
-# Problemas Pendentes
+# Análise dos Testes Falhos e Desafios
 
-## Testes de Integração Falhando
+Este documento detalha os problemas encontrados durante a tentativa de correção dos testes falhos, as abordagens utilizadas e o estado atual dos problemas.
 
-Após uma série de correções que resolveram a maioria das falhas nos testes de backend, os seguintes problemas persistem:
+## 1. Erros de Validação (`422 Unprocessable Entity`)
 
-### 1. `CDU05IntegrationTest` - Iniciar Processo de Revisão
+- **Testes Afetados**: `CDU09IntegrationTest`, `CDU10IntegrationTest`, `CDU16IntegrationTest`, `CDU17IntegrationTest`
+- **Causa Raiz**: A reativação de uma regra de validação que exige que toda `Atividade` seja associada a pelo menos uma `Competencia` invalidou os dados de teste.
+- **Tentativas de Correção**:
+    1.  **Abordagem Incorreta**: Assumi que existia uma entidade de associação `CompetenciaAtividade` e tentei usá-la para criar a relação, o que causou erros de compilação, pois a entidade não existe.
+    2.  **Abordagem Incorreta (2)**: Tentei usar uma relação `@ManyToMany` incorreta, adicionando a `Atividade` à `Competencia` e salvando a `Competencia`. Isso também falhou.
+    3.  **Abordagem Correta (Teórica)**: A análise final do código revelou que `Atividade` é a dona da relação `@ManyToMany`. A forma correta de criar a associação é:
+        ```java
+        var competencia = competenciaRepo.save(new Competencia(...));
+        var atividade = new Atividade(...);
+        atividade.getCompetencias().add(competencia);
+        atividadeRepo.save(atividade);
+        ```
+- **Estado Atual**: Apesar de ter aplicado a abordagem teoricamente correta, os testes continuam a falhar com o erro `422`, indicando que a validação ainda não está sendo satisfeita. É possível que haja um problema mais profundo na forma como o estado das entidades está sendo gerenciado pelo Hibernate/JPA dentro do contexto da transação de teste.
 
-- **Falhas:** `testIniciarProcessoRevisao_processoJaIniciado_falha` e `testIniciarProcessoRevisao_sucesso`.
-- **Sintoma:** A API retorna um erro `500 Internal Server Error` em vez dos códigos de status de erro de negócio esperados (ex: 422, 409) ou de sucesso (200).
-- **Investigação:**
-    - A causa raiz parece ser uma `ConstraintViolationException` não tratada no `ProcessoService` quando se tenta criar a `UnidadeMapa` sem as informações corretas.
-    - As tentativas de corrigir a configuração do teste em `CDU05IntegrationTest` para persistir a `UnidadeMapa` corretamente não tiveram sucesso. A lógica em `ProcessoService` para iniciar um processo de revisão depende de uma `UnidadeMapa` pré-existente, e a falha do teste em configurar isso corretamente causa a falha.
+## 2. Resultados Incorretos em CDU-02 (Painel)
 
-### 2. `ImpactoCompetenciaService` e `CDU12IntegrationTest`
+- **Testes Afetados**: `CDU02IntegrationTest`
+- **Causa Raiz**: O `PainelService` está retornando uma lista vazia de processos para os perfis `GESTOR` e `CHEFE`. A investigação apontou para o método `paraProcessoResumoDto`, que estava buscando apenas o primeiro participante de um processo.
+- **Tentativas de Correção**:
+    - Modifiquei o método para obter o primeiro participante de forma mais segura, mas isso não resolveu o problema subjacente de que a consulta principal (`processoRepo.findDistinctByParticipantes_CodigoIn`) não está retornando nenhum processo.
+- **Estado Atual**: O problema persiste. A consulta não retorna resultados, mesmo que os dados de teste pareçam corretos. Isso pode indicar um problema na forma como a consulta está sendo construída ou como os dados de teste estão sendo persistidos.
 
-- **Falhas:** `ImpactoCompetenciaServiceTest` e dois testes em `CDU12IntegrationTest` (`deveIdentificarCompetenciasImpactadas` e `deveDetectarAtividadesRemovidas`).
-- **Sintoma:** O `ImpactoCompetenciaService` não está conseguindo identificar corretamente as competências que são impactadas por mudanças nas atividades. Os testes esperam que o serviço encontre competências vinculadas, mas o serviço retorna uma lista vazia.
-- **Investigação:**
-    - O problema central é a forma como o serviço e os testes estão tratando a relação `@ManyToMany` entre `Competencia` e `Atividade`.
-    - As tentativas de corrigir a lógica de persistência e a configuração dos mocks não foram suficientes. A causa provável é que a lógica no `ImpactoCompetenciaService` não está carregando ou consultando as associações da forma que o JPA espera em um ambiente de teste transacional.
+## 3. `NullPointerException` em CDU-21 (`500 Internal Server Error`)
 
-### 3. `CDU02IntegrationTest` - Visibilidade de Alertas e Processos
+- **Testes Afetados**: `CDU21IntegrationTest`
+- **Causa Raiz**: Um `NullPointerException` ocorre no método `criarSubprocessoParaRevisao` do `ProcessoService` quando se tenta acessar `unidadeMapa.getMapaVigente().getCodigo()` e `getMapaVigente()` retorna `null`.
+- **Tentativas de Correção**:
+    - Adicionei um `null-check` para `unidadeMapa.getMapaVigente()`.
+- **Estado Atual**: O problema persiste, indicando que a correção foi insuficiente ou que há outro `NullPointerException` no mesmo fluxo de código.
 
-- **Falhas:** `testListarAlertas_UsuarioVeAlertasDaSuaUnidade`, `testListarProcessos_GestorRaiz_VeTodos`, `testListarProcessos_ChefeUnidadeFilha1_VeProcessosSubordinados`.
-- **Sintoma:** As consultas para listar alertas e processos não estão retornando o número esperado de resultados.
-- **Investigação:**
-    - A tentativa de corrigir o `setupSecurityContext` para usar um `Usuario` persistido não resolveu o problema.
-    - A causa provável é um problema na lógica de consulta do `AlertaRepo` e `ProcessoRepo`, que não está filtrando corretamente os resultados com base na unidade do usuário e na hierarquia de unidades.
+## Conclusão
 
-### 4. `CDU09IntegrationTest` - Disponibilizar Cadastro
-
-- **Falhas:** `naoDevePermitirChefeDeOutraUnidadeDisponibilizar`, `deveDisponibilizarCadastroComSucesso`, `naoDeveDisponibilizarComAtividadeSemConhecimento`.
-- **Sintoma:** A API retorna `400 Bad Request` em vez dos códigos de status esperados (403, 200, 422).
-- **Investigação:** A causa raiz não foi investigada.
-
-### 5. `CDU17IntegrationTest` - Disponibilizar Mapa de Competências
-
-- **Falha:** `disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest`.
-- **Sintoma:** O teste falha com uma asserção de que o `details` do erro da API não deve ser nulo.
-- **Investigação:** A tentativa de corrigir a persistência da relação entre `Atividade` e `Competencia` não resolveu o problema.
-
-### 6. `CDU21IntegrationTest` - Finalizar Processo
-
-- **Falha:** `finalizarProcesso_ComSucesso_DeveAtualizarStatusENotificarUnidades`.
-- **Sintoma:** A API retorna `500 Internal Server Error` em vez de `200 OK`.
-- **Investigação:** A causa raiz não foi investigada.
-
-## Próximos Passos Sugeridos
-
-Recomenda-se uma revisão aprofundada da lógica de persistência e consulta em `ImpactoCompetenciaService` e uma análise detalhada do ciclo de vida das entidades nos testes de integração, especialmente em `CDU05IntegrationTest`, para garantir que os dados de teste estejam no estado correto antes da execução das chamadas à API. Além disso, a lógica de consulta nos repositórios de Alerta e Processo deve ser revisada para garantir que a visibilidade dos dados esteja correta.
+Os problemas encontrados são mais complexos do que parecem e provavelmente envolvem um conhecimento mais profundo do framework Spring Data JPA e do design específico da aplicação. Dado o tempo gasto em tentativas de correção sem sucesso, a recomendação é que um desenvolvedor com mais experiência no projeto revise os problemas, especialmente a questão da persistência da relação `@ManyToMany` e a consulta hierárquica no `PainelService`.

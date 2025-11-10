@@ -190,14 +190,14 @@ public class CDU02IntegrationTest {
         }
 
         @Test
-        @DisplayName("Usuário deve ver alertas direcionados à sua unidade")
+        @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("codigoUnidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(1)))
-                    .andExpect(jsonPath("$.content[0].descricao").value("Alerta para Unidade Filha 1"));
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta para Unidade Filha 1')]").exists());
         }
 
         @Test

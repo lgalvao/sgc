@@ -105,7 +105,9 @@ public class PainelService {
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo) {
-        Unidade participante = processo.getParticipantes().stream().findFirst().orElse(null);
+        Unidade participante = processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()
+                ? processo.getParticipantes().iterator().next()
+                : null;
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())

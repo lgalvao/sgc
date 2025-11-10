@@ -102,11 +102,10 @@ class CDU10IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar a revisão do cadastro quando todas as condições são atendidas")
         void deveDisponibilizarRevisaoComSucesso() throws Exception {
-            var competencia = new Competencia("Competência de Teste", subprocessoRevisao.getMapa());
-            Atividade atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
-            atividade = atividadeRepo.save(atividade);
-            competencia.setAtividades(Set.of(atividade));
-            competenciaRepo.save(competencia);
+            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoRevisao.getMapa()));
+            var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
