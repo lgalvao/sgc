@@ -75,7 +75,9 @@ class SubprocessoServiceTest {
         @Test
         @DisplayName("Deve lançar exceção se competência não estiver associada")
         void validarAssociacoesMapa_CompetenciaNaoAssociada_LancaExcecao() {
-            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(new Competencia()));
+            Competencia competencia = new Competencia();
+            competencia.setDescricao("Competencia de Teste");
+            when(competenciaRepo.findByMapaCodigo(1L)).thenReturn(Collections.singletonList(competencia));
 
             assertThrows(ErroValidacao.class, () -> service.validarAssociacoesMapa(1L));
         }

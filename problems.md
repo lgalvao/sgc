@@ -9,14 +9,16 @@ Este documento detalha os problemas encontrados durante a tentativa de correçã
 - **Tentativas de Correção**:
     1.  **Abordagem Incorreta**: Assumi que existia uma entidade de associação `CompetenciaAtividade` e tentei usá-la para criar a relação, o que causou erros de compilação, pois a entidade não existe.
     2.  **Abordagem Incorreta (2)**: Tentei usar uma relação `@ManyToMany` incorreta, adicionando a `Atividade` à `Competencia` e salvando a `Competencia`. Isso também falhou.
-    3.  **Abordagem Correta (Teórica)**: A análise final do código revelou que `Atividade` é a dona da relação `@ManyToMany`. A forma correta de criar a associação é:
+    3.  **Abordagem Correta ( bem-sucedida)**: A análise final do código revelou que `Atividade` é a dona da relação `@ManyToMany`. A forma correta de criar a associação é:
         ```java
         var competencia = competenciaRepo.save(new Competencia(...));
         var atividade = new Atividade(...);
         atividade.getCompetencias().add(competencia);
         atividadeRepo.save(atividade);
+        competencia.getAtividades().add(atividade);
+        competenciaRepo.save(competencia);
         ```
-- **Estado Atual**: Apesar de ter aplicado a abordagem teoricamente correta, os testes continuam a falhar com o erro `422`, indicando que a validação ainda não está sendo satisfeita. É possível que haja um problema mais profundo na forma como o estado das entidades está sendo gerenciado pelo Hibernate/JPA dentro do contexto da transação de teste.
+- **Estado Atual**: A abordagem acima corrigiu os testes `CDU09IntegrationTest`, `CDU10IntegrationTest` e `CDU17IntegrationTest`.
 
 ## 2. Resultados Incorretos em CDU-02 (Painel)
 
@@ -36,4 +38,4 @@ Este documento detalha os problemas encontrados durante a tentativa de correçã
 
 ## Conclusão
 
-Os problemas encontrados são mais complexos do que parecem e provavelmente envolvem um conhecimento mais profundo do framework Spring Data JPA e do design específico da aplicação. Dado o tempo gasto em tentativas de correção sem sucesso, a recomendação é que um desenvolvedor com mais experiência no projeto revise os problemas, especialmente a questão da persistência da relação `@ManyToMany` e a consulta hierárquica no `PainelService`.
+Os problemas encontrados são mais complexos do que parecem e provavelmente envolvem um conhecimento mais aprofundado do framework Spring Data JPA e do design específico da aplicação. Dado o tempo gasto em tentativas de correção sem sucesso, a recomendação é que um desenvolvedor com mais experiência no projeto revise os problemas, especialmente a questão da persistência da relação `@ManyToMany` e a consulta hierárquica no `PainelService`.

@@ -139,6 +139,8 @@ class CDU17IntegrationTest {
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
+            competencia.getAtividades().add(atividade);
+            competenciaRepo.save(competencia);
 
             Analise analiseAntiga = new Analise();
             analiseAntiga.setSubprocesso(subprocesso);
@@ -222,8 +224,9 @@ class CDU17IntegrationTest {
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
             Atividade dummyActivity = new Atividade(mapa, "Dummy Activity");
-            dummyActivity.getCompetencias().add(competencia);
             atividadeRepo.save(dummyActivity);
+            competencia.getAtividades().add(dummyActivity);
+            competenciaRepo.save(competencia);
 
             DisponibilizarMapaReq request = new DisponibilizarMapaReq(LocalDate.now().plusDays(10), OBS_LITERAL);
 

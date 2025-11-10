@@ -106,6 +106,8 @@ class CDU10IntegrationTest {
             var atividade = new Atividade(subprocessoRevisao.getMapa(), "Atividade de Teste");
             atividade.getCompetencias().add(competencia);
             atividadeRepo.save(atividade);
+            competencia.getAtividades().add(atividade);
+            competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 
             mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
