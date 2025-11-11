@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { vi } from 'vitest';
+import { vi, beforeEach, beforeAll } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import waitOn from 'wait-on';
 
 // Set the base URL for all API calls
 axios.defaults.baseURL = 'http://localhost:10000/api';
-
-vi.stubGlobal('vi', vi);
 
 const localStorageMock = (() => {
     let store: { [key: string]: string } = {};
@@ -22,6 +22,18 @@ const localStorageMock = (() => {
     };
 })();
 
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(global, 'localStorage', {
     value: localStorageMock,
 });
+
+
+beforeAll(async () => {
+    console.log('Waiting for backend to become available...');
+    await waitOn({ resources: ['http://localhost:10000/actuator/health'], timeout: 30000 });
+});
+
+beforeEach(() => {
+    setActivePinia(createPinia());
+});
+
+vi.stubGlobal('vi', vi);
