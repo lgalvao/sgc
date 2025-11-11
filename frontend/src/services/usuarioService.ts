@@ -14,12 +14,12 @@ export async function autenticar(request: AutenticacaoRequest): Promise<boolean>
 }
 
 export async function autorizar(tituloEleitoral: number): Promise<PerfilUnidade[]> {
-  const response = await apiClient.post<any[]>('/usuarios/autorizar', tituloEleitoral, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  return response.data.map(mapPerfilUnidadeToFrontend);
+    const response = await apiClient.post<any[]>('/usuarios/autorizar', tituloEleitoral, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data.map(mapPerfilUnidadeToFrontend);
 }
 
 export async function entrar(request: EntrarRequest): Promise<LoginResponse> {
