@@ -217,7 +217,7 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
 import * as mapaService from '@/services/mapaService';
-import {UsuariosService} from "@/services/usuariosService";
+import { buscarUsuariosPorUnidade } from "@/services/usuarioService";
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
 
 const unidadesSelecionadas = ref<number[]>([])
@@ -255,7 +255,7 @@ function extrairCodigosUnidades(unidades: any[]): number[] {
 onMounted(async () => {
   await unidadesStore.fetchUnidades();
   await carregarUnidadesValidas(tipo.value);
-  
+
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
@@ -268,9 +268,9 @@ onMounted(async () => {
         dataLimite.value = processo.dataLimite.split('T')[0];
 
         await carregarUnidadesValidas(processo.tipo);
-        
+
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
-        
+
         await nextTick();
       }
     } catch (error) {
@@ -284,7 +284,7 @@ watch(tipo, async (novoTipo) => {
   if (unidadesStore.unidades.length === 0) {
     return;
   }
-  
+
   try {
     const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
     if (response.ok) {
@@ -293,7 +293,7 @@ watch(tipo, async (novoTipo) => {
   } catch (error) {
     console.error('Erro ao buscar unidades bloqueadas:', error);
   }
-  
+
   await carregarUnidadesValidas(novoTipo);
 });
 
@@ -310,10 +310,10 @@ async function carregarUnidadesValidas(tipoProcesso: string) {
     unidadesComServidores.value = todasUnidades;
     return;
   }
-  
+
   // Para REVISAO e DIAGNOSTICO, precisamos verificar o mapa vigente.
   const mapaChecks = todasUnidades.map(codigo =>
-    mapaService.verificarMapaVigente(codigo).then(temMapa => ({ codigo, temMapa }))
+    unidadeTemMapaVigente(codigo).then(temMapa => ({ codigo, temMapa }))
   );
   const mapaResultados = await Promise.all(mapaChecks);
   unidadesComMapaVigente.value = mapaResultados.filter(r => r.temMapa).map(r => r.codigo);
@@ -348,21 +348,21 @@ function isUnidadeValida(codigo: number | undefined): boolean {
   if (codigo === undefined) {
     return false;
   }
-  
+
   const tipoAtual = tipo.value;
-  
+
   if (tipoAtual === 'REVISAO' || tipoAtual === 'DIAGNOSTICO') {
     if (!unidadesComMapaVigente.value.includes(codigo)) {
       return false;
     }
   }
-  
+
   if (tipoAtual === 'DIAGNOSTICO') {
     if (!unidadesComServidores.value.includes(codigo)) {
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -413,7 +413,7 @@ async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
 
 async function unidadeTemServidores(codigo: number): Promise<boolean> {
   try {
-    const usuarios = await UsuariosService.buscarUsuariosPorUnidade(codigo);
+    const usuarios = await buscarUsuariosPorUnidade(codigo);
     return usuarios.length > 0;
   } catch (error) {
     console.warn(`[DEBUG Vue] Não foi possível verificar usuários para unidade ${codigo}:`, error);
@@ -426,7 +426,7 @@ async function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecio
     const isIntermediaria = isUnidadeIntermediaria(codigo);
     return !isIntermediaria;
   });
-  
+
   return unidadesValidas;
 }
 
@@ -597,7 +597,7 @@ const unidadesStatus = computed(() => {
       desabilitadas.push(codigo);
     }
   }
-  
+
   return {
     desabilitadas,
     elegiveis
@@ -615,12 +615,12 @@ function temFilhasElegiveis(unidade: Unidade): boolean {
   if (unidadeElegivel(unidade)) {
     return true;
   }
-  
+
   // Se a unidade não é elegível, verificar filhas
   if (unidade.filhas && unidade.filhas.length > 0) {
     return unidade.filhas.some(f => temFilhasElegiveis(f));
   }
-  
+
   return false;
 }
 

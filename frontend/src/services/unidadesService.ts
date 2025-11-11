@@ -1,10 +1,11 @@
 import apiClient from '../axios-setup';
 
-export const UnidadesService = {
-    async buscarTodasUnidades() {
-        return await apiClient.get('/unidades');
-    },
-    async buscarUnidadePorSigla(sigla: string) {
-        return await apiClient.get(`/unidades/sigla/${sigla}`);
-    }
-};
+export async function buscarTodasUnidades() {
+    const response = await apiClient.get('/unidades');
+    return response.data;
+}
+
+export async function buscarUnidadePorSigla(sigla: string) {
+    const response = await apiClient.get(`/unidades/sigla/${sigla}`);
+    return response.data;
+}

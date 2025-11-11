@@ -6,7 +6,7 @@ import { useProcessosStore } from '@/stores/processos';
 import { useUnidadesStore } from '@/stores/unidades';
 import { useNotificacoesStore } from '@/stores/notificacoes';
 import * as mapaService from '@/services/mapaService';
-import { UsuariosService } from '@/services/usuariosService';
+import { buscarUsuariosPorUnidade } from '@/services/usuarioService';
 import { h } from 'vue';
 
 // Helper to flush pending promises
@@ -14,7 +14,7 @@ const flushPromises = () => new Promise(setImmediate);
 
 // Mock the services
 vi.mock('@/services/mapaService');
-vi.mock('@/services/usuariosService');
+vi.mock('@/services/usuarioService');
 
 // Mock axios-setup to prevent router issues
 vi.mock('@/axios-setup', () => ({
@@ -59,7 +59,7 @@ describe('CadProcesso.vue', () => {
     vi.clearAllMocks();
 
     vi.mocked(mapaService).verificarMapaVigente.mockResolvedValue(true);
-    vi.mocked(UsuariosService).buscarUsuariosPorUnidade.mockResolvedValue([{ nome: 'Test User' }]);
+    vi.mocked(buscarUsuariosPorUnidade).mockResolvedValue([{ nome: 'Test User' }]);
 
     wrapper = mount(CadProcesso, {
       global: {
@@ -135,7 +135,7 @@ describe('CadProcesso.vue', () => {
 
     it('disables units without servers for DIAGNOSTICO type', async () => {
       vi.mocked(mapaService).verificarMapaVigente.mockResolvedValue(true);
-      vi.mocked(UsuariosService).buscarUsuariosPorUnidade.mockImplementation(async (codigo) => codigo === 1 ? [{ nome: 'Test' }] : []);
+      vi.mocked(buscarUsuariosPorUnidade).mockImplementation(async (codigo) => codigo === 1 ? [{ nome: 'Test' }] : []);
 
       await wrapper.find('[data-testid="select-tipo"]').setValue('DIAGNOSTICO');
       await flushPromises();

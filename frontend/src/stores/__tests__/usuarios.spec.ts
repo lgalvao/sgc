@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {initPinia} from '@/test-utils/helpers';
 import {useUsuariosStore} from '../usuarios';
-import {UsuariosService} from "@/services/usuariosService";
+import * as usuarioService from "@/services/usuarioService";
 import type {Usuario} from "@/types/tipos";
 
 const mockUsuarios: Usuario[] = [
@@ -23,10 +23,8 @@ const mockUsuarios: Usuario[] = [
     }
 ];
 
-vi.mock('@/services/usuariosService', () => ({
-    UsuariosService: {
-        buscarTodosUsuarios: vi.fn(() => Promise.resolve({ data: mockUsuarios }))
-    }
+vi.mock('@/services/usuarioService', () => ({
+    buscarTodosUsuarios: vi.fn(() => Promise.resolve(mockUsuarios))
 }));
 
 describe('useUsuariosStore', () => {
@@ -48,12 +46,12 @@ describe('useUsuariosStore', () => {
         it('fetchUsuarios should fetch and set usuarios', async () => {
             usuariosStore.usuarios = [];
             await usuariosStore.fetchUsuarios();
-            expect(UsuariosService.buscarTodosUsuarios).toHaveBeenCalledTimes(1);
+            expect(usuarioService.buscarTodosUsuarios).toHaveBeenCalledTimes(1);
             expect(usuariosStore.usuarios.length).toBe(2);
         });
 
         it('fetchUsuarios should handle errors', async () => {
-            (UsuariosService.buscarTodosUsuarios as any).mockRejectedValue(new Error('Failed'));
+            vi.mocked(usuarioService.buscarTodosUsuarios).mockRejectedValue(new Error('Failed'));
             await usuariosStore.fetchUsuarios();
             expect(usuariosStore.error).toContain('Falha ao carregar usuários');
         });
