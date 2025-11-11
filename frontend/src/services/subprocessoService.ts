@@ -18,18 +18,17 @@ export async function fetchSubprocessoDetalhe(id: number, perfil: string, unidad
   return response.data;
 }
 
-// Funções de competência mantidas aqui, pois estão fortemente acopladas ao subprocesso
-export const adicionarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
+export async function adicionarCompetencia(codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> {
     const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias`, competencia);
     return mapMapaCompletoDtoToModel(response.data);
 }
 
-export const atualizarCompetencia = async (codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> => {
+export async function atualizarCompetencia(codSubprocesso: number, competencia: Competencia): Promise<MapaCompleto> {
     const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${competencia.codigo}/atualizar`, competencia);
     return mapMapaCompletoDtoToModel(response.data);
 }
 
-export const removerCompetencia = async (codSubprocesso: number, idCompetencia: number): Promise<MapaCompleto> => {
+export async function removerCompetencia(codSubprocesso: number, idCompetencia: number): Promise<MapaCompleto> {
     const response = await apiClient.post(`/subprocessos/${codSubprocesso}/competencias/${idCompetencia}/remover`);
     return mapMapaCompletoDtoToModel(response.data);
 }

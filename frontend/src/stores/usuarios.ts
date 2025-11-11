@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import type {Usuario} from '@/types/tipos'
-import {UsuariosService} from "@/services/usuariosService";
+import {buscarTodosUsuarios} from "@/services/usuarioService";
 
 export const useUsuariosStore = defineStore('usuarios', {
     state: () => ({
@@ -18,8 +18,8 @@ export const useUsuariosStore = defineStore('usuarios', {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await UsuariosService.buscarTodosUsuarios();
-                this.usuarios = (response as any).data.map(u => ({
+                const response = await buscarTodosUsuarios();
+                this.usuarios = (response as any).map(u => ({
                     ...u,
                     unidade: {sigla: u.unidade}
                 })) as unknown as Usuario[];
