@@ -1,13 +1,25 @@
+package sgc.subprocesso.dto;
 
-    package sgc.subprocesso.dto;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    import jakarta.validation.constraints.Future;
-    import jakarta.validation.constraints.NotNull;
-    import java.time.LocalDate;
+import java.time.LocalDate;
 
-    public record DisponibilizarMapaRequest(
-        @NotNull(message = "A data limite para validação é obrigatória.")
-        @Future(message = "A data limite para validação deve ser uma data futura.")
-        LocalDate dataLimite,
-        String observacoes
-    ) {}
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DisponibilizarMapaRequest {
+
+    @NotNull(message = "A data limite para validação é obrigatória.")
+    @Future(message = "A data limite para validação deve ser uma data futura.")
+    private LocalDate dataLimite;
+
+    private String observacoes;
+}

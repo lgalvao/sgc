@@ -1,5 +1,10 @@
 package sgc.mapa.service;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
@@ -35,9 +40,10 @@ public class ImpactoCompetenciaService {
             for (Competencia comp : competenciasDoMapa) {
                 if (comp.getAtividades().stream().anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
-                            .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
-                                    comp.getCodigo(),
-                                    comp.getDescricao()));
+                            .computeIfAbsent(comp.getCodigo(), x -> CompetenciaImpactoAcumulador.builder()
+                                    .codigo(comp.getCodigo())
+                                    .descricao(comp.getDescricao())
+                                    .build());
 
                     acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.getDescricao()));
                 }
@@ -52,9 +58,10 @@ public class ImpactoCompetenciaService {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),
-                                    x -> new CompetenciaImpactoAcumulador(
-                                            comp.getCodigo(),
-                                            comp.getDescricao()));
+                                    x -> CompetenciaImpactoAcumulador.builder()
+                                            .codigo(comp.getCodigo())
+                                            .descricao(comp.getDescricao())
+                                            .build());
 
                     String detalhe = String.format(
                             "Atividade alterada: '%s' → '%s'",
@@ -101,15 +108,16 @@ public class ImpactoCompetenciaService {
         return "IMPACTO_GENERICO";
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class CompetenciaImpactoAcumulador {
-        final Long codigo;
-        final String descricao;
-        final Set<String> atividadesAfetadas = new LinkedHashSet<>();
-
-        CompetenciaImpactoAcumulador(Long codigo, String descricao) {
-            this.codigo = codigo;
-            this.descricao = descricao;
-        }
+        private Long codigo;
+        private String descricao;
+        @Builder.Default
+        private Set<String> atividadesAfetadas = new LinkedHashSet<>();
 
         void adicionarImpacto(String descricaoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);
