@@ -10,6 +10,7 @@
     "lint": "eslint . --fix",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
     "test:unit": "vitest --run",
+    "test:integration": "vitest --run --config ./vitest.integration.config.ts",
     "coverage": "npm run coverage:unit",
     "coverage:unit": "vitest run --coverage"
   },
