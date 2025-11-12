@@ -47,10 +47,13 @@
             v-model="unidadesSelecionadas"
             :unidades="unidadesStore.unidades"
             :desabilitadas="unidadesDesabilitadas"
-            :filtrarPor="unidadeElegivel"
+            :filtrar-por="unidadeElegivel"
           />
-          <div v-else class="text-center py-3">
-            <span class="spinner-border spinner-border-sm me-2"></span>
+          <div
+            v-else
+            class="text-center py-3"
+          >
+            <span class="spinner-border spinner-border-sm me-2" />
             Carregando unidades...
           </div>
         </div>
@@ -343,42 +346,10 @@ function extrairTodasUnidadesCodigos(unidades: Unidade[]): number[] {
   return codigos;
 }
 
-// Verifica se a unidade deve estar visível/habilitada baseado no tipo de processo
-function isUnidadeValida(codigo: number | undefined): boolean {
-  if (codigo === undefined) {
-    return false;
-  }
 
-  const tipoAtual = tipo.value;
 
-  if (tipoAtual === 'REVISAO' || tipoAtual === 'DIAGNOSTICO') {
-    if (!unidadesComMapaVigente.value.includes(codigo)) {
-      return false;
-    }
-  }
 
-  if (tipoAtual === 'DIAGNOSTICO') {
-    if (!unidadesComServidores.value.includes(codigo)) {
-      return false;
-    }
-  }
 
-  return true;
-}
-
-// Verifica se a unidade deve estar desabilitada
-function isUnidadeDesabilitada(codigo: number): boolean {
-  // Desabilita apenas se estiver bloqueada (já em processo ativo)
-  return isUnidadeBloqueada(codigo);
-}
-
-function isUnidadeBloqueada(codigo: number): boolean {
-  // Não bloquear se estamos editando e a unidade já estava selecionada
-  if (processoEditando.value && unidadesSelecionadas.value.includes(codigo)) {
-    return false;
-  }
-  return unidadesBloqueadas.value.includes(codigo);
-}
 
 function limparCampos() {
   descricao.value = ''
@@ -610,18 +581,13 @@ function unidadeElegivel(unidade: Unidade): boolean {
   return unidadesStatus.value.elegiveis.includes(unidade.codigo);
 }
 
-// Função auxiliar para verificar se unidade ou suas filhas são elegíveis
-function temFilhasElegiveis(unidade: Unidade): boolean {
-  if (unidadeElegivel(unidade)) {
-    return true;
-  }
-
-  // Se a unidade não é elegível, verificar filhas
-  if (unidade.filhas && unidade.filhas.length > 0) {
-    return unidade.filhas.some(f => temFilhasElegiveis(f));
-  }
-
-  return false;
-}
+defineExpose({
+  unidadesSelecionadas,
+  unidadesBloqueadas,
+  unidadesComMapaVigente,
+  unidadesComServidores,
+  unidadesStatus,
+  unidadeElegivel,
+});
 
 </script>

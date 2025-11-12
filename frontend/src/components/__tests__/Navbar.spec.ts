@@ -2,7 +2,7 @@ import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, type MockInstance, vi} from 'vitest';
 import {createRouter, createWebHistory} from 'vue-router';
 import {ref} from 'vue';
-import Navbar from '@/components/Navbar.vue';
+import NavBar from '../NavBar.vue';
 import {initPinia} from '@/test-utils/helpers';
 import {usePerfil} from '@/composables/usePerfil';
 import {usePerfilStore} from '@/stores/perfil';
@@ -42,7 +42,7 @@ describe('Navbar.vue', () => {
     });
 
     it('deve navegar para a rota correta ao chamar navigateFromNavbar', async () => {
-        const wrapper = mount(Navbar, {global: {plugins: [router]}});
+        const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
         const vm = wrapper.vm as any;
         vm.navigateFromNavbar('/teste');
@@ -55,7 +55,7 @@ describe('Navbar.vue', () => {
             unidadeSelecionada: ref('TRE-PR'),
         } as any);
 
-        const wrapper = mount(Navbar, {global: {plugins: [router]}});
+        const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
 
         const userInfo = wrapper.find('span.nav-link');
@@ -67,7 +67,7 @@ describe('Navbar.vue', () => {
             perfilSelecionado: 'ADMIN',
         } as any);
 
-        const wrapper = mount(Navbar, {global: {plugins: [router]}});
+        const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
 
         const settingsIcon = wrapper.find('[title="Configurações do sistema"]');
@@ -79,7 +79,7 @@ describe('Navbar.vue', () => {
             perfilSelecionado: 'GESTOR',
         } as any);
 
-        const wrapper = mount(Navbar, {global: {plugins: [router]}});
+        const wrapper = mount(NavBar, {global: {plugins: [router]}});
         await router.isReady();
 
         const settingsIcon = wrapper.find('[title="Configurações do sistema"]');

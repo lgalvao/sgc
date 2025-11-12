@@ -24,7 +24,10 @@
           :class="{ 'text-muted': isUnidadeDesabilitada(unidade.codigo) }"
         >
           <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-          <span v-if="isUnidadeDesabilitada(unidade.codigo)" class="badge bg-warning text-dark ms-2">
+          <span
+            v-if="isUnidadeDesabilitada(unidade.codigo)"
+            class="badge bg-warning text-dark ms-2"
+          >
             Não elegível
           </span>
         </label>
@@ -58,7 +61,10 @@
               :class="{ 'text-muted': isUnidadeDesabilitada(filha.codigo) }"
             >
               <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-              <span v-if="isUnidadeDesabilitada(filha.codigo)" class="badge bg-warning text-dark ms-2">
+              <span
+                v-if="isUnidadeDesabilitada(filha.codigo)"
+                class="badge bg-warning text-dark ms-2"
+              >
                 Não elegível
               </span>
             </label>
@@ -90,7 +96,10 @@
                   :class="{ 'text-muted': isUnidadeDesabilitada(neta.codigo) }"
                 >
                   <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                  <span v-if="isUnidadeDesabilitada(neta.codigo)" class="badge bg-warning text-dark ms-2">
+                  <span
+                    v-if="isUnidadeDesabilitada(neta.codigo)"
+                    class="badge bg-warning text-dark ms-2"
+                  >
                     Não elegível
                   </span>
                 </label>

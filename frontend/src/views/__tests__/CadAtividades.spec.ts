@@ -1,13 +1,10 @@
 import {mount} from '@vue/test-utils'
-import {beforeEach, describe, expect, it, vi} from 'vitest'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import CadAtividades from '@/views/CadAtividades.vue'
 import {createTestingPinia} from '@pinia/testing'
 import {useAtividadesStore} from '@/stores/atividades'
-import {useUnidadesStore} from '@/stores/unidades'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
-import {useAnalisesStore} from '@/stores/analises'
-import {useNotificacoesStore} from '@/stores/notificacoes'
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos'
 
 vi.mock('vue-router', () => ({
@@ -40,11 +37,8 @@ const mockAtividades = [
 describe('CadAtividades.vue', () => {
   let wrapper;
   let atividadesStore;
-  let unidadesStore;
   let processosStore;
   let subprocessosStore;
-  let analisesStore;
-  let notificacoesStore;
 
   function createWrapper(isRevisao = false) {
     return mount(CadAtividades, {
@@ -80,20 +74,28 @@ describe('CadAtividades.vue', () => {
           }),
         ],
       },
+      attachTo: document.body,
     });
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     wrapper = createWrapper();
     atividadesStore = useAtividadesStore();
-    unidadesStore = useUnidadesStore();
     processosStore = useProcessosStore();
     subprocessosStore = useSubprocessosStore();
-    analisesStore = useAnalisesStore();
-    notificacoesStore = useNotificacoesStore();
+    // unidadesStore = useUnidadesStore();
+    // analisesStore = useAnalisesStore();
+    // notificacoesStore = useNotificacoesStore();
 
     atividadesStore.getAtividadesPorSubprocesso = vi.fn().mockReturnValue(mockAtividades);
+    processosStore.fetchProcessoDetalhe = vi.fn().mockResolvedValue(undefined);
     window.confirm = vi.fn(() => true);
+    
+    await wrapper.vm.$nextTick();
+  });
+
+  afterEach(() => {
+    wrapper?.unmount();
   });
 
   it('deve adicionar uma atividade', async () => {

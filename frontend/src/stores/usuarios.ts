@@ -22,7 +22,7 @@ export const useUsuariosStore = defineStore('usuarios', {
                 this.usuarios = (response as any).map(u => ({
                     ...u,
                     unidade: {sigla: u.unidade}
-                })) as unknown as Usuario[];
+                })) as any as Usuario[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar usuários: ' + err.message;
             } finally {

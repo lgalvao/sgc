@@ -47,7 +47,7 @@
           </tr>
         </thead>
         <tbody>
-          <TreeRow
+          <TreeRowItem
             v-for="item in flattenedData"
             :key="item.id"
             :columns="columns"
@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
 import {computed, nextTick, ref, watch} from 'vue'
-import TreeRow from './TreeRow.vue'
+import TreeRowItem from './TreeRowItem.vue'
 
 interface TreeItem {
   id: number | string;
@@ -93,7 +93,9 @@ interface TreeTableProps {
 }
 
 const props = defineProps<TreeTableProps>()
-const emit = defineEmits<{ (e: 'row-click', item: TreeItem): void; }>()
+const emit = defineEmits<{
+  (e: 'row-click', item: TreeItem): void
+}>()
 
 const internalData = ref<TreeItem[]>([])
 
@@ -182,5 +184,6 @@ defineExpose({
   internalData,
   findItemById,
   toggleExpand,
+  handleTreeRowClick,
 })
 </script>

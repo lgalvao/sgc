@@ -49,17 +49,35 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve([]),
-  })
-);
+    headers: new Headers(),
+    redirected: false,
+    status: 200,
+    statusText: 'OK',
+    type: 'basic' as ResponseType,
+    url: '',
+    clone: () => new Response(),
+    arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+    blob: () => Promise.resolve(new Blob()),
+    formData: () => Promise.resolve(new FormData()),
+    text: () => Promise.resolve(''),
+  } as any as Response)
+) as any;
 
 describe('CadProcesso.vue', () => {
   let wrapper;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     vi.mocked(mapaService).verificarMapaVigente.mockResolvedValue(true);
-    vi.mocked(buscarUsuariosPorUnidade).mockResolvedValue([{ nome: 'Test User' }]);
+    vi.mocked(buscarUsuariosPorUnidade).mockResolvedValue([{ 
+      codigo: 1,
+      nome: 'Test User',
+      email: 'test@test.com',
+      ramal: '1234',
+      tituloEleitoral: '123456',
+      unidade: { codigo: 1, nome: 'Unit' } as any
+    }]);
 
     wrapper = mount(CadProcesso, {
       global: {
@@ -80,6 +98,8 @@ describe('CadProcesso.vue', () => {
 
     const unidadesStore = useUnidadesStore();
     unidadesStore.fetchUnidades = vi.fn().mockResolvedValue(true);
+    
+    await wrapper.vm.$nextTick();
   });
 
   it('renders the form correctly', () => {
@@ -97,7 +117,7 @@ describe('CadProcesso.vue', () => {
     await wrapper.find('[data-testid="input-descricao"]').setValue('Novo Processo de Teste');
     await wrapper.find('[data-testid="input-dataLimite"]').setValue('2025-12-31');
 
-    await wrapper.vm.unidadesSelecionadas.push(1);
+    wrapper.vm.unidadesSelecionadas.push(1);
 
     await wrapper.find('button[type="button"].btn-primary').trigger('click');
 
@@ -135,7 +155,14 @@ describe('CadProcesso.vue', () => {
 
     it('disables units without servers for DIAGNOSTICO type', async () => {
       vi.mocked(mapaService).verificarMapaVigente.mockResolvedValue(true);
-      vi.mocked(buscarUsuariosPorUnidade).mockImplementation(async (codigo) => codigo === 1 ? [{ nome: 'Test' }] : []);
+      vi.mocked(buscarUsuariosPorUnidade).mockImplementation(async (codigo) => codigo === 1 ? [{ 
+        codigo: 1,
+        nome: 'Test',
+        email: 'test@test.com',
+        ramal: '1234',
+        tituloEleitoral: '123456',
+        unidade: { codigo: 1, nome: 'Unit' } as any
+      }] : []);
 
       await wrapper.find('[data-testid="select-tipo"]').setValue('DIAGNOSTICO');
       await flushPromises();

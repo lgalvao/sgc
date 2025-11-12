@@ -36,6 +36,9 @@ export default [
                 sourceType: "module",
             },
         },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+        },
     },
     {
         files: ["tests/vue-specific-setup.ts"],

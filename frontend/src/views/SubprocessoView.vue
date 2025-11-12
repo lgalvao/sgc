@@ -214,7 +214,7 @@ function navegarParaMapa() {
   }
 
   const params = {codProcesso: processoAtual.value.codigo, siglaUnidade: sigla.value};
-  router.push({name: 'SubprocessoVisMapa', params});
+  router.push({name: 'SubprocessoMapa', params});
 }
 
 function irParaAtividadesConhecimentos() {

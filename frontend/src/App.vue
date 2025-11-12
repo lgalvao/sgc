@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Navbar from './components/Navbar.vue'
+import Navbar from './components/NavBar.vue'
 import {useRoute} from 'vue-router'
 import {computed, ref, watch} from 'vue'
 import BarraNavegacao from './components/BarraNavegacao.vue';
@@ -7,7 +7,7 @@ import pkg from '../package.json';
 
 interface PackageJson {
   version: string;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 const route = useRoute()

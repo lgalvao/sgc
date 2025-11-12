@@ -57,13 +57,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useProcessosStore } from '@/stores/processos'
 import { usePerfilStore } from '@/stores/perfil'
 import { useNotificacoesStore } from '@/stores/notificacoes'
-import TreeTable from '@/components/TreeTable.vue'
+import TreeTable from '@/components/TreeTableView.vue'
 import ProcessoDetalhes from '@/components/ProcessoDetalhes.vue'
 import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
 import ModalAcaoBloco, { type UnidadeSelecao } from '@/components/ModalAcaoBloco.vue'
@@ -162,7 +162,7 @@ async function executarFinalizacao() {
     await processosStore.finalizarProcesso(processo.value.codigo)
     notificacoesStore.sucesso('Processo finalizado', 'O processo foi finalizado. Todos os mapas de competências estão agora vigentes.')
     await router.push('/painel')
-  } catch (error) {
+  } catch {
     notificacoesStore.erro('Erro ao finalizar processo', 'Ocorreu um erro durante a finalização. Tente novamente.')
   }
 }
@@ -210,7 +210,7 @@ async function confirmarAcaoBloco(unidades: UnidadeSelecao[]) {
       mostrarAlertaSucesso.value = false
       router.push('/painel')
     }, 2000)
-  } catch (error) {
+  } catch {
     notificacoesStore.erro('Erro ao processar em bloco', 'Ocorreu um erro ao processar os cadastros em bloco.')
   }
 }

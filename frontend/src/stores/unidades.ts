@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import type {Unidade} from '@/types/tipos';
 import {mapUnidadesArray} from '@/mappers/unidades';
-import {UnidadesService} from "@/services/unidadesService";
+import {buscarTodasUnidades, buscarUnidadePorSigla} from "@/services/unidadesService";
 
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({
@@ -15,7 +15,7 @@ export const useUnidadesStore = defineStore('unidades', {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await UnidadesService.buscarTodasUnidades();
+                const response = await buscarTodasUnidades();
                 this.unidades = mapUnidadesArray((response as any).data as any) as Unidade[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar unidades: ' + err.message;
@@ -27,7 +27,7 @@ export const useUnidadesStore = defineStore('unidades', {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await UnidadesService.buscarUnidadePorSigla(sigla);
+                const response = await buscarUnidadePorSigla(sigla);
                 this.unidade = response.data as Unidade;
             } catch (err: any) {
                 this.error = 'Falha ao carregar unidade: ' + err.message;
