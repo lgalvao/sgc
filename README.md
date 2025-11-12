@@ -30,6 +30,7 @@ O SGC permite:
 - Java 21
 - Spring Boot 3.5.7
 - JPA/Hibernate
+- Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
 - Arquitetura: Em camadas, estruturada por domínio 
 
@@ -37,6 +38,7 @@ O SGC permite:
 - Vue.js 3.5 + TypeScript
 - Vite (build)
 - Pinia (estado)
+- Vue Router (rotas)
 - Bootstrap 5
 - Axios (cliente http)
 
@@ -49,18 +51,20 @@ O SGC permite:
 
 ```
 sgc/
-├── backend/              # API REST Spring Boot
+├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
-│   │   ├── processo/     # Principal conceito do sistema, de onde partem todos os fluxos. 
-│   │   ├── subprocesso/  # Cada unidade envolvida em um processo tem o seu subprocesso
-│   │   ├── mapa/         # Mapas de competências
-│   │   ├── atividade/    # Atividades e conhecimentos
-│   │   ├── analise/      # Trilha de auditoria
-│   │   ├── notificacao/  # Sistema de notificações
-│   │   ├── alerta/       # Alertas internos
-│   │   ├── sgrh/         # Integração com RH
-│   │   ├── unidade/      # Estrutura organizacional
-│   │   └── comum/        # Componentes compartilhados
+│   │   ├── processo/     # Orquestrador dos fluxos de negócio (Mapeamento, Revisão, Diagnóstico)
+│   │   ├── subprocesso/  # Máquina de estados para o workflow de cada unidade
+│   │   ├── mapa/         # Gestão dos mapas de competências (criação, versionamento)
+│   │   ├── atividade/    # CRUD de atividades e conhecimentos
+│   │   ├── analise/      # Trilha de auditoria imutável
+│   │   ├── notificacao/  # Envio de notificações por e-mail
+│   │   ├── alerta/       # Alertas exibidos na interface
+│   │   ├── painel/       # Endpoints para os dashboards
+│   │   ├── sgrh/         # Integração com SGRH (usuários, perfis, unidades)
+│   │   ├── unidade/      # Representação da estrutura organizacional
+│   │   ├── util/         # Classes utilitárias
+│   │   └── comum/        # Componentes compartilhados (DTOs, exceções)
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
 │       ├── application-e2e.yml     # Testes E2E (H2)
@@ -68,13 +72,18 @@ sgc/
 │
 ├── frontend/             # Aplicação Vue.js
 │   ├── src/
-│      ├── components/   # Componentes reutilizáveis
-│      ├── views/        # Páginas da aplicação
-│      ├── stores/       # Pinia stores
-│      ├── services/     # Serviços de API
-│      ├── router/       # Vue Router
-│      └── types/        # Tipo TypeScript│   
-│
+│      ├── components/   # Componentes reutilizáveis (Vue)
+│      ├── views/        # Páginas da aplicação (Vue)
+│      ├── stores/       # Módulos de estado (Pinia)
+│      ├── services/     # Comunicação com a API (Axios)
+│      ├── router/       # Configuração de rotas (Vue Router)
+│      ├── composables/  # Funções reutilizáveis (Composition API)
+│      ├── mappers/      # Mapeamento de DTOs
+│      ├── utils/        # Funções utilitárias
+│      ├── constants/    # Constantes e enums
+│      ├── types/        # Tipos e interfaces (TypeScript)
+│      └── test-utils/   # Utilitários para testes
+│   
 ├── e2e/                  # Testes End-to-End (Playwright)
 │   ├── cdu-01.spec.ts    # Login e autenticação
 │   ├── cdu-02.spec.ts    # Criar processo
