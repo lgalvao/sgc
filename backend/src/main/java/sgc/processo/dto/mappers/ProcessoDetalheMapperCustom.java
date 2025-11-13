@@ -42,7 +42,11 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
-        Usuario user = (Usuario) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof Usuario)) {
+            return false;
+        }
+        Usuario user = (Usuario) principal;
         return processo.getParticipantes().stream()
                 .anyMatch(unidade -> unidade.getCodigo().equals(user.getUnidade().getCodigo()));
     }

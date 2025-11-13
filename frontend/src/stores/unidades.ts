@@ -16,7 +16,7 @@ export const useUnidadesStore = defineStore('unidades', {
             this.error = null;
             try {
                 const response = await buscarTodasUnidades();
-                this.unidades = mapUnidadesArray((response as any).data as any) as Unidade[];
+                this.unidades = mapUnidadesArray(response as any) as Unidade[];
             } catch (err: any) {
                 this.error = 'Falha ao carregar unidades: ' + err.message;
             } finally {

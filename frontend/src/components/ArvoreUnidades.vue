@@ -4,10 +4,7 @@
       v-for="unidade in unidadesFiltradas"
       :key="unidade.sigla"
     >
-      <div
-        v-if="temFilhasElegiveis(unidade)"
-        class="form-check"
-      >
+      <div class="form-check">
         <input
           :id="`chk-${unidade.sigla}`"
           v-model="unidadesSelecionadasLocal"
@@ -33,19 +30,16 @@
         </label>
       </div>
 
-      <!-- Mostrar filhas se a unidade tem filhas elegíveis (mesmo que a unidade pai não seja) -->
+      <!-- Mostrar filhas se a unidade tem filhas (mesmo que a unidade pai não seja) -->
       <div
-        v-if="unidade.filhas && unidade.filhas.length && temFilhasElegiveis(unidade)"
+        v-if="unidade.filhas && unidade.filhas.length"
         class="ms-4"
       >
         <template
           v-for="filha in unidade.filhas"
           :key="filha.sigla"
         >
-          <div
-            v-if="temFilhasElegiveis(filha)"
-            class="form-check"
-          >
+          <div class="form-check">
             <input
               :id="`chk-${filha.sigla}`"
               v-model="unidadesSelecionadasLocal"
@@ -78,10 +72,7 @@
               v-for="neta in filha.filhas"
               :key="neta.sigla"
             >
-              <div
-                v-if="temFilhasElegiveis(neta)"
-                class="form-check"
-              >
+              <div class="form-check">
                 <input
                   :id="`chk-${neta.sigla}`"
                   v-model="unidadesSelecionadasLocal"

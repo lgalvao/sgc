@@ -146,7 +146,7 @@ test.describe('CDU-03: Manter processo', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro\?codProcesso=\d+/, );
 
         // 2. Verificar que campo está preenchido com valor atual
-        await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 2000});
+        await expect(page.locator(SELETORES.CAMPO_DESCRICAO)).toHaveValue(/./);
         const descricaoAtual = await page.locator(SELETORES.CAMPO_DESCRICAO).inputValue();
         expect(descricaoAtual).toBeTruthy();
 

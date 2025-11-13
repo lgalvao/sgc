@@ -322,8 +322,8 @@ async function salvarProcesso() {
         unidades: unidadesSelecionadas.value
       };
       const novoProcesso = await processosStore.criarProcesso(request);
-      notificacoesStore.sucesso('Processo salvo', 'O processo foi salvo!');
-      await router.push(`/processo/${novoProcesso.codigo}`);
+      notificacoesStore.sucesso('Processo criado', 'O processo foi criado!');
+      await router.push('/painel');
     }
     limparCampos();
   } catch (error) {
