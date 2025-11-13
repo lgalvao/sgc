@@ -6,15 +6,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller REST para Processos.
@@ -39,6 +36,23 @@ public class ProcessoController {
         ProcessoDto criado = processoService.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
+    }
+
+    /**
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado
+     * ou de um processo específico, útil para desabilitar checkboxes no frontend.
+     *
+     * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @param codProcesso Código opcional do processo a ser considerado
+     * @return Objeto contendo lista de unidades desabilitadas
+     */
+    @GetMapping("/status-unidades")
+    @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
+    public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
+            @RequestParam String tipo,
+            @RequestParam(required = false) Long codProcesso) {
+        List<Long> unidadesDesabilitadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
+        return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
     }
 
     /**

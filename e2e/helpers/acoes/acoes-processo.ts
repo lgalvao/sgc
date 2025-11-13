@@ -10,22 +10,9 @@ import {extrairIdDoSeletor} from '../utils/utils';
  * @param siglas Um array de siglas das unidades a serem selecionadas (ex: ['STIC', 'SGP']).
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
-    // Aguardar a árvore de unidades carregar
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible'});
-
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        const alvo = page.locator(seletorCheckbox);
-        
-        // Aguardar a unidade aparecer na árvore (pode demorar devido a validações assíncronas)
-        await alvo.waitFor({state: 'visible'});
-        
-        const isDisabled = await alvo.isDisabled();
-        if (isDisabled) {
-            console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
-            continue;
-        }
-        
+        await page.waitForSelector(seletorCheckbox);
         await page.check(seletorCheckbox);
     }
 }
@@ -37,7 +24,6 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
  * @returns O ID da unidade selecionada.
  */
 export async function selecionarUnidadeDisponivel(page: Page, index: number = 0): Promise<string> {
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
     const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
     const total = await disponiveis.count();
     if (total === 0) throw new Error('Nenhuma unidade disponível para seleção');
@@ -267,8 +253,6 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
 
     // Aguardar formulário carregar com os dados do processo
     await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
-    // Aguardar um pouco mais para garantir que todos os dados foram carregados (unidades, etc)
-    await page.waitForTimeout(2000); // Aumentado de 1s para 2s
     console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
 
     // DEBUG: Verificar dados carregados usando page.evaluate

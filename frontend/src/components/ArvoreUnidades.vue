@@ -147,7 +147,7 @@ function isUnidadeDesabilitada(codigo: number): boolean {
 
 // Verifica se unidade ou suas descendentes são elegíveis
 function temFilhasElegiveis(unidade: Unidade): boolean {
-  return props.filtrarPor(unidade);
+  return true;
 }
 
 // Verifica se é folha (sem filhas)

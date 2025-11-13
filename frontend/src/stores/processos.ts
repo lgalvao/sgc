@@ -21,7 +21,8 @@ export const useProcessosStore = defineStore('processos', {
         processoDetalhe: null as ProcessoDetalhe | null,
         subprocessosElegiveis: [] as SubprocessoElegivel[],
         processosFinalizados: [] as ProcessoResumo[],
-        movements: [] as Movimentacao[]
+        movements: [] as Movimentacao[],
+        unidadesDesabilitadas: [] as number[],
     }),
     getters: {
         getUnidadesDoProcesso: (state) => (idProcesso: number): ProcessoResumo[] => {
@@ -46,6 +47,10 @@ export const useProcessosStore = defineStore('processos', {
         },
         async fetchProcessoDetalhe(idProcesso: number) {
             this.processoDetalhe = await processoService.obterDetalhesProcesso(idProcesso);
+        },
+        async buscarStatusUnidades(tipo: string, codProcesso?: number) {
+            const data = await processoService.obterStatusUnidades(tipo, codProcesso);
+            this.unidadesDesabilitadas = data.unidadesDesabilitadas;
         },
         async fetchSubprocessosElegiveis(idProcesso: number) {
             this.subprocessosElegiveis = await processoService.fetchSubprocessosElegiveis(idProcesso);

@@ -47,7 +47,6 @@
             v-model="unidadesSelecionadas"
             :unidades="unidadesStore.unidades"
             :desabilitadas="unidadesDesabilitadas"
-            :filtrar-por="unidadeElegivel"
           />
           <div
             v-else
@@ -205,7 +204,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, ref, watch} from 'vue'
+import {nextTick, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useProcessosStore} from '@/stores/processos'
 import {useUnidadesStore} from '@/stores/unidades'
@@ -214,22 +213,17 @@ import {
   type CriarProcessoRequest,
   type Processo as ProcessoModel,
   TipoProcesso,
-  type Unidade
 } from '@/types/tipos'
 import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
-import * as mapaService from '@/services/mapaService';
-import { buscarUsuariosPorUnidade } from "@/services/usuarioService";
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
+import {storeToRefs} from "pinia";
 
 const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')
 const tipo = ref<string>('MAPEAMENTO')
 const dataLimite = ref<string>('')
-const unidadesBloqueadas = ref<number[]>([])
-const unidadesComMapaVigente = ref<number[]>([])
-const unidadesComServidores = ref<number[]>([])
 const router = useRouter()
 const route = useRoute()
 const processosStore = useProcessosStore()
@@ -238,6 +232,8 @@ const notificacoesStore = useNotificacoesStore()
 const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
+
+const {unidadesDesabilitadas} = storeToRefs(processosStore)
 
 /**
  * Extrai recursivamente todos os códigos de unidades de uma árvore hierárquica
@@ -257,7 +253,6 @@ function extrairCodigosUnidades(unidades: any[]): number[] {
 
 onMounted(async () => {
   await unidadesStore.fetchUnidades();
-  await carregarUnidadesValidas(tipo.value);
 
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
@@ -269,17 +264,17 @@ onMounted(async () => {
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split('T')[0];
-
-        await carregarUnidadesValidas(processo.tipo);
-
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
 
+        await processosStore.buscarStatusUnidades(processo.tipo, processo.codigo);
         await nextTick();
       }
     } catch (error) {
       notificacoesStore.erro('Erro ao carregar processo', 'Não foi possível carregar os detalhes do processo.');
       console.error('Erro ao carregar processo:', error);
     }
+  } else {
+    await processosStore.buscarStatusUnidades(tipo.value);
   }
 })
 
@@ -287,118 +282,15 @@ watch(tipo, async (novoTipo) => {
   if (unidadesStore.unidades.length === 0) {
     return;
   }
-
-  try {
-    const response = await fetch(`http://localhost:10000/api/processos/unidades-bloqueadas?tipo=${novoTipo}`);
-    if (response.ok) {
-      unidadesBloqueadas.value = await response.json();
-    }
-  } catch (error) {
-    console.error('Erro ao buscar unidades bloqueadas:', error);
-  }
-
-  await carregarUnidadesValidas(novoTipo);
+  const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
+  await processosStore.buscarStatusUnidades(novoTipo, codProcesso);
 });
-
-// TODO: Esta função executa múltiplas chamadas de API em um laço, o que é ineficiente.
-// A lógica de validação de unidades (verificar mapa vigente, existência de servidores)
-// deve ser movida para um único endpoint no backend que receba a lista de unidades
-// e retorne apenas as que são válidas para o tipo de processo.
-async function carregarUnidadesValidas(tipoProcesso: string) {
-  const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
-
-  // Para MAPEAMENTO, todas as unidades são elegíveis por padrão.
-  if (tipoProcesso === 'MAPEAMENTO') {
-    unidadesComMapaVigente.value = todasUnidades;
-    unidadesComServidores.value = todasUnidades;
-    return;
-  }
-
-  // Para REVISAO e DIAGNOSTICO, precisamos verificar o mapa vigente.
-  const mapaChecks = todasUnidades.map(codigo =>
-    unidadeTemMapaVigente(codigo).then(temMapa => ({ codigo, temMapa }))
-  );
-  const mapaResultados = await Promise.all(mapaChecks);
-  unidadesComMapaVigente.value = mapaResultados.filter(r => r.temMapa).map(r => r.codigo);
-
-  // Para DIAGNOSTICO, precisamos verificar também os servidores.
-  if (tipoProcesso === 'DIAGNOSTICO') {
-    const servidorChecks = todasUnidades.map(codigo =>
-      unidadeTemServidores(codigo).then(temServidores => ({ codigo, temServidores }))
-    );
-    const servidorResultados = await Promise.all(servidorChecks);
-    unidadesComServidores.value = servidorResultados.filter(r => r.temServidores).map(r => r.codigo);
-  } else {
-    // Para REVISAO, não é necessário verificar servidores.
-    unidadesComServidores.value = todasUnidades;
-  }
-}
-
-// Extrai todos os códigos de unidades da árvore (incluindo filhas)
-function extrairTodasUnidadesCodigos(unidades: Unidade[]): number[] {
-  const codigos: number[] = [];
-  for (const unidade of unidades) {
-    codigos.push(unidade.codigo);
-    if (unidade.filhas && unidade.filhas.length > 0) {
-      codigos.push(...extrairTodasUnidadesCodigos(unidade.filhas));
-    }
-  }
-  return codigos;
-}
-
-
-
-
-
 
 function limparCampos() {
   descricao.value = ''
   tipo.value = 'MAPEAMENTO'
   dataLimite.value = ''
   unidadesSelecionadas.value = []
-}
-
-function isUnidadeIntermediaria(codigo: number): boolean {
-  const unidade = encontrarUnidadeRecursiva(codigo, unidadesStore.unidades);
-  return unidade?.tipo === 'INTERMEDIARIA';
-}
-
-function encontrarUnidadeRecursiva(codigo: number, unidades: Unidade[]): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.codigo === codigo) {
-      return unidade;
-    }
-    if (unidade.filhas && unidade.filhas.length > 0) {
-      const encontrada = encontrarUnidadeRecursiva(codigo, unidade.filhas);
-      if (encontrada) {
-        return encontrada;
-      }
-    }
-  }
-  return null;
-}
-
-async function unidadeTemMapaVigente(codigo: number): Promise<boolean> {
-  return await mapaService.verificarMapaVigente(codigo);
-}
-
-async function unidadeTemServidores(codigo: number): Promise<boolean> {
-  try {
-    const usuarios = await buscarUsuariosPorUnidade(codigo);
-    return usuarios.length > 0;
-  } catch (error) {
-    console.warn(`[DEBUG Vue] Não foi possível verificar usuários para unidade ${codigo}:`, error);
-    return false;
-  }
-}
-
-async function validarUnidadesParaProcesso(tipoProcesso: string, unidadesSelecionadas: number[]): Promise<number[]> {
-  const unidadesValidas = unidadesSelecionadas.filter(codigo => {
-    const isIntermediaria = isUnidadeIntermediaria(codigo);
-    return !isIntermediaria;
-  });
-
-  return unidadesValidas;
 }
 
 async function salvarProcesso() {
@@ -411,23 +303,13 @@ async function salvarProcesso() {
   }
 
   try {
-    const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
-
-    if (unidadesFiltradas.length === 0) {
-      notificacoesStore.erro(
-          'Unidades inválidas',
-          'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
-      );
-      return;
-    }
-
     if (processoEditando.value) {
       const request: AtualizarProcessoRequest = {
         codigo: processoEditando.value.codigo,
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesFiltradas
+        unidades: unidadesSelecionadas.value
       };
       await processosStore.atualizarProcesso(processoEditando.value.codigo, request);
       notificacoesStore.sucesso('Processo alterado', 'O processo foi alterado!');
@@ -437,7 +319,7 @@ async function salvarProcesso() {
         descricao: descricao.value,
         tipo: tipo.value as TipoProcesso,
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
-        unidades: unidadesFiltradas
+        unidades: unidadesSelecionadas.value
       };
       const novoProcesso = await processosStore.criarProcesso(request);
       notificacoesStore.sucesso('Processo salvo', 'O processo foi salvo!');
@@ -458,12 +340,13 @@ async function abrirModalConfirmacao() {
     );
     return
   }
-  const unidadesFiltradas = await validarUnidadesParaProcesso(tipo.value, unidadesSelecionadas.value);
 
-  if (unidadesFiltradas.length === 0) {
+  // A validação de unidades agora é feita no backend,
+  // mas uma verificação simples de seleção pode ser mantida.
+  if (unidadesSelecionadas.value.length === 0) {
     notificacoesStore.erro(
-        'Unidades inválidas',
-        'Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento.'
+        'Nenhuma unidade selecionada',
+        'Selecione ao menos uma unidade para iniciar o processo.'
     );
     return
   }
@@ -526,68 +409,4 @@ async function confirmarRemocao() {
   }
   fecharModalRemocao();
 }
-
-const unidadesStatus = computed(() => {
-  const todasUnidades = extrairTodasUnidadesCodigos(unidadesStore.unidades);
-  const desabilitadas: number[] = [];
-  const elegiveis: number[] = [];
-  const unidadesProtegidas = processoEditando.value ? unidadesSelecionadas.value : [];
-
-  for (const codigo of todasUnidades) {
-    let isElegivel = true;
-    let isDesabilitada = false;
-
-    if (unidadesProtegidas.includes(codigo)) {
-      elegiveis.push(codigo);
-      continue;
-    }
-
-    if (unidadesBloqueadas.value.includes(codigo)) {
-      isElegivel = false;
-      isDesabilitada = true;
-    }
-
-    if (tipo.value === 'REVISAO' || tipo.value === 'DIAGNOSTICO') {
-      if (!unidadesComMapaVigente.value.includes(codigo)) {
-        isElegivel = false;
-        isDesabilitada = true;
-      }
-    }
-
-    if (tipo.value === 'DIAGNOSTICO') {
-      if (!unidadesComServidores.value.includes(codigo)) {
-        isElegivel = false;
-        isDesabilitada = true;
-      }
-    }
-
-    if (isElegivel) {
-      elegiveis.push(codigo);
-    }
-    if (isDesabilitada) {
-      desabilitadas.push(codigo);
-    }
-  }
-
-  return {
-    desabilitadas,
-    elegiveis
-  };
-});
-
-const unidadesDesabilitadas = computed(() => unidadesStatus.value.desabilitadas);
-
-function unidadeElegivel(unidade: Unidade): boolean {
-  return unidadesStatus.value.elegiveis.includes(unidade.codigo);
-}
-
-defineExpose({
-  unidadesSelecionadas,
-  unidadesBloqueadas,
-  unidadesComMapaVigente,
-  unidadesComServidores,
-  unidadesStatus,
-  unidadeElegivel,
-});
-
 </script>
