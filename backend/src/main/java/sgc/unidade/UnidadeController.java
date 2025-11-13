@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.service.UnidadeService;
 
 import java.util.List;
@@ -21,6 +24,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UnidadeController {
     private final UnidadeService unidadeService;
+
+    /**
+     * Cria uma nova atribuição temporária para um servidor em uma unidade.
+     * @param idUnidade O ID da unidade.
+     * @param request Os dados da atribuição.
+     * @return Resposta vazia com status 201 (Created).
+     */
+    @PostMapping("/{idUnidade}/atribuicoes-temporarias")
+    public ResponseEntity<Void> criarAtribuicaoTemporaria(
+        @PathVariable Long idUnidade,
+        @RequestBody CriarAtribuicaoTemporariaRequest request
+    ) {
+        unidadeService.criarAtribuicaoTemporaria(idUnidade, request);
+        return ResponseEntity.created(null).build();
+    }
 
     /**
      * Busca todas as unidades em estrutura hierárquica

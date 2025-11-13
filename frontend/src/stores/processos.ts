@@ -51,11 +51,12 @@ export const useProcessosStore = defineStore('processos', {
             this.subprocessosElegiveis = await processoService.fetchSubprocessosElegiveis(idProcesso);
         },
         async criarProcesso(payload: CriarProcessoRequest) {
-            await processoService.criarProcesso(payload);
+            const novoProcesso = await processoService.criarProcesso(payload);
             const perfilStore = usePerfilStore();
             if (perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada) {
                 await this.fetchProcessosPainel(perfilStore.perfilSelecionado, Number(perfilStore.unidadeSelecionada), 0, 10);
             }
+            return novoProcesso;
         },
         async atualizarProcesso(idProcesso: number, payload: AtualizarProcessoRequest) {
             await processoService.atualizarProcesso(idProcesso, payload);

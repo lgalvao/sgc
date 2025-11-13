@@ -8,9 +8,13 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.unidade.model.AtribuicaoTemporaria;
+import sgc.unidade.model.AtribuicaoTemporariaRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +26,28 @@ public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
+    private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
 
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
         return montarHierarquia(todasUnidades);
+    }
+
+    public void criarAtribuicaoTemporaria(Long idUnidade, CriarAtribuicaoTemporariaRequest request) {
+        Unidade unidade = unidadeRepo.findById(idUnidade)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + idUnidade + " não encontrada"));
+
+        Usuario usuario = usuarioRepo.findById(request.tituloEleitoralServidor())
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário com título eleitoral " + request.tituloEleitoralServidor() + " não encontrado"));
+
+        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+        atribuicao.setUnidade(unidade);
+        atribuicao.setUsuario(usuario);
+        atribuicao.setDataInicio(LocalDateTime.now());
+        atribuicao.setDataTermino(request.dataTermino().atTime(23, 59, 59));
+        atribuicao.setJustificativa(request.justificativa());
+
+        atribuicaoTemporariaRepo.save(atribuicao);
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {

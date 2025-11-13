@@ -15,8 +15,6 @@ import java.util.List;
  */
 @Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
-
-
     /**
      * Busca todos os alertas associados a um processo específico.
      * @param codProcesso O código do processo.

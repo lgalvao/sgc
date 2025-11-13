@@ -20,10 +20,13 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 
 -   **Exceções:** Nomes de classes de exceção devem seguir o padrão `ErroXxxx`, por exemplo, `ErroEntidadeNaoEncontrada`.
 -   **Repositórios JPA:** Nomes de interfaces de repositório JPA devem seguir o padrão `XxxxRepo`, por exemplo, `SubprocessoRepo`.
+- As classes de serviço usam o sufixo padrão 'Service'
+- As classes de controle usam o sufixo padrão 'Controller'
 
-## 3. Backend (Java/Kotlin com Spring Boot)
+## 3. Backend (Java com Spring Boot)
 
-*(Adicionar diretrizes específicas para o backend aqui, se houver. Ex: uso de Lombok, padrões de serviço, etc.)*
+- O Backend usa a versão mais recente do Spring Boot, além de Hibernate, Lombok e MapStruct. 
+- Os testes são criados com JUnit e o mais possível das facilidades oferecidas pelo Spring Boot para testes.
 
 ## 4. Frontend (Vue.js com TypeScript)
 
@@ -40,7 +43,7 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 
 ### 5.2. Playwright (Testes E2E)
 
-Os testes E2E são cruciais para a qualidade do sistema. Siga estas diretrizes para executá-los e mantê-los:
+Siga estas diretrizes para executar e manter testes e2e:
 
 -   **Execução Otimizada:**
     -   Sempre execute o mínimo de testes possível para o contexto da sua alteração.
@@ -58,9 +61,3 @@ Os testes E2E são cruciais para a qualidade do sistema. Siga estas diretrizes p
     -   Prefira o uso de atributos `data-testid` para identificar elementos na interface do usuário. Isso torna os testes mais resilientes a mudanças na estrutura HTML ou CSS.
 -   **Reutilização de Código:**
     -   Utilize as funções auxiliares (`helpers/acoes`, `helpers/dados`, `helpers/verificacoes`) para padronizar interações, dados e verificações, evitando duplicação e melhorando a legibilidade.
--   **Modo UI para Depuração:**
-    -   Para depurar testes ou entender o fluxo, utilize o modo UI do Playwright:
-        ```bash
-        npx playwright test --ui
-        ```
-        Isso permite inspecionar elementos, executar testes passo a passo e visualizar o estado da aplicação durante a execução do teste.

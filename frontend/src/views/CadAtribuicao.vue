@@ -23,14 +23,22 @@
                 :value="null"
                 disabled
               >
-                <div
-                  v-if="erroServidor"
-                  class="text-danger small"
-                >
-                  {{ erroServidor }}
-                </div>
+                Selecione um servidor
+              </option>
+              <option
+                v-for="servidor in servidores"
+                :key="servidor.codigo"
+                :value="servidor.codigo"
+              >
+                {{ servidor.nome }}
               </option>
             </select>
+            <div
+              v-if="erroServidor"
+              class="text-danger small mt-1"
+            >
+              {{ erroServidor }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -84,23 +92,74 @@
         >
           Atribuição criada!
         </div>
+        <div
+          v-if="erroApi"
+          class="alert alert-danger mt-3"
+        >
+          {{ erroApi }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { buscarUnidadePorSigla } from '@/services/unidadesService'
+import { buscarUsuariosPorUnidade } from '@/services/usuarioService'
+import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService'
+import type { Unidade, Usuario } from '@/types/tipos'
+
 const props = defineProps<{ sigla: string }>()
 
 const router = useRouter()
 const sigla = computed(() => props.sigla)
 
-const servidorSelecionado = ref<number | null>(null)
-const dataTermino = ref("")
-const justificativa = ref("")
-const sucesso = ref(false)
-const erroServidor = ref("")
+const unidade = ref<Unidade | null>(null)
+const servidores = ref<Usuario[]>([])
+const servidorSelecionado = ref<string | null>(null)
+const dataTermino = ref('')
+const justificativa = ref('')
 
+const sucesso = ref(false)
+const erroServidor = ref('')
+const erroApi = ref('')
+
+onMounted(async () => {
+  try {
+    unidade.value = await buscarUnidadePorSigla(sigla.value)
+    if (unidade.value) {
+      servidores.value = await buscarUsuariosPorUnidade(unidade.value.codigo)
+    }
+  } catch (error) {
+    erroServidor.value = 'Falha ao carregar dados da unidade ou servidores.'
+    console.error(error)
+  }
+})
+
+async function criarAtribuicao() {
+  if (!unidade.value || !servidorSelecionado.value) {
+    return
+  }
+
+  erroApi.value = ''
+  sucesso.value = false
+
+  try {
+    await criarAtribuicaoTemporaria(unidade.value.codigo, {
+      tituloEleitoralServidor: servidorSelecionado.value,
+      dataTermino: dataTermino.value,
+      justificativa: justificativa.value,
+    })
+    sucesso.value = true
+    // Reset form
+    servidorSelecionado.value = null
+    dataTermino.value = ''
+    justificativa.value = ''
+  } catch (error) {
+    erroApi.value = 'Falha ao criar atribuição. Tente novamente.'
+    console.error(error)
+  }
+}
 </script>
