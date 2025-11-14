@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Testes do E2eTestController")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Import({TestSecurityConfig.class})
-@org.springframework.transaction.annotation.Transactional
 class E2eTestControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +59,12 @@ class E2eTestControllerTest {
 
     @BeforeEach
     void setUp() {
+        movimentacaoRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        processoRepo.deleteAll();
+        alertaUsuarioRepo.deleteAll();
+        alertaRepo.deleteAll();
+
         var processo1 = new Processo();
         processo1.setTipo(TipoProcesso.MAPEAMENTO);
         processo1.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -79,6 +84,15 @@ class E2eTestControllerTest {
         movimentacao.setSubprocesso(subprocesso);
         movimentacao.setDescricao("Movimentação de teste");
         movimentacaoRepo.save(movimentacao);
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        movimentacaoRepo.deleteAll();
+        subprocessoRepo.deleteAll();
+        processoRepo.deleteAll();
+        alertaUsuarioRepo.deleteAll();
+        alertaRepo.deleteAll();
     }
 
     @Nested
