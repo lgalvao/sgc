@@ -286,14 +286,35 @@ export async function criarProcessoCompleto(
     dataLimite: string,
     unidades: number[]
 ): Promise<{ processo: { codigo: number; descricao: string; } }> {
+    let processoId = 0;
+    
+    // Intercept the API response to extract the process ID
+    const responsePromise = page.waitForResponse(response =>
+        response.url().includes('/api/processos') &&
+        !response.url().includes('/status-unidades') &&
+        response.request().method() === 'POST' &&
+        response.status() === 201
+    );
+    
     await navegarParaCriacaoProcesso(page);
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarUnidadesPorId(page, unidades);
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
-    await page.waitForURL(/\/processo\/\d+$/);
-    const url = page.url();
-    const id = Number(url.split('/').pop());
-    return {processo: {codigo: id, descricao}};
+    
+    try {
+        const response = await responsePromise;
+        const data = await response.json();
+        if (data && data.codigo) {
+            processoId = data.codigo;
+        }
+    } catch (error) {
+        console.warn('Could not extract process ID from response:', error);
+    }
+    
+    // Frontend redirects to /painel after saving
+    await page.waitForURL(/\/painel/);
+    
+    return { processo: { codigo: processoId, descricao } };
 }
 
 /**

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
 
@@ -154,7 +155,9 @@ public class ProcessoController {
         } else {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
+        ProcessoDto processoAtualizado = processoService.obterPorId(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        return ResponseEntity.ok(processoAtualizado);
     }
 
     /**
@@ -197,6 +200,20 @@ public class ProcessoController {
     @GetMapping("/{codigo}/subprocessos-elegiveis")
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
     public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(@PathVariable Long codigo) {
+        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
+        return ResponseEntity.ok(elegiveis);
+    }
+
+    /**
+     * Retorna todos os subprocessos de um processo.
+     * Utilizado pelo frontend para exibir a árvore de unidades e seus subprocessos.
+     *
+     * @param codigo O código do processo.
+     * @return Lista de subprocessos do processo.
+     */
+    @GetMapping("/{codigo}/subprocessos")
+    @Operation(summary = "Lista todos os subprocessos de um processo")
+    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessos(@PathVariable Long codigo) {
         List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
         return ResponseEntity.ok(elegiveis);
     }

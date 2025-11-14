@@ -6,6 +6,7 @@ import {
     clicarIniciarProcesso,
     confirmarNoModal,
     gerarNomeUnico,
+    limparProcessosEmAndamento,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     preencherFormularioProcesso,
@@ -31,6 +32,7 @@ import {
  */
 test.describe('CDU-05: Iniciar processo de revisão', () => {
     test.beforeEach(async ({page}) => {
+        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
     });
 
@@ -142,12 +144,9 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await abrirProcessoPorNome(page, nomeProcesso);
         await clicarIniciarProcesso(page);
         await confirmarNoModal(page);
-        await page.waitForTimeout(2000);
+        await page.waitForURL(/\/painel/);
 
         // Verificar criação de alertas
-        await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-alertas"]', );
-        
         const tabelaAlertas = page.locator('[data-testid="tabela-alertas"]');
         const alertaInicio = tabelaAlertas.locator('tr').filter({hasText: /Início do processo/i});
         await expect(alertaInicio.first()).toBeVisible();
