@@ -12,17 +12,17 @@
           class="form-check-input"
           type="checkbox"
           :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
-          :disabled="isUnidadeDesabilitada(unidade.codigo)"
+          :disabled="!unidade.isElegivel"
           :data-testid="`chk-${unidade.sigla}`"
         >
         <label
           :for="`chk-${unidade.sigla}`"
           class="form-check-label ms-2"
-          :class="{ 'text-muted': isUnidadeDesabilitada(unidade.codigo) }"
+          :class="{ 'text-muted': !unidade.isElegivel }"
         >
           <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
           <span
-            v-if="isUnidadeDesabilitada(unidade.codigo)"
+            v-if="!unidade.isElegivel"
             class="badge bg-warning text-dark ms-2"
           >
             Não elegível
@@ -47,16 +47,16 @@
               class="form-check-input"
               type="checkbox"
               :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
-              :disabled="isUnidadeDesabilitada(filha.codigo)"
+              :disabled="!filha.isElegivel"
             >
             <label
               :for="`chk-${filha.sigla}`"
               class="form-check-label ms-2"
-              :class="{ 'text-muted': isUnidadeDesabilitada(filha.codigo) }"
+              :class="{ 'text-muted': !filha.isElegivel }"
             >
               <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
               <span
-                v-if="isUnidadeDesabilitada(filha.codigo)"
+                v-if="!filha.isElegivel"
                 class="badge bg-warning text-dark ms-2"
               >
                 Não elegível
@@ -79,16 +79,16 @@
                   :value="neta.codigo"
                   class="form-check-input"
                   type="checkbox"
-                  :disabled="isUnidadeDesabilitada(neta.codigo)"
+                  :disabled="!neta.isElegivel"
                 >
                 <label
                   :for="`chk-${neta.sigla}`"
                   class="form-check-label ms-2"
-                  :class="{ 'text-muted': isUnidadeDesabilitada(neta.codigo) }"
+                  :class="{ 'text-muted': !neta.isElegivel }"
                 >
                   <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
                   <span
-                    v-if="isUnidadeDesabilitada(neta.codigo)"
+                    v-if="!neta.isElegivel"
                     class="badge bg-warning text-dark ms-2"
                   >
                     Não elegível
@@ -110,12 +110,10 @@ import type {Unidade} from '@/types/tipos';
 interface Props {
   unidades: Unidade[];
   modelValue: number[];
-  desabilitadas?: number[];
   filtrarPor?: (unidade: Unidade) => boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  desabilitadas: () => [],
   filtrarPor: () => true
 });
 
@@ -135,11 +133,6 @@ const processandoSelecao = ref(false);
 const unidadesFiltradas = computed(() => {
   return props.unidades.filter(props.filtrarPor);
 });
-
-// Verifica se unidade está desabilitada
-function isUnidadeDesabilitada(codigo: number): boolean {
-  return props.desabilitadas.includes(codigo);
-}
 
 // Verifica se unidade ou suas descendentes são elegíveis
 function temFilhasElegiveis(unidade: Unidade): boolean {

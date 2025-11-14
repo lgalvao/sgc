@@ -46,7 +46,6 @@
             v-if="!unidadesStore.isLoading"
             v-model="unidadesSelecionadas"
             :unidades="unidadesStore.unidades"
-            :desabilitadas="unidadesDesabilitadas"
           />
           <div
             v-else
@@ -218,7 +217,6 @@ import {useNotificacoesStore} from '@/stores/notificacoes'
 import {TEXTOS} from '@/constants';
 import * as processoService from '@/services/processoService';
 import ArvoreUnidades from '@/components/ArvoreUnidades.vue';
-import {storeToRefs} from "pinia";
 
 const unidadesSelecionadas = ref<number[]>([])
 const descricao = ref<string>('')
@@ -233,27 +231,7 @@ const mostrarModalConfirmacao = ref(false)
 const mostrarModalRemocao = ref(false)
 const processoEditando = ref<ProcessoModel | null>(null)
 
-const {unidadesDesabilitadas} = storeToRefs(processosStore)
-
-/**
- * Extrai recursivamente todos os códigos de unidades de uma árvore hierárquica
- * @param unidades Array de UnidadeParticipante (pode ter filhos)
- * @returns Array com todos os códigos de unidades (raiz + filhos + netos...)
- */
-function extrairCodigosUnidades(unidades: any[]): number[] {
-  const codigos: number[] = [];
-  for (const unidade of unidades) {
-    codigos.push(unidade.codUnidade);
-    if (unidade.filhos && unidade.filhos.length > 0) {
-      codigos.push(...extrairCodigosUnidades(unidade.filhos));
-    }
-  }
-  return codigos;
-}
-
 onMounted(async () => {
-  await unidadesStore.fetchUnidades();
-
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     try {
@@ -264,8 +242,8 @@ onMounted(async () => {
         descricao.value = processo.descricao;
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split('T')[0];
-        unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
-        await processosStore.buscarStatusUnidades(processo.tipo, processo.codigo);
+        unidadesSelecionadas.value = processo.unidades.map(u => u.codUnidade);
+        await unidadesStore.fetchUnidadesParaProcesso(processo.tipo, processo.codigo);
         await nextTick();
       }
     } catch (error) {
@@ -273,16 +251,13 @@ onMounted(async () => {
       console.error('Erro ao carregar processo:', error);
     }
   } else {
-    await processosStore.buscarStatusUnidades(tipo.value);
+    await unidadesStore.fetchUnidadesParaProcesso(tipo.value);
   }
 })
 
 watch(tipo, async (novoTipo) => {
-  if (unidadesStore.unidades.length === 0) {
-    return;
-  }
   const codProcesso = processoEditando.value ? processoEditando.value.codigo : undefined;
-  await processosStore.buscarStatusUnidades(novoTipo, codProcesso);
+  await unidadesStore.fetchUnidadesParaProcesso(novoTipo, codProcesso);
 });
 
 function limparCampos() {

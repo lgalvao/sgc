@@ -23,13 +23,13 @@ The core of this refactoring is to establish a clear separation of concerns, wit
 
 ---
 
-### 2.1. Process Creation (`CadProcesso.vue`)
+### 2.1. Process Creation (`CadProcesso.vue`) - Concluído
 
 *   **Objective**: Simplify the process creation form by removing all business logic related to unit selection and validation. The backend will determine which units are eligible to participate in a process.
 
 *   **Identified Issues**:
     *   **Client-Side Unit Filtering**: The frontend currently fetches a list of all units and then calls `processosStore.buscarStatusUnidades`. This action hits a backend endpoint that returns a simple list of unit IDs to be disabled. The frontend then has to walk through the unit tree and apply the disabled state. This is inefficient and places business logic on the client.
-    *   **Data Structure Manipulation**: The `extrairCodigosUnidades` function is a client-side workaround to flatten a nested data structure for submission, which indicates a mismatch between the API's expectations and the component's data model.
+    *   **Data Structure Manipulation**: The `extrairCodigosUnidades` function is a client-side workaround to a nested data structure for submission, which indicates a mismatch between the API's expectations and the component's data model.
 
 *   **Proposed Changes**:
     *   **Backend (Agent Task)**:

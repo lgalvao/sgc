@@ -72,17 +72,6 @@ export async function validarMapa(id: number): Promise<void> {
     await apiClient.post(`/processos/validar-mapa`, { id });
 }
 
-export async function obterStatusUnidades(tipo: string, codProcesso?: number): Promise<{
-    unidadesDesabilitadas: number[]
-}> {
-    let url = `/processos/status-unidades?tipo=${tipo}`;
-    if (codProcesso) {
-        url += `&codProcesso=${codProcesso}`;
-    }
-    const response = await apiClient.get(url);
-    return response.data;
-}
-
 export async function buscarSubprocessos(processoId: number): Promise<Subprocesso[]> {
     const response = await apiClient.get(`/processos/${processoId}/subprocessos`);
     return response.data;
