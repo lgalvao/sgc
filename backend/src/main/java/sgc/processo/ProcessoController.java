@@ -145,13 +145,12 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long codigo,
-            @RequestParam(name = "tipo") sgc.processo.model.TipoProcesso tipo,
-            @RequestBody(required = false) List<Long> unidades) {
+            @RequestBody IniciarProcessoReq req) {
 
-        if (tipo == sgc.processo.model.TipoProcesso.REVISAO) {
-            processoService.iniciarProcessoRevisao(codigo, unidades);
-        } else if (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
-            processoService.iniciarProcessoMapeamento(codigo, unidades);
+        if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
+            processoService.iniciarProcessoRevisao(codigo, req.unidades());
+        } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
+            processoService.iniciarProcessoMapeamento(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();
         }

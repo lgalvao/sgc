@@ -324,11 +324,16 @@ class CDU14IntegrationTest {
 
         ProcessoDto processoDto = objectMapper.readValue(resJson, ProcessoDto.class);
 
+        Map<String, Object> iniciarReqMap = Map.of(
+                "tipo", "REVISAO",
+                "unidades", List.of(unidade.getCodigo())
+        );
+        String iniciarReqJson = objectMapper.writeValueAsString(iniciarReqMap);
+
         mockMvc.perform(post("/api/processos/{codigo}/iniciar", processoDto.getCodigo())
-                        .param("tipo", "REVISAO")
                         .with(csrf()).with(user(gestor))
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(List.of(unidade.getCodigo()))))
+                        .content(iniciarReqJson))
                 .andExpect(status().isOk());
 
         entityManager.flush();
