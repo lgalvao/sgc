@@ -18,8 +18,6 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
-import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -69,7 +67,6 @@ class CDU21IntegrationTest {
     @Autowired private UnidadeRepo unidadeRepo;
     @Autowired private SubprocessoRepo subprocessoRepo;
     @Autowired private MapaRepo mapaRepo;
-    @Autowired private UnidadeMapaRepo unidadeMapaRepo;
     @Autowired private UsuarioRepo usuarioRepo;
 
     @MockitoBean
@@ -140,14 +137,14 @@ class CDU21IntegrationTest {
         assertThat(processoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(processoFinalizado.getDataFinalizacao()).isNotNull();
 
-        UnidadeMapa um1 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo()).orElseThrow();
+        Unidade un1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
         Subprocesso sp1 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional1.getCodigo())).findFirst().orElseThrow();
-        assertThat(um1.getMapaVigente().getCodigo()).isEqualTo(sp1.getMapa().getCodigo());
-        assertThat(um1.getDataVigencia()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
+        assertThat(un1.getMapaVigente().getCodigo()).isEqualTo(sp1.getMapa().getCodigo());
+        assertThat(un1.getDataVigenciaMapaAtual()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
 
-        UnidadeMapa um2 = unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo()).orElseThrow();
+        Unidade un2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
         Subprocesso sp2 = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream().filter(s -> s.getUnidade().getCodigo().equals(unidadeOperacional2.getCodigo())).findFirst().orElseThrow();
-        assertThat(um2.getMapaVigente().getCodigo()).isEqualTo(sp2.getMapa().getCodigo());
+        assertThat(un2.getMapaVigente().getCodigo()).isEqualTo(sp2.getMapa().getCodigo());
 
         verify(notificacaoEmailService, times(3)).enviarEmailHtml(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
 
@@ -188,8 +185,10 @@ class CDU21IntegrationTest {
         Processo processoNaoFinalizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(processoNaoFinalizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
-        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional1.getCodigo())).isEmpty();
-        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidadeOperacional2.getCodigo())).isEmpty();
+        Unidade u1 = unidadeRepo.findById(unidadeOperacional1.getCodigo()).orElseThrow();
+        Unidade u2 = unidadeRepo.findById(unidadeOperacional2.getCodigo()).orElseThrow();
+        assertThat(u1.getMapaVigente()).isNull();
+        assertThat(u2.getMapaVigente()).isNull();
 
         verify(notificacaoEmailService, never()).enviarEmailHtml(anyString(), anyString(), anyString());
     }

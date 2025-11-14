@@ -49,6 +49,26 @@ describe('usuarioService', () => {
         expect(mockApi.post).toHaveBeenCalledWith('/usuarios/entrar', request)
     })
 
+    it('buscarTodosUsuarios should get request and return data', async () => {
+        const mockUsuarios = [{ id: 1, name: 'Test User' }];
+        mockApi.get.mockResolvedValueOnce({ data: mockUsuarios });
+
+        const result = await service.buscarTodosUsuarios();
+
+        expect(mockApi.get).toHaveBeenCalledWith('/usuarios');
+        expect(result).toEqual(mockUsuarios);
+    });
+
+    it('buscarUsuariosPorUnidade should get request and return data', async () => {
+        const mockUsuarios = [{ id: 1, name: 'Test User' }];
+        mockApi.get.mockResolvedValueOnce({ data: mockUsuarios });
+
+        const result = await service.buscarUsuariosPorUnidade(1);
+
+        expect(mockApi.get).toHaveBeenCalledWith('/unidades/1/usuarios');
+        expect(result).toEqual(mockUsuarios);
+    });
+
     // Error handling
     it('autenticar should throw error on failure', async () => {
         const request = { tituloEleitoral: 123, senha: '123' }

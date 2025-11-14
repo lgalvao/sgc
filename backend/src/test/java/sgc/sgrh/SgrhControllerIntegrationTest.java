@@ -16,12 +16,9 @@ import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
 import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
-
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

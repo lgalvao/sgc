@@ -8,13 +8,13 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/login',
         name: 'Login',
-        component: () => import('./views/Login.vue'),
+        component: () => import('./views/LoginView.vue'),
         meta: {title: 'Login', breadcrumb: false},
     },
     {
         path: '/painel',
         name: 'Painel',
-        component: () => import('./views/Painel.vue'),
+        component: () => import('./views/PainelView.vue'),
         props: true,
         meta: {title: 'Painel', breadcrumb: 'Painel'},
     },
@@ -27,14 +27,14 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/processo/:codProcesso',
         name: 'Processo',
-        component: () => import('./views/Processo.vue'),
+        component: () => import('./views/ProcessoView.vue'),
         props: true,
         meta: {title: 'Unidades do Processo', breadcrumb: 'Processo'},
     },
     {
         path: '/processo/:codProcesso/:siglaUnidade',
         name: 'Subprocesso',
-        component: () => import('./views/Subprocesso.vue'),
+        component: () => import('./views/SubprocessoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codProcesso: Number(route.params.codProcesso),
             siglaUnidade: route.params.siglaUnidade
@@ -108,7 +108,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/unidade/:siglaUnidade',
         name: 'Unidade',
-        component: () => import('./views/Unidade.vue'),
+        component: () => import('./views/UnidadeView.vue'),
         props: true,
         meta: {
             title: 'Unidade',
@@ -135,19 +135,19 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/historico',
         name: 'Historico',
-        component: () => import('./views/Historico.vue'),
+        component: () => import('./views/HistoricoView.vue'),
         meta: {title: 'Histórico', breadcrumb: 'Histórico'},
     },
     {
         path: '/relatorios',
         name: 'Relatorios',
-        component: () => import('./views/Relatorios.vue'),
+        component: () => import('./views/RelatoriosView.vue'),
         meta: {title: 'Relatórios', breadcrumb: 'Relatórios'},
     },
     {
         path: '/configuracoes',
         name: 'Configuracoes',
-        component: () => import('./views/Configuracoes.vue'),
+        component: () => import('./views/ConfiguracoesView.vue'),
         meta: {title: 'Configurações', breadcrumb: 'Configurações'},
     }
 ];

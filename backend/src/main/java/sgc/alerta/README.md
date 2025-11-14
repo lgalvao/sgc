@@ -24,7 +24,7 @@ graph TD
 
     subgraph "Módulo Alerta (este pacote)"
         Service(AlertaService)
-        Controle(AlertaControle)
+        Controle(AlertaController)
         Repo[AlertaRepo]
     end
 
@@ -53,6 +53,6 @@ graph TD
 
 ## Componentes Principais
 - **`AlertaService`**: Contém a lógica de negócio para criar, formatar e persistir os alertas, além de gerenciar sua leitura. É invocado pelo `EventoProcessoListener` central.
-- **`AlertaControle`**: Expõe um endpoint REST para o frontend marcar um alerta como lido.
+- **`AlertaController`**: Expõe um endpoint REST para o frontend marcar um alerta como lido.
 - **`Alerta` / `AlertaUsuario`**: Entidades JPA que modelam um alerta e sua associação com um ou mais usuários.
 - **`AlertaRepo` / `AlertaUsuarioRepo`**: Repositórios Spring Data para interagir com o banco de dados.

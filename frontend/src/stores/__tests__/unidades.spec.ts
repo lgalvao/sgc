@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useUnidadesStore} from '../unidades';
 import {initPinia} from '@/test-utils/helpers';
 import {expectContainsAll} from '@/test-utils/uiHelpers';
-import {UnidadesService} from "@/services/unidadesService";
+import * as unidadesService from "@/services/unidadesService";
 import type {Unidade} from "@/types/tipos";
 
 const mockUnidades: Unidade[] = [
@@ -162,9 +162,9 @@ const mockUnidades: Unidade[] = [
 ];
 
 vi.mock('@/services/unidadesService', () => ({
-    UnidadesService: {
-        buscarTodasUnidades: vi.fn(() => Promise.resolve({ data: mockUnidades }))
-    }
+    buscarTodasUnidades: vi.fn(() => Promise.resolve(mockUnidades)),
+    buscarUnidadePorSigla: vi.fn(),
+    buscarArvoreComElegibilidade: vi.fn(() => Promise.resolve(mockUnidades))
 }));
 
 describe('useUnidadesStore', () => {
@@ -185,8 +185,8 @@ describe('useUnidadesStore', () => {
     describe('actions', () => {
         it('should fetch and set unidades', async () => {
             unidadesStore.unidades = [];
-            await unidadesStore.fetchUnidades();
-            expect(UnidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
+            await unidadesStore.fetchUnidadesParaProcesso('MAPEAMENTO');
+            expect(unidadesService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
             expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         });
         it('pesquisarUnidadePorSigla should find SEDOC unit by sigla', () => {

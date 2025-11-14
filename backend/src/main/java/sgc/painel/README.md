@@ -13,7 +13,7 @@ graph TD
     end
 
     subgraph "Módulo Painel"
-        Controle(PainelControle)
+        Controle(PainelController)
         Service(PainelService)
     end
 
@@ -30,12 +30,14 @@ graph TD
 
 ## Componentes Principais
 
-- **`PainelControle`**: Expõe a API REST para o painel. Recebe as requisições do frontend e delega a busca dos dados para o `PainelService`.
+- **`PainelController`**: Expõe a API REST para o painel. Recebe as requisições do frontend e delega a busca dos dados
+  para o `PainelService`.
 - **`PainelService`**: Contém a lógica de negócio para buscar e agregar os dados. Ele interage com os repositórios de outros módulos para construir as visualizações necessárias para o painel.
 
 ## Fluxos de Trabalho
-1.  O frontend solicita os dados do painel ao `PainelControle`.
-2.  O `PainelControle` invoca o `PainelService` com os parâmetros da requisição (ex: perfil do usuário, unidade).
+
+1. O frontend solicita os dados do painel ao `PainelController`.
+2. O `PainelController` invoca o `PainelService` com os parâmetros da requisição (ex: perfil do usuário, unidade).
 3.  O `PainelService` consulta o `ProcessoRepo` e o `AlertaRepo` para buscar os dados relevantes.
 4.  O `PainelService` processa e agrega os dados, retornando uma página de DTOs (`ProcessoResumoDto`, `AlertaDto`).
-5.  O `PainelControle` retorna os dados como uma resposta JSON para o frontend.
+5. O `PainelController` retorna os dados como uma resposta JSON para o frontend.

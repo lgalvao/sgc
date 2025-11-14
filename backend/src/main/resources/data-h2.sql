@@ -59,7 +59,7 @@ VALUES (904, 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (1, 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
-VALUES (2, 'Carlos Henrique Lima', 'carlos.lima@tre-pe.jus.br', '2345', 3);
+VALUES (2, 'Carlos Henrique Lima', 'carlos.lima@tre-pe.jus.br', '2345', 200);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (3, 'Fernanda Oliveira', 'fernanda.oliveira@tre-pe.jus.br', '3456', 8);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
@@ -214,26 +214,37 @@ INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codig
 VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
         CURRENT_DATE - 90);
 
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (8, 1001);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (9, 1002);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (10, 1003);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (102, 1004);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (100, 1004); -- ADMIN-UNIT também tem mapa vigente para testes CDU-05
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (101, 1004); -- GESTOR-UNIT também tem mapa vigente para testes CDU-05
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (901, 1004); -- CDU05-REV-UNIT tem mapa vigente
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (902, 1004); -- CDU05-SUB-UNIT tem mapa vigente
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (903, 1004); -- CDU05-ALERT-UNIT tem mapa vigente
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (904, 1004); -- CDU05-READONLY-UNIT tem mapa vigente
+-- Mapas vigentes (migrados para a tabela unidade)
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1001
+WHERE codigo = 8;
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1002
+WHERE codigo = 9;
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1003
+WHERE codigo = 10;
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 102;
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 100; -- ADMIN-UNIT também tem mapa vigente para testes CDU-05
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 101; -- GESTOR-UNIT também tem mapa vigente para testes CDU-05
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 901; -- CDU05-REV-UNIT tem mapa vigente
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 902; -- CDU05-SUB-UNIT tem mapa vigente
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 903; -- CDU05-ALERT-UNIT tem mapa vigente
+UPDATE SGC.UNIDADE
+SET mapa_vigente_codigo = 1004
+WHERE codigo = 904; -- CDU05-READONLY-UNIT tem mapa vigente
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES (10001, 1001, 'Desenvolvimento em Java');
@@ -377,3 +388,37 @@ INSERT INTO SGC.ALERTA (descricao, processo_codigo, usuario_destino_titulo, data
 VALUES ('Alerta para Gestor', 200, 8, CURRENT_TIMESTAMP);
 INSERT INTO SGC.ALERTA (descricao, processo_codigo, unidade_destino_codigo, data_hora)
 VALUES ('Alerta para Unidade Filha 1', 201, 6, CURRENT_TIMESTAMP);
+-- CDU-17 Test Data
+INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
+VALUES (1700, 'Processo CDU-17', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
+
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES (1700, 8);
+
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1700);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+VALUES (1700, 1700, 8, 1700, 'REVISAO_CADASTRO_HOMOLOGADA', CURRENT_DATE + 30);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
+VALUES (17001, 1700, 'Competência CDU-17');
+
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
+VALUES (17001, 1700, 'Atividade CDU-17');
+
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
+VALUES (17001, 17001);
+
+-- CDU-19 Test Data
+INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
+VALUES (1900, 'Processo CDU-19', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
+
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
+VALUES (1900, 9);
+
+INSERT INTO SGC.MAPA (codigo)
+VALUES (1900);
+
+INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
+VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', CURRENT_DATE + 30);

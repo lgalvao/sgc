@@ -66,7 +66,8 @@ describe('VisMapa.vue', () => {
 
     const store = useMapasStore()
     store.mapaVisualizacao = {
-      sugestoes: '',
+      codigo: 1,
+      descricao: 'Mapa Test',
       competencias: [
         {
           codigo: 1,
@@ -76,7 +77,7 @@ describe('VisMapa.vue', () => {
               codigo: 1,
               descricao: 'Atividade 1',
               conhecimentos: [
-                { codigo: 1, descricao: 'Conhecimento 1' }
+                { id: 1, descricao: 'Conhecimento 1' }
               ]
             }
           ]

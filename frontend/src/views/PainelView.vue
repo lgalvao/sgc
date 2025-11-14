@@ -92,8 +92,8 @@ onMounted(async () => {
 
 const processosOrdenados = computed(() => {
   return [...processosPainel.value].sort((a, b) => {
-    let valA: unknown = a[criterio.value]
-    let valB: unknown = b[criterio.value]
+    let valA: any = a[criterio.value]
+    let valB: any = b[criterio.value]
 
     const valAString = String(valA);
     const valBString = String(valB);

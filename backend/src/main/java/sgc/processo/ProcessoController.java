@@ -6,15 +6,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sgc.processo.dto.AtualizarProcessoReq;
-import sgc.processo.dto.CriarProcessoReq;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.processo.dto.*;
 import sgc.processo.service.ProcessoService;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller REST para Processos.
@@ -39,6 +37,23 @@ public class ProcessoController {
         ProcessoDto criado = processoService.criar(requisicao);
         URI uri = URI.create("/api/processos/%d".formatted(criado.getCodigo()));
         return ResponseEntity.created(uri).body(criado);
+    }
+
+    /**
+     * Retorna códigos de unidades que já participam de processos ativos do tipo especificado
+     * ou de um processo específico, útil para desabilitar checkboxes no frontend.
+     *
+     * @param tipo        Tipo do processo (MAPEAMENTO, REVISAO, DIAGNOSTICO)
+     * @param codProcesso Código opcional do processo a ser considerado
+     * @return Objeto contendo lista de unidades desabilitadas
+     */
+    @GetMapping("/status-unidades")
+    @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
+    public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
+            @RequestParam String tipo,
+            @RequestParam(required = false) Long codProcesso) {
+        List<Long> unidadesDesabilitadas = processoService.listarUnidadesBloqueadasPorTipo(tipo);
+        return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
     }
 
     /**
@@ -130,17 +145,18 @@ public class ProcessoController {
     @Operation(summary = "Inicia um processo (CDU-03)")
     public ResponseEntity<ProcessoDto> iniciar(
             @PathVariable Long codigo,
-            @RequestParam(name = "tipo") sgc.processo.model.TipoProcesso tipo,
-            @RequestBody(required = false) List<Long> unidades) {
+            @RequestBody IniciarProcessoReq req) {
 
-        if (tipo == sgc.processo.model.TipoProcesso.REVISAO) {
-            processoService.iniciarProcessoRevisao(codigo, unidades);
-        } else if (tipo == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
-            processoService.iniciarProcessoMapeamento(codigo, unidades);
+        if (req.tipo() == sgc.processo.model.TipoProcesso.REVISAO) {
+            processoService.iniciarProcessoRevisao(codigo, req.unidades());
+        } else if (req.tipo() == sgc.processo.model.TipoProcesso.MAPEAMENTO) {
+            processoService.iniciarProcessoMapeamento(codigo, req.unidades());
         } else {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
+        ProcessoDto processoAtualizado = processoService.obterPorId(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Processo", codigo));
+        return ResponseEntity.ok(processoAtualizado);
     }
 
     /**
@@ -183,6 +199,20 @@ public class ProcessoController {
     @GetMapping("/{codigo}/subprocessos-elegiveis")
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
     public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(@PathVariable Long codigo) {
+        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
+        return ResponseEntity.ok(elegiveis);
+    }
+
+    /**
+     * Retorna todos os subprocessos de um processo.
+     * Utilizado pelo frontend para exibir a árvore de unidades e seus subprocessos.
+     *
+     * @param codigo O código do processo.
+     * @return Lista de subprocessos do processo.
+     */
+    @GetMapping("/{codigo}/subprocessos")
+    @Operation(summary = "Lista todos os subprocessos de um processo")
+    public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessos(@PathVariable Long codigo) {
         List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
         return ResponseEntity.ok(elegiveis);
     }

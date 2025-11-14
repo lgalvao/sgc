@@ -17,12 +17,12 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockChefe;
 import sgc.integracao.mocks.WithMockChefeSecurityContextFactory;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
@@ -35,7 +35,6 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -103,10 +102,11 @@ class CDU09IntegrationTest {
         @Test
         @DisplayName("Deve disponibilizar o cadastro quando todas as condições são atendidas")
         void deveDisponibilizarCadastroComSucesso() throws Exception {
-            var competencia = new Competencia("Competência de Teste", subprocessoMapeamento.getMapa());
-            Atividade atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
-            atividade = atividadeRepo.save(atividade);
-            competencia.setAtividades(Set.of(atividade));
+            var competencia = competenciaRepo.save(new Competencia("Competência de Teste", subprocessoMapeamento.getMapa()));
+            var atividade = new Atividade(subprocessoMapeamento.getMapa(), "Atividade de Teste");
+            atividade.getCompetencias().add(competencia);
+            atividadeRepo.save(atividade);
+            competencia.getAtividades().add(atividade);
             competenciaRepo.save(competencia);
             conhecimentoRepo.save(new Conhecimento("Conhecimento de Teste", atividade));
 

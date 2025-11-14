@@ -73,7 +73,7 @@ describe('usePerfil', () => {
         } as any);
 
         vi.mocked(useAtribuicaoTemporariaStore).mockReturnValue({
-            getAtribuicoesPorServidor: (id: number) => [],
+            getAtribuicoesPorServidor: () => [],
         } as any);
 
         const { getPerfisDoServidor } = usePerfil();

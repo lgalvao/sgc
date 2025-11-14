@@ -92,7 +92,7 @@ public class CDU06IntegrationTest {
         SecurityContextHolder.setContext(context);
 
         when(sgrhService.buscarPerfisUsuario(anyString()))
-                .thenReturn(List.of(new PerfilDto(String.valueOf(TEST_USER_ID), unidade.getCodigo(), unidade.getNome(), perfil.name())));
+                .thenReturn(List.of(new PerfilDto(TEST_USER_ID, unidade.getCodigo(), unidade.getNome(), perfil.name())));
     }
 
     @Test

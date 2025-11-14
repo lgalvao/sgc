@@ -4,28 +4,24 @@ import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
 import {extrairIdDoSeletor} from '../utils/utils';
 
+// Reduz ruído de logs: suprime linhas [DEBUG] salvo se E2E_DEBUG estiver definido.
+const ORIGINAL_LOG = console.log;
+if (!process.env.E2E_DEBUG) {
+    console.log = (...args: any[]) => {
+        if (args.length && typeof args[0] === 'string' && args[0].includes('[DEBUG]')) return;
+        ORIGINAL_LOG(...args);
+    };
+}
+
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
  * @param page A instância da página do Playwright.
  * @param siglas Um array de siglas das unidades a serem selecionadas (ex: ['STIC', 'SGP']).
  */
 export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): Promise<void> {
-    // Aguardar a árvore de unidades carregar
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible'});
-
     for (const sigla of siglas) {
         const seletorCheckbox = `#chk-${sigla}`;
-        const alvo = page.locator(seletorCheckbox);
-
-        // Aguardar a unidade aparecer na árvore (pode demorar devido a validações assíncronas)
-        await alvo.waitFor({state: 'visible'});
-
-        const isDisabled = await alvo.isDisabled();
-        if (isDisabled) {
-            console.warn(`[AVISO] Checkbox "${sigla}" está desabilitada (unidade já em uso em outro processo)`);
-            continue;
-        }
-
+        await page.waitForSelector(seletorCheckbox);
         await page.check(seletorCheckbox);
     }
 }
@@ -37,7 +33,6 @@ export async function selecionarUnidadesPorSigla(page: Page, siglas: string[]): 
  * @returns O ID da unidade selecionada.
  */
 export async function selecionarUnidadeDisponivel(page: Page, index: number = 0): Promise<string> {
-    await page.waitForSelector('.form-check-input[type="checkbox"]', {state: 'visible', timeout: 2000});
     const disponiveis = page.locator('.form-check-input[type="checkbox"]:not(:disabled)');
     const total = await disponiveis.count();
     if (total === 0) throw new Error('Nenhuma unidade disponível para seleção');
@@ -218,7 +213,8 @@ export async function criarProcessoBasico(
     descricao: string,
     tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO',
     siglas: string[],
-    dataLimite: string = '2025-12-31'
+    dataLimite: string = '2025-12-31',
+    situacao: 'CRIADO' | 'EM_ANDAMENTO' = 'CRIADO'
 ): Promise<void> {
     console.log(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
 
@@ -246,6 +242,15 @@ export async function criarProcessoBasico(
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, );
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
+
+    if (situacao === 'EM_ANDAMENTO') {
+        console.log(`[DEBUG] criarProcessoBasico: Iniciando processo "${descricao}"`);
+        await abrirProcessoPorNome(page, descricao);
+        await iniciarProcessoMapeamento(page);
+        await confirmarIniciacaoProcesso(page);
+        await page.waitForURL(/\/painel/, );
+        console.log(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
+    }
 }
 
 /**
@@ -267,8 +272,6 @@ export async function abrirProcessoPorNome(page: Page, descricao: string): Promi
 
     // Aguardar formulário carregar com os dados do processo
     await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, {state: 'visible', timeout: 10000});
-    // Aguardar um pouco mais para garantir que todos os dados foram carregados (unidades, etc)
-    await page.waitForTimeout(2000); // Aumentado de 1s para 2s
     console.log(`[DEBUG] abrirProcessoPorNome: Formulário carregado`);
 
     // DEBUG: Verificar dados carregados usando page.evaluate
@@ -302,14 +305,35 @@ export async function criarProcessoCompleto(
     dataLimite: string,
     unidades: number[]
 ): Promise<{ processo: { codigo: number; descricao: string; } }> {
+    let processoId = 0;
+
+    // Intercept the API response to extract the process ID
+    const responsePromise = page.waitForResponse(response =>
+        response.url().includes('/api/processos') &&
+        !response.url().includes('/status-unidades') &&
+        response.request().method() === 'POST' &&
+        response.status() === 201
+    );
+
     await navegarParaCriacaoProcesso(page);
     await preencherFormularioProcesso(page, descricao, tipo, dataLimite);
     await selecionarUnidadesPorId(page, unidades);
     await page.getByRole('button', {name: TEXTOS.SALVAR}).click();
-    await page.waitForURL(/\/processo\/\d+$/);
-    const url = page.url();
-    const id = Number(url.split('/').pop());
-    return {processo: {codigo: id, descricao}};
+
+    try {
+        const response = await responsePromise;
+        const data = await response.json();
+        if (data && data.codigo) {
+            processoId = data.codigo;
+        }
+    } catch (error) {
+        console.warn('Could not extract process ID from response:', error);
+    }
+
+    // Frontend redirects to /painel after saving
+    await page.waitForURL(/\/painel/);
+
+    return { processo: { codigo: processoId, descricao } };
 }
 
 /**

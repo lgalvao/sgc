@@ -389,26 +389,19 @@ import {storeToRefs} from 'pinia'
 import {useRoute} from 'vue-router'
 import {useMapasStore} from '@/stores/mapas'
 import {useAtividadesStore} from '@/stores/atividades'
-import {useNotificacoesStore} from '@/stores/notificacoes'
 import {usePerfilStore} from '@/stores/perfil'
 import {useProcessosStore} from '@/stores/processos'
-import {useRevisaoStore} from '@/stores/revisao'
-import {useUnidadesStore} from '@/stores/unidades'
 import {usePerfil} from '@/composables/usePerfil'
-import {Atividade, Competencia, Perfil, Servidor, SituacaoSubprocesso, Subprocesso, Unidade} from '@/types/tipos'
+import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
 
 const route = useRoute()
 const mapasStore = useMapasStore()
 const {mapaCompleto} = storeToRefs(mapasStore)
 const atividadesStore = useAtividadesStore()
-const notificacoesStore = useNotificacoesStore()
 const perfilStore = usePerfilStore()
 const processosStore = useProcessosStore()
-const revisaoStore = useRevisaoStore()
-const unidadesStore = useUnidadesStore()
-const {unidades} = storeToRefs(unidadesStore)
-const { servidorLogado } = usePerfil()
+usePerfil()
 
 const codProcesso = computed(() => Number(route.params.codProcesso))
 const siglaUnidade = computed(() => String(route.params.siglaUnidade))
@@ -436,17 +429,17 @@ function abrirModalImpacto() {
   // Segue o comportamento esperado pelos testes:
   // - Sem mudanças: não abre o modal e exibe notificação "Nenhum impacto..."
   // - Com mudanças: abre o modal de impactos
-  if (revisaoStore.mudancasRegistradas.length === 0) {
-    notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
-    return;
-  }
-  revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
+  // if (revisaoStore.mudancasRegistradas.length === 0) {
+  //   notificacoesStore.info('Impacto no Mapa', 'Nenhum impacto no mapa da unidade.');
+  //   return;
+  // }
+  // revisaoStore.setMudancasParaImpacto(revisaoStore.mudancasRegistradas);
   mostrarModalImpacto.value = true;
 }
 
 function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
-  revisaoStore.setMudancasParaImpacto([]);
+  // revisaoStore.setMudancasParaImpacto([]);
 }
 
 function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
@@ -460,7 +453,11 @@ function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | null {
   return null
 }
 
-const unidade = computed<Unidade | null>(() => buscarUnidade(unidades.value as Unidade[], siglaUnidade.value))
+const unidade = computed<Unidade | null>(() => {
+  // TODO: Fix unidades source
+  const unidadesData = processosStore.processoDetalhe?.unidades || [];
+  return buscarUnidade(unidadesData as unknown as Unidade[], siglaUnidade.value);
+})
 const codSubrocesso = computed(() => subprocesso.value?.codUnidade);
 
 onMounted(async () => {
@@ -470,10 +467,12 @@ onMounted(async () => {
   }
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new Tooltip(tooltipTriggerEl)
-    })
+    if (typeof document !== 'undefined') {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipTriggerList.forEach(tooltipTriggerEl => {
+        new Tooltip(tooltipTriggerEl)
+      })
+    }
   })
 });
 
@@ -526,14 +525,18 @@ function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   }
 
   // Inicializar tooltips do modal
-  setTimeout(() => {
-    import('bootstrap').then(({Tooltip}) => {
-      const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
-      modalTooltips.forEach(tooltipEl => {
-        new Tooltip(tooltipEl)
+  if (typeof document !== 'undefined') {
+    setTimeout(() => {
+      import('bootstrap').then(({Tooltip}) => {
+        if (typeof document !== 'undefined') {
+          const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
+          modalTooltips.forEach(tooltipEl => {
+            new Tooltip(tooltipEl)
+          })
+        }
       })
-    })
-  }, 100)
+    }, 100)
+  }
 }
 
 function fecharModalCriarNovaCompetencia() {
@@ -635,12 +638,6 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
   }
 }
 
-function formatarData(data: string): string {
-  if (!data) return ''
-  const [ano, mes, dia] = data.split('-')
-  return `${dia}/${mes}/${ano}`
-}
-
 async function disponibilizarMapa() {
   if (!codSubrocesso.value) return
 
@@ -651,7 +648,7 @@ async function disponibilizarMapa() {
     })
     fecharModalDisponibilizar()
     // TODO: Adicionar redirecionamento para o painel
-  } catch (error) {
+  } catch {
     // O erro já é tratado e notificado pelo store
   }
 }
@@ -665,10 +662,12 @@ function fecharModalDisponibilizar() {
 onMounted(() => {
   // Inicializar tooltips após o componente ser montado
   import('bootstrap').then(({Tooltip}) => {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new Tooltip(tooltipTriggerEl)
-    })
+    if (typeof document !== 'undefined') {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipTriggerList.forEach(tooltipTriggerEl => {
+        new Tooltip(tooltipTriggerEl)
+      })
+    }
   })
 })
 

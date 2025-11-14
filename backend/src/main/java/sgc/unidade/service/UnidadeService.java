@@ -8,13 +8,19 @@ import sgc.sgrh.dto.UnidadeDto;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
+import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
+import sgc.unidade.model.AtribuicaoTemporaria;
+import sgc.unidade.model.AtribuicaoTemporariaRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +28,39 @@ public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final MapaRepo mapaRepo;
     private final UsuarioRepo usuarioRepo;
+    private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
 
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
         return montarHierarquia(todasUnidades);
+    }
+
+    public List<UnidadeDto> buscarArvoreComElegibilidade(TipoProcesso tipoProcesso, Long codProcesso) {
+        List<Unidade> todasUnidades = unidadeRepo.findAll();
+        // Lógica de elegibilidade a ser implementada
+        return montarHierarquia(todasUnidades).stream()
+            .map(unidade -> {
+                unidade.setElegivel(true);
+                return unidade;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public void criarAtribuicaoTemporaria(Long idUnidade, CriarAtribuicaoTemporariaRequest request) {
+        Unidade unidade = unidadeRepo.findById(idUnidade)
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Unidade com id " + idUnidade + " não encontrada"));
+
+        Usuario usuario = usuarioRepo.findById(request.tituloEleitoralServidor())
+            .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Usuário com título eleitoral " + request.tituloEleitoralServidor() + " não encontrado"));
+
+        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+        atribuicao.setUnidade(unidade);
+        atribuicao.setUsuario(usuario);
+        atribuicao.setDataInicio(LocalDateTime.now());
+        atribuicao.setDataTermino(request.dataTermino().atTime(23, 59, 59));
+        atribuicao.setJustificativa(request.justificativa());
+
+        atribuicaoTemporariaRepo.save(atribuicao);
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
@@ -59,7 +94,8 @@ public class UnidadeService {
                 u.getNome(),
                 u.getSigla(),
                 codigoPai,
-                u.getTipo().name()
+                u.getTipo().name(),
+                new ArrayList<>()
             );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -95,14 +131,8 @@ public class UnidadeService {
             subunidadesCompletas.add(montarComSubunidades(filha, mapaFilhas));
         }
 
-        return new UnidadeDto(
-            dto.getCodigo(),
-            dto.getNome(),
-            dto.getSigla(),
-            dto.getCodigoPai(),
-            dto.getTipo(),
-            subunidadesCompletas
-        );
+        dto.setSubunidades(subunidadesCompletas);
+        return dto;
     }
 
     public UnidadeDto buscarPorSigla(String sigla) {
@@ -117,7 +147,7 @@ public class UnidadeService {
             unidade.getSigla(),
             codigoPai,
             unidade.getTipo().name(),
-            List.of()
+            new ArrayList<>()
         );
     }
 }

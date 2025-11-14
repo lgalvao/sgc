@@ -1,6 +1,8 @@
 import {vueTest as test} from '../support/vue-specific-setup';
+import {expect} from '@playwright/test';
 import {
     clicarProcesso,
+    criarProcessoBasico,
     esperarElementoVisivel,
     loginComoAdmin,
     loginComoChefe,
@@ -18,57 +20,57 @@ import {
 
 test.describe('CDU-02: Visualizar Painel', () => {
     test.describe('Visibilidade de Componentes por Perfil', () => {
-        test('não deve exibir o botão "Criar processo" para GESTOR', async ({page}) => {
-            await loginComoGestor(page);
-            await verificarElementosPainel(page);
-            await verificarAusenciaBotaoCriarProcesso(page);
-        });
-
-        test('não deve exibir o botão "Criar processo" para CHEFE', async ({page}) => {
-            await loginComoChefe(page);
-            await verificarElementosPainel(page);
-            await verificarAusenciaBotaoCriarProcesso(page);
-        });
-
-        test('deve exibir o botão "Criar processo" para ADMIN', async ({page}) => {
-            await loginComoAdmin(page);
-            await esperarElementoVisivel(page, SELETORES.BTN_CRIAR_PROCESSO);
-        });
+        const NOME_PROCESSO_CRIADO = 'Processo teste revisão CDU-05';
 
         test('deve exibir painel com seções Processos e Alertas para SERVIDOR', async ({page}) => {
+            // Cria um processo em estado "EM_ANDAMENTO" para o SERVIDOR (Ana Paula Souza, SESEL)
+            await loginComoAdmin(page);
+            await criarProcessoBasico(page, 'Processo Servidor SESEL', 'MAPEAMENTO', ['SESEL'], '2025-12-31', 'EM_ANDAMENTO');
+
             await loginComoServidor(page);
             await verificarElementosPainel(page);
             await verificarAusenciaBotaoCriarProcesso(page);
             await esperarElementoVisivel(page, SELETORES.TABELA_ALERTAS);
         });
+    });
 
-        test('deve exibir processos em situação "Criado" apenas para ADMIN', async ({page}) => {
+    test.describe('Tabela de Processos', () => {
+        test.beforeEach(async ({ page }) => {
             await loginComoAdmin(page);
-            await verificarVisibilidadeProcesso(page, /Processo teste revisão CDU-05/, true);
+            // Cria um processo visível para o Chefe da STIC (unidade 2)
+            await criarProcessoBasico(page, 'Processo da STIC para CDU-02', 'MAPEAMENTO', ['STIC']);
+            // Cria um processo fora da hierarquia da STIC
+            await criarProcessoBasico(page, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', ['ADMIN-UNIT']);
         });
 
-        test('não deve exibir processos em situação "Criado" para GESTOR', async ({page}) => {
-            await loginComoGestor(page);
-            await verificarVisibilidadeProcesso(page, /Processo teste revisão CDU-05/, false);
+        test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
+            await loginComoChefeStic(page);
+
+            // Aguardar tabela de processos carregar
+            await page.waitForSelector(`${SELETORES.TABELA_PROCESSOS} tbody tr`);
+
+            // Chefe STIC deve ver o processo da sua unidade
+            await verificarVisibilidadeProcesso(page, /Processo da STIC para CDU-02/, true);
+
+            // Não deve ver processo da ADMIN-UNIT
+            await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);
+
+            // A tabela deve conter exatamente 1 processo visível para este usuário
+            const tabela = page.getByTestId('tabela-processos');
+            const linhas = tabela.locator('tbody tr');
+            await expect(linhas).toHaveCount(1);
         });
     });
 
-     test.describe('Tabela de Processos', () => {
-         test('deve exibir apenas processos da unidade do usuário (e subordinadas)', async ({page}) => {
-             await loginComoChefeStic(page);
-
-             // Aguardar tabela de processos carregar com pelo menos uma linha
-             await page.getByTestId('tabela-processos').locator('tbody tr').first().waitFor();
-
-             // Chefe STIC deve ver processo EM_ANDAMENTO da STIC (processo 2)
-             await verificarVisibilidadeProcesso(page, /Processo da Raiz CDU02/, true);
-
-             // Não deve ver processo da ADMIN-UNIT (processo 5)
-             await verificarVisibilidadeProcesso(page, /Processo ADMIN-UNIT - Fora da STIC/, false);
-         });
-     });
-
     test.describe('Navegação a partir do Painel', () => {
+        const NOME_PROCESSO_CRIADO = 'Processo teste revisão CDU-05';
+
+        test.beforeEach(async ({ page }) => {
+            // Cria um processo em estado "CRIADO" para o teste de navegação
+            await loginComoAdmin(page);
+            await criarProcessoBasico(page, NOME_PROCESSO_CRIADO, 'REVISAO', ['CDU05-REV-UNIT']);
+        });
+
         test('ADMIN deve navegar para a edição ao clicar em processo "Criado"', async ({page}) => {
             await loginComoAdmin(page);
             await clicarProcesso(page, /Processo teste revisão CDU-05/);

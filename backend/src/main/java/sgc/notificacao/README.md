@@ -21,7 +21,7 @@ graph TD
 
     subgraph "Módulo de Notificação (este pacote)"
         Listener(EventoProcessoListener)
-        TemplateService(NotificacaoModeloEmailService)
+        TemplateService(NotificacaoModelosService)
         EmailService(NotificacaoService)
     end
 
@@ -46,7 +46,7 @@ graph TD
 2.  **Publicação do Evento:** Ele publica um evento de domínio (ex: `ProcessoIniciadoEvento`).
 3.  **Captura do Evento:** O `EventoProcessoListener` captura este evento.
 4.  **Criação de Alertas:** O listener invoca o `AlertaService` para criar os alertas internos.
-5.  **Criação do E-mail:** O listener usa o `NotificacaoModeloEmailService` para gerar o conteúdo HTML do e-mail.
+5. **Criação do E-mail:** O listener usa o `NotificacaoModelosService` para gerar o conteúdo HTML do e-mail.
 6.  **Envio do E-mail:** O listener invoca o `NotificacaoService` para enviar o e-mail.
 
 ## Componentes Principais

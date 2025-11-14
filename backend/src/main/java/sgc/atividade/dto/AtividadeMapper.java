@@ -39,6 +39,7 @@ public abstract class AtividadeMapper {
      */
     @Mapping(source = "mapaCodigo", target = "mapa")
     @Mapping(target = "conhecimentos", ignore = true)
+    @Mapping(target = "competencias", ignore = true)
     public abstract Atividade toEntity(AtividadeDto atividadeDto);
 
     /**

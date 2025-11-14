@@ -1,5 +1,10 @@
 package sgc.mapa.service;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.atividade.model.Atividade;
@@ -28,22 +33,18 @@ public class ImpactoCompetenciaService {
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
         List<Competencia> competenciasDoMapa = repositorioCompetencia.findByMapaCodigo(mapaVigente.getCodigo());
 
-        // Itera sobre as competências do mapa vigente para criar um mapa de pesquisa por descrição
-        Map<String, Competencia> mapaCompetencias = competenciasDoMapa.stream()
-                .collect(Collectors.toMap(Competencia::getDescricao, comp -> comp));
-
-        // Processa as atividades removidas
         for (AtividadeImpactadaDto atividadeDto : removidas) {
-            // Para cada competência que estava vinculada à atividade removida (informação vinda do DTO)
-            for (String descComp : atividadeDto.getCompetenciasVinculadas()) {
-                // Se a competência ainda existe no mapa vigente
-                if (mapaCompetencias.containsKey(descComp)) {
-                    Competencia comp = mapaCompetencias.get(descComp);
-                    // Acumula o impacto
+            Atividade atividade = atividadeRepo.findById(atividadeDto.getCodigo()).orElse(null);
+            if (atividade == null) continue;
+
+            for (Competencia comp : competenciasDoMapa) {
+                if (comp.getAtividades().stream().anyMatch(a -> a.getCodigo().equals(atividade.getCodigo()))) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
-                            .computeIfAbsent(comp.getCodigo(), x -> new CompetenciaImpactoAcumulador(
-                                    comp.getCodigo(),
-                                    comp.getDescricao()));
+                            .computeIfAbsent(comp.getCodigo(), x -> CompetenciaImpactoAcumulador.builder()
+                                    .codigo(comp.getCodigo())
+                                    .descricao(comp.getDescricao())
+                                    .build());
+
                     acumulador.adicionarImpacto("Atividade removida: %s".formatted(atividadeDto.getDescricao()));
                 }
             }
@@ -57,9 +58,10 @@ public class ImpactoCompetenciaService {
                 if (comp.getMapa().getCodigo().equals(mapaVigente.getCodigo())) {
                     CompetenciaImpactoAcumulador acumulador = mapaImpactos
                             .computeIfAbsent(comp.getCodigo(),
-                                    x -> new CompetenciaImpactoAcumulador(
-                                            comp.getCodigo(),
-                                            comp.getDescricao()));
+                                    x -> CompetenciaImpactoAcumulador.builder()
+                                            .codigo(comp.getCodigo())
+                                            .descricao(comp.getDescricao())
+                                            .build());
 
                     String detalhe = String.format(
                             "Atividade alterada: '%s' → '%s'",
@@ -106,15 +108,16 @@ public class ImpactoCompetenciaService {
         return "IMPACTO_GENERICO";
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class CompetenciaImpactoAcumulador {
-        final Long codigo;
-        final String descricao;
-        final Set<String> atividadesAfetadas = new LinkedHashSet<>();
-
-        CompetenciaImpactoAcumulador(Long codigo, String descricao) {
-            this.codigo = codigo;
-            this.descricao = descricao;
-        }
+        private Long codigo;
+        private String descricao;
+        @Builder.Default
+        private Set<String> atividadesAfetadas = new LinkedHashSet<>();
 
         void adicionarImpacto(String descricaoImpacto) {
             atividadesAfetadas.add(descricaoImpacto);

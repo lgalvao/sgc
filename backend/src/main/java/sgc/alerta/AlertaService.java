@@ -193,11 +193,10 @@ public class AlertaService {
      * @param processo          O processo ao qual o cadastro pertence.
      * @param codUnidadeOrigem  O código da unidade que disponibilizou o cadastro.
      * @param codUnidadeDestino O código da unidade que deve analisar o cadastro (destino).
-     * @return O {@link Alerta} criado.
      * @throws ErroEntidadeNaoEncontrada se a unidade de origem não for encontrada.
      */
     @Transactional
-    public Alerta criarAlertaCadastroDisponibilizado(
+    public void criarAlertaCadastroDisponibilizado(
             Processo processo,
             Long codUnidadeOrigem,
             Long codUnidadeDestino) {
@@ -211,7 +210,7 @@ public class AlertaService {
                 processo.getDescricao()
         );
 
-        return criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao, null);
+        criarAlerta(processo, TipoAlerta.CADASTRO_DISPONIBILIZADO, codUnidadeDestino, descricao, null);
     }
 
     /**
@@ -224,14 +223,13 @@ public class AlertaService {
      * @param processo          O processo ao qual o cadastro pertence.
      * @param codUnidadeDestino O código da unidade que precisa ajustar o cadastro.
      * @param motivo            A descrição do motivo pelo qual o cadastro foi devolvido.
-     * @return O {@link Alerta} criado.
      */
     @Transactional
-    public Alerta criarAlertaCadastroDevolvido(Processo processo, Long codUnidadeDestino, String motivo) {
+    public void criarAlertaCadastroDevolvido(Processo processo, Long codUnidadeDestino, String motivo) {
         String desc = "Cadastro devolvido no processo '%s'. Motivo: %s. Realize os ajustes necessários e disponibilize novamente."
                 .formatted(processo.getDescricao(), motivo);
 
-        return criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc, null);
+        criarAlerta(processo, TipoAlerta.CADASTRO_DEVOLVIDO, codUnidadeDestino, desc, null);
     }
 
     private void criarAlertaUsuario(Alerta alerta, String tituloStr, Long codUnidade) {

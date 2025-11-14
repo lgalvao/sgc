@@ -8,31 +8,31 @@ const mainRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/Login.vue'),
+    component: () => import('@/views/LoginView.vue'),
     meta: { title: 'Login' },
   },
   {
     path: '/painel',
     name: 'Painel',
-    component: () => import('@/views/Painel.vue'),
+    component: () => import('@/views/PainelView.vue'),
     meta: { title: 'Painel' },
   },
   {
     path: '/historico',
     name: 'Historico',
-    component: () => import('@/views/Historico.vue'),
+    component: () => import('@/views/HistoricoView.vue'),
     meta: { title: 'Histórico' },
   },
   {
     path: '/relatorios',
     name: 'Relatorios',
-    component: () => import('@/views/Relatorios.vue'),
+    component: () => import('@/views/RelatoriosView.vue'),
     meta: { title: 'Relatórios' },
   },
   {
     path: '/configuracoes',
     name: 'Configuracoes',
-    component: () => import('@/views/Configuracoes.vue'),
+    component: () => import('@/views/ConfiguracoesView.vue'),
     meta: { title: 'Configurações' },
   },
 ];

@@ -6,7 +6,6 @@ import sgc.alerta.model.Alerta;
 
 @Mapper(componentModel = "spring")
 public interface AlertaMapper {
-
     @Mapping(source = "processo.codigo", target = "codProcesso")
     @Mapping(source = "unidadeOrigem.sigla", target = "unidadeOrigem")
     @Mapping(source = "unidadeDestino.sigla", target = "unidadeDestino")

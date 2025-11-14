@@ -15,15 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.sgrh.dto.AutenticacaoReq;
 import sgc.sgrh.dto.EntrarReq;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 import sgc.util.TestUtil;
-
-import java.util.Collections;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -79,7 +74,7 @@ public class CDU01IntegrationTest {
             mockMvc.perform(post(BASE_URL + "/autorizar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(String.valueOf(tituloEleitoral)))
+                            .content(tituloEleitoral))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
                 .andExpect(jsonPath("$[0].siglaUnidade").value("ADMIN-UNIT"));
@@ -110,7 +105,7 @@ public class CDU01IntegrationTest {
             mockMvc.perform(post(BASE_URL + "/autorizar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(String.valueOf(tituloEleitoral)))
+                            .content(tituloEleitoral))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[*].perfil").value(containsInAnyOrder("ADMIN", "GESTOR")));
@@ -135,7 +130,7 @@ public class CDU01IntegrationTest {
             mockMvc.perform(post(BASE_URL + "/autorizar")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(String.valueOf(tituloEleitoral)))
+                            .content(tituloEleitoral))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("&#39;Usuário&#39; com codigo &#39;" + tituloEleitoral + "&#39; não encontrado(a)."));
         }

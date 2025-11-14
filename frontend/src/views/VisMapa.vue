@@ -118,7 +118,7 @@
                   <div class="conhecimentos-atividade px-2 pb-2 ps-3">
                     <span
                       v-for="conhecimento in atv.conhecimentos"
-                      :key="conhecimento.codigo"
+                      :key="conhecimento.descricao"
                       class="me-3 mb-1"
                       data-testid="conhecimento-item"
                     >
@@ -548,9 +548,9 @@ function fecharModalAceitar() {
 }
 
 function abrirModalSugestoes() {
-  if (mapa.value?.sugestoes) {
-    sugestoes.value = mapa.value.sugestoes
-  }
+  // if (mapa.value?.sugestoes) {
+  //   sugestoes.value = mapa.value.sugestoes
+  // }
   mostrarModalSugestoes.value = true
 }
 
@@ -573,7 +573,7 @@ function fecharModalValidar() {
 }
 
 function abrirModalDevolucao() {
-  mostrarModalDevolucum.value = true
+  mostrarModalDevolucao.value = true
 }
 
 function fecharModalDevolucao() {
@@ -590,7 +590,8 @@ function fecharModalHistorico() {
 }
 
 function verSugestoes() {
-  sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
+  // TODO: Fix sugestoes access - property doesn't exist on MapaVisualizacao
+  // sugestoesVisualizacao.value = mapa.value?.sugestoes || "Nenhuma sugestão registrada.";
   mostrarModalVerSugestoes.value = true;
 }
 

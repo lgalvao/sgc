@@ -38,7 +38,8 @@ graph TD
 
 ## Componentes Principais
 - **`AnaliseService`**: Centraliza a lógica de negócio para criar os registros de análise, independentemente do tipo. É chamado por serviços de nível superior para garantir que as ações de workflow sejam devidamente auditadas.
-- **`AnaliseControle`**: Expõe endpoints REST distintos para o frontend criar e consultar o histórico de cada tipo de análise de um subprocesso.
+- **`AnaliseController`**: Expõe endpoints REST distintos para o frontend criar e consultar o histórico de cada tipo de
+  análise de um subprocesso.
   - `GET /api/subprocessos/{codigo}/analises-cadastro`
   - `POST /api/subprocessos/{codigo}/analises-cadastro`
   - `GET /api/subprocessos/{codigo}/analises-validacao`

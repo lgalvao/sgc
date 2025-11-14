@@ -15,7 +15,7 @@ graph TD
     end
 
     subgraph "Módulo Atividade"
-        Controle(AtividadeControle)
+        Controle(AtividadeController)
         Service(AtividadeService)
         subgraph "Repositórios"
             AtividadeRepo
@@ -41,7 +41,8 @@ graph TD
 ```
 
 ## Componentes Principais
-- **`AtividadeControle`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos` aninhados.
+
+- **`AtividadeController`**: Expõe a API REST para gerenciar `Atividades` e seus `Conhecimentos` aninhados.
   - **Endpoints de Atividade**:
     - `POST /api/atividades`: Cria uma nova atividade.
     - `PUT /api/atividades/{id}`: Atualiza uma atividade.

@@ -1,5 +1,19 @@
 # Componentes do Frontend
 
+Este documento fornece uma visão geral dos componentes Vue.js reutilizáveis desenvolvidos para o projeto SGC.
+
+## Princípios dos Componentes
+
+Para manter a arquitetura do projeto limpa e manutenível, os componentes neste diretório devem seguir os seguintes princípios:
+
+-   **Reutilizáveis e Agnósticos:** Componentes devem ser projetados para serem reutilizáveis em diferentes partes da aplicação. Eles não devem ter conhecimento do contexto específico da página (view) em que estão inseridos.
+-   **Controlados por Props e Eventos:** A comunicação com um componente deve ser feita primariamente através de `props` (para passar dados para dentro) e `emits` (para comunicar eventos para fora).
+-   **Evitar Lógica de Negócio:** Componentes de UI não devem conter lógica de negócio complexa, chamadas de API (serviços) ou manipulação direta do estado global (stores). Essa responsabilidade pertence às `views` e `stores`.
+
+---
+
+Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend. Abaixo, uma descrição de cada componente:
+
 Este diretório contém os componentes Vue.js reutilizáveis utilizados na aplicação frontend. Abaixo, uma descrição de cada componente:
 
 ---

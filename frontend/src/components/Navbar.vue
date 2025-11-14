@@ -100,15 +100,12 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
 import {useRouter} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';
-import {useUsuariosStore} from '@/stores/usuarios';
 import {usePerfil} from '@/composables/usePerfil';
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const usuariosStore = useUsuariosStore();
 
 const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
@@ -118,6 +115,10 @@ function navigateFromNavbar(path: string) {
   sessionStorage.setItem('cameFromNavbar', '1');
   router.push(path);
 }
+
+defineExpose({
+  navigateFromNavbar,
+})
 </script>
 
 <style scoped>

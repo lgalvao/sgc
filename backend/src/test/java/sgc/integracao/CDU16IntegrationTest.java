@@ -15,18 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
 import sgc.subprocesso.dto.SalvarAjustesReq;
@@ -39,7 +38,6 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -78,16 +76,11 @@ public class CDU16IntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
-
     private Subprocesso subprocesso;
     private Atividade atividade1;
 
     @BeforeEach
     void setUp() {
-        var admin = usuarioRepo.findById("111111111111").orElseThrow();
-
         Unidade unidade = unidadeRepo.findById(15L).orElseThrow();
 
         Processo processo = new Processo(
@@ -103,15 +96,19 @@ public class CDU16IntegrationTest {
                 processo,
                 unidade,
                 mapa,
-                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA,
+                SituacaoSubprocesso.MAPA_AJUSTADO,
                 processo.getDataLimite()
         );
         subprocessoRepo.save(subprocesso);
 
-        Competencia c1 = new Competencia("Competência 1", mapa);
-        atividade1 = atividadeRepo.save(new Atividade(mapa, "Atividade 1"));
-        Atividade atividade2 = atividadeRepo.save(new Atividade(mapa, "Atividade 2"));
-        c1.setAtividades(Set.of(atividade1, atividade2));
+        var c1 = competenciaRepo.save(new Competencia("Competência 1", mapa));
+        atividade1 = new Atividade(mapa, "Atividade 1");
+        var atividade2 = new Atividade(mapa, "Atividade 2");
+        atividade1.getCompetencias().add(c1);
+        atividade2.getCompetencias().add(c1);
+        c1.getAtividades().add(atividade1);
+        c1.getAtividades().add(atividade2);
+        atividadeRepo.saveAll(List.of(atividade1, atividade2));
         competenciaRepo.save(c1);
     }
 
@@ -127,6 +124,7 @@ public class CDU16IntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
 
         Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
@@ -143,24 +141,24 @@ public class CDU16IntegrationTest {
             Competencia c1 = competenciaRepo.findAll().getFirst();
 
             var request = new SalvarAjustesReq(List.of(
-                CompetenciaAjusteDto.builder()
-                    .codCompetencia(c1.getCodigo())
-                    .nome("Competência Ajustada")
-                    .atividades(List.of(
-                        AtividadeAjusteDto.builder()
-                            .codAtividade(atividade1.getCodigo())
-                            .nome("Atividade 1 Ajustada")
-                            .conhecimentos(List.of())
+                    CompetenciaAjusteDto.builder()
+                            .codCompetencia(c1.getCodigo())
+                            .nome("Competência Ajustada")
+                            .atividades(List.of(
+                                    AtividadeAjusteDto.builder()
+                                            .codAtividade(atividade1.getCodigo())
+                                            .nome("Atividade 1 Ajustada")
+                                            .conhecimentos(List.of())
+                                            .build()
+                            ))
                             .build()
-                    ))
-                    .build()
             ));
 
             mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk());
 
             Subprocesso subprocessoAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
             assertThat(subprocessoAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPA_AJUSTADO);
@@ -179,10 +177,10 @@ public class CDU16IntegrationTest {
             var request = new SalvarAjustesReq(List.of());
 
             mockMvc.perform(post(API_SUBPROCESSO_MAPA_AJUSTE, subprocesso.getCodigo())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableEntity());
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableEntity());
         }
     }
 }
