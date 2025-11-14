@@ -33,9 +33,8 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class ImpactoMapaService {
-    private final SubprocessoRepo repositorioSubprocesso;
+    private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
-    private final AtividadeRepo atividadeRepo;
     private final ImpactoAtividadeService impactoAtividadeService;
     private final ImpactoCompetenciaService impactoCompetenciaService;
 
@@ -63,7 +62,7 @@ public class ImpactoMapaService {
     public ImpactoMapaDto verificarImpactos(Long codSubprocesso, Usuario usuario) {
         log.info("Verificando impactos no mapa: subprocesso={}", codSubprocesso);
 
-        Subprocesso subprocesso = repositorioSubprocesso.findById(codSubprocesso)
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
         verificarAcesso(usuario, subprocesso);
@@ -81,17 +80,8 @@ public class ImpactoMapaService {
                 .findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa não encontrado para subprocesso", codSubprocesso));
 
-        log.info("ImpactoMapaService - Mapa Vigente Código: {}", mapaVigente.getCodigo());
-        log.info("ImpactoMapaService - Mapa Subprocesso Código: {}", mapaSubprocesso.getCodigo());
-
         List<Atividade> atividadesAtuais = impactoAtividadeService.obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = impactoAtividadeService.obterAtividadesDoMapa(mapaVigente);
-
-        atividadesAtuais.forEach(a -> log.info("Atividade Atual: {} - {}", a.getCodigo(), a.getDescricao()));
-        atividadesVigentes.forEach(a -> log.info("Atividade Vigente: {} - {}", a.getCodigo(), a.getDescricao()));
-
-        log.info("ImpactoMapaService - Atividades Atuais (mapaSubprocesso) tamanho: {}", atividadesAtuais.size());
-        log.info("ImpactoMapaService - Atividades Vigentes (mapaVigente) tamanho: {}", atividadesVigentes.size());
 
         List<AtividadeImpactadaDto> inseridas = impactoAtividadeService.detectarAtividadesInseridas(atividadesAtuais, atividadesVigentes);
         List<AtividadeImpactadaDto> removidas = impactoAtividadeService.detectarAtividadesRemovidas(atividadesAtuais, atividadesVigentes, mapaVigente);
@@ -122,16 +112,11 @@ public class ImpactoMapaService {
     }
 
     private void validarSituacao(SituacaoSubprocesso atual, List<SituacaoSubprocesso> esperadas, String mensagemErro) {
-        if (!esperadas.contains(atual)) {
-            throw new ErroAccessoNegado(mensagemErro);
-        }
+        if (!esperadas.contains(atual)) throw new ErroAccessoNegado(mensagemErro);
     }
 
     private boolean hasRole(Usuario usuario, String role) {
         return usuario.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_%s".formatted(role)));
-    }
-
-    private record CompetenciaImpactoAcumulador(Long codigo, String descricao) {
     }
 }

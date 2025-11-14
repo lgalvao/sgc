@@ -1,11 +1,7 @@
 package sgc.unidade.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sgc.comum.model.EntidadeBase;
 import sgc.processo.model.Processo;
 import sgc.sgrh.model.Usuario;
@@ -60,6 +56,13 @@ public class Unidade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "unidade_superior_codigo")
     private Unidade unidadeSuperior;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mapa_vigente_codigo")
+    private sgc.mapa.model.Mapa mapaVigente;
+
+    @Column(name = "data_vigencia_mapa_atual")
+    private java.time.LocalDateTime dataVigenciaMapaAtual;
 
     @ManyToMany(mappedBy = "participantes")
     @Builder.Default

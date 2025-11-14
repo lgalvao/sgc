@@ -8,19 +8,18 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.subprocesso.dto.AtividadeAjusteDto;
 import sgc.subprocesso.dto.CompetenciaAjusteDto;
-import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroAtividadesEmSituacaoInvalida;
+import sgc.subprocesso.erros.ErroMapaEmSituacaoInvalida;
 import sgc.subprocesso.erros.ErroMapaNaoAssociado;
 import sgc.subprocesso.model.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

@@ -16,29 +16,14 @@ import java.util.List;
 @Repository
 public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     /**
-     * Busca alertas destinados a uma unidade específica, de forma paginada.
-     * @param unidadeCodigo O código da unidade de destino.
-     * @param pageable      Informações de paginação.
-     * @return Uma página de alertas.
-     */
-    Page<Alerta> findByUnidadeDestino_Codigo(Long unidadeCodigo, Pageable pageable);
-
-    /**
      * Busca todos os alertas associados a um processo específico.
      * @param codProcesso O código do processo.
      * @return Uma lista de alertas.
      */
     List<Alerta> findByProcessoCodigo(Long codProcesso);
 
-    @Query("select a.codigo from Alerta a where a.processo.codigo = :proc")
-    List<Long> findIdsByProcessoCodigo(@Param("proc") Long processoCodigo);
-
     @Query("select a.codigo from Alerta a where a.processo.codigo in :procs")
     List<Long> findIdsByProcessoCodigoIn(@Param("procs") List<Long> processosCodigo);
-
-    @Modifying
-    @Query("delete from Alerta a where a.processo.codigo = :proc")
-    void deleteByProcessoCodigo(@Param("proc") Long processoCodigo);
 
     @Modifying
     @Query("delete from Alerta a where a.processo.codigo in :procs")

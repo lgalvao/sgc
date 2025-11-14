@@ -24,8 +24,6 @@ import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
-import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.dto.DevolverValidacaoReq;
 import sgc.subprocesso.model.*;
@@ -88,16 +86,9 @@ public class CDU20IntegrationTest {
     @BeforeEach
     void setUp() {
         // Use existing units from data-postgresql.sql
-        Unidade sedoc = unidadeRepo.findById(15L).orElseThrow(); // SEDOC
-        Usuario adminMock = usuarioRepo.findById("111111111111").orElseThrow();
-
         unidadeSuperiorSuperior = unidadeRepo.findById(2L).orElseThrow(); // STIC
         unidadeSuperior = unidadeRepo.findById(6L).orElseThrow(); // COSIS
         Unidade unidade = unidadeRepo.findById(8L).orElseThrow(); // SEDESENV
-
-        // Use existing users
-        Usuario chefeMock = usuarioRepo.findById("333333333333").orElseThrow();
-        Usuario gestorMock = usuarioRepo.findById("222222222222").orElseThrow();
 
         Processo processo = processoRepo.save(new Processo("Processo de Teste", TipoProcesso.MAPEAMENTO, SituacaoProcesso.EM_ANDAMENTO, LocalDateTime.now()));
         subprocesso = subprocessoRepo.save(
@@ -180,9 +171,9 @@ public class CDU20IntegrationTest {
 
         // Verifica o alerta de aceite para a unidade hierarquicamente superior
         Alerta alertaDeAceite = alertasAceite.stream()
-            .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
-            .findFirst()
-            .orElseThrow(() -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
+                .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
 
         assertThat(alertaDeAceite.getDescricao()).contains("Validação do mapa de competências da SEDESENV submetida para análise");
     }

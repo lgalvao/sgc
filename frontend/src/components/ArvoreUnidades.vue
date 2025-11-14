@@ -4,10 +4,7 @@
       v-for="unidade in unidadesFiltradas"
       :key="unidade.sigla"
     >
-      <div
-        v-if="temFilhasElegiveis(unidade)"
-        class="form-check"
-      >
+      <div class="form-check">
         <input
           :id="`chk-${unidade.sigla}`"
           v-model="unidadesSelecionadasLocal"
@@ -15,34 +12,34 @@
           class="form-check-input"
           type="checkbox"
           :indeterminate.prop="getEstadoSelecao(unidade) === 'indeterminate'"
-          :disabled="isUnidadeDesabilitada(unidade.codigo)"
+          :disabled="!unidade.isElegivel"
           :data-testid="`chk-${unidade.sigla}`"
         >
         <label
           :for="`chk-${unidade.sigla}`"
           class="form-check-label ms-2"
-          :class="{ 'text-muted': isUnidadeDesabilitada(unidade.codigo) }"
+          :class="{ 'text-muted': !unidade.isElegivel }"
         >
           <strong>{{ unidade.sigla }}</strong> - {{ unidade.nome }}
-          <span v-if="isUnidadeDesabilitada(unidade.codigo)" class="badge bg-warning text-dark ms-2">
+          <span
+            v-if="!unidade.isElegivel"
+            class="badge bg-warning text-dark ms-2"
+          >
             Não elegível
           </span>
         </label>
       </div>
 
-      <!-- Mostrar filhas se a unidade tem filhas elegíveis (mesmo que a unidade pai não seja) -->
+      <!-- Mostrar filhas se a unidade tem filhas (mesmo que a unidade pai não seja) -->
       <div
-        v-if="unidade.filhas && unidade.filhas.length && temFilhasElegiveis(unidade)"
+        v-if="unidade.filhas && unidade.filhas.length"
         class="ms-4"
       >
         <template
           v-for="filha in unidade.filhas"
           :key="filha.sigla"
         >
-          <div
-            v-if="temFilhasElegiveis(filha)"
-            class="form-check"
-          >
+          <div class="form-check">
             <input
               :id="`chk-${filha.sigla}`"
               v-model="unidadesSelecionadasLocal"
@@ -50,15 +47,18 @@
               class="form-check-input"
               type="checkbox"
               :indeterminate.prop="getEstadoSelecao(filha) === 'indeterminate'"
-              :disabled="isUnidadeDesabilitada(filha.codigo)"
+              :disabled="!filha.isElegivel"
             >
             <label
               :for="`chk-${filha.sigla}`"
               class="form-check-label ms-2"
-              :class="{ 'text-muted': isUnidadeDesabilitada(filha.codigo) }"
+              :class="{ 'text-muted': !filha.isElegivel }"
             >
               <strong>{{ filha.sigla }}</strong> - {{ filha.nome }}
-              <span v-if="isUnidadeDesabilitada(filha.codigo)" class="badge bg-warning text-dark ms-2">
+              <span
+                v-if="!filha.isElegivel"
+                class="badge bg-warning text-dark ms-2"
+              >
                 Não elegível
               </span>
             </label>
@@ -72,25 +72,25 @@
               v-for="neta in filha.filhas"
               :key="neta.sigla"
             >
-              <div
-                v-if="temFilhasElegiveis(neta)"
-                class="form-check"
-              >
+              <div class="form-check">
                 <input
                   :id="`chk-${neta.sigla}`"
                   v-model="unidadesSelecionadasLocal"
                   :value="neta.codigo"
                   class="form-check-input"
                   type="checkbox"
-                  :disabled="isUnidadeDesabilitada(neta.codigo)"
+                  :disabled="!neta.isElegivel"
                 >
                 <label
                   :for="`chk-${neta.sigla}`"
                   class="form-check-label ms-2"
-                  :class="{ 'text-muted': isUnidadeDesabilitada(neta.codigo) }"
+                  :class="{ 'text-muted': !neta.isElegivel }"
                 >
                   <strong>{{ neta.sigla }}</strong> - {{ neta.nome }}
-                  <span v-if="isUnidadeDesabilitada(neta.codigo)" class="badge bg-warning text-dark ms-2">
+                  <span
+                    v-if="!neta.isElegivel"
+                    class="badge bg-warning text-dark ms-2"
+                  >
                     Não elegível
                   </span>
                 </label>
@@ -110,12 +110,10 @@ import type {Unidade} from '@/types/tipos';
 interface Props {
   unidades: Unidade[];
   modelValue: number[];
-  desabilitadas?: number[];
   filtrarPor?: (unidade: Unidade) => boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  desabilitadas: () => [],
   filtrarPor: () => true
 });
 
@@ -124,6 +122,11 @@ const emit = defineEmits<{
 }>();
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+
+console.log('[DEBUG ArvoreUnidades] Initial modelValue:', props.modelValue);
+console.log('[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:', unidadesSelecionadasLocal.value);
+console.log('[DEBUG ArvoreUnidades] Initial props.unidades:', props.unidades);
+
 const processandoSelecao = ref(false);
 
 // Filtrar unidades pela função customizada
@@ -131,14 +134,9 @@ const unidadesFiltradas = computed(() => {
   return props.unidades.filter(props.filtrarPor);
 });
 
-// Verifica se unidade está desabilitada
-function isUnidadeDesabilitada(codigo: number): boolean {
-  return props.desabilitadas.includes(codigo);
-}
-
 // Verifica se unidade ou suas descendentes são elegíveis
 function temFilhasElegiveis(unidade: Unidade): boolean {
-  return props.filtrarPor(unidade);
+  return true;
 }
 
 // Verifica se é folha (sem filhas)
@@ -208,113 +206,18 @@ function encontrarUnidade(codigo: number, unidades: Unidade[]): Unidade | null {
   return null;
 }
 
-// Watch para processar mudanças de seleção (lógica hierárquica)
-watch(unidadesSelecionadasLocal, (novoValor, valorAnterior) => {
-  if (processandoSelecao.value) return;
-
-  try {
-    processandoSelecao.value = true;
-
-    let novaSelecao = [...novoValor];
-    const selecionadasAnteriores = valorAnterior || [];
-
-    const adicionadas = novoValor.filter(c => !selecionadasAnteriores.includes(c));
-    const removidas = selecionadasAnteriores.filter(c => !novoValor.includes(c));
-
-    // Processar adicionadas - marcar todas filhas
-    if (adicionadas.length === 1) {
-      const codigo = adicionadas[0];
-      const unidade = encontrarUnidade(codigo, props.unidades);
-      if (unidade && !isFolha(unidade)) {
-        const subunidades = getTodasSubunidades(unidade);
-        for (const sub of subunidades) {
-          if (!novaSelecao.includes(sub)) {
-            novaSelecao.push(sub);
-          }
-        }
-      }
-    }
-
-    // Processar removidas - desmarcar todas filhas
-    if (removidas.length === 1) {
-      const codigo = removidas[0];
-      const unidade = encontrarUnidade(codigo, props.unidades);
-      if (unidade && !isFolha(unidade)) {
-        const subunidades = getTodasSubunidades(unidade);
-        novaSelecao = novaSelecao.filter(c => !subunidades.includes(c));
-      }
-    }
-
-    // Verificar pais - propagar seleção para cima
-    function verificarPais(unidadesArray: Unidade[]) {
-      for (const unidade of unidadesArray) {
-        if (unidade.filhas && unidade.filhas.length > 0) {
-          verificarPais(unidade.filhas);
-        }
-      }
-
-      for (const unidade of unidadesArray) {
-        if (!isFolha(unidade)) {
-          const filhasDirectas = unidade.filhas?.map(f => f.codigo) || [];
-
-          const selecionadas = filhasDirectas.filter(s => novaSelecao.includes(s)).length;
-          const total = filhasDirectas.length;
-
-          if (selecionadas === total && total > 0) {
-            if (!novaSelecao.includes(unidade.codigo)) {
-              novaSelecao.push(unidade.codigo);
-            }
-          } else if (selecionadas === 0) {
-            // INTEROPERACIONAL que estava explicitamente marcada antes pode permanecer
-            const estaExplicitamenteMarcada = selecionadasAnteriores.includes(unidade.codigo);
-            if (unidade.tipo === 'INTEROPERACIONAL' && estaExplicitamenteMarcada) {
-              // Manter marcada
-            } else {
-              novaSelecao = novaSelecao.filter(c => c !== unidade.codigo);
-            }
-          } else {
-            // INTEROPERACIONAL que estava explicitamente marcada antes pode permanecer
-            const estaExplicitamenteMarcada = selecionadasAnteriores.includes(unidade.codigo);
-            if (unidade.tipo === 'INTEROPERACIONAL' && estaExplicitamenteMarcada) {
-              // Manter marcada
-            } else {
-              novaSelecao = novaSelecao.filter(c => c !== unidade.codigo);
-            }
-          }
-        }
-      }
-    }
-
-    verificarPais(props.unidades);
-
-    // Atualizar local apenas se mudou
-    const selecaoAtualSorted = JSON.stringify([...novoValor].sort());
-    const novaSelecaoSorted = JSON.stringify([...novaSelecao].sort());
-
-    if (selecaoAtualSorted !== novaSelecaoSorted) {
-      unidadesSelecionadasLocal.value = novaSelecao;
-    }
-
-    // Emitir para o pai apenas se diferente do modelValue recebido
-    const modelValueSorted = JSON.stringify([...props.modelValue].sort());
-    if (novaSelecaoSorted !== modelValueSorted) {
-      emit('update:modelValue', novaSelecao);
-    }
-  } finally {
-    processandoSelecao.value = false;
+watch(() => props.modelValue, (novoValor) => {
+  console.log('[DEBUG ArvoreUnidades] modelValue changed:', novoValor);
+  if (JSON.stringify(novoValor.sort()) !== JSON.stringify(unidadesSelecionadasLocal.value.sort())) {
+    unidadesSelecionadasLocal.value = [...novoValor];
+    console.log('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:', unidadesSelecionadasLocal.value);
   }
 }, { deep: true });
 
-// Watch para sincronizar com mudanças externas do modelValue
-watch(() => props.modelValue, (novoValor) => {
-  if (processandoSelecao.value) return;
-
-  const localSorted = JSON.stringify([...unidadesSelecionadasLocal.value].sort());
-  const propsSorted = JSON.stringify([...novoValor].sort());
-
-  if (localSorted !== propsSorted) {
-    unidadesSelecionadasLocal.value = [...novoValor];
-  }
+// Watch para reagir a mudanças internas e emitir para o pai
+watch(unidadesSelecionadasLocal, (novoValor) => {
+  console.log('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):', novoValor);
+  emit('update:modelValue', novoValor);
 }, { deep: true });
 </script>
 

@@ -6,9 +6,17 @@ import {extrairIdDoSeletor} from '~/helpers/utils/utils';
 
 /**
  * CDU-04: Iniciar processo de mapeamento
+ *
+ * NOTA: Usa test.describe.serial() porque os testes criam e modificam estados de processos.
+ * Limpa apenas processos em EM_ANDAMENTO antes de cada teste (não toca em dados estáticos).
  */
-test.describe('CDU-04: Iniciar processo', () => {
-    test.beforeEach(async ({page}) => await loginComoAdmin(page));
+test.describe.serial('CDU-04: Iniciar processo', () => {
+    test.beforeEach(async ({page}) => {
+        await loginComoAdmin(page);
+    });
+
+
+
 
     test('deve abrir modal de confirmação e iniciar processo', async ({page}) => {
         // Capturar logs do console

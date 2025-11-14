@@ -22,7 +22,6 @@ import sgc.notificacao.NotificacaoEmailService;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.Movimentacao;

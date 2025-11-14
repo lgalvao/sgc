@@ -30,13 +30,11 @@ public class MapaVisualizacaoService {
     private final ConhecimentoRepo conhecimentoRepo;
 
     public MapaVisualizacaoDto obterMapaParaVisualizacao(Long codSubprocesso) {
-        log.debug("Obtendo mapa para visualização do subprocesso: codigo={}", codSubprocesso);
-
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
             .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", codSubprocesso));
 
         if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado.");
+            throw new ErroEntidadeNaoEncontrada("Subprocesso não possui mapa associado: ", codSubprocesso);
         }
 
         Unidade unidade = subprocesso.getUnidade();

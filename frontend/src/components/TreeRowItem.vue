@@ -44,9 +44,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'toggle', id: number | string): void;
-  (e: 'row-click', item: TreeItem): void;
-}>();
+  (e: 'toggle', id: number | string): void
+  (e: 'row-click', item: TreeItem): void
+}>()
+
 
 const toggleExpand = (id: number | string) => {
   emit('toggle', id);
@@ -56,6 +57,11 @@ const handleRowClick = () => {
   if (props.item.clickable === false) return;
   emit('row-click', props.item);
 };
+
+defineExpose({
+  toggleExpand,
+  handleRowClick,
+})
 </script>
 
 <style scoped>

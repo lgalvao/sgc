@@ -41,7 +41,7 @@ Fluxo principal:
 
 [Término de fluxo de criação de competências]
 
-8. ADMIN repete o fluxo de criação de competências até que o mapa esteja completo.
+7. ADMIN repete o fluxo de criação de competências até que o mapa esteja completo.
 8. Se desejar editar uma competência criada:
 
    12.1. ADMIN clica no botão de ação de editar no cabeçalho do bloco correspondente à competência.

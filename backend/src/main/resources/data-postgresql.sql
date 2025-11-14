@@ -149,14 +149,11 @@ VALUES ('Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURR
 
 -- Unidades participantes dos processos
 -- Processo 2: STIC (código 2)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (2, 2, 'Secretaria de Informática e Comunicações', 'STIC', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 2);
 -- Processo 4: ADMIN-UNIT (código 100) - para CDU-05
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (4, 100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (4, 100);
 -- Processo 5: ADMIN-UNIT (código 100)
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (5, 100, 'ADMIN-UNIT', 'ADMIN-UNIT', 'INTEROPERACIONAL', NULL);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (5, 100);
 
 -- Usuários adicionais para testes E2E (antes dos perfis!)
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
@@ -180,14 +177,9 @@ VALUES (100, 'Mapeamento Base 2024 - FINALIZADO', 'MAPEAMENTO', 'FINALIZADO', CU
         CURRENT_DATE - 60);
 
 -- 2. Unidades participantes do processo 100
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (100, 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 6);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (100, 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 6);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, nome, sigla, tipo, unidade_superior_codigo)
-VALUES (100, 10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 6);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 8);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 9);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 10);
 
 -- 3. Criar mapas para essas unidades
 INSERT INTO SGC.MAPA (codigo)
@@ -213,13 +205,10 @@ INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codig
 VALUES (1003, 100, 10, 1003, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
         CURRENT_DATE - 90);
 
--- 5. Configurar mapas vigentes para as unidades (tabela UNIDADE_MAPA)
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (8, 1001);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (9, 1002);
-INSERT INTO SGC.UNIDADE_MAPA (unidade_codigo, mapa_vigente_codigo)
-VALUES (10, 1003);
+-- 5. Configurar mapas vigentes para as unidades (tabela UNIDADE)
+UPDATE SGC.UNIDADE SET mapa_vigente_codigo = 1001 WHERE codigo = 8;
+UPDATE SGC.UNIDADE SET mapa_vigente_codigo = 1002 WHERE codigo = 9;
+UPDATE SGC.UNIDADE SET mapa_vigente_codigo = 1003 WHERE codigo = 10;
 
 -- 6. Adicionar competências aos mapas para torná-los mais realistas
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)

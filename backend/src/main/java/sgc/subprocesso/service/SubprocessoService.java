@@ -75,20 +75,16 @@ public class SubprocessoService {
             );
         }
 
-        // O trecho abaixo foi removido para flexibilizar o mapeamento,
-        // permitindo que atividades sejam cadastradas sem que sejam inicialmente
-        // associadas a competências.
-        //
-        // List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
-        // List<String> atividadesSemAssociacao = new ArrayList<>();
-        // for (Atividade atividade : atividades) {
-        //     if (atividade.getCompetencias().isEmpty()) {
-        //         atividadesSemAssociacao.add(atividade.getDescricao());
-        //     }
-        // }
-        // if (!atividadesSemAssociacao.isEmpty()) {
-        //     throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.", Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
-        // }
+        List<Atividade> atividades = atividadeRepo.findByMapaCodigo(mapaId);
+        List<String> atividadesSemAssociacao = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (atividade.getCompetencias().isEmpty()) {
+                atividadesSemAssociacao.add(atividade.getDescricao());
+            }
+        }
+        if (!atividadesSemAssociacao.isEmpty()) {
+            throw new ErroValidacao("Existem atividades que não foram associadas a nenhuma competência.", Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
+        }
     }
 
     @Transactional

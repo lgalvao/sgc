@@ -34,6 +34,9 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
                 .podeHomologarMapa(isCurrentUserChefeOuCoordenador(processo))
                 .build();
 
+        // Montar a hierarquia de unidades participantes
+        montarHierarquiaUnidades(dto, processo, List.of());
+
         return dto;
     }
 
@@ -42,7 +45,11 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
-        Usuario user = (Usuario) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof Usuario)) {
+            return false;
+        }
+        Usuario user = (Usuario) principal;
         return processo.getParticipantes().stream()
                 .anyMatch(unidade -> unidade.getCodigo().equals(user.getUnidade().getCodigo()));
     }
@@ -78,9 +85,10 @@ public abstract class ProcessoDetalheMapperCustom implements ProcessoDetalheMapp
             }
         }
 
-        // Adiciona apenas as unidades raiz ao DTO final
+        // Adiciona unidades raiz E unidades sem pai no mapa (participantes diretos sem hierarquia)
         for (ProcessoDetalheDto.UnidadeParticipanteDto unidadeDto : mapaUnidades.values()) {
-            if (unidadeDto.getCodUnidadeSuperior() == null) {
+            if (unidadeDto.getCodUnidadeSuperior() == null ||
+                !mapaUnidades.containsKey(unidadeDto.getCodUnidadeSuperior())) {
                 dto.getUnidades().add(unidadeDto);
             }
         }

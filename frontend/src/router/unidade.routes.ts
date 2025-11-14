@@ -4,7 +4,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
   {
     path: '/unidade/:codUnidade',
     name: 'Unidade',
-    component: () => import('@/views/Unidade.vue'),
+    component: () => import('@/views/UnidadeView.vue'),
     props: (route: RouteLocationNormalized) => ({ codUnidade: Number(route.params.codUnidade) }),
     meta: {
       title: 'Unidade',

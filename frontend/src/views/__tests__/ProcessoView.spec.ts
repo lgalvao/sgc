@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
-import Processo from '../Processo.vue'
+import ProcessoView from '../ProcessoView.vue'
 import { useProcessosStore } from '@/stores/processos'
-import { usePerfilStore } from '@/stores/perfil'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -11,7 +10,7 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
     { path: '/painel', name: 'Painel', component: { template: '<div>Painel</div>' } },
-    { path: '/processo/:codProcesso', name: 'Processo', component: Processo },
+    { path: '/processo/:codProcesso', name: 'Processo', component: ProcessoView },
     { path: '/subprocesso/:codProcesso/:siglaUnidade', name: 'Subprocesso', component: { template: '<div>Subprocesso</div>' } },
   ],
 })
@@ -22,7 +21,7 @@ describe('Processo.vue', () => {
   })
 
   it('renders process details', async () => {
-    const wrapper = mount(Processo, {
+    const wrapper = mount(ProcessoView, {
       global: {
         plugins: [
           createTestingPinia({
@@ -36,6 +35,9 @@ describe('Processo.vue', () => {
                   situacao: 'EM_ANDAMENTO',
                   unidades: [],
                 },
+              },
+              perfil: {
+                perfilSelecionado: 'ADMIN',
               },
             },
           }),
@@ -56,7 +58,7 @@ describe('Processo.vue', () => {
     processosStore.fetchProcessoDetalhe = vi.fn()
     processosStore.fetchSubprocessosElegiveis = vi.fn()
 
-    mount(Processo, {
+    mount(ProcessoView, {
       global: {
         plugins: [pinia, router],
       },
@@ -70,7 +72,7 @@ describe('Processo.vue', () => {
   })
 
   it('shows action buttons when there are eligible subprocesses', async () => {
-    const wrapper = mount(Processo, {
+    const wrapper = mount(ProcessoView, {
       global: {
         plugins: [
           createTestingPinia({

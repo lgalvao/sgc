@@ -109,12 +109,13 @@ defineProps<{
   situacao?: string;
 }>();
 
-const emit = defineEmits<{
-  irParaAtividades: [];
-  navegarParaMapa: [];
-  irParaDiagnosticoEquipe: [];
-  irParaOcupacoesCriticas: [];
-}>();
+const emit = defineEmits({
+  irParaAtividades: () => true,
+  navegarParaMapa: () => true,
+  irParaDiagnosticoEquipe: () => true,
+  irParaOcupacoesCriticas: () => true,
+});
+
 
 
 const handleMapaClick = () => {

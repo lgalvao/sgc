@@ -30,7 +30,7 @@ describe('utilitários', () => {
         });
 
         it('deve retornar a classe padrão para situações desconhecidas', () => {
-            expect(badgeClass('unknown')).toBe('bg-secondary');
+            expect(badgeClass('any')).toBe('bg-secondary');
         });
     });
 
@@ -44,7 +44,7 @@ describe('utilitários', () => {
         });
 
         it('deve retornar o ícone padrão para tipos desconhecidos', () => {
-            expect(iconeTipo('unknown' as 'success')).toBe('bi bi-bell-fill');
+            expect(iconeTipo('any' as 'success')).toBe('bi bi-bell-fill');
         });
     });
 

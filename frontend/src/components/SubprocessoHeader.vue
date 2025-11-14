@@ -50,7 +50,7 @@
       >
         <button
           class="btn btn-outline-primary"
-          @click="$emit('alterarDataLimite')"
+          @click="handleAlterarDataLimite"
         >
           <i class="bi bi-calendar me-1" />
           Alterar data limite
@@ -83,9 +83,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
-defineEmits<{
-  alterarDataLimite: [];
-}>();
+const emit = defineEmits({
+  alterarDataLimite: null
+});
 
 const mostrarBotaoAlterarData = computed(() => props.perfilUsuario === Perfil.ADMIN);
+
+const handleAlterarDataLimite = () => {
+  emit('alterarDataLimite');
+};
 </script>

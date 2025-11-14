@@ -1,7 +1,6 @@
 plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.openrewrite.rewrite") version "6.15.0"
 }
 
 apply(plugin = "base")

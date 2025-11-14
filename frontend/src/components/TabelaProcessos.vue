@@ -9,7 +9,7 @@
           <th
             data-testid="coluna-descricao"
             style="cursor:pointer"
-            @click="emit('ordenar', 'descricao')"
+            @click="handleOrdenar('descricao')"
           >
             Descrição
             <span v-if="criterioOrdenacao === 'descricao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
@@ -17,7 +17,7 @@
           <th
             data-testid="coluna-tipo"
             style="cursor:pointer"
-            @click="emit('ordenar', 'tipo')"
+            @click="handleOrdenar('tipo')"
           >
             Tipo
             <span v-if="criterioOrdenacao === 'tipo'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
@@ -26,7 +26,7 @@
             v-if="showDataFinalizacao"
             data-testid="coluna-data-finalizacao"
             style="cursor:pointer"
-            @click="emit('ordenar', 'dataFinalizacao')"
+            @click="handleOrdenar('dataFinalizacao')"
           >
             Finalizado em
             <span v-if="criterioOrdenacao === 'dataFinalizacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
@@ -34,7 +34,7 @@
           <th
             data-testid="coluna-situacao"
             style="cursor:pointer"
-            @click="emit('ordenar', 'situacao')"
+            @click="handleOrdenar('situacao')"
           >
             Situação
             <span v-if="criterioOrdenacao === 'situacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
@@ -48,7 +48,7 @@
           :data-testid="`processo-row-${processo.codigo}`"
           class="clickable-row"
           style="cursor:pointer;"
-          @click="emit('selecionarProcesso', processo)"
+          @click="handleSelecionarProcesso(processo)"
         >
           <td>
             {{ processo.descricao }}
@@ -75,7 +75,16 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'ordenar', campo: keyof ProcessoResumo | 'dataFinalizacao'): void;
-  (e: 'selecionarProcesso', processo: ProcessoResumo): void;
-}>();
+  (e: 'ordenar', campo: keyof ProcessoResumo | 'dataFinalizacao'): void
+  (e: 'selecionarProcesso', processo: ProcessoResumo): void
+}>()
+
+
+const handleOrdenar = (campo: keyof ProcessoResumo | 'dataFinalizacao') => {
+  emit('ordenar', campo);
+};
+
+const handleSelecionarProcesso = (processo: ProcessoResumo) => {
+  emit('selecionarProcesso', processo);
+};
 </script>

@@ -1,6 +1,5 @@
 package sgc.integracao;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,20 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
-import sgc.atividade.model.ConhecimentoRepo;
+import sgc.integracao.mocks.*;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.CompetenciaRepo;
-import sgc.integracao.mocks.*;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
-import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.sgrh.model.Usuario;
-import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -36,7 +30,6 @@ import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -60,33 +53,31 @@ class CDU12IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     // Repositories
-    @Autowired private ProcessoRepo processoRepo;
-    @Autowired private UnidadeRepo unidadeRepo;
-    @Autowired private SubprocessoRepo subprocessoRepo;
-    @Autowired private MapaRepo mapaRepo;
-    @Autowired private AtividadeRepo atividadeRepo;
-    @Autowired private ConhecimentoRepo conhecimentoRepo;
-    @Autowired private UsuarioRepo usuarioRepo;
-    @Autowired private CompetenciaRepo competenciaRepo;
-    @Autowired private UnidadeMapaRepo unidadeMapaRepo;
+    @Autowired
+    private ProcessoRepo processoRepo;
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MapaRepo mapaRepo;
+    @Autowired
+    private AtividadeRepo atividadeRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
     private Competencia competenciaVigente1;
     private Subprocesso subprocessoRevisao;
     private Mapa mapaSubprocesso;
+    private Unidade unidade;
 
 
     @BeforeEach
     void setUp() {
-        Unidade unidade = unidadeRepo.findById(12L).orElseThrow();
-        Usuario chefe = usuarioRepo.findById(CHEFE_TITULO).orElseThrow();
-        Usuario gestor = usuarioRepo.findById("222222222222").orElseThrow();
-        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
+        unidade = unidadeRepo.findById(12L).orElseThrow();
 
         Processo processoRevisao = new Processo(
                 "Processo de Revisão 2024",
@@ -99,38 +90,31 @@ class CDU12IntegrationTest {
         Mapa mapaVigente = new Mapa();
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
-        unidade = unidadeRepo.save(unidade);
-        mapaVigente = mapaRepo.saveAndFlush(mapaVigente);
-
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
-        unidadeMapa.setMapaVigenteCodigo(mapaVigente.getCodigo());
-        unidadeMapaRepo.saveAndFlush(unidadeMapa);
+        unidade.setMapaVigente(mapaVigente);
+        unidadeRepo.save(unidade);
 
         atividadeVigente1 = atividadeRepo.save(new Atividade(mapaVigente, "Analisar e despachar processos."));
         atividadeVigente2 = atividadeRepo.save(new Atividade(mapaVigente, "Elaborar relatórios gerenciais."));
 
         competenciaVigente1 = competenciaRepo.save(new Competencia("Gerenciamento de Processos", mapaVigente));
 
-        vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1, competenciaRepo, atividadeRepo);
-        vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2, competenciaRepo, atividadeRepo);
+        vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente1);
+        vincularAtividadeCompetencia(competenciaVigente1, atividadeVigente2);
 
         mapaSubprocesso = mapaRepo.save(new Mapa());
         subprocessoRevisao = new Subprocesso(
                 processoRevisao,
                 unidade,
-            mapaSubprocesso,
-            SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-            processoRevisao.getDataLimite()
+                mapaSubprocesso,
+                SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                processoRevisao.getDataLimite()
         );
         subprocessoRepo.save(subprocessoRevisao);
     }
 
-    private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade, CompetenciaRepo competenciaRepo, AtividadeRepo atividadeRepo) {
-        // Garante que ambos os lados da relação estão sincronizados
+    private void vincularAtividadeCompetencia(Competencia competencia, Atividade atividade) {
         competencia.getAtividades().add(atividade);
         atividade.getCompetencias().add(competencia);
-        // Salva as entidades para persistir a relação
         competenciaRepo.save(competencia);
         atividadeRepo.save(atividade);
     }
@@ -147,16 +131,16 @@ class CDU12IntegrationTest {
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente2.getDescricao()));
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(0)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(0)))
-                .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
-                .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(0)))
-                .andExpect(jsonPath("$.atividadesInseridas", empty()))
-                .andExpect(jsonPath("$.atividadesRemovidas", empty()))
-                .andExpect(jsonPath("$.atividadesAlteradas", empty()))
-                .andExpect(jsonPath("$.competenciasImpactadas", empty()));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(0)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(0)))
+                    .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
+                    .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(0)))
+                    .andExpect(jsonPath("$.atividadesInseridas", empty()))
+                    .andExpect(jsonPath("$.atividadesRemovidas", empty()))
+                    .andExpect(jsonPath("$.atividadesAlteradas", empty()))
+                    .andExpect(jsonPath("$.competenciasImpactadas", empty()));
         }
 
         @Test
@@ -168,12 +152,12 @@ class CDU12IntegrationTest {
             atividadeRepo.save(new Atividade(mapaSubprocesso, "Realizar auditorias internas."));
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
-                .andExpect(jsonPath("$.atividadesInseridas", hasSize(1)))
-                .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Realizar auditorias internas.")))
-                .andExpect(jsonPath("$.atividadesInseridas[0].tipoImpacto", is("INSERIDA")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
+                    .andExpect(jsonPath("$.atividadesInseridas", hasSize(1)))
+                    .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Realizar auditorias internas.")))
+                    .andExpect(jsonPath("$.atividadesInseridas[0].tipoImpacto", is("INSERIDA")));
         }
 
         @Test
@@ -183,13 +167,13 @@ class CDU12IntegrationTest {
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
-                .andExpect(jsonPath("$.atividadesRemovidas", hasSize(1)))
-                .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())))
-                .andExpect(jsonPath("$.atividadesRemovidas[0].tipoImpacto", is("REMOVIDA")))
-                .andExpect(jsonPath("$.atividadesRemovidas[0].competenciasVinculadas", contains(competenciaVigente1.getDescricao())));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
+                    .andExpect(jsonPath("$.atividadesRemovidas", hasSize(1)))
+                    .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())))
+                    .andExpect(jsonPath("$.atividadesRemovidas[0].tipoImpacto", is("REMOVIDA")))
+                    .andExpect(jsonPath("$.atividadesRemovidas[0].competenciasVinculadas", contains(competenciaVigente1.getDescricao())));
         }
 
         @Test
@@ -201,13 +185,13 @@ class CDU12IntegrationTest {
             atividadeRepo.save(new Atividade(mapaSubprocesso, atividadeVigente1.getDescricao()));
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
-                .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
-                .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Elaborar relatórios gerenciais e estratégicos.")))
-                .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(1)))
+                    .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
+                    .andExpect(jsonPath("$.atividadesInseridas[0].descricao", is("Elaborar relatórios gerenciais e estratégicos.")))
+                    .andExpect(jsonPath("$.atividadesRemovidas[0].descricao", is(atividadeVigente2.getDescricao())));
         }
 
         @Test
@@ -218,20 +202,20 @@ class CDU12IntegrationTest {
             atividadeRepo.save(atividadeNova);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(2)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
-                .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(1)))
-                .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
-                .andExpect(jsonPath("$.competenciasImpactadas[0].descricao", is(competenciaVigente1.getDescricao())))
-                .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(2)))
-                .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
-                    containsInAnyOrder(
-                        "Atividade removida: " + atividadeVigente1.getDescricao(),
-                        "Atividade removida: " + atividadeVigente2.getDescricao()
-                    )
-                ));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(true)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(2)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(1)))
+                    .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(1)))
+                    .andExpect(jsonPath("$.competenciasImpactadas", hasSize(1)))
+                    .andExpect(jsonPath("$.competenciasImpactadas[0].descricao", is(competenciaVigente1.getDescricao())))
+                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas", hasSize(2)))
+                    .andExpect(jsonPath("$.competenciasImpactadas[0].atividadesAfetadas",
+                            containsInAnyOrder(
+                                    "Atividade removida: " + atividadeVigente1.getDescricao(),
+                                    "Atividade removida: " + atividadeVigente2.getDescricao()
+                            )
+                    ));
         }
     }
 
@@ -243,15 +227,16 @@ class CDU12IntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
-            unidadeMapaRepo.deleteAll();
+            unidade.setMapaVigente(null);
+            unidadeRepo.save(unidade);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(0)))
-                .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(0)))
-                .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
-                .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(0)));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(TEM_IMPACTOS_JSON_PATH, is(false)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_INSERIDAS_JSON_PATH, is(0)))
+                    .andExpect(jsonPath(TOTAL_ATIVIDADES_REMOVIDAS_JSON_PATH, is(0)))
+                    .andExpect(jsonPath("$.totalAtividadesAlteradas", is(0)))
+                    .andExpect(jsonPath("$.totalCompetenciasImpactadas", is(0)));
         }
 
         @Test
@@ -259,7 +244,7 @@ class CDU12IntegrationTest {
         @DisplayName("Deve retornar 404 para subprocesso inexistente")
         void deveRetornar404_QuandoSubprocessoNaoExiste() throws Exception {
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, 9999L))
-                .andExpect(status().isNotFound());
+                    .andExpect(status().isNotFound());
         }
     }
 
@@ -275,7 +260,7 @@ class CDU12IntegrationTest {
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk());
+                    .andExpect(status().isOk());
         }
 
         @Test
@@ -286,7 +271,7 @@ class CDU12IntegrationTest {
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk());
+                    .andExpect(status().isOk());
         }
 
         @Test
@@ -297,7 +282,7 @@ class CDU12IntegrationTest {
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk());
+                    .andExpect(status().isOk());
         }
 
         @Test
@@ -308,7 +293,7 @@ class CDU12IntegrationTest {
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isOk());
+                    .andExpect(status().isOk());
         }
 
         @Test
@@ -319,7 +304,7 @@ class CDU12IntegrationTest {
             subprocessoRepo.save(subprocessoRevisao);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, subprocessoRevisao.getCodigo()))
-                .andExpect(status().isForbidden());
+                    .andExpect(status().isForbidden());
         }
     }
 }

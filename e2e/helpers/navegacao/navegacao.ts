@@ -27,6 +27,7 @@ export async function navegarParaLogin(page: Page): Promise<void> {
  */
 export async function navegarParaCriacaoProcesso(page: Page): Promise<void> {
     await page.goto(URLS.PROCESSO_CADASTRO);
+    await page.waitForSelector(SELETORES.CAMPO_DESCRICAO, { state: 'visible' });
 }
 
 /**

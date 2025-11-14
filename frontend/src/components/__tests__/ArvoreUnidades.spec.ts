@@ -19,7 +19,6 @@ import type {Unidade} from '@/types/tipos';
 
 describe('ArvoreUnidades - Seleção Hierárquica', () => {
   let unidades: Unidade[];
-  let unidadesSelecionadas: number[];
 
   beforeEach(() => {
     // Mock da árvore de unidades
@@ -86,7 +85,7 @@ describe('ArvoreUnidades - Seleção Hierárquica', () => {
       }
     ];
 
-    unidadesSelecionadas = [];
+    // unidadesSelecionadasLocal = [];
   });
 
   // Funções auxiliares (copiadas do componente)

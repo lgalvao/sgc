@@ -173,7 +173,7 @@ function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   })
 }
 
-function navegarParaUnidadeSubordinada(item: { id: unknown }) {
+function navegarParaUnidadeSubordinada(item: { id: any }) {
   if (item && typeof item.id === 'number') router.push({path: `/unidade/${item.id}`});
 }
 

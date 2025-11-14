@@ -18,16 +18,15 @@ import sgc.atividade.model.Atividade;
 import sgc.atividade.model.AtividadeRepo;
 import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.TestThymeleafConfig;
 import sgc.integracao.mocks.WithMockAdmin;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.CompetenciaRepo;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.model.MapaRepo;
-import sgc.mapa.model.UnidadeMapa;
-import sgc.mapa.model.UnidadeMapaRepo;
 import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.IniciarProcessoReq;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -36,6 +35,7 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
-    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{codigo}/iniciar?tipo=REVISAO";
+    private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,9 +64,6 @@ public class CDU05IntegrationTest {
 
     @Autowired
     private MapaRepo mapaRepo;
-
-    @Autowired
-    private UnidadeMapaRepo unidadeMapaRepo;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;
@@ -104,12 +101,8 @@ public class CDU05IntegrationTest {
         conhecimentoRepo.save(conhecimentoOriginal);
 
         // Define o mapa como vigente para a unidade
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setUnidade(unidade);
-        unidadeMapa.setUnidadeCodigo(unidade.getCodigo());
-        unidadeMapa.setMapaVigente(mapaOriginal);
-        unidadeMapa.setMapaVigenteCodigo(mapaOriginal.getCodigo());
-        unidadeMapaRepo.save(unidadeMapa);
+        unidade.setMapaVigente(mapaOriginal);
+        unidadeRepo.save(unidade);
     }
 
     private CriarProcessoReq criarCriarProcessoReq(String descricao, List<Long> unidades, LocalDateTime dataLimiteEtapa1) {
@@ -136,9 +129,10 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Iniciar o processo de revisão
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isOk());
 
         // 3. Buscar o subprocesso criado e verificar a cópia do mapa
@@ -188,15 +182,19 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Tentar iniciar o processo de revisão (deve falhar)
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isConflict()); // Espera-se um erro de negócio
     }
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())) // código que não existe
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, Collections.emptyList());
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L).with(csrf()) // código que não existe
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isNotFound());
     }
 
@@ -220,15 +218,16 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // Inicia o processo a primeira vez
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unidades)))
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
     }
 }

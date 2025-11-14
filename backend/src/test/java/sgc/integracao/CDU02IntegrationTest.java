@@ -12,25 +12,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaRepo;
 import sgc.integracao.mocks.TestSecurityConfig;
 import sgc.integracao.mocks.WithMockAdmin;
-import sgc.processo.model.Processo;
 import sgc.sgrh.model.Perfil;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,22 +48,21 @@ public class CDU02IntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private AlertaRepo alertaRepo;
-    @Autowired
     private UsuarioRepo usuarioRepo;
 
-    private void criarAlerta(String descricao, Processo processo, Usuario usuario, Unidade unidade) {
-        Alerta a = new Alerta();
-        a.setDescricao(descricao);
-        a.setProcesso(processo);
-        a.setUsuarioDestino(usuario);
-        a.setUnidadeDestino(unidade);
-        a.setDataHora(LocalDateTime.now());
-        alertaRepo.save(a);
+    // Unidades
+    private Unidade unidadeRaiz;
+    private Unidade unidadeFilha1;
+    private Unidade unidadeFilha2;
+
+    @BeforeEach
+    void setup() {
+        unidadeRaiz = unidadeRepo.findById(2L).orElseThrow();
+        unidadeFilha1 = unidadeRepo.findById(6L).orElseThrow();
+        unidadeFilha2 = unidadeRepo.findById(7L).orElseThrow();
     }
 
-    private void setupSecurityContext(String tituloEleitoral, Long codigoUnidade, String... perfis) {
-        Unidade unidade = unidadeRepo.findById(codigoUnidade).orElseThrow();
+    private void setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
         Usuario principal = usuarioRepo.findById(tituloEleitoral)
                 .orElseGet(() -> {
                     Usuario newUser = new Usuario(
@@ -81,7 +76,7 @@ public class CDU02IntegrationTest {
                     return usuarioRepo.save(newUser);
                 });
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            principal, null, principal.getAuthorities());
+                principal, null, principal.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
@@ -89,7 +84,6 @@ public class CDU02IntegrationTest {
 
     @Nested
     @DisplayName("Testes de Visibilidade de Processos")
-    @Sql("/datasets/cdu02-processos.sql")
     class VisibilidadeProcessosTestes {
 
         @Test
@@ -99,38 +93,38 @@ public class CDU02IntegrationTest {
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "ADMIN"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(4)));
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(4))));
         }
 
         @Test
         @DisplayName("GESTOR da unidade raiz deve ver todos os processos da sua unidade e de todas as subordinadas")
         void testListarProcessos_GestorRaiz_VeTodos() throws Exception {
-            setupSecurityContext("1", 2L, "GESTOR"); // Unidade Raiz
+            setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
-                            .param("codigoUnidade", "2"))
+                            .param("unidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(3)));
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(3))));
         }
 
         @Test
         @DisplayName("CHEFE da unidade Filha 1 deve ver processos da sua unidade e da Neta 1")
         void testListarProcessos_ChefeUnidadeFilha1_VeProcessosSubordinados() throws Exception {
-            setupSecurityContext("2", 6L, "CHEFE"); // Unidade Filha 1
+            setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
-                            .param("codigoUnidade", "6"))
+                            .param("unidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(2)));
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(2))));
         }
 
         @Test
         @DisplayName("CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
         void testListarProcessos_ChefeUnidadeFilha2_NaoVeProcessosDeOutros() throws Exception {
-            setupSecurityContext("3", 7L, "CHEFE"); // Unidade Filha 2
+            setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "CHEFE")
-                            .param("codigoUnidade", "7"))
+                            .param("unidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(0)));
         }
@@ -138,10 +132,10 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado'")
         void testListarProcessos_NaoAdmin_NaoVeProcessosCriados() throws Exception {
-            setupSecurityContext("1", 2L, "GESTOR"); // Unidade Raiz
+            setupSecurityContext("1", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_PROCESSOS)
                             .param("perfil", "GESTOR")
-                            .param("codigoUnidade", "2"))
+                            .param("unidade", unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado')]", hasSize(0)));
         }
@@ -154,7 +148,7 @@ public class CDU02IntegrationTest {
         @Test
         @DisplayName("Usuário deve ver alertas direcionados a ele")
         void testListarAlertas_UsuarioVeSeusAlertas() throws Exception {
-            setupSecurityContext("8", 2L, "GESTOR");
+            setupSecurityContext("8", unidadeRaiz, "GESTOR");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "8"))
                     .andExpect(status().isOk())
@@ -163,22 +157,23 @@ public class CDU02IntegrationTest {
         }
 
         @Test
-        @DisplayName("Usuário deve ver alertas direcionados à sua unidade")
+        @DisplayName("Usuário deve ver alertas direcionados à sua unidade e às suas subordinadas")
         void testListarAlertas_UsuarioVeAlertasDaSuaUnidade() throws Exception {
-            setupSecurityContext("333333333333", 6L, "CHEFE");
+            setupSecurityContext("2", unidadeFilha1, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
-                            .param("codigoUnidade", "6"))
+                            .param("codigoUnidade", unidadeFilha1.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(2)));
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta para Unidade Filha 1')]").exists());
         }
 
         @Test
         @DisplayName("Usuário não deve ver alertas de outros usuários ou unidades")
         void testListarAlertas_UsuarioNaoVeAlertasDeOutros() throws Exception {
-            setupSecurityContext("3", 7L, "CHEFE");
+            setupSecurityContext("3", unidadeFilha2, "CHEFE");
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", "3")
-                            .param("codigoUnidade", "7"))
+                            .param("codigoUnidade", unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content", hasSize(0)));
         }

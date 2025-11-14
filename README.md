@@ -2,8 +2,8 @@
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3.5-green.svg)](https://vuejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3.5.x-green.svg)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.x-blue.svg)](https://www.typescriptlang.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-E2E%20Tests-45ba4b.svg)](https://playwright.dev/)
 
 Sistema para gerenciar sistematicamente as competências técnicas das unidades organizacionais do TRE-PE, incluindo mapeamento, revisão e diagnóstico de competências.
@@ -30,6 +30,7 @@ O SGC permite:
 - Java 21
 - Spring Boot 3.5.7
 - JPA/Hibernate
+- Lombok e MapStruct
 - PostgreSQL (produção) / H2 (desenvolvimento e testes)
 - Arquitetura: Em camadas, estruturada por domínio
 
@@ -37,6 +38,7 @@ O SGC permite:
 - Vue.js 3.5 + TypeScript
 - Vite (build)
 - Pinia (estado)
+- Vue Router (rotas)
 - Bootstrap 5
 - Axios (cliente http)
 
@@ -49,33 +51,38 @@ O SGC permite:
 
 ```
 sgc/
-├── backend/              # API REST Spring Boot
+├── backend/              # API REST baseada em Spring Boot
 │   ├── src/main/java/sgc/
-│   │   ├── processo/     # Principal conceito do sistema, de onde partem todos os fluxos.
-│   │   ├── subprocesso/  # Cada unidade envolvida em um processo tem o seu subprocesso
-│   │   ├── mapa/         # Mapas de competências
-│   │   ├── competencia/  # Gestão de competências
-│   │   ├── atividade/    # Atividades e conhecimentos
-│   │   ├── analise/      # Trilha de auditoria
-│   │   ├── notificacao/  # Sistema de notificações
-│   │   ├── alerta/       # Alertas internos
-│   │   ├── sgrh/         # Integração com RH
-│   │   ├── unidade/      # Estrutura organizacional
-│   │   └── comum/        # Componentes compartilhados
+│   │   ├── processo/     # Orquestrador dos fluxos de negócio (Mapeamento, Revisão, Diagnóstico)
+│   │   ├── subprocesso/  # Máquina de estados para o workflow de cada unidade
+│   │   ├── mapa/         # Gestão dos mapas de competências (criação, versionamento)
+│   │   ├── atividade/    # CRUD de atividades e conhecimentos
+│   │   ├── analise/      # Trilha de auditoria imutável
+│   │   ├── notificacao/  # Envio de notificações por e-mail
+│   │   ├── alerta/       # Alertas exibidos na interface
+│   │   ├── painel/       # Endpoints para os dashboards
+│   │   ├── sgrh/         # Integração com SGRH (usuários, perfis, unidades)
+│   │   ├── unidade/      # Representação da estrutura organizacional
+│   │   ├── util/         # Classes utilitárias
+│   │   └── comum/        # Componentes compartilhados (DTOs, exceções)
 │   └── src/main/resources/
 │       ├── application.yml         # Config padrão (PostgreSQL)
-│       ├── application-e2e.yml     # Testes E2E (H2 + data)
-│       └── data.sql                # Dados iniciais para testes
+│       ├── application-e2e.yml     # Testes E2E (H2)
+│       └── data-h2.sql             # Dados iniciais para testes
 │
 ├── frontend/             # Aplicação Vue.js
 │   ├── src/
-│   │   ├── components/   # Componentes reutilizáveis
-│   │   ├── views/        # Páginas da aplicação
-│   │   ├── stores/       # Pinia stores
-│   │   ├── services/     # Serviços de API
-│   │   ├── router/       # Vue Router
-│   │   └── types/        # Tipo TypeScript
-│   └── build/            # Build artifacts
+│      ├── components/   # Componentes reutilizáveis (Vue)
+│      ├── views/        # Páginas da aplicação (Vue)
+│      ├── stores/       # Módulos de estado (Pinia)
+│      ├── services/     # Comunicação com a API (Axios)
+│      ├── router/       # Configuração de rotas (Vue Router)
+│      ├── composables/  # Funções reutilizáveis (Composition API)
+│      ├── mappers/      # Mapeamento de DTOs
+│      ├── utils/        # Funções utilitárias
+│      ├── constants/    # Constantes e enums
+│      ├── types/        # Tipos e interfaces (TypeScript)
+│      └── test-utils/   # Utilitários para testes
 │
 ├── e2e/                  # Testes End-to-End (Playwright)
 │   ├── cdu-01.spec.ts    # Login e autenticação
@@ -92,14 +99,12 @@ sgc/
 │   ├── cdu-01.md         # Caso de uso 01: Login
 │   ├── cdu-02.md         # Caso de uso 02: Criar processo
 │   ├── ...               # Ao toodo, 21 casos de uso documentados
-│   ├── PROFILES.md       # Guia de perfis Spring
 │   └── _informacoes-gerais.md
 │
 ├── build.gradle.kts      # Build raiz (multi-projeto)
 ├── package.json          # Scripts E2E
 ├── playwright.config.ts  # Configuração Playwright
-├── AGENTS.md             # Guia para agentes de IA
-└── licoes-aprendidas.md  # Lições aprendidas (ao corrigir os testes E2E)
+└── AGENTS.md             # Guia para agentes de IA
 ```
 
 ---
@@ -120,6 +125,17 @@ cd sgc
 ```
 
 ### 2. Desenvolvimento Local (Recomendado)
+
+Para iniciar o ambiente de desenvolvimento completo (backend e frontend), utilize o script `dev:e2e` na raiz do projeto:
+
+```bash
+npm run dev:e2e
+```
+Este comando iniciará:
+- O **backend** em `http://localhost:10000` (usando H2 em memória com dados de teste).
+- O **frontend** em `http://localhost:5173`.
+
+Alternativamente, você pode iniciar o backend e o frontend separadamente:
 
 #### Terminal 1: Backend
 ```bash
@@ -167,42 +183,6 @@ cd frontend
 npm run test:unit
 ```
 
-### Testes E2E (Playwright) - 21 Casos de Uso
-
-⚠️ **Importante:** Testes E2E exigem backend rodando separadamente.
-
-**Passo 1:** Inicie o backend com perfil `e2e`
-```bash
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e' > backend.log 2>&1 &
-```
-
-**Passo 2:** Aguarde o backend iniciar (verificar log)
-```bash
-tail -f backend.log
-# Procure por "Started Sgc"
-```
-
-**Passo 3:** Execute os testes E2E
-```bash
-npm run test:e2e
-```
-
-**Passo 4:** Pare o backend
-```bash
-# No Windows
-taskkill /F /IM java.exe
-
-# No Linux/Mac
-pkill java
-```
-
-**Casos de uso testados:**
-- CDU-01: Login e seleção de perfil
-- CDU-02: Criação de processo
-- CDU-03 a CDU-21: Workflow completo de mapeamento e validação
-
----
-
 ## 📊 Perfis Spring
 
 O projeto usa **3 perfis distintos**:
@@ -220,10 +200,7 @@ O projeto usa **3 perfis distintos**:
 ./gradlew :backend:bootRun
 
 # Desenvolvimento (H2 + dados de teste)
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
-
-# Testes E2E (H2 + dados de teste)
-./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'
+./gradlew :backend:bootRunE2E
 
 # Testes JUnit (automático)
 ./gradlew :backend:test
@@ -238,10 +215,6 @@ Gerencia o ciclo de vida dos processos de alto nível (Mapeamento, Revisão, Dia
 
 ### 2. Subprocesso (Máquina de Estados)
 Gerencia o workflow detalhado de cada unidade organizacional com transições de estado e histórico imutável de movimentações.
-
-**Estados principais:**
-- `PENDENTE_CADASTRO` → `CADASTRO_DISPONIBILIZADO` → `EM_ANALISE_GESTOR`
-- `MAPA_AJUSTADO` → `EM_ANALISE_ADMIN` → `HOMOLOGADO`
 
 ### 3. Mapa de Competências
 Orquestra criação, cópia e análise de impacto dos mapas. Cada mapa está vinculado a uma unidade e pode ter diferentes situações (ATIVO, ARQUIVADO, etc.).
@@ -273,41 +246,9 @@ Sistema orientado a eventos que reage aos eventos de domínio:
 
 ---
 
-## 🛠️ Build e Deploy
-
-### Build Completo (Backend + Frontend)
-
-```bash
-# Instala dependências do frontend
-./gradlew installFrontend
-
-# Compila frontend (Vite)
-./gradlew buildFrontend
-
-# Copia build do frontend para resources/static
-./gradlew copyFrontend
-
-# Compila backend + embedded frontend
-./gradlew :backend:build
-```
-
-O JAR resultante estará em: `backend/build/libs/backend-1.0.0.jar`
-
-### Executar JAR em Produção
-
-```bash
-java -jar backend/build/libs/backend-1.0.0.jar
-```
-
-O backend servirá tanto a API REST (`/api/**`) quanto o frontend estático (`/`).
-
----
-
 ## 📚 Documentação Adicional
 
 - **[AGENTS.md](AGENTS.md)**: Guia para agentes de IA trabalhando no projeto
-- **[reqs/PROFILES.md](reqs/PROFILES.md)**: Detalhes completos dos perfis Spring
-- **[licoes-aprendidas.md](licoes-aprendidas.md)**: Lições aprendidas ao corrigir testes E2E
 - **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend com diagramas Mermaid
 - **[reqs/](reqs/)**: 21 casos de uso documentados (CDU-01 a CDU-21)
 
@@ -316,69 +257,3 @@ O backend servirá tanto a API REST (`/api/**`) quanto o frontend estático (`/`
 http://localhost:10000/swagger-ui.html
 http://localhost:10000/api-docs
 ```
-
----
-
-## 🤝 Contribuindo
-
-### Estrutura de Commits
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `test:` Adição ou correção de testes
-- `docs:` Documentação
-- `refactor:` Refatoração de código
-- `chore:` Tarefas de manutenção
-
-### Workflow de Desenvolvimento
-
-1. **Crie uma branch** do `main`
-2. **Desenvolva** com testes
-3. **Execute testes locais**:
-   ```bash
-   ./gradlew :backend:test
-   cd frontend && npm run test:unit
-   npm run test:e2e
-   ```
-4. **Commit** com mensagem descritiva
-5. **Push** e abra Pull Request
-
-### Regras de Testes
-
-- ✅ Backend: Testes unitários obrigatórios para serviços
-- ✅ Frontend: Cobertura mínima de 70% (Vitest)
-- ✅ E2E: Todos os 21 casos de uso devem passar antes de merge
-
----
-
-## 📝 Licença
-
-Este projeto é propriedade do TRE-PE (Tribunal Regional Eleitoral de Pernambuco).
-
----
-
-## 👥 Autores
-
-- **Leonardo Galvão** - Desenvolvimento inicial
-- **Equipe SEDESENV/COSIS/TRE-PE**
-
----
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-1. Consulte a [documentação](reqs/)
-2. Verifique issues abertas no repositório
-3. Contate a equipe de desenvolvimento SEDESENV
-
----
-
-## 🔄 Estado do Projeto
-
-- ✅ Backend: Arquitetura completa e funcional
-- ✅ Frontend: Interface responsiva com Bootstrap 5
-- ✅ Testes E2E: 21 casos de uso automatizados
-- ⚠️ Segurança: Em implementação (JWT real pendente)
-- 🚧 Integração SGRH: Simulada (produção pendente)
-
-**Versão:** 1.0.0
-**Última atualização:** 2025-10-30

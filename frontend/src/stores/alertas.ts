@@ -31,7 +31,7 @@ export const useAlertasStore = defineStore('alertas', {
                     await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20);
                 }
                 return true;
-            } catch (error) {
+            } catch {
                 return false;
             }
         },

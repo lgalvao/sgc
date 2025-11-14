@@ -13,10 +13,10 @@ A complexidade do workflow é gerenciada através de uma arquitetura de serviço
 ```mermaid
 graph TD
     subgraph "Frontend"
-        ControleCrud(SubprocessoCrudControle)
-        ControleCadastro(SubprocessoCadastroControle)
-        ControleMapa(SubprocessoMapaControle)
-        ControleValidacao(SubprocessoValidacaoControle)
+        ControleCrud(SubprocessoCrudController)
+        ControleCadastro(SubprocessoCadastroController)
+        ControleMapa(SubprocessoMapaController)
+        ControleValidacao(SubprocessoValidacaoController)
     end
 
     subgraph "Módulo Subprocesso"
@@ -45,10 +45,12 @@ graph TD
 ## Componentes Principais
 
 ### Controladores REST
-- **`SubprocessoCrudControle`**: Gerencia as operações básicas de CRUD.
-- **`SubprocessoCadastroControle`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver, aceitar, etc.).
-- **`SubprocessoMapaControle`**: Expõe endpoints relacionados à gestão do mapa de competências.
-- **`SubprocessoValidacaoControle`**: Lida com as ações de workflow da etapa de validação.
+
+- **`SubprocessoCrudController`**: Gerencia as operações básicas de CRUD.
+- **`SubprocessoCadastroController`**: Lida com as ações de workflow da etapa de cadastro (disponibilizar, devolver,
+  aceitar, etc.).
+- **`SubprocessoMapaController`**: Expõe endpoints relacionados à gestão do mapa de competências.
+- **`SubprocessoValidacaoController`**: Lida com as ações de workflow da etapa de validação.
 
 ### Camada de Fachada
 - **`SubprocessoService`**: Atua como o ponto de entrada para as operações de CRUD.
@@ -60,7 +62,7 @@ graph TD
 - **`SubprocessoMapaService`**: Contém a lógica de negócio relacionada à interação com o mapa.
 - **`SubprocessoMapaWorkflowService`**: Gerencia a lógica de salvamento do mapa no contexto do workflow.
 - **`SubprocessoNotificacaoService`**: Gerencia o envio de notificações específicas do subprocesso.
-- **`modelo/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
+- **`model/`**: Contém as entidades JPA `Subprocesso` e `Movimentacao`.
 - **`SituacaoSubprocesso`**: Enum que define todos os estados possíveis do workflow.
 
 ## Diagrama da Máquina de Estados
