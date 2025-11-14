@@ -265,7 +265,6 @@ onMounted(async () => {
         tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split('T')[0];
         unidadesSelecionadas.value = extrairCodigosUnidades(processo.unidades);
-
         await processosStore.buscarStatusUnidades(processo.tipo, processo.codigo);
         await nextTick();
       }
@@ -376,7 +375,9 @@ async function confirmarIniciarProcesso() {
         'O processo foi iniciado! Notificações enviadas às unidades.'
     );
     await router.push('/painel');
-    limparCampos();
+    if (!processoEditando.value) { // Only clear fields if it was a new process
+      limparCampos();
+    }
   } catch (error) {
     notificacoesStore.erro('Erro ao iniciar processo', 'Não foi possível iniciar o processo. Tente novamente.');
     console.error('Erro ao iniciar processo:', error);
@@ -402,6 +403,9 @@ async function confirmarRemocao() {
         testId: 'notificacao-remocao'
       });
       await router.push('/painel');
+      if (!processoEditando.value) { // Only clear fields if it was a new process
+        limparCampos();
+      }
     } catch (error) {
       notificacoesStore.erro('Erro ao remover processo', 'Não foi possível remover o processo. Tente novamente.');
       console.error('Erro ao remover processo:', error);

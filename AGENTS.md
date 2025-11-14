@@ -46,6 +46,7 @@ Este documento estabelece diretrizes e boas práticas para agentes de desenvolvi
 Siga estas diretrizes para executar e manter testes e2e:
 
 -   **Execução Otimizada:**
+    -   **Inicialização Automática:** Ao executar `npx playwright test`, o frontend e o backend são iniciados automaticamente. O backend usa o perfil `e2e` com um banco de dados H2 em memória, e o frontend é iniciado via `npm run dev`.
     -   Sempre execute o mínimo de testes possível para o contexto da sua alteração.
     -   Para rodar apenas os testes que falharam na última execução:
         ```bash

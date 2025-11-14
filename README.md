@@ -126,6 +126,17 @@ cd sgc
 
 ### 2. Desenvolvimento Local (Recomendado)
 
+Para iniciar o ambiente de desenvolvimento completo (backend e frontend), utilize o script `dev:e2e` na raiz do projeto:
+
+```bash
+npm run dev:e2e
+```
+Este comando iniciará:
+- O **backend** em `http://localhost:10000` (usando H2 em memória com dados de teste).
+- O **frontend** em `http://localhost:5173`.
+
+Alternativamente, você pode iniciar o backend e o frontend separadamente:
+
 #### Terminal 1: Backend
 ```bash
 ./gradlew :backend:bootRun --args='--spring.profiles.active=e2e'

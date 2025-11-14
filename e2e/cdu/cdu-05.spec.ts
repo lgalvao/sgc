@@ -5,8 +5,8 @@ import {
     cancelarIniciacaoProcesso,
     clicarIniciarProcesso,
     confirmarNoModal,
+    criarProcessoBasico,
     gerarNomeUnico,
-    limparProcessosEmAndamento,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     preencherFormularioProcesso,
@@ -16,29 +16,33 @@ import {
 
 /**
  * CDU-05: Iniciar processo de revisão
- * 
+ *
  * Ator: ADMIN
- * 
+ *
  * Objetivo: Validar a iniciação de um processo de revisão, incluindo:
  * - Abertura do modal de confirmação
  * - Criação de subprocessos para unidades participantes
  * - Envio de notificações e criação de alertas
  * - Mudança de situação do processo para EM_ANDAMENTO
- * 
+ *
  * Cobertura:
  * ✅ Fluxo principal completo (passos 1-13)
  * ✅ Fluxo alternativo (cancelamento - passo 5)
  * ✅ Validações de estado e criação de dados
  */
 test.describe('CDU-05: Iniciar processo de revisão', () => {
-    test.beforeEach(async ({page}) => {
-        await limparProcessosEmAndamento(page);
+    const NOME_PROCESSO_REVISAO = 'Processo teste revisão CDU-05';
+
+    test.beforeEach(async ({ page }) => {
+        // Loga como admin e cria o processo base para os testes
         await loginComoAdmin(page);
+        await criarProcessoBasico(page, NOME_PROCESSO_REVISAO, 'REVISAO', ['CDU05-REV-UNIT']);
+        // O login de cada teste (se houver) vai sobrescrever ou continuar a sessão
     });
 
     test('deve exibir modal de confirmação ao clicar em Iniciar processo', async ({page}) => {
         // Abrir processo de revisão em situação CRIADO
-        await abrirProcessoPorNome(page, 'Processo teste revisão CDU-05');
+        await abrirProcessoPorNome(page, NOME_PROCESSO_REVISAO);
 
         // Clicar em Iniciar processo
         await clicarIniciarProcesso(page);
@@ -54,7 +58,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
 
     test('deve cancelar iniciação do processo ao clicar em Cancelar no modal', async ({page}) => {
         // Abrir processo e clicar em Iniciar
-        await abrirProcessoPorNome(page, 'Processo teste revisão CDU-05');
+        await abrirProcessoPorNome(page, NOME_PROCESSO_REVISAO);
         await clicarIniciarProcesso(page);
 
         // Cancelar no modal
@@ -87,7 +91,7 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
         await page.waitForSelector('[data-testid="tabela-processos"]', );
         const processoRow = page.locator('[data-testid="tabela-processos"] tr').filter({hasText: nomeProcesso});
         await expect(processoRow).toBeVisible();
-        await expect(processoRow).toContainText(/Em andamento/i);
+        await expect(processoRow).toContainText(/EM_ANDAMENTO/i);
 
         // Verificar que botão Iniciar não está mais disponível
         await processoRow.click();
@@ -188,26 +192,30 @@ test.describe('CDU-05: Iniciar processo de revisão', () => {
     });
 
     test('deve validar que apenas processos CRIADO podem ser iniciados', async ({page}) => {
-        await page.goto('http://localhost:5173/painel');
-        await page.waitForSelector('[data-testid="tabela-processos"]', );
-        
-        // Procurar processo EM_ANDAMENTO
-        const processoEmAndamento = page.locator('[data-testid="tabela-processos"] tr')
-            .filter({hasText: /Revisão de mapa de competências STIC - 2024/});
-        
-        if (await processoEmAndamento.count() > 0) {
-            await processoEmAndamento.click();
-            await page.waitForTimeout(2000);
-            
-            // Verificar que botão Iniciar não está presente
-            await expect(page.getByRole('button', {name: /Iniciar processo/i})).not.toBeVisible();
-        }
+        // 1. Criar e iniciar um processo para que ele fique EM_ANDAMENTO
+        const nomeProcessoEmAndamento = `Processo JÁ EM ANDAMENTO ${gerarNomeUnico('CDU-05')}`;
+        await navegarParaCriacaoProcesso(page);
+        await preencherFormularioProcesso(page, nomeProcessoEmAndamento, 'REVISAO', '2025-12-31');
+        await selecionarUnidadesPorSigla(page, ['CDU05-READONLY-UNIT']);
+        await page.getByRole('button', {name: /Salvar/i}).click();
+        await page.waitForURL(/\/painel/);
+        await abrirProcessoPorNome(page, nomeProcessoEmAndamento);
+        await clicarIniciarProcesso(page);
+        await confirmarNoModal(page);
+        await page.waitForURL(/\/painel/);
+
+        // 2. Abrir o processo que está EM_ANDAMENTO
+        await page.getByText(nomeProcessoEmAndamento).first().click();
+        await page.waitForURL(/\/processo\/\d+/);
+
+        // 3. Verificar que o botão "Iniciar processo" não está visível
+        await expect(page.getByRole('button', {name: /Iniciar processo/i})).not.toBeVisible();
     });
 
     test('deve exibir informações corretas no modal de confirmação', async ({page}) => {
         // Abrir processo
-        await abrirProcessoPorNome(page, 'Processo teste revisão CDU-05');
-        
+        await abrirProcessoPorNome(page, NOME_PROCESSO_REVISAO);
+
         const descricao = await page.locator(SELETORES.CAMPO_DESCRICAO).inputValue();
         expect(descricao).toBeTruthy();
 

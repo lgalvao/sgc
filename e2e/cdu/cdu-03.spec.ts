@@ -1,7 +1,6 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {expect} from '@playwright/test';
 import {
-    limparProcessosEmAndamento,
     loginComoAdmin,
     navegarParaCriacaoProcesso,
     selecionarUnidadesPorSigla,
@@ -65,14 +64,7 @@ import {
  */
 test.describe('CDU-03: Manter processo', () => {
     test.beforeEach(async ({page}) => {
-        // Limpar processos EM_ANDAMENTO antes de cada teste
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
-    });
-
-    test.afterEach(async ({page}) => {
-        // Limpar processos EM_ANDAMENTO após cada teste para evitar bloquear próximos testes
-        await limparProcessosEmAndamento(page);
     });
 
     // ===== CRIAÇÃO DE PROCESSO =====

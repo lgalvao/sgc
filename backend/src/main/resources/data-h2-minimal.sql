@@ -1,3 +1,18 @@
+-- =================================================================================================
+-- DADOS DE REFERÊNCIA MÍNIMOS PARA TESTES E2E
+-- Contém apenas dados essenciais e estáveis: Unidades, Usuários, Perfis e Mapas Vigentes.
+-- NÃO contém dados transacionais como Processos, Subprocessos ou Alertas.
+-- =================================================================================================
+
+INSERT INTO SGC.MAPA (codigo) VALUES (1001);
+INSERT INTO SGC.MAPA (codigo) VALUES (1002);
+INSERT INTO SGC.MAPA (codigo) VALUES (1003);
+INSERT INTO SGC.MAPA (codigo) VALUES (1004);
+INSERT INTO SGC.MAPA (codigo) VALUES (201);
+
+-- -------------------------------------------------------------------------------------------------
+-- UNIDADES
+-- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
 VALUES (1, 'Tribunal Regional Eleitoral', 'TRE', 'INTEROPERACIONAL', 'ATIVA', NULL);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
@@ -26,12 +41,12 @@ VALUES (4, 'Coordenadoria de Educação Especial', 'COEDE', 'INTERMEDIARIA', 'AT
 
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
 VALUES (5, 'Seção Magistrados e Requisitados', 'SEMARE', 'OPERACIONAL', 'ATIVA', 4);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 'ATIVA', 6);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, 1001);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, 1002);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (10, 'Seção de Sistemas Eleitorais', 'SESEL', 'OPERACIONAL', 'ATIVA', 6, 1003);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
 VALUES (11, 'Seção de Infraestrutura', 'SENIC', 'OPERACIONAL', 'ATIVA', 7);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
@@ -40,22 +55,26 @@ INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_c
 VALUES (13, 'Seção de Processos', 'SEPRO', 'OPERACIONAL', 'ATIVA', 14);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
 VALUES (15, 'Seção de Documentação', 'SEDOC', 'OPERACIONAL', 'ATIVA', 2);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 'ATIVA', 101);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (102, 'SUB-UNIT', 'SUB-UNIT', 'OPERACIONAL', 'ATIVA', 101, 1004);
 INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
 VALUES (202, 'Seção de Atenção ao Servidor', 'SAS', 'OPERACIONAL', 'ATIVA', 201);
 
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (900, 'CDU04-UNIT', 'CDU04-UNIT', 'OPERACIONAL', 'ATIVA', 2);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (901, 'CDU05-REV-UNIT', 'CDU05-REV-UNIT', 'OPERACIONAL', 'ATIVA', 2);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (902, 'CDU05-SUB-UNIT', 'CDU05-SUB-UNIT', 'OPERACIONAL', 'ATIVA', 2);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (903, 'CDU05-ALERT-UNIT', 'CDU05-ALERT-UNIT', 'OPERACIONAL', 'ATIVA', 2);
-INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo)
-VALUES (904, 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA', 2);
+-- Unidades para testes específicos, mas sem processos atrelados
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (900, 'CDU04-UNIT', 'CDU04-UNIT', 'OPERACIONAL', 'ATIVA', 2, 1004);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (901, 'CDU05-REV-UNIT', 'CDU05-REV-UNIT', 'OPERACIONAL', 'ATIVA', 2, 1004);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (902, 'CDU05-SUB-UNIT', 'CDU05-SUB-UNIT', 'OPERACIONAL', 'ATIVA', 2, 1004);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (903, 'CDU05-ALERT-UNIT', 'CDU05-ALERT-UNIT', 'OPERACIONAL', 'ATIVA', 2, 1004);
+INSERT INTO SGC.UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, mapa_vigente_codigo)
+VALUES (904, 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA', 2, 1004);
 
+-- -------------------------------------------------------------------------------------------------
+-- USUÁRIOS
+-- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (1, 'Ana Paula Souza', 'ana.souza@tre-pe.jus.br', '1234', 10);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
@@ -98,70 +117,34 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (20, 'Juliana Almeida', 'juliana.almeida@tre-pe.jus.br', '7014', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (21, 'Rafael Moreira', 'rafael.moreira@tre-pe.jus.br', '7015', 2);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (22, 'Camila Barbosa', 'camila.barbosa@tre-pe.jus.br', '7016', 10);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (23, 'Thiago Carvalho', 'thiago.carvalho@tre-pe.jus.br', '7017', 14);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (24, 'Patrícia Lima', 'patricia.lima@tre-pe.jus.br', '7018', 6);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (25, 'Lucas Mendes', 'lucas.mendes@tre-pe.jus.br', '7019', 2);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (26, 'Beatriz Santos', 'beatriz.santos@tre-pe.jus.br', '7020', 2);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (27, 'Gustavo Oliveira', 'gustavo.oliveira@tre-pe.jus.br', '7021', 10);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (28, 'Carolina Souza', 'carolina.souza@tre-pe.jus.br', '7022', 14);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (29, 'Bruno Rodrigues', 'bruno.rodrigues@tre-pe.jus.br', '7023', 6);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
-VALUES (30, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024',
-        2);
-
+VALUES (30, 'Mariana Costa', 'mariana.costa@tre-pe.jus.br', '7024', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (111111111111, 'Admin Teste', 'admin.teste@tre-pe.jus.br', '1111', 100);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (222222222222, 'Gestor Teste', 'gestor.teste@tre-pe.jus.br', '2222', 101);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (666666666666, 'Gestor COSIS', 'gestor.cosis@tre-pe.jus.br', '6666', 6);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (333333333333, 'Chefe Teste', 'chefe.teste@tre-pe.jus.br', '3333', 8);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (121212121212, 'Chefe SEJUR Teste', 'chefe.sejur@tre-pe.jus.br', '1212', 12);
-
-INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
-VALUES ('Mapeamento de competências - 2025', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 365);
-
-INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
-VALUES ('Revisão de mapa de competências STIC - 2024', 'REVISAO', 'EM_ANDAMENTO', CURRENT_DATE - 150,
-        CURRENT_DATE + 60);
-
-INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
-VALUES ('Mapeamento inicial - 2025', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE - 30, CURRENT_DATE + 300);
-
-INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
-VALUES ('Processo teste revisão CDU-05', 'REVISAO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 60);
-
-INSERT INTO SGC.PROCESSO (descricao, tipo, situacao, data_criacao, data_limite)
-VALUES ('Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 180);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (4, 100);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (5, 9);
-
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (777, 'Chefe STIC Teste', 'chefe.stic@tre-pe.jus.br', '7777', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
@@ -172,140 +155,22 @@ INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (987654321098, 'Maria Santos', 'maria.santos@tre-pe.jus.br', '8002', 2);
 INSERT INTO SGC.USUARIO (TITULO_ELEITORAL, NOME, EMAIL, RAMAL, unidade_codigo)
 VALUES (111222333444, 'Pedro Oliveira', 'pedro.oliveira@tre-pe.jus.br', '8003', 2);
-
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_finalizacao, data_limite)
-VALUES (100, 'Mapeamento Base 2024 - FINALIZADO', 'MAPEAMENTO', 'FINALIZADO', CURRENT_DATE - 180, CURRENT_DATE - 30,
-        CURRENT_DATE - 60);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 8);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 9);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 10);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (100, 102);
-
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1001);
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1002);
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1003);
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1004);
-
-INSERT INTO SGC.MAPA (codigo)
-VALUES (201);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1001, 100, 8, 1001, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1002, 100, 9, 1002, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1003, 100, 10, 1003, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1,
-                             data_fim_etapa1, data_limite_etapa2, data_fim_etapa2)
-VALUES (1004, 100, 102, 1004, 'MAPA_HOMOLOGADO', CURRENT_DATE - 150, CURRENT_DATE - 120, CURRENT_DATE - 100,
-        CURRENT_DATE - 90);
-
--- Mapas vigentes (migrados para a tabela unidade)
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1001
-WHERE codigo = 8;
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1002
-WHERE codigo = 9;
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1003
-WHERE codigo = 10;
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 102;
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 100; -- ADMIN-UNIT também tem mapa vigente para testes CDU-05
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 101; -- GESTOR-UNIT também tem mapa vigente para testes CDU-05
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 901; -- CDU05-REV-UNIT tem mapa vigente
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 902; -- CDU05-SUB-UNIT tem mapa vigente
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 903; -- CDU05-ALERT-UNIT tem mapa vigente
-UPDATE SGC.UNIDADE
-SET mapa_vigente_codigo = 1004
-WHERE codigo = 904; -- CDU05-READONLY-UNIT tem mapa vigente
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10001, 1001, 'Desenvolvimento em Java');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10002, 1001, 'Desenvolvimento em Vue.js');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10003, 1002, 'Análise de Dados');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10004, 1002, 'Machine Learning');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10005, 1003, 'Segurança da Informação');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10006, 1003, 'Gestão de Projetos');
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (10007, 1004, 'Gestão Administrativa');
-
-INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
-VALUES (30000, 1004, 'Realizar atendimento presencial');
-
-INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao)
-VALUES (40000, 30000, 'Atendimento ao público');
-
-INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
-VALUES (30000, 10007);
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (20001, 201, 'Gestão Administrativa');
-
-INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
-VALUES (30001, 201, 'Realizar atendimento presencial');
-
-INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao)
-VALUES (40001, 30001, 'Atendimento ao público');
-
-INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
-VALUES (30001, 20001);
-
 INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50001, 'João da Silva', 8);
-
 INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50002, 'Maria Oliveira', 8);
-
 INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50003, 'Pedro Santos', 9);
-
 INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50004, 'Ana Costa', 9);
-
 INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50005, 'Carlos Pereira', 10);
-
-INSERT INTO SGC.usuario (titulo_eleitoral, nome, unidade_codigo)
+INSERT INTO SGC.USUARIO (titulo_eleitoral, nome, unidade_codigo)
 VALUES (50006, 'Juliana Lima', 10);
 
+-- -------------------------------------------------------------------------------------------------
+-- PERFIS DE USUÁRIO
+-- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil)
 VALUES (1, 'SERVIDOR');
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil)
@@ -333,6 +198,9 @@ VALUES (999999999999, 'ADMIN');
 INSERT INTO SGC.USUARIO_PERFIL (usuario_titulo_eleitoral, perfil)
 VALUES (999999999999, 'GESTOR');
 
+-- -------------------------------------------------------------------------------------------------
+-- TITULARES DAS UNIDADES
+-- -------------------------------------------------------------------------------------------------
 UPDATE SGC.UNIDADE
 SET titular_titulo = 777
 WHERE codigo = 2; -- STIC
@@ -344,13 +212,13 @@ SET titular_titulo = 2
 WHERE codigo = 3; -- COAD
 UPDATE SGC.UNIDADE
 SET titular_titulo = 333333333333
-WHERE codigo = 8; -- SEDESENV (for CDU09 tests)
+WHERE codigo = 8; -- SEDESENV
 UPDATE SGC.UNIDADE
 SET titular_titulo = 333333333333
-WHERE codigo = 9; -- SEDIA (for CDU19 tests)
+WHERE codigo = 9; -- SEDIA
 UPDATE SGC.UNIDADE
 SET titular_titulo = 333333333333
-WHERE codigo = 10; -- SESEL (for CDU10 tests)
+WHERE codigo = 10; -- SESEL
 UPDATE SGC.UNIDADE
 SET titular_titulo = 12
 WHERE codigo = 11; -- SENIC
@@ -367,58 +235,33 @@ UPDATE SGC.UNIDADE
 SET titular_titulo = 333333333333
 WHERE codigo = 102; -- SUB-UNIT
 
+-- -------------------------------------------------------------------------------------------------
+-- MAPAS, COMPETÊNCIAS, ATIVIDADES (DADOS BASE PARA REVISÃO)
+-- -------------------------------------------------------------------------------------------------
+-- Mapas vigentes (removido - agora inserido diretamente nas unidades)
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10001, 1001, 'Desenvolvimento em Java');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10002, 1001, 'Desenvolvimento em Vue.js');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10003, 1002, 'Análise de Dados');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10004, 1002, 'Machine Learning');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10005, 1003, 'Segurança da Informação');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10006, 1003, 'Gestão de Projetos');
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (10007, 1004, 'Gestão Administrativa');
+
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30000, 1004, 'Realizar atendimento presencial');
+INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40000, 30000, 'Atendimento ao público');
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30000, 10007);
+
+INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao) VALUES (20001, 201, 'Gestão Administrativa');
+INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao) VALUES (30001, 201, 'Realizar atendimento presencial');
+INSERT INTO SGC.CONHECIMENTO (codigo, atividade_codigo, descricao) VALUES (40001, 30001, 'Atendimento ao público');
+INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo) VALUES (30001, 20001);
+
+-- Processo mínimo para que o painel carregue
 INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (200, 'Processo da Raiz CDU02', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
+VALUES (1, 'Processo Teste STIC', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 30);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (1, 2); -- STIC
+
 INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (201, 'Processo da Filha 1 CDU02', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (202, 'Processo da Neta 1 CDU02', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (203, 'Processo Criado CDU02', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 30);
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (205, 'Processo ADMIN-UNIT - Fora da STIC', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (200, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (201, 6);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (202, 8);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (203, 2);
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (205, 100);
-
-INSERT INTO SGC.ALERTA (descricao, processo_codigo, usuario_destino_titulo, data_hora)
-VALUES ('Alerta para Gestor', 200, 8, CURRENT_TIMESTAMP);
-INSERT INTO SGC.ALERTA (descricao, processo_codigo, unidade_destino_codigo, data_hora)
-VALUES ('Alerta para Unidade Filha 1', 201, 6, CURRENT_TIMESTAMP);
--- CDU-17 Test Data
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (1700, 'Processo CDU-17', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (1700, 8);
-
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1700);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
-VALUES (1700, 1700, 8, 1700, 'REVISAO_CADASTRO_HOMOLOGADA', CURRENT_DATE + 30);
-
-INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
-VALUES (17001, 1700, 'Competência CDU-17');
-
-INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
-VALUES (17001, 1700, 'Atividade CDU-17');
-
-INSERT INTO SGC.COMPETENCIA_ATIVIDADE (atividade_codigo, competencia_codigo)
-VALUES (17001, 17001);
-
--- CDU-19 Test Data
-INSERT INTO SGC.PROCESSO (codigo, descricao, tipo, situacao, data_criacao, data_limite)
-VALUES (1900, 'Processo CDU-19', 'MAPEAMENTO', 'EM_ANDAMENTO', CURRENT_DATE, CURRENT_DATE + 30);
-
-INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo)
-VALUES (1900, 9);
-
-INSERT INTO SGC.MAPA (codigo)
-VALUES (1900);
-
-INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, mapa_codigo, situacao_id, data_limite_etapa1)
-VALUES (1900, 1900, 9, 1900, 'MAPA_DISPONIBILIZADO', CURRENT_DATE + 30);
+VALUES (2, 'Processo Teste SESEL', 'MAPEAMENTO', 'CRIADO', CURRENT_DATE, CURRENT_DATE + 30);
+INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo) VALUES (2, 10); -- SESEL

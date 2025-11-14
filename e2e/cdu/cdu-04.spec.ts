@@ -1,7 +1,7 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {expect} from '@playwright/test';
 
-import {loginComoAdmin, navegarParaCriacaoProcesso, selecionarUnidadesPorSigla, SELETORES, limparProcessosEmAndamento} from '~/helpers';
+import {loginComoAdmin, navegarParaCriacaoProcesso, selecionarUnidadesPorSigla, SELETORES} from '~/helpers';
 import {extrairIdDoSeletor} from '~/helpers/utils/utils';
 
 /**
@@ -12,9 +12,6 @@ import {extrairIdDoSeletor} from '~/helpers/utils/utils';
  */
 test.describe.serial('CDU-04: Iniciar processo', () => {
     test.beforeEach(async ({page}) => {
-        // Limpa APENAS processos em EM_ANDAMENTO da execução anterior
-        // Não toca em dados de teste estáticos
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
     });
 

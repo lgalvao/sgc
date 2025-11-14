@@ -4,7 +4,6 @@ import {
     clicarUnidadeNaTabelaDetalhes,
     criarProcessoCompleto,
     iniciarProcesso,
-    limparProcessosEmAndamento,
     loginComoAdmin,
     loginComoGestor,
     navegarParaProcessoNaTabela,
@@ -17,9 +16,8 @@ import {expect} from '@playwright/test';
 test.describe.serial('CDU-06: Detalhar processo', () => {
     test('deve mostrar detalhes do processo para ADMIN', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - ADMIN';
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
-        await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1, 2]);
+        await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [3, 4]);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await navegarParaProcessoNaTabela(page, nomeProcesso);
         // Wait for the form to load
@@ -33,9 +31,8 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
 
     test('deve mostrar detalhes do processo para GESTOR participante', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - GESTOR';
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
-        await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [1, 2]);
+        await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [3, 4]);
         await aguardarProcessoNoPainel(page, nomeProcesso);
         await navegarParaProcessoNaTabela(page, nomeProcesso);
         // Wait for the form to load
@@ -50,7 +47,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
 
     test('deve exibir o botão "Iniciar Processo" quando o processo está em estado CRIADO', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - CRIADO';
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [3, 4]);
         await aguardarProcessoNoPainel(page, nomeProcesso);
@@ -62,7 +58,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
 
     test('deve exibir o botão "Finalizar Processo" quando o processo está EM ANDAMENTO', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - EM ANDAMENTO';
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [5, 6]);
         await aguardarProcessoNoPainel(page, nomeProcesso);
@@ -79,7 +74,6 @@ test.describe.serial('CDU-06: Detalhar processo', () => {
 
     test('deve permitir clicar em unidade', async ({page}) => {
         const nomeProcesso = 'Processo de Detalhes Teste - UNIDADE';
-        await limparProcessosEmAndamento(page);
         await loginComoAdmin(page);
         await criarProcessoCompleto(page, nomeProcesso, 'MAPEAMENTO', '2025-12-31', [7, 8]);
         await aguardarProcessoNoPainel(page, nomeProcesso);

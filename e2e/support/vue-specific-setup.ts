@@ -1,5 +1,6 @@
 import {ErrorReporter} from './error-reporter';
-import {Page, test} from '@playwright/test';
+import {Page} from '@playwright/test';
+import {test} from './fixtures'; // Use nossa fixture com cleanDatabase
 
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import {join} from 'path';

@@ -4,6 +4,15 @@ import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
 import {extrairIdDoSeletor} from '../utils/utils';
 
+// Reduz ruído de logs: suprime linhas [DEBUG] salvo se E2E_DEBUG estiver definido.
+const ORIGINAL_LOG = console.log;
+if (!process.env.E2E_DEBUG) {
+    console.log = (...args: any[]) => {
+        if (args.length && typeof args[0] === 'string' && args[0].includes('[DEBUG]')) return;
+        ORIGINAL_LOG(...args);
+    };
+}
+
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
  * @param page A instância da página do Playwright.
@@ -204,7 +213,8 @@ export async function criarProcessoBasico(
     descricao: string,
     tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO',
     siglas: string[],
-    dataLimite: string = '2025-12-31'
+    dataLimite: string = '2025-12-31',
+    situacao: 'CRIADO' | 'EM_ANDAMENTO' = 'CRIADO'
 ): Promise<void> {
     console.log(`[DEBUG] criarProcessoBasico: Iniciando criação de processo "${descricao}"`);
 
@@ -232,6 +242,15 @@ export async function criarProcessoBasico(
     // Aguardar redirecionamento ao painel
     await page.waitForURL(/\/painel/, );
     console.log(`[DEBUG] criarProcessoBasico: Redirecionado ao painel`);
+
+    if (situacao === 'EM_ANDAMENTO') {
+        console.log(`[DEBUG] criarProcessoBasico: Iniciando processo "${descricao}"`);
+        await abrirProcessoPorNome(page, descricao);
+        await iniciarProcessoMapeamento(page);
+        await confirmarIniciacaoProcesso(page);
+        await page.waitForURL(/\/painel/, );
+        console.log(`[DEBUG] criarProcessoBasico: Processo "${descricao}" iniciado e redirecionado ao painel`);
+    }
 }
 
 /**
