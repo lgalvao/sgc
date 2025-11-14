@@ -162,8 +162,9 @@ const mockUnidades: Unidade[] = [
 ];
 
 vi.mock('@/services/unidadesService', () => ({
-    buscarTodasUnidades: vi.fn(() => Promise.resolve({ data: mockUnidades })),
-    buscarUnidadePorSigla: vi.fn()
+    buscarTodasUnidades: vi.fn(() => Promise.resolve(mockUnidades)),
+    buscarUnidadePorSigla: vi.fn(),
+    buscarArvoreComElegibilidade: vi.fn(() => Promise.resolve(mockUnidades))
 }));
 
 describe('useUnidadesStore', () => {
@@ -184,8 +185,8 @@ describe('useUnidadesStore', () => {
     describe('actions', () => {
         it('should fetch and set unidades', async () => {
             unidadesStore.unidades = [];
-            await unidadesStore.fetchUnidades();
-            expect(unidadesService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
+            await unidadesStore.fetchUnidadesParaProcesso('MAPEAMENTO');
+            expect(unidadesService.buscarArvoreComElegibilidade).toHaveBeenCalledTimes(1);
             expect(unidadesStore.unidades.length).toBeGreaterThan(0);
         });
         it('pesquisarUnidadePorSigla should find SEDOC unit by sigla', () => {

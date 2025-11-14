@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sgc.processo.model.TipoProcesso;
 import sgc.sgrh.dto.ServidorDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controller para operações relacionadas a unidades organizacionais
+ * Controle para operações relacionadas a unidades organizacionais
  */
 @RestController
 @RequestMapping("/api/unidades")
@@ -48,6 +50,21 @@ public class UnidadeController {
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
         List<UnidadeDto> hierarquia = unidadeService.buscarTodasUnidades();
         return ResponseEntity.ok(hierarquia);
+    }
+
+    /**
+     * Busca a árvore de unidades indicando a elegibilidade de cada uma para participar de um processo.
+     * @param tipoProcesso O tipo de processo a ser criado.
+     * @param codProcesso O código do processo (opcional, para edição).
+     * @return A lista de unidades raiz com a árvore de filhas e a elegibilidade.
+     */
+    @GetMapping("/arvore-com-elegibilidade")
+    public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
+        @RequestParam("tipoProcesso") String tipoProcesso,
+        @RequestParam(value = "codProcesso", required = false) Long codProcesso
+    ) {
+        List<UnidadeDto> arvore = unidadeService.buscarArvoreComElegibilidade(TipoProcesso.valueOf(tipoProcesso), codProcesso);
+        return ResponseEntity.ok(arvore);
     }
     
     /**

@@ -11,6 +11,7 @@ import sgc.sgrh.model.UsuarioRepo;
 import sgc.unidade.dto.CriarAtribuicaoTemporariaRequest;
 import sgc.unidade.model.AtribuicaoTemporaria;
 import sgc.unidade.model.AtribuicaoTemporariaRepo;
+import sgc.processo.model.TipoProcesso;
 import sgc.unidade.model.Unidade;
 import sgc.unidade.model.UnidadeRepo;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,17 @@ public class UnidadeService {
     public List<UnidadeDto> buscarTodasUnidades() {
         List<Unidade> todasUnidades = unidadeRepo.findAll();
         return montarHierarquia(todasUnidades);
+    }
+
+    public List<UnidadeDto> buscarArvoreComElegibilidade(TipoProcesso tipoProcesso, Long codProcesso) {
+        List<Unidade> todasUnidades = unidadeRepo.findAll();
+        // Lógica de elegibilidade a ser implementada
+        return montarHierarquia(todasUnidades).stream()
+            .map(unidade -> {
+                unidade.setElegivel(true);
+                return unidade;
+            })
+            .collect(Collectors.toList());
     }
 
     public void criarAtribuicaoTemporaria(Long idUnidade, CriarAtribuicaoTemporariaRequest request) {
@@ -81,7 +94,8 @@ public class UnidadeService {
                 u.getNome(),
                 u.getSigla(),
                 codigoPai,
-                u.getTipo().name()
+                u.getTipo().name(),
+                new ArrayList<>()
             );
             mapaUnidades.put(u.getCodigo(), dto);
             mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
@@ -117,14 +131,8 @@ public class UnidadeService {
             subunidadesCompletas.add(montarComSubunidades(filha, mapaFilhas));
         }
         
-        return new UnidadeDto(
-            dto.getCodigo(),
-            dto.getNome(),
-            dto.getSigla(),
-            dto.getCodigoPai(),
-            dto.getTipo(),
-            subunidadesCompletas
-        );
+        dto.setSubunidades(subunidadesCompletas);
+        return dto;
     }
 
     public UnidadeDto buscarPorSigla(String sigla) {
@@ -139,7 +147,7 @@ public class UnidadeService {
             unidade.getSigla(),
             codigoPai,
             unidade.getTipo().name(),
-            List.of()
+            new ArrayList<>()
         );
     }
 }
