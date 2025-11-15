@@ -129,6 +129,7 @@ export interface ProcessoResumo {
     unidadeNome: string;
     dataFinalizacao?: string;
     dataFinalizacaoFormatada?: string;
+    linkDestino?: string;
 }
 
 export interface Subprocesso {
@@ -163,6 +164,7 @@ export interface AlertaFormatado {
     origem: string;
     mensagem: string;
     data: string;
+    linkDestino?: string;
 }
 
 export interface Movimentacao {
@@ -170,7 +172,7 @@ export interface Movimentacao {
     subprocesso: Subprocesso;
     dataHora: string;
     unidadeOrigem: Unidade;
-    unidadeDestino: Unideade;
+    unidadeDestino: Unidade;
     descricao: string;
     usuario: Usuario;
 }

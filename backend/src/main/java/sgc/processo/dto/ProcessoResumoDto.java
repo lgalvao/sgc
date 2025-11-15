@@ -18,4 +18,5 @@ public class ProcessoResumoDto {
     private LocalDateTime dataCriacao;
     private Long unidadeCodigo;
     private String unidadeNome;
+    private String linkDestino;
 }

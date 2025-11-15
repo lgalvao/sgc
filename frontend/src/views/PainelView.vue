@@ -54,8 +54,7 @@ import {useAlertasStore} from '@/stores/alertas'
 import {useUsuariosStore} from '@/stores/usuarios'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useRouter} from 'vue-router'
-import {usePerfil} from '@/composables/usePerfil'
-import {type AlertaFormatado, Perfil, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
+import {type AlertaFormatado, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import TabelaAlertas from '@/components/TabelaAlertas.vue';
 import {formatDateTimeBR} from '@/utils';
@@ -65,7 +64,6 @@ const processosStore = useProcessosStore()
 const alertasStore = useAlertasStore()
 const usuariosStore = useUsuariosStore()
 const unidadesStore = useUnidadesStore()
-const {unidadeSelecionada: unidadeSelecionadaSigla} = usePerfil()
 
 const { processosPainel } = storeToRefs(processosStore)
 const { alertas } = storeToRefs(alertasStore)
@@ -90,19 +88,7 @@ onMounted(async () => {
   }
 });
 
-const processosOrdenados = computed(() => {
-  return [...processosPainel.value].sort((a, b) => {
-    let valA: any = a[criterio.value]
-    let valB: any = b[criterio.value]
-
-    const valAString = String(valA);
-    const valBString = String(valB);
-
-    if (valAString < valBString) return asc.value ? -1 : 1;
-    if (valAString > valBString) return asc.value ? 1 : -1;
-    return 0
-  });
-})
+const processosOrdenados = computed(() => processosPainel.value);
 
 function ordenarPor(campo: keyof ProcessoResumo) {
   if (criterio.value === campo) {
@@ -111,26 +97,19 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo
     asc.value = true
   }
+  processosStore.fetchProcessosPainel(
+    perfil.perfilSelecionado!,
+    Number(perfil.unidadeSelecionada),
+    0,
+    10,
+    criterio.value,
+    asc.value ? 'asc' : 'desc'
+  );
 }
 
 function abrirDetalhesProcesso(processo: ProcessoResumo) {
-  const perfilUsuario = perfil.perfilSelecionado;
-  
-  // CDU-05: Para ADMIN, processos "Criado" vão para tela de cadastro
-  if (perfilUsuario === Perfil.ADMIN && processo.situacao === 'CRIADO') { 
-    router.push({name: 'CadProcesso', query: {codProcesso: String(processo.codigo)}})
-    return;
-  }
-  
-  if (perfilUsuario === Perfil.ADMIN || perfilUsuario === Perfil.GESTOR) {
-    router.push({name: 'Processo', params: {codProcesso: String(processo.codigo)}})
-  } else { // CHEFE ou SERVIDOR
-    const siglaUnidade = unidadeSelecionadaSigla.value;
-    if (siglaUnidade) {
-      router.push({name: 'Subprocesso', params: {codProcesso: String(processo.codigo), siglaUnidade: String(siglaUnidade)}})
-    } else {
-      console.error('Unidade do usuário não encontrada para o perfil CHEFE/SERVIDOR.');
-    }
+  if (processo.linkDestino) {
+    router.push(processo.linkDestino);
   }
 }
 
@@ -157,39 +136,23 @@ const alertasFormatados = computed((): AlertaFormatado[] => {
 const alertaCriterio = ref<'data' | 'processo'>('data');
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 
-const alertasOrdenados = computed(() => {
-  const lista = [...alertasFormatados.value];
-  return lista.sort((a, b) => {
-    if (alertaCriterio.value === 'data') {
-      const da = new Date(a.dataHora).getTime();
-      const db = new Date(b.dataHora).getTime();
-      return alertaAsc.value ? da - db : db - da;
-    } else {
-      const pa = (a.processo || '').toString().toLowerCase();
-      const pb = (b.processo || '').toString().toLowerCase();
-      if (pa < pb) return alertaAsc.value ? -1 : 1;
-      if (pa > pb) return alertaAsc.value ? 1 : -1;
-      return 0;
-    }
-  });
-});
+const alertasOrdenados = computed(() => alertasFormatados.value);
 
 function ordenarAlertasPor(campo: 'data' | 'processo') {
-    if (campo === 'data') {
-        if (alertaCriterio.value === 'data') {
-            alertaAsc.value = !alertaAsc.value;
-        } else {
-            alertaCriterio.value = 'data';
-            alertaAsc.value = false;
-        }
-    } else {
-        if (alertaCriterio.value === 'processo') {
-            alertaAsc.value = !alertaAsc.value;
-        } else {
-            alertaCriterio.value = 'processo';
-            alertaAsc.value = true;
-        }
-    }
+  if (alertaCriterio.value === campo) {
+    alertaAsc.value = !alertaAsc.value;
+  } else {
+    alertaCriterio.value = campo;
+    alertaAsc.value = campo === 'data' ? false : true;
+  }
+  alertasStore.fetchAlertas(
+    perfil.servidorId?.toString() || '',
+    Number(perfil.unidadeSelecionada),
+    0,
+    10,
+    alertaCriterio.value,
+    alertaAsc.value ? 'asc' : 'desc'
+  );
 }
 
 function marcarComoLido(idAlerta: number) {
