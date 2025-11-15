@@ -13,8 +13,7 @@ describe('SubprocessoHeader.vue', () => {
     titularNome: 'João Silva',
     titularRamal: '1234',
     titularEmail: 'joao@teste.com',
-    perfilUsuario: Perfil.ADMIN,
-    isSubprocessoEmAndamento: true
+    podeAlterarDataLimite: false, // Default to false
   };
 
   const mountComponent = (props = {}) => {
@@ -92,10 +91,9 @@ describe('SubprocessoHeader.vue', () => {
   });
 
   describe('alterar data limite button', () => {
-    it('should show button for ADMIN user when subprocesso is em andamento', () => {
+    it('should show button when podeAlterarDataLimite is true', () => {
       const wrapper = mountComponent({
-        perfilUsuario: Perfil.ADMIN,
-        isSubprocessoEmAndamento: true
+        podeAlterarDataLimite: true,
       });
 
       const button = wrapper.find('button');
@@ -104,30 +102,9 @@ describe('SubprocessoHeader.vue', () => {
       expect(button.classes()).toContain('btn-outline-primary');
     });
 
-    it('should not show button for non-ADMIN user', () => {
+    it('should not show button when podeAlterarDataLimite is false', () => {
       const wrapper = mountComponent({
-        perfilUsuario: Perfil.GESTOR,
-        isSubprocessoEmAndamento: true
-      });
-
-      const button = wrapper.find('button');
-      expect(button.exists()).toBe(false);
-    });
-
-    it('should not show button when subprocesso is not em andamento', () => {
-      const wrapper = mountComponent({
-        perfilUsuario: Perfil.ADMIN,
-        isSubprocessoEmAndamento: false
-      });
-
-      const button = wrapper.find('button');
-      expect(button.exists()).toBe(false);
-    });
-
-    it('should not show button when perfilUsuario is null', () => {
-      const wrapper = mountComponent({
-        perfilUsuario: null,
-        isSubprocessoEmAndamento: true
+        podeAlterarDataLimite: false,
       });
 
       const button = wrapper.find('button');
@@ -136,12 +113,12 @@ describe('SubprocessoHeader.vue', () => {
 
     it('should emit alterarDataLimite when button is clicked', async () => {
       const wrapper = mountComponent({
-        perfilUsuario: Perfil.ADMIN,
-        isSubprocessoEmAndamento: true
+        podeAlterarDataLimite: true,
       });
 
       const button = wrapper.find('button');
-      expect(button.exists()).toBe(true);
+      await button.trigger('click');
+      expect(wrapper.emitted()).toHaveProperty('alterarDataLimite');
     });
   });
 
