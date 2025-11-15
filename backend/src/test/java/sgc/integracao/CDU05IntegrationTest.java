@@ -35,7 +35,6 @@ import sgc.unidade.model.UnidadeRepo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,7 +128,7 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Iniciar o processo de revisão
-        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
@@ -182,7 +181,7 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Tentar iniciar o processo de revisão (deve falhar)
-        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
@@ -191,7 +190,8 @@ public class CDU05IntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, Collections.emptyList());
+        // Any DTO is fine, the service should fail before using it
+        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L).with(csrf()) // código que não existe
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
@@ -218,7 +218,7 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // Inicia o processo a primeira vez
-        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))

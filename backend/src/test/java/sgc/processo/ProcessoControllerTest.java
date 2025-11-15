@@ -242,10 +242,10 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
-        var dto = ProcessoDto.builder().codigo(1L).build();
+        var processoDto = ProcessoDto.builder().codigo(1L).build();
 
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
         doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processoDto));
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,10 +258,10 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        var dto = ProcessoDto.builder().codigo(1L).build();
+        var processoDto = ProcessoDto.builder().codigo(1L).build();
 
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
         doNothing().when(processoService).iniciarProcessoRevisao(eq(1L), anyList());
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processoDto));
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -273,7 +273,8 @@ public class ProcessoControllerTest {
 
     @Test
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
-        var req = new IniciarProcessoReq(null, List.of(1L)); // Tipo inválido
+        // Here, we pass an empty DTO, which should be caught by bean validation.
+        var req = new IniciarProcessoReq(null, null);
 
         mockMvc.perform(post("/api/processos/999/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
