@@ -43,9 +43,9 @@
         <strong>Unidade atual:</strong> {{ unidadeAtual }}
       </p>
 
-      <!-- Botão para alterar data limite (apenas para ADMIN) -->
+      <!-- Botão para alterar data limite -->
       <div
-        v-if="mostrarBotaoAlterarData && isSubprocessoEmAndamento"
+        v-if="podeAlterarDataLimite"
         class="mt-3"
       >
         <button
@@ -61,9 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
-import {Perfil} from '@/types/tipos';
-import {badgeClass} from '@/utils'; // Importar a função badgeClass
+import { badgeClass } from '@/utils';
 
 interface Props {
   processoDescricao: string;
@@ -77,17 +75,14 @@ interface Props {
   responsavelRamal?: string;
   responsavelEmail?: string;
   unidadeAtual?: string;
-  perfilUsuario: Perfil | null;
-  isSubprocessoEmAndamento: boolean;
+  podeAlterarDataLimite: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const emit = defineEmits({
-  alterarDataLimite: null
+  alterarDataLimite: null,
 });
-
-const mostrarBotaoAlterarData = computed(() => props.perfilUsuario === Perfil.ADMIN);
 
 const handleAlterarDataLimite = () => {
   emit('alterarDataLimite');

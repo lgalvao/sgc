@@ -2,7 +2,7 @@
  * Utilitários centralizados do projeto SGC (Português BR)
  */
 
-import {CLASSES_BADGE_SITUACAO} from '@/constants/situacoes';
+import {CLASSES_BADGE_SITUACAO, LABELS_SITUACAO} from '@/constants/situacoes';
 import {TipoNotificacao} from '@/stores/notificacoes';
 
 // ===== GERAÇÃO DE IDs =====
@@ -14,6 +14,12 @@ export function generateUniqueId(): number {
 // ===== CLASSES DE BADGE =====
 export function badgeClass(situacao: string): string {
   return CLASSES_BADGE_SITUACAO[situacao as keyof typeof CLASSES_BADGE_SITUACAO] || 'bg-secondary';
+}
+
+// ===== LABELS DE SITUAÇÃO =====
+export function situacaoLabel(situacao?: string | null): string {
+  if (!situacao) return 'Não disponibilizado';
+  return LABELS_SITUACAO[situacao as keyof typeof LABELS_SITUACAO] || situacao;
 }
 
 // ===== ÍCONES DE NOTIFICAÇÃO =====

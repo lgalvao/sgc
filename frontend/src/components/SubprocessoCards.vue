@@ -11,6 +11,7 @@
           <div class="card-body">
             <h5 class="card-title">Atividades e conhecimentos</h5>
             <p class="card-text text-muted">Cadastro de atividades e conhecimentos da unidade</p>
+            <span :class="badgeClass(situacao)" class="badge">{{ situacaoLabel(situacao) }}</span>
           </div>
         </div>
         <div
@@ -22,6 +23,7 @@
           <div class="card-body">
             <h5 class="card-title">Atividades e conhecimentos</h5>
             <p class="card-text text-muted">Visualização das atividades e conhecimentos da unidade</p>
+            <span :class="badgeClass(situacao)" class="badge">{{ situacaoLabel(situacao) }}</span>
           </div>
         </div>
       </section>
@@ -37,6 +39,7 @@
           <div class="card-body">
             <h5 class="card-title">Mapa de Competências</h5>
             <p class="card-text text-muted">Mapa de competências técnicas da unidade</p>
+            <span :class="badgeClass(mapa?.situacao)" class="badge">{{ situacaoLabel(mapa?.situacao) }}</span>
           </div>
         </div>
       </section>
@@ -47,11 +50,13 @@
         <div
             v-if="permissoes.podeVisualizarDiagnostico"
             class="card h-100 card-actionable"
+            data-testid="diagnostico-card"
             @click="navegarPara('DiagnosticoEquipe')"
         >
           <div class="card-body">
             <h5 class="card-title">Diagnóstico da Equipe</h5>
             <p class="card-text text-muted">Diagnóstico das competências pelos servidores da unidade</p>
+            <span :class="badgeClass(situacao)" class="badge">{{ situacaoLabel(situacao) }}</span>
           </div>
         </div>
       </section>
@@ -59,11 +64,13 @@
       <section class="col-md-4 mb-3">
         <div
             class="card h-100 card-actionable"
+            data-testid="ocupacoes-card"
             @click="navegarPara('OcupacoesCriticas')"
         >
           <div class="card-body">
             <h5 class="card-title">Ocupações Críticas</h5>
             <p class="card-text text-muted">Identificação das ocupações críticas da unidade</p>
+            <span :class="badgeClass(situacao)" class="badge">{{ situacaoLabel(situacao) }}</span>
           </div>
         </div>
       </section>
@@ -74,6 +81,7 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { Mapa, MapaCompleto, SubprocessoPermissoes, TipoProcesso } from '@/types/tipos';
+import { badgeClass, situacaoLabel } from '@/utils';
 
 const props = defineProps<{
   tipoProcesso: TipoProcesso;

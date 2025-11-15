@@ -75,7 +75,7 @@ The core of this refactoring is to establish a clear separation of concerns, wit
 
 ---
 
-### 2.2. Subprocess Visualization (`SubprocessoView.vue`)
+### 2.2. Subprocess Visualization (`SubprocessoView.vue`) - Concluído
 
 *   **Objective**: Transform the view into a pure display component that renders state and options provided by the backend, removing all complex client-side state calculations and authorization logic.
 

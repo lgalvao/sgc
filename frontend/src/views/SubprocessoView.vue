@@ -13,8 +13,7 @@
         :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
         :responsavel-email="subprocesso.responsavel?.email || ''"
         :unidade-atual="subprocesso.unidade.sigla"
-        :perfil-usuario="perfilStore.perfilSelecionado"
-        :is-subprocesso-em-andamento="subprocesso.isEmAndamento"
+        :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
         @alterar-data-limite="abrirModalAlterarDataLimite"
     />
     <div v-else>
@@ -27,9 +26,6 @@
         :mapa="mapa"
         :situacao="subprocesso.situacao"
         :permissoes="subprocesso.permissoes"
-        @navegar-para-mapa="navegarParaMapa"
-        @ir-para-diagnostico-equipe="irParaDiagnosticoEquipe"
-        @ir-para-ocupacoes-criticas="irParaOcupacoesCriticas"
     />
 
     <TabelaMovimentacoes :movimentacoes="movimentacoes" />
@@ -38,7 +34,6 @@
   <SubprocessoModal
       :mostrar-modal="mostrarModalAlterarDataLimite"
       :data-limite-atual="dataLimite"
-      :etapa-atual="etapaAtual"
       :situacao-etapa-atual="subprocesso?.situacao || 'Não informado'"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
@@ -47,9 +42,8 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useProcessosStore } from '@/stores/processos'
-import { usePerfilStore } from '@/stores/perfil'
 import { useMapasStore } from '@/stores/mapas'
 import { Movimentacao, SubprocessoDetalhe, TipoProcesso } from "@/types/tipos";
 import { useNotificacoesStore } from '@/stores/notificacoes';
@@ -61,8 +55,8 @@ import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const route = useRoute()
+const router = useRouter()
 const processosStore = useProcessosStore()
-const perfilStore = usePerfilStore()
 const notificacoesStore = useNotificacoesStore()
 const mapaStore = useMapasStore()
 
@@ -75,24 +69,12 @@ const processoAtual = computed(() => processosStore.processoDetalhe?.processo);
 const mapa = computed(() => mapaStore.mapaCompleto);
 const movimentacoes = computed<Movimentacao[]>(() => subprocesso.value?.movimentacoes || []);
 const dataLimite = computed(() => subprocesso.value?.prazoEtapaAtual ? new Date(subprocesso.value.prazoEtapaAtual) : new Date());
-const etapaAtual = computed(() => subprocesso.value?.etapaAtual);
 
 onMounted(async () => {
   await processosStore.fetchProcessoDetalhe(codSubprocesso.value);
   await mapaStore.fetchMapaCompleto(codSubprocesso.value);
 });
 
-function navegarParaMapa() {
-  // A lógica de navegação será simplificada ou movida para o SubprocessoCards
-}
-
-function irParaDiagnosticoEquipe() {
-  // A lógica de navegação será simplificada ou movida para o SubprocessoCards
-}
-
-function irParaOcupacoesCriticas() {
-  // A lógica de navegação será simplificada ou movida para o SubprocessoCards
-}
 
 function abrirModalAlterarDataLimite() {
   if (subprocesso.value?.permissoes.podeAlterarDataLimite) {
