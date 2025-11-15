@@ -13,7 +13,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.RestExceptionHandler;
-import sgc.processo.dto.*;
+import sgc.processo.dto.AtualizarProcessoReq;
+import sgc.processo.dto.CriarProcessoReq;
+import sgc.processo.dto.IniciarProcessoReq;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.ProcessoDto;
 import sgc.processo.erros.ErroProcesso;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
@@ -242,10 +246,9 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoMapeamento_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.MAPEAMENTO, List.of(1L));
-        var processoDto = ProcessoDto.builder().codigo(1L).build();
+        var dto = ProcessoDto.builder().codigo(1L).build();
 
-        doNothing().when(processoService).iniciarProcessoMapeamento(eq(1L), anyList());
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processoDto));
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(post("/api/processos/1/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,10 +261,9 @@ public class ProcessoControllerTest {
     @Test
     void iniciarProcessoRevisao_Valido_RetornaOk() throws Exception {
         var req = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        var processoDto = ProcessoDto.builder().codigo(1L).build();
+        var dto = ProcessoDto.builder().codigo(1L).build();
 
-        doNothing().when(processoService).iniciarProcessoRevisao(eq(1L), anyList());
-        when(processoService.obterPorId(1L)).thenReturn(Optional.of(processoDto));
+        when(processoService.obterPorId(1L)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(post(API_PROCESSOS_1 + "/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -273,8 +275,8 @@ public class ProcessoControllerTest {
 
     @Test
     void iniciarProcesso_Invalido_RetornaBadRequest() throws Exception {
-        // Here, we pass an empty DTO, which should be caught by bean validation.
-        var req = new IniciarProcessoReq(null, null);
+        var req = new IniciarProcessoReq(null, List.of(1L));
+        doThrow(new IllegalArgumentException()).when(processoService).iniciarProcessoMapeamento(eq(999L), anyList());
 
         mockMvc.perform(post("/api/processos/999/iniciar")
                         .contentType(MediaType.APPLICATION_JSON)

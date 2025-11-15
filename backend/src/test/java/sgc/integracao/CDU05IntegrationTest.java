@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-05: Iniciar processo de revisão")
 public class CDU05IntegrationTest {
-    private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
+    private static final String API_PROCESSOS_ID_INICIAR_TIPO_REVISAO = "/api/processos/{codigo}/iniciar";
 
     @Autowired
     private MockMvc mockMvc;
@@ -128,8 +128,8 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Iniciar o processo de revisão
-        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isOk());
@@ -181,8 +181,8 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // 2. Tentar iniciar o processo de revisão (deve falhar)
-        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isConflict()); // Espera-se um erro de negócio
@@ -190,11 +190,10 @@ public class CDU05IntegrationTest {
 
     @Test
     void testIniciarProcessoRevisao_processoNaoEncontrado_falha() throws Exception {
-        // Any DTO is fine, the service should fail before using it
-        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, List.of(1L));
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, 999L).with(csrf()) // código que não existe
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, new ArrayList<>());
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, 999L).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
+                        .content(objectMapper.writeValueAsString(iniciarRequestDTO))) // código que não existe
                 .andExpect(status().isNotFound());
     }
 
@@ -218,14 +217,14 @@ public class CDU05IntegrationTest {
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         // Inicia o processo a primeira vez
-        var iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
+        IniciarProcessoReq iniciarRequestDTO = new IniciarProcessoReq(TipoProcesso.REVISAO, unidades);
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isOk());
 
         // 2. Tentar iniciar o processo novamente
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId).with(csrf())
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR_TIPO_REVISAO, processoId).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarRequestDTO)))
                 .andExpect(status().isUnprocessableEntity()); // Espera-se um erro de negócio
