@@ -57,7 +57,7 @@ public class E2eTestController {
     @PostMapping("/processos/unidade/{codigoUnidade}/limpar")
     @Transactional
     public ResponseEntity<Void> limparProcessosPorUnidade(@PathVariable Long codigoUnidade) {
-        var processos = processoRepo.findDistinctByParticipantes_CodigoIn(List.of(codigoUnidade));
+        var processos = processoRepo.findDistinctByParticipantes_CodigoIn(List.of(codigoUnidade), org.springframework.data.domain.Pageable.unpaged());
         var codigos = processos.stream()
                 .map(Processo::getCodigo)
                 .distinct()
@@ -100,7 +100,7 @@ public class E2eTestController {
                 .toList();
 
         // Depois, limpa todos os processos das unidades específicas
-        var processos = processoRepo.findDistinctByParticipantes_CodigoIn(codigosUnidades);
+        var processos = processoRepo.findDistinctByParticipantes_CodigoIn(codigosUnidades, org.springframework.data.domain.Pageable.unpaged());
         var processosUnidades = processos.stream()
                 .map(Processo::getCodigo)
                 .distinct()

@@ -1,42 +1,42 @@
 <template>
   <div class="container mt-4">
     <SubprocessoHeader
-        v-if="subprocesso"
-        :processo-descricao="processoAtual?.descricao || ''"
-        :unidade-sigla="subprocesso.unidade.sigla"
-        :unidade-nome="subprocesso.unidade.nome"
-        :situacao="subprocesso.situacaoLabel"
-        :titular-nome="subprocesso.titular?.nome || ''"
-        :titular-ramal="subprocesso.titular?.ramal || ''"
-        :titular-email="subprocesso.titular?.email || ''"
-        :responsavel-nome="subprocesso.responsavel?.nome || ''"
-        :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
-        :responsavel-email="subprocesso.responsavel?.email || ''"
-        :unidade-atual="subprocesso.unidade.sigla"
-        :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
-        @alterar-data-limite="abrirModalAlterarDataLimite"
+      v-if="subprocesso"
+      :processo-descricao="processoAtual?.descricao || ''"
+      :unidade-sigla="subprocesso.unidade.sigla"
+      :unidade-nome="subprocesso.unidade.nome"
+      :situacao="subprocesso.situacaoLabel"
+      :titular-nome="subprocesso.titular?.nome || ''"
+      :titular-ramal="subprocesso.titular?.ramal || ''"
+      :titular-email="subprocesso.titular?.email || ''"
+      :responsavel-nome="subprocesso.responsavel?.nome || ''"
+      :responsavel-ramal="subprocesso.responsavel?.ramal || ''"
+      :responsavel-email="subprocesso.responsavel?.email || ''"
+      :unidade-atual="subprocesso.unidade.sigla"
+      :pode-alterar-data-limite="subprocesso.permissoes.podeAlterarDataLimite"
+      @alterar-data-limite="abrirModalAlterarDataLimite"
     />
     <div v-else>
       <p>Unidade não encontrada.</p>
     </div>
 
     <SubprocessoCards
-        v-if="subprocesso"
-        :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
-        :mapa="mapa"
-        :situacao="subprocesso.situacao"
-        :permissoes="subprocesso.permissoes"
+      v-if="subprocesso"
+      :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
+      :mapa="mapa"
+      :situacao="subprocesso.situacao"
+      :permissoes="subprocesso.permissoes"
     />
 
     <TabelaMovimentacoes :movimentacoes="movimentacoes" />
   </div>
 
   <SubprocessoModal
-      :mostrar-modal="mostrarModalAlterarDataLimite"
-      :data-limite-atual="dataLimite"
-      :situacao-etapa-atual="subprocesso?.situacao || 'Não informado'"
-      @fechar-modal="fecharModalAlterarDataLimite"
-      @confirmar-alteracao="confirmarAlteracaoDataLimite"
+    :mostrar-modal="mostrarModalAlterarDataLimite"
+    :data-limite-atual="dataLimite"
+    :situacao-etapa-atual="subprocesso?.situacao || 'Não informado'"
+    @fechar-modal="fecharModalAlterarDataLimite"
+    @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
 </template>
 

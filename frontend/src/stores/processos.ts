@@ -36,8 +36,15 @@ export const useProcessosStore = defineStore('processos', {
         }
     },
     actions: {
-        async fetchProcessosPainel(perfil: string, unidade: number, page: number, size: number) {
-            const response = await painelService.listarProcessos(perfil, unidade, page, size);
+        async fetchProcessosPainel(
+            perfil: string,
+            unidade: number,
+            page: number,
+            size: number,
+            sort?: keyof ProcessoResumo,
+            order?: 'asc' | 'desc'
+        ) {
+            const response = await painelService.listarProcessos(perfil, unidade, page, size, sort, order);
             this.processosPainel = response.content;
             this.processosPainelPage = response;
         },

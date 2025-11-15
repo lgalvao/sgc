@@ -47,25 +47,19 @@ public class PainelService {
             throw new ErroParametroPainelInvalido("O parâmetro 'perfil' é obrigatório");
         }
 
-        List<Processo> processos;
+        Page<Processo> processos;
         if (perfil == Perfil.ADMIN) {
-            processos = processoRepo.findAll();
+            processos = processoRepo.findAll(pageable);
         } else {
             if (codigoUnidade == null) return Page.empty(pageable);
 
             List<Long> unidadeIds = obterIdsUnidadesSubordinadas(codigoUnidade);
             unidadeIds.add(codigoUnidade);
 
-            processos = processoRepo.findDistinctByParticipantes_CodigoIn(unidadeIds).stream()
-                    .filter(p -> p.getSituacao() != SituacaoProcesso.CRIADO)
-                    .toList();
+            processos = processoRepo.findDistinctByParticipantes_CodigoIn(unidadeIds, pageable);
         }
 
-        List<ProcessoResumoDto> dtos = processos.stream()
-                .map(this::paraProcessoResumoDto)
-                .toList();
-
-        return new PageImpl<>(dtos, pageable, dtos.size());
+        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade));
     }
 
     /**
@@ -104,10 +98,11 @@ public class PainelService {
         return ids;
     }
 
-    private ProcessoResumoDto paraProcessoResumoDto(Processo processo) {
+    private ProcessoResumoDto paraProcessoResumoDto(Processo processo, Perfil perfil, Long codigoUnidade) {
         Unidade participante = processo.getParticipantes() != null && !processo.getParticipantes().isEmpty()
                 ? processo.getParticipantes().iterator().next()
                 : null;
+        String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
@@ -117,10 +112,28 @@ public class PainelService {
                 .dataCriacao(processo.getDataCriacao())
                 .unidadeCodigo(participante != null ? participante.getCodigo() : null)
                 .unidadeNome(participante != null ? participante.getNome() : null)
+                .linkDestino(linkDestino)
                 .build();
     }
 
+    private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
+        if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
+            return "/processos/cadastro?codProcesso=" + processo.getCodigo();
+        }
+        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
+            return "/processos/" + processo.getCodigo();
+        }
+        // Para CHEFE ou SERVIDOR, precisamos da sigla da unidade
+        if (codigoUnidade != null) {
+            return unidadeRepo.findById(codigoUnidade)
+                .map(unidade -> "/subprocessos/" + processo.getCodigo() + "/unidade/" + unidade.getSigla())
+                .orElse(null);
+        }
+        return null;
+    }
+
     private AlertaDto paraAlertaDto(Alerta alerta) {
+        String linkDestino = calcularLinkDestinoAlerta(alerta);
         return AlertaDto.builder()
             .codigo(alerta.getCodigo())
             .codProcesso(alerta.getProcesso() != null ? alerta.getProcesso().getCodigo() : null)
@@ -128,6 +141,14 @@ public class PainelService {
             .dataHora(alerta.getDataHora())
             .unidadeOrigem(alerta.getUnidadeOrigem() != null ? alerta.getUnidadeOrigem().getSigla() : null)
             .unidadeDestino(alerta.getUnidadeDestino() != null ? alerta.getUnidadeDestino().getSigla() : null)
+            .linkDestino(linkDestino)
             .build();
+    }
+
+    private String calcularLinkDestinoAlerta(Alerta alerta) {
+        if (alerta.getProcesso() != null && alerta.getUnidadeDestino() != null) {
+            return "/subprocessos/" + alerta.getProcesso().getCodigo() + "/unidade/" + alerta.getUnidadeDestino().getSigla();
+        }
+        return null;
     }
 }

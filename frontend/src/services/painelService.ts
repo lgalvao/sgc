@@ -14,7 +14,14 @@ export interface Page<T> {
   empty: boolean;
 }
 
-export async function listarProcessos(perfil: string, unidade?: number, page: number = 0, size: number = 20): Promise<Page<ProcessoResumo>> {
+export async function listarProcessos(
+    perfil: string,
+    unidade?: number,
+    page: number = 0,
+    size: number = 20,
+    sort?: keyof ProcessoResumo,
+    order?: 'asc' | 'desc'
+): Promise<Page<ProcessoResumo>> {
   const params: any = {
     perfil,
     page,
@@ -22,6 +29,9 @@ export async function listarProcessos(perfil: string, unidade?: number, page: nu
   };
   if (unidade !== undefined && unidade !== null) {
     params.unidade = unidade;
+  }
+  if (sort) {
+    params.sort = `${sort},${order}`;
   }
   const response = await apiClient.get<Page<any>>('/painel/processos', {
     params,
@@ -32,7 +42,14 @@ export async function listarProcessos(perfil: string, unidade?: number, page: nu
   };
 }
 
-export async function listarAlertas(usuarioTitulo?: string, unidade?: number, page: number = 0, size: number = 20): Promise<Page<Alerta>> {
+export async function listarAlertas(
+    usuarioTitulo?: string,
+    unidade?: number,
+    page: number = 0,
+    size: number = 20,
+    sort?: 'data' | 'processo',
+    order?: 'asc' | 'desc'
+): Promise<Page<Alerta>> {
   const params: any = {
     page,
     size,
@@ -42,6 +59,9 @@ export async function listarAlertas(usuarioTitulo?: string, unidade?: number, pa
   }
   if (unidade !== undefined && unidade !== null) {
     params.unidade = unidade;
+  }
+  if (sort) {
+    params.sort = `${sort},${order}`;
   }
   const response = await apiClient.get<Page<any>>('/painel/alertas', {
     params,

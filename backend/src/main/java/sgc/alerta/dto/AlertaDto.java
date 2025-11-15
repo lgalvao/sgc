@@ -15,4 +15,5 @@ public class AlertaDto {
     String descricao;
     LocalDateTime dataHora;
     LocalDateTime dataHoraLeitura;
+    String linkDestino;
 }

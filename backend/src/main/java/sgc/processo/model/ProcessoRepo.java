@@ -1,5 +1,7 @@
 package sgc.processo.model;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +18,5 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
 
     List<Processo> findBySituacao(SituacaoProcesso situacao);
 
-    List<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos);
+    Page<Processo> findDistinctByParticipantes_CodigoIn(List<Long> codigos, Pageable pageable);
 }

@@ -17,8 +17,15 @@ export const useAlertasStore = defineStore('alertas', {
         // }
     },
     actions: {
-        async fetchAlertas(usuarioTitulo: string, unidade: number, page: number, size: number) {
-            const response = await painelService.listarAlertas(usuarioTitulo, unidade, page, size);
+        async fetchAlertas(
+            usuarioTitulo: string,
+            unidade: number,
+            page: number,
+            size: number,
+            sort?: 'data' | 'processo',
+            order?: 'asc' | 'desc'
+        ) {
+            const response = await painelService.listarAlertas(usuarioTitulo, unidade, page, size, sort, order);
             this.alertas = response.content;
             this.alertasPage = response;
         },
