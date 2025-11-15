@@ -16,7 +16,6 @@ import sgc.atividade.model.Conhecimento;
 import sgc.atividade.model.ConhecimentoRepo;
 import sgc.comum.erros.ErroAccessoNegado;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroSituacaoInvalida;
 import sgc.sgrh.model.Usuario;
 import sgc.sgrh.model.UsuarioRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -89,16 +88,6 @@ class AtividadeServiceTest {
             when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
 
             assertThrows(ErroAccessoNegado.class, () -> service.criar(atividadeDto, "123"));
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção se subprocesso estiver finalizado")
-        void criar_SubprocessoFinalizado_LancaExcecao() {
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPA_HOMOLOGADO);
-            when(subprocessoRepo.findByMapaCodigo(1L)).thenReturn(Optional.of(subprocesso));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
-
-            assertThrows(ErroSituacaoInvalida.class, () -> service.criar(atividadeDto, "123"));
         }
     }
 

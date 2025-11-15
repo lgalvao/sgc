@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sgc.atividade.dto.AtividadeDto;
 import sgc.atividade.dto.ConhecimentoDto;
+import sgc.sgrh.model.Usuario;
 import sgc.subprocesso.model.Movimentacao;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.util.HtmlUtils;
@@ -23,18 +24,25 @@ import java.util.stream.Collectors;
 @Builder
 public class SubprocessoDetalheDto {
     private final UnidadeDto unidade;
+    private final ResponsavelDto titular;
     private final ResponsavelDto responsavel;
     private final String situacao;
+    private final String situacaoLabel;
     private final String localizacaoAtual;
     private final LocalDateTime prazoEtapaAtual;
+    private final boolean isEmAndamento;
+    private final Integer etapaAtual;
     private final List<MovimentacaoDto> movimentacoes;
     private final List<ElementoProcessoDto> elementosProcesso;
+    private final SubprocessoPermissoesDto permissoes;
 
     public static SubprocessoDetalheDto of(Subprocesso sp,
+                                           Usuario responsavel,
                                            List<Movimentacao> movimentacoes,
                                            List<AtividadeDto> atividades,
                                            List<ConhecimentoDto> conhecimentos,
-                                           MovimentacaoMapper movimentacaoMapper) {
+                                           MovimentacaoMapper movimentacaoMapper,
+                                           SubprocessoPermissoesDto permissoes) {
         UnidadeDto unidadeDto = null;
         if (sp.getUnidade() != null) {
             unidadeDto = UnidadeDto.builder()
@@ -44,13 +52,22 @@ public class SubprocessoDetalheDto {
                 .build();
         }
 
-        ResponsavelDto responsavelDto = null;
+        ResponsavelDto titularDto = null;
         if (sp.getUnidade() != null && sp.getUnidade().getTitular() != null) {
             var titular = sp.getUnidade().getTitular();
-            responsavelDto = ResponsavelDto.builder()
+            titularDto = ResponsavelDto.builder()
                 .nome(HtmlUtils.escapeHtml(titular.getNome()))
                 .ramal(HtmlUtils.escapeHtml(titular.getRamal()))
                 .email(HtmlUtils.escapeHtml(titular.getEmail()))
+                .build();
+        }
+
+        ResponsavelDto responsavelDto = null;
+        if (responsavel != null) {
+            responsavelDto = ResponsavelDto.builder()
+                .nome(HtmlUtils.escapeHtml(responsavel.getNome()))
+                .ramal(HtmlUtils.escapeHtml(responsavel.getRamal()))
+                .email(HtmlUtils.escapeHtml(responsavel.getEmail()))
                 .build();
         }
 
@@ -79,12 +96,17 @@ public class SubprocessoDetalheDto {
 
         return SubprocessoDetalheDto.builder()
             .unidade(unidadeDto)
+            .titular(titularDto)
             .responsavel(responsavelDto)
             .situacao(sp.getSituacao().name())
+            .situacaoLabel(sp.getSituacao().getDescricao())
             .localizacaoAtual(localizacaoAtual)
             .prazoEtapaAtual(prazoEtapaAtual)
+            .isEmAndamento(sp.isEmAndamento())
+            .etapaAtual(sp.getEtapaAtual())
             .movimentacoes(movimentacoesDto)
             .elementosProcesso(elementos)
+            .permissoes(permissoes)
             .build();
     }
 

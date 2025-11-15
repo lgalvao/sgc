@@ -7,6 +7,8 @@ import sgc.sgrh.dto.PerfilDto;
 import sgc.sgrh.dto.ResponsavelDto;
 import sgc.sgrh.dto.UnidadeDto;
 import sgc.sgrh.dto.UsuarioDto;
+import sgc.sgrh.model.Perfil;
+import sgc.sgrh.model.Usuario;
 import sgc.unidade.model.UnidadeRepo;
 
 import java.util.*;
@@ -30,6 +32,16 @@ public class SgrhService {
                 "%s@tre-pe.jus.br".formatted(titulo),
                 "MAT%s".formatted(titulo.substring(0, Math.min(6, titulo.length()))),
                 "Analista Judiciário"));
+    }
+
+    public Usuario buscarUsuarioPorLogin(String login) {
+        log.warn("MOCK SGRH: Buscando usuário por login.");
+        return new Usuario(login, "Usuário Mock", "email", "ramal", null, Set.of(Perfil.CHEFE));
+    }
+
+    public Usuario buscarResponsavelVigente(String sigla) {
+        log.warn("MOCK SGRH: Buscando responsável vigente.");
+        return new Usuario("responsavel", "Responsável Vigente", "email", "ramal", null, Set.of(Perfil.CHEFE));
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {

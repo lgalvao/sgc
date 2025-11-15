@@ -170,7 +170,7 @@ export interface Movimentacao {
     subprocesso: Subprocesso;
     dataHora: string;
     unidadeOrigem: Unidade;
-    unidadeDestino: Unidade;
+    unidadeDestino: Unideade;
     descricao: string;
     usuario: Usuario;
 }
@@ -248,20 +248,32 @@ export interface UnidadeParticipante {
     filhos: UnidadeParticipante[];
 }
 
-export interface ProcessoDetalhe {
-    codigo: number;
-    descricao: string;
-    tipo: TipoProcesso;
-    situacao: SituacaoProcesso;
-    dataLimite: string;
-    dataCriacao: string;
-    dataFinalizacao?: string;
-    unidades: UnidadeParticipante[];
-    resumoSubprocessos: ProcessoResumo[];
-    podeFinalizar: boolean;
-    podeHomologarCadastro: boolean;
-    podeHomologarMapa: boolean;
+export interface SubprocessoPermissoes {
+    podeVerPagina: boolean;
+    podeEditarMapa: boolean;
+    podeVisualizarMapa: boolean;
+    podeDisponibilizarCadastro: boolean;
+    podeDevolverCadastro: boolean;
+    podeAceitarCadastro: boolean;
+    podeVisualizarDiagnostico: boolean;
+    podeAlterarDataLimite: boolean;
 }
+
+export interface SubprocessoDetalhe {
+    unidade: Unidade;
+    titular: Usuario;
+    responsavel: Usuario;
+    situacao: string;
+    situacaoLabel: string;
+    localizacaoAtual: string;
+    prazoEtapaAtual: string;
+    isEmAndamento: boolean;
+    etapaAtual: number;
+    movimentacoes: Movimentacao[];
+    elementosProcesso: any[];
+    permissoes: SubprocessoPermissoes;
+}
+
 
 export interface ConhecimentoVisualizacao {
     id: number;
