@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, type Mocked, vi} from 'vitest';
 import {useProcessosStore} from '../processos';
-import type {ProcessoDetalhe} from '@/types/tipos';
+import type {Processo} from '@/types/tipos';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import {initPinia} from '@/test-utils/helpers';
 
@@ -17,7 +17,7 @@ describe('useProcessosStore', () => {
     let processoService: Mocked<typeof import('@/services/processoService')>;
 
     const MOCK_ERROR = new Error('Service failed');
-    const MOCK_PROCESSO_DETALHE: ProcessoDetalhe = {
+    const MOCK_PROCESSO_DETALHE: Processo = {
         codigo: 1,
         descricao: 'Teste',
         tipo: TipoProcesso.MAPEAMENTO,
@@ -26,9 +26,6 @@ describe('useProcessosStore', () => {
         dataCriacao: '2025-01-01',
         unidades: [],
         resumoSubprocessos: [],
-        podeFinalizar: false,
-        podeHomologarCadastro: false,
-        podeHomologarMapa: false,
     };
 
     beforeEach(async () => {
@@ -51,7 +48,7 @@ describe('useProcessosStore', () => {
                 const mockPage = { content: [{ id: 1 }], totalPages: 1 };
                 painelService.listarProcessos.mockResolvedValue(mockPage as any);
                 await store.fetchProcessosPainel('perfil', 1, 0, 10);
-                expect(painelService.listarProcessos).toHaveBeenCalledWith('perfil', 1, 0, 10);
+                expect(painelService.listarProcessos).toHaveBeenCalledWith('perfil', 1, 0, 10, undefined, undefined);
                 expect(store.processosPainel).toEqual(mockPage.content);
             });
 

@@ -88,7 +88,7 @@ Cada domínio possui um store dedicado:
 - `HistoricoAnaliseModal.vue`: Modal que exibe o histórico de análises e observações de um mapa.
 - `ImpactoMapaModal.vue`: Exibe o impacto das alterações de atividades em um mapa em revisão.
 - `ImportarAtividadesModal.vue`: Permite importar atividades de processos finalizados.
-- `Navbar.vue`: Barra de navegação superior principal, com links, seletor de perfil e logout.
+- `MainNavbar.vue`: Barra de navegação superior principal, com links, seletor de perfil e logout.
 - `NotificacaoContainer.vue`: Container global para exibição de notificações (toasts).
 - `SistemaNotificacoesModal.vue`: Central que exibe o histórico de todas as notificações.
 - `SubprocessoCards.vue`: Apresenta cards de navegação dinâmicos na tela de subprocesso.

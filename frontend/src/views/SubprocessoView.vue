@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <SubprocessoHeader
       v-if="subprocesso"
-      :processo-descricao="processoAtual?.descricao || ''"
+      :processo-descricao="subprocesso.processoDescricao || ''"
       :unidade-sigla="subprocesso.unidade.sigla"
       :unidade-nome="subprocesso.unidade.nome"
       :situacao="subprocesso.situacaoLabel"
@@ -22,7 +22,7 @@
 
     <SubprocessoCards
       v-if="subprocesso"
-      :tipo-processo="processoAtual?.tipo || TipoProcesso.MAPEAMENTO"
+      :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       :mapa="mapa"
       :situacao="subprocesso.situacao"
       :permissoes="subprocesso.permissoes"
@@ -34,7 +34,7 @@
   <SubprocessoModal
     :mostrar-modal="mostrarModalAlterarDataLimite"
     :data-limite-atual="dataLimite"
-    :situacao-etapa-atual="subprocesso?.situacao || 'Não informado'"
+    :etapa-atual="subprocesso?.etapaAtual || null"
     @fechar-modal="fecharModalAlterarDataLimite"
     @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />
@@ -42,8 +42,8 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useProcessosStore } from '@/stores/processos'
+import { useRoute } from 'vue-router'
+import { useSubprocessosStore } from '@/stores/subprocessos'
 import { useMapasStore } from '@/stores/mapas'
 import { Movimentacao, SubprocessoDetalhe, TipoProcesso } from "@/types/tipos";
 import { useNotificacoesStore } from '@/stores/notificacoes';
@@ -52,11 +52,10 @@ import SubprocessoCards from '@/components/SubprocessoCards.vue';
 import SubprocessoModal from '@/components/SubprocessoModal.vue';
 import TabelaMovimentacoes from '@/components/TabelaMovimentacoes.vue';
 
-const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
+defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
 const route = useRoute()
-const router = useRouter()
-const processosStore = useProcessosStore()
+const subprocessosStore = useSubprocessosStore()
 const notificacoesStore = useNotificacoesStore()
 const mapaStore = useMapasStore()
 
@@ -64,14 +63,13 @@ const mostrarModalAlterarDataLimite = ref(false)
 
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
 
-const subprocesso = computed<SubprocessoDetalhe | null>(() => processosStore.processoDetalhe);
-const processoAtual = computed(() => processosStore.processoDetalhe?.processo);
+const subprocesso = computed<SubprocessoDetalhe | null>(() => subprocessosStore.subprocessoDetalhe);
 const mapa = computed(() => mapaStore.mapaCompleto);
 const movimentacoes = computed<Movimentacao[]>(() => subprocesso.value?.movimentacoes || []);
 const dataLimite = computed(() => subprocesso.value?.prazoEtapaAtual ? new Date(subprocesso.value.prazoEtapaAtual) : new Date());
 
 onMounted(async () => {
-  await processosStore.fetchProcessoDetalhe(codSubprocesso.value);
+  await subprocessosStore.fetchSubprocessoDetalhe(codSubprocesso.value);
   await mapaStore.fetchMapaCompleto(codSubprocesso.value);
 });
 
@@ -94,10 +92,10 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
   }
 
   try {
-    await processosStore.alterarDataLimiteSubprocesso(subprocesso.value.unidade.codigo, { novaData });
+    await subprocessosStore.alterarDataLimiteSubprocesso(subprocesso.value.unidade.codigo, { novaData });
     fecharModalAlterarDataLimite();
     notificacoesStore.sucesso('Data limite alterada', 'A data limite foi alterada com sucesso!');
-  } catch (error) {
+  } catch {
     notificacoesStore.erro('Erro ao alterar data limite', 'Não foi possível alterar a data limite.');
   }
 }

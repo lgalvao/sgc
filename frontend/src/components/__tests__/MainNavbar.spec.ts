@@ -2,7 +2,7 @@ import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, type MockInstance, vi} from 'vitest';
 import {createRouter, createWebHistory} from 'vue-router';
 import {ref} from 'vue';
-import NavBar from '../Navbar.vue';
+import NavBar from '../MainNavbar.vue';
 import {initPinia} from '@/test-utils/helpers';
 import {usePerfil} from '@/composables/usePerfil';
 import {usePerfilStore} from '@/stores/perfil';
@@ -19,7 +19,7 @@ const routes = [
     {path: '/configuracoes', component: {template: '<div></div>'}},
 ];
 
-describe('Navbar.vue', () => {
+describe('MainNavbar.vue', () => {
     let router: ReturnType<typeof createRouter>;
     let pushSpy: MockInstance;
 

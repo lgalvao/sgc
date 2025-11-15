@@ -36,7 +36,7 @@ describe('useMapasStore', () => {
 
     describe('fetchMapaCompleto', () => {
         it('should call service and update state on success', async () => {
-            const mockMapa: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: []};
+            const mockMapa: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [], situacao: 'EM_ANDAMENTO'};
             vi.mocked(mapaService.obterMapaCompleto).mockResolvedValue(mockMapa);
 
             await store.fetchMapaCompleto(codSubrocesso);
@@ -58,7 +58,7 @@ describe('useMapasStore', () => {
     describe('salvarMapa', () => {
         it('should call service and update state on success', async () => {
             const request = {competencias: []};
-            const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}]};
+            const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}], situacao: 'EM_ANDAMENTO'};
             vi.mocked(mapaService.salvarMapaCompleto).mockResolvedValue(mockResponse);
 
             await store.salvarMapa(codSubrocesso, request);

@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import type {Unidade} from '@/types/tipos';
 import {mapUnidadesArray} from '@/mappers/unidades';
-import {buscarTodasUnidades, buscarUnidadePorSigla, buscarArvoreComElegibilidade} from "@/services/unidadesService";
+import {buscarUnidadePorSigla, buscarArvoreComElegibilidade} from "@/services/unidadesService";
 
 export const useUnidadesStore = defineStore('unidades', {
     state: () => ({

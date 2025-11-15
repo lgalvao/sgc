@@ -84,7 +84,7 @@ Este componente é um diálogo modal que facilita a importação de atividades d
 
 ---
 
-## Navbar.vue
+## MainNavbar.vue
 
 Este componente implementa a barra de navegação principal da aplicação. Ele inclui links para várias seções como "Painel", "Minha unidade", "Relatórios" e "Histórico". Ele também apresenta um mecanismo dinâmico de seleção de perfil, permitindo aos usuários alternar entre diferentes perfis (por exemplo, ADMIN, GESTOR, SERVIDOR) associados à sua conta e unidade logadas. O perfil e a unidade selecionados são exibidos, e clicar neles revela um menu suspenso para alterar o perfil ativo. Um link "Configurações do sistema" é visível apenas para usuários ADMIN, e um link "Sair" está sempre presente para logout. As ações de navegação são tratadas por `navigateFromNavbar`, que define um item de armazenamento de sessão antes de rotear.
 

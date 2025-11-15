@@ -118,7 +118,7 @@ import { useRouter } from 'vue-router';
 import { Mapa, MapaCompleto, SubprocessoPermissoes, TipoProcesso } from '@/types/tipos';
 import { badgeClass, situacaoLabel } from '@/utils';
 
-const props = defineProps<{
+defineProps<{
   tipoProcesso: TipoProcesso;
   mapa: Mapa | MapaCompleto | null;
   situacao?: string;

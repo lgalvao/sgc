@@ -3,7 +3,7 @@ import {createPinia, setActivePinia} from 'pinia';
 import {useProcessosStore} from '@/stores/processos';
 import {useAtividadesStore} from '@/stores/atividades';
 import {ref} from 'vue';
-import {ProcessoDetalhe, ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
+import {SubprocessoDetalhe, ProcessoResumo, SituacaoProcesso, TipoProcesso, SituacaoSubprocesso} from '@/types/tipos';
 
 const mockProcessosPainel: ProcessoResumo[] = [{
     codigo: 1,
@@ -16,18 +16,30 @@ const mockProcessosPainel: ProcessoResumo[] = [{
     unidadeNome: 'unidade 1',
 }];
 
-const mockProcessoDetalhe: ProcessoDetalhe = {
-    codigo: 1,
-    descricao: 'processo detalhe',
-    tipo: TipoProcesso.MAPEAMENTO,
-    situacao: SituacaoProcesso.EM_ANDAMENTO,
-    dataLimite: '2025-12-31',
-    dataCriacao: '2025-01-01',
-    unidades: [],
-    resumoSubprocessos: [],
-    podeFinalizar: true,
-    podeHomologarCadastro: true,
-    podeHomologarMapa: true,
+const mockProcessoDetalhe: SubprocessoDetalhe = {
+    unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' },
+    titular: { codigo: 1, nome: 'Titular Teste', tituloEleitoral: '123', email: 't@t.com', ramal: '123', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
+    responsavel: { codigo: 1, nome: 'Responsável Teste', tituloEleitoral: '456', email: 'r@r.com', ramal: '456', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
+    situacao: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
+    situacaoLabel: 'Em Andamento',
+    localizacaoAtual: 'Na unidade',
+    processoDescricao: 'Processo Teste',
+    tipoProcesso: TipoProcesso.MAPEAMENTO,
+    prazoEtapaAtual: '2025-12-31',
+    isEmAndamento: true,
+    etapaAtual: 1,
+    movimentacoes: [],
+    elementosProcesso: [],
+    permissoes: {
+        podeVerPagina: true,
+        podeEditarMapa: true,
+        podeVisualizarMapa: true,
+        podeDisponibilizarCadastro: true,
+        podeDevolverCadastro: true,
+        podeAceitarCadastro: true,
+        podeVisualizarDiagnostico: true,
+        podeAlterarDataLimite: true,
+    },
 };
 
 // Mock das stores
