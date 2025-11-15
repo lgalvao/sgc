@@ -64,7 +64,7 @@ describe('useAlertasStore', () => {
 
             await alertasStore.fetchAlertas('123', 456, 0, 10);
 
-            expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 10);
+            expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 10, undefined, undefined);
             expect(alertasStore.alertas).toEqual(mockPage.content);
             expect(alertasStore.alertasPage).toEqual(mockPage);
         });
@@ -97,7 +97,7 @@ describe('useAlertasStore', () => {
 
                 expect(result).toBe(true);
                 expect(alertaService.marcarComoLido).toHaveBeenCalledWith(1);
-                expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 20);
+                expect(painelService.listarAlertas).toHaveBeenCalledWith('123', 456, 0, 20, undefined, undefined);
                 expect(alertasStore.alertas).toEqual(mockReloadPage.content);
             });
 

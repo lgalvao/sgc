@@ -127,17 +127,10 @@ console.log('[DEBUG ArvoreUnidades] Initial modelValue:', props.modelValue);
 console.log('[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:', unidadesSelecionadasLocal.value);
 console.log('[DEBUG ArvoreUnidades] Initial props.unidades:', props.unidades);
 
-const processandoSelecao = ref(false);
-
 // Filtrar unidades pela função customizada
 const unidadesFiltradas = computed(() => {
   return props.unidades.filter(props.filtrarPor);
 });
-
-// Verifica se unidade ou suas descendentes são elegíveis
-function temFilhasElegiveis(unidade: Unidade): boolean {
-  return true;
-}
 
 // Verifica se é folha (sem filhas)
 function isFolha(unidade: Unidade): boolean {
@@ -190,20 +183,6 @@ function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
   }
   
   return 'indeterminate';
-}
-
-// Encontra unidade no array recursivamente
-function encontrarUnidade(codigo: number, unidades: Unidade[]): Unidade | null {
-  for (const unidade of unidades) {
-    if (unidade.codigo === codigo) {
-      return unidade;
-    }
-    if (unidade.filhas) {
-      const encontrada = encontrarUnidade(codigo, unidade.filhas);
-      if (encontrada) return encontrada;
-    }
-  }
-  return null;
 }
 
 watch(() => props.modelValue, (novoValor) => {

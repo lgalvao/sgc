@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest, ProcessoDetalhe} from '@/types/tipos'
+import {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest, SubprocessoDetalhe} from '@/types/tipos'
 import {useNotificacoesStore} from './notificacoes'
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil"; // Adicionar esta linha
@@ -37,9 +37,13 @@ async function _executarAcao(
 
 export const useSubprocessosStore = defineStore('subprocessos', {
     state: () => ({
-        subprocessoDetalhe: null as ProcessoDetalhe | null,
+        subprocessoDetalhe: null as SubprocessoDetalhe | null,
     }),
     actions: {
+        async alterarDataLimiteSubprocesso(id: number, dados: { novaData: string }) {
+            const processosStore = useProcessosStore();
+            await processosStore.alterarDataLimiteSubprocesso(id, dados);
+        },
         async fetchSubprocessoDetalhe(id: number) {
             const notificacoes = useNotificacoesStore();
             const perfilStore = usePerfilStore(); // Adicionar esta linha

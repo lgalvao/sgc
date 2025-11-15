@@ -33,13 +33,6 @@
               Data limite atual: {{ dataLimiteAtualFormatada }}
             </div>
           </div>
-          <div
-            v-if="etapaAtual"
-            class="alert alert-info"
-          >
-            <i class="bi bi-info-circle me-2" />
-            Alterando data limite da etapa {{ etapaAtual }}: {{ situacaoEtapaAtual }}
-          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -74,13 +67,11 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
 import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate} from '@/utils';
-import {SITUACOES_SUBPROCESSO} from '@/constants/situacoes';
 
 interface Props {
    mostrarModal: boolean;
    dataLimiteAtual: Date | null;
    etapaAtual: number | null;
-   situacaoEtapaAtual: typeof SITUACOES_SUBPROCESSO[keyof typeof SITUACOES_SUBPROCESSO] | 'Não informado';
 }
 
 const props = defineProps<Props>();

@@ -295,7 +295,7 @@ async function salvarProcesso() {
         dataLimiteEtapa1: `${dataLimite.value}T00:00:00`,
         unidades: unidadesSelecionadas.value
       };
-      const novoProcesso = await processosStore.criarProcesso(request);
+      await processosStore.criarProcesso(request);
       notificacoesStore.sucesso('Processo criado', 'O processo foi criado!');
       await router.push('/painel');
     }

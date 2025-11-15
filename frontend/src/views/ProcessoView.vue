@@ -68,7 +68,7 @@ import ProcessoDetalhes from '@/components/ProcessoDetalhes.vue'
 import ProcessoAcoes from '@/components/ProcessoAcoes.vue'
 import ModalAcaoBloco, { type UnidadeSelecao } from '@/components/ModalAcaoBloco.vue'
 import ModalFinalizacao from '@/components/ModalFinalizacao.vue'
-import { ProcessoDetalhe, UnidadeParticipante } from '@/types/tipos'
+import { Processo, UnidadeParticipante } from '@/types/tipos'
 
 interface TreeTableItem {
   id: number | string
@@ -104,7 +104,7 @@ onMounted(async () => {
   }
 })
 
-const processo = computed<ProcessoDetalhe | undefined>(() => processoDetalhe.value || undefined)
+const processo = computed<Processo | undefined>(() => processoDetalhe.value || undefined)
 const participantesHierarquia = computed<UnidadeParticipante[]>(() => processo.value?.unidades || [])
 
 const colunasTabela = [

@@ -65,6 +65,7 @@ export function mapMapaCompletoDtoToModel(dto: any): MapaCompleto {
         })),
       })),
     })),
+    situacao: dto.situacao || '',
   };
 }
 

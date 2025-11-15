@@ -47,6 +47,7 @@ export interface Unidade {
     tipo?: string;
     idServidorTitular?: number;
     responsavel?: UnidadeResponsavel;
+    isElegivel?: boolean;
 }
 
 /**
@@ -265,9 +266,11 @@ export interface SubprocessoDetalhe {
     unidade: Unidade;
     titular: Usuario;
     responsavel: Usuario;
-    situacao: string;
+    situacao: SituacaoSubprocesso;
     situacaoLabel: string;
     localizacaoAtual: string;
+    processoDescricao: string;
+    tipoProcesso: TipoProcesso;
     prazoEtapaAtual: string;
     isEmAndamento: boolean;
     etapaAtual: number;
@@ -345,6 +348,7 @@ export interface MapaCompleto {
     subprocessoCodigo: number;
     observacoes: string;
     competencias: Competencia[];
+    situacao: string;
 }
 
 export interface MapaAjuste {

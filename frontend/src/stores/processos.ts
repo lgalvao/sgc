@@ -3,7 +3,7 @@ import {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
     Movimentacao,
-    ProcessoDetalhe,
+    Processo,
     ProcessoResumo,
     SubprocessoElegivel,
     TipoProcesso
@@ -18,7 +18,7 @@ export const useProcessosStore = defineStore('processos', {
     state: () => ({
         processosPainel: [] as ProcessoResumo[],
         processosPainelPage: {} as Page<ProcessoResumo>,
-        processoDetalhe: null as ProcessoDetalhe | null,
+        processoDetalhe: null as Processo | null,
         subprocessosElegiveis: [] as SubprocessoElegivel[],
         processosFinalizados: [] as ProcessoResumo[],
         movements: [] as Movimentacao[],

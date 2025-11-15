@@ -3,7 +3,6 @@ import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
     Processo,
-    ProcessoDetalhe,
     ProcessoResumo,
     Subprocesso,
     SubprocessoElegivel,
@@ -41,8 +40,8 @@ export async function excluirProcesso(codProcesso: number): Promise<void> {
     await apiClient.post(`/processos/${codProcesso}/excluir`);
 }
 
-export async function obterDetalhesProcesso(id: number): Promise<ProcessoDetalhe> {
-    const response = await apiClient.get<ProcessoDetalhe>(`/processos/${id}/detalhes`);
+export async function obterDetalhesProcesso(id: number): Promise<Processo> {
+    const response = await apiClient.get<Processo>(`/processos/${id}/detalhes`);
     return response.data;
 }
 
