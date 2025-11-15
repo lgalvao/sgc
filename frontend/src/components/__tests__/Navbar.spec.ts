@@ -2,7 +2,7 @@ import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, it, type MockInstance, vi} from 'vitest';
 import {createRouter, createWebHistory} from 'vue-router';
 import {ref} from 'vue';
-import NavBar from '../NavBar.vue';
+import NavBar from '../Navbar.vue';
 import {initPinia} from '@/test-utils/helpers';
 import {usePerfil} from '@/composables/usePerfil';
 import {usePerfilStore} from '@/stores/perfil';

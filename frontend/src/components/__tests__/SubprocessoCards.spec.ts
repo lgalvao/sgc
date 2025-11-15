@@ -306,8 +306,7 @@ describe('SubprocessoCards.vue', () => {
     it('should handle undefined situacao prop', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: mockMapa,
-        // situacao is undefined
+        mapa: { ...mockMapa, situacao: undefined as any }, // situacao is undefined
       });
 
       // Should show default "Disponibilizado" badge when situacao is undefined
@@ -317,8 +316,7 @@ describe('SubprocessoCards.vue', () => {
     it('should handle empty string situacao', () => {
       const wrapper = mountComponent({
         tipoProcesso: TipoProcesso.MAPEAMENTO,
-        mapa: mockMapa,
-        situacao: '', // Empty string
+        mapa: { ...mockMapa, situacao: '' }, // Empty string
       });
 
       // Should show default "Disponibilizado" badge when situacao is empty string
