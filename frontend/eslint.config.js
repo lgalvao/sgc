@@ -45,5 +45,20 @@ export default [
         rules: {
             "@typescript-eslint/no-explicit-any": "off",
         },
+    },
+    {
+        files: ["src/**/*.{ts,tsx,vue}"],
+        rules: {
+            "no-restricted-imports": [
+                "warn",
+                {
+                    "patterns": [
+                        "**/*.test.*",
+                        "**/*.spec.*",
+                        "**/__tests__/**"
+                    ]
+                }
+            ]
+        }
     }
 ];

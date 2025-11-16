@@ -62,3 +62,12 @@ Siga estas diretrizes para executar e manter testes e2e:
     -   Prefira o uso de atributos `data-testid` para identificar elementos na interface do usuário. Isso torna os testes mais resilientes a mudanças na estrutura HTML ou CSS.
 -   **Reutilização de Código:**
     -   Utilize as funções auxiliares (`helpers/acoes`, `helpers/dados`, `helpers/verificacoes`) para padronizar interações, dados e verificações, evitando duplicação e melhorando a legibilidade.
+
+### 5.3. Verificações de Qualidade de Código
+
+O projeto está configurado com um conjunto de scripts para garantir a qualidade e a integridade do código.
+
+-   **`npm run validate`**: Executa todas as verificações de qualidade de código em um único comando.
+-   **`npm run typecheck`**: Verifica a consistência de tipos do TypeScript.
+-   **`npm run check:ts-unused`**: Identifica e relata exportações de TypeScript não utilizadas.
+-   **`npm run lint`**: Executa o ESLint para identificar e corrigir problemas de estilo e erros de código.
