@@ -69,7 +69,7 @@ describe('ImportarAtividadesModal', () => {
     await nextTick();
 
     // Find and check the checkbox for the activity
-    await wrapper.find('[data-testid="checkbox-atividade-1"]').setChecked(true);
+    await wrapper.find('[data-testid="checkbox-atividade-1"]').setValue(true);
     await nextTick();
 
     // Now, the button should be enabled

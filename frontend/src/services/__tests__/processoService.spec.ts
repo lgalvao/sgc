@@ -94,7 +94,37 @@ describe('processoService', () => {
         expect(mockApi.post).toHaveBeenCalledWith('/processos/1/acoes-em-bloco', payload);
     });
 
+    it('fetchSubprocessosElegiveis should get from the correct endpoint', async () => {
+        mockApi.get.mockResolvedValue({ data: [] });
+        await service.fetchSubprocessosElegiveis(1);
+        expect(mockApi.get).toHaveBeenCalledWith('/processos/1/subprocessos-elegiveis');
+    });
 
+    it('alterarDataLimiteSubprocesso should post to the correct endpoint', async () => {
+        const payload = { novaData: '2026-01-01' };
+        mockApi.post.mockResolvedValue({});
+        await service.alterarDataLimiteSubprocesso(1, payload);
+        expect(mockApi.post).toHaveBeenCalledWith('/processos/alterar-data-limite', { id: 1, ...payload });
+    });
+
+    it('apresentarSugestoes should post to the correct endpoint', async () => {
+        const payload = { sugestoes: 'sugestoes' };
+        mockApi.post.mockResolvedValue({});
+        await service.apresentarSugestoes(1, payload);
+        expect(mockApi.post).toHaveBeenCalledWith('/processos/apresentar-sugestoes', { id: 1, ...payload });
+    });
+
+    it('validarMapa should post to the correct endpoint', async () => {
+        mockApi.post.mockResolvedValue({});
+        await service.validarMapa(1);
+        expect(mockApi.post).toHaveBeenCalledWith('/processos/validar-mapa', { id: 1 });
+    });
+
+    it('buscarSubprocessos should get from the correct endpoint', async () => {
+        mockApi.get.mockResolvedValue({ data: [] });
+        await service.buscarSubprocessos(1);
+        expect(mockApi.get).toHaveBeenCalledWith('/processos/1/subprocessos');
+    });
 
     // Error handling
     it('criarProcesso should throw error on failure', async () => {

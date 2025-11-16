@@ -128,5 +128,95 @@ describe('useProcessosStore', () => {
                 await expect(store.iniciarProcesso(1, TipoProcesso.MAPEAMENTO, [10])).rejects.toThrow(MOCK_ERROR);
             });
         });
+
+        describe('fetchProcessosFinalizados', () => {
+            it('deve atualizar o estado em caso de sucesso', async () => {
+                const mockProcessos = [{ id: 1 }];
+                processoService.fetchProcessosFinalizados.mockResolvedValue(mockProcessos as any);
+                await store.fetchProcessosFinalizados();
+                expect(processoService.fetchProcessosFinalizados).toHaveBeenCalled();
+                expect(store.processosFinalizados).toEqual(mockProcessos);
+            });
+        });
+
+        describe('fetchSubprocessosElegiveis', () => {
+            it('deve atualizar o estado em caso de sucesso', async () => {
+                const mockSubprocessos = [{ id: 1 }];
+                processoService.fetchSubprocessosElegiveis.mockResolvedValue(mockSubprocessos as any);
+                await store.fetchSubprocessosElegiveis(1);
+                expect(processoService.fetchSubprocessosElegiveis).toHaveBeenCalledWith(1);
+                expect(store.subprocessosElegiveis).toEqual(mockSubprocessos);
+            });
+        });
+
+        describe('finalizarProcesso', () => {
+            it('deve chamar o processoService e recarregar os detalhes', async () => {
+                processoService.finalizarProcesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
+                await store.finalizarProcesso(1);
+                expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
+                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('processarCadastroBloco', () => {
+            it('deve chamar o processoService e recarregar os detalhes', async () => {
+                const payload = { codProcesso: 1, unidades: ['1'], tipoAcao: 'aceitar', unidadeUsuario: '1' } as any;
+                processoService.processarAcaoEmBloco.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
+                await store.processarCadastroBloco(payload);
+                expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(payload);
+                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('alterarDataLimiteSubprocesso', () => {
+            it('deve chamar o processoService e recarregar os detalhes', async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                const payload = { novaData: '2026-01-01' };
+                processoService.alterarDataLimiteSubprocesso.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
+                await store.alterarDataLimiteSubprocesso(1, payload);
+                expect(processoService.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(1, payload);
+                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('apresentarSugestoes', () => {
+            it('deve chamar o processoService e recarregar os detalhes', async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                const payload = { sugestoes: 'sugestoes' };
+                processoService.apresentarSugestoes.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
+                await store.apresentarSugestoes(1, payload);
+                expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(1, payload);
+                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('validarMapa', () => {
+            it('deve chamar o processoService e recarregar os detalhes', async () => {
+                store.processoDetalhe = MOCK_PROCESSO_DETALHE;
+                processoService.validarMapa.mockResolvedValue();
+                processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
+                const fetchDetalheSpy = vi.spyOn(store, 'fetchProcessoDetalhe');
+                await store.validarMapa(1);
+                expect(processoService.validarMapa).toHaveBeenCalledWith(1);
+                expect(fetchDetalheSpy).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('addMovement', () => {
+            it('deve adicionar um movimento', () => {
+                const movement = { descricao: 'movimento' };
+                store.addMovement(movement as any);
+                expect(store.movements).toHaveLength(1);
+                expect(store.movements[0].descricao).toBe('movimento');
+            });
+        });
     });
 });
