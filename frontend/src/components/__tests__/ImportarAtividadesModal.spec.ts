@@ -1,102 +1,89 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createPinia, setActivePinia} from 'pinia';
-import {useProcessosStore} from '@/stores/processos';
-import {useAtividadesStore} from '@/stores/atividades';
-import {ref} from 'vue';
-import {SubprocessoDetalhe, ProcessoResumo, SituacaoProcesso, TipoProcesso, SituacaoSubprocesso} from '@/types/tipos';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mount, VueWrapper } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
+import { Atividade, ProcessoResumo, TipoProcesso } from '@/types/tipos';
+import { nextTick } from 'vue';
 
-const mockProcessosPainel: ProcessoResumo[] = [{
-    codigo: 1,
-    descricao: 'processo 1',
-    situacao: SituacaoProcesso.EM_ANDAMENTO,
-    tipo: TipoProcesso.MAPEAMENTO,
-    dataLimite: '2025-12-31',
-    dataCriacao: '2025-01-01',
-    unidadeCodigo: 1,
-    unidadeNome: 'unidade 1',
-}];
+// Helper type for the component instance
+type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
 
-const mockProcessoDetalhe: SubprocessoDetalhe = {
-    unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' },
-    titular: { codigo: 1, nome: 'Titular Teste', tituloEleitoral: '123', email: 't@t.com', ramal: '123', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
-    responsavel: { codigo: 1, nome: 'Responsável Teste', tituloEleitoral: '456', email: 'r@r.com', ramal: '456', unidade: { codigo: 1, nome: 'Teste', sigla: 'TST' } },
-    situacao: SituacaoSubprocesso.CADASTRO_EM_ANDAMENTO,
-    situacaoLabel: 'Em Andamento',
-    localizacaoAtual: 'Na unidade',
-    processoDescricao: 'Processo Teste',
-    tipoProcesso: TipoProcesso.MAPEAMENTO,
-    prazoEtapaAtual: '2025-12-31',
-    isEmAndamento: true,
-    etapaAtual: 1,
-    movimentacoes: [],
-    elementosProcesso: [],
-    permissoes: {
-        podeVerPagina: true,
-        podeEditarMapa: true,
-        podeVisualizarMapa: true,
-        podeDisponibilizarCadastro: true,
-        podeDevolverCadastro: true,
-        podeAceitarCadastro: true,
-        podeVisualizarDiagnostico: true,
-        podeAlterarDataLimite: true,
-    },
+// Mock data
+const mockProcessos: ProcessoResumo[] = [
+  { codigo: 1, descricao: 'Processo 1', tipo: TipoProcesso.MAPEAMENTO, situacao: 'FINALIZADO', unidadesParticipantes: [] },
+];
+const mockProcessoDetalhe = {
+  unidades: [{ codUnidade: 10, sigla: 'U1', codSubprocesso: 100 }],
 };
+const mockAtividades: Atividade[] = [
+  { codigo: 1, descricao: 'Atividade A', conhecimentos: [] },
+];
 
-// Mock das stores
+// Mock composable and stores
+const mockExecute = vi.fn();
+vi.mock('@/composables/useApi', () => ({
+  useApi: () => ({ execute: mockExecute, error: { value: null }, isLoading: { value: false }, clearError: vi.fn() }),
+}));
 vi.mock('@/stores/processos', () => ({
-  useProcessosStore: vi.fn(() => ({
-    processosPainel: ref([]),
-    processoDetalhe: ref(null),
+  useProcessosStore: () => ({
+    processosPainel: mockProcessos,
+    processoDetalhe: mockProcessoDetalhe,
     fetchProcessosPainel: vi.fn(),
     fetchProcessoDetalhe: vi.fn(),
-  })),
+  }),
 }));
-
 vi.mock('@/stores/atividades', () => ({
-  useAtividadesStore: vi.fn(() => ({
-    atividadesPorSubprocesso: ref(new Map()),
-    getAtividadesPorSubprocesso: vi.fn().mockReturnValue([]),
+  useAtividadesStore: () => ({
+    getAtividadesPorSubprocesso: () => mockAtividades,
     fetchAtividadesParaSubprocesso: vi.fn(),
     importarAtividades: vi.fn(),
-  })),
+  }),
 }));
 
-describe('ImportarAtividadesModal Store Logic', () => {
-  let processosStore: ReturnType<typeof useProcessosStore>;
-  let atividadesStore: ReturnType<typeof useAtividadesStore>;
+describe('ImportarAtividadesModal', () => {
+  let wrapper: VueWrapper<ImportarAtividadesModalVM>;
 
   beforeEach(() => {
     setActivePinia(createPinia());
-    processosStore = useProcessosStore();
-    atividadesStore = useAtividadesStore();
     vi.clearAllMocks();
-
-    // Setup default mocks
-    (processosStore.fetchProcessosPainel as any).mockResolvedValue(undefined);
-    (processosStore.fetchProcessoDetalhe as any).mockResolvedValue(undefined);
-    (atividadesStore.fetchAtividadesParaSubprocesso as any).mockResolvedValue(undefined);
-    processosStore.processosPainel = mockProcessosPainel as any;
+    wrapper = mount(ImportarAtividadesModal, {
+      props: { mostrar: true, codSubrocessoDestino: 999 },
+    });
   });
 
-  it('should fetch available processes', async () => {
-    await processosStore.fetchProcessosPainel('CHEFE', 1, 0, 10);
-    expect(processosStore.fetchProcessosPainel).toHaveBeenCalled();
+  it('deve emitir "fechar" ao clicar em Cancelar', async () => {
+    await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
+    expect(wrapper.emitted('fechar')).toBeTruthy();
   });
 
-  it('should fetch process details', async () => {
-    (processosStore.processoDetalhe as any).value = mockProcessoDetalhe;
-    await processosStore.fetchProcessoDetalhe(1);
-    expect(processosStore.fetchProcessoDetalhe).toHaveBeenCalledWith(1);
-  });
+  it('deve habilitar o botão de importação e chamar a API ao importar', async () => {
+    const importButton = wrapper.find('[data-testid="btn-importar"]');
+    expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
-  it('should fetch activities', async () => {
-    (processosStore.processoDetalhe as any).value = mockProcessoDetalhe;
-    await atividadesStore.fetchAtividadesParaSubprocesso(101);
-    expect(atividadesStore.fetchAtividadesParaSubprocesso).toHaveBeenCalledWith(101);
-  });
+    // Simulate user selecting a process and unit
+    await wrapper.find('[data-testid="select-processo"]').setValue('1');
+    await nextTick();
+    await wrapper.find('[data-testid="select-unidade"]').setValue('10');
+    await nextTick();
 
-  it('should import activities', async () => {
-    await atividadesStore.importarAtividades(1, 101);
-    expect(atividadesStore.importarAtividades).toHaveBeenCalledWith(1, 101);
+    // Directly manipulate the component's internal state for reliability
+    wrapper.vm.atividadesSelecionadas = [mockAtividades[0]];
+    await nextTick();
+
+    // Now, the button should be enabled
+    expect((importButton.element as HTMLButtonElement).disabled).toBe(false);
+
+    // Simulate the import click
+    mockExecute.mockResolvedValue(true);
+    await importButton.trigger('click');
+
+    // Verify the API call and emitted events
+    expect(mockExecute).toHaveBeenCalledWith(
+      999,
+      mockProcessoDetalhe.unidades[0].codSubprocesso,
+      [mockAtividades[0].codigo]
+    );
+    expect(wrapper.emitted('importar')).toBeTruthy();
+    expect(wrapper.emitted('fechar')).toBeTruthy();
   });
 });

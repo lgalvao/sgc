@@ -217,7 +217,7 @@ watch(() => props.mostrar, (mostrar) => {
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosDisponiveis.value.find(p => p.codigo === newId)
+    const processo = processosDisponiveis.value.find(p => p.codigo === Number(newId))
     if (processo) {
       await selecionarProcesso(processo)
     }
@@ -228,7 +228,7 @@ watch(processoSelecionadoId, async (newId) => {
 
 watch(unidadeSelecionadaId, (newId) => {
   if (newId) {
-    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === newId)
+    const unidade = unidadesParticipantes.value.find(u => u.codUnidade === Number(newId))
     if (unidade) {
       selecionarUnidade(unidade)
     }

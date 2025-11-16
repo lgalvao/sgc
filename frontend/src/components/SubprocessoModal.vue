@@ -103,5 +103,5 @@ watch(() => props.mostrarModal, (novoValor: boolean) => {
   } else {
     novaDataLimite.value = '';
   }
-});
+}, { immediate: true });
 </script>

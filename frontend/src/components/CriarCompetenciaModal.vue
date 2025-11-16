@@ -145,7 +145,7 @@ watch(() => props.mostrar, (mostrar) => {
       })
     }, 100)
   }
-})
+}, { immediate: true })
 
 function toggleAtividade(codigo: number) {
   const index = atividadesSelecionadas.value.indexOf(codigo)
