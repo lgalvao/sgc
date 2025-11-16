@@ -105,6 +105,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
+import logger from '@/utils/logger';
 import type {Unidade} from '@/types/tipos';
 
 interface Props {
@@ -123,9 +124,9 @@ const emit = defineEmits<{
 
 const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
 
-console.log('[DEBUG ArvoreUnidades] Initial modelValue:', props.modelValue);
-console.log('[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:', unidadesSelecionadasLocal.value);
-console.log('[DEBUG ArvoreUnidades] Initial props.unidades:', props.unidades);
+logger.debug('[DEBUG ArvoreUnidades] Initial modelValue:', props.modelValue);
+logger.debug('[DEBUG ArvoreUnidades] Initial unidadesSelecionadasLocal:', unidadesSelecionadasLocal.value);
+logger.debug('[DEBUG ArvoreUnidades] Initial props.unidades:', props.unidades);
 
 // Filtrar unidades pela função customizada
 const unidadesFiltradas = computed(() => {
@@ -186,16 +187,16 @@ function getEstadoSelecao(unidade: Unidade): boolean | 'indeterminate' {
 }
 
 watch(() => props.modelValue, (novoValor) => {
-  console.log('[DEBUG ArvoreUnidades] modelValue changed:', novoValor);
+  logger.debug('[DEBUG ArvoreUnidades] modelValue changed:', novoValor);
   if (JSON.stringify(novoValor.sort()) !== JSON.stringify(unidadesSelecionadasLocal.value.sort())) {
     unidadesSelecionadasLocal.value = [...novoValor];
-    console.log('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:', unidadesSelecionadasLocal.value);
+    logger.debug('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal updated:', unidadesSelecionadasLocal.value);
   }
 }, { deep: true });
 
 // Watch para reagir a mudanças internas e emitir para o pai
 watch(unidadesSelecionadasLocal, (novoValor) => {
-  console.log('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):', novoValor);
+  logger.debug('[DEBUG ArvoreUnidades] unidadesSelecionadasLocal changed (internal):', novoValor);
   emit('update:modelValue', novoValor);
 }, { deep: true });
 </script>
