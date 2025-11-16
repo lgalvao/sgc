@@ -26,7 +26,7 @@
         v-for="(alerta, index) in alertas"
         :key="index"
         style="cursor: pointer;"
-        @click="emit('marcarComoLido', alerta.codigo)"
+        @click="emit('selecionar-alerta', alerta)"
       >
         <td>{{ alerta.dataHoraFormatada }}</td>
         <td>{{ alerta.mensagem }}</td>
@@ -46,14 +46,14 @@
 </template>
 
 <script lang="ts" setup>
-import type {AlertaFormatado} from '@/types/tipos';
+import type {Alerta} from '@/types/tipos';
 
 defineProps<{
-  alertas: AlertaFormatado[]
+  alertas: Alerta[]
 }>();
 
 const emit = defineEmits<{
   (e: 'ordenar', criterio: 'data' | 'processo'): void
-  (e: 'marcarComoLido', id: number): void
+  (e: 'selecionar-alerta', alerta: Alerta): void
 }>();
 </script>

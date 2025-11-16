@@ -37,9 +37,9 @@
         </div>
       </div>
       <TabelaAlertas
-        :alertas="alertasOrdenados"
+        :alertas="alertas"
         @ordenar="ordenarAlertasPor"
-        @marcar-como-lido="marcarComoLido"
+        @selecionar-alerta="abrirDetalhesAlerta"
       />
     </div>
   </div>
@@ -54,10 +54,9 @@ import {useAlertasStore} from '@/stores/alertas'
 import {useUsuariosStore} from '@/stores/usuarios'
 import {useUnidadesStore} from '@/stores/unidades'
 import {useRouter} from 'vue-router'
-import {type AlertaFormatado, type ProcessoResumo, Servidor, Unidade} from '@/types/tipos'
+import {type Alerta, type ProcessoResumo} from '@/types/tipos'
 import TabelaProcessos from '@/components/TabelaProcessos.vue';
 import TabelaAlertas from '@/components/TabelaAlertas.vue';
-import {formatDateTimeBR} from '@/utils';
 
 const perfil = usePerfilStore()
 const processosStore = useProcessosStore()
@@ -113,30 +112,15 @@ function abrirDetalhesProcesso(processo: ProcessoResumo) {
   }
 }
 
-const alertasFormatados = computed((): AlertaFormatado[] => {
-  return alertas.value.map(alerta => {
-    const partes = alerta.descricao.split(' ');
-    const MOCK_UNIDADE: Unidade = { codigo: 0, nome: '', sigla: '' };
-    const MOCK_SERVIDOR: Servidor = { codigo: 0, nome: '', tituloEleitoral: '', unidade: MOCK_UNIDADE, email: '', ramal: '' };
-    return {
-      ...alerta,
-      mensagem: alerta.descricao,
-      data: alerta.dataHora,
-      dataHoraFormatada: formatDateTimeBR(new Date(alerta.dataHora)),
-      origem: partes[0],
-      processo: partes[2],
-      unidadeOrigem: MOCK_UNIDADE,
-      unidadeDestino: MOCK_UNIDADE,
-      usuarioDestino: MOCK_SERVIDOR,
-    } as AlertaFormatado;
-  });
-});
+function abrirDetalhesAlerta(alerta: Alerta) {
+  if (alerta.linkDestino) {
+    router.push(alerta.linkDestino);
+  }
+}
 
 // Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
 const alertaCriterio = ref<'data' | 'processo'>('data');
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
-
-const alertasOrdenados = computed(() => alertasFormatados.value);
 
 function ordenarAlertasPor(campo: 'data' | 'processo') {
   if (alertaCriterio.value === campo) {
@@ -153,9 +137,5 @@ function ordenarAlertasPor(campo: 'data' | 'processo') {
     alertaCriterio.value,
     alertaAsc.value ? 'asc' : 'desc'
   );
-}
-
-function marcarComoLido(idAlerta: number) {
-  alertasStore.marcarAlertaComoLido(idAlerta);
 }
 </script>

@@ -74,7 +74,7 @@ export enum SituacaoSubprocesso {
     AGUARDANDO_HOMOLOGACAO_MAPA = 'AGUARDANDO_HOMOLOGACAO_MAPA',
     MAPA_HOMOLOGADO = 'MAPA_HOMOLOGADO',
     CONCLUIDO = 'CONCLUIDO',
-    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDAMENTO',
+    REVISAO_CADASTRO_EM_ANDAMENTO = 'REVISAO_CADASTRO_EM_ANDamento',
     CADASTRO_EM_ANDAMENTO = 'CADASTRO_EM_ANDAMENTO',
 }
 
@@ -361,7 +361,6 @@ export interface ImpactoMapa {
     temImpactos: boolean;
     totalAtividadesInseridas: number;
     totalAtividadesRemovidas: number;
-
     totalAtividadesAlteradas: number;
     totalCompetenciasImpactadas: number;
     atividadesInseridas: Atividade[];

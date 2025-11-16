@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {Alerta} from '@/mappers/alertas';
+import {Alerta} from '@/types/tipos';
 import * as painelService from '../services/painelService';
 import {Page} from '@/services/painelService';
 import * as alertaService from '../services/alertaService';
@@ -35,7 +35,7 @@ export const useAlertasStore = defineStore('alertas', {
                 await alertaService.marcarComoLido(idAlerta);
                 const perfilStore = usePerfilStore();
                 if (perfilStore.servidorId && perfilStore.unidadeSelecionada) {
-                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20);
+                    await this.fetchAlertas(perfilStore.servidorId.toString(), Number(perfilStore.unidadeSelecionada), 0, 20, undefined, undefined);
                 }
                 return true;
             } catch {
