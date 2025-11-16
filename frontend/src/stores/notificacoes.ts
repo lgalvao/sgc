@@ -1,15 +1,15 @@
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
 
-export type TipoNotificacao = 'success' | 'error' | 'warning' | 'info' | 'email';
+type TipoNotificacao = 'success' | 'error' | 'warning' | 'info' | 'email';
 
-export interface EmailContent {
+interface EmailContent {
   assunto: string;
   destinatario: string;
   corpo: string;
 }
 
-export interface Notificacao {
+interface Notificacao {
   id: string;
   tipo: TipoNotificacao;
   titulo: string;

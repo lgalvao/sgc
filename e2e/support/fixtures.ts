@@ -8,10 +8,9 @@
  */
 import { test as base } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique test IDs
-import logger from '../../frontend/src/utils/logger';
+import { debug as debugLog, logger } from '../helpers/utils/logger';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:10000';
-const debugLog = (...args: any[]) => { if (process.env.E2E_DEBUG === '1') logger.debug(...args); };
 
 // Declare the types of fixtures you want to add.
 type MyFixtures = {

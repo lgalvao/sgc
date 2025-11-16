@@ -11,7 +11,7 @@ export enum TipoMudanca {
     ConhecimentoAlterado = 'ConhecimentoAlterado',
 }
 
-export interface Mudanca {
+interface Mudanca {
     id: number; // ID único da mudança
     tipo: TipoMudanca;
     idAtividade?: number; // ID da atividade envolvida

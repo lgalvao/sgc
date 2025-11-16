@@ -1,16 +1,9 @@
 import {expect, Page} from '@playwright/test';
 import {SELETORES, TEXTOS} from '../dados';
-import logger from '../../../frontend/src/utils/logger';
 import {clicarElemento, preencherCampo} from '../utils';
 import {navegarParaCriacaoProcesso} from '~/helpers';
 import {extrairIdDoSeletor} from '../utils/utils';
-
-// Reduz ruído de logs: suprime linhas [DEBUG] salvo se E2E_DEBUG estiver definido.
-const debug = (...args: any[]) => {
-  if (process.env.E2E_DEBUG) {
-    logger.debug(...args);
-  }
-};
+import { debug, logger } from '../utils/logger';
 
 /**
  * Seleciona unidades na árvore de hierarquia usando suas siglas.
