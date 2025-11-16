@@ -9,7 +9,7 @@ const apiClient = axios.create({
   },
 });
 
-export const handleResponseError = (error: any) => {
+const handleResponseError = (error: any) => {
   try {
     const notificacoesStore = useNotificacoesStore();
     if (error && typeof error === 'object' && 'response' in error) {

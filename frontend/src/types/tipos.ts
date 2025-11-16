@@ -29,15 +29,6 @@ export enum Perfil {
 /**
  * Representa uma unidade organizacional.
  */
-export interface UnidadeResponsavel extends Usuario {
-    usuarioTitulo?: string;
-    unidadeCodigo?: number;
-    tipo?: string;
-    idServidor?: number;
-    dataInicio?: string;
-    dataFim?: string | null;
-}
-
 export interface Unidade {
     codigo: number;
     nome: string;
@@ -46,7 +37,6 @@ export interface Unidade {
     filhas?: Unidade[];
     tipo?: string;
     idServidorTitular?: number;
-    responsavel?: UnidadeResponsavel;
     isElegivel?: boolean;
 }
 
@@ -291,11 +281,6 @@ export interface AtividadeVisualizacao {
     conhecimentos: ConhecimentoVisualizacao[];
 }
 
-export interface CompetenciaVisualizacao {
-    codigo: number;
-    descricao: string;
-    atividades: AtividadeVisualizacao[];
-}
 
 export interface MapaVisualizacao {
     codigo: number;

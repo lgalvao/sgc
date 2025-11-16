@@ -1,9 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import axios from 'axios';
 import { FullConfig } from '@playwright/test';
-import logger from '../../frontend/src/utils/logger';
-
-const debugLog = (...args: any[]) => { if (process.env.E2E_DEBUG === '1') logger.debug(...args); };
+import { debug as debugLog, logger } from '../helpers/utils/logger';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:10000';
 const BACKEND_HEALTH_URL = `${BACKEND_URL}/actuator/health`;
