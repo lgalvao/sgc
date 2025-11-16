@@ -1,7 +1,9 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import axios from 'axios';
 import { FullConfig } from '@playwright/test';
-const debugLog = (...args: any[]) => { if (process.env.E2E_DEBUG === '1') console.log(...args); };
+import logger from '../../frontend/src/utils/logger';
+
+const debugLog = (...args: any[]) => { if (process.env.E2E_DEBUG === '1') logger.debug(...args); };
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:10000';
 const BACKEND_HEALTH_URL = `${BACKEND_URL}/actuator/health`;
@@ -24,7 +26,7 @@ async function globalSetup(config: FullConfig) {
         try {
             const response = await axios.get(BACKEND_HEALTH_URL);
             if (response.status === 200 && response.data.status === 'UP') {
-                console.log('Backend server is up and healthy.');
+                logger.success('Backend server is up and healthy.');
                 break;
             }
         } catch (error) {
@@ -35,7 +37,7 @@ async function globalSetup(config: FullConfig) {
     }
 
     if (retries === maxRetries) {
-        console.error('Backend server did not start within the expected time.');
+        logger.error('Backend server did not start within the expected time.');
         if (backendProcess) {
             backendProcess.kill();
         }
@@ -51,21 +53,21 @@ async function globalTeardown() {
     debugLog('Stopping E2E backend server gracefully...');
     try {
         await axios.post(`${BACKEND_URL}/actuator/shutdown`);
-        console.log('Backend shutdown request sent. Waiting for process to exit...');
+        logger.info('Backend shutdown request sent. Waiting for process to exit...');
         // Give some time for the process to shut down
         await new Promise(resolve => setTimeout(resolve, 5000));
     } catch (error: any) {
-        console.error(`Error sending shutdown request to backend: ${error.message}`);
+        logger.error(`Error sending shutdown request to backend: ${error.message}`);
         if (backendProcess) {
-            console.log('Force killing backend process...');
+            logger.warn('Force killing backend process...');
             backendProcess.kill();
         }
     } finally {
         if (backendProcess && !backendProcess.killed) {
-            console.log('Backend process still running, force killing...');
+            logger.warn('Backend process still running, force killing...');
             backendProcess.kill();
         }
-        console.log('Backend server stopped.');
+        logger.success('Backend server stopped.');
     }
 }
 

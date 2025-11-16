@@ -1,4 +1,5 @@
 import {Locator, Page} from '@playwright/test';
+import logger from '../../../frontend/src/utils/logger';
 
 /**
  * Extrai o ID de um seletor completo ou retorna o valor se já for um ID simples.
@@ -38,7 +39,7 @@ export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade:
         
         const codigo = codigosUnidade[siglaUnidade];
         if (!codigo) {
-            console.warn(`Unidade ${siglaUnidade} não mapeada para cleanup`);
+            logger.warn(`Unidade ${siglaUnidade} não mapeada para cleanup`);
             return;
         }
         
@@ -46,7 +47,7 @@ export async function limparProcessosCriadosComUnidade(page: Page, siglaUnidade:
         await page.request.post(`http://localhost:10000/api/e2e/processos/unidade/${codigo}/limpar`);
     } catch (error) {
         // Falha silenciosa - se não conseguir limpar, teste tentará rodar mesmo assim
-        console.log('Aviso: Não foi possível limpar processos:', error);
+        logger.warn('Aviso: Não foi possível limpar processos:', error);
     }
 }
 

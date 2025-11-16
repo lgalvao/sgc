@@ -1,5 +1,6 @@
 import {vueTest as test} from '../support/vue-specific-setup';
 import {expect} from '@playwright/test';
+import logger from '../../frontend/src/utils/logger';
 
 import {loginComoAdmin, navegarParaCriacaoProcesso, selecionarUnidadesPorSigla, SELETORES} from '~/helpers';
 import {extrairIdDoSeletor} from '~/helpers/utils/utils';
@@ -49,9 +50,9 @@ test.describe.serial('CDU-04: Iniciar processo', () => {
         await page.waitForTimeout(1000);
         
         // Imprimir logs capturados
-        console.log('=== LOGS DO NAVEGADOR ===');
-        logs.forEach(log => console.log(log));
-        console.log('=========================');
+        logger.info('=== LOGS DO NAVEGADOR ===');
+        logs.forEach(log => logger.info(log));
+        logger.info('=========================');
 
         // 3. Clicar em Iniciar Processo → Abre modal
         await page.getByTestId(extrairIdDoSeletor(SELETORES.BTN_INICIAR_PROCESSO)).click();
