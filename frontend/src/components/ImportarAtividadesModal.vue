@@ -110,6 +110,7 @@
                       :value="ativ"
                       class="form-check-input"
                       type="checkbox"
+                      :data-testid="`checkbox-atividade-${ativ.codigo}`"
                     >
                     <label
                       :for="`ativ-check-${ativ.codigo}`"

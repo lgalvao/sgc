@@ -18,8 +18,9 @@
           <label
             for="observacao-textarea"
             class="form-label"
-            v-html="corpoModal"
-          />
+          >
+            Observações <span class="text-muted small">(opcional)</span>
+          </label>
           <textarea
             id="observacao-textarea"
             v-model="observacao"
@@ -83,7 +84,7 @@ const tituloModal = computed(() => {
 const corpoModal = computed(() => {
   return props.perfil === 'ADMIN'
     ? 'Confirma a homologação do mapa de competências?'
-    : 'Observações <small class="text-muted">(opcional)</small>';
+    : 'Observações';
 });
 
 computed(() => {
