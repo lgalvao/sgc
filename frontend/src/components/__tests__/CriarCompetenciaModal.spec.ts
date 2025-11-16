@@ -10,7 +10,7 @@ describe('CriarCompetenciaModal', () => {
 
   const atividades = [
     { codigo: 1, descricao: 'Atividade 1', conhecimentos: [] },
-    { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ codigo: 1, descricao: 'Conhecimento 1' }] },
+    { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }] },
   ];
 
   it('não deve renderizar o modal quando mostrar for falso', () => {

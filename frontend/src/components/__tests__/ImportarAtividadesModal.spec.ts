@@ -3,14 +3,16 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
 import { Atividade, ProcessoResumo, TipoProcesso } from '@/types/tipos';
-import { nextTick } from 'vue';
+import { nextTick, ref } from 'vue';
 
 // Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
 
 // Mock data
+import { SituacaoProcesso } from '@/types/tipos';
+
 const mockProcessos: ProcessoResumo[] = [
-  { codigo: 1, descricao: 'Processo 1', tipo: TipoProcesso.MAPEAMENTO, situacao: 'FINALIZADO', unidadesParticipantes: [] },
+  { codigo: 1, descricao: 'Processo 1', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.FINALIZADO, dataCriacao: '2021-01-01', dataLimite: '2021-01-01', unidadeCodigo: 1, unidadeNome: 'test' },
 ];
 const mockProcessoDetalhe = {
   unidades: [{ codUnidade: 10, sigla: 'U1', codSubprocesso: 100 }],
@@ -22,7 +24,7 @@ const mockAtividades: Atividade[] = [
 // Mock composable and stores
 const mockExecute = vi.fn();
 vi.mock('@/composables/useApi', () => ({
-  useApi: () => ({ execute: mockExecute, error: { value: null }, isLoading: { value: false }, clearError: vi.fn() }),
+  useApi: () => ({ execute: mockExecute, error: ref(null), isLoading: ref(false), clearError: vi.fn() }),
 }));
 vi.mock('@/stores/processos', () => ({
   useProcessosStore: () => ({
@@ -66,8 +68,8 @@ describe('ImportarAtividadesModal', () => {
     await wrapper.find('[data-testid="select-unidade"]').setValue('10');
     await nextTick();
 
-    // Directly manipulate the component's internal state for reliability
-    wrapper.vm.atividadesSelecionadas = [mockAtividades[0]];
+    // Find and check the checkbox for the activity
+    await wrapper.find('[data-testid="checkbox-atividade-1"]').setChecked(true);
     await nextTick();
 
     // Now, the button should be enabled

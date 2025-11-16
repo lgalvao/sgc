@@ -39,7 +39,7 @@ describe('ModalAcaoBloco', () => {
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(unidades.length);
     expect(rows[0].text()).toContain('Unidade 1');
-    expect(rows[1].find('input[type="checkbox"]').element.checked).toBe(true);
+    expect((rows[1].find('input[type="checkbox"]').element as HTMLInputElement).checked).toBe(true);
   });
 
   it('deve emitir "fechar" ao clicar no botão de cancelar', async () => {

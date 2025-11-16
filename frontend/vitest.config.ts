@@ -10,5 +10,10 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{js,ts}'],
     exclude: ['node_modules', 'e2e', 'eve'],
     setupFiles: ['./vitest.setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['json', 'text'],
+      reportsDirectory: './coverage',
+    },
   },
 })
