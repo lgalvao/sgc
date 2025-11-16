@@ -18,7 +18,8 @@
           <label
             for="observacao-textarea"
             class="form-label"
-          >{{ corpoModal }}</label>
+            v-html="corpoModal"
+          />
           <textarea
             id="observacao-textarea"
             v-model="observacao"
