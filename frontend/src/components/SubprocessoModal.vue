@@ -1,67 +1,44 @@
 <template>
-  <!-- Modal para alterar data limite -->
-  <div
-    v-if="mostrarModal"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
+  <b-modal
+    v-model="show"
+    title="Alterar data limite"
+    centered
+    @hidden="fecharModal"
   >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-calendar text-primary me-2" />
-            Alterar data limite
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="$emit('fecharModal')"
-          />
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Nova data limite</label>
-            <input
-              v-model="novaDataLimite"
-              type="date"
-              class="form-control"
-              :min="dataLimiteMinima"
-              data-testid="input-nova-data-limite"
-            >
-            <div class="form-text">
-              Data limite atual: {{ dataLimiteAtualFormatada }}
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-testid="btn-modal-cancelar"
-            @click="$emit('fecharModal')"
-          >
-            <i class="bi bi-x-circle me-1" />
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            :disabled="!novaDataLimite || !isDataValida"
-            data-testid="btn-modal-confirmar"
-            @click="$emit('confirmarAlteracao', novaDataLimite)"
-          >
-            <i class="bi bi-check-circle me-1" />
-            Confirmar
-          </button>
-        </div>
+    <div class="mb-3">
+      <label class="form-label">Nova data limite</label>
+      <input
+        v-model="novaDataLimite"
+        type="date"
+        class="form-control"
+        :min="dataLimiteMinima"
+        data-testid="input-nova-data-limite"
+      >
+      <div class="form-text">
+        Data limite atual: {{ dataLimiteAtualFormatada }}
       </div>
     </div>
-  </div>
-  <div
-    v-if="mostrarModal"
-    class="modal-backdrop fade show"
-  />
+
+    <template #footer>
+      <b-button
+        variant="secondary"
+        data-testid="btn-modal-cancelar"
+        @click="fecharModal"
+      >
+        <i class="bi bi-x-circle me-1" />
+        Cancelar
+      </b-button>
+      <b-button
+        variant="primary"
+        :disabled="!novaDataLimite || !isDataValida"
+        data-testid="btn-modal-confirmar"
+        @click="$emit('confirmarAlteracao', novaDataLimite)"
+      >
+        <i class="bi bi-check-circle me-1" />
+        Confirmar
+      </b-button>
+    </template>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
@@ -76,12 +53,17 @@ interface Props {
 
 const props = defineProps<Props>();
 
-defineEmits<{
-   fecharModal: [];
-   confirmarAlteracao: [novaData: string];
+const emit = defineEmits<{
+   (e: 'update:mostrarModal', value: boolean): void;
+   (e: 'confirmarAlteracao', novaData: string): void;
 }>();
 
 const novaDataLimite = ref('');
+
+const show = computed({
+  get: () => props.mostrarModal,
+  set: (value) => emit('update:mostrarModal', value)
+})
 
 const dataLimiteMinima = computed(() => {
   return formatDateForInput(new Date());
@@ -104,4 +86,8 @@ watch(() => props.mostrarModal, (novoValor: boolean) => {
     novaDataLimite.value = '';
   }
 });
+
+function fecharModal() {
+  emit('update:mostrarModal', false);
+}
 </script>

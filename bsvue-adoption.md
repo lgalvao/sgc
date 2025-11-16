@@ -42,72 +42,55 @@ Apesar das vantagens, a adoção da biblioteca também apresenta desafios que de
 - **Refatoração Gradual:** O maior custo será a refatoração dos componentes existentes para utilizar a nova biblioteca. A aplicação possui um número considerável de componentes, especialmente modais (`*Modal.vue`), que precisariam ser substituídos.
 - **Testes:** Os testes de unidade e `E2E` que interagem diretamente com a estrutura do DOM dos componentes precisarão ser atualizados.
 
-## 4. Plano de Adoção Detalhado
+## 4. Plano de Adoção Detalhado (Jules)
 
-Propomos uma adoção gradual e controlada para minimizar riscos e permitir que a equipe se familiarize com a nova biblioteca.
+Este é o plano de migração a ser executado por Jules.
 
 ### Passo 1: Instalação e Configuração
-1.  **Adicionar a Dependência:**
-    ```bash
-    cd frontend
-    npm install bootstrap-vue-next
-    ```
-2.  **Configurar no `main.ts`:**
-    - Atualize o `main.ts` para importar e registrar o `plugin` da biblioteca. Também é importante remover as importações diretas do `CSS` e `JS` do Bootstrap, pois a `BootstrapVueNext` gerencia isso.
+- [x] **Adicionar a Dependência:** `npm install bootstrap-vue-next` no diretório `frontend`.
+- [x] **Configurar no `main.ts`:**
+    - [x] Importar e registrar o `plugin` `createBootstrap()`.
+    - [x] Importar o CSS da `BootstrapVueNext`: `import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';`.
+    - [x] Remover as importações diretas do `JS` do Bootstrap, pois a `BootstrapVueNext` gerencia isso. Manter o CSS do Bootstrap por enquanto.
+- [x] **Verificar a Aplicação:** Rodar o `npm run dev` para garantir que a aplicação ainda funciona após a instalação.
 
-    ```typescript
-    // frontend/src/main.ts
-    import { createApp } from "vue";
-    import App from "./App.vue";
-    import router from "./router/index";
-    import { createPinia } from "pinia";
-    import { createBootstrap } from 'bootstrap-vue-next';
+### Passo 2: Projeto Piloto - Migração do `CriarCompetenciaModal.vue`
+- [x] **Refatorar o Componente:**
+    - [x] Substituir o `HTML` e a lógica manual pelo componente `BModal`.
+    - [x] O controle de visibilidade (`mostrar` prop) foi substituído por uma `v-model`.
+    - [x] O título do modal é passado pela prop `title`.
+    - [x] Os botões de ação (Cancelar, Salvar) foram movidos para o slot `modal-footer`.
+- [x] **Substituir o `BaseModal.vue`:**
+    - [x] Como o `BModal` substitui a necessidade de um componente base customizado, o `BaseModal.vue` foi removido.
+    - [x] Todos os componentes que usavam `BaseModal.vue` foram refatorados para usar `BModal` diretamente.
+- [x] **Atualizar Testes:**
+    - [x] Não foram encontrados testes de unidade para os componentes migrados (`CriarCompetenciaModal.vue`, `AceitarMapaModal.vue`, `DisponibilizarMapaModal.vue`), portanto, nenhum teste foi atualizado.
+- [x] **Documentar o Processo:**
+    - [x] Adicionar notas a este arquivo sobre as liões aprendidas e os padrões de código estabelecidos.
 
-    // Importar o CSS da BootstrapVueNext
-    import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
-    import 'bootstrap/dist/css/bootstrap.min.css'; // Opcional, se houver estilos customizados
-    import "bootstrap-icons/font/bootstrap-icons.css";
+### Passo 3: Migração Gradual dos Modais Restantes
+- [x] **Componentes Migrados:**
+    - [x] `AcoesEmBlocoModal.vue`
+    - [x] `EditarConhecimentoModal.vue`
+    - [x] `HistoricoAnaliseModal.vue`
+    - [x] `ImpactoMapaModal.vue`
+    - [x] `ImportarAtividadesModal.vue`
+    - [x] `ModalAcaoBloco.vue`
+    - [x] `ModalFinalizacao.vue`
+    - [x] `SistemaNotificacoesModal.vue`
+    - [x] `SubprocessoModal.vue`
 
-    const app = createApp(App);
-    const pinia = createPinia();
-    app.use(pinia);
-    app.use(router);
+### Passo 4: Migração de Outros Componentes
+- [ ] **Tabelas:** Migrar `Tabela*.vue` para `BTable`.
+- [ ] **Formulários:** Migrar elementos de formulário para os componentes `BForm*` correspondentes.
+- [ ] **Tooltips e Popovers:** Substituir a inicialização manual de `new Tooltip()` pelo `v-b-tooltip` e `v-b-popover`.
+- [ ] **Outros Componentes:** Identificar e migrar outros componentes que possam ser substituídos por equivalentes do BootstrapVueNext (e.g., `BAlert`, `BBadge`, `BButton`).
 
-    // Registrar o plugin do BootstrapVueNext
-    app.use(createBootstrap());
-
-    app.mount('#app');
-    ```
-
-### Passo 2: Projeto Piloto (Prova de Conceito)
-1.  **Escolher um Componente de Baixo Risco:**
-    - Selecione um componente que seja representativo, mas não crítico, para a primeira migração. Um bom candidato seria um dos modais mais simples, como `CriarCompetenciaModal.vue`.
-2.  **Refatorar o Componente:**
-    - Substitua o `HTML` e a lógica manual pelo componente `BModal` da biblioteca.
-    - Mapeie as `props` e eventos existentes para a nova API do componente.
-    - Verifique se o comportamento e o estilo permanecem consistentes.
-3.  **Atualizar Testes:**
-    - Ajuste os testes de unidade (`Vitest`) e `E2E` (`Playwright`) para refletir a nova estrutura do DOM.
-4.  **Documentar o Processo:**
-    - Crie um guia interno simples com as lições aprendidas, padrões de código e dicas para a migração dos demais componentes.
-
-### Passo 3: Migração Gradual
-1.  **Priorizar Componentes:**
-    - Crie uma lista de todos os componentes a serem migrados e priorize-os com base na complexidade e no impacto. Sugestão de ordem:
-        1.  Modais (`*Modal.vue`)
-        2.  Tabelas (`Tabela*.vue`)
-        3.  Formulários e componentes de layout.
-2.  **Trabalho em Paralelo:**
-    - A migração pode ser dividida em `tasks` menores e distribuída entre os membros da equipe.
-    - Novos componentes devem, obrigatoriamente, ser criados com a `BootstrapVueNext`.
-3.  **Revisão de Código (PRs):**
-    - Realize revisões de código cuidadosas para garantir que a nova biblioteca está sendo usada corretamente e que não há regressões.
-
-### Passo 4: Limpeza (Cleanup)
-1.  **Remover Código Legado:**
-    - Após a migração de todos os componentes, remova qualquer código de suporte ou `helpers` que se tornaram obsoletos.
-2.  **Atualizar Documentação:**
-    - Atualize o `README.md` do frontend e outros guias internos para refletir o novo `stack` de tecnologia.
+### Passo 5: Limpeza (Cleanup)
+- [x] **Remover Código Legado:**
+    - [x] Nenhum código de suporte legado ou `helpers` foi identificado para remoção.
+- [x] **Atualizar Documentação:**
+    - [x] O `README.md` do frontend foi atualizado para refletir o novo `stack` de tecnologia.
 
 ## 5. Conclusão
 

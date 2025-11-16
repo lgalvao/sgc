@@ -1,111 +1,86 @@
 <template>
-  <div
-    v-if="mostrar"
-    aria-labelledby="criarCompetenciaModalLabel"
-    aria-modal="true"
-    class="modal fade show"
-    role="dialog"
-    style="display: block;"
-    tabindex="-1"
+  <b-modal
+    v-model="mostrarModal"
+    :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
+    size="lg"
+    centered
+    @hidden="fechar"
   >
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5
-            id="criarCompetenciaModalLabel"
-            class="modal-title"
-          >
-            {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}
-          </h5>
-          <button
-            aria-label="Close"
-            class="btn-close"
-            type="button"
-            @click="fechar"
-          />
-        </div>
-        <div class="modal-body">
-          <div class="mb-4">
-            <h5>Descrição</h5>
-            <div class="mb-2">
-              <textarea
-                v-model="novaCompetencia.descricao"
-                class="form-control"
-                placeholder="Descreva a competência"
-                rows="3"
-                data-testid="input-descricao-competencia"
-              />
-            </div>
-          </div>
+    <div class="mb-4">
+      <h5>Descrição</h5>
+      <div class="mb-2">
+        <textarea
+          v-model="novaCompetencia.descricao"
+          class="form-control"
+          placeholder="Descreva a competência"
+          rows="3"
+          data-testid="input-descricao-competencia"
+        />
+      </div>
+    </div>
 
-          <div class="mb-4">
-            <h5>Atividades</h5>
-            <div class="d-flex flex-wrap gap-2">
-              <div
-                v-for="atividade in atividades"
-                :key="atividade.codigo"
-                :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-                class="card atividade-card-item"
-                @click="toggleAtividade(atividade.codigo)"
+    <div class="mb-4">
+      <h5>Atividades</h5>
+      <div class="d-flex flex-wrap gap-2">
+        <div
+          v-for="atividade in atividades"
+          :key="atividade.codigo"
+          :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
+          class="card atividade-card-item"
+          @click="toggleAtividade(atividade.codigo)"
+        >
+          <div class="card-body d-flex align-items-center py-2">
+            <input
+              :id="`atv-${atividade.codigo}`"
+              v-model="atividadesSelecionadas"
+              :value="atividade.codigo"
+              class="form-check-input me-2"
+              hidden
+              type="checkbox"
+            >
+            <label class="form-check-label mb-0 d-flex align-items-center">
+              {{ atividade.descricao }}
+              <b-badge
+                v-if="atividade.conhecimentos.length > 0"
+                v-b-tooltip="{
+                  title: getConhecimentosTooltip(atividade),
+                  html: true,
+                  placement: 'right',
+                  customClass: 'conhecimentos-tooltip'
+                }"
+                variant="secondary"
+                class="ms-2"
               >
-                <div class="card-body d-flex align-items-center py-2">
-                  <input
-                    :id="`atv-${atividade.codigo}`"
-                    v-model="atividadesSelecionadas"
-                    :value="atividade.codigo"
-                    class="form-check-input me-2"
-                    hidden
-                    type="checkbox"
-                  >
-                  <label class="form-check-label mb-0 d-flex align-items-center">
-                    {{ atividade.descricao }}
-                    <span
-                      v-if="atividade.conhecimentos.length > 0"
-                      :data-bs-html="true"
-                      :data-bs-title="getConhecimentosModal(atividade)"
-                      class="badge bg-secondary ms-2"
-                      data-bs-custom-class="conhecimentos-tooltip"
-                      data-bs-placement="right"
-                      data-bs-toggle="tooltip"
-                    >
-                      {{ atividade.conhecimentos.length }}
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
+                {{ atividade.conhecimentos.length }}
+              </b-badge>
+            </label>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            class="btn btn-secondary"
-            type="button"
-            data-testid="btn-modal-cancelar"
-            @click="fechar"
-          >
-            Cancelar
-          </button>
-          <button
-            :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-            class="btn btn-primary"
-            type="button"
-            data-testid="btn-modal-confirmar"
-            @click="salvar"
-          >
-            <i class="bi bi-save" /> Salvar
-          </button>
         </div>
       </div>
     </div>
-  </div>
-  <div
-    v-if="mostrar"
-    class="modal-backdrop fade show"
-  />
+
+    <template #footer>
+      <b-button
+        variant="secondary"
+        data-testid="btn-modal-cancelar"
+        @click="fechar"
+      >
+        Cancelar
+      </b-button>
+      <b-button
+        :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+        variant="primary"
+        data-testid="btn-modal-confirmar"
+        @click="salvar"
+      >
+        <i class="bi bi-save" /> Salvar
+      </b-button>
+    </template>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
+import {ref, watch, computed} from 'vue'
 import {Atividade, Competencia} from '@/types/tipos'
 
 const props = defineProps<{
@@ -115,13 +90,18 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  fechar: []
-  salvar: [competencia: { descricao: string, atividadesSelecionadas: number[] }]
+  (e: 'update:mostrar', value: boolean): void
+  (e: 'salvar', competencia: { descricao: string, atividadesSelecionadas: number[], codigo?: number }): void
 }>()
 
 const novaCompetencia = ref({descricao: ''})
 const atividadesSelecionadas = ref<number[]>([])
 const competenciaSendoEditada = ref<Competencia | null>(null)
+
+const mostrarModal = computed({
+  get: () => props.mostrar,
+  set: (value) => emit('update:mostrar', value)
+})
 
 watch(() => props.mostrar, (mostrar) => {
   if (mostrar) {
@@ -134,16 +114,6 @@ watch(() => props.mostrar, (mostrar) => {
       atividadesSelecionadas.value = []
       competenciaSendoEditada.value = null
     }
-
-    // Inicializar tooltips do modal
-    setTimeout(() => {
-      import('bootstrap').then(({Tooltip}) => {
-        const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
-        modalTooltips.forEach(tooltipEl => {
-          new Tooltip(tooltipEl)
-        })
-      })
-    }, 100)
   }
 })
 
@@ -156,7 +126,7 @@ function toggleAtividade(codigo: number) {
   }
 }
 
-function getConhecimentosModal(atividade: Atividade): string {
+function getConhecimentosTooltip(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {
     return 'Nenhum conhecimento'
   }
@@ -169,14 +139,17 @@ function getConhecimentosModal(atividade: Atividade): string {
 }
 
 function fechar() {
-  emit('fechar')
+  emit('update:mostrar', false)
 }
 
 function salvar() {
-  emit('salvar', {
+  const competencia = {
     descricao: novaCompetencia.value.descricao,
-    atividadesSelecionadas: atividadesSelecionadas.value
-  })
+    atividadesSelecionadas: atividadesSelecionadas.value,
+    codigo: competenciaSendoEditada.value?.codigo
+  }
+  emit('salvar', competencia)
+  fechar()
 }
 </script>
 
@@ -211,5 +184,10 @@ function salvar() {
 
 .atividade-card-item .card-body {
   padding: 0.5rem 0.75rem;
+}
+</style>
+<style>
+.conhecimentos-tooltip {
+  --bs-tooltip-max-width: 400px;
 }
 </style>

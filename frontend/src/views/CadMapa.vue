@@ -33,7 +33,7 @@
         <button
           class="btn btn-outline-primary mb-3"
           data-testid="btn-abrir-criar-competencia"
-          @click="() => abrirModalCriarNovaCompetencia()"
+          @click="abrirModalCriarNovaCompetencia"
         >
           <i class="bi bi-plus-lg" /> Criar competência
         </button>
@@ -114,118 +114,11 @@
       <p>Unidade não encontrada.</p>
     </div>
 
-    <!-- Modal de Criar Nova Competência -->
-    <div
-      v-if="mostrarModalCriarNovaCompetencia"
-      data-testid="criar-competencia-modal"
-      aria-labelledby="criarCompetenciaModalLabel"
-      aria-modal="true"
-      class="modal fade show"
-      role="dialog"
-      style="display: block;"
-      tabindex="-1"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              id="criarCompetenciaModalLabel"
-              class="modal-title"
-            >
-              {{ competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência' }}
-            </h5>
-            <button
-              aria-label="Close"
-              class="btn-close"
-              type="button"
-              @click="fecharModalCriarNovaCompetencia"
-            />
-          </div>
-          <div class="modal-body">
-            <!-- Conteúdo do card movido para cá -->
-            <div class="mb-4">
-              <h5>Descrição</h5>
-              <div class="mb-2">
-                <textarea
-                  v-model="novaCompetencia.descricao"
-                  class="form-control"
-                  data-testid="input-nova-competencia"
-                  placeholder="Descreva a competência"
-                  rows="3"
-                />
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <h5>Atividades</h5>
-              <div class="d-flex flex-wrap gap-2">
-                <div
-                  v-for="atividade in atividades"
-                  :key="atividade.codigo"
-                  :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
-                  class="card atividade-card-item"
-                  :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.codigo)"
-                >
-                  <div class="card-body d-flex align-items-center">
-                    <input
-                      :id="`atv-${atividade.codigo}`"
-                      v-model="atividadesSelecionadas"
-                      :value="atividade.codigo"
-                      class="form-check-input me-2"
-                      data-testid="atividade-checkbox"
-                      hidden
-                      type="checkbox"
-                    >
-                    <label class="form-check-label mb-0 d-flex align-items-center">
-                      {{ atividade.descricao }}
-                      <span
-                        v-if="atividade.conhecimentos.length > 0"
-                        :data-bs-html="true"
-                        :data-bs-title="getConhecimentosModal(atividade)"
-                        class="badge bg-secondary ms-2"
-                        data-bs-custom-class="conhecimentos-tooltip"
-                        data-bs-placement="right"
-                        data-bs-toggle="tooltip"
-                        data-testid="badge-conhecimentos"
-                      >
-                        {{ atividade.conhecimentos.length }}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-secondary"
-              type="button"
-              @click="fecharModalCriarNovaCompetencia"
-            >
-              Cancelar
-            </button>
-            <button
-              :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-              class="btn btn-primary"
-              data-bs-toggle="tooltip"
-              data-testid="btn-criar-competencia"
-              title="Criar Competência"
-              type="button"
-              @click="adicionarCompetenciaEFecharModal"
-            >
-              <i
-                class="bi bi-save"
-              /> Salvar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-if="mostrarModalCriarNovaCompetencia"
-      class="modal-backdrop fade show"
+    <CriarCompetenciaModal
+      v-model:mostrar="mostrarModalCriarNovaCompetencia"
+      :atividades="atividades"
+      :competencia-para-editar="competenciaSendoEditada"
+      @salvar="adicionarCompetenciaEFecharModal"
     />
 
     <!-- Modal de Disponibilizar -->
@@ -394,6 +287,7 @@ import {useProcessosStore} from '@/stores/processos'
 import {usePerfil} from '@/composables/usePerfil'
 import {Atividade, Competencia, Perfil, SituacaoSubprocesso, Unidade} from '@/types/tipos'
 import ImpactoMapaModal from '@/components/ImpactoMapaModal.vue'
+import CriarCompetenciaModal from '@/components/CriarCompetenciaModal.vue'
 
 const route = useRoute()
 const mapasStore = useMapasStore()
@@ -484,18 +378,6 @@ const atividades = computed<Atividade[]>(() => {
 })
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
-const atividadesSelecionadas = ref<number[]>([])
-const novaCompetencia = ref({descricao: ''})
-
-function toggleAtividade(codigo: number) {
-  const index = atividadesSelecionadas.value.indexOf(codigo);
-  if (index > -1) {
-    atividadesSelecionadas.value.splice(index, 1);
-  } else {
-    atividadesSelecionadas.value.push(codigo);
-  }
-}
-
 
 const competenciaSendoEditada = ref<Competencia | null>(null)
 
@@ -512,41 +394,14 @@ function abrirModalDisponibilizar() {
   mostrarModalDisponibilizar.value = true;
 }
 
-function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
-  mostrarModalCriarNovaCompetencia.value = true;
-  if (competenciaParaEditar) {
-    novaCompetencia.value.descricao = competenciaParaEditar.descricao;
-    atividadesSelecionadas.value = [...competenciaParaEditar.atividadesAssociadas];
-    competenciaSendoEditada.value = competenciaParaEditar;
-  } else {
-    novaCompetencia.value.descricao = '';
-    atividadesSelecionadas.value = [];
-    competenciaSendoEditada.value = null;
-  }
-
-  // Inicializar tooltips do modal
-  if (typeof document !== 'undefined') {
-    setTimeout(() => {
-      import('bootstrap').then(({Tooltip}) => {
-        if (typeof document !== 'undefined') {
-          const modalTooltips = document.querySelectorAll('.modal [data-bs-toggle="tooltip"]')
-          modalTooltips.forEach(tooltipEl => {
-            new Tooltip(tooltipEl)
-          })
-        }
-      })
-    }, 100)
-  }
+function abrirModalCriarNovaCompetencia() {
+  competenciaSendoEditada.value = null
+  mostrarModalCriarNovaCompetencia.value = true
 }
-
-function fecharModalCriarNovaCompetencia() {
-  mostrarModalCriarNovaCompetencia.value = false;
-}
-
 
 function iniciarEdicaoCompetencia(competencia: Competencia) {
   competenciaSendoEditada.value = competencia;
-  abrirModalCriarNovaCompetencia(competencia);
+  mostrarModalCriarNovaCompetencia.value = true;
 }
 
 
@@ -572,39 +427,21 @@ function getAtividadeCompleta(codigo: number): Atividade | undefined {
   return atividades.value.find(a => a.codigo === codigo)
 }
 
-function getConhecimentosModal(atividade: Atividade): string {
-  if (!atividade.conhecimentos.length) {
-    return 'Nenhum conhecimento'
-  }
-
-  const conhecimentosHtml = atividade.conhecimentos
-      .map(c => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join('')
-
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`
-}
-
-function adicionarCompetenciaEFecharModal() {
-  if (!novaCompetencia.value.descricao || atividadesSelecionadas.value.length === 0) return;
-
-  const competencia: Competencia = {
-    codigo: competenciaSendoEditada.value?.codigo || 0,
-    descricao: novaCompetencia.value.descricao,
-    atividadesAssociadas: atividadesSelecionadas.value,
+function adicionarCompetenciaEFecharModal(competencia: { descricao: string, atividadesSelecionadas: number[], codigo?: number }) {
+  const competenciaParaSalvar: Competencia = {
+    codigo: competencia.codigo || 0,
+    descricao: competencia.descricao,
+    atividadesAssociadas: competencia.atividadesSelecionadas,
   };
 
   if (competenciaSendoEditada.value) {
-    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competencia);
+    mapasStore.atualizarCompetencia(codSubrocesso.value as number, competenciaParaSalvar);
   } else {
-    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competencia);
+    mapasStore.adicionarCompetencia(codSubrocesso.value as number, competenciaParaSalvar);
   }
 
-  // Limpar formulário
-  novaCompetencia.value.descricao = '';
-  atividadesSelecionadas.value = [];
   competenciaSendoEditada.value = null;
-
-  fecharModalCriarNovaCompetencia();
+  mostrarModalCriarNovaCompetencia.value = false
 }
 
 function excluirCompetencia(codigo: number) {

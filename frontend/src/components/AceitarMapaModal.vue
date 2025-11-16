@@ -1,65 +1,62 @@
 <template>
-  <BaseModal
-    :mostrar="mostrarModal"
-    :titulo="tituloModal"
-    :tipo="perfil === 'ADMIN' ? 'success' : 'primary'"
-    :icone="perfil === 'ADMIN' ? 'bi bi-check-circle' : 'bi bi-check-circle'"
-    @fechar="$emit('fecharModal')"
+  <b-modal
+    v-model="show"
+    :title="tituloModal"
+    :header-class="headerClass"
+    size="lg"
+    centered
+    @hidden="$emit('fecharModal')"
   >
-    <template #conteudo>
-      <div data-testid="modal-aceite-body">
-        <p v-if="perfil === 'ADMIN'">
-          {{ corpoModal }}
-        </p>
-        <div
-          v-else
-          class="mb-3"
-        >
-          <label
-            for="observacao-textarea"
-            class="form-label"
-          >{{ corpoModal }}</label>
-          <textarea
-            id="observacao-textarea"
-            v-model="observacao"
-            class="form-control"
-            rows="4"
-            placeholder="Digite suas observações sobre o mapa..."
-            data-testid="observacao-aceite-textarea"
-          />
-          <div class="form-text">
-            As observações serão registradas junto com a validação do mapa.
-          </div>
+    <div data-testid="modal-aceite-body">
+      <p v-if="perfil === 'ADMIN'">
+        {{ corpoModal }}
+      </p>
+      <div
+        v-else
+        class="mb-3"
+      >
+        <label
+          for="observacao-textarea"
+          class="form-label"
+          v-html="corpoModal"
+        />
+        <textarea
+          id="observacao-textarea"
+          v-model="observacao"
+          class="form-control"
+          rows="4"
+          placeholder="Digite suas observações sobre o mapa..."
+          data-testid="observacao-aceite-textarea"
+        />
+        <div class="form-text">
+          As observações serão registradas junto com a validação do mapa.
         </div>
       </div>
-    </template>
+    </div>
 
-    <template #acoes>
-      <button
-        type="button"
-        class="btn btn-secondary"
+    <template #footer>
+      <b-button
+        variant="secondary"
         data-testid="modal-aceite-cancelar"
         @click="$emit('fecharModal')"
       >
         <i class="bi bi-x-circle me-1" />
         Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-success"
+      </b-button>
+      <b-button
+        variant="success"
         data-testid="modal-aceite-confirmar"
         @click="$emit('confirmarAceitacao', observacao)"
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar
-      </button>
+      </b-button>
     </template>
-  </BaseModal>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
-import BaseModal from './BaseModal.vue';
+import { computed, ref } from 'vue';
 
 interface Props {
   mostrarModal: boolean;
@@ -68,12 +65,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-defineEmits<{
-  fecharModal: [];
-  confirmarAceitacao: [observacao: string];
+const emit = defineEmits<{
+  (e: 'update:mostrarModal', value: boolean): void;
+  (e: 'confirmarAceitacao', observacao: string): void;
+  (e: 'fecharModal'): void;
 }>();
 
 const observacao = ref('');
+
+const show = computed({
+  get: () => props.mostrarModal,
+  set: (value) => emit('update:mostrarModal', value),
+});
 
 const tituloModal = computed(() => {
   return props.perfil === 'ADMIN' ? 'Homologação' : 'Aceitar Mapa de Competências';
@@ -85,8 +88,8 @@ const corpoModal = computed(() => {
     : 'Observações <small class="text-muted">(opcional)</small>';
 });
 
-computed(() => {
-  return props.perfil !== 'ADMIN';
+const headerClass = computed(() => {
+  return props.perfil === 'ADMIN' ? 'bg-success text-white' : 'bg-primary text-white';
 });
 </script>
 
@@ -94,16 +97,5 @@ computed(() => {
 .form-control:focus {
   border-color: var(--bs-success);
   box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
-  border: none;
-  transition: transform 0.2s ease;
-}
-
-.btn-success:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, var(--bs-success) 0%, var(--bs-success) 100%);
 }
 </style>

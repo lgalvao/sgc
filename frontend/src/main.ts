@@ -2,10 +2,12 @@ import {createApp} from "vue";
 import App from "./App.vue";
 import router from "./router/index";
 import {createPinia} from "pinia";
+import {createBootstrap} from 'bootstrap-vue-next'
+
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 import "./style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 declare global {
   interface Window {
@@ -22,6 +24,7 @@ app.use(pinia);
 window.pinia = pinia;
 
 app.use(router);
+app.use(createBootstrap())
 
 app.mount('#app');
 

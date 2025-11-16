@@ -1,173 +1,132 @@
 <template>
-  <div
-    v-if="mostrarModal"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
+  <b-modal
+    v-model="show"
+    title="Sistema de Notificações"
+    size="xl"
+    centered
+    @hidden="fecharModal"
   >
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-bell me-2" />
-            Sistema de Notificações
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-testid="btn-modal-fechar"
-            @click="fecharModal"
-          />
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6>Notificações do Sistema</h6>
-              <button
-                class="btn btn-sm btn-outline-danger"
-                data-testid="btn-limpar-notificacoes"
-                @click="limparTodas"
-              >
-                <i class="bi bi-trash me-1" />
-                Limpar Todas
-              </button>
-            </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6>Notificações do Sistema</h6>
+        <b-button
+          variant="outline-danger"
+          size="sm"
+          data-testid="btn-limpar-notificacoes"
+          @click="limparTodas"
+        >
+          <i class="bi bi-trash me-1" />
+          Limpar Todas
+        </b-button>
+      </div>
 
-            <div
-              v-if="notificacoes.length === 0"
-              class="text-center text-muted py-4"
-            >
-              <i class="bi bi-bell-slash display-4" />
-              <p class="mt-2">
-                Nenhuma notificação no momento.
-              </p>
-            </div>
+      <div
+        v-if="notificacoes.length === 0"
+        class="text-center text-muted py-4"
+      >
+        <i class="bi bi-bell-slash display-4" />
+        <p class="mt-2">
+          Nenhuma notificação no momento.
+        </p>
+      </div>
 
-            <div
-              v-else
-              class="list-group"
-            >
-              <div
-                v-for="notificacao in notificacoesOrdenadas"
-                :key="notificacao.id"
-                :class="['list-group-item list-group-item-action', classeNotificacao(notificacao)]"
-                :data-testid="`notificacao-${notificacao.tipo}`"
+      <div
+        v-else
+        class="list-group"
+      >
+        <div
+          v-for="notificacao in notificacoesOrdenadas"
+          :key="notificacao.id"
+          :class="['list-group-item list-group-item-action', classeNotificacao(notificacao)]"
+          :data-testid="`notificacao-${notificacao.tipo}`"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <div class="d-flex align-items-center">
+              <i
+                :class="iconeTipo(notificacao.tipo)"
+                class="me-2"
+              />
+              <h6 class="mb-1">
+                {{ notificacao.titulo }}
+              </h6>
+            </div>
+            <div class="d-flex align-items-center">
+              <small class="text-muted me-2">{{ formatarDataHora(notificacao.timestamp) }}</small>
+              <b-button
+                variant="outline-secondary"
+                size="sm"
+                title="Remover notificação"
+                @click="removerNotificacao(notificacao.id)"
               >
-                <div class="d-flex w-100 justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <i
-                      :class="iconeTipo(notificacao.tipo)"
-                      class="me-2"
-                    />
-                    <h6 class="mb-1">
-                      {{ notificacao.titulo }}
-                    </h6>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <small class="text-muted me-2">{{ formatarDataHora(notificacao.timestamp) }}</small>
-                    <button
-                      class="btn btn-sm btn-outline-secondary"
-                      title="Remover notificação"
-                      @click="removerNotificacao(notificacao.id)"
-                    >
-                      <i class="bi bi-x" />
-                    </button>
-                  </div>
-                </div>
-                <p class="mb-1">
-                  {{ notificacao.mensagem }}
-                </p>
-                <div
-                  v-if="notificacao.tipo === 'email' && notificacao.emailContent"
-                  class="mt-2"
-                >
-                  <button
-                    class="btn btn-sm btn-outline-primary"
-                    data-testid="btn-ver-email"
-                    @click="mostrarEmail(notificacao)"
-                  >
-                    <i class="bi bi-envelope me-1" />
-                    Ver e-mail completo
-                  </button>
-                </div>
-              </div>
+                <i class="bi bi-x" />
+              </b-button>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-testid="btn-modal-fechar"
-            @click="fecharModal"
+          <p class="mb-1">
+            {{ notificacao.mensagem }}
+          </p>
+          <div
+            v-if="notificacao.tipo === 'email' && notificacao.emailContent"
+            class="mt-2"
           >
-            Fechar
-          </button>
+            <b-button
+              variant="outline-primary"
+              size="sm"
+              data-testid="btn-ver-email"
+              @click="mostrarEmail(notificacao)"
+            >
+              <i class="bi bi-envelope me-1" />
+              Ver e-mail completo
+            </b-button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div
-    v-if="mostrarModal"
-    class="modal-backdrop fade show"
-  />
+    <template #footer>
+      <b-button
+        variant="secondary"
+        data-testid="btn-modal-fechar"
+        @click="fecharModal"
+      >
+        Fechar
+      </b-button>
+    </template>
+  </b-modal>
 
   <!-- Modal para visualizar e-mail completo -->
-  <div
-    v-if="emailModalVisivel"
-    class="modal fade show"
-    style="display: block;"
-    tabindex="-1"
+  <b-modal
+    v-model="emailModalVisivel"
+    title="E-mail Simulado"
+    size="lg"
+    centered
+    @hidden="fecharEmailModal"
   >
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-envelope me-2" />
-            E-mail Simulado
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-testid="btn-modal-fechar"
-            @click="fecharEmailModal"
-          />
-        </div>
-        <div class="modal-body">
-          <div v-if="emailAtual">
-            <div class="mb-3">
-              <strong>Assunto:</strong> {{ emailAtual.assunto }}
-            </div>
-            <div class="mb-3">
-              <strong>Destinatário:</strong> {{ emailAtual.destinatario }}
-            </div>
-            <div class="mb-3">
-              <strong>Corpo:</strong>
-              <div class="mt-2 p-3 bg-light rounded">
-                <pre style="white-space: pre-wrap; font-family: inherit;">{{ emailAtual.corpo }}</pre>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-testid="btn-modal-fechar"
-            @click="fecharEmailModal"
-          >
-            Fechar
-          </button>
+    <div v-if="emailAtual">
+      <div class="mb-3">
+        <strong>Assunto:</strong> {{ emailAtual.assunto }}
+      </div>
+      <div class="mb-3">
+        <strong>Destinatário:</strong> {{ emailAtual.destinatario }}
+      </div>
+      <div class="mb-3">
+        <strong>Corpo:</strong>
+        <div class="mt-2 p-3 bg-light rounded">
+          <pre style="white-space: pre-wrap; font-family: inherit;">{{ emailAtual.corpo }}</pre>
         </div>
       </div>
     </div>
-  </div>
 
-  <div
-    v-if="emailModalVisivel"
-    class="modal-backdrop fade show"
-  />
+    <template #footer>
+      <b-button
+        variant="secondary"
+        data-testid="btn-modal-fechar"
+        @click="fecharEmailModal"
+      >
+        Fechar
+      </b-button>
+    </template>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
@@ -180,10 +139,10 @@ interface Props {
   mostrarModal: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  fecharModal: []
+  (e: 'update:mostrarModal', value: boolean): void
 }>()
 
 const notificacoesStore = useNotificacoesStore()
@@ -193,6 +152,11 @@ const {removerNotificacao, limparTodas} = notificacoesStore
 // Estado para modal de email
 const emailModalVisivel = ref(false)
 const emailAtual = ref<EmailContent | null>(null)
+
+const show = computed({
+  get: () => props.mostrarModal,
+  set: (value) => emit('update:mostrarModal', value)
+})
 
 const notificacoesOrdenadas = computed(() => {
   return [...notificacoes.value].sort((a, b) =>
@@ -251,7 +215,7 @@ const fecharEmailModal = () => {
 }
 
 const fecharModal = () => {
-  emit('fecharModal')
+  emit('update:mostrarModal', false)
 }
 </script>
 
