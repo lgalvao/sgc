@@ -28,7 +28,10 @@ const mockUnidades: Unidade[] = [
                     "ramal": "1313",
                     "usuarioTitulo": "Servidor Responsável 13",
                     "unidadeCodigo": 1,
-                    "tipo": "SERVIDOR"
+                    "tipo": "SERVIDOR",
+                    "idServidor": 13,
+                    "dataInicio": "2023-01-01",
+                    "dataFim": null
                 },
                 "filhas": [
                     {
@@ -82,7 +85,10 @@ const mockUnidades: Unidade[] = [
                                     "ramal": "8888",
                                     "usuarioTitulo": "Servidor Responsável 8",
                                     "unidadeCodigo": 1,
-                                    "tipo": "SERVIDOR"
+                                    "tipo": "SERVIDOR",
+                                    "idServidor": 8,
+                                    "dataInicio": "2023-01-01",
+                                    "dataFim": null
                                 },
                                 "filhas": [],
                                 "codigo": 8

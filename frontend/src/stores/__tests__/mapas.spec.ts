@@ -118,7 +118,7 @@ describe('useMapasStore', () => {
 
     describe('adicionarCompetencia', () => {
         it('should call service and update state on success', async () => {
-            const competencia = { descricao: 'Nova Competencia' };
+            const competencia = { descricao: 'Nova Competencia', codigo: 0, atividadesAssociadas: [] };
             const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}], situacao: 'EM_ANDAMENTO'};
             vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(mockResponse);
 
@@ -131,7 +131,7 @@ describe('useMapasStore', () => {
 
     describe('atualizarCompetencia', () => {
         it('should call service and update state on success', async () => {
-            const competencia = { codigo: 1, descricao: 'Competencia Atualizada' };
+            const competencia = { codigo: 1, descricao: 'Competencia Atualizada', atividadesAssociadas: [] };
             const mockResponse: MapaCompleto = {codigo: 1, subprocessoCodigo: 1, observacoes: 'teste', competencias: [{codigo: 1, descricao: 'Nova', atividadesAssociadas: []}], situacao: 'EM_ANDAMENTO'};
             vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(mockResponse);
 
@@ -157,7 +157,7 @@ describe('useMapasStore', () => {
 
     describe('fetchMapaVisualizacao', () => {
         it('should call service and update state on success', async () => {
-            const mockMapa: MapaVisualizacao = { id: 1, nome: 'Teste' };
+            const mockMapa: MapaVisualizacao = { codigo: 1, descricao: 'Teste', competencias: [] };
             vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue(mockMapa);
 
             await store.fetchMapaVisualizacao(codSubrocesso);
@@ -178,7 +178,7 @@ describe('useMapasStore', () => {
 
     describe('disponibilizarMapa', () => {
         it('should call service successfully', async () => {
-            const request = { observacoes: 'teste' };
+            const request = { observacoes: 'teste', dataLimite: '2025-12-31' };
             vi.mocked(mapaService.disponibilizarMapa).mockResolvedValue(undefined);
 
             await store.disponibilizarMapa(codSubrocesso, request);
@@ -187,7 +187,7 @@ describe('useMapasStore', () => {
         });
 
         it('should throw error on failure', async () => {
-            const request = { observacoes: 'teste' };
+            const request = { observacoes: 'teste', dataLimite: '2025-12-31' };
             const error = { response: { data: { message: 'Error' } } };
             vi.mocked(mapaService.disponibilizarMapa).mockRejectedValue(error);
 

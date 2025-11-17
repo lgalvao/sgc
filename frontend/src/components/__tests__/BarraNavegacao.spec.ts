@@ -25,6 +25,12 @@ const createMockRoute = (path: string, matched: any[]) => ({
   path,
   matched,
   params: { id: '123' },
+  name: '',
+  fullPath: path,
+  query: {},
+  hash: '',
+  meta: {},
+  redirectedFrom: undefined,
 })
 
 const mockMatchedDefault = [

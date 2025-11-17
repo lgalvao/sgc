@@ -38,6 +38,22 @@ export interface Unidade {
     tipo?: string;
     idServidorTitular?: number;
     isElegivel?: boolean;
+    responsavel?: Responsavel | null;
+}
+
+export interface Responsavel {
+    codigo: number;
+    nome: string;
+    tituloEleitoral: string;
+    unidade: Unidade;
+    email: string;
+    ramal: string;
+    usuarioTitulo: string;
+    unidadeCodigo: number;
+    idServidor: number;
+    tipo: string;
+    dataInicio: string;
+    dataFim: string | null;
 }
 
 /**
@@ -281,6 +297,12 @@ export interface AtividadeVisualizacao {
     conhecimentos: ConhecimentoVisualizacao[];
 }
 
+
+export interface CompetenciaVisualizacao {
+    codigo: number;
+    descricao: string;
+    atividades: AtividadeVisualizacao[];
+}
 
 export interface MapaVisualizacao {
     codigo: number;
