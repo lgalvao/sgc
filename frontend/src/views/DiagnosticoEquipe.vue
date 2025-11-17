@@ -41,57 +41,36 @@
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold">Importância da competência:</label>
-              <select
+              <b-form-select
                 v-model="avaliacoes[competencia.codigo].importancia"
-                class="form-select"
-              >
-                <option value="1">
-                  1 - Muito baixa
-                </option>
-                <option value="2">
-                  2 - Baixa
-                </option>
-                <option value="3">
-                  3 - Média
-                </option>
-                <option value="4">
-                  4 - Alta
-                </option>
-                <option value="5">
-                  5 - Muito alta
-                </option>
-              </select>
+                :options="[
+                  { value: 1, text: '1 - Muito baixa' },
+                  { value: 2, text: '2 - Baixa' },
+                  { value: 3, text: '3 - Média' },
+                  { value: 4, text: '4 - Alta' },
+                  { value: 5, text: '5 - Muito alta' },
+                ]"
+              />
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Domínio da competência pela equipe:</label>
-              <select
+              <b-form-select
                 v-model="avaliacoes[competencia.codigo].dominio"
-                class="form-select"
-              >
-                <option value="1">
-                  1 - Muito baixo
-                </option>
-                <option value="2">
-                  2 - Baixo
-                </option>
-                <option value="3">
-                  3 - Médio
-                </option>
-                <option value="4">
-                  4 - Alto
-                </option>
-                <option value="5">
-                  5 - Muito alto
-                </option>
-              </select>
+                :options="[
+                  { value: 1, text: '1 - Muito baixo' },
+                  { value: 2, text: '2 - Baixo' },
+                  { value: 3, text: '3 - Médio' },
+                  { value: 4, text: '4 - Alto' },
+                  { value: 5, text: '5 - Muito alto' },
+                ]"
+              />
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Observações:</label>
-              <textarea
+              <b-form-textarea
                 v-model="avaliacoes[competencia.codigo].observacoes"
-                class="form-control"
                 rows="2"
                 placeholder="Comentários sobre esta competência..."
               />

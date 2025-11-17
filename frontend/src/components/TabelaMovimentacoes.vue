@@ -7,38 +7,33 @@
     >
       Nenhuma movimentação registrada para este subprocesso.
     </div>
-    <table
+    <b-table
       v-else
-      class="table table-striped"
+      striped
+      :items="movimentacoes"
+      :fields="fields"
+      primary-key="codigo"
     >
-      <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Unidade Origem</th>
-          <th>Unidade Destino</th>
-          <th>Descrição</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="movimentacao in movimentacoes"
-          :key="movimentacao.codigo"
-        >
-          <td>{{ formatDateTimeBR(movimentacao.dataHora) }}</td>
-          <td>{{ movimentacao.unidadeOrigem }}</td>
-          <td>{{ movimentacao.unidadeDestino }}</td>
-          <td>{{ movimentacao.descricao }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <template #cell(dataHora)="data">
+        {{ formatDateTimeBR(data.item.dataHora) }}
+      </template>
+    </b-table>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type {Movimentacao} from '@/types/tipos';
 import {formatDateTimeBR} from '@/utils';
+import {ref} from 'vue';
 
 defineProps<{
   movimentacoes: Movimentacao[]
 }>();
+
+const fields = ref([
+  { key: 'dataHora', label: 'Data/Hora' },
+  { key: 'unidadeOrigem', label: 'Unidade Origem' },
+  { key: 'unidadeDestino', label: 'Unidade Destino' },
+  { key: 'descricao', label: 'Descrição' }
+]);
 </script>

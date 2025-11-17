@@ -84,42 +84,30 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nome da Ocupação</label>
-              <input
+              <b-form-input
                 v-model="novaOcupacao.nome"
                 type="text"
-                class="form-control"
                 required
-              >
+              />
             </div>
             <div class="col-md-6">
               <label class="form-label">Nível de Criticidade</label>
-              <select
+              <b-form-select
                 v-model="novaOcupacao.nivelCriticidade"
-                class="form-select"
                 required
-              >
-                <option value="1">
-                  1 - Baixo
-                </option>
-                <option value="2">
-                  2 - Baixo-Médio
-                </option>
-                <option value="3">
-                  3 - Médio
-                </option>
-                <option value="4">
-                  4 - Alto
-                </option>
-                <option value="5">
-                  5 - Muito Alto
-                </option>
-              </select>
+                :options="[
+                  { value: 1, text: '1 - Baixo' },
+                  { value: 2, text: '2 - Baixo-Médio' },
+                  { value: 3, text: '3 - Médio' },
+                  { value: 4, text: '4 - Alto' },
+                  { value: 5, text: '5 - Muito Alto' },
+                ]"
+              />
             </div>
             <div class="col-12">
               <label class="form-label">Descrição</label>
-              <textarea
+              <b-form-textarea
                 v-model="novaOcupacao.descricao"
-                class="form-control"
                 rows="3"
                 required
               />
@@ -132,20 +120,13 @@
                   :key="competencia.codigo"
                   class="form-check"
                 >
-                  <input
-                    :id="'comp-' + competencia.codigo"
-                    v-model="novaOcupacao.competenciasCriticas"
-                    :value="competencia.descricao"
-                    type="checkbox"
-                    class="form-check-input"
-                  >
-                  <label
-                    :for="'comp-' + competencia.codigo"
-                    class="form-check-label"
-                  >
-                    {{ competencia.descricao }}
-                  </label>
-                </div>
+                                  <b-form-checkbox
+                                    :id="'comp-' + competencia.codigo"
+                                    v-model="novaOcupacao.competenciasCriticas"
+                                    :value="competencia.descricao"
+                                  >
+                                    {{ competencia.descricao }}
+                                  </b-form-checkbox>                </div>
               </div>
             </div>
             <div class="col-12">

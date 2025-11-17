@@ -11,48 +11,38 @@
           for="filtroTipo"
           class="form-label"
         >Tipo de Processo</label>
-        <select
+        <b-form-select
           id="filtroTipo"
           v-model="filtroTipo"
-          class="form-select"
-        >
-          <option value="">
-            Todos
-          </option>
-          <option value="Mapeamento">
-            Mapeamento
-          </option>
-          <option value="Revisão">
-            Revisão
-          </option>
-          <option value="Diagnóstico">
-            Diagnóstico
-          </option>
-        </select>
+          :options="[
+            { value: '', text: 'Todos' },
+            { value: 'Mapeamento', text: 'Mapeamento' },
+            { value: 'Revisão', text: 'Revisão' },
+            { value: 'Diagnóstico', text: 'Diagnóstico' },
+          ]"
+        />
       </div>
       <div class="col-md-4">
         <label
           for="filtroDataInicio"
           class="form-label"
         >Data Início</label>
-        <input
+        <b-form-input
           id="filtroDataInicio"
           v-model="filtroDataInicio"
           type="date"
-          class="form-control"
-        >
+        />
       </div>
       <div class="col-md-4">
         <label
           for="filtroDataFim"
           class="form-label"
         >Data Fim</label>
-        <input
+        <b-form-input
           id="filtroDataFim"
           v-model="filtroDataFim"
           type="date"
-          class="form-control"
-        >
+        />
       </div>
     </div>
 

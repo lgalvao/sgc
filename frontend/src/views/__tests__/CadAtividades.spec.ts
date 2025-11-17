@@ -6,6 +6,7 @@ import {useAtividadesStore} from '@/stores/atividades'
 import {useProcessosStore} from '@/stores/processos'
 import {useSubprocessosStore} from '@/stores/subprocessos'
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos'
+import { BFormInput } from 'bootstrap-vue-next';
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({
@@ -73,6 +74,9 @@ describe('CadAtividades.vue', () => {
             stubActions: false,
           }),
         ],
+        components: {
+          BFormInput,
+        },
       },
       attachTo: document.body,
     });
@@ -99,8 +103,9 @@ describe('CadAtividades.vue', () => {
   });
 
   it('deve adicionar uma atividade', async () => {
-    const input = wrapper.find('[data-testid="input-nova-atividade"]');
-    await input.setValue('Nova Atividade');
+    const inputWrapper = wrapper.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find('input');
+    await nativeInput.setValue('Nova Atividade');
     await wrapper.find('[data-testid="form-nova-atividade"]').trigger('submit.prevent');
 
     expect(atividadesStore.adicionarAtividade).toHaveBeenCalledWith(
@@ -117,8 +122,9 @@ describe('CadAtividades.vue', () => {
 
   it('deve adicionar um conhecimento', async () => {
     const form = wrapper.find('[data-testid="form-novo-conhecimento"]');
-    const input = form.find('[data-testid="input-novo-conhecimento"]');
-    await input.setValue('Novo Conhecimento');
+    const inputWrapper = form.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find('input');
+    await nativeInput.setValue('Novo Conhecimento');
     await form.trigger('submit.prevent');
 
     expect(atividadesStore.adicionarConhecimento).toHaveBeenCalledWith(

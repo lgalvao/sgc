@@ -25,26 +25,23 @@
           class="form-label"
           for="processo-select"
         >Processo</label>
-        <select
+        <b-form-select
           id="processo-select"
           v-model="processoSelecionadoId"
-          class="form-select"
           data-testid="select-processo"
+          :options="processosDisponiveis"
+          value-field="codigo"
+          text-field="descricao"
         >
-          <option
-            disabled
-            value=""
-          >
-            Selecione
-          </option>
-          <option
-            v-for="proc in processosDisponiveis"
-            :key="proc.codigo"
-            :value="proc.codigo"
-          >
-            {{ proc.descricao }}
-          </option>
-        </select>
+          <template #first>
+            <b-form-select-option
+              disabled
+              value=""
+            >
+              Selecione
+            </b-form-select-option>
+          </template>
+        </b-form-select>
         <div
           v-if="!processosDisponiveis.length"
           class="text-center text-muted mt-3"
@@ -58,27 +55,24 @@
           class="form-label"
           for="unidade-select"
         >Unidade</label>
-        <select
+        <b-form-select
           id="unidade-select"
           v-model="unidadeSelecionadaId"
           :disabled="!processoSelecionado"
-          class="form-select"
           data-testid="select-unidade"
+          :options="unidadesParticipantes"
+          value-field="codUnidade"
+          text-field="sigla"
         >
-          <option
-            disabled
-            value=""
-          >
-            Selecione
-          </option>
-          <option
-            v-for="pu in unidadesParticipantes"
-            :key="pu.codUnidade"
-            :value="pu.codUnidade"
-          >
-            {{ pu.sigla }}
-          </option>
-        </select>
+          <template #first>
+            <b-form-select-option
+              disabled
+              value=""
+            >
+              Selecione
+            </b-form-select-option>
+          </template>
+        </b-form-select>
       </div>
 
       <div v-if="unidadeSelecionada">
@@ -92,20 +86,14 @@
             :key="ativ.codigo"
             class="form-check"
           >
-            <input
+            <b-form-checkbox
               :id="`ativ-check-${ativ.codigo}`"
               v-model="atividadesSelecionadas"
               :value="ativ"
-              class="form-check-input"
-              type="checkbox"
               :data-testid="`checkbox-atividade-${ativ.codigo}`"
             >
-            <label
-              :for="`ativ-check-${ativ.codigo}`"
-              class="form-check-label"
-            >
               {{ ativ.descricao }}
-            </label>
+            </b-form-checkbox>
           </div>
         </div>
         <div

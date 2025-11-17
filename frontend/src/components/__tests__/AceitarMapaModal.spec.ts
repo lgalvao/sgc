@@ -2,17 +2,27 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AceitarMapaModal from '../AceitarMapaModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
+import { BFormTextarea } from 'bootstrap-vue-next';
 
 describe('AceitarMapaModal', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
+  const globalComponents = {
+    global: {
+      components: {
+        BFormTextarea,
+      },
+    },
+  };
+
   it('não deve renderizar o modal quando mostrarModal for falso', () => {
     const wrapper = mount(AceitarMapaModal, {
       props: {
         mostrarModal: false,
       },
+      ...globalComponents,
     });
     expect(wrapper.find('[data-testid="modal-aceite-body"]').exists()).toBe(false);
   });
@@ -22,6 +32,7 @@ describe('AceitarMapaModal', () => {
       props: {
         mostrarModal: true,
       },
+      ...globalComponents,
     });
 
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
@@ -36,6 +47,7 @@ describe('AceitarMapaModal', () => {
         mostrarModal: true,
         perfil: 'ADMIN',
       },
+      ...globalComponents,
     });
 
     const corpoModal = wrapper.find('[data-testid="modal-aceite-body"]');
@@ -49,6 +61,7 @@ describe('AceitarMapaModal', () => {
       props: {
         mostrarModal: true,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="modal-aceite-cancelar"]').trigger('click');
@@ -60,10 +73,13 @@ describe('AceitarMapaModal', () => {
       props: {
         mostrarModal: true,
       },
+      ...globalComponents,
     });
 
     const observacao = 'Mapa de competências está de acordo com o esperado.';
-    await wrapper.find('[data-testid="observacao-aceite-textarea"]').setValue(observacao);
+    const textareaWrapper = wrapper.findComponent(BFormTextarea);
+    const nativeTextarea = textareaWrapper.find('textarea');
+    await nativeTextarea.setValue(observacao);
     await wrapper.find('[data-testid="modal-aceite-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('confirmarAceitacao')).toBeTruthy();
@@ -75,6 +91,7 @@ describe('AceitarMapaModal', () => {
       props: {
         mostrarModal: true,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="modal-aceite-confirmar"]').trigger('click');

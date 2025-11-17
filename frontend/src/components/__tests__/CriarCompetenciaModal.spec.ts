@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import CriarCompetenciaModal from '../CriarCompetenciaModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
+import { BFormTextarea, BFormCheckbox } from 'bootstrap-vue-next';
 
 describe('CriarCompetenciaModal', () => {
   beforeEach(() => {
@@ -13,12 +14,22 @@ describe('CriarCompetenciaModal', () => {
     { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }] },
   ];
 
+  const globalComponents = {
+    global: {
+      components: {
+        BFormTextarea,
+        BFormCheckbox,
+      },
+    },
+  };
+
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(CriarCompetenciaModal, {
       props: {
         mostrar: false,
         atividades: [],
       },
+      ...globalComponents,
     });
     expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
   });
@@ -29,9 +40,10 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
+      ...globalComponents,
     });
 
-    expect(wrapper.find('textarea').element.value).toBe('');
+    expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('');
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeDefined();
   });
 
@@ -48,11 +60,12 @@ describe('CriarCompetenciaModal', () => {
         atividades,
         competenciaParaEditar,
       },
+      ...globalComponents,
     });
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('textarea').element.value).toBe('Competência existente');
+    expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('Competência existente');
   });
 
   it('deve habilitar o botão de salvar quando a descrição e pelo menos uma atividade forem selecionadas', async () => {
@@ -61,10 +74,13 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
+      ...globalComponents,
     });
 
-    await wrapper.find('textarea').setValue('Nova competência');
-    await wrapper.find('.atividade-card-item').trigger('click');
+    const textareaWrapper = wrapper.findComponent(BFormTextarea);
+    const nativeTextarea = textareaWrapper.find('textarea');
+    await nativeTextarea.setValue('Nova competência');
+    await wrapper.findComponent(BFormCheckbox).trigger('click');
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeUndefined();
   });
 
@@ -74,6 +90,7 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -86,11 +103,14 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
+      ...globalComponents,
     });
 
     const descricao = 'Competência de teste';
-    await wrapper.find('textarea').setValue(descricao);
-    await wrapper.find('.atividade-card-item').trigger('click');
+    const textareaWrapper = wrapper.findComponent(BFormTextarea);
+    const nativeTextarea = textareaWrapper.find('textarea');
+    await nativeTextarea.setValue(descricao);
+    await wrapper.findComponent(BFormCheckbox).trigger('click');
     await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();

@@ -172,10 +172,9 @@
                 for="sugestoesTextarea"
                 class="form-label"
               >Sugestões para o mapa de competências:</label>
-              <textarea
+              <b-form-textarea
                 id="sugestoesTextarea"
                 v-model="sugestoes"
-                class="form-control"
                 rows="5"
                 placeholder="Digite suas sugestões para o mapa de competências..."
                 data-testid="sugestoes-textarea"
@@ -233,9 +232,8 @@
           >
             <div class="mb-3">
               <label class="form-label">Sugestões registradas para o mapa de competências:</label>
-              <textarea
+              <b-form-textarea
                 v-model="sugestoesVisualizacao"
-                class="form-control"
                 rows="5"
                 readonly
                 data-testid="sugestoes-visualizacao-textarea"
@@ -340,10 +338,9 @@
                 for="observacaoDevolucao"
                 class="form-label"
               >Observação:</label>
-              <textarea
+              <b-form-textarea
                 id="observacaoDevolucao"
                 v-model="observacaoDevolucao"
-                class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a devolução..."
                 data-testid="observacao-devolucao-textarea"

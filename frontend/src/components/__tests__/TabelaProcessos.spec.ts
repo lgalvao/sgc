@@ -2,7 +2,53 @@ import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import TabelaProcessos from '../TabelaProcessos.vue';
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
-import {BTable} from 'bootstrap-vue-next';
+
+// Mock BTable component
+const MockBTable = {
+  template: `
+    <table class="table">
+      <thead>
+        <tr>
+          <th v-for="field in fields" :key="field.key" :aria-sort="getAriaSort(field.key)" @click="handleSort(field.key)">
+            {{ field.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="items.length === 0">
+          <td :colspan="fields.length">
+            <slot name="empty"></slot>
+          </td>
+        </tr>
+        <tr v-for="(item, index) in items" :key="index" @click="$emit('row-clicked', item)">
+          <td v-for="field in fields" :key="field.key">
+            {{ getItemValue(item, field.key) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `,
+  props: ['items', 'fields', 'sortBy', 'sortDesc'],
+  emits: ['row-clicked', 'sort-changed'],
+  methods: {
+    getAriaSort(key) {
+      if (this.sortBy === key) {
+        return this.sortDesc ? 'descending' : 'ascending';
+      }
+      return 'none';
+    },
+    getItemValue(item, key) {
+      // Handle nested properties if necessary
+      if (key.includes('.')) {
+        return key.split('.').reduce((o, i) => (o ? o[i] : ''), item);
+      }
+      return item[key];
+    },
+    handleSort(key) {
+      this.$emit('sort-changed', { sortBy: key, sortDesc: !this.sortDesc });
+    }
+  },
+};
 
 // Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
@@ -35,7 +81,7 @@ describe('TabelaProcessos.vue', () => {
   const mountOptions = {
     global: {
       components: {
-        BTable,
+        BTable: MockBTable,
       },
     },
   };
@@ -50,7 +96,7 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    const table = wrapper.findComponent(BTable);
+    const table = wrapper.findComponent(MockBTable);
     expect(table.exists()).toBe(true);
 
     await wrapper.vm.$nextTick();
@@ -97,7 +143,7 @@ describe('TabelaProcessos.vue', () => {
       },
     });
 
-    await wrapper.findComponent(BTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
+    await wrapper.findComponent(MockBTable).vm.$emit('sort-changed', { sortBy: 'tipo' });
 
     expect(wrapper.emitted('ordenar')).toBeTruthy();
     expect(wrapper.emitted('ordenar')![0]).toEqual(['tipo']);

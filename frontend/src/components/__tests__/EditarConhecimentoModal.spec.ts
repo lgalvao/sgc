@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import EditarConhecimentoModal from '../EditarConhecimentoModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
+import { BFormTextarea } from 'bootstrap-vue-next';
 
 describe('EditarConhecimentoModal', () => {
   beforeEach(() => {
@@ -13,12 +14,21 @@ describe('EditarConhecimentoModal', () => {
     descricao: 'Conhecimento original',
   };
 
+  const globalComponents = {
+    global: {
+      components: {
+        BFormTextarea,
+      },
+    },
+  };
+
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(EditarConhecimentoModal, {
       props: {
         mostrar: false,
         conhecimento,
       },
+      ...globalComponents,
     });
     expect(wrapper.find('[data-testid="input-conhecimento-modal"]').exists()).toBe(false);
   });
@@ -29,10 +39,11 @@ describe('EditarConhecimentoModal', () => {
         mostrar: true,
         conhecimento,
       },
+      ...globalComponents,
     });
 
     const textarea = wrapper.find('[data-testid="input-conhecimento-modal"]');
-    expect((textarea.element as HTMLTextAreaElement).value).toBe(conhecimento.descricao);
+    expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe(conhecimento.descricao);
   });
 
   it('deve desabilitar o botão de salvar quando a descrição estiver vazia', async () => {
@@ -41,9 +52,12 @@ describe('EditarConhecimentoModal', () => {
         mostrar: true,
         conhecimento,
       },
+      ...globalComponents,
     });
 
-    await wrapper.find('[data-testid="input-conhecimento-modal"]').setValue('');
+    const textareaWrapper = wrapper.findComponent(BFormTextarea);
+    const nativeTextarea = textareaWrapper.find('textarea');
+    await nativeTextarea.setValue('');
     const salvarButton = wrapper.find('[data-testid="btn-salvar-conhecimento-modal"]');
     expect(salvarButton.attributes('disabled')).toBeDefined();
   });
@@ -54,6 +68,7 @@ describe('EditarConhecimentoModal', () => {
         mostrar: true,
         conhecimento,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('button.btn-secondary').trigger('click');
@@ -66,10 +81,13 @@ describe('EditarConhecimentoModal', () => {
         mostrar: true,
         conhecimento,
       },
+      ...globalComponents,
     });
 
     const novaDescricao = 'Conhecimento atualizado';
-    await wrapper.find('[data-testid="input-conhecimento-modal"]').setValue(novaDescricao);
+    const textareaWrapper = wrapper.findComponent(BFormTextarea);
+    const nativeTextarea = textareaWrapper.find('textarea');
+    await nativeTextarea.setValue(novaDescricao);
     await wrapper.find('[data-testid="btn-salvar-conhecimento-modal"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();

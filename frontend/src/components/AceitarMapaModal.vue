@@ -21,10 +21,9 @@
         >
           Observações <span class="text-muted small">(opcional)</span>
         </label>
-        <textarea
+        <b-form-textarea
           id="observacao-textarea"
           v-model="observacao"
-          class="form-control"
           rows="4"
           placeholder="Digite suas observações sobre o mapa..."
           data-testid="observacao-aceite-textarea"

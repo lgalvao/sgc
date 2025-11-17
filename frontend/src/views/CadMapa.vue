@@ -146,9 +146,8 @@
             <div class="mb-4">
               <h5>Descrição</h5>
               <div class="mb-2">
-                <textarea
+                <b-form-textarea
                   v-model="novaCompetencia.descricao"
-                  class="form-control"
                   data-testid="input-nova-competencia"
                   placeholder="Descreva a competência"
                   rows="3"
@@ -165,19 +164,14 @@
                   :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
                   class="card atividade-card-item"
                   :data-testid="atividadesSelecionadas.includes(atividade.codigo) ? 'atividade-associada' : 'atividade-nao-associada'"
-                  @click="toggleAtividade(atividade.codigo)"
                 >
                   <div class="card-body d-flex align-items-center">
-                    <input
+                    <b-form-checkbox
                       :id="`atv-${atividade.codigo}`"
                       v-model="atividadesSelecionadas"
                       :value="atividade.codigo"
-                      class="form-check-input me-2"
                       data-testid="atividade-checkbox"
-                      hidden
-                      type="checkbox"
                     >
-                    <label class="form-check-label mb-0 d-flex align-items-center">
                       {{ atividade.descricao }}
                       <span
                         v-if="atividade.conhecimentos.length > 0"
@@ -191,7 +185,7 @@
                       >
                         {{ atividade.conhecimentos.length }}
                       </span>
-                    </label>
+                    </b-form-checkbox>
                   </div>
                 </div>
               </div>
@@ -261,24 +255,22 @@
                 class="form-label"
                 for="dataLimite"
               >Data limite para validação</label>
-              <input
+              <b-form-input
                 id="dataLimite"
                 v-model="dataLimiteValidacao"
                 data-testid="input-data-limite"
-                class="form-control"
                 type="date"
-              >
+              />
             </div>
             <div class="mb-3">
               <label
                 class="form-label"
                 for="observacoes"
               >Observações</label>
-              <textarea
+              <b-form-textarea
                 id="observacoes"
                 v-model="observacoesDisponibilizacao"
                 data-testid="input-observacoes-disponibilizacao"
-                class="form-control"
                 rows="3"
                 placeholder="Digite observações sobre a disponibilização..."
               />
@@ -487,14 +479,7 @@ const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const atividadesSelecionadas = ref<number[]>([])
 const novaCompetencia = ref({descricao: ''})
 
-function toggleAtividade(codigo: number) {
-  const index = atividadesSelecionadas.value.indexOf(codigo);
-  if (index > -1) {
-    atividadesSelecionadas.value.splice(index, 1);
-  } else {
-    atividadesSelecionadas.value.push(codigo);
-  }
-}
+
 
 
 const competenciaSendoEditada = ref<Competencia | null>(null)

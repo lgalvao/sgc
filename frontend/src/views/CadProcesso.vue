@@ -8,14 +8,13 @@
           class="form-label"
           for="descricao"
         >Descrição</label>
-        <input
+        <b-form-input
           id="descricao"
           v-model="descricao"
-          class="form-control"
           placeholder="Descreva o processo"
           type="text"
           data-testid="input-descricao"
-        >
+        />
       </div>
 
       <div class="mb-3">
@@ -23,20 +22,12 @@
           class="form-label"
           for="tipo"
         >Tipo</label>
-        <select
+        <b-form-select
           id="tipo"
           v-model="tipo"
-          class="form-select"
           data-testid="select-tipo"
-        >
-          <option
-            v-for="tipoOption in TipoProcesso"
-            :key="tipoOption"
-            :value="tipoOption"
-          >
-            {{ tipoOption }}
-          </option>
-        </select>
+          :options="Object.values(TipoProcesso)"
+        />
       </div>
 
       <div class="mb-3">
@@ -62,13 +53,12 @@
           class="form-label"
           for="dataLimite"
         >Data limite</label>
-        <input
+        <b-form-input
           id="dataLimite"
           v-model="dataLimite"
-          class="form-control"
           type="date"
           data-testid="input-dataLimite"
-        >
+        />
       </div>
       <button
         class="btn btn-primary"

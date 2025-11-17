@@ -29,12 +29,10 @@
             :key="unidade.sigla"
           >
             <td>
-              <input
+              <b-form-checkbox
                 :id="'chk-' + unidade.sigla"
                 v-model="unidade.selecionada"
-                type="checkbox"
-                class="form-check-input"
-              >
+              />
             </td>
             <td><strong>{{ unidade.sigla }}</strong></td>
             <td>{{ unidade.nome }}</td>

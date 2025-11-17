@@ -12,27 +12,19 @@
               class="form-label"
               for="servidor"
             >Servidor</label>
-            <select
+            <b-form-select
               id="servidor"
               v-model="servidorSelecionado"
-              class="form-select"
               data-testid="select-servidor"
               required
+              :options="servidores"
+              value-field="codigo"
+              text-field="nome"
             >
-              <option
-                :value="null"
-                disabled
-              >
-                Selecione um servidor
-              </option>
-              <option
-                v-for="servidor in servidores"
-                :key="servidor.codigo"
-                :value="servidor.codigo"
-              >
-                {{ servidor.nome }}
-              </option>
-            </select>
+              <template #first>
+                <b-form-select-option :value="null" disabled>Selecione um servidor</b-form-select-option>
+              </template>
+            </b-form-select>
             <div
               v-if="erroServidor"
               class="text-danger small mt-1"
@@ -46,14 +38,13 @@
               class="form-label"
               for="dataTermino"
             >Data de término</label>
-            <input
+            <b-form-input
               id="dataTermino"
               v-model="dataTermino"
-              class="form-control"
               data-testid="input-data-termino"
               required
               type="date"
-            >
+            />
           </div>
 
           <div class="mb-3">
@@ -61,10 +52,9 @@
               class="form-label"
               for="justificativa"
             >Justificativa</label>
-            <textarea
+            <b-form-textarea
               id="justificativa"
               v-model="justificativa"
-              class="form-control"
               data-testid="textarea-justificativa"
               required
             />

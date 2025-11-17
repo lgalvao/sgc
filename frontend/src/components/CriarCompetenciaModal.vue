@@ -9,9 +9,8 @@
     <div class="mb-4">
       <h5>Descrição</h5>
       <div class="mb-2">
-        <textarea
+        <b-form-textarea
           v-model="novaCompetencia.descricao"
-          class="form-control"
           placeholder="Descreva a competência"
           rows="3"
           data-testid="input-descricao-competencia"
@@ -27,18 +26,14 @@
           :key="atividade.codigo"
           :class="{ checked: atividadesSelecionadas.includes(atividade.codigo) }"
           class="card atividade-card-item"
-          @click="toggleAtividade(atividade.codigo)"
         >
           <div class="card-body d-flex align-items-center py-2">
-            <input
+            <b-form-checkbox
               :id="`atv-${atividade.codigo}`"
               v-model="atividadesSelecionadas"
               :value="atividade.codigo"
               class="form-check-input me-2"
-              hidden
-              type="checkbox"
             >
-            <label class="form-check-label mb-0 d-flex align-items-center">
               {{ atividade.descricao }}
               <span
                 v-if="atividade.conhecimentos.length > 0"
@@ -51,7 +46,7 @@
               >
                 {{ atividade.conhecimentos.length }}
               </span>
-            </label>
+            </b-form-checkbox>
           </div>
         </div>
       </div>
@@ -112,14 +107,7 @@ watch(() => props.mostrar, (mostrar) => {
   }
 }, { immediate: true })
 
-function toggleAtividade(codigo: number) {
-  const index = atividadesSelecionadas.value.indexOf(codigo)
-  if (index > -1) {
-    atividadesSelecionadas.value.splice(index, 1)
-  } else {
-    atividadesSelecionadas.value.push(codigo)
-  }
-}
+
 
 function getConhecimentosModal(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {

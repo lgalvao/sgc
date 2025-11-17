@@ -1,13 +1,23 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import DisponibilizarMapaModal from '../DisponibilizarMapaModal.vue';
+import { BFormInput } from 'bootstrap-vue-next';
 
 describe('DisponibilizarMapaModal', () => {
+  const globalComponents = {
+    global: {
+      components: {
+        BFormInput,
+      },
+    },
+  };
+
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(DisponibilizarMapaModal, {
       props: {
         mostrar: false,
       },
+      ...globalComponents,
     });
     expect(wrapper.find('[data-testid="input-data-limite"]').exists()).toBe(false);
   });
@@ -17,11 +27,12 @@ describe('DisponibilizarMapaModal', () => {
       props: {
         mostrar: true,
       },
+      ...globalComponents,
     });
 
     const dataInput = wrapper.find('[data-testid="input-data-limite"]');
     expect(dataInput.exists()).toBe(true);
-    expect((dataInput.element as HTMLInputElement).value).toBe('');
+    expect(wrapper.findComponent(BFormInput).props().modelValue).toBe('');
 
     const disponibilizarButton = wrapper.find('[data-testid="btn-disponibilizar"]');
     expect(disponibilizarButton.attributes('disabled')).toBeDefined();
@@ -32,9 +43,12 @@ describe('DisponibilizarMapaModal', () => {
       props: {
         mostrar: true,
       },
+      ...globalComponents,
     });
 
-    await wrapper.find('[data-testid="input-data-limite"]').setValue('2024-12-31');
+    const inputWrapper = wrapper.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find('input');
+    await nativeInput.setValue('2024-12-31');
     const disponibilizarButton = wrapper.find('[data-testid="btn-disponibilizar"]');
     expect(disponibilizarButton.attributes('disabled')).toBeUndefined();
   });
@@ -44,6 +58,7 @@ describe('DisponibilizarMapaModal', () => {
       props: {
         mostrar: true,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -55,10 +70,13 @@ describe('DisponibilizarMapaModal', () => {
       props: {
         mostrar: true,
       },
+      ...globalComponents,
     });
 
     const dataLimite = '2024-12-31';
-    await wrapper.find('[data-testid="input-data-limite"]').setValue(dataLimite);
+    const inputWrapper = wrapper.findComponent(BFormInput);
+    const nativeInput = inputWrapper.find('input');
+    await nativeInput.setValue(dataLimite);
     await wrapper.find('[data-testid="btn-disponibilizar"]').trigger('click');
 
     expect(wrapper.emitted('disponibilizar')).toBeTruthy();

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AcoesEmBlocoModal from '../AcoesEmBlocoModal.vue';
+import { BFormCheckbox } from 'bootstrap-vue-next';
 
 const unidadesDisponiveis = [
   { sigla: 'UND1', nome: 'Unidade 1', situacao: 'Pendente' },
@@ -8,6 +9,14 @@ const unidadesDisponiveis = [
 ];
 
 describe('AcoesEmBlocoModal', () => {
+  const globalComponents = {
+    global: {
+      components: {
+        BFormCheckbox,
+      },
+    },
+  };
+
   it("deve renderizar o título e o botão corretamente para a ação 'aceitar'", () => {
     const wrapper = mount(AcoesEmBlocoModal, {
       props: {
@@ -15,6 +24,7 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
 
     expect(wrapper.find('.table').exists()).toBe(true);
@@ -28,6 +38,7 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'homologar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
 
     expect(wrapper.find('.table').exists()).toBe(true);
@@ -41,14 +52,16 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
 
     await wrapper.setProps({ mostrar: true });
+    await wrapper.vm.$nextTick();
 
-    const checkboxes = wrapper.findAll<HTMLInputElement>('input[type="checkbox"]');
+    const checkboxes = wrapper.findAllComponents(BFormCheckbox);
     expect(checkboxes).toHaveLength(2);
     checkboxes.forEach((checkbox) => {
-      expect(checkbox.element.checked).toBe(true);
+      expect(checkbox.props().modelValue).toBe(true);
     });
   });
 
@@ -59,6 +72,7 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -72,10 +86,11 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
     await wrapper.setProps({ mostrar: true });
-
-    await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
+    await wrapper.vm.$nextTick();
+    await wrapper.find('[data-testid="chk-unidade-UND2"]').trigger('click');
     await wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').trigger('click');
 
     expect(wrapper.emitted()).toHaveProperty('confirmar');
@@ -91,11 +106,13 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
+      ...globalComponents,
     });
     await wrapper.setProps({ mostrar: true });
+    await wrapper.vm.$nextTick();
 
-    await wrapper.find('[data-testid="chk-unidade-UND1"]').setValue(false);
-    await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
+    await wrapper.find('[data-testid="chk-unidade-UND1"]').trigger('click');
+    await wrapper.find('[data-testid="chk-unidade-UND2"]').trigger('click');
     await wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').trigger('click');
 
     expect(alertSpy).toHaveBeenCalledWith('Selecione ao menos uma unidade para processar.');

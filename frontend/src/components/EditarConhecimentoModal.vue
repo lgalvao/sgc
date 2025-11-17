@@ -10,10 +10,9 @@
         for="descricaoConhecimento"
         class="form-label"
       >Descrição do Conhecimento</label>
-      <textarea
+      <b-form-textarea
         id="descricaoConhecimento"
         v-model="descricaoEditada"
-        class="form-control"
         data-testid="input-conhecimento-modal"
         placeholder="Descreva o conhecimento"
         rows="3"

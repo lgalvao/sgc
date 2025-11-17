@@ -7,14 +7,13 @@
           class="form-label"
           for="diasInativacaoProcesso"
         >Dias para inativação de processos:</label>
-        <input
+        <b-form-input
           id="diasInativacaoProcesso"
           v-model.number="configuracoesStore.diasInativacaoProcesso"
-          class="form-control"
           min="1"
           required
           type="number"
-        >
+        />
         <div class="form-text">
           Dias depois da finalização de um processo para que seja considerado inativo.
         </div>
@@ -25,14 +24,13 @@
           class="form-label"
           for="diasAlertaNovo"
         >Dias para indicação de alerta como novo:</label>
-        <input
+        <b-form-input
           id="diasAlertaNovo"
           v-model.number="configuracoesStore.diasAlertaNovo"
-          class="form-control"
           min="1"
           required
           type="number"
-        >
+        />
         <div class="form-text">
           Dias depois de um alerta ser enviado para uma unidade, para que deixe de ser marcado como novo.
         </div>

@@ -7,20 +7,18 @@
     centered
     @hidden="fechar"
   >
-    <div class="mb-3">
-      <label
-        class="form-label"
-        for="dataLimite"
-      >Data limite para validação</label>
-      <input
-        id="dataLimite"
-        v-model="dataLimiteValidacao"
-        class="form-control"
-        type="date"
-        data-testid="input-data-limite"
-      >
-    </div>
-    <div
+        <div class="mb-3">
+          <label
+            class="form-label"
+            for="dataLimite"
+          >Data limite para validação</label>
+          <b-form-input
+            id="dataLimite"
+            v-model="dataLimiteValidacao"
+            type="date"
+            data-testid="input-data-limite"
+          />
+        </div>    <div
       v-if="notificacao"
       class="alert alert-info mt-3"
     >

@@ -27,16 +27,15 @@
             >
               <i class="bi bi-person-circle me-2" />
               Título eleitoral</label>
-            <input
+            <b-form-input
               id="titulo"
               v-model="titulo"
               :disabled="loginStep > 1"
               autocomplete="username"
-              class="form-control"
               placeholder="Digite seu título"
               type="text"
               data-testid="input-titulo"
-            >
+            />
           </div>
           <div class="mb-3">
             <label
@@ -46,16 +45,15 @@
             >
               <i class="bi bi-key me-2" />
               Senha</label>
-            <input
+            <b-form-input
               id="senha"
               v-model="senha"
               :disabled="loginStep > 1"
               autocomplete="current-password"
-              class="form-control"
               placeholder="Digite sua senha"
               type="password"
               data-testid="input-senha"
-            >
+            />
           </div>
 
           <div
@@ -68,20 +66,18 @@
               for="par"
               data-testid="label-perfil-unidade"
             >Selecione o Perfil e a Unidade</label>
-            <select
+            <b-form-select
               id="par"
               v-model="parSelecionado"
-              class="form-select"
+              :options="perfisUnidadesOptions"
+              value-field="value"
+              text-field="text"
               data-testid="select-perfil-unidade"
             >
-              <option
-                v-for="par in perfilStore.perfisUnidades"
-                :key="par.perfil + par.unidade.sigla"
-                :value="par"
-              >
-                {{ par.perfil }} - {{ par.unidade.sigla }}
-              </option>
-            </select>
+              <template #first>
+                <b-form-select-option :value="null" disabled>-- Selecione uma opção --</b-form-select-option>
+              </template>
+            </b-form-select>
           </div>
 
           <button
@@ -116,6 +112,13 @@ const loginStep = ref(1)
 const parSelecionado = ref<PerfilUnidade | null>(null)
 
 const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
+
+const perfisUnidadesOptions = computed(() => {
+  return perfilStore.perfisUnidades.map(par => ({
+    value: par,
+    text: `${par.perfil} - ${par.unidade.sigla}`
+  }));
+});
 
 watch(perfisUnidadesDisponiveis, (newVal) => {
   if (newVal.length > 0) {

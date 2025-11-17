@@ -51,14 +51,13 @@
       @submit.prevent="adicionarAtividade"
     >
       <div class="col">
-        <input
+        <b-form-input
           v-model="novaAtividade"
-          class="form-control"
           data-testid="input-nova-atividade"
           placeholder="Nova atividade"
           type="text"
           aria-label="Nova atividade"
-        >
+        />
       </div>
       <div class="col-auto">
         <button
@@ -85,12 +84,12 @@
           class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card"
         >
           <template v-if="editandoAtividade === atividade.codigo">
-            <input
+            <b-form-input
               v-model="atividadeEditada"
-              class="form-control me-2 atividade-edicao-input"
+              class="me-2 atividade-edicao-input"
               data-testid="input-editar-atividade"
               aria-label="Editar atividade"
-            >
+            />
             <button
               class="btn btn-sm btn-outline-success me-1 botao-acao"
               data-bs-toggle="tooltip"
@@ -177,14 +176,14 @@
             @submit.prevent="adicionarConhecimento(idx)"
           >
             <div class="col">
-              <input
+              <b-form-input
                 v-model="atividade.novoConhecimento"
-                class="form-control form-control-sm"
+                class="form-control-sm"
                 data-testid="input-novo-conhecimento"
                 placeholder="Novo conhecimento"
                 type="text"
                 aria-label="Novo conhecimento"
-              >
+              />
             </div>
             <div class="col-auto">
               <button
