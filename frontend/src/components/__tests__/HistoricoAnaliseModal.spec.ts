@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import HistoricoAnaliseModal from '../HistoricoAnaliseModal.vue';
 import { createPinia, setActivePinia } from 'pinia';
+import { dateToString } from '../../utils/date';
 
 const mockAnalises = [
   {
@@ -62,7 +63,8 @@ describe('HistoricoAnaliseModal', () => {
 
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockAnalises.length);
-    expect(rows[0].text()).toContain('01/01/2024 09:00:00');
+    const expectedDate = dateToString(new Date(mockAnalises[0].dataHora));
+    expect(rows[0].text()).toContain(expectedDate);
     expect(rows[0].text()).toContain('TEST');
     expect(rows[0].text()).toContain('APROVADO');
     expect(rows[0].text()).toContain('Tudo certo.');

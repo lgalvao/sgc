@@ -14,22 +14,12 @@ describe('CriarCompetenciaModal', () => {
     { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }] },
   ];
 
-  const globalComponents = {
-    global: {
-      components: {
-        BFormTextarea,
-        BFormCheckbox,
-      },
-    },
-  };
-
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(CriarCompetenciaModal, {
       props: {
         mostrar: false,
         atividades: [],
       },
-      ...globalComponents,
     });
     expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
   });
@@ -40,7 +30,6 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalComponents,
     });
 
     expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('');
@@ -60,7 +49,6 @@ describe('CriarCompetenciaModal', () => {
         atividades,
         competenciaParaEditar,
       },
-      ...globalComponents,
     });
 
     await wrapper.vm.$nextTick();
@@ -74,13 +62,10 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalComponents,
     });
 
-    const textareaWrapper = wrapper.findComponent(BFormTextarea);
-    const nativeTextarea = textareaWrapper.find('textarea');
-    await nativeTextarea.setValue('Nova competência');
-    await wrapper.findComponent(BFormCheckbox).trigger('click');
+    await wrapper.findComponent(BFormTextarea).setValue('Nova competência');
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeUndefined();
   });
 
@@ -90,7 +75,6 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -103,20 +87,19 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalComponents,
     });
 
     const descricao = 'Competência de teste';
-    const textareaWrapper = wrapper.findComponent(BFormTextarea);
-    const nativeTextarea = textareaWrapper.find('textarea');
-    await nativeTextarea.setValue(descricao);
-    await wrapper.findComponent(BFormCheckbox).trigger('click');
+    await wrapper.findComponent(BFormTextarea).setValue(descricao);
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
     await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();
-    expect(wrapper.emitted('salvar')?.[0]).toEqual([{
-      descricao,
-      atividadesSelecionadas: [atividades[0].codigo],
-    }]);
+    expect(wrapper.emitted('salvar')?.[0]).toEqual([
+      {
+        descricao,
+        atividadesSelecionadas: [atividades[0].codigo],
+      },
+    ]);
   });
 });
