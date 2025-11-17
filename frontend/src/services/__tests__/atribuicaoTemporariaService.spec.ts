@@ -7,7 +7,7 @@ vi.mock('@/axios-setup');
 describe('atribuicaoTemporariaService', () => {
     it('buscarTodasAtribuicoes should make a GET request', async () => {
         const mockData = [{ id: 1 }];
-        apiClient.get.mockResolvedValue({ data: mockData });
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
 
         const result = await buscarTodasAtribuicoes();
 
@@ -17,7 +17,7 @@ describe('atribuicaoTemporariaService', () => {
 
     it('criarAtribuicaoTemporaria should make a POST request', async () => {
         const request = { tituloEleitoralServidor: '123', dataTermino: '2025-12-31', justificativa: 'teste' };
-        apiClient.post.mockResolvedValue({});
+        vi.mocked(apiClient.post).mockResolvedValue({});
 
         await criarAtribuicaoTemporaria(1, request);
 

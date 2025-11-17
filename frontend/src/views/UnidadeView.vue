@@ -77,7 +77,7 @@ import {usePerfilStore} from '@/stores/perfil'
 import {useUsuariosStore} from '@/stores/usuarios'
 import {useMapasStore} from '@/stores/mapas'
 import TreeTable from '../components/TreeTable.vue'
-import {MapaCompleto, Usuario, Unidade} from '@/types/tipos';
+import {MapaCompleto, Usuario, Unidade, Responsavel} from '@/types/tipos';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes'
 
 const props = defineProps<{ codUnidade: number }>();
@@ -91,9 +91,7 @@ const mapasStore = useMapasStore()
 const atribuicaoTemporariaStore = useAtribuicaoTemporariaStore()
 
 onMounted(async () => {
-  if (unidadesStore.unidades.length === 0) {
-    await unidadesStore.fetchUnidades();
-  }
+  await unidadesStore.fetchUnidadesParaProcesso('');
 });
 
 const unidadeOriginal = computed<Unidade | null>(() => unidadesStore.pesquisarUnidadePorCodigo(codigo.value) || null)
@@ -113,10 +111,24 @@ const unidadeComResponsavelDinamico = computed<Unidade | null>(() => {
   });
 
   if (atribuicaoVigente) {
+    const responsavel: Responsavel = {
+      codigo: atribuicaoVigente.servidor.codigo,
+      nome: atribuicaoVigente.servidor.nome,
+      tituloEleitoral: atribuicaoVigente.servidor.tituloEleitoral,
+      unidade: atribuicaoVigente.servidor.unidade,
+      email: atribuicaoVigente.servidor.email,
+      ramal: atribuicaoVigente.servidor.ramal,
+      usuarioTitulo: atribuicaoVigente.servidor.nome,
+      unidadeCodigo: atribuicaoVigente.unidade.codigo,
+      idServidor: atribuicaoVigente.servidor.codigo,
+      tipo: 'TEMPORARIO',
+      dataInicio: atribuicaoVigente.dataInicio,
+      dataFim: atribuicaoVigente.dataFim,
+    };
     // Retorna uma nova unidade com o responsável da atribuição temporária
     return {
       ...unidade,
-      responsavel: atribuicaoVigente.servidor
+      responsavel,
     };
   }
 

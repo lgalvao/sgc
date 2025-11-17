@@ -7,7 +7,7 @@ vi.mock('@/axios-setup');
 describe('unidadesService', () => {
     it('buscarTodasUnidades should make a GET request', async () => {
         const mockData = [{ id: 1 }];
-        apiClient.get.mockResolvedValue({ data: mockData });
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
 
         const result = await buscarTodasUnidades();
 
@@ -17,7 +17,7 @@ describe('unidadesService', () => {
 
     it('buscarUnidadePorSigla should make a GET request', async () => {
         const mockData = { id: 1 };
-        apiClient.get.mockResolvedValue({ data: mockData });
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
 
         const result = await buscarUnidadePorSigla('TESTE');
 
@@ -27,7 +27,7 @@ describe('unidadesService', () => {
 
     it('buscarArvoreComElegibilidade should make a GET request', async () => {
         const mockData = [{ id: 1 }];
-        apiClient.get.mockResolvedValue({ data: mockData });
+        vi.mocked(apiClient.get).mockResolvedValue({ data: mockData });
 
         const result = await buscarArvoreComElegibilidade('MAPEAMENTO', 1);
 
