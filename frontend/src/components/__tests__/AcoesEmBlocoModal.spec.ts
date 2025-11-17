@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AcoesEmBlocoModal from '../AcoesEmBlocoModal.vue';
+import { BFormCheckbox } from 'bootstrap-vue-next';
 
 const unidadesDisponiveis = [
   { sigla: 'UND1', nome: 'Unidade 1', situacao: 'Pendente' },

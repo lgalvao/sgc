@@ -31,7 +31,7 @@ const BFormSelectStub = {
 };
 
 const BFormCheckboxStub = {
-  template: `<input type="checkbox" :checked="isChecked" @change="onChange" />`,
+  template: `<input type="checkbox" :checked="modelValue.some(item => item.codigo === value.codigo)" @change="onChange" />`,
   props: ['modelValue', 'value'],
   emits: ['update:modelValue'],
   setup(props: any, { emit }: any) {
