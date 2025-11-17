@@ -1,9 +1,10 @@
 <template>
   <div>
-    <span
-      class="badge bg-secondary mb-2"
+    <b-badge
+      variant="secondary"
+      class="mb-2"
       style="border-radius: 0"
-    >Detalhes do processo</span>
+    >Detalhes do processo</b-badge>
     <h2
       class="display-6"
       data-testid="processo-info"

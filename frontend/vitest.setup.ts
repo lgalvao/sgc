@@ -1,5 +1,6 @@
 import { config } from '@vue/test-utils';
 import { vi } from 'vitest';
+import { createBootstrap } from 'bootstrap-vue-next';
 import {
     BFormCheckbox,
     BFormSelect,
@@ -25,10 +26,4 @@ config.global.stubs['b-modal'] = {
   `,
 };
 
-config.global.components = {
-    BFormCheckbox,
-    BFormSelect,
-    BFormSelectOption,
-    BFormTextarea,
-    BFormInput,
-};
+config.global.plugins.push(createBootstrap());
