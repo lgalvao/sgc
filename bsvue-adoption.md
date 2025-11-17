@@ -116,5 +116,7 @@ A adoção da `BootstrapVueNext` representa um investimento inicial em tempo de 
 ## 6. Progresso da Migração
 
 - [x] **Modais (`*Modal.vue`):** Todos os componentes de modal foram migrados para usar o componente `<b-modal>` da `BootstrapVueNext`. O componente `BaseModal.vue` foi removido.
-- [ ] **Tabelas (`Tabela*.vue`):** A migração das tabelas ainda não foi iniciada.
+- [x] **Tabelas (`Tabela*.vue`):** Migração em andamento.
+  - [x] `TabelaAlertas.vue`: Migrado para `b-table`.
+  - [x] `TabelaProcessos.vue`: Migrado para `b-table`.
 - [ ] **Formulários e componentes de layout:** A migração dos formulários e outros componentes de layout ainda não foi iniciada.

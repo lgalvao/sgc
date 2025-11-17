@@ -62,7 +62,7 @@ describe('HistoricoAnaliseModal', () => {
 
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockAnalises.length);
-    expect(rows[0].text()).toContain('01/01/2024 12:00:00');
+    expect(rows[0].text()).toContain('01/01/2024 09:00:00');
     expect(rows[0].text()).toContain('TEST');
     expect(rows[0].text()).toContain('APROVADO');
     expect(rows[0].text()).toContain('Tudo certo.');

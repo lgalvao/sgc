@@ -1,73 +1,30 @@
 <template>
   <div>
-    <table
-      class="table table-hover"
+    <b-table
+      :items="processos"
+      :fields="fields"
+      hover
+      responsive
       data-testid="tabela-processos"
+      :sort-by="criterioOrdenacao"
+      :sort-desc="!direcaoOrdenacaoAsc"
+      @row-clicked="handleSelecionarProcesso"
+      @sort-changed="handleSortChange"
     >
-      <thead>
-        <tr>
-          <th
-            data-testid="coluna-descricao"
-            style="cursor:pointer"
-            @click="handleOrdenar('descricao')"
-          >
-            Descrição
-            <span v-if="criterioOrdenacao === 'descricao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            data-testid="coluna-tipo"
-            style="cursor:pointer"
-            @click="handleOrdenar('tipo')"
-          >
-            Tipo
-            <span v-if="criterioOrdenacao === 'tipo'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            v-if="showDataFinalizacao"
-            data-testid="coluna-data-finalizacao"
-            style="cursor:pointer"
-            @click="handleOrdenar('dataFinalizacao')"
-          >
-            Finalizado em
-            <span v-if="criterioOrdenacao === 'dataFinalizacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-          <th
-            data-testid="coluna-situacao"
-            style="cursor:pointer"
-            @click="handleOrdenar('situacao')"
-          >
-            Situação
-            <span v-if="criterioOrdenacao === 'situacao'">{{ direcaoOrdenacaoAsc ? '↑' : '↓' }}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="processo in processos"
-          :key="processo.codigo"
-          :data-testid="`processo-row-${processo.codigo}`"
-          class="clickable-row"
-          style="cursor:pointer;"
-          @click="handleSelecionarProcesso(processo)"
-        >
-          <td>
-            {{ processo.descricao }}
-          </td>
-          <td>{{ processo.tipo }}</td>
-          <td v-if="showDataFinalizacao">
-            {{ (processo as any).dataFinalizacaoFormatada }}
-          </td>
-          <td>{{ processo.situacao }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <template #empty>
+        <div class="text-center text-muted">
+          Nenhum processo encontrado.
+        </div>
+      </template>
+    </b-table>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ProcessoResumo} from '@/types/tipos';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   processos: ProcessoResumo[];
   criterioOrdenacao: keyof ProcessoResumo | 'dataFinalizacao';
   direcaoOrdenacaoAsc: boolean;
@@ -79,9 +36,23 @@ const emit = defineEmits<{
   (e: 'selecionarProcesso', processo: ProcessoResumo): void
 }>()
 
+const fields = computed(() => {
+  const baseFields = [
+    { key: 'descricao', label: 'Descrição', sortable: true },
+    { key: 'tipo', label: 'Tipo', sortable: true },
+  ];
 
-const handleOrdenar = (campo: keyof ProcessoResumo | 'dataFinalizacao') => {
-  emit('ordenar', campo);
+  if (props.showDataFinalizacao) {
+    baseFields.push({ key: 'dataFinalizacaoFormatada', label: 'Finalizado em', sortable: true });
+  }
+
+  baseFields.push({ key: 'situacao', label: 'Situação', sortable: true });
+
+  return baseFields;
+});
+
+const handleSortChange = (ctx: any) => {
+  emit('ordenar', ctx.sortBy);
 };
 
 const handleSelecionarProcesso = (processo: ProcessoResumo) => {

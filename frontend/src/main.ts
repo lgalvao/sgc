@@ -2,10 +2,13 @@ import {createApp} from "vue";
 import App from "./App.vue";
 import router from "./router/index";
 import {createPinia} from "pinia";
+import { createBootstrap } from 'bootstrap-vue-next'; // Importar createBootstrap
+
 import "./style.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'; // Importar o CSS da BootstrapVueNext
+import "bootstrap/dist/css/bootstrap.min.css"; // Manter se houver estilos customizados
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+// Remover "bootstrap/dist/js/bootstrap.bundle.min.js"; pois BootstrapVueNext gerencia o JS
 
 declare global {
   interface Window {
@@ -22,6 +25,9 @@ app.use(pinia);
 window.pinia = pinia;
 
 app.use(router);
+
+// Registrar o plugin do BootstrapVueNext
+app.use(createBootstrap());
 
 app.mount('#app');
 

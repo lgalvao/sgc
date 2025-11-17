@@ -10,12 +10,7 @@ The core of this refactoring is to establish a clear separation of concerns, wit
 - **All business rules, validation, and authorization logic** must reside exclusively in the backend.
 - The frontend should not duplicate any of this logic. Its role is to present data and collect user input.
 
-### 1.2. "Smart" DTOs and "Dumb" Views
-- The backend API should provide Data Transfer Objects (DTOs) that are tailor-made for the frontend's needs.
-- **Pre-calculated State**: Instead of sending raw data that requires frontend logic to interpret, the backend should send pre-calculated state. For example, a `SubprocessoDTO` should include a boolean flag like `isEmAndamento` rather than just a `situacao` enum that the frontend has to decode.
-- **Permissions-based UI**: The backend should determine what actions a user can perform on a given resource. DTOs should include a `permissoes` object (e.g., `permissoes: { podeEditar: true, podeExcluir: false }`). The frontend will use these flags to conditionally render buttons, links, and form fields, eliminating the need for client-side authorization checks.
-
-### 1.3. API-Driven User Experience
+### 1.2. API-Driven User Experience
 - The frontend should be completely driven by the API. If a piece of data is displayed or a UI element is enabled/disabled, it's because the API response explicitly instructed it to do so.
 - **Client-side validation** should be limited to basic, non-business-critical checks for a better user experience (e.g., checking for empty required fields before sending a request). The authoritative validation will always be on the backend.
 

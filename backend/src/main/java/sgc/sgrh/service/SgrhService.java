@@ -36,12 +36,14 @@ public class SgrhService {
 
     public Usuario buscarUsuarioPorLogin(String login) {
         log.warn("MOCK SGRH: Buscando usuário por login.");
-        return new Usuario(login, "Usuário Mock", "email", "ramal", null, Set.of(Perfil.CHEFE));
+        var unidade = unidadeRepo.findById(10L).orElse(null); // Usa uma unidade padrão para o mock
+        return new Usuario(login, "Usuário Mock", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
     }
 
     public Usuario buscarResponsavelVigente(String sigla) {
-        log.warn("MOCK SGRH: Buscando responsável vigente.");
-        return new Usuario("responsavel", "Responsável Vigente", "email", "ramal", null, Set.of(Perfil.CHEFE));
+        log.warn("MOCK SGRH: Buscando responsável vigente para a sigla {}.", sigla);
+        var unidade = unidadeRepo.findBySigla(sigla).orElse(null);
+        return new Usuario("responsavel", "Responsável Vigente", "email", "ramal", unidade, Set.of(Perfil.CHEFE));
     }
 
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {

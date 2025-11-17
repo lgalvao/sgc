@@ -9,12 +9,10 @@
   },
   "author": "Leonardo Galvao",
   "scripts": {
-    "test:e2e": "playwright test",
     "dev:e2e": "concurrently \"./gradlew bootRunE2E\" \"cd frontend && npm run dev\"",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "check:ts-unused": "ts-unused-exports frontend/tsconfig.json --ignoreFiles='.*/(logger|vite.config|vitest.config|situacoes).ts'",
-    "validate": "npm run typecheck && npm run check:ts-unused",
-    "why-consola": "Consola is used for logging in e2e tests"
+    "validate": "npm run typecheck && npm run check:ts-unused"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",

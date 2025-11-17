@@ -23,14 +23,24 @@ public class WithMockChefeSecurityContextFactory implements WithSecurityContextF
     @Override
     public SecurityContext createSecurityContext(WithMockChefe annotation) {
         Unidade unidade = unidadeRepo.findById(10L).orElseThrow();
-        Usuario usuario = new Usuario(
-            annotation.value(),
-            "Chefe Teste",
-            "chefe@teste.com",
-            "123",
-            unidade,
-            Set.of(Perfil.CHEFE)
-        );
+
+        // Busca o usuário ou cria um novo para evitar instâncias duplicadas
+        Usuario usuario = usuarioRepo.findById(annotation.value())
+            .orElseGet(() -> {
+                Usuario novoUsuario = new Usuario(
+                    annotation.value(),
+                    "Chefe Teste",
+                    "chefe@teste.com",
+                    "123",
+                    unidade,
+                    Set.of(Perfil.CHEFE)
+                );
+                return usuarioRepo.save(novoUsuario);
+            });
+
+        // Garante que a unidade está correta no usuário do contexto, pois o usuário
+        // pode existir no banco de dados com uma unidade diferente.
+        usuario.setUnidade(unidade);
         usuarioRepo.save(usuario);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
