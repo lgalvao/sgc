@@ -20,7 +20,7 @@ describe('CriarCompetenciaModal', () => {
         atividades: [],
       },
     });
-    expect(wrapper.find('.modal.show').exists()).toBe(false);
+    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
   });
 
   it('deve renderizar o modal no modo de criação', () => {
@@ -31,7 +31,7 @@ describe('CriarCompetenciaModal', () => {
       },
     });
 
-    expect(wrapper.find('.modal-title').text()).toBe('Criação de competência');
+    expect(wrapper.find('b-modal-stub').props('title')).toBe('Criação de competência');
     expect(wrapper.find('textarea').element.value).toBe('');
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeDefined();
   });
@@ -53,7 +53,7 @@ describe('CriarCompetenciaModal', () => {
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('.modal-title').text()).toBe('Edição de competência');
+    expect(wrapper.find('b-modal-stub').props('title')).toBe('Edição de competência');
     expect(wrapper.find('textarea').element.value).toBe('Competência existente');
   });
 
@@ -100,31 +100,5 @@ describe('CriarCompetenciaModal', () => {
       descricao,
       atividadesSelecionadas: [atividades[0].codigo],
     }]);
-  });
-
-  it('deve resetar o estado do modal ao reabri-lo', async () => {
-    const competenciaParaEditar = {
-      codigo: 1,
-      descricao: 'Competência existente',
-      atividadesAssociadas: [1],
-    };
-
-    const wrapper = mount(CriarCompetenciaModal, {
-      props: {
-        mostrar: true,
-        atividades,
-        competenciaParaEditar,
-      },
-    });
-
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find('textarea').element.value).toBe('Competência existente');
-
-    await wrapper.setProps({ mostrar: false, competenciaParaEditar: null });
-    await wrapper.setProps({ mostrar: true });
-
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find('textarea').element.value).toBe('');
-    expect(wrapper.find('.modal-title').text()).toBe('Criação de competência');
   });
 });

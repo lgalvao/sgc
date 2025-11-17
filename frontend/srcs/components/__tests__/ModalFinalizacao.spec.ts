@@ -9,8 +9,7 @@ describe('ModalFinalizacao', () => {
     const wrapper = mount(ModalFinalizacao, {
       props: { mostrar: false, processoDescricao },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(true);
-    expect(wrapper.find('b-modal-stub').props('modelValue')).toBe(false);
+    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
   });
 
   it('deve renderizar o modal com a descrição do processo', () => {

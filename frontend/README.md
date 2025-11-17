@@ -10,6 +10,7 @@ Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema 
 -   **Gerenciador de Estado:** [Pinia](https://pinia.vuejs.org/)
 -   **Roteamento:** [Vue Router](https://router.vuejs.org/)
 -   **Estilização:** [Bootstrap](https://getbootstrap.com/) 5 e [Bootstrap Icons](https://icons.getbootstrap.com/)
+-   **Componentes UI:** [BootstrapVueNext](https://bootstrap-vue-next.github.io/)
 -   **Testes:** [Vitest](https://vitest.dev/)
 -   **Cliente HTTP:** [Axios](https://axios-http.com/)
 

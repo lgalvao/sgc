@@ -1,42 +1,41 @@
 <template>
-  <BaseModal
-    :mostrar="mostrarModal"
-    :titulo="tituloModal"
-    :tipo="perfil === 'ADMIN' ? 'success' : 'primary'"
-    :icone="perfil === 'ADMIN' ? 'bi bi-check-circle' : 'bi bi-check-circle'"
-    @fechar="$emit('fecharModal')"
+  <b-modal
+    :model-value="mostrarModal"
+    :title="tituloModal"
+    :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
+    header-text-variant="white"
+    centered
+    @hidden="$emit('fecharModal')"
   >
-    <template #conteudo>
-      <div data-testid="modal-aceite-body">
-        <p v-if="perfil === 'ADMIN'">
-          {{ corpoModal }}
-        </p>
-        <div
-          v-else
-          class="mb-3"
+    <div data-testid="modal-aceite-body">
+      <p v-if="perfil === 'ADMIN'">
+        {{ corpoModal }}
+      </p>
+      <div
+        v-else
+        class="mb-3"
+      >
+        <label
+          for="observacao-textarea"
+          class="form-label"
         >
-          <label
-            for="observacao-textarea"
-            class="form-label"
-          >
-            Observações <span class="text-muted small">(opcional)</span>
-          </label>
-          <textarea
-            id="observacao-textarea"
-            v-model="observacao"
-            class="form-control"
-            rows="4"
-            placeholder="Digite suas observações sobre o mapa..."
-            data-testid="observacao-aceite-textarea"
-          />
-          <div class="form-text">
-            As observações serão registradas junto com a validação do mapa.
-          </div>
+          Observações <span class="text-muted small">(opcional)</span>
+        </label>
+        <textarea
+          id="observacao-textarea"
+          v-model="observacao"
+          class="form-control"
+          rows="4"
+          placeholder="Digite suas observações sobre o mapa..."
+          data-testid="observacao-aceite-textarea"
+        />
+        <div class="form-text">
+          As observações serão registradas junto com a validação do mapa.
         </div>
       </div>
-    </template>
+    </div>
 
-    <template #acoes>
+    <template #footer>
       <button
         type="button"
         class="btn btn-secondary"
@@ -56,12 +55,11 @@
         Aceitar
       </button>
     </template>
-  </BaseModal>
+  </b-modal>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
-import BaseModal from './BaseModal.vue';
 
 interface Props {
   mostrarModal: boolean;
