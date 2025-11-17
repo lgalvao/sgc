@@ -4,17 +4,6 @@ import CriarCompetenciaModal from '../CriarCompetenciaModal.vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { BFormTextarea, BFormCheckbox } from 'bootstrap-vue-next';
 
-const BModalStub = {
-  template: `
-    <div v-if="modelValue">
-      <h5 class="modal-title">{{ title }}</h5>
-      <slot />
-      <slot name="footer" />
-    </div>
-  `,
-  props: ['modelValue', 'title'],
-};
-
 describe('CriarCompetenciaModal', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -25,25 +14,12 @@ describe('CriarCompetenciaModal', () => {
     { codigo: 2, descricao: 'Atividade 2', conhecimentos: [{ id: 1, descricao: 'Conhecimento 1' }] },
   ];
 
-  const globalConfig = {
-    global: {
-      components: {
-        BFormTextarea,
-        BFormCheckbox,
-      },
-      stubs: {
-        'b-modal': BModalStub,
-      },
-    },
-  };
-
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(CriarCompetenciaModal, {
       props: {
         mostrar: false,
         atividades: [],
       },
-      ...globalConfig,
     });
     expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
   });
@@ -54,7 +30,6 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalConfig,
     });
 
     expect(wrapper.findComponent(BFormTextarea).props().modelValue).toBe('');
@@ -74,7 +49,6 @@ describe('CriarCompetenciaModal', () => {
         atividades,
         competenciaParaEditar,
       },
-      ...globalConfig,
     });
 
     await wrapper.vm.$nextTick();
@@ -88,12 +62,10 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalConfig,
     });
 
-    await wrapper.find('textarea').setValue('Nova competência');
-    await wrapper.find('input[type="checkbox"]').setValue(true);
-
+    await wrapper.findComponent(BFormTextarea).setValue('Nova competência');
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeUndefined();
   });
 
@@ -103,7 +75,6 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalConfig,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -116,17 +87,19 @@ describe('CriarCompetenciaModal', () => {
         mostrar: true,
         atividades,
       },
-      ...globalConfig,
     });
 
     const descricao = 'Competência de teste';
-    await wrapper.find('textarea').setValue(descricao);
-    await wrapper.find('input[type="checkbox"]').setValue(true);
+    await wrapper.findComponent(BFormTextarea).setValue(descricao);
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
     await wrapper.find('[data-testid="btn-modal-confirmar"]').trigger('click');
 
     expect(wrapper.emitted('salvar')).toBeTruthy();
-    const payload = wrapper.emitted('salvar')![0][0] as any;
-    expect(payload.descricao).toBe(descricao);
-    expect(payload.atividadesSelecionadas).toEqual([atividades[0].codigo]);
+    expect(wrapper.emitted('salvar')?.[0]).toEqual([
+      {
+        descricao,
+        atividadesSelecionadas: [atividades[0].codigo],
+      },
+    ]);
   });
 });

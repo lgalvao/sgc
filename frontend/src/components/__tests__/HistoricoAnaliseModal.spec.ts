@@ -2,17 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import HistoricoAnaliseModal from '../HistoricoAnaliseModal.vue';
 import { createPinia, setActivePinia } from 'pinia';
-
-const BModalStub = {
-  template: `
-    <div v-if="modelValue">
-      <h5 class="modal-title">{{ title }}</h5>
-      <slot />
-      <slot name="footer" />
-    </div>
-  `,
-  props: ['modelValue', 'title'],
-};
+import { formatDateTimeBR } from '../../utils';
 
 const mockAnalises = [
   {
@@ -23,7 +13,7 @@ const mockAnalises = [
   },
   {
     dataHora: '2024-01-02T14:30:00Z',
-    unidadeSigla: 'TEST2',
+    unidade: 'TEST2',
     resultado: 'REPROVADO',
     observacoes: 'Faltou informação.',
   },
@@ -42,21 +32,12 @@ describe('HistoricoAnaliseModal', () => {
     setActivePinia(createPinia());
   });
 
-  const globalConfig = {
-    global: {
-      stubs: {
-        'b-modal': BModalStub,
-      },
-    },
-  };
-
   it('não deve renderizar o modal quando mostrar for falso', () => {
     const wrapper = mount(HistoricoAnaliseModal, {
       props: {
         mostrar: false,
         codSubrocesso: 1,
       },
-      ...globalConfig,
     });
     expect(wrapper.find('[data-testid="modal-historico-body"]').exists()).toBe(false);
   });
@@ -67,7 +48,6 @@ describe('HistoricoAnaliseModal', () => {
         mostrar: true,
         codSubrocesso: 2,
       },
-      ...globalConfig,
     });
 
     expect(wrapper.find('.alert-info').text()).toContain('Nenhuma análise registrada');
@@ -79,17 +59,15 @@ describe('HistoricoAnaliseModal', () => {
         mostrar: true,
         codSubrocesso: 1,
       },
-      ...globalConfig,
     });
 
     const rows = wrapper.findAll('tbody tr');
     expect(rows.length).toBe(mockAnalises.length);
-    const firstRowText = rows[0].text();
-    expect(firstRowText).toContain('01/01/2024');
-    expect(firstRowText).toContain('12:00:00');
-    expect(firstRowText).toContain('TEST');
-    expect(firstRowText).toContain('APROVADO');
-    expect(firstRowText).toContain('Tudo certo.');
+    const expectedDate = '01/01/2024 12:00:00';
+    expect(rows[0].text()).toContain(expectedDate);
+    expect(rows[0].text()).toContain('TEST');
+    expect(rows[0].text()).toContain('APROVADO');
+    expect(rows[0].text()).toContain('Tudo certo.');
   });
 
   it('deve emitir o evento fechar ao clicar no botão de fechar', async () => {
@@ -98,7 +76,6 @@ describe('HistoricoAnaliseModal', () => {
         mostrar: true,
         codSubrocesso: 1,
       },
-      ...globalConfig,
     });
 
     await wrapper.find('[data-testid="btn-modal-fechar"]').trigger('click');

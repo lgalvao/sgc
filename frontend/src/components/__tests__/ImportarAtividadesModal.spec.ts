@@ -2,77 +2,45 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import ImportarAtividadesModal from '../ImportarAtividadesModal.vue';
-import { Atividade, ProcessoResumo, TipoProcesso, UnidadeParticipante, SituacaoProcesso } from '@/types/tipos';
+import { Atividade, ProcessoResumo, TipoProcesso } from '@/types/tipos';
 import { nextTick, ref } from 'vue';
+import { BFormSelect, BFormCheckbox } from 'bootstrap-vue-next';
 
+// Helper type for the component instance
 type ImportarAtividadesModalVM = InstanceType<typeof ImportarAtividadesModal>;
+
+// Mock data
+import { SituacaoProcesso } from '@/types/tipos';
 
 const mockProcessos: ProcessoResumo[] = [
   { codigo: 1, descricao: 'Processo 1', tipo: TipoProcesso.MAPEAMENTO, situacao: SituacaoProcesso.FINALIZADO, dataCriacao: '2021-01-01', dataLimite: '2021-01-01', unidadeCodigo: 1, unidadeNome: 'test' },
 ];
-const mockUnidades: UnidadeParticipante[] = [{ codUnidade: 10, sigla: 'U1', codSubprocesso: 100 }];
-const mockAtividades: Atividade[] = [{ codigo: 1, descricao: 'Atividade A', conhecimentos: [] }];
-
-const BModalStub = {
-  template: `<div v-if="modelValue"><slot /><slot name="footer" /></div>`,
-  props: ['modelValue'],
+const mockProcessoDetalhe = {
+  unidades: [{ codUnidade: 10, sigla: 'U1', codSubprocesso: 100 }],
 };
+const mockAtividades: Atividade[] = [
+  { codigo: 1, descricao: 'Atividade A', conhecimentos: [] },
+];
 
-const BFormSelectStub = {
-  template: `
-    <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
-      <slot name="first" />
-      <option v-for="option in options" :key="option[valueField]" :value="option[valueField]">
-        {{ option[textField] }}
-      </option>
-    </select>
-  `,
-  props: ['modelValue', 'options', 'valueField', 'textField'],
-};
-
-const BFormCheckboxStub = {
-  template: `<input type="checkbox" :checked="modelValue.some(item => item.codigo === value.codigo)" @change="onChange" />`,
-  props: ['modelValue', 'value'],
-  emits: ['update:modelValue'],
-  setup(props: any, { emit }: any) {
-    const isChecked = ref(props.modelValue.some((item: any) => item.codigo === props.value.codigo));
-    const onChange = (event: any) => {
-      const isChecked = event.target.checked;
-      if (isChecked) {
-        emit('update:modelValue', [...props.modelValue, props.value]);
-      } else {
-        emit('update:modelValue', props.modelValue.filter((item: any) => item.codigo !== props.value.codigo));
-      }
-    };
-    return { isChecked, onChange };
-  },
-};
-
-const BFormSelectOptionStub = {
-  template: `<option :value="value" :disabled="disabled"><slot /></option>`,
-  props: ['value', 'disabled'],
-};
-
-const mockImportar = vi.fn();
+// Mock composable and stores
+const mockExecute = vi.fn();
 vi.mock('@/composables/useApi', () => ({
-  useApi: () => ({ execute: mockImportar, error: ref(null), isLoading: ref(false), clearError: vi.fn() }),
+  useApi: () => ({ execute: mockExecute, error: ref(null), isLoading: ref(false), clearError: vi.fn() }),
 }));
-
 vi.mock('@/stores/processos', () => ({
   useProcessosStore: () => ({
     processosPainel: mockProcessos,
-    processoDetalhe: { unidades: mockUnidades },
+    processoDetalhe: mockProcessoDetalhe,
     fetchProcessosPainel: vi.fn(),
-    fetchProcessoDetalhe: vi.fn(),
+    fetchProcessoDetalhe: vi.fn().mockResolvedValue(true),
   }),
 }));
-
 vi.mock('@/stores/atividades', () => ({
-  useAtividadesStore: vi.fn(() => ({
-    getAtividadesPorSubprocesso: vi.fn().mockReturnValue(mockAtividades),
-    fetchAtividadesParaSubprocesso: vi.fn(),
+  useAtividadesStore: () => ({
+    getAtividadesPorSubprocesso: () => mockAtividades,
+    fetchAtividadesParaSubprocesso: vi.fn().mockResolvedValue(true),
     importarAtividades: vi.fn(),
-  })),
+  }),
 }));
 
 describe('ImportarAtividadesModal', () => {
@@ -81,15 +49,12 @@ describe('ImportarAtividadesModal', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
-
     wrapper = mount(ImportarAtividadesModal, {
       props: { mostrar: true, codSubrocessoDestino: 999 },
       global: {
-        stubs: {
-          'b-modal': BModalStub,
-          'b-form-select': BFormSelectStub,
-          'b-form-checkbox': BFormCheckboxStub,
-          'b-form-select-option': BFormSelectOptionStub,
+        components: {
+          BFormSelect,
+          BFormCheckbox,
         },
       },
     });
@@ -101,24 +66,39 @@ describe('ImportarAtividadesModal', () => {
   });
 
   it('deve habilitar o botão de importação e chamar a API ao importar', async () => {
+    const flushPromises = () => new Promise(setImmediate);
+
     const importButton = wrapper.find('[data-testid="btn-importar"]');
     expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
+    // Simulate user selecting a process and unit
     await wrapper.find('[data-testid="select-processo"]').setValue('1');
+    await flushPromises();
     await nextTick();
+
     await wrapper.find('[data-testid="select-unidade"]').setValue('10');
+    await flushPromises();
     await nextTick();
 
-    const checkbox = wrapper.find('[data-testid^="checkbox-atividade-"]');
-    await checkbox.setValue(true);
+    // Find and check the checkbox for the activity
+    await wrapper.find('[data-testid="checkbox-atividade-1"]').setChecked(true);
     await nextTick();
 
+    // Now, the button should be enabled
     expect((importButton.element as HTMLButtonElement).disabled).toBe(false);
 
-    mockImportar.mockResolvedValue(true);
+    // Simulate the import click
+    mockExecute.mockResolvedValue(true);
     await importButton.trigger('click');
+    await flushPromises();
+    await nextTick();
 
-    expect(mockImportar).toHaveBeenCalledWith(999, 100, [1]);
+    // Verify the API call and emitted events
+    expect(mockExecute).toHaveBeenCalledWith(
+      999,
+      mockProcessoDetalhe.unidades[0].codSubprocesso,
+      [mockAtividades[0].codigo]
+    );
     expect(wrapper.emitted('importar')).toBeTruthy();
     expect(wrapper.emitted('fechar')).toBeTruthy();
   });
