@@ -4,33 +4,34 @@
       v-if="mostrarBotoesBloco"
       class="mt-3 d-flex gap-2"
     >
-      <button
+      <b-button
         v-if="perfil === 'GESTOR'"
-        class="btn btn-outline-primary"
+        variant="outline-primary"
         data-testid="btn-aceitar-em-bloco"
         @click="emit('aceitarBloco')"
       >
         <i class="bi bi-check-circle me-1" />
         Aceitar em bloco
-      </button>
-      <button
+      </b-button>
+      <b-button
         v-if="perfil === 'ADMIN'"
-        class="btn btn-outline-success"
+        variant="outline-success"
         data-testid="btn-abrir-modal-homologar-bloco"
         @click="emit('homologarBloco')"
       >
         <i class="bi bi-check-all me-1" />
         Homologar em bloco
-      </button>
+      </b-button>
     </div>
-    <button
+    <b-button
       v-if="perfil === 'ADMIN' && situacaoProcesso === 'EM_ANDAMENTO'"
-      class="btn btn-danger mt-3"
+      variant="danger"
+      class="mt-3"
       data-testid="btn-finalizar-processo"
       @click="emit('finalizar')"
     >
       Finalizar processo
-    </button>
+    </b-button>
   </div>
 </template>
 
