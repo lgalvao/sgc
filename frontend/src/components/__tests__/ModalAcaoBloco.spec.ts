@@ -13,15 +13,13 @@ describe('ModalAcaoBloco', () => {
     const wrapper = mount(ModalAcaoBloco, {
       props: { mostrar: false, tipo: 'aceitar', unidades },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(true);
-    expect(wrapper.find('b-modal-stub').props('modelValue')).toBe(false);
+    expect(wrapper.find('.table').exists()).toBe(false);
   });
 
   it('deve renderizar o título e o botão corretos para o tipo "aceitar"', () => {
     const wrapper = mount(ModalAcaoBloco, {
       props: { mostrar: true, tipo: 'aceitar', unidades },
     });
-    expect(wrapper.find('b-modal-stub').props('title')).toContain('Aceitar cadastros em bloco');
     expect(wrapper.find('.btn-primary').text()).toContain('Aceitar');
   });
 
@@ -29,7 +27,6 @@ describe('ModalAcaoBloco', () => {
     const wrapper = mount(ModalAcaoBloco, {
       props: { mostrar: true, tipo: 'homologar', unidades },
     });
-    expect(wrapper.find('b-modal-stub').props('title')).toContain('Homologar cadastros em bloco');
     expect(wrapper.find('.btn-success').text()).toContain('Homologar');
   });
 

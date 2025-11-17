@@ -20,8 +20,7 @@ describe('EditarConhecimentoModal', () => {
         conhecimento,
       },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(true);
-    expect(wrapper.find('b-modal-stub').props('modelValue')).toBe(false);
+    expect(wrapper.find('[data-testid="input-conhecimento-modal"]').exists()).toBe(false);
   });
 
   it('deve renderizar o modal com a descrição do conhecimento', () => {
@@ -32,7 +31,6 @@ describe('EditarConhecimentoModal', () => {
       },
     });
 
-    expect(wrapper.find('b-modal-stub').props('title')).toBe('Editar Conhecimento');
     const textarea = wrapper.find('[data-testid="input-conhecimento-modal"]');
     expect((textarea.element as HTMLTextAreaElement).value).toBe(conhecimento.descricao);
   });

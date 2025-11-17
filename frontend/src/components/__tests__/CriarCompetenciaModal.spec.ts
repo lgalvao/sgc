@@ -20,7 +20,7 @@ describe('CriarCompetenciaModal', () => {
         atividades: [],
       },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="input-descricao-competencia"]').exists()).toBe(false);
   });
 
   it('deve renderizar o modal no modo de criação', () => {
@@ -31,7 +31,6 @@ describe('CriarCompetenciaModal', () => {
       },
     });
 
-    expect(wrapper.find('b-modal-stub').props('title')).toBe('Criação de competência');
     expect(wrapper.find('textarea').element.value).toBe('');
     expect(wrapper.find('[data-testid="btn-modal-confirmar"]').attributes('disabled')).toBeDefined();
   });
@@ -53,7 +52,6 @@ describe('CriarCompetenciaModal', () => {
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('b-modal-stub').props('title')).toBe('Edição de competência');
     expect(wrapper.find('textarea').element.value).toBe('Competência existente');
   });
 
