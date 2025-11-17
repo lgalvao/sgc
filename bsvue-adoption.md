@@ -112,3 +112,9 @@ Propomos uma adoção gradual e controlada para minimizar riscos e permitir que 
 ## 5. Conclusão
 
 A adoção da `BootstrapVueNext` representa um investimento inicial em tempo de refatoração, mas com um retorno claro em produtividade, qualidade e manutenibilidade a longo prazo. O plano de adoção gradual permite mitigar os riscos e garantir uma transição suave, alinhando o frontend do SGC com as melhores práticas do ecossistema Vue 3.
+
+## 6. Progresso da Migração
+
+- [x] **Modais (`*Modal.vue`):** Todos os componentes de modal foram migrados para usar o componente `<b-modal>` da `BootstrapVueNext`. O componente `BaseModal.vue` foi removido.
+- [ ] **Tabelas (`Tabela*.vue`):** A migração das tabelas ainda não foi iniciada.
+- [ ] **Formulários e componentes de layout:** A migração dos formulários e outros componentes de layout ainda não foi iniciada.

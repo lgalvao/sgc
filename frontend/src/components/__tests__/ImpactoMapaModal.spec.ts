@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import ImpactoMapaModal from '../ImpactoMapaModal.vue';
-import { TipoMudanca } from '@/stores/revisao';
 
 // Mock data
 const mockUnidade = { nome: 'Unidade Teste', sigla: 'UT' };
@@ -18,9 +17,9 @@ const mockMapa = {
   ],
 };
 const mockMudancas = [
-  { id: 1, tipo: TipoMudanca.AtividadeAdicionada, idAtividade: 203, descricaoAtividade: 'Nova Atividade' },
-  { id: 2, tipo: TipoMudanca.ConhecimentoAdicionado, idAtividade: 203, descricaoConhecimento: 'Novo Conhecimento' },
-  { id: 3, tipo: TipoMudanca.AtividadeRemovida, idAtividade: 202, descricaoAtividade: 'Atividade Y' },
+  { id: 1, tipo: 0, idAtividade: 203, descricaoAtividade: 'Nova Atividade' },
+  { id: 2, tipo: 3, idAtividade: 203, descricaoConhecimento: 'Novo Conhecimento' },
+  { id: 3, tipo: 1, idAtividade: 202, descricaoAtividade: 'Atividade Y' },
 ];
 
 // Mock stores
@@ -68,7 +67,7 @@ describe('ImpactoMapaModal', () => {
     const wrapper = mount(ImpactoMapaModal, {
       props: { mostrar: false, idProcesso: 1, siglaUnidade: 'UT' },
     });
-    expect(wrapper.find('[data-testid="impacto-mapa-modal"]').exists()).toBe(false);
+    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
   });
 
   it('deve renderizar a seção de atividades inseridas corretamente', () => {

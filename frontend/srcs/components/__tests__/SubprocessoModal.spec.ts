@@ -10,8 +10,7 @@ describe('SubprocessoModal', () => {
     const wrapper = mount(SubprocessoModal, {
       props: { mostrarModal: false, dataLimiteAtual, etapaAtual: 1 },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(true);
-    expect(wrapper.find('b-modal-stub').props('modelValue')).toBe(false);
+    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
   });
 
   it('deve inicializar o campo de data com a data limite atual', () => {

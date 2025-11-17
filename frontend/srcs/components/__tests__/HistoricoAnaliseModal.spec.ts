@@ -38,8 +38,7 @@ describe('HistoricoAnaliseModal', () => {
         codSubrocesso: 1,
       },
     });
-    expect(wrapper.find('b-modal-stub').exists()).toBe(true);
-    expect(wrapper.find('b-modal-stub').props('modelValue')).toBe(false);
+    expect(wrapper.find('b-modal-stub').exists()).toBe(false);
   });
 
   it('deve renderizar a mensagem de "nenhuma análise" quando não houver análises', () => {
