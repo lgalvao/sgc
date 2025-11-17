@@ -9,14 +9,6 @@ const unidadesDisponiveis = [
 ];
 
 describe('AcoesEmBlocoModal', () => {
-  const globalComponents = {
-    global: {
-      components: {
-        BFormCheckbox,
-      },
-    },
-  };
-
   it("deve renderizar o título e o botão corretamente para a ação 'aceitar'", () => {
     const wrapper = mount(AcoesEmBlocoModal, {
       props: {
@@ -24,7 +16,6 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
 
     expect(wrapper.find('.table').exists()).toBe(true);
@@ -38,7 +29,6 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'homologar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
 
     expect(wrapper.find('.table').exists()).toBe(true);
@@ -52,7 +42,6 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
 
     await wrapper.setProps({ mostrar: true });
@@ -72,7 +61,6 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
 
     await wrapper.find('[data-testid="btn-modal-cancelar"]').trigger('click');
@@ -86,11 +74,11 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
     await wrapper.setProps({ mostrar: true });
     await wrapper.vm.$nextTick();
-    await wrapper.find('[data-testid="chk-unidade-UND2"]').trigger('click');
+
+    await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
     await wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').trigger('click');
 
     expect(wrapper.emitted()).toHaveProperty('confirmar');
@@ -106,13 +94,12 @@ describe('AcoesEmBlocoModal', () => {
         tipoAcao: 'aceitar',
         unidadesDisponiveis,
       },
-      ...globalComponents,
     });
     await wrapper.setProps({ mostrar: true });
     await wrapper.vm.$nextTick();
 
-    await wrapper.find('[data-testid="chk-unidade-UND1"]').trigger('click');
-    await wrapper.find('[data-testid="chk-unidade-UND2"]').trigger('click');
+    await wrapper.find('[data-testid="chk-unidade-UND1"]').setValue(false);
+    await wrapper.find('[data-testid="chk-unidade-UND2"]').setValue(false);
     await wrapper.find('[data-testid="btn-confirmar-acao-bloco"]').trigger('click');
 
     expect(alertSpy).toHaveBeenCalledWith('Selecione ao menos uma unidade para processar.');

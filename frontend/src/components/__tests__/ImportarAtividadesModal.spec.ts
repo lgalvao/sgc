@@ -51,12 +51,6 @@ describe('ImportarAtividadesModal', () => {
     vi.clearAllMocks();
     wrapper = mount(ImportarAtividadesModal, {
       props: { mostrar: true, codSubrocessoDestino: 999 },
-      global: {
-        components: {
-          BFormSelect,
-          BFormCheckbox,
-        },
-      },
     });
   });
 
@@ -70,15 +64,13 @@ describe('ImportarAtividadesModal', () => {
     expect((importButton.element as HTMLButtonElement).disabled).toBe(true);
 
     // Simulate user selecting a process and unit
-    await wrapper.findComponent(BFormSelect).trigger('update:modelValue', 1);
+    await wrapper.findComponent(BFormSelect).setValue('1');
     await nextTick();
-    await wrapper.findAllComponents(BFormSelect)[1].trigger('update:modelValue', 10);
+    await wrapper.findAllComponents(BFormSelect)[1].setValue('100');
     await nextTick();
 
     // Find and check the checkbox for the activity
-    const checkboxWrapper = wrapper.findComponent(BFormCheckbox);
-    const nativeCheckbox = checkboxWrapper.find('input[type="checkbox"]');
-    await nativeCheckbox.setChecked(true);
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
     await nextTick();
 
     // Now, the button should be enabled
